@@ -80,6 +80,10 @@ class Invoice extends EntityModel implements BalanceAffecting
     /**
      * @var string
      */
+    public static $fieldPONumber = 'po_number';
+    /**
+     * @var string
+     */
     public static $fieldInvoiceDate = 'invoice_date';
     /**
      * @var string
@@ -110,6 +114,7 @@ class Invoice extends EntityModel implements BalanceAffecting
         return [
             Client::$fieldName,
             Invoice::$fieldInvoiceNumber,
+            Invoice::$fieldPONumber,
             Invoice::$fieldInvoiceDate,
             Invoice::$fieldDueDate,
             Invoice::$fieldAmount,
@@ -127,9 +132,11 @@ class Invoice extends EntityModel implements BalanceAffecting
         return [
             'number^po' => 'invoice_number',
             'amount' => 'amount',
-            'organization' => 'name',
+            'client|organization' => 'name',
             'paid^date' => 'paid',
-            'invoice_date|create_date' => 'invoice_date',
+            'invoice date|create date' => 'invoice_date',
+            'po number' => 'po_number',
+            'due date' => 'due_date',
             'terms' => 'terms',
             'notes' => 'notes',
         ];
@@ -426,6 +433,25 @@ class Invoice extends EntityModel implements BalanceAffecting
         return $this->isType(INVOICE_TYPE_STANDARD) && ! $this->is_recurring;
     }
 
+    public function markSentIfUnsent()
+    {
+        if ( ! $this->isSent()) {
+            $this->markSent();
+        }
+    }
+
+    public function markSent()
+    {
+        if ( ! $this->isSent()) {
+            $this->invoice_status_id = INVOICE_STATUS_SENT;
+        }
+
+        $this->is_public = true;
+        $this->save();
+
+        $this->markInvitationsSent();
+    }
+
     /**
      * @param bool $notify
      */
@@ -462,7 +488,7 @@ class Invoice extends EntityModel implements BalanceAffecting
      */
     public function markInvitationSent($invitation, $messageId = false, $notify = true, $notes = false)
     {
-        if (!$this->isSent()) {
+        if ( ! $this->isSent()) {
             $this->invoice_status_id = INVOICE_STATUS_SENT;
             $this->save();
         }
@@ -566,7 +592,7 @@ class Invoice extends EntityModel implements BalanceAffecting
 
     public function canBePaid()
     {
-        return floatval($this->balance) > 0 && ! $this->is_deleted && $this->isInvoice() && $this->is_public;
+        return floatval($this->balance) > 0 && ! $this->is_deleted && $this->isInvoice();
     }
 
     public static function calcStatusLabel($status, $class, $entityType, $quoteInvoiceId)
@@ -667,7 +693,7 @@ class Invoice extends EntityModel implements BalanceAffecting
      */
     public function isSent()
     {
-        return $this->invoice_status_id >= INVOICE_STATUS_SENT;
+        return $this->invoice_status_id >= INVOICE_STATUS_SENT && $this->getOriginal('is_public');
     }
 
     /**
@@ -1265,7 +1291,7 @@ class Invoice extends EntityModel implements BalanceAffecting
         }
 
         foreach ($this->invoice_items as $invoiceItem) {
-            $itemTaxAmount = $this->getItemTaxable($invoiceItem, $taxable);
+            $taxable = $this->getItemTaxable($invoiceItem, $taxable);
 
             if ($invoiceItem->tax_name1) {
                 $itemTaxAmount = round($taxable * ($invoiceItem->tax_rate1 / 100), 2);

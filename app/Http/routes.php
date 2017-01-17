@@ -20,7 +20,6 @@ Route::get('/update', 'AppController@update');
 
 // Public pages
 Route::get('/', 'HomeController@showIndex');
-Route::get('/terms', 'HomeController@showTerms');
 Route::get('/log_error', 'HomeController@logError');
 Route::get('/invoice_now', 'HomeController@invoiceNow');
 Route::get('/keep_alive', 'HomeController@keepAlive');
@@ -134,10 +133,11 @@ Route::group(['middleware' => 'auth:user'], function() {
     Route::get('api/clients', 'ClientController@getDatatable');
     Route::get('api/activities/{client_id?}', 'ActivityController@getDatatable');
     Route::post('clients/bulk', 'ClientController@bulk');
+    Route::get('clients/statement/{client_id}', 'ClientController@statement');
 
     Route::resource('tasks', 'TaskController');
     Route::get('api/tasks/{client_id?}', 'TaskController@getDatatable');
-    Route::get('tasks/create/{client_id?}', 'TaskController@create');
+    Route::get('tasks/create/{client_id?}/{project_id?}', 'TaskController@create');
     Route::post('tasks/bulk', 'TaskController@bulk');
     Route::get('projects', 'ProjectController@index');
     Route::get('api/projects', 'ProjectController@getDatatable');
@@ -204,7 +204,7 @@ Route::group(['middleware' => 'auth:user'], function() {
 
     // Expense
     Route::resource('expenses', 'ExpenseController');
-    Route::get('expenses/create/{vendor_id?}/{client_id?}', 'ExpenseController@create');
+    Route::get('expenses/create/{vendor_id?}/{client_id?}/{category_id?}', 'ExpenseController@create');
     Route::get('api/expenses', 'ExpenseController@getDatatable');
     Route::get('api/expenses/{id}', 'ExpenseController@getDatatableVendor');
     Route::post('expenses/bulk', 'ExpenseController@bulk');
@@ -244,10 +244,12 @@ Route::group([
     Route::post('tax_rates/bulk', 'TaxRateController@bulk');
 
     Route::get('settings/email_preview', 'AccountController@previewEmail');
+    Route::post('settings/client_portal', 'AccountController@saveClientPortalSettings');
+    Route::post('settings/email_settings', 'AccountController@saveEmailSettings');
     Route::get('company/{section}/{subSection?}', 'AccountController@redirectLegacy');
     Route::get('settings/data_visualizations', 'ReportController@d3');
-    Route::get('settings/reports', 'ReportController@showReports');
-    Route::post('settings/reports', 'ReportController@showReports');
+    Route::get('reports', 'ReportController@showReports');
+    Route::post('reports', 'ReportController@showReports');
 
     Route::post('settings/change_plan', 'AccountController@changePlan');
     Route::post('settings/cancel_account', 'AccountController@cancelAccount');

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
 use App\Models\Traits\PresentsInvoice;
 use App\Models\Traits\GeneratesNumbers;
+use App\Models\Traits\SendsEmails;
 
 /**
  * Class Account
@@ -24,6 +25,7 @@ class Account extends Eloquent
     use SoftDeletes;
     use PresentsInvoice;
     use GeneratesNumbers;
+    use SendsEmails;
 
     /**
      * @var string
@@ -82,6 +84,12 @@ class Account extends Eloquent
         'show_accept_quote_terms',
         'require_invoice_signature',
         'require_quote_signature',
+        'pdf_email_attachment',
+        'document_email_attachment',
+        'email_design_id',
+        'enable_email_markup',
+        'domain_id',
+        'payment_terms',
     ];
 
     /**
@@ -109,7 +117,7 @@ class Account extends Eloquent
         ACCOUNT_EMAIL_SETTINGS,
         ACCOUNT_TEMPLATES_AND_REMINDERS,
         ACCOUNT_BANKS,
-        ACCOUNT_REPORTS,
+        //ACCOUNT_REPORTS,
         ACCOUNT_DATA_VISUALIZATIONS,
         ACCOUNT_API_TOKENS,
         ACCOUNT_USER_MANAGEMENT,
@@ -467,6 +475,17 @@ class Account extends Eloquent
     {
         return $this->date_format ? $this->date_format->format : DEFAULT_DATE_FORMAT;
     }
+
+
+    public function getSampleLink()
+    {
+        $invitation = new Invitation();
+        $invitation->account = $this;
+        $invitation->invitation_key = '...';
+
+        return $invitation->getLink();
+    }
+
 
     /**
      * @param $amount
@@ -987,7 +1006,6 @@ class Account extends Eloquent
                     return false;
                 }
                 // Fallthrough
-            case FEATURE_CLIENT_PORTAL_CSS:
             case FEATURE_REMOVE_CREATED_BY:
                 return !empty($planDetails);// A plan is required even for self-hosted users
 
@@ -1549,9 +1567,7 @@ class Account extends Eloquent
             if ($headerFont != $bodyFont) {
                 $css .= 'h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{'.$headerFont.'}';
             }
-        }
-        if ($this->hasFeature(FEATURE_CLIENT_PORTAL_CSS)) {
-            // For self-hosted users, a white-label license is required for custom CSS
+
             $css .= $this->client_view_css;
         }
 
@@ -1699,6 +1715,22 @@ class Account extends Eloquent
         }
 
         return $invoice->isQuote() ? $this->require_quote_signature : $this->require_invoice_signature;
+    }
+
+    public function emailMarkupEnabled()
+    {
+        if ( ! Utils::isNinja()) {
+            return false;
+        }
+
+        return $this->enable_email_markup;
+    }
+
+    public function defaultDueDate()
+    {
+        $numDays = $this->payment_terms == -1 ? 0 : $this->payment_terms;
+
+        return Carbon::now($this->getTimezone())->addDays($numDays)->format('Y-m-d');
     }
 }
 

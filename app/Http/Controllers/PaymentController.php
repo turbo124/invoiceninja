@@ -85,7 +85,6 @@ class PaymentController extends BaseController
     {
         $invoices = Invoice::scope()
                     ->invoices()
-                    ->whereIsPublic(true)
                     ->where('invoices.balance', '>', 0)
                     ->with('client', 'invoice_status')
                     ->orderBy('invoice_number')->get();
@@ -165,8 +164,10 @@ class PaymentController extends BaseController
      */
     public function store(CreatePaymentRequest $request)
     {
-        $input = $request->input();
+        // check payment has been marked sent
+        $request->invoice->markSentIfUnsent();
 
+        $input = $request->input();
         $input['invoice_id'] = Invoice::getPrivateId($input['invoice']);
         $input['client_id'] = Client::getPrivateId($input['client']);
         $payment = $this->paymentRepo->save($input);

@@ -473,6 +473,7 @@
             'tasks' => false,
             'expenses' => false,
             'vendors' => false,
+            'reports' => false,
             'settings' => false,
         ] as $key => $value)
             {!! Form::nav_link($key, $value ?: $key) !!}
@@ -513,6 +514,9 @@
                         'icon' => $module->get('icon', 'th-large'),
                     ])
                 @endforeach
+            @endif
+            @if (Auth::user()->is_admin)
+                @include('partials.navigation_option', ['option' => 'reports'])
             @endif
             @include('partials.navigation_option', ['option' => 'settings'])
             <li style="width:100%;">
@@ -630,7 +634,7 @@
                 {!! Former::checkbox('terms_checkbox')
                     ->label(' ')
                     ->value(1)
-                    ->text(trans('texts.agree_to_terms', ['terms' => '<a href="'.URL::to('terms').'" target="_blank">'.trans('texts.terms_of_service').'</a>']))
+                    ->text(trans('texts.agree_to_terms', ['terms' => '<a href="'.Utils::getTermsLink().'" target="_blank">'.trans('texts.terms_of_service').'</a>']))
                     ->raw() !!}
                 <br/>
             </div>

@@ -149,6 +149,7 @@
 				{!! Former::text('invoice_date')->data_bind("datePicker: invoice_date, valueUpdate: 'afterkeydown'")->label(trans("texts.{$entityType}_date"))
 							->data_date_format(Session::get(SESSION_DATE_PICKER_FORMAT, DEFAULT_DATE_PICKER_FORMAT))->appendIcon('calendar')->addGroupClass('invoice_date') !!}
 				{!! Former::text('due_date')->data_bind("datePicker: due_date, valueUpdate: 'afterkeydown'")->label(trans("texts.{$entityType}_due_date"))
+							->placeholder($invoice->exists ? ' ' : $account->present()->dueDatePlaceholder())
 							->data_date_format(Session::get(SESSION_DATE_PICKER_FORMAT, DEFAULT_DATE_PICKER_FORMAT))->appendIcon('calendar')->addGroupClass('due_date') !!}
 
                 {!! Former::text('partial')->data_bind("value: partial, valueUpdate: 'afterkeydown'")->onkeyup('onPartialChange()')
@@ -246,7 +247,7 @@
 		<thead>
 			<tr>
 				<th style="min-width:32px;" class="hide-border"></th>
-				<th style="min-width:160px">{{ $invoiceLabels['item'] }}</th>
+				<th style="width:25%">{{ $invoiceLabels['item'] }}</th>
 				<th style="width:100%">{{ $invoiceLabels['description'] }}</th>
                 @if ($account->showCustomField('custom_invoice_item_label1'))
                     <th style="min-width:120px">{{ $account->custom_invoice_item_label1 }}</th>
@@ -564,7 +565,7 @@
                     @if (!$invoice->trashed())
                         @if ($invoice->id)
                             {!! DropdownButton::normal(trans('texts.more_actions'))
-                                  ->withContents($actions)
+                                  ->withContents($invoice->present()->moreActions())
                                   ->dropup() !!}
                         @elseif ( ! $invoice->isQuote() && Request::is('*/clone'))
                             {!! Button::normal(trans($invoice->is_recurring ? 'texts.disable_recurring' : 'texts.enable_recurring'))->withAttributes(['id' => 'recurrButton', 'onclick' => 'onRecurrClick()'])->appendIcon(Icon::create('repeat')) !!}

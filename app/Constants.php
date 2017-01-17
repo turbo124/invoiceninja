@@ -3,7 +3,7 @@
 if (!defined('APP_NAME'))
 {
     define('APP_NAME', env('APP_NAME', 'Invoice Ninja'));
-    define('CONTACT_EMAIL', env('MAIL_FROM_ADDRESS'));
+    define('CONTACT_EMAIL', env('MAIL_FROM_ADDRESS', env('MAIL_USERNAME')));
     define('CONTACT_NAME', env('MAIL_FROM_NAME'));
     define('SITE_URL', env('APP_URL'));
 
@@ -292,7 +292,7 @@ if (!defined('APP_NAME'))
     define('NINJA_APP_URL', env('NINJA_APP_URL', 'https://app.invoiceninja.com'));
     define('NINJA_DOCS_URL', env('NINJA_DOCS_URL', 'http://docs.invoiceninja.com/en/latest'));
     define('NINJA_DATE', '2000-01-01');
-    define('NINJA_VERSION', '2.9.3' . env('NINJA_VERSION_SUFFIX'));
+    define('NINJA_VERSION', '3.0.0' . env('NINJA_VERSION_SUFFIX'));
 
     define('SOCIAL_LINK_FACEBOOK', env('SOCIAL_LINK_FACEBOOK', 'https://www.facebook.com/invoiceninja'));
     define('SOCIAL_LINK_TWITTER', env('SOCIAL_LINK_TWITTER', 'https://twitter.com/invoiceninja'));
@@ -464,7 +464,6 @@ if (!defined('APP_NAME'))
     define('FEATURE_MORE_CLIENTS', 'more_clients'); // No trial allowed
 
     // Whitelabel
-    define('FEATURE_CLIENT_PORTAL_CSS', 'client_portal_css');
     define('FEATURE_WHITE_LABEL', 'feature_white_label');
 
     // Enterprise

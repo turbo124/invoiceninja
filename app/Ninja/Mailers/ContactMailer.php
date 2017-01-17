@@ -137,7 +137,7 @@ class ContactMailer extends Mailer
      * @throws \Laracasts\Presenter\Exceptions\PresenterException
      */
     private function sendInvitation(
-        Invitation$invitation,
+        Invitation $invitation,
         Invoice $invoice,
         $body,
         $subject,
@@ -199,7 +199,8 @@ class ContactMailer extends Mailer
             'invoice' => $invoice,
             'documents' => $documentStrings,
             'notes' => $reminder,
-            'bcc_email' => $account->isPro() ? $account->bcc_email : false,
+            'bccEmail' => $account->getBccEmail(),
+            'fromEmail' => $account->getFromEmail(),
         ];
 
         if ($account->attachPDF()) {
@@ -286,7 +287,8 @@ class ContactMailer extends Mailer
             'account' => $account,
             'payment' => $payment,
             'entityType' => ENTITY_INVOICE,
-            'bcc_email' => $account->isPro() ? $account->bcc_email : false,
+            'bccEmail' => $account->getBccEmail(),
+            'fromEmail' => $account->getFromEmail(),
         ];
 
         if ($account->attachPDF()) {

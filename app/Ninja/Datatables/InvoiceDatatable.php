@@ -123,8 +123,8 @@ class InvoiceDatatable extends EntityDatatable
                 function ($model) use ($entityType) {
                     return "javascript:submitForm_{$entityType}('markPaid', {$model->public_id})";
                 },
-                function ($model) {
-                    return $model->balance > 0 && Auth::user()->can('editByOwner', [ENTITY_INVOICE, $model->user_id]);
+                function ($model) use ($entityType) {
+                    return $entityType == ENTITY_INVOICE && $model->balance > 0 && Auth::user()->can('editByOwner', [ENTITY_INVOICE, $model->user_id]);
                 }
             ],
             [
@@ -133,7 +133,7 @@ class InvoiceDatatable extends EntityDatatable
                     return URL::to("payments/create/{$model->client_public_id}/{$model->public_id}");
                 },
                 function ($model) use ($entityType) {
-                    return $model->is_public && $entityType == ENTITY_INVOICE && $model->balance > 0 && Auth::user()->can('create', ENTITY_PAYMENT);
+                    return $entityType == ENTITY_INVOICE && $model->balance > 0 && Auth::user()->can('create', ENTITY_PAYMENT);
                 }
             ],
             [
@@ -180,6 +180,10 @@ class InvoiceDatatable extends EntityDatatable
 
         if ($this->entityType == ENTITY_INVOICE || $this->entityType == ENTITY_QUOTE) {
             $actions[] = \DropdownButton::DIVIDER;
+            $actions[] = [
+                'label' => mtrans($this->entityType, 'email_' . $this->entityType),
+                'url' => 'javascript:submitForm_'.$this->entityType.'("emailInvoice")',
+            ];
             $actions[] = [
                 'label' => mtrans($this->entityType, 'mark_sent'),
                 'url' => 'javascript:submitForm_'.$this->entityType.'("markSent")',

@@ -9,7 +9,6 @@ use Cache;
 use Redirect;
 use DB;
 use URL;
-use DropdownButton;
 use App\Models\Invoice;
 use App\Models\Client;
 use App\Models\Account;
@@ -19,7 +18,7 @@ use App\Models\Payment;
 use App\Models\TaxRate;
 use App\Models\InvoiceDesign;
 use App\Models\Activity;
-use App\Ninja\Mailers\ContactMailer as Mailer;
+use App\Jobs\SendInvoiceEmail;
 use App\Ninja\Repositories\InvoiceRepository;
 use App\Ninja\Repositories\ClientRepository;
 use App\Ninja\Repositories\DocumentRepository;
@@ -33,7 +32,6 @@ use App\Http\Requests\UpdateInvoiceRequest;
 
 class InvoiceController extends BaseController
 {
-    protected $mailer;
     protected $invoiceRepo;
     protected $clientRepo;
     protected $documentRepo;
@@ -42,11 +40,10 @@ class InvoiceController extends BaseController
     protected $recurringInvoiceService;
     protected $entityType = ENTITY_INVOICE;
 
-    public function __construct(Mailer $mailer, InvoiceRepository $invoiceRepo, ClientRepository $clientRepo, InvoiceService $invoiceService, DocumentRepository $documentRepo, RecurringInvoiceService $recurringInvoiceService, PaymentService $paymentService)
+    public function __construct(InvoiceRepository $invoiceRepo, ClientRepository $clientRepo, InvoiceService $invoiceService, DocumentRepository $documentRepo, RecurringInvoiceService $recurringInvoiceService, PaymentService $paymentService)
     {
         // parent::__construct();
 
-        $this->mailer = $mailer;
         $this->invoiceRepo = $invoiceRepo;
         $this->clientRepo = $clientRepo;
         $this->invoiceService = $invoiceService;
@@ -125,46 +122,6 @@ class InvoiceController extends BaseController
             'invoice_settings' => Auth::user()->hasFeature(FEATURE_INVOICE_SETTINGS),
         ];
 
-        $actions = [
-            ['url' => 'javascript:onCloneClick()', 'label' => trans("texts.clone_{$entityType}")],
-            ['url' => URL::to("{$entityType}s/{$entityType}_history/{$invoice->public_id}"), 'label' => trans('texts.view_history')],
-            DropdownButton::DIVIDER
-        ];
-
-        if ($entityType == ENTITY_QUOTE) {
-            if ($invoice->quote_invoice_id) {
-                $actions[] = ['url' => URL::to("invoices/{$invoice->quote_invoice_id}/edit"), 'label' => trans('texts.view_invoice')];
-            } else {
-                $actions[] = ['url' => 'javascript:onConvertClick()', 'label' => trans('texts.convert_to_invoice')];
-            }
-        } elseif ($entityType == ENTITY_INVOICE) {
-            if ($invoice->quote_id) {
-                $actions[] = ['url' => URL::to("quotes/{$invoice->quote_id}/edit"), 'label' => trans('texts.view_quote')];
-            }
-
-            if (!$invoice->is_recurring && $invoice->balance > 0) {
-                $actions[] = ['url' => 'javascript:submitBulkAction("markPaid")', 'label' => trans('texts.mark_paid')];
-                if ($invoice->is_public) {
-                    $actions[] = ['url' => 'javascript:onPaymentClick()', 'label' => trans('texts.enter_payment')];
-                }
-            }
-
-            foreach ($invoice->payments as $payment) {
-                $label = trans('texts.view_payment');
-                if (count($invoice->payments) > 1) {
-                    $label .= ' - ' . $account->formatMoney($payment->amount, $invoice->client);
-                }
-                $actions[] = ['url' => $payment->present()->url, 'label' => $label];
-            }
-        }
-
-        if (count($actions) > 3) {
-            $actions[] = DropdownButton::DIVIDER;
-        }
-
-        $actions[] = ['url' => 'javascript:onArchiveClick()', 'label' => trans("texts.archive_{$entityType}")];
-        $actions[] = ['url' => 'javascript:onDeleteClick()', 'label' => trans("texts.delete_{$entityType}")];
-
         $lastSent = ($invoice->is_recurring && $invoice->last_sent_date) ? $invoice->recurring_invoices->last() : null;
 
         if(!Auth::user()->hasPermission('view_all')){
@@ -182,7 +139,6 @@ class InvoiceController extends BaseController
                 'title' => trans("texts.edit_{$entityType}"),
                 'client' => $invoice->client,
                 'isRecurring' => $invoice->is_recurring,
-                'actions' => $actions,
                 'lastSent' => $lastSent];
         $data = array_merge($data, self::getViewModel($invoice));
 
@@ -459,7 +415,8 @@ class InvoiceController extends BaseController
         if ($invoice->is_recurring) {
             $response = $this->emailRecurringInvoice($invoice);
         } else {
-            $response = $this->mailer->sendInvoice($invoice, false, $pdfUpload);
+            $this->dispatch(new SendInvoiceEmail($invoice, false, $pdfUpload));
+            return true;
         }
 
         if ($response === true) {
@@ -489,7 +446,8 @@ class InvoiceController extends BaseController
         if ($invoice->isPaid()) {
             return true;
         } else {
-            return $this->mailer->sendInvoice($invoice);
+            $this->dispatch(new SendInvoiceEmail($invoice));
+            return true;
         }
     }
 
@@ -521,6 +479,8 @@ class InvoiceController extends BaseController
         if ($count > 0) {
             if ($action == 'markSent') {
                 $key = 'marked_sent_invoice';
+            } elseif ($action == 'emailInvoice') {
+                $key = 'emailed_' . $entityType;
             } elseif ($action == 'markPaid') {
                 $key = 'created_payment';
             } else {
