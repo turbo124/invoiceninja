@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Reports;
 
-use Auth;
-use App\Models\Payment;
 use App\Models\Expense;
+use App\Models\Payment;
+use Auth;
 
 class ProfitAndLossReport extends AbstractReport
 {
@@ -23,7 +23,9 @@ class ProfitAndLossReport extends AbstractReport
         $payments = Payment::scope()
                         ->with('client.contacts')
                         ->withArchived()
-                        ->excludeFailed();
+                        ->excludeFailed()
+                        ->where('payment_date', '>=', $this->startDate)
+                        ->where('payment_date', '<=', $this->endDate);
 
         foreach ($payments->get() as $payment) {
             $client = $payment->client;
@@ -40,10 +42,11 @@ class ProfitAndLossReport extends AbstractReport
             $this->addToTotals($client->currency_id, 'profit', $payment->getCompletedAmount(), $payment->present()->month);
         }
 
-
         $expenses = Expense::scope()
                         ->with('client.contacts')
-                        ->withArchived();
+                        ->withArchived()
+                        ->where('expense_date', '>=', $this->startDate)
+                        ->where('expense_date', '<=', $this->endDate);
 
         foreach ($expenses->get() as $expense) {
             $client = $expense->client;
@@ -55,11 +58,10 @@ class ProfitAndLossReport extends AbstractReport
                 $expense->present()->category,
             ];
 
-            $this->addToTotals($client->currency_id, 'revenue', 0, $expense->present()->month);
-            $this->addToTotals($client->currency_id, 'expenses', $expense->amount, $expense->present()->month);
-            $this->addToTotals($client->currency_id, 'profit', $expense->amount * -1, $expense->present()->month);
+            $this->addToTotals($expense->expense_currency_id, 'revenue', 0, $expense->present()->month);
+            $this->addToTotals($expense->expense_currency_id, 'expenses', $expense->amount, $expense->present()->month);
+            $this->addToTotals($expense->expense_currency_id, 'profit', $expense->amount * -1, $expense->present()->month);
         }
-
 
         //$this->addToTotals($client->currency_id, 'paid', $payment ? $payment->getCompletedAmount() : 0);
         //$this->addToTotals($client->currency_id, 'amount', $invoice->amount);

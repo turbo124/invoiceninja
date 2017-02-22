@@ -26,6 +26,10 @@
 
     @if ($payment)
         {!! Former::populate($payment) !!}
+    @else
+        @if ($account->payment_type_id)
+            {!! Former::populateField('payment_type_id', $account->payment_type_id) !!}
+        @endif
     @endif
 
     <span style="display:none">
@@ -92,6 +96,8 @@
 
 	</center>
 
+    @include('partials/refund_payment')
+
 	{!! Former::close() !!}
 
 	<script type="text/javascript">
@@ -133,6 +139,10 @@
     function submitAction(action) {
         $('#action').val(action);
         $('.main-form').submit();
+    }
+
+    function submitForm_payment(action) {
+        submitAction(action);
     }
 
     function onDeleteClick() {

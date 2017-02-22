@@ -462,7 +462,7 @@ NINJA.invoiceLines = function(invoice) {
         }
         if (!hideQuantity) {
             row.push({style:["cost", rowStyle], text:cost});
-            row.push({style:["quantity", rowStyle], text:qty || ' '});
+            row.push({style:["quantity", rowStyle], text:formatAmount(qty, invoice.client.currency_id) || ' '});
         }
         if (showItemTaxes) {
             var str = ' ';
@@ -486,17 +486,26 @@ NINJA.invoiceLines = function(invoice) {
 }
 
 NINJA.invoiceDocuments = function(invoice) {
-    if(!invoice.account.invoice_embed_documents)return[];
+    if (invoice.account.invoice_embed_documents != '1') {
+        return [];
+    }
+
+    var j = 0;
     var stack = [];
     var stackItem = null;
 
-    var j = 0;
-    for (var i = 0; i < invoice.documents.length; i++)addDoc(invoice.documents[i]);
+    if (invoice.documents) {
+        for (var i = 0; i < invoice.documents.length; i++) {
+            addDoc(invoice.documents[i]);
+        }
+    }
 
-    if(invoice.expenses){
+    if (invoice.expenses) {
         for (var i = 0; i < invoice.expenses.length; i++) {
             var expense = invoice.expenses[i];
-            for (var j = 0; j < expense.documents.length; j++)addDoc(expense.documents[j]);
+            for (var j = 0; j < expense.documents.length; j++) {
+                addDoc(expense.documents[j]);
+            }
         }
     }
 

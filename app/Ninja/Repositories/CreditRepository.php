@@ -1,9 +1,11 @@
-<?php namespace App\Ninja\Repositories;
+<?php
 
+namespace App\Ninja\Repositories;
+
+use App\Models\Client;
+use App\Models\Credit;
 use DB;
 use Utils;
-use App\Models\Credit;
-use App\Models\Client;
 
 class CreditRepository extends BaseRepository
 {
@@ -75,9 +77,15 @@ class CreditRepository extends BaseRepository
                     );
 
         $table = \Datatable::query($query)
-            ->addColumn('credit_date', function ($model) { return Utils::fromSqlDate($model->credit_date); })
-            ->addColumn('amount', function ($model) { return Utils::formatMoney($model->amount, $model->currency_id, $model->country_id); })
-            ->addColumn('balance', function ($model) { return Utils::formatMoney($model->balance, $model->currency_id, $model->country_id); })
+            ->addColumn('credit_date', function ($model) {
+                return Utils::fromSqlDate($model->credit_date);
+            })
+            ->addColumn('amount', function ($model) {
+                return Utils::formatMoney($model->amount, $model->currency_id, $model->country_id);
+            })
+            ->addColumn('balance', function ($model) {
+                return Utils::formatMoney($model->balance, $model->currency_id, $model->country_id);
+            })
             ->make();
 
         return $table;
