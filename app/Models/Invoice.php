@@ -1118,6 +1118,9 @@ class Invoice extends EntityModel implements BalanceAffecting
             case FREQUENCY_MONTHLY:
                 $rule = 'FREQ=MONTHLY;';
                 break;
+            case FREQUENCY_TWO_MONTHS:
+                $rule = 'FREQ=MONTHLY;INTERVAL=2;';
+                break;
             case FREQUENCY_THREE_MONTHS:
                 $rule = 'FREQ=MONTHLY;INTERVAL=3;';
                 break;
@@ -1193,6 +1196,8 @@ class Invoice extends EntityModel implements BalanceAffecting
                 return $daysSinceLastSent >= 28;
             case FREQUENCY_MONTHLY:
                 return $monthsSinceLastSent >= 1;
+            case FREQUENCY_TWO_MONTHS:
+                return $monthsSinceLastSent >= 2;
             case FREQUENCY_THREE_MONTHS:
                 return $monthsSinceLastSent >= 3;
             case FREQUENCY_SIX_MONTHS:
@@ -1258,7 +1263,7 @@ class Invoice extends EntityModel implements BalanceAffecting
 
         if ($this->discount > 0) {
             if ($this->is_amount_discount) {
-                $total -= $invoiceTotal ? ($total / $invoiceTotal * $this->discount) : 0;
+                $total -= $invoiceTotal ? ($total / ($invoiceTotal + $this->discount) * $this->discount) : 0;
             } else {
                 $total *= (100 - $this->discount) / 100;
                 $total = round($total, 2);

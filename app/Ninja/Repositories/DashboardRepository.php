@@ -219,7 +219,7 @@ class DashboardRepository
         if ($startDate) {
             $paidToDate->where('payments.payment_date', '>=', $startDate);
         } elseif ($startDate = $account->financialYearStart()) {
-            $paidToDate->where('payments.payment_date', '>=', $startDate);
+            //$paidToDate->where('payments.payment_date', '>=', $startDate);
         }
 
         return $paidToDate->groupBy('payments.account_id')
@@ -250,7 +250,7 @@ class DashboardRepository
         }
 
         if ($startDate = $account->financialYearStart()) {
-            $averageInvoice->where('invoices.invoice_date', '>=', $startDate);
+            //$averageInvoice->where('invoices.invoice_date', '>=', $startDate);
         }
 
         return $averageInvoice->groupBy('accounts.id')
@@ -336,7 +336,10 @@ class DashboardRepository
                     ->where('invoices.is_deleted', '=', false)
                     ->where('invoices.is_public', '=', true)
                     ->where('contacts.is_primary', '=', true)
-                    ->where('invoices.due_date', '>=', date('Y-m-d'))
+                    ->where(function($query) {
+                        $query->where('invoices.due_date', '>=', date('Y-m-d'))
+                            ->orWhereNull('invoices.due_date');
+                    })
                     ->orderBy('invoices.due_date', 'asc');
 
         if (! $viewAll) {
@@ -393,7 +396,7 @@ class DashboardRepository
         }
 
         if ($startDate = $account->financialYearStart()) {
-            $expenses->where('expenses.expense_date', '>=', $startDate);
+            //$expenses->where('expenses.expense_date', '>=', $startDate);
         }
 
         return $expenses->groupBy('accounts.id')

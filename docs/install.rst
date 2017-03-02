@@ -21,12 +21,15 @@ Automated Installers
 
 - Softaculous ($30): `softaculous.com <https://www.softaculous.com/apps/ecommerce/Invoice_Ninja>`_
 
+Steps to Install
+^^^^^^^^^^^^^^^^
+
 Step 1: Download the code
 """""""""""""""""""""""""
 
 You can either download the zip file below or checkout the code from our GitHub repository. The zip includes all third party libraries whereas using GitHub requires you to use Composer to install the dependencies.
 
-https://download.invoiceninja.com/ninja-v3.0.5.zip
+https://download.invoiceninja.com/ninja-v3.1.0.zip
 
 .. Note:: All Pro and Enterprise features from our hosted app are included in both the zip file and the GitHub repository. We offer a $20 per year white-label license to remove our branding.
 
@@ -63,7 +66,7 @@ Please see these guides for detailed information on configuring Apache or Nginx.
 
 Once you can access the site the initial setup screen will enable you to configure the database and email settings as well as create the initial admin user.
 
-.. Tip:: The best practice to remove public/ from the URL is to map the webroot to the folder, alternatively you can uncomment ``RewriteRule ^(.*)$ public/$1 [L]`` in the .htaccess file.
+.. Tip:: The best practice to remove public/ from the URL is to map the webroot to the /public folder, alternatively you can uncomment ``RewriteRule ^(.*)$ public/$1 [L]`` in the .htaccess file.
 
 Troubleshooting
 ^^^^^^^^^^^^^^^

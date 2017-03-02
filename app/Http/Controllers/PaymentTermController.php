@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentTerm;
 use App\Services\PaymentTermService;
+use Auth;
 use Input;
 use Redirect;
 use Session;
@@ -43,7 +44,9 @@ class PaymentTermController extends BaseController
      */
     public function getDatatable()
     {
-        return $this->paymentTermService->getDatatable();
+        $accountId = Auth::user()->account_id;
+
+        return $this->paymentTermService->getDatatable($accountId);
     }
 
     /**
@@ -109,8 +112,8 @@ class PaymentTermController extends BaseController
             $paymentTerm = PaymentTerm::createNew();
         }
 
-        $paymentTerm->name = trim(Input::get('name'));
         $paymentTerm->num_days = Utils::parseInt(Input::get('num_days'));
+        $paymentTerm->name = 'Net ' . $paymentTerm->num_days;
         $paymentTerm->save();
 
         $message = $publicId ? trans('texts.updated_payment_term') : trans('texts.created_payment_term');
