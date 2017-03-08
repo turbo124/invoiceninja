@@ -268,6 +268,7 @@ class AppController extends BaseController
         if (! Utils::isNinjaProd()) {
             try {
                 set_time_limit(60 * 5);
+                $this->checkInnoDB();
                 Artisan::call('clear-compiled');
                 Artisan::call('cache:clear');
                 Artisan::call('debugbar:clear');
@@ -303,6 +304,29 @@ class AppController extends BaseController
         return Redirect::to('/');
     }
 
+    // MySQL changed the default table type from MyISAM to InnoDB
+    // We need to make sure all tables are InnoDB to prevent migration failures
+    public function checkInnoDB()
+    {
+        $result = DB::select("SELECT engine
+                    FROM information_schema.TABLES
+                    WHERE TABLE_NAME='clients' AND TABLE_SCHEMA='ninja'");
+
+        if (count($result) && $result[0]->engine == 'InnoDB') {
+            return;
+        }
+
+        $tables = DB::select('SHOW TABLES');
+        $sql = "SET sql_mode = 'ALLOW_INVALID_DATES';\n";
+
+        foreach($tables as $table) {
+            $fieldName = 'Tables_in_' . env('DB_DATABASE');
+            $sql .= "ALTER TABLE {$table->$fieldName} engine=InnoDB;\n";
+        }
+
+        DB::unprepared($sql);
+    }
+
     public function emailBounced()
     {
         $messageId = Input::get('MessageID');
@@ -318,6 +342,16 @@ class AppController extends BaseController
         return $this->emailService->markOpened($messageId) ? RESULT_SUCCESS : RESULT_FAILURE;
 
         return RESULT_SUCCESS;
+    }
+
+    public function checkData()
+    {
+        try {
+            Artisan::call('ninja:check-data');
+            return RESULT_SUCCESS;
+        } catch (Exception $exception) {
+            return RESULT_FAILURE;
+        }
     }
 
     public function stats()

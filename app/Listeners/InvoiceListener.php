@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use Illuminate\Queue\Events\JobExceptionOccurred;
 use App\Events\InvoiceInvitationWasViewed;
 use App\Events\InvoiceWasCreated;
 use App\Events\InvoiceWasUpdated;
@@ -148,5 +149,18 @@ class InvoiceListener
 
         $invoice->updateBalances($adjustment);
         $invoice->updatePaidStatus();
+    }
+
+    public function jobFailed(JobExceptionOccurred $exception)
+    {
+        if ($errorEmail = env('ERROR_EMAIL')) {
+            \Mail::raw(print_r($exception->data, true), function ($message) use ($errorEmail) {
+                $message->to($errorEmail)
+                        ->from(CONTACT_EMAIL)
+                        ->subject('Job failed');
+            });
+        }
+
+        Utils::logError($exception->exception);
     }
 }

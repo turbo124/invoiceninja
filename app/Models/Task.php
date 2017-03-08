@@ -196,7 +196,7 @@ class Task extends EntityModel
     public function getDisplayName()
     {
         if ($this->description) {
-            return mb_strimwidth($this->description, 0, 16, '...');
+            return Utils::truncateString($this->description, 16);
         }
 
         return '#' . $this->public_id;
@@ -205,7 +205,7 @@ class Task extends EntityModel
     public function scopeDateRange($query, $startDate, $endDate)
     {
         $query->whereRaw('cast(substring(time_log, 3, 10) as unsigned) >= ' . $startDate->format('U'));
-        $query->whereRaw('cast(substring(time_log, 3, 10) as unsigned) <= ' . $endDate->format('U'));
+        $query->whereRaw('cast(substring(time_log, 3, 10) as unsigned) <= ' . $endDate->modify('+1 day')->format('U'));
 
         return $query;
     }

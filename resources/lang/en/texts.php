@@ -791,7 +791,7 @@ $LANG = array(
     'default_invoice_footer' => 'Default Invoice Footer',
     'quote_footer' => 'Quote Footer',
     'free' => 'Free',
-    'quote_is_approved' => 'This quote is approved',
+    'quote_is_approved' => 'The quote has been approved',
     'apply_credit' => 'Apply Credit',
     'system_settings' => 'System Settings',
     'archive_token' => 'Archive Token',
@@ -2395,6 +2395,8 @@ $LANG = array(
     'create_project' => 'Create project',
     'create_vendor' => 'Create vendor',
     'create_expense_category' => 'Create category',
+    'pro_plan_reports' => ':link to enable reports by joining the Pro Plan',
+    'mark_ready' => 'Mark Ready',
 
 );
 

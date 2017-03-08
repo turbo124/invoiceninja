@@ -71,7 +71,10 @@ Route::post('signup/submit', 'AccountController@submitSignup');
 
 Route::get('/auth/{provider}', 'Auth\AuthController@authLogin');
 Route::get('/auth_unlink', 'Auth\AuthController@authUnlink');
-Route::match(['GET', 'POST'], '/buy_now/{gateway_type?}', 'OnlinePaymentController@handleBuyNow');
+
+Route::group(['middleware' => 'cors'], function () {
+    Route::match(['GET', 'POST', 'OPTIONS'], '/buy_now/{gateway_type?}', 'OnlinePaymentController@handleBuyNow');
+});
 
 Route::post('/hook/email_bounced', 'AppController@emailBounced');
 Route::post('/hook/email_opened', 'AppController@emailOpened');
@@ -108,6 +111,10 @@ if (Utils::isNinja()) {
 
 if (Utils::isReseller()) {
     Route::post('/reseller_stats', 'AppController@stats');
+}
+
+if (Utils::isTravis()) {
+    Route::get('/check_data', 'AppController@checkData');
 }
 
 Route::group(['middleware' => 'auth:user'], function () {
@@ -301,11 +308,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'api/v1'], function () {
     Route::put('accounts', 'AccountApiController@update');
     Route::resource('clients', 'ClientApiController');
     Route::get('quotes', 'QuoteApiController@index');
-    Route::get('invoices', 'InvoiceApiController@index');
     Route::get('download/{invoice_id}', 'InvoiceApiController@download');
     Route::resource('invoices', 'InvoiceApiController');
     Route::resource('payments', 'PaymentApiController');
-    Route::get('tasks', 'TaskApiController@index');
     Route::resource('tasks', 'TaskApiController');
     Route::post('hooks', 'IntegrationController@subscribe');
     Route::post('email_invoice', 'InvoiceApiController@emailInvoice');

@@ -1220,6 +1220,10 @@ class Invoice extends EntityModel implements BalanceAffecting
             return false;
         }
 
+        if (Utils::isTravis()) {
+            return false;
+        }
+
         $invitation = $this->invitations[0];
         $link = $invitation->getLink('view', true);
         $pdfString = false;
@@ -1237,18 +1241,21 @@ class Invoice extends EntityModel implements BalanceAffecting
 
             $pdfString = strip_tags($pdfString);
         } catch (\Exception $exception) {
-            Utils::logError("PhantomJS - Failed to create pdf: {$exception->getMessage()}");
-
+            Utils::logError("PhantomJS - Failed to load: {$exception->getMessage()}");
             return false;
         }
 
         if (! $pdfString || strlen($pdfString) < 200) {
-            Utils::logError("PhantomJS - Failed to create pdf: {$pdfString}");
-
+            Utils::logError("PhantomJS - Invalid response: {$pdfString}");
             return false;
         }
 
-        return Utils::decodePDF($pdfString);
+        if ($pdf = Utils::decodePDF($pdfString)) {
+            return $pdf;
+        } else {
+            Utils::logError("PhantomJS - Unable to decode: {$pdfString}");
+            return false;
+        }
     }
 
     /**
@@ -1266,11 +1273,10 @@ class Invoice extends EntityModel implements BalanceAffecting
                 $total -= $invoiceTotal ? ($total / ($invoiceTotal + $this->discount) * $this->discount) : 0;
             } else {
                 $total *= (100 - $this->discount) / 100;
-                $total = round($total, 2);
             }
         }
 
-        return $total;
+        return round($total, 2);
     }
 
     /**
@@ -1331,16 +1337,16 @@ class Invoice extends EntityModel implements BalanceAffecting
         }
 
         foreach ($this->invoice_items as $invoiceItem) {
-            $taxable = $this->getItemTaxable($invoiceItem, $taxable);
+            $itemTaxable = $this->getItemTaxable($invoiceItem, $taxable);
 
             if ($invoiceItem->tax_name1) {
-                $itemTaxAmount = round($taxable * ($invoiceItem->tax_rate1 / 100), 2);
+                $itemTaxAmount = round($itemTaxable * ($invoiceItem->tax_rate1 / 100), 2);
                 $itemPaidAmount = floatval($this->amount) && $itemTaxAmount ? ($paidAmount / $this->amount * $itemTaxAmount) : 0;
                 $this->calculateTax($taxes, $invoiceItem->tax_name1, $invoiceItem->tax_rate1, $itemTaxAmount, $itemPaidAmount);
             }
 
             if ($invoiceItem->tax_name2) {
-                $itemTaxAmount = round($taxable * ($invoiceItem->tax_rate2 / 100), 2);
+                $itemTaxAmount = round($itemTaxable * ($invoiceItem->tax_rate2 / 100), 2);
                 $itemPaidAmount = floatval($this->amount) && $itemTaxAmount ? ($paidAmount / $this->amount * $itemTaxAmount) : 0;
                 $this->calculateTax($taxes, $invoiceItem->tax_name2, $invoiceItem->tax_rate2, $itemTaxAmount, $itemPaidAmount);
             }

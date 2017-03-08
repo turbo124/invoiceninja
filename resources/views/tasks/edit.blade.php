@@ -115,17 +115,17 @@
                             <td style="padding: 0px 12px 12px 0 !important">
                                 <div data-bind="css: { 'has-error': !isStartValid() }">
                                     <input type="text" data-bind="dateTimePicker: startTime.pretty, event:{ change: $root.refresh }"
-                                        class="form-control time-input" placeholder="{{ trans('texts.start_time') }}"/>
+                                        class="form-control time-input time-input-start" placeholder="{{ trans('texts.start_time') }}"/>
                                 </div>
                             </td>
                             <td style="padding: 0px 12px 12px 0 !important">
                                 <div data-bind="css: { 'has-error': !isEndValid() }">
                                     <input type="text" data-bind="dateTimePicker: endTime.pretty, event:{ change: $root.refresh }"
-                                        class="form-control time-input" placeholder="{{ trans('texts.end_time') }}"/>
+                                        class="form-control time-input time-input-end" placeholder="{{ trans('texts.end_time') }}"/>
                                 </div>
                             </td>
-                            <td style="width:100px">
-                                <div data-bind="text: duration.pretty, visible: !isEmpty()"></div>
+                            <td style="padding: 0px 12px 12px 0 !important; width:100px">
+                                <input type="text" data-bind="value: duration.pretty, visible: !isEmpty()" class="form-control"></div>
                                 <a href="#" data-bind="click: function() { setNow(), $root.refresh() }, visible: isEmpty()">{{ trans('texts.set_now') }}</a>
                             </td>
                             <td style="width:30px" class="td-icon">
@@ -208,6 +208,13 @@
                 $(element).datetimepicker({
                     value: current_time
                 });
+                // set end to an hour after the start time
+                if ($(element).hasClass('time-input-start')) {
+                    var timeModel = ko.dataFor(element);
+                    if (!timeModel.endTime()) {
+                        timeModel.endTime((current_time.getTime() / 1000));
+                    }
+                }
             },
             dayOfWeekStart: {{ Session::get('start_of_week') }}
          });
@@ -219,7 +226,9 @@
       },
       update: function (element, valueAccessor) {
         var value = ko.utils.unwrapObservable(valueAccessor());
-        if (value) $(element).val(value);
+        if (value) {
+            $(element).val(value);
+        }
       }
     }
 
@@ -341,23 +350,27 @@
             self.endTime(moment.tz(timezone).unix());
         }
 
-        self.duration.pretty = ko.computed(function() {
-            var duration = false;
-            var start = self.startTime();
-            var end = self.endTime();
+        self.duration.pretty = ko.computed({
+            read: function() {
+                var duration = false;
+                var start = self.startTime();
+                var end = self.endTime();
 
-            if (start && end) {
-                var duration = end - start;
+                if (start && end) {
+                    var duration = end - start;
+                }
+
+                var duration = moment.duration(duration * 1000);
+                return Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(":mm:ss")
+            },
+            write: function(data) {
+                self.endTime(self.startTime() + convertToSeconds(data));
             }
-
-            var duration = moment.duration(duration * 1000);
-            return Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(":mm:ss")
-        }, self);
+        });
 
         /*
-        self.isEmpty = function() {
-            return false;
-        };
+        self.duration.pretty = ko.computed(function() {
+        }, self);
         */
 
         self.hideActions = function() {
@@ -367,6 +380,17 @@
         self.showActions = function() {
             self.actionsVisible(true);
         };
+    }
+
+    function convertToSeconds(str) {
+        if (!str) {
+            return 0;
+        }
+        if (str.indexOf(':') >= 0) {
+            return moment.duration(str).asSeconds();
+        } else {
+            return parseFloat(str) * 60 * 60;
+        }
     }
 
     function loadTimeLog(data) {
@@ -442,34 +466,35 @@
     window.model = new ViewModel({!! $task !!});
     ko.applyBindings(model);
 
-    $(function() {
-        @if (!$task && !$clientPublicId)
-            $('.client-select input.form-control').focus();
-        @else
-            $('#description').focus();
-        @endif
+    function onTaskTypeChange() {
+        var val = $('input[name=task_type]:checked').val();
+        if (val == 'timer') {
+            $('#datetime-details').hide();
+        } else {
+            $('#datetime-details').fadeIn();
+        }
+        setButtonsVisible();
+        if (isStorageSupported()) {
+            localStorage.setItem('last:task_type', val);
+        }
+    }
 
-        $('input[type=radio]').change(function(event) {
-            var val = $(event.target).val();
-            if (val == 'timer') {
-                $('#datetime-details').hide();
-            } else {
-                $('#datetime-details').fadeIn();
-            }
-            setButtonsVisible();
+    function setButtonsVisible() {
+        var val = $('input[name=task_type]:checked').val();
+        if (val == 'timer') {
+            $('#start-button').show();
+            $('#save-button').hide();
+        } else {
+            $('#start-button').hide();
+            $('#save-button').show();
+        }
+    }
+
+    $(function() {
+        $('input[type=radio]').change(function() {
+            onTaskTypeChange();
         })
 
-        function setButtonsVisible() {
-            //model.removeItems();
-            var val = $('input[name=task_type]:checked').val();
-            if (val == 'timer') {
-                $('#start-button').show();
-                $('#save-button').hide();
-            } else {
-                $('#start-button').hide();
-                $('#save-button').show();
-            }
-        }
         setButtonsVisible();
 
         $('#start-button').click(function() {
@@ -546,9 +571,7 @@
           var clientId = $('input[name=client]').val();
           var projectId = $('input[name=project_id]').val();
           var project = projectMap[projectId];
-          if (projectId == '-1') {
-            e.preventDefault();return;
-          } else if (project && ((project.client && project.client.public_id == clientId) || !project.client)) {
+          if (project && ((project.client && project.client.public_id == clientId) || !project.client)) {
             e.preventDefault();return;
           }
           setComboboxValue($('.project-select'), '', '');
@@ -556,7 +579,9 @@
           $projectCombobox.find('option').remove().end().combobox('refresh');
           $projectCombobox.append(new Option('', ''));
           @if (Auth::user()->can('create', ENTITY_PROJECT))
-            $projectCombobox.append(new Option("{{ trans('texts.create_project')}}: $name", '-1'));
+            if (clientId) {
+                $projectCombobox.append(new Option("{{ trans('texts.create_project')}}: $name", '-1'));
+            }
           @endif
           var list = clientId ? (projectsForClientMap.hasOwnProperty(clientId) ? projectsForClientMap[clientId] : []).concat(projectsForAllClients) : projects;
           for (var i=0; i<list.length; i++) {
@@ -595,6 +620,20 @@
         } else {
            $clientSelect.trigger('change');
         }
+
+        @if (!$task)
+            var taskType = localStorage.getItem('last:task_type');
+            if (taskType) {
+                $('input[name=task_type][value='+taskType+']').prop('checked', true);
+                onTaskTypeChange();
+            }
+        @endif
+
+        @if (!$task && !$clientPublicId)
+            $('.client-select input.form-control').focus();
+        @else
+            $('#description').focus();
+        @endif
     });
 
     </script>
