@@ -98,6 +98,10 @@ class OnlinePaymentController extends BaseController
 
         $paymentDriver = $account->paymentDriver($invitation, $gatewayTypeId);
 
+        if (! $paymentDriver) {
+            return redirect()->to('view/' . $invitation->invitation_key);
+        }
+
         try {
             return $paymentDriver->startPurchase(Input::all(), $sourceId);
         } catch (Exception $exception) {
@@ -277,7 +281,7 @@ class OnlinePaymentController extends BaseController
 
             return response()->json(['message' => $result]);
         } catch (Exception $exception) {
-            Utils::logError($exception->getMessage(), 'PHP');
+            //Utils::logError($exception->getMessage(), 'PHP');
 
             return response()->json(['message' => $exception->getMessage()], 500);
         }
@@ -327,7 +331,7 @@ class OnlinePaymentController extends BaseController
                 'currency_id' => $account->currency_id,
                 'contact' => Input::all(),
             ];
-            $client = $clientRepo->save($data);
+            $client = $clientRepo->save($data, $client);
         }
 
         $data = [
@@ -360,9 +364,15 @@ class OnlinePaymentController extends BaseController
         }
 
         if ($gatewayTypeAlias) {
-            return redirect()->to($invitation->getLink('payment') . "/{$gatewayTypeAlias}");
+            $link = $invitation->getLink('payment') . "/{$gatewayTypeAlias}";
         } else {
-            return redirect()->to($invitation->getLink());
+            $link = $invitation->getLink();
+        }
+
+        if (filter_var(Input::get('return_link'), FILTER_VALIDATE_BOOLEAN)) {
+            return $link;
+        } else {
+            return redirect()->to($link);
         }
     }
 }

@@ -130,7 +130,7 @@ Route::group(['middleware' => 'auth:user'], function () {
 
     Route::get('settings/user_details', 'AccountController@showUserDetails');
     Route::post('settings/user_details', 'AccountController@saveUserDetails');
-    Route::post('settings/payment_gateway_limits', 'AccountController@savePaymentGatewayLimits');
+    Route::post('settings/payment_gateway_limits', 'AccountGatewayController@savePaymentGatewayLimits');
     Route::post('users/change_password', 'UserController@changePassword');
 
     Route::resource('clients', 'ClientController');
@@ -307,6 +307,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'api/v1'], function () {
     Route::get('accounts', 'AccountApiController@show');
     Route::put('accounts', 'AccountApiController@update');
     Route::resource('clients', 'ClientApiController');
+    Route::resource('contacts', 'ContactApiController');
     Route::get('quotes', 'QuoteApiController@index');
     Route::get('download/{invoice_id}', 'InvoiceApiController@download');
     Route::resource('invoices', 'InvoiceApiController');
@@ -360,6 +361,9 @@ Route::get('/feed', function () {
 });
 Route::get('/comments/feed', function () {
     return Redirect::to(NINJA_WEB_URL.'/comments/feed', 301);
+});
+Route::get('/terms', function () {
+    return Redirect::to(NINJA_WEB_URL.'/terms', 301);
 });
 
 /*

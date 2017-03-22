@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\AccountGatewaySettings;
 use App\Models\AccountGateway;
 use App\Models\Gateway;
 use App\Services\AccountGatewayService;
@@ -130,6 +131,10 @@ class AccountGatewayController extends BaseController
         $account->load('account_gateways');
         $currentGateways = $account->account_gateways;
         $gateways = Gateway::where('payment_library_id', '=', 1)->orderBy('name')->get();
+
+        if ($accountGateway) {
+            $accountGateway->fields = [];
+        }
 
         foreach ($gateways as $gateway) {
             $fields = $gateway->getFields();
@@ -501,4 +506,33 @@ class AccountGatewayController extends BaseController
 
         return Redirect::to("gateways/{$accountGateway->public_id}/edit");
     }
+
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function savePaymentGatewayLimits()
+    {
+        $gateway_type_id = intval(Input::get('gateway_type_id'));
+        $gateway_settings = AccountGatewaySettings::scope()->where('gateway_type_id', '=', $gateway_type_id)->first();
+
+        if (! $gateway_settings) {
+            $gateway_settings = AccountGatewaySettings::createNew();
+            $gateway_settings->gateway_type_id = $gateway_type_id;
+        }
+
+        $gateway_settings->min_limit = Input::get('limit_min_enable') ? intval(Input::get('limit_min')) : null;
+        $gateway_settings->max_limit = Input::get('limit_max_enable') ? intval(Input::get('limit_max')) : null;
+
+        if ($gateway_settings->max_limit !== null && $gateway_settings->min_limit > $gateway_settings->max_limit) {
+            $gateway_settings->max_limit = $gateway_settings->min_limit;
+        }
+
+        $gateway_settings->fill(Input::all());
+        $gateway_settings->save();
+
+        Session::flash('message', trans('texts.updated_settings'));
+
+        return Redirect::to('settings/' . ACCOUNT_PAYMENTS);
+    }
+
 }

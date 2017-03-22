@@ -59,12 +59,14 @@ If you require contacts to enter a password to see their invoice you'll need to 
 
 You can install PhantomJS to generate the PDF locally, to enable it add ``PHANTOMJS_BIN_PATH=/usr/local/bin/phantomjs``.
 
+We suggest using version >= 2.1.1, users have reported seeing 'Error: 0' with older versions.
+
 .. TIP:: To determine the path you can run ``which phantomjs`` from the command line.
 
 Custom Fonts
 """"""""""""
 
-Follow these steps to add custom ttf fonts: ie, Google fonts
+Follow these steps to add custom ttf fonts: ie, `Google fonts <https://www.google.com/get/noto/>`_
 
 - Create a new folder in ``public/fonts/invoice-fonts/`` and copy over the ttf files
 - Run ``grunt dump_dir``

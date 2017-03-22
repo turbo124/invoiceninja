@@ -132,6 +132,12 @@ class BasePaymentDriver
             return redirect()->to('view/' . $this->invitation->invitation_key);
         }
 
+        if (! $this->isGatewayType(GATEWAY_TYPE_TOKEN)) {
+            // apply gateway fees
+            $invoicRepo = app('App\Ninja\Repositories\InvoiceRepository');
+            $invoicRepo->setGatewayFee($this->invoice(), $this->gatewayType);
+        }
+
         if ($this->isGatewayType(GATEWAY_TYPE_TOKEN) || $gateway->is_offsite) {
             if (Session::has('error')) {
                 Session::reflash();
@@ -263,6 +269,9 @@ class BasePaymentDriver
                     ->firstOrFail();
             }
 
+            $invoicRepo = app('App\Ninja\Repositories\InvoiceRepository');
+            $invoicRepo->setGatewayFee($this->invoice(), $paymentMethod->payment_type->gateway_type_id);
+
             if (! $this->meetsGatewayTypeLimits($paymentMethod->payment_type->gateway_type_id)) {
                 // The customer must have hacked the URL
                 Session::flash('error', trans('texts.limits_not_met'));
@@ -360,7 +369,7 @@ class BasePaymentDriver
     {
         $invoice = $this->invoice();
         $gatewayTypeAlias = $this->gatewayType == GATEWAY_TYPE_TOKEN ? $this->gatewayType : GatewayType::getAliasFromId($this->gatewayType);
-        $completeUrl = url('complete/' . $this->invitation->invitation_key . '/' . $gatewayTypeAlias);
+        $completeUrl = $this->invitation->getLink('complete', true) . '/' . $gatewayTypeAlias;
 
         $data = [
             'amount' => $invoice->getRequestedAmount(),
@@ -846,6 +855,8 @@ class BasePaymentDriver
                 $label = trans('texts.payment_type_on_file', ['type' => $paymentMethod->payment_type->name]);
             }
 
+            $label .= $this->invoice()->present()->gatewayFee($paymentMethod->payment_type->gateway_type_id);
+
             $links[] = [
                 'url' => $url,
                 'label' => $label,
@@ -878,6 +889,8 @@ class BasePaymentDriver
                 $label = trans("texts.{$gatewayTypeAlias}");
             }
 
+            $label .= $this->invoice()->present()->gatewayFee($gatewayTypeId);
+
             $links[] = [
                 'gatewayTypeId' => $gatewayTypeId,
                 'url' => $url,
@@ -886,6 +899,11 @@ class BasePaymentDriver
         }
 
         return $links;
+    }
+
+    public function supportsGatewayType($gatewayTypeId)
+    {
+        return in_array($gatewayTypeId, $this->gatewayTypes());
     }
 
     protected function meetsGatewayTypeLimits($gatewayTypeId)
