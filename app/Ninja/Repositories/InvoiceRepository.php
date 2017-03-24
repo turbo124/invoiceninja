@@ -68,9 +68,11 @@ class InvoiceRepository extends BaseRepository
                 'invoices.public_id',
                 'invoices.amount',
                 'invoices.balance',
-                'invoices.invoice_date as date',
-                'invoices.due_date',
-                'invoices.due_date as valid_until',
+                'invoices.invoice_date',
+                'invoices.due_date as due_date_sql',
+                DB::raw("CONCAT(invoices.invoice_date, invoices.created_at) as date"),
+                DB::raw("CONCAT(invoices.due_date, invoices.created_at) as due_date"),
+                DB::raw("CONCAT(invoices.due_date, invoices.created_at) as valid_until"),
                 'invoice_statuses.name as status',
                 'invoice_statuses.name as invoice_status_name',
                 'contacts.first_name',
@@ -153,10 +155,12 @@ class InvoiceRepository extends BaseRepository
                         'invoices.public_id',
                         'invoices.amount',
                         'frequencies.name as frequency',
-                        'invoices.start_date',
-                        'invoices.end_date',
-                        'invoices.last_sent_date',
-                        'invoices.last_sent_date as last_sent',
+                        'invoices.start_date as start_date_sql',
+                        'invoices.end_date as end_date_sql',
+                        'invoices.last_sent_date as last_sent_date_sql',
+                        DB::raw("CONCAT(invoices.start_date, invoices.created_at) as start_date"),
+                        DB::raw("CONCAT(invoices.end_date, invoices.created_at) as end_date"),
+                        DB::raw("CONCAT(invoices.last_sent_date, invoices.created_at) as last_sent"),
                         'contacts.first_name',
                         'contacts.last_name',
                         'contacts.email',
@@ -167,6 +171,7 @@ class InvoiceRepository extends BaseRepository
                         'invoices.invoice_status_id',
                         'invoices.balance',
                         'invoices.due_date',
+                        'invoices.due_date as due_date_sql',
                         'invoices.is_recurring',
                         'invoices.quote_invoice_id'
                     );
@@ -678,6 +683,46 @@ class InvoiceRepository extends BaseRepository
             $invoiceItem->fill($item);
 
             $invoice->invoice_items()->save($invoiceItem);
+        }
+
+        $invoice = $this->saveInvitations($invoice);
+
+        return $invoice;
+    }
+
+    private function saveInvitations($invoice)
+    {
+        $client = $invoice->client;
+        $client->load('contacts');
+        $sendInvoiceIds = [];
+
+        foreach ($client->contacts as $contact) {
+            if ($contact->send_invoice) {
+                $sendInvoiceIds[] = $contact->id;
+            }
+        }
+
+        // if no contacts are selected auto-select the first to enusre there's an invitation
+        if (! count($sendInvoiceIds)) {
+            $sendInvoiceIds[] = $client->contacts[0]->id;
+        }
+
+        foreach ($client->contacts as $contact) {
+            $invitation = Invitation::scope()->whereContactId($contact->id)->whereInvoiceId($invoice->id)->first();
+
+            if (in_array($contact->id, $sendInvoiceIds) && ! $invitation) {
+                $invitation = Invitation::createNew();
+                $invitation->invoice_id = $invoice->id;
+                $invitation->contact_id = $contact->id;
+                $invitation->invitation_key = str_random(RANDOM_KEY_LENGTH);
+                $invitation->save();
+            } elseif (! in_array($contact->id, $sendInvoiceIds) && $invitation) {
+                $invitation->delete();
+            }
+        }
+
+        if ($invoice->is_public && ! $invoice->areInvitationsSent()) {
+            $invoice->markInvitationsSent();
         }
 
         return $invoice;

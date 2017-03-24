@@ -39,6 +39,10 @@ trait GeneratesNumbers
                 $number = $prefix . str_pad($counter, $this->invoice_number_padding, '0', STR_PAD_LEFT);
             }
 
+            if ($entity->recurring_invoice_id) {
+                $number = $this->recurring_invoice_number_prefix . $number;
+            }
+
             if ($entity->isEntityType(ENTITY_CLIENT)) {
                 $check = Client::scope(false, $this->id)->whereIdNumber($number)->withTrashed()->first();
             } else {
@@ -64,10 +68,6 @@ trait GeneratesNumbers
                 $this->invoice_number_counter += $counterOffset - 1;
                 $this->save();
             }
-        }
-
-        if ($entity->recurring_invoice_id) {
-            $number = $this->recurring_invoice_number_prefix . $number;
         }
 
         return $number;
@@ -125,7 +125,7 @@ trait GeneratesNumbers
     {
         $pattern = $invoice->invoice_type_id == INVOICE_TYPE_QUOTE ? $this->quote_number_pattern : $this->invoice_number_pattern;
 
-        return strstr($pattern, '$custom') || strstr($pattern, '$idNumber');
+        return strstr($pattern, '$client') !== false || strstr($pattern, '$idNumber') !== false;
     }
 
     /**
@@ -161,16 +161,13 @@ trait GeneratesNumbers
         if (count($matches) > 1) {
             $format = $matches[1];
             $search[] = $matches[0];
-            //$date = date_create()->format($format);
-            $date = Carbon::now(session(SESSION_TIMEZONE, DEFAULT_TIMEZONE))->format($format);
+            $date = date_create()->format($format);
+            //$date = Carbon::now(session(SESSION_TIMEZONE, DEFAULT_TIMEZONE))->format($format);
             $replace[] = str_replace($format, $date, $matches[1]);
         }
 
         $pattern = str_replace($search, $replace, $pattern);
-
-        if ($entity->client_id) {
-            $pattern = $this->getClientInvoiceNumber($pattern, $entity);
-        }
+        $pattern = $this->getClientInvoiceNumber($pattern, $entity);
 
         return $pattern;
     }
@@ -183,7 +180,7 @@ trait GeneratesNumbers
      */
     private function getClientInvoiceNumber($pattern, $invoice)
     {
-        if (! $invoice->client) {
+        if (! $invoice->client_id) {
             return $pattern;
         }
 
@@ -191,12 +188,22 @@ trait GeneratesNumbers
             '{$custom1}',
             '{$custom2}',
             '{$idNumber}',
+            '{$clientCustom1}',
+            '{$clientCustom2}',
+            '{$clientIdNumber}',
+            '{$clientInvoiceCounter}',
+            '{$clientQuoteCounter}',
         ];
 
         $replace = [
             $invoice->client->custom_value1,
             $invoice->client->custom_value2,
             $invoice->client->id_number,
+            $invoice->client->custom_value1, // backwards compatibility
+            $invoice->client->custom_value2,
+            $invoice->client->id_number,
+            str_pad($invoice->client->invoice_number_counter, $this->invoice_number_padding, '0', STR_PAD_LEFT),
+            str_pad($invoice->client->quote_number_counter, $this->invoice_number_padding, '0', STR_PAD_LEFT),
         ];
 
         return str_replace($search, $replace, $pattern);
@@ -225,7 +232,9 @@ trait GeneratesNumbers
      */
     public function previewNextInvoiceNumber($entityType = ENTITY_INVOICE)
     {
-        $invoice = $this->createInvoice($entityType);
+        $client = \App\Models\Client::scope()->first();
+
+        $invoice = $this->createInvoice($entityType, $client ? $client->id : 0);
 
         return $this->getNextNumber($invoice);
     }
@@ -239,13 +248,41 @@ trait GeneratesNumbers
             if ($this->client_number_counter) {
                 $this->client_number_counter += 1;
             }
-        } elseif ($entity->isType(INVOICE_TYPE_QUOTE) && ! $this->share_counter) {
-            $this->quote_number_counter += 1;
-        } else {
-            $this->invoice_number_counter += 1;
+            $this->save();
+            return;
         }
 
-        $this->save();
+        if ($this->usesClientInvoiceCounter()) {
+            $entity->client->invoice_number_counter += 1;
+            $entity->client->save();
+        } elseif ($this->usesClientQuoteCounter()) {
+            $entity->client->quote_number_counter += 1;
+            $entity->client->save();
+        }
+
+        if ($this->usesInvoiceCounter()) {
+            if ($entity->isType(INVOICE_TYPE_QUOTE) && ! $this->share_counter) {
+                $this->quote_number_counter += 1;
+            } else {
+                $this->invoice_number_counter += 1;
+            }
+            $this->save();
+        }
+    }
+
+    public function usesInvoiceCounter()
+    {
+        return strpos($this->invoice_number_pattern, '{$counter}') !== false;
+    }
+
+    public function usesClientInvoiceCounter()
+    {
+        return strpos($this->invoice_number_pattern, '{$clientInvoiceCounter}') !== false;
+    }
+
+    public function usesClientQuoteCounter()
+    {
+        return strpos($this->invoice_number_pattern, '{$clientQuoteCounter}') !== false;
     }
 
     public function clientNumbersEnabled()

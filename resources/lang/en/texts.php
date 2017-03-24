@@ -369,7 +369,7 @@ $LANG = array(
     'confirm_email_quote' => 'Are you sure you want to email this quote?',
     'confirm_recurring_email_invoice' => 'Are you sure you want this invoice emailed?',
     'cancel_account' => 'Delete Account',
-    'cancel_account_message' => 'Warning: This will permanently erase all of your data, there is no undo.',
+    'cancel_account_message' => 'Warning: This will permanently delete your account, there is no undo.',
     'go_back' => 'Go Back',
     'data_visualizations' => 'Data Visualizations',
     'sample_data' => 'Sample data shown',
@@ -732,7 +732,7 @@ $LANG = array(
     'recurring_hour' => 'Recurring Hour',
     'pattern' => 'Pattern',
     'pattern_help_title' => 'Pattern Help',
-    'pattern_help_1' => 'Create custom invoice and quote numbers by specifying a pattern',
+    'pattern_help_1' => 'Create custom numbers by specifying a pattern',
     'pattern_help_2' => 'Available variables:',
     'pattern_help_3' => 'For example, :example would be converted to :value',
     'see_options' => 'See options',
@@ -2449,6 +2449,15 @@ $LANG = array(
     'create_credit_note' => 'Create Credit Note',
     'menu' => 'Menu',
     'error_incorrect_gateway_ids' => 'Error: The gateways table has incorrect ids.',
+    'purge_data' => 'Purge Data',
+    'delete_data' => 'Delete Data',
+    'purge_data_help' => 'Permanently delete all data in the account, keeping the account and settings.',
+    'cancel_account_help' => 'Permanently delete the account along with all data and setting.',
+    'purge_successful' => 'Successfully purged account data',
+    'forbidden' => 'Forbidden',
+    'purge_data_message' => 'Warning: This will permanently erase your data, there is no undo.',
+    'contact_phone' => 'Contact Phone',
+    'contact_email' => 'Contact Email',
 
 );
 
