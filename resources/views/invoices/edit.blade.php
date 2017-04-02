@@ -119,9 +119,9 @@
 			<div data-bind="with: client" class="invoice-contact">
 				<div style="display:none" class="form-group" data-bind="visible: contacts().length > 0, foreach: contacts">
 					<div class="col-lg-8 col-lg-offset-4 col-sm-offset-4">
-						<label class="checkbox" data-bind="attr: {for: $index() + '_check'}" onclick="refreshPDF(true)">
+						<label class="checkbox" data-bind="attr: {for: $index() + '_check'}, visible: email.display" onclick="refreshPDF(true)">
                             <input type="hidden" value="0" data-bind="attr: {name: 'client[contacts][' + $index() + '][send_invoice]'}">
-							<input type="checkbox" value="1" data-bind="visible: email || first_name || last_name, checked: send_invoice, attr: {id: $index() + '_check', name: 'client[contacts][' + $index() + '][send_invoice]'}">
+							<input type="checkbox" value="1" data-bind="visible: email() || first_name() || last_name(), checked: send_invoice, attr: {id: $index() + '_check', name: 'client[contacts][' + $index() + '][send_invoice]'}">
 							<span data-bind="html: email.display"></span>
                         </label>
                         @if ( ! $invoice->is_deleted && ! $invoice->client->is_deleted)
@@ -1629,8 +1629,11 @@
         number = number.replace('{$clientCustom1}', client.custom_value1 ? client.custom_value1 : '');
         number = number.replace('{$clientCustom2}', client.custom_value2 ? client.custom_value1 : '');
         number = number.replace('{$clientIdNumber}', client.id_number ? client.id_number : '');
-        number = number.replace('{$clientInvoiceCounter}', pad(client.invoice_number_counter, {{ $account->invoice_number_padding }}));
-        number = number.replace('{$clientQuoteCounter}', pad(client.quote_number_counter, {{ $account->invoice_number_padding }}));
+		@if ($invoice->isQuote() && ! $account->share_counter)
+			number = number.replace('{$clientCounter}', pad(client.quote_number_counter, {{ $account->invoice_number_padding }}));
+		@else
+        	number = number.replace('{$clientCounter}', pad(client.invoice_number_counter, {{ $account->invoice_number_padding }}));
+		@endif
 		// backwards compatibility
 		number = number.replace('{$custom1}', client.custom_value1 ? client.custom_value1 : '');
         number = number.replace('{$custom2}', client.custom_value2 ? client.custom_value1 : '');

@@ -16,6 +16,47 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `account_email_settings`
+--
+
+DROP TABLE IF EXISTS `account_email_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `account_email_settings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(10) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `reply_to_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcc_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email_subject_invoice` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_subject_quote` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_subject_payment` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_template_invoice` text COLLATE utf8_unicode_ci NOT NULL,
+  `email_template_quote` text COLLATE utf8_unicode_ci NOT NULL,
+  `email_template_payment` text COLLATE utf8_unicode_ci NOT NULL,
+  `email_subject_reminder1` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_subject_reminder2` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_subject_reminder3` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_template_reminder1` text COLLATE utf8_unicode_ci NOT NULL,
+  `email_template_reminder2` text COLLATE utf8_unicode_ci NOT NULL,
+  `email_template_reminder3` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `account_email_settings_account_id_index` (`account_id`),
+  CONSTRAINT `account_email_settings_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `account_email_settings`
+--
+
+LOCK TABLES `account_email_settings` WRITE;
+/*!40000 ALTER TABLE `account_email_settings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `account_email_settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `account_gateway_settings`
 --
 
@@ -232,9 +273,6 @@ CREATE TABLE `accounts` (
   `quote_number_counter` int(11) DEFAULT '1',
   `share_counter` tinyint(1) NOT NULL DEFAULT '1',
   `id_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_template_invoice` text COLLATE utf8_unicode_ci,
-  `email_template_quote` text COLLATE utf8_unicode_ci,
-  `email_template_payment` text COLLATE utf8_unicode_ci,
   `token_billing_type_id` smallint(6) NOT NULL DEFAULT '4',
   `invoice_footer` text COLLATE utf8_unicode_ci,
   `pdf_email_attachment` smallint(6) NOT NULL DEFAULT '0',
@@ -246,15 +284,6 @@ CREATE TABLE `accounts` (
   `iframe_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `military_time` tinyint(1) NOT NULL DEFAULT '0',
   `referral_user_id` int(10) unsigned DEFAULT NULL,
-  `email_subject_invoice` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_subject_quote` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_subject_payment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_subject_reminder1` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_subject_reminder2` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_subject_reminder3` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_template_reminder1` text COLLATE utf8_unicode_ci,
-  `email_template_reminder2` text COLLATE utf8_unicode_ci,
-  `email_template_reminder3` text COLLATE utf8_unicode_ci,
   `enable_reminder1` tinyint(1) NOT NULL DEFAULT '0',
   `enable_reminder2` tinyint(1) NOT NULL DEFAULT '0',
   `enable_reminder3` tinyint(1) NOT NULL DEFAULT '0',
@@ -315,7 +344,6 @@ CREATE TABLE `accounts` (
   `show_accept_quote_terms` tinyint(1) NOT NULL DEFAULT '0',
   `require_invoice_signature` tinyint(1) NOT NULL DEFAULT '0',
   `require_quote_signature` tinyint(1) NOT NULL DEFAULT '0',
-  `bcc_email` text COLLATE utf8_unicode_ci,
   `client_number_prefix` text COLLATE utf8_unicode_ci,
   `client_number_counter` int(11) DEFAULT '0',
   `client_number_pattern` text COLLATE utf8_unicode_ci,
@@ -1148,7 +1176,7 @@ CREATE TABLE `gateways` (
 
 LOCK TABLES `gateways` WRITE;
 /*!40000 ALTER TABLE `gateways` DISABLE KEYS */;
-INSERT INTO `gateways` VALUES (1,'2017-03-30 05:35:29','2017-03-30 05:35:29','Authorize.Net AIM','AuthorizeNet_AIM',1,1,4,0,NULL,0,0),(2,'2017-03-30 05:35:29','2017-03-30 05:35:29','Authorize.Net SIM','AuthorizeNet_SIM',1,2,10000,0,NULL,0,0),(3,'2017-03-30 05:35:29','2017-03-30 05:35:29','CardSave','CardSave',1,1,10000,0,NULL,0,0),(4,'2017-03-30 05:35:29','2017-03-30 05:35:29','Eway Rapid','Eway_RapidShared',1,1,10000,0,NULL,1,0),(5,'2017-03-30 05:35:29','2017-03-30 05:35:29','FirstData Connect','FirstData_Connect',1,1,10000,0,NULL,0,0),(6,'2017-03-30 05:35:29','2017-03-30 05:35:29','GoCardless','GoCardless',1,1,10000,0,NULL,1,0),(7,'2017-03-30 05:35:29','2017-03-30 05:35:29','Migs ThreeParty','Migs_ThreeParty',1,1,10000,0,NULL,0,0),(8,'2017-03-30 05:35:29','2017-03-30 05:35:29','Migs TwoParty','Migs_TwoParty',1,1,10000,0,NULL,0,0),(9,'2017-03-30 05:35:29','2017-03-30 05:35:29','Mollie','Mollie',1,1,7,0,NULL,1,0),(10,'2017-03-30 05:35:29','2017-03-30 05:35:29','MultiSafepay','MultiSafepay',1,1,10000,0,NULL,0,0),(11,'2017-03-30 05:35:29','2017-03-30 05:35:29','Netaxept','Netaxept',1,1,10000,0,NULL,0,0),(12,'2017-03-30 05:35:29','2017-03-30 05:35:29','NetBanx','NetBanx',1,1,10000,0,NULL,0,0),(13,'2017-03-30 05:35:29','2017-03-30 05:35:29','PayFast','PayFast',1,1,10000,0,NULL,1,0),(14,'2017-03-30 05:35:29','2017-03-30 05:35:29','Payflow Pro','Payflow_Pro',1,1,10000,0,NULL,0,0),(15,'2017-03-30 05:35:29','2017-03-30 05:35:29','PaymentExpress PxPay','PaymentExpress_PxPay',1,1,10000,0,NULL,0,0),(16,'2017-03-30 05:35:29','2017-03-30 05:35:29','PaymentExpress PxPost','PaymentExpress_PxPost',1,1,10000,0,NULL,0,0),(17,'2017-03-30 05:35:29','2017-03-30 05:35:29','PayPal Express','PayPal_Express',1,1,3,0,NULL,1,0),(18,'2017-03-30 05:35:29','2017-03-30 05:35:29','PayPal Pro','PayPal_Pro',1,1,10000,0,NULL,0,0),(19,'2017-03-30 05:35:29','2017-03-30 05:35:29','Pin','Pin',1,1,10000,0,NULL,0,0),(20,'2017-03-30 05:35:29','2017-03-30 05:35:29','SagePay Direct','SagePay_Direct',1,1,10000,0,NULL,0,0),(21,'2017-03-30 05:35:29','2017-03-30 05:35:29','SagePay Server','SagePay_Server',1,1,10000,0,NULL,0,0),(22,'2017-03-30 05:35:29','2017-03-30 05:35:29','SecurePay DirectPost','SecurePay_DirectPost',1,1,10000,0,NULL,0,0),(23,'2017-03-30 05:35:29','2017-03-30 05:35:29','Stripe','Stripe',1,1,1,0,NULL,0,0),(24,'2017-03-30 05:35:29','2017-03-30 05:35:29','TargetPay Direct eBanking','TargetPay_Directebanking',1,1,10000,0,NULL,0,0),(25,'2017-03-30 05:35:29','2017-03-30 05:35:29','TargetPay Ideal','TargetPay_Ideal',1,1,10000,0,NULL,0,0),(26,'2017-03-30 05:35:29','2017-03-30 05:35:29','TargetPay Mr Cash','TargetPay_Mrcash',1,1,10000,0,NULL,0,0),(27,'2017-03-30 05:35:29','2017-03-30 05:35:29','TwoCheckout','TwoCheckout',1,1,10000,0,NULL,1,0),(28,'2017-03-30 05:35:29','2017-03-30 05:35:29','WorldPay','WorldPay',1,1,10000,0,NULL,0,0),(29,'2017-03-30 05:35:29','2017-03-30 05:35:29','BeanStream','BeanStream',1,2,10000,0,NULL,0,0),(30,'2017-03-30 05:35:29','2017-03-30 05:35:29','Psigate','Psigate',1,2,10000,0,NULL,0,0),(31,'2017-03-30 05:35:29','2017-03-30 05:35:29','moolah','AuthorizeNet_AIM',1,1,10000,0,NULL,0,0),(32,'2017-03-30 05:35:29','2017-03-30 05:35:29','Alipay','Alipay_Express',1,1,10000,0,NULL,0,0),(33,'2017-03-30 05:35:29','2017-03-30 05:35:29','Buckaroo','Buckaroo_CreditCard',1,1,10000,0,NULL,0,0),(34,'2017-03-30 05:35:29','2017-03-30 05:35:29','Coinbase','Coinbase',1,1,10000,0,NULL,0,0),(35,'2017-03-30 05:35:29','2017-03-30 05:35:29','DataCash','DataCash',1,1,10000,0,NULL,0,0),(36,'2017-03-30 05:35:29','2017-03-30 05:35:29','Neteller','Neteller',1,2,10000,0,NULL,0,0),(37,'2017-03-30 05:35:29','2017-03-30 05:35:29','Pacnet','Pacnet',1,1,10000,0,NULL,0,0),(38,'2017-03-30 05:35:29','2017-03-30 05:35:29','PaymentSense','PaymentSense',1,2,10000,0,NULL,0,0),(39,'2017-03-30 05:35:29','2017-03-30 05:35:29','Realex','Realex_Remote',1,1,10000,0,NULL,0,0),(40,'2017-03-30 05:35:29','2017-03-30 05:35:29','Sisow','Sisow',1,1,10000,0,NULL,0,0),(41,'2017-03-30 05:35:29','2017-03-30 05:35:29','Skrill','Skrill',1,1,10000,0,NULL,1,0),(42,'2017-03-30 05:35:29','2017-03-30 05:35:29','BitPay','BitPay',1,1,6,0,NULL,1,0),(43,'2017-03-30 05:35:29','2017-03-30 05:35:29','Dwolla','Dwolla',1,1,5,0,NULL,1,0),(44,'2017-03-30 05:35:29','2017-03-30 05:35:29','AGMS','Agms',1,1,10000,0,NULL,0,0),(45,'2017-03-30 05:35:29','2017-03-30 05:35:29','Barclays','BarclaysEpdq\\Essential',1,1,10000,0,NULL,0,0),(46,'2017-03-30 05:35:29','2017-03-30 05:35:29','Cardgate','Cardgate',1,1,10000,0,NULL,0,0),(47,'2017-03-30 05:35:29','2017-03-30 05:35:29','Checkout.com','CheckoutCom',1,1,10000,0,NULL,0,0),(48,'2017-03-30 05:35:29','2017-03-30 05:35:29','Creditcall','Creditcall',1,1,10000,0,NULL,0,0),(49,'2017-03-30 05:35:29','2017-03-30 05:35:29','Cybersource','Cybersource',1,1,10000,0,NULL,0,0),(50,'2017-03-30 05:35:29','2017-03-30 05:35:29','ecoPayz','Ecopayz',1,1,10000,0,NULL,0,0),(51,'2017-03-30 05:35:29','2017-03-30 05:35:29','Fasapay','Fasapay',1,1,10000,0,NULL,0,0),(52,'2017-03-30 05:35:29','2017-03-30 05:35:29','Komoju','Komoju',1,1,10000,0,NULL,0,0),(53,'2017-03-30 05:35:29','2017-03-30 05:35:29','Multicards','Multicards',1,1,10000,0,NULL,0,0),(54,'2017-03-30 05:35:29','2017-03-30 05:35:29','Pagar.Me','Pagarme',1,2,10000,0,NULL,0,0),(55,'2017-03-30 05:35:29','2017-03-30 05:35:29','Paysafecard','Paysafecard',1,1,10000,0,NULL,0,0),(56,'2017-03-30 05:35:29','2017-03-30 05:35:29','Paytrace','Paytrace_CreditCard',1,1,10000,0,NULL,0,0),(57,'2017-03-30 05:35:29','2017-03-30 05:35:29','Secure Trading','SecureTrading',1,1,10000,0,NULL,0,0),(58,'2017-03-30 05:35:29','2017-03-30 05:35:29','SecPay','SecPay',1,1,10000,0,NULL,0,0),(59,'2017-03-30 05:35:29','2017-03-30 05:35:29','WeChat Express','WeChat_Express',1,2,10000,0,NULL,0,0),(60,'2017-03-30 05:35:29','2017-03-30 05:35:29','WePay','WePay',1,1,10000,0,NULL,0,0),(61,'2017-03-30 05:35:29','2017-03-30 05:35:29','Braintree','Braintree',1,1,2,0,NULL,0,0),(62,'2017-03-30 05:35:29','2017-03-30 05:35:29','Custom','Custom',1,1,8,0,NULL,1,0);
+INSERT INTO `gateways` VALUES (1,'2017-04-02 16:31:14','2017-04-02 16:31:14','Authorize.Net AIM','AuthorizeNet_AIM',1,1,4,0,NULL,0,0),(2,'2017-04-02 16:31:14','2017-04-02 16:31:14','Authorize.Net SIM','AuthorizeNet_SIM',1,2,10000,0,NULL,0,0),(3,'2017-04-02 16:31:14','2017-04-02 16:31:14','CardSave','CardSave',1,1,10000,0,NULL,0,0),(4,'2017-04-02 16:31:14','2017-04-02 16:31:14','Eway Rapid','Eway_RapidShared',1,1,10000,0,NULL,1,0),(5,'2017-04-02 16:31:14','2017-04-02 16:31:14','FirstData Connect','FirstData_Connect',1,1,10000,0,NULL,0,0),(6,'2017-04-02 16:31:14','2017-04-02 16:31:14','GoCardless','GoCardless',1,1,10000,0,NULL,1,0),(7,'2017-04-02 16:31:14','2017-04-02 16:31:14','Migs ThreeParty','Migs_ThreeParty',1,1,10000,0,NULL,0,0),(8,'2017-04-02 16:31:14','2017-04-02 16:31:14','Migs TwoParty','Migs_TwoParty',1,1,10000,0,NULL,0,0),(9,'2017-04-02 16:31:14','2017-04-02 16:31:14','Mollie','Mollie',1,1,7,0,NULL,1,0),(10,'2017-04-02 16:31:14','2017-04-02 16:31:14','MultiSafepay','MultiSafepay',1,1,10000,0,NULL,0,0),(11,'2017-04-02 16:31:14','2017-04-02 16:31:14','Netaxept','Netaxept',1,1,10000,0,NULL,0,0),(12,'2017-04-02 16:31:14','2017-04-02 16:31:14','NetBanx','NetBanx',1,1,10000,0,NULL,0,0),(13,'2017-04-02 16:31:14','2017-04-02 16:31:14','PayFast','PayFast',1,1,10000,0,NULL,1,0),(14,'2017-04-02 16:31:14','2017-04-02 16:31:14','Payflow Pro','Payflow_Pro',1,1,10000,0,NULL,0,0),(15,'2017-04-02 16:31:14','2017-04-02 16:31:14','PaymentExpress PxPay','PaymentExpress_PxPay',1,1,10000,0,NULL,0,0),(16,'2017-04-02 16:31:14','2017-04-02 16:31:14','PaymentExpress PxPost','PaymentExpress_PxPost',1,1,10000,0,NULL,0,0),(17,'2017-04-02 16:31:14','2017-04-02 16:31:14','PayPal Express','PayPal_Express',1,1,3,0,NULL,1,0),(18,'2017-04-02 16:31:14','2017-04-02 16:31:14','PayPal Pro','PayPal_Pro',1,1,10000,0,NULL,0,0),(19,'2017-04-02 16:31:14','2017-04-02 16:31:14','Pin','Pin',1,1,10000,0,NULL,0,0),(20,'2017-04-02 16:31:14','2017-04-02 16:31:14','SagePay Direct','SagePay_Direct',1,1,10000,0,NULL,0,0),(21,'2017-04-02 16:31:14','2017-04-02 16:31:14','SagePay Server','SagePay_Server',1,1,10000,0,NULL,0,0),(22,'2017-04-02 16:31:14','2017-04-02 16:31:14','SecurePay DirectPost','SecurePay_DirectPost',1,1,10000,0,NULL,0,0),(23,'2017-04-02 16:31:14','2017-04-02 16:31:14','Stripe','Stripe',1,1,1,0,NULL,0,0),(24,'2017-04-02 16:31:14','2017-04-02 16:31:14','TargetPay Direct eBanking','TargetPay_Directebanking',1,1,10000,0,NULL,0,0),(25,'2017-04-02 16:31:14','2017-04-02 16:31:14','TargetPay Ideal','TargetPay_Ideal',1,1,10000,0,NULL,0,0),(26,'2017-04-02 16:31:14','2017-04-02 16:31:14','TargetPay Mr Cash','TargetPay_Mrcash',1,1,10000,0,NULL,0,0),(27,'2017-04-02 16:31:14','2017-04-02 16:31:14','TwoCheckout','TwoCheckout',1,1,10000,0,NULL,1,0),(28,'2017-04-02 16:31:14','2017-04-02 16:31:14','WorldPay','WorldPay',1,1,10000,0,NULL,0,0),(29,'2017-04-02 16:31:14','2017-04-02 16:31:14','BeanStream','BeanStream',1,2,10000,0,NULL,0,0),(30,'2017-04-02 16:31:14','2017-04-02 16:31:14','Psigate','Psigate',1,2,10000,0,NULL,0,0),(31,'2017-04-02 16:31:14','2017-04-02 16:31:14','moolah','AuthorizeNet_AIM',1,1,10000,0,NULL,0,0),(32,'2017-04-02 16:31:14','2017-04-02 16:31:14','Alipay','Alipay_Express',1,1,10000,0,NULL,0,0),(33,'2017-04-02 16:31:14','2017-04-02 16:31:14','Buckaroo','Buckaroo_CreditCard',1,1,10000,0,NULL,0,0),(34,'2017-04-02 16:31:14','2017-04-02 16:31:14','Coinbase','Coinbase',1,1,10000,0,NULL,0,0),(35,'2017-04-02 16:31:14','2017-04-02 16:31:14','DataCash','DataCash',1,1,10000,0,NULL,0,0),(36,'2017-04-02 16:31:14','2017-04-02 16:31:14','Neteller','Neteller',1,2,10000,0,NULL,0,0),(37,'2017-04-02 16:31:14','2017-04-02 16:31:14','Pacnet','Pacnet',1,1,10000,0,NULL,0,0),(38,'2017-04-02 16:31:14','2017-04-02 16:31:14','PaymentSense','PaymentSense',1,2,10000,0,NULL,0,0),(39,'2017-04-02 16:31:14','2017-04-02 16:31:14','Realex','Realex_Remote',1,1,10000,0,NULL,0,0),(40,'2017-04-02 16:31:14','2017-04-02 16:31:14','Sisow','Sisow',1,1,10000,0,NULL,0,0),(41,'2017-04-02 16:31:14','2017-04-02 16:31:14','Skrill','Skrill',1,1,10000,0,NULL,1,0),(42,'2017-04-02 16:31:14','2017-04-02 16:31:14','BitPay','BitPay',1,1,6,0,NULL,1,0),(43,'2017-04-02 16:31:14','2017-04-02 16:31:14','Dwolla','Dwolla',1,1,5,0,NULL,1,0),(44,'2017-04-02 16:31:14','2017-04-02 16:31:14','AGMS','Agms',1,1,10000,0,NULL,0,0),(45,'2017-04-02 16:31:14','2017-04-02 16:31:14','Barclays','BarclaysEpdq\\Essential',1,1,10000,0,NULL,0,0),(46,'2017-04-02 16:31:14','2017-04-02 16:31:14','Cardgate','Cardgate',1,1,10000,0,NULL,0,0),(47,'2017-04-02 16:31:14','2017-04-02 16:31:14','Checkout.com','CheckoutCom',1,1,10000,0,NULL,0,0),(48,'2017-04-02 16:31:14','2017-04-02 16:31:14','Creditcall','Creditcall',1,1,10000,0,NULL,0,0),(49,'2017-04-02 16:31:14','2017-04-02 16:31:14','Cybersource','Cybersource',1,1,10000,0,NULL,0,0),(50,'2017-04-02 16:31:14','2017-04-02 16:31:14','ecoPayz','Ecopayz',1,1,10000,0,NULL,0,0),(51,'2017-04-02 16:31:14','2017-04-02 16:31:14','Fasapay','Fasapay',1,1,10000,0,NULL,0,0),(52,'2017-04-02 16:31:14','2017-04-02 16:31:14','Komoju','Komoju',1,1,10000,0,NULL,0,0),(53,'2017-04-02 16:31:14','2017-04-02 16:31:14','Multicards','Multicards',1,1,10000,0,NULL,0,0),(54,'2017-04-02 16:31:14','2017-04-02 16:31:14','Pagar.Me','Pagarme',1,2,10000,0,NULL,0,0),(55,'2017-04-02 16:31:14','2017-04-02 16:31:14','Paysafecard','Paysafecard',1,1,10000,0,NULL,0,0),(56,'2017-04-02 16:31:14','2017-04-02 16:31:14','Paytrace','Paytrace_CreditCard',1,1,10000,0,NULL,0,0),(57,'2017-04-02 16:31:14','2017-04-02 16:31:14','Secure Trading','SecureTrading',1,1,10000,0,NULL,0,0),(58,'2017-04-02 16:31:14','2017-04-02 16:31:14','SecPay','SecPay',1,1,10000,0,NULL,0,0),(59,'2017-04-02 16:31:14','2017-04-02 16:31:14','WeChat Express','WeChat_Express',1,2,10000,0,NULL,0,0),(60,'2017-04-02 16:31:14','2017-04-02 16:31:14','WePay','WePay',1,1,10000,0,NULL,0,0),(61,'2017-04-02 16:31:14','2017-04-02 16:31:14','Braintree','Braintree',1,1,2,0,NULL,0,0),(62,'2017-04-02 16:31:14','2017-04-02 16:31:14','Custom','Custom',1,1,8,0,NULL,1,0);
 /*!40000 ALTER TABLE `gateways` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1566,7 +1594,7 @@ CREATE TABLE `payment_libraries` (
 
 LOCK TABLES `payment_libraries` WRITE;
 /*!40000 ALTER TABLE `payment_libraries` DISABLE KEYS */;
-INSERT INTO `payment_libraries` VALUES (1,'2017-03-30 05:35:28','2017-03-30 05:35:28','Omnipay',1),(2,'2017-03-30 05:35:28','2017-03-30 05:35:28','PHP-Payments [Deprecated]',1);
+INSERT INTO `payment_libraries` VALUES (1,'2017-04-02 16:31:13','2017-04-02 16:31:13','Omnipay',1),(2,'2017-04-02 16:31:13','2017-04-02 16:31:13','PHP-Payments [Deprecated]',1);
 /*!40000 ALTER TABLE `payment_libraries` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1676,7 +1704,7 @@ CREATE TABLE `payment_terms` (
 
 LOCK TABLES `payment_terms` WRITE;
 /*!40000 ALTER TABLE `payment_terms` DISABLE KEYS */;
-INSERT INTO `payment_terms` VALUES (1,7,'Net 7','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,1),(2,10,'Net 10','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,2),(3,14,'Net 14','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,3),(4,15,'Net 15','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,4),(5,30,'Net 30','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,5),(6,60,'Net 60','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,6),(7,90,'Net 90','2017-03-30 05:35:28','2017-03-30 05:35:28',NULL,0,0,7),(8,-1,'Net 0','2017-03-30 05:35:31','2017-03-30 05:35:31',NULL,0,0,0);
+INSERT INTO `payment_terms` VALUES (1,7,'Net 7','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,1),(2,10,'Net 10','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,2),(3,14,'Net 14','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,3),(4,15,'Net 15','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,4),(5,30,'Net 30','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,5),(6,60,'Net 60','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,6),(7,90,'Net 90','2017-04-02 16:31:13','2017-04-02 16:31:13',NULL,0,0,7),(8,-1,'Net 0','2017-04-02 16:31:16','2017-04-02 16:31:16',NULL,0,0,0);
 /*!40000 ALTER TABLE `payment_terms` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2271,4 +2299,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-03-30 11:35:31
+-- Dump completed on 2017-04-02 22:31:16

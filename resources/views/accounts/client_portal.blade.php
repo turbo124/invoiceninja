@@ -240,6 +240,12 @@
                                 ->inlineHelp('buy_now_buttons_warning')
                                 ->addGroupClass('product-select') !!}
 
+                            @if (count($account->present()->customTextFields))
+                                {!! Former::inline_checkboxes('custom_fields')
+                                        ->onchange('updateBuyNowButtons()')
+                                        ->checkboxes($account->present()->customTextFields) !!}
+                            @endif
+
                             {!! Former::inline_radios('landing_page')
                                     ->onchange('showPaymentTypes();updateBuyNowButtons();')
                                     ->radios([
@@ -425,6 +431,13 @@ iframe.src = '{{ rtrim(SITE_URL ,'/') }}/view/'
                 '&product_id=' + productId;
 
             var form = '<form action="' + link + '" method="post" target="_top">' + "\n";
+
+            @foreach ($account->present()->customTextFields as $field => $val)
+                if ($('input#{{ $val['name'] }}').is(':checked')) {
+                    form += '<input type="text" name="{{ $val['name'] }}" placeholder="{{ $field }}" required/>' + "\n";
+                    link += '&{{ $val['name'] }}=';
+                }
+            @endforeach
 
             if (redirectUrl) {
                 link += '&redirect_url=' + encodeURIComponent(redirectUrl);

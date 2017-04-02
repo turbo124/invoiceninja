@@ -790,8 +790,11 @@ class AccountController extends BaseController
     {
         $account = $request->user()->account;
         $account->fill($request->all());
-        $account->bcc_email = $request->bcc_email;
         $account->save();
+
+        $settings = $account->account_email_settings;
+        $settings->fill($request->all());
+        $settings->save();
 
         return redirect('settings/' . ACCOUNT_EMAIL_SETTINGS)
                 ->with('message', trans('texts.updated_settings'));
@@ -808,11 +811,11 @@ class AccountController extends BaseController
             foreach ([ENTITY_INVOICE, ENTITY_QUOTE, ENTITY_PAYMENT, REMINDER1, REMINDER2, REMINDER3] as $type) {
                 $subjectField = "email_subject_{$type}";
                 $subject = Input::get($subjectField, $account->getEmailSubject($type));
-                $account->$subjectField = ($subject == $account->getDefaultEmailSubject($type) ? null : $subject);
+                $account->account_email_settings->$subjectField = ($subject == $account->getDefaultEmailSubject($type) ? null : $subject);
 
                 $bodyField = "email_template_{$type}";
                 $body = Input::get($bodyField, $account->getEmailTemplate($type));
-                $account->$bodyField = ($body == $account->getDefaultEmailTemplate($type) ? null : $body);
+                $account->account_email_settings->$bodyField = ($body == $account->getDefaultEmailTemplate($type) ? null : $body);
             }
 
             foreach ([REMINDER1, REMINDER2, REMINDER3] as $type) {
@@ -824,6 +827,7 @@ class AccountController extends BaseController
             }
 
             $account->save();
+            $account->account_email_settings->save();
 
             Session::flash('message', trans('texts.updated_settings'));
         }

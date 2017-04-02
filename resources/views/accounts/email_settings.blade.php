@@ -19,18 +19,30 @@
 
     {!! Former::open()->rules([
             'bcc_email' => 'email',
+            'reply_to_email' => 'email',
         ])->addClass('warn-on-exit') !!}
 
     {{ Former::populate($account) }}
     {{ Former::populateField('pdf_email_attachment', intval($account->pdf_email_attachment)) }}
     {{ Former::populateField('document_email_attachment', intval($account->document_email_attachment)) }}
     {{ Former::populateField('enable_email_markup', intval($account->enable_email_markup)) }}
+    {{ Former::populateField('bcc_email', $account->account_email_settings->bcc_email) }}
+    {{ Former::populateField('reply_to_email', $account->account_email_settings->reply_to_email) }}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{!! trans('texts.email_settings') !!}</h3>
         </div>
         <div class="panel-body form-padding-right">
+
+            {!! Former::text('reply_to_email')
+                    ->placeholder(Auth::user()->registered ? Auth::user()->email : ' ')
+                    ->help('reply_to_email_help') !!}
+
+            {!! Former::text('bcc_email')
+                    ->help('bcc_email_help') !!}
+
+            &nbsp;
 
             {!! Former::checkbox('pdf_email_attachment')
                     ->text(trans('texts.enable'))
@@ -43,10 +55,6 @@
             {!! Former::checkbox('document_email_attachment')
                     ->text(trans('texts.enable'))
                     ->value(1) !!}
-
-            &nbsp;
-
-            {!! Former::text('bcc_email')->help('bcc_email_help') !!}
 
             &nbsp;
 

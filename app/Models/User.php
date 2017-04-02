@@ -60,7 +60,6 @@ class User extends Authenticatable
      */
     protected $hidden = ['password', 'remember_token', 'confirmation_code'];
 
-    use SoftDeletes;
     /**
      * @var array
      */
@@ -264,7 +263,7 @@ class User extends Authenticatable
         // if the user changes their email then they need to reconfirm it
         if ($user->isEmailBeingChanged()) {
             $user->confirmed = 0;
-            $user->confirmation_code = str_random(RANDOM_KEY_LENGTH);
+            $user->confirmation_code = strtolower(str_random(RANDOM_KEY_LENGTH));
         }
     }
 

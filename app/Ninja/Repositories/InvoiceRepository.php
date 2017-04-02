@@ -685,7 +685,9 @@ class InvoiceRepository extends BaseRepository
             $invoice->invoice_items()->save($invoiceItem);
         }
 
-        $invoice = $this->saveInvitations($invoice);
+        if (Auth::check()) {
+            $invoice = $this->saveInvitations($invoice);
+        }
 
         return $invoice;
     }
@@ -711,10 +713,10 @@ class InvoiceRepository extends BaseRepository
             $invitation = Invitation::scope()->whereContactId($contact->id)->whereInvoiceId($invoice->id)->first();
 
             if (in_array($contact->id, $sendInvoiceIds) && ! $invitation) {
-                $invitation = Invitation::createNew();
+                $invitation = Invitation::createNew($invoice);
                 $invitation->invoice_id = $invoice->id;
                 $invitation->contact_id = $contact->id;
-                $invitation->invitation_key = str_random(RANDOM_KEY_LENGTH);
+                $invitation->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
                 $invitation->save();
             } elseif (! in_array($contact->id, $sendInvoiceIds) && $invitation) {
                 $invitation->delete();
@@ -840,7 +842,7 @@ class InvoiceRepository extends BaseRepository
         foreach ($invoice->invitations as $invitation) {
             $cloneInvitation = Invitation::createNew($invoice);
             $cloneInvitation->contact_id = $invitation->contact_id;
-            $cloneInvitation->invitation_key = str_random(RANDOM_KEY_LENGTH);
+            $cloneInvitation->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
             $clone->invitations()->save($cloneInvitation);
         }
 
@@ -1016,7 +1018,7 @@ class InvoiceRepository extends BaseRepository
         foreach ($recurInvoice->invitations as $recurInvitation) {
             $invitation = Invitation::createNew($recurInvitation);
             $invitation->contact_id = $recurInvitation->contact_id;
-            $invitation->invitation_key = str_random(RANDOM_KEY_LENGTH);
+            $invitation->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
             $invoice->invitations()->save($invitation);
         }
 

@@ -280,6 +280,14 @@ class Account extends Eloquent
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+    public function account_email_settings()
+    {
+        return $this->hasOne('App\Models\AccountEmailSettings');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function bank_accounts()
     {
         return $this->hasMany('App\Models\BankAccount');
