@@ -851,6 +851,7 @@ $LANG = array(
     'dark' => 'Dark',
     'industry_help' => 'Used to provide comparisons against the averages of companies of similar size and industry.',
     'subdomain_help' => 'Set the subdomain or display the invoice on your own website.',
+    'website_help' => 'Display the invoice in an iFrame on your own website',
     'invoice_number_help' => 'Specify a prefix or use a custom pattern to dynamically set the invoice number.',
     'quote_number_help' => 'Specify a prefix or use a custom pattern to dynamically set the quote number.',
     'custom_client_fields_helps' => 'Add a field when creating a client and display the label and value on the PDF.',
@@ -1041,7 +1042,7 @@ $LANG = array(
     'invoiced_amount' => 'Invoiced Amount',
     'invoice_item_fields' => 'Invoice Item Fields',
     'custom_invoice_item_fields_help' => 'Add a field when creating an invoice item and display the label and value on the PDF.',
-    'recurring_invoice_number' => 'Recurring Invoice Number',
+    'recurring_invoice_number' => 'Recurring Number',
     'recurring_invoice_number_prefix_help' => 'Speciy a prefix to be added to the invoice number for recurring invoices. The default value is \'R\'.',
 
     // Client Passwords
@@ -2255,7 +2256,7 @@ $LANG = array(
     'edit_credit' => 'Edit Credit',
     'live_preview_help' => 'Display a live PDF preview on the invoice page.<br/>Disable this to improve performance when editing invoices.',
     'force_pdfjs_help' => 'Replace the built-in PDF viewer in :chrome_link and :firefox_link.<br/>Enable this if your browser is automatically downloading the PDF.',
-    'force_pdfjs' => 'PDF Viewer',
+    'force_pdfjs' => 'Prevent Download',
     'redirect_url' => 'Redirect URL',
     'redirect_url_help' => 'Optionally specify a URL to redirect to after a payment is entered.',
     'save_draft' => 'Save Draft',
@@ -2463,6 +2464,15 @@ $LANG = array(
     'import_complete' => 'Your import has successfully completed.',
     'confirm_account_to_import' => 'Please confirm your account to import data.',
     'import_started' => 'Your import has started, we\'ll send you an email once it completes.',
+    'listening' => 'Listening...',
+    'microphone_help' => 'Say "new invoice for [client]" or "show me [client]\'s archived payments"',
+    'voice_commands' => 'Voice Commands',
+    'sample_commands' => 'Sample commands',
+    'voice_commands_feedback' => 'We\'re actively working to improve this feature, if there\'s a command you\'d like us to support please email us at :email.',
+    'payment_type_Venmo' => 'Venmo',
+    'archived_products' => 'Successfully archived :count products',
+    'recommend_on' => 'We recommend <b>enabling</b> this setting.',
+    'recommend_off' => 'We recommend <b>disabling</b> this setting.',
 
 );
 

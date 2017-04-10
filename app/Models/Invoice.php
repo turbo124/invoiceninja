@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Events\InvoiceInvitationWasEmailed;
 use App\Events\InvoiceWasCreated;
 use App\Events\InvoiceWasUpdated;
-use App\Events\QuoteInvitationWasEmailed;
 use App\Events\QuoteWasCreated;
 use App\Events\QuoteWasUpdated;
+use App\Events\InvoiceInvitationWasEmailed;
+use App\Events\QuoteInvitationWasEmailed;
 use App\Libraries\CurlUtils;
 use App\Models\Activity;
 use App\Models\Traits\ChargesFees;
@@ -71,6 +71,18 @@ class Invoice extends EntityModel implements BalanceAffecting
         'userId',
         'year',
         'date:',
+    ];
+
+    /**
+     * @var array
+     */
+    public static $requestFields = [
+        'invoice_number',
+        'invoice_date',
+        'due_date',
+        'po_number',
+        'discount',
+        'partial',
     ];
 
     public static $statusClasses = [

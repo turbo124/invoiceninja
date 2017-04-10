@@ -2,6 +2,10 @@
 
 namespace App\Ninja\Repositories;
 
+use App\Events\QuoteItemsWereCreated;
+use App\Events\QuoteItemsWereUpdated;
+use App\Events\InvoiceItemsWereCreated;
+use App\Events\InvoiceItemsWereUpdated;
 use App\Jobs\SendInvoiceEmail;
 use App\Models\Account;
 use App\Models\Client;
@@ -211,7 +215,6 @@ class InvoiceRepository extends BaseRepository
           ->where('clients.deleted_at', '=', null)
           ->where('invoices.is_recurring', '=', true)
           ->where('invoices.is_public', '=', true)
-          ->whereIn('invoices.auto_bill', [AUTO_BILL_OPT_IN, AUTO_BILL_OPT_OUT])
           //->where('invoices.start_date', '>=', date('Y-m-d H:i:s'))
           ->select(
                 DB::raw('COALESCE(clients.currency_id, accounts.currency_id) currency_id'),
@@ -225,6 +228,7 @@ class InvoiceRepository extends BaseRepository
                 'invoices.amount',
                 'invoices.start_date',
                 'invoices.end_date',
+                'invoices.auto_bill',
                 'invoices.client_enable_auto_bill',
                 'frequencies.name as frequency'
             );
@@ -243,7 +247,11 @@ class InvoiceRepository extends BaseRepository
                 return Utils::formatMoney($model->amount, $model->currency_id, $model->country_id);
             })
             ->addColumn('client_enable_auto_bill', function ($model) {
-                if ($model->client_enable_auto_bill) {
+                if ($model->auto_bill == AUTO_BILL_OFF) {
+                    return trans('texts.disabled');
+                } elseif ($model->auto_bill == AUTO_BILL_ALWAYS) {
+                    return trans('texts.enabled');
+                } elseif ($model->client_enable_auto_bill) {
                     return trans('texts.enabled') . ' - <a href="javascript:setAutoBill('.$model->public_id.',false)">'.trans('texts.disable').'</a>';
                 } else {
                     return trans('texts.disabled') . ' - <a href="javascript:setAutoBill('.$model->public_id.',true)">'.trans('texts.enable').'</a>';
@@ -685,9 +693,13 @@ class InvoiceRepository extends BaseRepository
             $invoice->invoice_items()->save($invoiceItem);
         }
 
+        $invoice->load('invoice_items');
+
         if (Auth::check()) {
             $invoice = $this->saveInvitations($invoice);
         }
+
+        $this->dispatchEvents($invoice);
 
         return $invoice;
     }
@@ -728,6 +740,23 @@ class InvoiceRepository extends BaseRepository
         }
 
         return $invoice;
+    }
+
+    private function dispatchEvents($invoice)
+    {
+        if ($invoice->isType(INVOICE_TYPE_QUOTE)) {
+            if ($invoice->wasRecentlyCreated) {
+                event(new QuoteItemsWereCreated($invoice));
+            } else {
+                event(new QuoteItemsWereUpdated($invoice));
+            }
+        } else {
+            if ($invoice->wasRecentlyCreated) {
+                event(new InvoiceItemsWereCreated($invoice));
+            } else {
+                event(new InvoiceItemsWereUpdated($invoice));
+            }
+        }
     }
 
     /**
@@ -1078,7 +1107,6 @@ class InvoiceRepository extends BaseRepository
             if ($item['invoice_item_type_id'] == INVOICE_ITEM_TYPE_PENDING_GATEWAY_FEE) {
                 unset($data['invoice_items'][$key]);
                 $this->save($data, $invoice);
-                $invoice->load('invoice_items');
                 break;
             }
         }
@@ -1115,6 +1143,27 @@ class InvoiceRepository extends BaseRepository
         $data['invoice_items'][] = $item;
 
         $this->save($data, $invoice);
-        $invoice->load('invoice_items');
     }
+
+    public function findPhonetically($invoiceNumber)
+    {
+        $map = [];
+        $max = SIMILAR_MIN_THRESHOLD;
+        $invoiceId = 0;
+
+        $invoices = Invoice::scope()->get(['id', 'invoice_number', 'public_id']);
+
+        foreach ($invoices as $invoice) {
+            $map[$invoice->id] = $invoice;
+            $similar = similar_text($invoiceNumber, $invoice->invoice_number, $percent);
+            var_dump($similar);
+            if ($percent > $max) {
+                $invoiceId = $invoice->id;
+                $max = $percent;
+            }
+        }
+
+        return ($invoiceId && isset($map[$invoiceId])) ? $map[$invoiceId] : null;
+    }
+
 }
