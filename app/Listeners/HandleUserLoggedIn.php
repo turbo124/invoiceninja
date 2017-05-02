@@ -56,8 +56,10 @@ class HandleUserLoggedIn
 
         $account->loadLocalizationSettings();
 
-        if (strpos($_SERVER['HTTP_USER_AGENT'], 'iPhone') || strpos($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
+        if (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone') || strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
             Session::flash('warning', trans('texts.iphone_app_message', ['link' => link_to(NINJA_IOS_APP_URL, trans('texts.iphone_app'))]));
+        } elseif (strstr($_SERVER['HTTP_USER_AGENT'], 'Android')) {
+            Session::flash('warning', trans('texts.iphone_app_message', ['link' => link_to(NINJA_ANDROID_APP_URL, trans('texts.android_app'))]));
         }
 
         // if they're using Stripe make sure they're using Stripe.js
@@ -69,8 +71,11 @@ class HandleUserLoggedIn
         }
 
         // check custom gateway id is correct
-        if (! Utils::isNinja() && Gateway::find(GATEWAY_CUSTOM)->name !== 'Custom') {
-            Session::flash('error', trans('texts.error_incorrect_gateway_ids'));
+        if (! Utils::isNinja()) {
+            $gateway = Gateway::find(GATEWAY_CUSTOM);
+            if (! $gateway || $gateway->name !== 'Custom') {
+                Session::flash('error', trans('texts.error_incorrect_gateway_ids'));
+            }
         }
     }
 }

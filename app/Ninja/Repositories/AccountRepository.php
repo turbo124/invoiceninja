@@ -356,13 +356,15 @@ class AccountRepository
             $account->company_id = $company->id;
             $account->save();
 
-            $random = strtolower(str_random(RANDOM_KEY_LENGTH));
+            $emailSettings = new AccountEmailSettings();
+            $account->account_email_settings()->save($emailSettings);
+
             $user = new User();
             $user->registered = true;
             $user->confirmed = true;
-            $user->email = 'contact@invoiceninja.com';
-            $user->password = $random;
-            $user->username = $random;
+            $user->email = NINJA_ACCOUNT_EMAIL;
+            $user->username = NINJA_ACCOUNT_EMAIL;
+            $user->password = strtolower(str_random(RANDOM_KEY_LENGTH));
             $user->first_name = 'Invoice';
             $user->last_name = 'Ninja';
             $user->notify_sent = true;
@@ -447,10 +449,14 @@ class AccountRepository
         if (! $user->registered) {
             $rules = ['email' => 'email|required|unique:users,email,'.$user->id.',id'];
             $validator = Validator::make(['email' => $email], $rules);
+
             if ($validator->fails()) {
                 $messages = $validator->messages();
-
                 return $messages->first('email');
+            }
+
+            if (! \App\Models\LookupUser::validateEmail($email, $user)) {
+                return trans('texts.email_taken');
             }
 
             $user->email = $email;

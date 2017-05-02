@@ -39,6 +39,10 @@ class AccountApiController extends BaseAPIController
 
     public function register(RegisterRequest $request)
     {
+        if (! \App\Models\LookupUser::validateEmail($request->email)) {
+            return $this->errorResponse(['message' => trans('texts.email_taken')], 500);
+        }
+
         $account = $this->accountRepo->create($request->first_name, $request->last_name, $request->email, $request->password);
         $user = $account->users()->first();
 
@@ -78,7 +82,7 @@ class AccountApiController extends BaseAPIController
         $updatedAt = $request->updated_at ? date('Y-m-d H:i:s', $request->updated_at) : false;
 
         $transformer = new AccountTransformer(null, $request->serializer);
-        $account->load(array_merge($transformer->getDefaultIncludes(), ['projects.client']));
+        $account->load(array_merge($transformer->getDefaultIncludes(), ['projects.client', 'products.default_tax_rate']));
         $account = $this->createItem($account, $transformer, 'account');
 
         return $this->response($account);
@@ -192,7 +196,7 @@ class AccountApiController extends BaseAPIController
         $oAuth = new OAuth();
         $user = $oAuth->getProvider($provider)->getTokenResponse($token);
 
-        if($user) {
+        if ($user) {
             Auth::login($user);
             return $this->processLogin($request);
         }

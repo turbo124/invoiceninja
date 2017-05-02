@@ -4,16 +4,17 @@ namespace App\Models;
 
 use App;
 use App\Events\UserSettingsChanged;
+use App\Models\LookupAccount;
 use App\Models\Traits\GeneratesNumbers;
 use App\Models\Traits\PresentsInvoice;
 use App\Models\Traits\SendsEmails;
+use App\Models\Traits\HasLogo;
 use Cache;
 use Carbon;
 use DateTime;
 use Eloquent;
 use Event;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
 use Laracasts\Presenter\PresentableTrait;
 use Session;
 use Utils;
@@ -28,6 +29,7 @@ class Account extends Eloquent
     use PresentsInvoice;
     use GeneratesNumbers;
     use SendsEmails;
+    use HasLogo;
 
     /**
      * @var string
@@ -92,9 +94,6 @@ class Account extends Eloquent
         'quote_number_counter',
         'share_counter',
         'id_number',
-        'email_template_invoice',
-        'email_template_quote',
-        'email_template_payment',
         'token_billing_type_id',
         'invoice_footer',
         'pdf_email_attachment',
@@ -103,15 +102,6 @@ class Account extends Eloquent
         'custom_design',
         'show_item_taxes',
         'military_time',
-        'email_subject_invoice',
-        'email_subject_quote',
-        'email_subject_payment',
-        'email_subject_reminder1',
-        'email_subject_reminder2',
-        'email_subject_reminder3',
-        'email_template_reminder1',
-        'email_template_reminder2',
-        'email_template_reminder3',
         'enable_reminder1',
         'enable_reminder2',
         'enable_reminder3',
@@ -173,6 +163,9 @@ class Account extends Eloquent
         'payment_type_id',
         'gateway_fee_enabled',
         'reset_counter_date',
+        'custom_contact_label1',
+        'custom_contact_label2',
+        'domain_id',
     ];
 
     /**
@@ -379,6 +372,14 @@ class Account extends Eloquent
     public function default_tax_rate()
     {
         return $this->belongsTo('App\Models\TaxRate');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function payment_type()
+    {
+        return $this->belongsTo('App\Models\PaymentType');
     }
 
     /**
@@ -838,101 +839,6 @@ class Account extends Eloquent
     }
 
     /**
-     * @return bool
-     */
-    public function hasLogo()
-    {
-        return ! empty($this->logo);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLogoDisk()
-    {
-        return Storage::disk(env('LOGO_FILESYSTEM', 'logos'));
-    }
-
-    protected function calculateLogoDetails()
-    {
-        $disk = $this->getLogoDisk();
-
-        if ($disk->exists($this->account_key.'.png')) {
-            $this->logo = $this->account_key.'.png';
-        } elseif ($disk->exists($this->account_key.'.jpg')) {
-            $this->logo = $this->account_key.'.jpg';
-        }
-
-        if (! empty($this->logo)) {
-            $image = imagecreatefromstring($disk->get($this->logo));
-            $this->logo_width = imagesx($image);
-            $this->logo_height = imagesy($image);
-            $this->logo_size = $disk->size($this->logo);
-        } else {
-            $this->logo = null;
-        }
-        $this->save();
-    }
-
-    /**
-     * @return null
-     */
-    public function getLogoRaw()
-    {
-        if (! $this->hasLogo()) {
-            return null;
-        }
-
-        $disk = $this->getLogoDisk();
-
-        return $disk->get($this->logo);
-    }
-
-    /**
-     * @param bool $cachebuster
-     *
-     * @return null|string
-     */
-    public function getLogoURL($cachebuster = false)
-    {
-        if (! $this->hasLogo()) {
-            return null;
-        }
-
-        $disk = $this->getLogoDisk();
-        $adapter = $disk->getAdapter();
-
-        if ($adapter instanceof \League\Flysystem\Adapter\Local) {
-            // Stored locally
-            $logoUrl = url('/logo/' . $this->logo);
-
-            if ($cachebuster) {
-                $logoUrl .= '?no_cache='.time();
-            }
-
-            return $logoUrl;
-        }
-
-        return Document::getDirectFileUrl($this->logo, $this->getLogoDisk());
-    }
-
-    public function getLogoPath()
-    {
-        if (! $this->hasLogo()) {
-            return null;
-        }
-
-        $disk = $this->getLogoDisk();
-        $adapter = $disk->getAdapter();
-
-        if ($adapter instanceof \League\Flysystem\Adapter\Local) {
-            return $adapter->applyPathPrefix($this->logo);
-        } else {
-            return Document::getDirectFileUrl($this->logo, $this->getLogoDisk());
-        }
-    }
-
-    /**
      * @return mixed
      */
     public function getPrimaryUser()
@@ -957,30 +863,6 @@ class Account extends Eloquent
         }
 
         return null;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getLogoWidth()
-    {
-        if (! $this->hasLogo()) {
-            return null;
-        }
-
-        return $this->logo_width;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getLogoHeight()
-    {
-        if (! $this->hasLogo()) {
-            return null;
-        }
-
-        return $this->logo_height;
     }
 
     /**
@@ -1347,26 +1229,6 @@ class Account extends Eloquent
         }
 
         return Carbon::instance($date);
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getLogoSize()
-    {
-        if (! $this->hasLogo()) {
-            return null;
-        }
-
-        return round($this->logo_size / 1000);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLogoTooLarge()
-    {
-        return $this->getLogoSize() > MAX_LOGO_FILE_SIZE;
     }
 
     /**
@@ -1787,7 +1649,17 @@ class Account extends Eloquent
 
         return $yearStart->format('Y-m-d');
     }
+
+    public function isClientPortalPasswordEnabled()
+    {
+        return $this->hasFeature(FEATURE_CLIENT_PORTAL_PASSWORD) && $this->enable_portal_password;
+    }
 }
+
+Account::creating(function ($account)
+{
+    LookupAccount::createAccount($account->account_key, $account->company_id);
+});
 
 Account::updated(function ($account) {
     // prevent firing event if the invoice/quote counter was changed
@@ -1798,4 +1670,11 @@ Account::updated(function ($account) {
     }
 
     Event::fire(new UserSettingsChanged());
+});
+
+Account::deleted(function ($account)
+{
+    LookupAccount::deleteWhere([
+        'account_key' => $account->account_key
+    ]);
 });

@@ -103,7 +103,7 @@
 
             {!! Former::select('client')
 					->addOption('', '')
-					->data_bind("dropdown: client, dropdownOptions: {highlighter: comboboxHighlighter}")
+					->data_bind("dropdown: client, dropdownOptions: {highlighter: comboboxHighlighter, matcher: comboboxMatcher}")
 					->addClass('client-input')
 					->addGroupClass('client_select closer-row') !!}
 
@@ -346,8 +346,8 @@
                         @if ($account->hasFeature(FEATURE_DOCUMENTS))
                             <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                                 {{ trans("texts.invoice_documents") }}
-                                @if (count($invoice->documents))
-                                    ({{ count($invoice->documents) }})
+                                @if ($count = $invoice->countDocuments())
+                                    ({{ $count }})
                                 @endif
                             </a></li>
                         @endif
@@ -393,9 +393,11 @@
                                 @if ($invoice->hasExpenseDocuments())
                                     <h4>{{trans('texts.documents_from_expenses')}}</h4>
                                     @foreach($invoice->expenses as $expense)
-                                        @foreach($expense->documents as $document)
-                                            <div>{{$document->name}}</div>
-                                        @endforeach
+										@if ($expense->invoice_documents)
+	                                        @foreach($expense->documents as $document)
+	                                            <div>{{$document->name}}</div>
+	                                        @endforeach
+										@endif
                                     @endforeach
                                 @endif
                             </div>
@@ -697,8 +699,20 @@
                             attr: {name: 'client[contacts][' + \$index() + '][phone]'}") !!}
                     @if ($account->hasFeature(FEATURE_CLIENT_PORTAL_PASSWORD) && $account->enable_portal_password)
                         {!! Former::password('password')->data_bind("value: (typeof password=='function'?password():null)?'-%unchanged%-':'', valueUpdate: 'afterkeydown',
-                            attr: {name: 'client[contacts][' + \$index() + '][password]'}") !!}
+                            attr: {name: 'client[contacts][' + \$index() + '][password]'}")->autocomplete('new-password') !!}
                     @endif
+					@if (Auth::user()->hasFeature(FEATURE_INVOICE_SETTINGS))
+	                    @if ($account->custom_contact_label1)
+	                        {!! Former::text('custom_contact1')->data_bind("value: custom_value1, valueUpdate: 'afterkeydown',
+		                            attr: {name: 'client[contacts][' + \$index() + '][custom_value1]'}")
+	                            ->label($account->custom_contact_label1) !!}
+	                    @endif
+	                    @if ($account->custom_contact_label2)
+							{!! Former::text('custom_contact2')->data_bind("value: custom_value2, valueUpdate: 'afterkeydown',
+									attr: {name: 'client[contacts][' + \$index() + '][custom_value2]'}")
+								->label($account->custom_contact_label2) !!}
+	                    @endif
+	                @endif
                     <div class="form-group">
                         <div class="col-lg-8 col-lg-offset-4">
                             <span class="redlink bold" data-bind="visible: $parent.contacts().length > 1">
@@ -827,8 +841,8 @@
 	<script type="text/javascript">
     Dropzone.autoDiscover = false;
 
-    var products = {!! $products !!};
-    var clients = {!! $clients !!};
+    var products = {!! strip_tags(json_encode($products)) !!};
+	var clients = {!! strip_tags(json_encode($clients)) !!};
     var account = {!! Auth::user()->account !!};
     var dropzone;
 
@@ -868,7 +882,7 @@
             // otherwise create blank model
             window.model = new ViewModel();
 
-            var invoice = {!! $invoice !!};
+            var invoice = {!! strip_tags(json_encode($invoice)) !!};
             ko.mapping.fromJS(invoice, model.invoice().mapping, model.invoice);
             model.invoice().is_recurring({{ $invoice->is_recurring ? '1' : '0' }});
             model.invoice().start_date_orig(model.invoice().start_date());
@@ -886,7 +900,7 @@
             @else
                 // set the default account tax rate
                 @if ($account->invoice_taxes && ! empty($defaultTax))
-                    var defaultTax = {!! $defaultTax->toJson() !!};
+                    var defaultTax = {!! strip_tags(json_encode($defaultTax)) !!};
                     model.invoice().tax_rate1(defaultTax.rate);
                     model.invoice().tax_name1(defaultTax.name);
                 @endif
@@ -895,7 +909,7 @@
             @if (isset($tasks) && $tasks)
                 // move the blank invoice line item to the end
                 var blank = model.invoice().invoice_items.pop();
-                var tasks = {!! $tasks !!};
+                var tasks = {!! strip_tags(json_encode($tasks)) !!};
 
                 for (var i=0; i<tasks.length; i++) {
                     var task = tasks[i];
@@ -914,7 +928,7 @@
 
                 // move the blank invoice line item to the end
                 var blank = model.invoice().invoice_items.pop();
-                var expenses = {!! $expenses !!}
+                var expenses = {!! strip_tags(json_encode($expenses)) !!}
 
                 for (var i=0; i<expenses.length; i++) {
                     var expense = expenses[i];
@@ -1085,7 +1099,7 @@
                 addRemoveLinks:true,
                 dictRemoveFileConfirmation:"{{trans('texts.are_you_sure')}}",
                 @foreach(['default_message', 'fallback_message', 'fallback_text', 'file_too_big', 'invalid_file_type', 'response_error', 'cancel_upload', 'cancel_upload_confirmation', 'remove_file'] as $key)
-                    "dict{{Utils::toClassCase($key)}}":"{{trans('texts.dropzone_'.$key)}}",
+                    "dict{{ Utils::toClassCase($key) }}" : "{!! strip_tags(addslashes(trans('texts.dropzone_'.$key))) !!}",
                 @endforeach
                 maxFilesize:{{floatval(MAX_DOCUMENT_SIZE/1000)}},
 				parallelUploads:1,

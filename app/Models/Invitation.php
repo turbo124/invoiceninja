@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Utils;
+use App\Models\LookupInvitation;
 
 /**
  * Class Invitation.
@@ -66,7 +67,7 @@ class Invitation extends EntityModel
      *
      * @return string
      */
-    public function getLink($type = 'view', $forceOnsite = false)
+    public function getLink($type = 'view', $forceOnsite = false, $forcePlain = false)
     {
         if (! $this->account) {
             $this->load('account');
@@ -87,7 +88,7 @@ class Invitation extends EntityModel
 
             if ($iframe_url && ! $forceOnsite) {
                 return "{$iframe_url}?{$this->invitation_key}";
-            } elseif ($this->account->subdomain) {
+            } elseif ($this->account->subdomain && ! $forcePlain) {
                 $url = Utils::replaceSubdomain($url, $account->subdomain);
             }
         }
@@ -162,3 +163,17 @@ class Invitation extends EntityModel
         return sprintf('<img src="data:image/svg+xml;base64,%s"></img><p/>%s: %s', $this->signature_base64, trans('texts.signed'), Utils::fromSqlDateTime($this->signature_date));
     }
 }
+
+Invitation::creating(function ($invitation)
+{
+    LookupInvitation::createNew($invitation->account->account_key, [
+        'invitation_key' => $invitation->invitation_key,
+    ]);
+});
+
+Invitation::deleted(function ($invitation)
+{
+    LookupInvitation::deleteWhere([
+        'invitation_key' => $invitation->invitation_key,
+    ]);
+});

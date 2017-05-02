@@ -251,11 +251,6 @@ class Utils
         }
     }
 
-    public static function getDemoAccountId()
-    {
-        return isset($_ENV[DEMO_ACCOUNT_ID]) ? $_ENV[DEMO_ACCOUNT_ID] : false;
-    }
-
     public static function getNewsFeedResponse($userType = false)
     {
         if (! $userType) {
@@ -969,10 +964,11 @@ class Utils
         return $str;
     }
 
-    public static function getSubdomainPlaceholder()
+    public static function getSubdomain($url)
     {
-        $parts = parse_url(SITE_URL);
+        $parts = parse_url($url);
         $subdomain = '';
+
         if (isset($parts['host'])) {
             $host = explode('.', $parts['host']);
             if (count($host) > 2) {
@@ -981,6 +977,11 @@ class Utils
         }
 
         return $subdomain;
+    }
+
+    public static function getSubdomainPlaceholder()
+    {
+        return static::getSubdomain(SITE_URL);
     }
 
     public static function getDomainPlaceholder()
@@ -1233,5 +1234,14 @@ class Utils
     public static function truncateString($string, $length)
     {
         return strlen($string) > $length ? rtrim(substr($string, 0, $length)) . '...' : $string;
+    }
+
+    // http://stackoverflow.com/a/14238078/497368
+    public static function isInterlaced($filename)
+    {
+       $handle = fopen($filename, 'r');
+       $contents = fread($handle, 32);
+       fclose($handle);
+       return( ord($contents[28]) != 0 );
     }
 }
