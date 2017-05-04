@@ -134,6 +134,10 @@ class TaskRepository extends BaseRepository
             $timeLog = [];
         }
 
+        if(isset($data['client_id'])) {
+            $task->client_id = Client::getPrivateId($data['client_id']);
+        }
+
         array_multisort($timeLog);
 
         if (isset($data['action'])) {
