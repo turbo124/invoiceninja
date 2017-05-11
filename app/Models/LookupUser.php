@@ -18,9 +18,10 @@ class LookupUser extends LookupModel
         'email',
         'user_id',
         'confirmation_code',
+        'oauth_user_key',
     ];
 
-    public static function updateUser($accountKey, $userId, $email, $confirmationCode)
+    public static function updateUser($accountKey, $user)
     {
         if (! env('MULTI_DB_ENABLED')) {
             return;
@@ -33,11 +34,12 @@ class LookupUser extends LookupModel
                             ->firstOrFail();
 
         $lookupUser = LookupUser::whereLookupAccountId($lookupAccount->id)
-                            ->whereUserId($userId)
+                            ->whereUserId($user->id)
                             ->firstOrFail();
 
-        $lookupUser->email = $email;
-        $lookupUser->confirmation_code = $confirmationCode;
+        $lookupUser->email = $user->email;
+        $lookupUser->confirmation_code = $user->confirmation_code;
+        $lookupUser->oauth_user_key = ($user->oauth_provider_id && $user->oauth_user_id) ? ($user->oauth_provider_id . '-' . $user->oauth_user_id) : null;
         $lookupUser->save();
 
         config(['database.default' => $current]);
@@ -50,12 +52,14 @@ class LookupUser extends LookupModel
         }
 
         $current = config('database.default');
+        $accountKey = $user->account->account_key;
+
         config(['database.default' => DB_NINJA_LOOKUP]);
 
         $lookupUser = LookupUser::whereEmail($email)->first();
 
         if ($user) {
-            $lookupAccount = LookupAccount::whereAccountKey($user->account->account_key)->firstOrFail();
+            $lookupAccount = LookupAccount::whereAccountKey($accountKey)->firstOrFail();
             $isValid = ! $lookupUser || ($lookupUser->lookup_account_id == $lookupAccount->id && $lookupUser->user_id == $user->id);
         } else {
             $isValid = ! $lookupUser;
