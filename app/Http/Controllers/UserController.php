@@ -182,7 +182,7 @@ class UserController extends BaseController
                             ->withInput();
             }
 
-            if (! \App\Models\LookupUser::validateEmail($email, $user)) {
+            if (! \App\Models\LookupUser::validateEmail(Input::get('email'), $user)) {
                 return Redirect::to($userPublicId ? 'users/edit' : 'users/create')
                     ->withError(trans('texts.email_taken'))
                     ->withInput();
@@ -256,11 +256,12 @@ class UserController extends BaseController
             $notice_msg = trans('texts.security_confirmation');
 
             $user->confirmed = true;
-            $user->confirmation_code = '';
+            $user->confirmation_code = null;
             $user->save();
 
             if ($user->public_id) {
                 Auth::logout();
+                Session::flush();
                 $token = Password::getRepository()->create($user);
 
                 return Redirect::to("/password/reset/{$token}");
@@ -279,7 +280,7 @@ class UserController extends BaseController
                 return Redirect::to($url)->with('message', $notice_msg);
             }
         } else {
-            $error_msg = trans('texts.security.wrong_confirmation');
+            $error_msg = trans('texts.wrong_confirmation');
 
             return Redirect::to('/login')->with('error', $error_msg);
         }
