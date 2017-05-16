@@ -19,6 +19,7 @@ class LookupUser extends LookupModel
         'user_id',
         'confirmation_code',
         'oauth_user_key',
+        'referral_code',
     ];
 
     public static function updateUser($accountKey, $user)
@@ -40,23 +41,24 @@ class LookupUser extends LookupModel
         $lookupUser->email = $user->email;
         $lookupUser->confirmation_code = $user->confirmation_code;
         $lookupUser->oauth_user_key = ($user->oauth_provider_id && $user->oauth_user_id) ? ($user->oauth_provider_id . '-' . $user->oauth_user_id) : null;
+        $lookupUser->referral_code = $user->referral_code;
         $lookupUser->save();
 
         config(['database.default' => $current]);
     }
 
-    public static function validateEmail($email, $user = false)
+    public static function validateField($field, $value, $user = false)
     {
         if (! env('MULTI_DB_ENABLED')) {
             return true;
         }
 
         $current = config('database.default');
-        $accountKey = $user->account->account_key;
+        $accountKey = $user ? $user->account->account_key : false;
 
         config(['database.default' => DB_NINJA_LOOKUP]);
 
-        $lookupUser = LookupUser::whereEmail($email)->first();
+        $lookupUser = LookupUser::where($field, '=', $value)->first();
 
         if ($user) {
             $lookupAccount = LookupAccount::whereAccountKey($accountKey)->firstOrFail();
