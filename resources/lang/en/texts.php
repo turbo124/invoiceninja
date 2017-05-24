@@ -2248,6 +2248,13 @@ $LANG = array(
     'oauth_taken' => 'The account is already registered',
     'emailed_payment' => 'Successfully emailed payment',
     'email_payment' => 'Email Payment',
+    'sent' => 'Sent',
+    'invoiceplane_import' => 'Use :link to migrate your data from InvoicePlane.',
+    'duplicate_expense_warning' => 'Warning: This :link may be a duplicate',
+    'expense_link' => 'expense',
+    'resume_task' => 'Resume Task',
+    'resumed_task' => 'Successfully resumed task',
+
 );
 
 return $LANG;

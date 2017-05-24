@@ -8,9 +8,9 @@
 [![Docs](https://readthedocs.org/projects/invoice-ninja/badge/?version=latest)](http://docs.invoiceninja.com/en/latest/?badge=latest)
 [![Join the chat at https://gitter.im/hillelcoren/invoice-ninja](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hillelcoren/invoice-ninja?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-## [Hosted](https://www.invoiceninja.com) | [Self-hosted](https://www.invoiceninja.org) | [iPhone](https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=1220337560&mt=8) | [Android](https://play.google.com/store/apps/details?id=com.invoiceninja.invoiceninja)
+## [Hosted](https://www.invoiceninja.com) | [Self-Hosted](https://www.invoiceninja.org) | [iPhone](https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=1220337560&mt=8) | [Android](https://play.google.com/store/apps/details?id=com.invoiceninja.invoiceninja)
 
-Watch this [YouTube Video](https://www.youtube.com/watch?v=xHGKvadapbA) for an overview of the app's features.
+Watch this [YouTube video](https://www.youtube.com/watch?v=xHGKvadapbA) for an overview of the app's features.
 
 All Pro and Enterprise features from the hosted app are included in the open-source code. We offer a $20 per year white-label license to remove our branding.
 
@@ -60,6 +60,9 @@ The [self-host zip](https://www.invoiceninja.com/self-host/) includes all third 
 * [Support Forum](https://www.invoiceninja.com/forums/forum/support/)
 * [Feature Roadmap](https://trello.com/b/63BbiVVe/)
 
+## Tools
+* [InvoicePlane Import](https://github.com/turbo124/Plane2Ninja)
+
 ## Development
 * [API Documentation](https://www.invoiceninja.com/api-documentation/)
 * [PHP SDK](https://github.com/invoiceninja/sdk-php)
@@ -72,6 +75,7 @@ For information on how contribute to Invoice Ninja, please see our [contributing
 
 ## Credits
 * [Hillel Coren](https://hillelcoren.com/)
+* [David Bomba](https://github.com/turbo124)
 * [All contributors](https://github.com/invoiceninja/invoiceninja/graphs/contributors)
 
 **Special thanks to:**

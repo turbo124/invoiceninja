@@ -46,6 +46,7 @@ class Invoice extends EntityModel implements BalanceAffecting
         'tax_rate1',
         'tax_name2',
         'tax_rate2',
+        'private_notes',
     ];
 
     /**
@@ -429,7 +430,7 @@ class Invoice extends EntityModel implements BalanceAffecting
     /**
      * @return bool
      */
-    public function isInvoice()
+    public function isStandard()
     {
         return $this->isType(INVOICE_TYPE_STANDARD) && ! $this->is_recurring;
     }
@@ -610,7 +611,7 @@ class Invoice extends EntityModel implements BalanceAffecting
 
     public function canBePaid()
     {
-        return floatval($this->balance) != 0 && ! $this->is_deleted && $this->isInvoice();
+        return floatval($this->balance) != 0 && ! $this->is_deleted && $this->isStandard();
     }
 
     public static function calcStatusLabel($status, $class, $entityType, $quoteInvoiceId)

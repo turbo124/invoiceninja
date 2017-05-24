@@ -16,6 +16,8 @@ If the auto-update fails you can manually run the update with the following comm
 
 .. NOTE:: If you've downloaded the code from GitHub you also need to run ``composer install``
 
+.. TIP:: You can see the detailed changes for each release on our `GitHub release notes <https://github.com/invoiceninja/invoiceninja/releases>`_.
+
 Version 3.2
 """""""""""
 
