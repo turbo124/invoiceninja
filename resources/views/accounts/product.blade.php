@@ -33,13 +33,15 @@
 
   {!! Former::text('cost') !!}
 
-  @include('partials.tax_rates')
+  @if ($account->invoice_item_taxes)
+    @include('partials.tax_rates')
+  @endif
 
   </div>
   </div>
 
   {!! Former::actions(
-      Button::normal(trans('texts.cancel'))->large()->asLinkTo(URL::to('/products'))->appendIcon(Icon::create('remove-circle')),
+      Button::normal(trans('texts.cancel'))->large()->asLinkTo(HTMLUtils::previousUrl('/products'))->appendIcon(Icon::create('remove-circle')),
       Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk'))
   ) !!}
 

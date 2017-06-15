@@ -1,20 +1,12 @@
 @extends('header')
 
-@section('head')
+@section('head_css')
 	@parent
 
-    @include('money_script')
-
-    @foreach ($account->getFontFolders() as $font)
-        <script src="{{ asset('js/vfs_fonts/'.$font.'.js') }}" type="text/javascript"></script>
-    @endforeach
-	<script src="{{ asset('pdf.built.js') }}?no_cache={{ NINJA_VERSION }}" type="text/javascript"></script>
-    <script src="{{ asset('js/lightbox.min.js') }}" type="text/javascript"></script>
-    <link href="{{ asset('css/lightbox.css') }}" rel="stylesheet" type="text/css"/>
+	<link href="{{ asset('css/lightbox.css') }}" rel="stylesheet" type="text/css"/>
 	<link href="{{ asset('css/quill.snow.css') }}" rel="stylesheet" type="text/css"/>
-	<script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
 
-    <style type="text/css">
+	<style type="text/css">
         select.tax-select {
             width: 50%;
             float: left;
@@ -33,6 +25,19 @@
 		}
 
     </style>
+@stop
+
+@section('head')
+	@parent
+
+    @include('money_script')
+
+    @foreach ($account->getFontFolders() as $font)
+        <script src="{{ asset('js/vfs_fonts/'.$font.'.js') }}" type="text/javascript"></script>
+    @endforeach
+	<script src="{{ asset('pdf.built.js') }}?no_cache={{ NINJA_VERSION }}" type="text/javascript"></script>
+    <script src="{{ asset('js/lightbox.min.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
 @stop
 
 @section('content')
@@ -552,7 +557,7 @@
             {!! Former::text('pdfupload') !!}
 		</div>
 
-		@if (!Utils::hasFeature(FEATURE_MORE_INVOICE_DESIGNS) || \App\Models\InvoiceDesign::count() == COUNT_FREE_DESIGNS_SELF_HOST)
+		@if (!Utils::hasFeature(FEATURE_MORE_INVOICE_DESIGNS))
 			{!! Former::select('invoice_design_id')->style('display:inline;width:150px;background-color:white !important')->raw()->fromQuery($invoiceDesigns, 'name', 'id')->data_bind("value: invoice_design_id")->addOption(trans('texts.more_designs') . '...', '-1') !!}
 		@else
 			{!! Former::select('invoice_design_id')->style('display:inline;width:150px;background-color:white !important')->raw()->fromQuery($invoiceDesigns, 'name', 'id')->data_bind("value: invoice_design_id") !!}
@@ -1281,7 +1286,7 @@
         var design  = getDesignJavascript();
 		if (!design) return;
 		var doc = generatePDF(invoice, design, true);
-        var type = invoice.is_quote ? '{{ trans('texts.'.ENTITY_QUOTE) }}' : '{{ trans('texts.'.ENTITY_INVOICE) }}';
+        var type = invoice.is_quote ? '{!! trans('texts.'.ENTITY_QUOTE) !!}' : '{!! trans('texts.'.ENTITY_INVOICE) !!}';
 		doc.save(type + '-' + $('#invoice_number').val() + '.pdf');
 	}
 
@@ -1345,12 +1350,19 @@
 
 	function onMarkSentClick() {
 		if (model.invoice().is_recurring()) {
+			if (! model.invoice().start_date()) {
+				swal("{{ trans('texts.start_date_required') }}");
+				return false;
+			}
 			if (!isSaveValid()) {
 	            model.showClientForm();
 	            return false;
 	        }
             // warn invoice will be emailed when saving new recurring invoice
-            var text = '\n' + getSendToEmails() + '\n\n' + "{!! trans("texts.confirm_recurring_timing") !!}";
+            var text = '\n' + getSendToEmails();
+			if (model.invoice().start_date() == "{{ Utils::fromSqlDate(date('Y-m-d')) }}") {
+				text += '\n\n' + "{!! trans("texts.confirm_recurring_timing") !!}";
+			}
             var title = "{!! trans("texts.confirm_recurring_email_$entityType") !!}";
             sweetConfirm(function() {
 				model.invoice().is_public(true);
@@ -1716,8 +1728,10 @@
         window.countUploadingDocuments--;
     }
 
-    function handleDocumentError() {
+    function handleDocumentError(file) {
+		dropzone.removeFile(file);
         window.countUploadingDocuments--;
+		swal("{!! trans('texts.error_refresh_page') !!}");
     }
 
 	</script>

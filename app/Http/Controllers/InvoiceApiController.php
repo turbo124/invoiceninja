@@ -149,6 +149,7 @@ class InvoiceApiController extends BaseAPIController
                     'country_id',
                     'private_notes',
                     'currency_code',
+                    'country_code',
                 ] as $field) {
                     if (isset($data[$field])) {
                         $clientData[$field] = $data[$field];
@@ -249,6 +250,10 @@ class InvoiceApiController extends BaseAPIController
         }
         if (! isset($data['due_date'])) {
             $fields['due_date_sql'] = false;
+        }
+
+        if (isset($data['is_quote']) && filter_var($data['is_quote'], FILTER_VALIDATE_BOOLEAN)) {
+            $fields['invoice_design_id'] = $account->quote_design_id;
         }
 
         foreach ($fields as $key => $val) {

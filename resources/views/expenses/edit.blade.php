@@ -198,7 +198,7 @@
 
     <center class="buttons">
         {!! Button::normal(trans('texts.cancel'))
-                ->asLinkTo(URL::to('/expenses'))
+                ->asLinkTo(HTMLUtils::previousUrl('/expenses'))
                 ->appendIcon(Icon::create('remove-circle'))
                 ->large() !!}
 
@@ -373,6 +373,10 @@
             @if ($expense && $expense->payment_date)
                 $('#payment_date').datepicker('update', '{{ Utils::fromSqlDate($expense->payment_date) }}');
             @endif
+
+            $('.payment_date .input-group-addon').click(function() {
+                toggleDatePicker('payment_date');
+            });
 
             // Initialize document upload
             dropzone = new Dropzone('#document-upload', {

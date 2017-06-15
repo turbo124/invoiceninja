@@ -1,9 +1,10 @@
 @extends('master')
 
+@section('head_css')
+    <link href="{{ asset('css/built.css') }}?no_cache={{ NINJA_VERSION }}" rel="stylesheet" type="text/css"/>
+@stop
 
 @section('head')
-
-  <link href="{{ asset('css/built.css') }}?no_cache={{ NINJA_VERSION }}" rel="stylesheet" type="text/css"/>
 
 <script type="text/javascript">
 
@@ -102,7 +103,7 @@
   $(function() {
     // auto-logout after 8 hours
     window.setTimeout(function() {
-        window.location = '{{ URL::to('/logout?reason=inactivity') }}';
+        window.location = '{{ URL::to('/logout?reason=inactive') }}';
     }, {{ 1000 * env('AUTO_LOGOUT_SECONDS', (60 * 60 * 8)) }});
 
     // auto-hide status alerts
@@ -394,13 +395,15 @@
             @include('partials.navigation_option', ['option' => 'settings'])
             <li style="width:100%;">
                 <div class="nav-footer">
-                    <a href="javascript:showContactUs()" target="_blank" title="{{ trans('texts.contact_us') }}">
-                        <i class="fa fa-envelope"></i>
-                    </a>
+                    @if (Auth::user()->registered)
+                        <a href="javascript:showContactUs()" title="{{ trans('texts.contact_us') }}">
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    @endif
                     <a href="{{ url(NINJA_FORUM_URL) }}" target="_blank" title="{{ trans('texts.support_forum') }}">
                         <i class="fa fa-list-ul"></i>
                     </a>
-                    <a href="javascript:showKeyboardShortcuts()" target="_blank" title="{{ trans('texts.help') }}">
+                    <a href="javascript:showKeyboardShortcuts()" title="{{ trans('texts.help') }}">
                         <i class="fa fa-question-circle"></i>
                     </a>
                     <a href="{{ url(SOCIAL_LINK_FACEBOOK) }}" target="_blank" title="Facebook">

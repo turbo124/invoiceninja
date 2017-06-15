@@ -279,7 +279,7 @@ class InvoiceRepository extends BaseRepository
           ->where('invoices.is_recurring', '=', false)
           ->where('invoices.is_public', '=', true)
           // Only show paid invoices for ninja accounts
-          ->whereRaw(sprintf("((accounts.account_key != '%s' and accounts.account_key not like '%s') or invoices.invoice_status_id = %d)", env('NINJA_LICENSE_ACCOUNT_KEY'), substr(NINJA_ACCOUNT_KEY, 0, 30), INVOICE_STATUS_PAID))
+          ->whereRaw(sprintf("((accounts.account_key != '%s' and accounts.account_key not like '%s%%') or invoices.invoice_status_id = %d)", env('NINJA_LICENSE_ACCOUNT_KEY'), substr(NINJA_ACCOUNT_KEY, 0, 30), INVOICE_STATUS_PAID))
           ->select(
                 DB::raw('COALESCE(clients.currency_id, accounts.currency_id) currency_id'),
                 DB::raw('COALESCE(clients.country_id, accounts.country_id) country_id'),
@@ -412,12 +412,14 @@ class InvoiceRepository extends BaseRepository
             $invoice->invoice_date = Utils::toSqlDate($data['invoice_date']);
         }
 
+        /*
         if (isset($data['invoice_status_id'])) {
             if ($data['invoice_status_id'] == 0) {
                 $data['invoice_status_id'] = INVOICE_STATUS_DRAFT;
             }
             $invoice->invoice_status_id = $data['invoice_status_id'];
         }
+        */
 
         if ($invoice->is_recurring) {
             if (! $isNew && isset($data['start_date']) && $invoice->start_date && $invoice->start_date != Utils::toSqlDate($data['start_date'])) {
@@ -469,8 +471,6 @@ class InvoiceRepository extends BaseRepository
         if (isset($data['po_number'])) {
             $invoice->po_number = trim($data['po_number']);
         }
-
-        $invoice->invoice_design_id = isset($data['invoice_design_id']) ? $data['invoice_design_id'] : $account->invoice_design_id;
 
         // provide backwards compatibility
         if (isset($data['tax_name']) && isset($data['tax_rate'])) {
@@ -725,7 +725,7 @@ class InvoiceRepository extends BaseRepository
             }
         }
 
-        // if no contacts are selected auto-select the first to enusre there's an invitation
+        // if no contacts are selected auto-select the first to ensure there's an invitation
         if (! count($sendInvoiceIds)) {
             $sendInvoiceIds[] = $client->contacts[0]->id;
         }
@@ -1071,6 +1071,8 @@ class InvoiceRepository extends BaseRepository
                 $invoice->invoice_status_id = INVOICE_STATUS_PAID;
             }
         }
+
+        $this->dispatchEvents($invoice);
 
         return $invoice;
     }

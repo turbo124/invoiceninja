@@ -48,6 +48,7 @@ class Invoice extends EntityModel implements BalanceAffecting
         'tax_rate2',
         'private_notes',
         'last_sent_date',
+        'invoice_design_id',
     ];
 
     /**
@@ -494,6 +495,7 @@ class Invoice extends EntityModel implements BalanceAffecting
     public function markInvitationSent($invitation, $messageId = false, $notify = true, $notes = false)
     {
         if (! $this->isSent()) {
+            $this->is_public = true;
             $this->invoice_status_id = INVOICE_STATUS_SENT;
             $this->save();
         }
@@ -1036,7 +1038,7 @@ class Invoice extends EntityModel implements BalanceAffecting
                         $dueDay = $lastDayOfMonth;
                     }
 
-                    if ($currentDay > $dueDay) {
+                    if ($currentDay >= $dueDay) {
                         // Wait until next month
                         // We don't need to handle the December->January wraparaound, since PHP handles month 13 as January of next year
                         $dueMonth++;
@@ -1251,14 +1253,12 @@ class Invoice extends EntityModel implements BalanceAffecting
                 $pdfString = CurlUtils::phantom('GET', $link . '?phantomjs=true&phantomjs_secret=' . env('PHANTOMJS_SECRET'));
             }
 
-            if (! $pdfString && (Utils::isNinja() || ! env('PHANTOMJS_BIN_PATH'))) {
-                if ($key = env('PHANTOMJS_CLOUD_KEY')) {
-                    if (Utils::isNinjaDev()) {
-                        $link = env('TEST_LINK');
-                    }
-                    $url = "http://api.phantomjscloud.com/api/browser/v2/{$key}/?request=%7Burl:%22{$link}?phantomjs=true%22,renderType:%22html%22%7D";
-                    $pdfString = CurlUtils::get($url);
+            if (! $pdfString && ($key = env('PHANTOMJS_CLOUD_KEY'))) {
+                if (Utils::isNinjaDev()) {
+                    $link = env('TEST_LINK');
                 }
+                $url = "http://api.phantomjscloud.com/api/browser/v2/{$key}/?request=%7Burl:%22{$link}?phantomjs=true%22,renderType:%22html%22%7D";
+                $pdfString = CurlUtils::get($url);
             }
 
             $pdfString = strip_tags($pdfString);

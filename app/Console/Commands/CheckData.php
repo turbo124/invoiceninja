@@ -10,6 +10,7 @@ use Mail;
 use Symfony\Component\Console\Input\InputOption;
 use Utils;
 use App\Models\Contact;
+use App\Models\Invoice;
 use App\Models\Invitation;
 
 /*
@@ -71,13 +72,12 @@ class CheckData extends Command
         if (! $this->option('client_id')) {
             $this->checkBlankInvoiceHistory();
             $this->checkPaidToDate();
+            $this->checkDraftSentInvoices();
         }
 
         $this->checkBalances();
         $this->checkContacts();
-
-        // TODO Enable once user_account companies have been merged
-        //$this->checkUserAccounts();
+        $this->checkUserAccounts();
 
         if (! $this->option('client_id')) {
             $this->checkOAuth();
@@ -89,8 +89,6 @@ class CheckData extends Command
 
         $this->logMessage('Done: ' . strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
         $errorEmail = env('ERROR_EMAIL');
-
-        $this->info($this->log);
 
         if ($errorEmail) {
             Mail::raw($this->log, function ($message) use ($errorEmail, $database) {
@@ -105,7 +103,32 @@ class CheckData extends Command
 
     private function logMessage($str)
     {
+        $str = date('Y-m-d h:i:s') . ' ' . $str;
+        $this->info($str);
         $this->log .= $str . "\n";
+    }
+
+    private function checkDraftSentInvoices()
+    {
+        $invoices = Invoice::whereInvoiceStatusId(INVOICE_STATUS_SENT)
+                        ->whereIsPublic(false)
+                        ->withTrashed()
+                        ->get();
+
+        $this->logMessage(count($invoices) . ' draft sent invoices');
+
+        if (count($invoices) > 0) {
+            $this->isValid = false;
+        }
+
+        if ($this->option('fix') == 'true') {
+            foreach ($invoices as $invoice) {
+                if ($invoice->is_deleted) {
+                    $invoice->unsetEventDispatcher();
+                }
+                $invoice->markSent();
+            }
+        }
     }
 
     private function checkOAuth()
@@ -221,8 +244,9 @@ class CheckData extends Command
             }
         }
 
+        $this->logMessage($countInvalid . ' user accounts with multiple companies');
+
         if ($countInvalid > 0) {
-            $this->logMessage($countInvalid . ' user accounts with multiple companies');
             $this->isValid = false;
         }
     }
@@ -336,7 +360,10 @@ class CheckData extends Command
     private function checkInvitations()
     {
         $invoices = DB::table('invoices')
-                    ->leftJoin('invitations', 'invitations.invoice_id', '=', 'invoices.id')
+                    ->leftJoin('invitations', function ($join) {
+                        $join->on('invitations.invoice_id', '=', 'invoices.id')
+                             ->whereNull('invitations.deleted_at');
+                    })
                     ->groupBy('invoices.id', 'invoices.user_id', 'invoices.account_id', 'invoices.client_id')
                     ->havingRaw('count(invitations.id) = 0')
                     ->get(['invoices.id', 'invoices.user_id', 'invoices.account_id', 'invoices.client_id']);
