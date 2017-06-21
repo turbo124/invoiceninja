@@ -14,7 +14,9 @@ function ViewModel(data) {
         @if (!$invoice->id)
             self.setDueDate();
             // copy default note from the client to the invoice
-            model.invoice().public_notes(client.public_notes);
+            if (client.public_notes) {
+                model.invoice().public_notes(client.public_notes);
+            }
         @endif
     }
 
@@ -163,6 +165,22 @@ function ViewModel(data) {
             }
         }
     });
+
+    self.hasTasksCached;
+    self.hasTasks = ko.computed(function() {
+        if (self.hasTasksCached) {
+            return true;
+        }
+        invoice = self.invoice();
+        for (var i=0; i<invoice.invoice_items().length; ++i) {
+            var item = invoice.invoice_items()[i];
+            if (! item.isEmpty() && item.invoice_item_type_id() == {{ INVOICE_ITEM_TYPE_TASK }}) {
+                self.hasTasksCached = true;
+                return true;
+            }
+        }
+        return false;
+    });
 }
 
 function InvoiceModel(data) {
@@ -285,14 +303,6 @@ function InvoiceModel(data) {
     } else {
         self.addItem();
     }
-
-    self.qtyLabel = ko.computed(function() {
-        return self.has_tasks() ? invoiceLabels['hours'] : invoiceLabels['quantity'];
-    }, this);
-
-    self.costLabel = ko.computed(function() {
-        return self.has_tasks() ? invoiceLabels['rate'] : invoiceLabels['unit_cost'];
-    }, this);
 
     this.tax1 = ko.computed({
         read: function () {
@@ -558,6 +568,18 @@ function InvoiceModel(data) {
         }
         self.applyInclusivTax(taxRate);
     }
+
+    self.invoice_items_with_tasks = ko.computed(function() {
+        return ko.utils.arrayFilter(self.invoice_items(), function(item) {
+            return item.invoice_item_type_id() == {{ INVOICE_ITEM_TYPE_TASK }};
+        });
+    });
+
+    self.invoice_items_without_tasks = ko.computed(function() {
+        return ko.utils.arrayFilter(self.invoice_items(), function(item) {
+            return item.invoice_item_type_id() != {{ INVOICE_ITEM_TYPE_TASK }};
+        });
+    });
 }
 
 function ClientModel(data) {
