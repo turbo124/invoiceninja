@@ -202,7 +202,7 @@
         <p>&nbsp;<br/>&nbsp;</p>
     @endif
 
-    @if ($accountGateway->isGateway(GATEWAY_WEPAY) && $account->token_billing_type_id === TOKEN_BILLING_DISABLED)
+    @if ($accountGateway->isGateway(GATEWAY_WEPAY) && $account->token_billing_type_id == TOKEN_BILLING_DISABLED)
         {{--- do nothing ---}}
     @else
         <div class="row">
@@ -316,11 +316,12 @@
     <p>&nbsp;</p>
     <center>
         @if (isset($invitation))
-            {!! Button::normal(strtoupper(trans('texts.cancel')))->large()->asLinkTo($invitation->getLink()) !!}
+            {!! Button::normal(strtoupper(trans('texts.cancel')))->large()->asLinkTo(HTMLUtils::previousUrl('/credits')) !!}
             &nbsp;&nbsp;
         @endif
-        @if(isset($amount))
-            {!! Button::success(strtoupper(trans('texts.pay_now') . ' - ' . $account->formatMoney($amount, $client, CURRENCY_DECORATOR_CODE)  ))
+
+        @if (isset($amount))
+            {!! Button::success(request()->update ? strtoupper(trans('texts.submit')) : strtoupper(trans('texts.pay_now') . ' - ' . $account->formatMoney($amount, $client, CURRENCY_DECORATOR_CODE)  ))
                             ->submit()
                             ->large() !!}
         @else

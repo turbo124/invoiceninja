@@ -21,7 +21,7 @@ function GetPdfMake(invoice, javascript, callback) {
         var json = JSON.parse(javascript);
         for (var i=0; i<json.content.length; i++) {
             var item = json.content[i];
-            if (item.style == 'invoiceLineItemsTable') {
+            if (item.table && item.table.body == '$invoiceLineItems') {
                 itemsTable = JSON.stringify(item);
                 itemsTable = itemsTable.replace('$invoiceLineItems', '$taskLineItems');
                 //itemsTable = itemsTable.replace('$invoiceLineItemColumns', '$taskLineItemColumns');
@@ -468,7 +468,7 @@ NINJA.invoiceLines = function(invoice, isSecondTable) {
     }
 
     if (invoice.has_product_key) {
-        grid[0].push({text: invoiceLabels.item, style: styles.concat('itemTableHeader')});
+        grid[0].push({text: isTasks ? invoiceLabels.service : invoiceLabels.item, style: styles.concat('itemTableHeader')});
     }
 
     grid[0].push({text: invoiceLabels.description, style: styles.concat('descriptionTableHeader')});
@@ -830,8 +830,14 @@ NINJA.renderField = function(invoice, field, twoColumn) {
         value = (contact.first_name || contact.last_name) ? contact.first_name + ' ' + contact.last_name : false;
     } else if (field == 'client.id_number') {
         value = client.id_number;
+        if (invoiceLabels.id_number_orig) {
+            label = invoiceLabels.id_number;
+        }
     } else if (field == 'client.vat_number') {
         value = client.vat_number;
+        if (invoiceLabels.vat_number_orig) {
+            label = invoiceLabels.vat_number;
+        }
     } else if (field == 'client.address1') {
         value = client.address1;
     } else if (field == 'client.address2') {
@@ -879,8 +885,14 @@ NINJA.renderField = function(invoice, field, twoColumn) {
         value = account.name;
     } else if (field == 'account.id_number') {
         value = account.id_number;
+        if (invoiceLabels.id_number_orig) {
+            label = invoiceLabels.id_number;
+        }
     } else if (field == 'account.vat_number') {
         value = account.vat_number;
+        if (invoiceLabels.vat_number_orig) {
+            label = invoiceLabels.vat_number;
+        }
     } else if (field == 'account.website') {
         value = account.website;
     } else if (field == 'account.email') {
@@ -1159,7 +1171,7 @@ NINJA.parseRegExp = function(val, regExpStr, formatter, groupText)
 NINJA.parseRegExpLine = function(line, regExp, formatter, groupText)
 {
     var parts = [];
-    var lastIndex = 0;
+    var lastIndex = -1;
 
     while (match = regExp.exec(line)) {
         if (match.index > lastIndex) {

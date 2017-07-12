@@ -75,7 +75,7 @@ class OnlinePaymentController extends BaseController
             ]);
         }
 
-        if (! $invitation->invoice->canBePaid()) {
+        if (! $invitation->invoice->canBePaid() && ! request()->update) {
             return redirect()->to('view/' . $invitation->invitation_key);
         }
 
@@ -120,14 +120,16 @@ class OnlinePaymentController extends BaseController
         $gatewayTypeId = Session::get($invitation->id . 'gateway_type');
         $paymentDriver = $invitation->account->paymentDriver($invitation, $gatewayTypeId);
 
-        if (! $invitation->invoice->canBePaid()) {
+        if (! $invitation->invoice->canBePaid() && ! request()->update) {
             return redirect()->to('view/' . $invitation->invitation_key);
         }
 
         try {
             $paymentDriver->completeOnsitePurchase($request->all());
 
-            if ($paymentDriver->isTwoStep()) {
+            if (request()->update) {
+                return redirect('/client/dashboard')->withMessage(trans('texts.updated_payment_details'));
+            } elseif ($paymentDriver->isTwoStep()) {
                 Session::flash('warning', trans('texts.bank_account_verification_next_steps'));
             } else {
                 Session::flash('message', trans('texts.applied_payment'));
@@ -343,13 +345,14 @@ class OnlinePaymentController extends BaseController
         $data = [
             'client_id' => $client->id,
             'is_recurring' => filter_var(Input::get('is_recurring'), FILTER_VALIDATE_BOOLEAN),
+            'is_public' => filter_var(Input::get('is_recurring'), FILTER_VALIDATE_BOOLEAN),
             'frequency_id' => Input::get('frequency_id'),
             'auto_bill_id' => Input::get('auto_bill_id'),
             'start_date' => Input::get('start_date', date('Y-m-d')),
             'tax_rate1' => $account->tax_rate1,
-            'tax_name1' => $account->tax_name1,
+            'tax_name1' => $account->tax_name1 ?: '',
             'tax_rate2' => $account->tax_rate2,
-            'tax_name2' => $account->tax_name2,
+            'tax_name2' => $account->tax_name2 ?: '',
             'custom_text_value1' => Input::get('custom_invoice1'),
             'custom_text_value2' => Input::get('custom_invoice2'),
             'invoice_items' => [[
@@ -358,9 +361,9 @@ class OnlinePaymentController extends BaseController
                 'cost' => $product->cost,
                 'qty' => 1,
                 'tax_rate1' => $account->tax_rate1,
-                'tax_name1' => $account->tax_name1,
+                'tax_name1' => $account->tax_name1 ?: '',
                 'tax_rate2' => $account->tax_rate2,
-                'tax_name2' => $account->tax_name2,
+                'tax_name2' => $account->tax_name2 ?: '',
                 'custom_value1' => Input::get('custom_product1') ?: $product->custom_value1,
                 'custom_value2' => Input::get('custom_product2') ?: $product->custom_value2,
             ]],

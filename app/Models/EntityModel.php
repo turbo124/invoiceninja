@@ -312,6 +312,7 @@ class EntityModel extends Eloquent
             'invoices' => 'file-pdf-o',
             'payments' => 'credit-card',
             'recurring_invoices' => 'files-o',
+            'recurring_expenses' => 'files-o',
             'credits' => 'credit-card',
             'quotes' => 'file-text-o',
             'tasks' => 'clock-o',
@@ -396,6 +397,13 @@ class EntityModel extends Eloquent
                 $nextId = static::getNextPublicId($this->account_id);
                 if ($nextId != $this->public_id) {
                     $this->public_id = $nextId;
+                    if (env('MULTI_DB_ENABLED')) {
+                        if ($this->contact_key) {
+                            $this->contact_key = strtolower(str_random(RANDOM_KEY_LENGTH));
+                        } elseif ($this->invitation_key) {
+                            $this->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
+                        }
+                    }
                     return $this->save($options);
                 }
             }

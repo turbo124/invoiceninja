@@ -53,8 +53,12 @@
 			<li>{!! link_to(($entityType == ENTITY_QUOTE ? 'quotes' : 'invoices'), trans('texts.' . ($entityType == ENTITY_QUOTE ? 'quotes' : 'invoices'))) !!}</li>
 			<li class="active">{{ $invoice->invoice_number }}</li>
 		@endif
-		@if ($invoice->is_recurring && $invoice->isSent() && (! $invoice->last_sent_date || $invoice->last_sent_date == '0000-00-00'))
-			{!! $invoice->present()->statusLabel(trans('texts.pending')) !!}
+		@if ($invoice->is_recurring && $invoice->isSent())
+			@if (! $invoice->last_sent_date || $invoice->last_sent_date == '0000-00-00')
+				{!! $invoice->present()->statusLabel(trans('texts.pending')) !!}
+			@else
+				{!! $invoice->present()->statusLabel(trans('texts.active')) !!}
+			@endif
 		@else
 			{!! $invoice->present()->statusLabel !!}
 		@endif
@@ -159,7 +163,7 @@
 				{!! Former::text('invoice_date')->data_bind("datePicker: invoice_date, valueUpdate: 'afterkeydown'")->label(trans("texts.{$entityType}_date"))
 							->data_date_format(Session::get(SESSION_DATE_PICKER_FORMAT, DEFAULT_DATE_PICKER_FORMAT))->appendIcon('calendar')->addGroupClass('invoice_date') !!}
 				{!! Former::text('due_date')->data_bind("datePicker: due_date, valueUpdate: 'afterkeydown'")->label($account->getLabel($invoice->getDueDateLabel()))
-							->placeholder($invoice->exists || $invoice->isQuote() ? ' ' : $account->present()->dueDatePlaceholder())
+							->placeholder($invoice->id || $invoice->isQuote() ? ' ' : $account->present()->dueDatePlaceholder())
 							->data_date_format(Session::get(SESSION_DATE_PICKER_FORMAT, DEFAULT_DATE_PICKER_FORMAT))->appendIcon('calendar')->addGroupClass('due_date') !!}
 				{!! Former::text('partial')->data_bind("value: partial, valueUpdate: 'afterkeydown'")->onkeyup('onPartialChange()')
 							->addGroupClass('partial')!!}
@@ -254,7 +258,10 @@
 		<table class="table invoice-table">
 
 			@include('invoices.edit_table', ['isTasks' => false])
-			@include('invoices.edit_table', ['isTasks' => true])
+
+			@if ($account->isModuleEnabled(ENTITY_TASK) && ($invoice->has_tasks || ! empty($tasks)))
+				@include('invoices.edit_table', ['isTasks' => true])
+			@endif
 
 		<tfoot>
 			<tr>
@@ -278,21 +285,24 @@
                         @endif
                     </ul>
 
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="public_notes" style="padding-bottom:44px">
+					{{ Former::setOption('TwitterBootstrap3.labelWidths.large', 0) }}
+					{{ Former::setOption('TwitterBootstrap3.labelWidths.small', 0) }}
+
+                    <div class="tab-content" style="padding-right:12px;max-width:600px;">
+                        <div role="tabpanel" class="tab-pane active" id="public_notes" style="padding-bottom:44px;">
                             {!! Former::textarea('public_notes')
 									->data_bind("value: public_notes, valueUpdate: 'afterkeydown'")
-                            		->label(null)->style('width: 550px')->rows(4) !!}
+                            		->label(null)->style('width: 100%')->rows(4)->label(null) !!}
                         </div>
 						<div role="tabpanel" class="tab-pane" id="private_notes" style="padding-bottom:44px">
                             {!! Former::textarea('private_notes')
 									->data_bind("value: private_notes, valueUpdate: 'afterkeydown'")
-                            		->label(null)->style('width: 550px')->rows(4) !!}
+                            		->label(null)->style('width: 100%')->rows(4) !!}
                         </div>
                         <div role="tabpanel" class="tab-pane" id="terms">
                             {!! Former::textarea('terms')
 									->data_bind("value:terms, placeholder: terms_placeholder, valueUpdate: 'afterkeydown'")
-                            		->label(false)->style('width: 550px')->rows(4)
+                            		->label(false)->style('width: 100%')->rows(4)
 		                            ->help('<div class="checkbox">
 		                                        <label>
 		                                            <input name="set_default_terms" type="checkbox" style="width: 24px" data-bind="checked: set_default_terms"/>'.trans('texts.save_as_default_terms').'
@@ -305,7 +315,7 @@
                         <div role="tabpanel" class="tab-pane" id="footer">
                             {!! Former::textarea('invoice_footer')
 									->data_bind("value:invoice_footer, placeholder: footer_placeholder, valueUpdate: 'afterkeydown'")
-		                            ->label(false)->style('width: 550px')->rows(4)
+		                            ->label(false)->style('width: 100%')->rows(4)
 		                            ->help('<div class="checkbox">
 		                                        <label>
 		                                            <input name="set_default_footer" type="checkbox" style="width: 24px" data-bind="checked: set_default_footer"/>'.trans('texts.save_as_default_footer').'
@@ -338,6 +348,9 @@
                         @endif
                     </div>
                 </div>
+
+				{{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
+				{{ Former::setOption('TwitterBootstrap3.labelWidths.small', 4) }}
 
 				</td>
 				<td class="hide-border" style="display:none" data-bind="visible: $root.invoice_item_taxes.show"/>
@@ -482,7 +495,7 @@
 			{!! Former::select('invoice_design_id')->style('display:inline;width:150px;background-color:white !important')->raw()->fromQuery($invoiceDesigns, 'name', 'id')->data_bind("value: invoice_design_id") !!}
 		@endif
 
-        @if ( $invoice->exists && $invoice->id && ! $invoice->is_recurring)
+        @if ( $invoice->id && ! $invoice->is_recurring)
 		    {!! Button::primary(trans('texts.download_pdf'))
                     ->withAttributes(['onclick' => 'onDownloadClick()', 'id' => 'downloadPdfButton'])
                     ->appendIcon(Icon::create('download-alt')) !!}
@@ -794,7 +807,7 @@
 	                continue;
 	            }
             @endif
-			var clientName = client.name;
+			var clientName = client.name || '';
 			for (var j=0; j<client.contacts.length; j++) {
                 var contact = client.contacts[j];
                 var contactName = getContactDisplayNameWithEmail(contact);
@@ -1155,7 +1168,20 @@
         return invoice;
 	}
 
+	var origInvoiceNumber = false;
 	function getPDFString(cb, force) {
+		@if (! $invoice->id && $account->credit_number_counter > 0)
+			var total = model.invoice().totals.rawTotal();
+			var invoiceNumber = model.invoice().invoice_number();
+			var creditNumber = "{{ $account->getNextNumber(new \App\Models\Credit()) }}";
+			if (total < 0 && invoiceNumber != creditNumber) {
+				origInvoiceNumber = invoiceNumber;
+				model.invoice().invoice_number(creditNumber);
+			} else if (total >= 0 && invoiceNumber == creditNumber && origInvoiceNumber) {
+				model.invoice().invoice_number(origInvoiceNumber);
+			}
+		@endif
+
 		@if ( ! $account->live_preview)
 			return;
 		@endif
@@ -1425,7 +1451,8 @@
 		var isValid = model.invoice().client().name() ? true : false;
 		for (var i=0; i<model.invoice().client().contacts().length; i++) {
 			var contact = model.invoice().client().contacts()[i];
-			if (isValidEmailAddress(contact.email()) || contact.first_name() || contact.last_name()) {
+			var email = contact.email() ? contact.email().trim() : '';
+			if (isValidEmailAddress(email) || contact.first_name() || contact.last_name()) {
 				isValid = true;
 				break;
 			}
@@ -1453,7 +1480,8 @@
             if ( ! contact.send_invoice()) {
                 continue;
             }
-			if (isValidEmailAddress(contact.email())) {
+			var email = contact.email() ? contact.email().trim() : '';
+			if (isValidEmailAddress(email)) {
 				isValid = true;
 			} else {
 				isValid = false;
