@@ -37,8 +37,6 @@ Route::group(['middleware' => ['lookup:contact', 'auth:client']], function () {
     Route::get('bank/{routing_number}', 'OnlinePaymentController@getBankInfo');
     Route::get('client/payment_methods', 'ClientPortalController@paymentMethods');
     Route::post('client/payment_methods/verify', 'ClientPortalController@verifyPaymentMethod');
-    //Route::get('client/payment_methods/add/{gateway_type}/{source_id?}', 'ClientPortalController@addPaymentMethod');
-    //Route::post('client/payment_methods/add/{gateway_type}', 'ClientPortalController@postAddPaymentMethod');
     Route::post('client/payment_methods/default', 'ClientPortalController@setDefaultPaymentMethod');
     Route::post('client/payment_methods/{source_id}/remove', 'ClientPortalController@removePaymentMethod');
     Route::get('client/quotes', 'ClientPortalController@quoteIndex');
@@ -66,10 +64,10 @@ Route::group(['middleware' => 'lookup:license'], function () {
     Route::get('license', 'NinjaController@show_license_payment');
     Route::post('license', 'NinjaController@do_license_payment');
     Route::get('claim_license', 'NinjaController@claim_license');
-});
-
-Route::group(['middleware' => 'cors'], function () {
-    Route::match(['GET', 'POST', 'OPTIONS'], '/buy_now/{gateway_type?}', 'OnlinePaymentController@handleBuyNow');
+    if (Utils::isNinja()) {
+        Route::post('/signup/register', 'AccountController@doRegister');
+        Route::get('/news_feed/{user_type}/{version}/', 'HomeController@newsFeed');
+    }
 });
 
 Route::group(['middleware' => 'lookup:postmark'], function () {
@@ -79,6 +77,7 @@ Route::group(['middleware' => 'lookup:postmark'], function () {
 
 Route::group(['middleware' => 'lookup:account'], function () {
     Route::post('/payment_hook/{account_key}/{gateway_id}', 'OnlinePaymentController@handlePaymentWebhook');
+    Route::match(['GET', 'POST', 'OPTIONS'], '/buy_now/{gateway_type?}', 'OnlinePaymentController@handleBuyNow');
 });
 
 //Route::post('/hook/bot/{platform?}', 'BotController@handleMessage');
@@ -111,11 +110,6 @@ Route::group(['middleware' => ['lookup:contact']], function () {
     Route::post('/client/recover_password', ['as' => 'forgot', 'uses' => 'ClientAuth\PasswordController@postEmail']);
     Route::post('/client/password/reset', ['as' => 'forgot', 'uses' => 'ClientAuth\PasswordController@postReset']);
 });
-
-if (Utils::isNinja()) {
-    Route::post('/signup/register', 'AccountController@doRegister');
-    Route::get('/news_feed/{user_type}/{version}/', 'HomeController@newsFeed');
-}
 
 if (Utils::isReseller()) {
     Route::post('/reseller_stats', 'AppController@stats');
@@ -175,9 +169,19 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::get('recurring_invoices/create/{client_id?}', 'InvoiceController@createRecurring');
     Route::get('recurring_invoices', 'RecurringInvoiceController@index');
     Route::get('recurring_invoices/{invoices}/edit', 'InvoiceController@edit');
+    Route::get('recurring_invoices/{invoices}', 'InvoiceController@edit');
     Route::get('invoices/{invoices}/clone', 'InvoiceController@cloneInvoice');
     Route::post('invoices/bulk', 'InvoiceController@bulk');
     Route::post('recurring_invoices/bulk', 'InvoiceController@bulk');
+
+    Route::get('recurring_expenses', 'RecurringExpenseController@index');
+    Route::get('api/recurring_expenses', 'RecurringExpenseController@getDatatable');
+    Route::get('recurring_expenses/create/{vendor_id?}/{client_id?}/{category_id?}', 'RecurringExpenseController@create');
+    Route::post('recurring_expenses', 'RecurringExpenseController@store');
+    Route::put('recurring_expenses/{recurring_expenses}', 'RecurringExpenseController@update');
+    Route::get('recurring_expenses/{recurring_expenses}/edit', 'RecurringExpenseController@edit');
+    Route::get('recurring_expenses/{recurring_expenses}', 'RecurringExpenseController@edit');
+    Route::post('recurring_expenses/bulk', 'RecurringExpenseController@bulk');
 
     Route::get('documents/{documents}/{filename?}', 'DocumentController@get');
     Route::get('documents/js/{documents}/{filename}', 'DocumentController@getVFSJS');

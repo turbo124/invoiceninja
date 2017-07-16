@@ -14,14 +14,14 @@ Watch this [YouTube video](https://www.youtube.com/watch?v=xHGKvadapbA) for an o
 
 All Pro and Enterprise features from the hosted app are included in the open-source code. We offer a $20 per year white-label license to remove our branding.
 
-The [self-host zip](https://www.invoiceninja.com/self-host/) includes all third party libraries whereas downloading the code from GitHub requires using Composer to install the dependencies.
+The self-host zip includes all third party libraries whereas downloading the code from GitHub requires using Composer to install the dependencies.
 
 ## Affiliates Programs
 * Referral program (we pay you): $100 per sign up paid over 3 years - [Learn more](https://www.invoiceninja.com/referral-program/)
 * White-label reseller (you pay us): $500 sign up fee and either 10% of revenue or $1 per user per month
 
 ### Installation Options
-* [Self-Host Zip](https://www.invoiceninja.com/knowledgebase/self-host/)
+* [Self-Host Zip](http://docs.invoiceninja.com/en/latest/install.html)
 * [Docker File](https://github.com/invoiceninja/dockerfiles)
 * [Softaculous](https://www.softaculous.com/apps/ecommerce/Invoice_Ninja)
 
@@ -54,20 +54,25 @@ The [self-host zip](https://www.invoiceninja.com/self-host/) includes all third 
 * [D3.js](http://d3js.org/) visualizations
 
 ## Documentation
-* [Self Host Guide](https://www.invoiceninja.com/self-host)
 * [User Guide](http://docs.invoiceninja.com/en/latest/)
-* [Developer Guide](https://www.invoiceninja.com/knowledgebase/developer-guide/)
 * [Support Forum](https://www.invoiceninja.com/forums/forum/support/)
 * [Feature Roadmap](https://trello.com/b/63BbiVVe/)
 
 ## Tools
 * [InvoicePlane Import](https://github.com/turbo124/Plane2Ninja)
+* [Toggl Sync](https://github.com/Matth--/toggl-invoiceninja-sync)
+* [Shopping Cart](https://github.com/Scifabric/invoiceninjashoppingcart)
 
 ## Development
 * [API Documentation](https://www.invoiceninja.com/api-documentation/)
 * [PHP SDK](https://github.com/invoiceninja/sdk-php)
 * [Zend Framework](https://github.com/alexz707/InvoiceNinjaModule)
 * [Custom Module](http://docs.invoiceninja.com/en/latest/custom_modules.html) | [Watch Video](https://www.youtube.com/watch?v=8jJ-PYuq85k)
+
+## Third Party Developers
+* [theDevelopers](https://www.thedevelopers.ro/customisation-request-invoiceninja)
+
+Email us to be added to the list
 
 ## Contributing
 All contributors are welcome!  
@@ -86,6 +91,7 @@ For information on how contribute to Invoice Ninja, please see our [contributing
 * [Holger Lösken](https://github.com/codedge) - [codedge](http://codedge.de)
 * [Samuel Laulhau](https://github.com/lalop) - [Lalop](http://lalop.co/)
 * [Alexander Zamponi](https://github.com/alexz707)
+* [Matthieu Calie](https://github.com/Matth--)
 
 ## License
 Invoice Ninja is released under the Attribution Assurance License.  

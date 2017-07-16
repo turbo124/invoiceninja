@@ -84,11 +84,16 @@ class LookupModel extends Eloquent
 
             // check entity is found on the server
             if ($field === 'oauth_user_key') {
-                list($providerId, $oauthId) = explode('-', $value);
+                $providerId = substr($value, 0, 1);
+                $oauthId = substr($value, 2);
                 $isFound = $entity::where('oauth_provider_id', '=', $providerId)
-                                ->where('oauth_user_id', '=', $oauthId)->first();
+                                ->where('oauth_user_id', '=', $oauthId)
+                                ->withTrashed()
+                                ->first();
             } else {
-                $isFound = $entity::where($field, '=', $value)->first();
+                $isFound = $entity::where($field, '=', $value)
+                                ->withTrashed()
+                                ->first();
             }
             if (! $isFound) {
                 abort("Looked up {$className} not found: {$field} => {$value}");
