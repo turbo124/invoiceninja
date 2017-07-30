@@ -622,7 +622,7 @@
                     {!! Former::select('client[country_id]')
                             ->label(trans('texts.country_id'))
                             ->addOption('','')->addGroupClass('country_select')
-                            ->fromQuery(Cache::get('countries'), 'name', 'id')->data_bind("dropdown: country_id") !!}
+                            ->fromQuery($countries, 'name', 'id')->data_bind("dropdown: country_id") !!}
                 </span>
 
             </div>
@@ -858,19 +858,14 @@
             @endif
 
             @if (isset($tasks) && $tasks)
-                // move the blank invoice line item to the end
-                var blank = model.invoice().invoice_items.pop();
                 var tasks = {!! json_encode($tasks) !!};
-
                 for (var i=0; i<tasks.length; i++) {
                     var task = tasks[i];
-                    var item = model.invoice().addItem();
+                    var item = model.invoice().addItem(true);
                     item.notes(task.description);
                     item.qty(task.duration);
                     item.task_public_id(task.publicId);
-                    item.invoice_item_type_id({{ INVOICE_ITEM_TYPE_TASK }});
                 }
-                model.invoice().invoice_items.push(blank);
                 model.invoice().has_tasks(true);
             @endif
 
@@ -878,7 +873,7 @@
                 model.expense_currency_id({{ isset($expenseCurrencyId) ? $expenseCurrencyId : 0 }});
 
                 // move the blank invoice line item to the end
-                var blank = model.invoice().invoice_items.pop();
+                var blank = model.invoice().invoice_items_without_tasks.pop();
                 var expenses = {!! $expenses !!}
 
                 for (var i=0; i<expenses.length; i++) {
@@ -894,7 +889,7 @@
                     item.tax_rate2(expense.tax_rate2);
                     item.tax_name2(expense.tax_name2);
                 }
-                model.invoice().invoice_items.push(blank);
+                model.invoice().invoice_items_without_tasks.push(blank);
                 model.invoice().has_expenses(true);
             @endif
 
@@ -1041,51 +1036,8 @@
                 return;
             }
 
-            window.dropzone = new Dropzone('#document-upload .dropzone', {
-                url:{!! json_encode(url('documents')) !!},
-                params:{
-                    _token:"{{ Session::getToken() }}"
-                },
-                acceptedFiles:{!! json_encode(implode(',',\App\Models\Document::$allowedMimes)) !!},
-                addRemoveLinks:true,
-                dictRemoveFileConfirmation:"{{trans('texts.are_you_sure')}}",
-                @foreach(['default_message', 'fallback_message', 'fallback_text', 'file_too_big', 'invalid_file_type', 'response_error', 'cancel_upload', 'cancel_upload_confirmation', 'remove_file'] as $key)
-                    "dict{{ Utils::toClassCase($key) }}" : "{!! strip_tags(addslashes(trans('texts.dropzone_'.$key))) !!}",
-                @endforeach
-                maxFilesize:{{floatval(MAX_DOCUMENT_SIZE/1000)}},
-				parallelUploads:1,
-            });
-            if(dropzone instanceof Dropzone){
-                dropzone.on("addedfile",handleDocumentAdded);
-                dropzone.on("removedfile",handleDocumentRemoved);
-                dropzone.on("success",handleDocumentUploaded);
-                dropzone.on("canceled",handleDocumentCanceled);
-                dropzone.on("error",handleDocumentError);
-                for (var i=0; i<model.invoice().documents().length; i++) {
-                    var document = model.invoice().documents()[i];
-                    var mockFile = {
-                        name:document.name(),
-                        size:document.size(),
-                        type:document.type(),
-                        public_id:document.public_id(),
-                        status:Dropzone.SUCCESS,
-                        accepted:true,
-                        url:document.url(),
-                        mock:true,
-                        index:i
-                    };
+			@include('partials.dropzone', ['documentSource' => 'model.invoice().documents()'])
 
-                    dropzone.emit('addedfile', mockFile);
-                    dropzone.emit('complete', mockFile);
-                    if(document.preview_url()){
-                        dropzone.emit('thumbnail', mockFile, document.preview_url());
-                    }
-                    else if(document.type()=='jpeg' || document.type()=='png' || document.type()=='svg'){
-                        dropzone.emit('thumbnail', mockFile, document.url());
-                    }
-                    dropzone.files.push(mockFile);
-                }
-            }
         });
         @endif
 	});
@@ -1144,7 +1096,7 @@
 		invoice.contact = _.findWhere(invoice.client.contacts, {send_invoice: true});
 
         if (invoice.is_recurring) {
-            invoice.invoice_number = "{{ trans('texts.assigned_when_sent') }}";
+            invoice.invoice_number = "{!! trans('texts.assigned_when_sent') !!}";
             if (invoice.start_date) {
                 invoice.invoice_date = invoice.start_date;
             }
@@ -1552,23 +1504,25 @@
 	{
 		var hasEmptyStandard = false;
 		var hasEmptyTask = false;
-		for(var i=0; i<model.invoice().invoice_items().length; i++) {
-			var item = model.invoice().invoice_items()[i];
+
+		for (var i=0; i<model.invoice().invoice_items_without_tasks().length; i++) {
+			var item = model.invoice().invoice_items_without_tasks()[i];
 			if (item.isEmpty()) {
-				if (item.invoice_item_type_id() == {{ INVOICE_ITEM_TYPE_TASK }}) {
-					hasEmptyTask = true;
-				} else {
-					hasEmptyStandard = true;
-				}
+				hasEmptyStandard = true;
 			}
 		}
-
 		if (!hasEmptyStandard) {
 			model.invoice().addItem();
 		}
+
+		for (var i=0; i<model.invoice().invoice_items_with_tasks().length; i++) {
+			var item = model.invoice().invoice_items_with_tasks()[i];
+			if (item.isEmpty()) {
+				hasEmptyTask = true;
+			}
+		}
 		if (!hasEmptyTask) {
-			item = model.invoice().addItem();
-			item.invoice_item_type_id({{ INVOICE_ITEM_TYPE_TASK }});
+			model.invoice().addItem(true);
 		}
 
 		if (!silent) {
@@ -1637,54 +1591,22 @@
         model.invoice().invoice_number(number);
     }
 
-    window.countUploadingDocuments = 0;
+	function addDocument(file) {
+		file.index = model.invoice().documents().length;
+	    model.invoice().addDocument({name:file.name, size:file.size, type:file.type});
+	}
 
-    function handleDocumentAdded(file){
-        // open document when clicked
-        if (file.url) {
-            file.previewElement.addEventListener("click", function() {
-                window.open(file.url, '_blank');
-            });
-        }
-        if(file.mock)return;
-        file.index = model.invoice().documents().length;
-        model.invoice().addDocument({name:file.name, size:file.size, type:file.type});
-        window.countUploadingDocuments++;
-    }
+	function addedDocument(file, response) {
+		model.invoice().documents()[file.index].update(response.document);
+	    @if ($account->invoice_embed_documents)
+	        refreshPDF(true);
+	    @endif
+	}
 
-    function handleDocumentRemoved(file){
-        model.invoice().removeDocument(file.public_id);
-        refreshPDF(true);
-        $.ajax({
-            url: '{{ '/documents/' }}' + file.public_id,
-            type: 'DELETE',
-            success: function(result) {
-                // Do something with the result
-            }
-        });
-    }
-
-    function handleDocumentUploaded(file, response){
-        window.countUploadingDocuments--;
-        file.public_id = response.document.public_id
-        model.invoice().documents()[file.index].update(response.document);
-        @if ($account->invoice_embed_documents)
-            refreshPDF(true);
-        @endif
-        if(response.document.preview_url){
-            dropzone.emit('thumbnail', file, response.document.preview_url);
-        }
-    }
-
-    function handleDocumentCanceled() {
-        window.countUploadingDocuments--;
-    }
-
-    function handleDocumentError(file) {
-		dropzone.removeFile(file);
-        window.countUploadingDocuments--;
-		swal("{!! trans('texts.error_refresh_page') !!}");
-    }
+	function deleteDocument(file) {
+		model.invoice().removeDocument(file.public_id);
+		refreshPDF(true);
+	}
 
 	</script>
     @if ($account->hasFeature(FEATURE_DOCUMENTS) && $account->invoice_embed_documents)

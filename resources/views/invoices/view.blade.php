@@ -151,15 +151,8 @@
             <div class="invoice-documents">
             <h3>{{ trans('texts.documents_header') }}</h3>
             <ul>
-            @foreach ($invoice->documents as $document)
+            @foreach ($invoice->allDocuments() as $document)
                 <li><a target="_blank" href="{{ $document->getClientUrl($invitation) }}">{{$document->name}} ({{Form::human_filesize($document->size)}})</a></li>
-            @endforeach
-            @foreach ($invoice->expenses as $expense)
-                @foreach ($expense->documents as $document)
-					@if ($expense->invoice_documents)
-                    	<li><a target="_blank" href="{{ $document->getClientUrl($invitation) }}">{{$document->name}} ({{Form::human_filesize($document->size)}})</a></li>
-					@endif
-                @endforeach
             @endforeach
             </ul>
             </div>

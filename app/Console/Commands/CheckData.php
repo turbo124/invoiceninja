@@ -64,7 +64,7 @@ class CheckData extends Command
 
     public function fire()
     {
-        $this->logMessage(date('Y-m-d') . ' Running CheckData...');
+        $this->logMessage(date('Y-m-d h:i:s') . ' Running CheckData...');
 
         if ($database = $this->option('database')) {
             config(['database.default' => $database]);
@@ -136,6 +136,10 @@ class CheckData extends Command
     private function checkInvoices()
     {
         if (! env('PHANTOMJS_BIN_PATH')) {
+            return;
+        }
+
+        if ($this->option('fix') == 'true') {
             return;
         }
 
@@ -367,6 +371,9 @@ class CheckData extends Command
 
     private function checkFailedJobs()
     {
+        $current = config('database.default');
+        config(['database.default' => env('QUEUE_DATABASE')]);
+
         $count = DB::table('failed_jobs')->count();
 
         if ($count > 0) {
@@ -374,6 +381,8 @@ class CheckData extends Command
         }
 
         $this->logMessage($count . ' failed jobs');
+
+        config(['database.default' => $current]);
     }
 
     private function checkBlankInvoiceHistory()

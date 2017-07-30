@@ -34,13 +34,8 @@ class TemplateService
 
         if ($account->hasFeature(FEATURE_DOCUMENTS) && $invoice->hasDocuments()) {
             $documentsHTML .= trans('texts.email_documents_header').'<ul>';
-            foreach ($invoice->documents as $document) {
+            foreach ($invoice->allDocuments() as $document) {
                 $documentsHTML .= '<li><a href="'.HTML::entities($document->getClientUrl($invitation)).'">'.HTML::entities($document->name).'</a></li>';
-            }
-            foreach ($invoice->expenses as $expense) {
-                foreach ($expense->documents as $document) {
-                    $documentsHTML .= '<li><a href="'.HTML::entities($document->getClientUrl($invitation)).'">'.HTML::entities($document->name).'</a></li>';
-                }
             }
             $documentsHTML .= '</ul>';
         }
