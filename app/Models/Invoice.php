@@ -115,6 +115,8 @@ class Invoice extends EntityModel implements BalanceAffecting
             'terms',
             'product',
             'quantity',
+            'tax1',
+            'tax2',
         ];
     }
 
@@ -135,6 +137,7 @@ class Invoice extends EntityModel implements BalanceAffecting
             'notes' => 'notes',
             'product|item' => 'product',
             'quantity|qty' => 'quantity',
+            'tax' => 'tax1',
         ];
     }
 
@@ -1329,13 +1332,21 @@ class Invoice extends EntityModel implements BalanceAffecting
     /**
      * @return int
      */
-    public function countDocuments()
+    public function countDocuments($expenses = false)
     {
         $count = count($this->documents);
 
         foreach ($this->expenses as $expense) {
             if ($expense->invoice_documents) {
                 $count += count($expense->documents);
+            }
+        }
+
+        if ($expenses) {
+            foreach ($expenses as $expense) {
+                if ($expense->invoice_documents) {
+                    $count += count($expense->documents);
+                }
             }
         }
 

@@ -1330,7 +1330,7 @@ $LANG = array(
     'import_products' => 'Import Products',
     'products_will_create' => 'products will be created',
     'product_key' => 'Product',
-    'created_products' => 'Successfully created :count product(s)',
+    'created_products' => 'Successfully created/updated :count product(s)',
     'export_help' => 'Use JSON if you plan to import the data into Invoice Ninja.<br/>The file includes clients, products, invoices, quotes and payments.',
     'JSON_file' => 'JSON File',
 
@@ -2236,7 +2236,7 @@ $LANG = array(
     'oauth_taken' => 'The account is already registered',
     'emailed_payment' => 'Successfully emailed payment',
     'email_payment' => 'Email Payment',
-    'sent' => 'Sent',
+    'sent' => 'sent',
     'invoiceplane_import' => 'Use :link to migrate your data from InvoicePlane.',
     'duplicate_expense_warning' => 'Warning: This :link may be a duplicate',
     'expense_link' => 'expense',
@@ -2389,6 +2389,17 @@ $LANG = array(
     'currency_peruvian_sol' => 'Peruvian Sol',
 
     'use_english_version' => 'Make sure to use the English version of the files.<br/>We use the column headers to match the fields.',
+    'tax1' => 'First Tax',
+    'tax2' => 'Second Tax',
+    'fee_help' => 'Gateway fees are the costs charged for access to the financial networks that handle the processing of online payments.',
+	'format_export' => 'Exporting format',
+    'custom1' => 'First Custom',
+    'custom2' => 'Second Custom',
+    'contact_first_name' => 'Contact First Name',
+    'contact_last_name' => 'Contact Last Name',
+    'contact_custom1' => 'Contact First Custom',
+    'contact_custom2' => 'Contact Second Custom',
+    'currency' => 'Currency',
 
 );
 
