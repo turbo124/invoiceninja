@@ -91,7 +91,7 @@ class PaymentController extends BaseController
     {
         $invoices = Invoice::scope()
                     ->invoices()
-                    ->where('invoices.balance', '!=', 0)
+                    ->where('invoices.invoice_status_id', '!=', INVOICE_STATUS_PAID)
                     ->with('client', 'invoice_status')
                     ->orderBy('invoice_number')->get();
 
@@ -239,7 +239,7 @@ class PaymentController extends BaseController
         $ids = Input::get('public_id') ? Input::get('public_id') : Input::get('ids');
 
         if ($action === 'email') {
-            $payment = Payment::scope($ids)->first();
+            $payment = Payment::scope($ids)->withArchived()->first();
             $this->contactMailer->sendPaymentConfirmation($payment);
             Session::flash('message', trans('texts.emailed_payment'));
         } else {

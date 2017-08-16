@@ -395,7 +395,7 @@ $LANG = array(
     'more_designs_self_host_text' => '',
     'buy' => 'Buy',
     'bought_designs' => 'Successfully added additional invoice designs',
-    'sent' => 'sent',
+    'sent' => 'Sent',
     'vat_number' => 'VAT Number',
     'timesheets' => 'Timesheets',
     'payment_title' => 'Enter Your Billing Address and Credit Card information',
@@ -670,6 +670,8 @@ $LANG = array(
     'status_viewed' => 'Viewed',
     'status_partial' => 'Partial',
     'status_paid' => 'Paid',
+    'status_unpaid' => 'Unpaid',
+    'status_all' => 'All',
     'show_line_item_tax' => 'Display <b>line item taxes inline</b>',
     'iframe_url' => 'Website',
     'iframe_url_help1' => 'Copy the following code to a page on your site.',
@@ -1013,7 +1015,7 @@ $LANG = array(
 
     'pro_plan_remove_logo' => ':link to remove the Invoice Ninja logo by joining the Pro Plan',
     'pro_plan_remove_logo_link' => 'Click here',
-    'invitation_status_sent' => 'Sent',
+    'invitation_status_sent' => 'sent',
     'invitation_status_opened' => 'Openend',
     'invitation_status_viewed' => 'Viewed',
     'email_error_inactive_client' => 'Emails can not be sent to inactive clients',
@@ -1174,7 +1176,7 @@ $LANG = array(
     'list_vendors' => 'List Vendors',
     'add_users_not_supported' => 'Upgrade to the Enterprise plan to add additional users to your account.',
     'enterprise_plan_features' => 'The Enterprise plan adds support for multiple users and file attachments, :link to see the full list of features.',
-    'return_to_app' => 'Return to app',
+    'return_to_app' => 'Return To App',
 
 
     // Payment updates

@@ -327,7 +327,7 @@ class InvoiceRepository extends BaseRepository
         return $table->addColumn('due_date', function ($model) {
             return Utils::fromSqlDate($model->due_date);
         })
-        ->addColumn('status', function ($model) use ($entityType) {
+        ->addColumn('invoice_status_id', function ($model) use ($entityType) {
             if ($model->invoice_status_id == INVOICE_STATUS_PAID) {
                 $label = trans('texts.status_paid');
                 $class = 'success';
@@ -526,8 +526,8 @@ class InvoiceRepository extends BaseRepository
                 continue;
             }
 
-            $invoiceItemCost = round(Utils::parseFloat($item['cost']), 2);
-            $invoiceItemQty = round(Utils::parseFloat($item['qty']), 2);
+            $invoiceItemCost = Utils::roundSignificant(Utils::parseFloat($item['cost']));
+            $invoiceItemQty = Utils::roundSignificant(Utils::parseFloat($item['qty']));
 
             $lineTotal = $invoiceItemCost * $invoiceItemQty;
             $total += round($lineTotal, 2);
@@ -535,8 +535,8 @@ class InvoiceRepository extends BaseRepository
 
         foreach ($data['invoice_items'] as $item) {
             $item = (array) $item;
-            $invoiceItemCost = round(Utils::parseFloat($item['cost']), 2);
-            $invoiceItemQty = round(Utils::parseFloat($item['qty']), 2);
+            $invoiceItemCost = Utils::roundSignificant(Utils::parseFloat($item['cost']));
+            $invoiceItemQty = Utils::roundSignificant(Utils::parseFloat($item['qty']));
             $lineTotal = $invoiceItemCost * $invoiceItemQty;
 
             if ($invoice->discount > 0) {
