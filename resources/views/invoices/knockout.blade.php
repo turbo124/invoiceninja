@@ -383,7 +383,7 @@ function InvoiceModel(data) {
         if (parseInt(self.is_amount_discount())) {
             return roundToTwo(self.discount());
         } else {
-            return roundToTwo(self.totals.rawSubtotal() * (self.discount()/100));
+            return roundToTwo(self.totals.rawSubtotal() * self.discount() / 100);
         }
     });
 
@@ -427,7 +427,7 @@ function InvoiceModel(data) {
                 if (parseInt(self.is_amount_discount())) {
                     lineTotal -= roundToTwo((lineTotal/total) * self.discount());
                 } else {
-                    lineTotal -= roundToTwo(lineTotal * (self.discount()/100));
+                    lineTotal -= roundToTwo(lineTotal * self.discount() / 100);
                 }
             }
 
@@ -591,6 +591,17 @@ function InvoiceModel(data) {
             return;
         }
         self.applyInclusivTax(taxRate);
+    }
+
+    self.isAmountDiscountChanged = function(obj, event) {
+        if (! event.originalEvent) {
+            return;
+        }
+        if (! isStorageSupported()) {
+            return;
+        }
+        var isAmountDiscount = $('#is_amount_discount').val();
+        localStorage.setItem('last:is_amount_discount', isAmountDiscount);
     }
 }
 
@@ -811,7 +822,7 @@ function ItemModel(data) {
 
     this.prettyQty = ko.computed({
         read: function () {
-            return NINJA.parseFloat(this.qty()) ? roundSignificant(NINJA.parseFloat(this.qty())) : '';
+            return NINJA.parseFloat(this.qty()) ? NINJA.parseFloat(this.qty()) : '';
         },
         write: function (value) {
             this.qty(value);
@@ -821,7 +832,7 @@ function ItemModel(data) {
 
     this.prettyCost = ko.computed({
         read: function () {
-            return this.cost() ? roundSignificant(this.cost()) : '';
+            return this.cost() ? this.cost() : '';
         },
         write: function (value) {
             this.cost(value);
@@ -831,6 +842,12 @@ function ItemModel(data) {
 
     if (data) {
         ko.mapping.fromJS(data, {}, this);
+        var precision = getPrecision(this.cost());
+        var cost = parseFloat(this.cost());
+        if (cost) {
+            this.cost(cost.toFixed(Math.max(2, precision)));
+        }
+        this.qty(roundSignificant(this.qty()));
     }
 
     this.totals = ko.observable();

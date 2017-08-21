@@ -228,8 +228,11 @@
 			{!! Former::text('po_number')->label($account->getLabel('po_number', 'po_number_short'))->data_bind("value: po_number, valueUpdate: 'afterkeydown'") !!}
 			{!! Former::text('discount')->data_bind("value: discount, valueUpdate: 'afterkeydown'")
 					->addGroupClass('discount-group')->type('number')->min('0')->step('any')->append(
-						Former::select('is_amount_discount')->addOption(trans('texts.discount_percent'), '0')
-						->addOption(trans('texts.discount_amount'), '1')->data_bind("value: is_amount_discount")->raw()
+						Former::select('is_amount_discount')
+							->addOption(trans('texts.discount_percent'), '0')
+							->addOption(trans('texts.discount_amount'), '1')
+							->data_bind("value: is_amount_discount, event:{ change: isAmountDiscountChanged}")
+							->raw()
 			) !!}
 
             @if ($account->showCustomField('custom_invoice_text_label2', $invoice))
@@ -636,7 +639,8 @@
                     {!! Former::select('client[country_id]')
                             ->label(trans('texts.country_id'))
                             ->addOption('','')->addGroupClass('country_select')
-                            ->fromQuery($countries, 'name', 'id')->data_bind("dropdown: country_id") !!}
+                            ->fromQuery($countries, 'name', 'id')
+							->data_bind("dropdown: country_id") !!}
                 </span>
 
             </div>
@@ -869,6 +873,14 @@
 						model.invoice().tax_name2("{{ $account->tax_name2 }}");
 					@endif
                 @endif
+
+				// load previous isAmountDiscount setting
+				if (isStorageSupported()) {
+					var lastIsAmountDiscount = parseInt(localStorage.getItem('last:is_amount_discount'));
+		            if (lastIsAmountDiscount) {
+						model.invoice().is_amount_discount(lastIsAmountDiscount);
+		            }
+		        }
             @endif
 
             @if (isset($tasks) && $tasks)
@@ -918,10 +930,9 @@
         ko.applyBindings(model);
         onItemChange(true);
 
-
-		$('#country_id').combobox().on('change', function(e) {
-			var countryId = $('input[name=country_id]').val();
-            var country = _.findWhere(countries, {id: countryId});
+        $('#client\\[country_id\\]').on('change', function(e) {
+			var countryId = $(e.currentTarget).val();
+			var country = _.findWhere(countries, {id: parseInt(countryId)});
 			if (country) {
                 model.invoice().client().country = country;
                 model.invoice().client().country_id(countryId);
