@@ -86,9 +86,9 @@
           "canvas": [
           {
             "type": "rect",
-            "x": 76,
+            "x": 60,
             "y": 20,
-            "w": 182,
+            "w": 198,
             "h": 30,
             "r": 7,
             "lineWidth": 1,
@@ -99,7 +99,7 @@
           {
             "style": "subtotalsBalance",
             "table": {
-                "widths": ["*", "35%"],
+                "widths": ["*", "45%"],
                 "body": "$subtotalsBalance"
             },
             "layout": {
@@ -168,7 +168,8 @@
             "fontSize": "$fontSizeLargest",
             "bold": true,
             "color":"#ffffff",
-            "alignment":"right"
+            "alignment":"right",
+            "noWrap":true
         },
         "invoiceDetails": {
             "color": "#ffffff"

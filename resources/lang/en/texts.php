@@ -439,7 +439,7 @@ $LANG = array(
     'reset_all' => 'Reset All',
     'approve' => 'Approve',
     'token_billing_type_id' => 'Token Billing',
-    'token_billing_help' => 'Store payment details with WePay, Stripe or Braintree.',
+    'token_billing_help' => 'Store payment details with WePay, Stripe, Braintree or GoCardless.',
     'token_billing_1' => 'Disabled',
     'token_billing_2' => 'Opt-in - checkbox is shown but not selected',
     'token_billing_3' => 'Opt-out - checkbox is shown and selected',
@@ -834,7 +834,7 @@ $LANG = array(
     'disabled' => 'Disabled',
     'show_archived_users' => 'Show archived users',
     'notes' => 'Notes',
-    'invoice_will_create' => 'client will be created',
+    'invoice_will_create' => 'invoice will be created',
     'invoices_will_create' => 'invoices will be created',
     'failed_to_import' => 'The following records failed to import, they either already exist or are missing required fields.',
     'publishable_key' => 'Publishable Key',
@@ -2389,6 +2389,7 @@ $LANG = array(
     'currency_jordanian_dinar' => 'Jordanian Dinar',
     'currency_myanmar_kyat' => 'Myanmar Kyat',
     'currency_peruvian_sol' => 'Peruvian Sol',
+    'review_app_help' => 'We hope you\'re enjoying using the app.<br/>If you\'d consider <a href="http://www.capterra.com/p/145215/Invoice-Ninja/" target="_blank">writing a review</a> we\'d greatly appreciate it!',
 
     'use_english_version' => 'Make sure to use the English version of the files.<br/>We use the column headers to match the fields.',
     'tax1' => 'First Tax',
@@ -2403,6 +2404,19 @@ $LANG = array(
     'contact_custom2' => 'Contact Second Custom',
     'currency' => 'Currency',
     'ofx_help' => 'In most cases the default values should work, if you\'re unable to connect it may help to adjust the settings.',
+
+    'item_product' => 'Item Product',
+    'item_notes' => 'Item Notes',
+    'item_cost' => 'Item Cost',
+    'item_quantity' => 'Item Quantity',
+    'item_tax_rate' => 'Item Tax Rate',
+    'item_tax_name' => 'Item Tax Name',
+    'item_tax1' => 'Item Tax1',
+    'item_tax2' => 'Item Tax2',
+
+    'delete_company' => 'Delete Company',
+    'delete_company_help' => 'Permanently delete the company along with all data and setting.',
+    'delete_company_message' => 'Warning: This will permanently delete your company, there is no undo.',
 
 );
 

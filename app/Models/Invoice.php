@@ -109,14 +109,16 @@ class Invoice extends EntityModel implements BalanceAffecting
             'po_number',
             'invoice_date',
             'due_date',
-            'amount',
             'paid',
-            'notes',
             'terms',
-            'product',
-            'quantity',
-            'tax1',
-            'tax2',
+            'public_notes',
+            'private_notes',
+            'item_product',
+            'item_notes',
+            'item_quantity',
+            'item_cost',
+            'item_tax1',
+            'item_tax2',
         ];
     }
 
@@ -127,17 +129,19 @@ class Invoice extends EntityModel implements BalanceAffecting
     {
         return [
             'number^po' => 'invoice_number',
-            'amount' => 'amount',
             'client|organization' => 'name',
             'paid^date' => 'paid',
             'invoice date|create date' => 'invoice_date',
             'po number' => 'po_number',
             'due date' => 'due_date',
             'terms' => 'terms',
-            'notes' => 'notes',
-            'product|item' => 'product',
-            'quantity|qty' => 'quantity',
-            'tax' => 'tax1',
+            'public notes' => 'public_notes',
+            'private notes' => 'private_notes',
+            'description' => 'item_notes',
+            'quantity|qty' => 'item_quantity',
+            'amount|cost' => 'item_cost',
+            'product|item' => 'item_product',
+            'tax' => 'item_tax1',
         ];
     }
 

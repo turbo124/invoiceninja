@@ -632,14 +632,8 @@ class ImportService
 
     private function getCsvData($fileName)
     {
-        require_once app_path().'/Includes/parsecsv.lib.php';
-
         $this->checkForFile($fileName);
-
-        $csv = new parseCSV();
-        $csv->heading = false;
-        $csv->auto($fileName);
-        $data = $csv->data;
+        $data = array_map('str_getcsv', file($fileName));
 
         if (count($data) > 0) {
             $headers = $data[0];
