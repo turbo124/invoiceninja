@@ -2181,7 +2181,7 @@ $LANG = array(
     'created_new_company' => 'Successfully created new company',
     'fees_disabled_for_gateway' => 'Fees are disabled for this gateway.',
     'logout_and_delete' => 'Log Out/Delete Account',
-    'tax_rate_type_help' => 'Inclusive taxes adjust the line item cost when selected.',
+    'tax_rate_type_help' => 'Inclusive tax rates adjust the line item cost when selected.<br/>Only exclusive tax rates can be used as a default.',
     'invoice_footer_help' => 'Use $pageNumber and $pageCount to display the page information.',
     'credit_note' => 'Credit Note',
     'credit_issued_to' => 'Credit issued to',
@@ -2417,6 +2417,14 @@ $LANG = array(
     'delete_company' => 'Delete Company',
     'delete_company_help' => 'Permanently delete the company along with all data and setting.',
     'delete_company_message' => 'Warning: This will permanently delete your company, there is no undo.',
+
+    'applied_discount' => 'The coupon has been applied, the plan price has been reduced by :discount%.',
+    'applied_free_year' => 'The coupon has been applied, your account has been upgraded to pro for one year.',
+
+    'contact_us_help' => 'If you\'re reporting an error please include any relevant logs from storage/logs/laravel-error.log',
+    'include_errors' => 'Include Errors',
+    'include_errors_help' => 'Include :link from storage/logs/laravel-error.log',
+    'recent_errors' => 'recent errors',
 
 );
 
