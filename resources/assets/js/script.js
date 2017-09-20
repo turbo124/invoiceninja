@@ -465,6 +465,15 @@ function comboboxHighlighter(item) {
     return result.replace(new RegExp("\n", 'g'), '<br/>');
 }
 
+// https://stackoverflow.com/a/326076/497368
+function inIframe () {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
+
 function comboboxMatcher(item) {
     return ~stripHtmlTags(item).toLowerCase().indexOf(this.query.toLowerCase());
 }
@@ -662,6 +671,8 @@ function calculateAmounts(invoice) {
   var hasTaxes = false;
   var taxes = {};
   invoice.has_product_key = false;
+  invoice.has_custom_item_value1 = false;
+  invoice.has_custom_item_value2 = false;
 
   // Bold designs currently breaks w/o the product column
   if (invoice.invoice_design_id == 2) {
@@ -706,6 +717,16 @@ function calculateAmounts(invoice) {
         invoice.has_product_key = true;
     }
 
+    if (invoice.features.invoice_settings) {
+        if (item.custom_value1) {
+            invoice.has_custom_item_value1 = true;
+        }
+
+        if (item.custom_value2) {
+            invoice.has_custom_item_value2 = true;
+        }
+    }
+
     if (parseFloat(item.tax_rate1) != 0) {
       taxRate1 = parseFloat(item.tax_rate1);
       taxName1 = item.tax_name1;
@@ -717,7 +738,7 @@ function calculateAmounts(invoice) {
     }
 
     // calculate line item tax
-    var lineTotal = roundToTwo(NINJA.parseFloat(item.cost)) * roundToTwo(NINJA.parseFloat(item.qty));
+    var lineTotal = roundToFour(NINJA.parseFloat(item.cost)) * roundToFour(NINJA.parseFloat(item.qty));
     if (invoice.discount != 0) {
         if (parseInt(invoice.is_amount_discount)) {
             lineTotal -= roundToTwo((lineTotal/total) * invoice.discount);
@@ -1249,4 +1270,20 @@ function pad(n, width, z) {
     z = z || '0';
     n = n + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function brewerColor(number) {
+    var colors = [
+        '#1c9f77',
+        '#d95d02',
+        '#716cb1',
+        '#e62a8b',
+        '#5fa213',
+        '#e6aa04',
+        '#a87821',
+        '#676767',
+    ];
+    var number = (number-1) % colors.length;
+
+    return colors[number];
 }

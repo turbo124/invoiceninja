@@ -125,17 +125,19 @@ class CreateTestData extends Command
             $this->info('Client: ' . $client->name);
 
             $this->createInvoices($client);
+            $this->createInvoices($client, true);
         }
     }
 
     /**
      * @param $client
      */
-    private function createInvoices($client)
+    private function createInvoices($client, $isQuote = false)
     {
         for ($i = 0; $i < $this->count; $i++) {
             $data = [
                 'is_public' => true,
+                'is_quote' => $isQuote,
                 'client_id' => $client->id,
                 'invoice_date_sql' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
                 'due_date_sql' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
@@ -150,7 +152,9 @@ class CreateTestData extends Command
             $invoice = $this->invoiceRepo->save($data);
             $this->info('Invoice: ' . $invoice->invoice_number);
 
-            $this->createPayment($client, $invoice);
+            if (! $isQuote) {
+                $this->createPayment($client, $invoice);
+            }
         }
     }
 
@@ -206,7 +210,7 @@ class CreateTestData extends Command
             $data = [
                 'vendor_id' => $vendor->id,
                 'amount' => $this->faker->randomFloat(2, 1, 10),
-                'expense_date' => null,
+                'expense_date' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
                 'public_notes' => '',
             ];
 

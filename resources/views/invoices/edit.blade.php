@@ -67,8 +67,9 @@
 
 	{!! Former::open($url)
             ->method($method)
-            ->addClass('warn-on-exit main-form search') // 'search' prevents LastPass auto-fill http://stackoverflow.com/a/30921628/497368
+            ->addClass('warn-on-exit main-form search')
             ->autocomplete('off')
+            ->name('lastpass-disable-search') // 'search' prevents LastPass auto-fill http://stackoverflow.com/a/30921628/497368
             ->onsubmit('return onFormSubmit(event)')
             ->rules(array(
         		'client' => 'required',
@@ -536,8 +537,10 @@
 					@endif
                     @if ($invoice->id)
                         {!! DropdownButton::normal(trans('texts.more_actions'))->withContents($invoice->present()->moreActions())->dropup() !!}
-                    @elseif ( ! $invoice->isQuote() && Request::is('*/clone'))
+                    @elseif (! $invoice->isQuote() && Request::is('*/clone'))
                         {!! Button::normal(trans($invoice->is_recurring ? 'texts.disable_recurring' : 'texts.enable_recurring'))->withAttributes(['id' => 'recurrButton', 'onclick' => 'onRecurrClick()'])->appendIcon(Icon::create('repeat')) !!}
+					@elseif (! empty($tasks))
+						{!! Button::normal(trans('texts.add_item'))->withAttributes(['id' => 'addItemButton', 'onclick' => 'onAddItemClick()'])->appendIcon(Icon::create('plus-sign')) !!}
                     @endif
         	    @endif
                 @if ($invoice->trashed())
@@ -1146,6 +1149,7 @@
 	}
 
 	var origInvoiceNumber = false;
+	var checkedInvoiceBalances = false;
 	function getPDFString(cb, force) {
 		@if (! $invoice->id && $account->credit_number_counter > 0)
 			var total = model.invoice().totals.rawTotal();
@@ -1159,12 +1163,31 @@
 			}
 		@endif
 
+		var invoice = createInvoiceModel();
+
+		@if ($invoice->exists)
+			if (! checkedInvoiceBalances) {
+				// check amounts are correct
+				checkedInvoiceBalances = true;
+				var phpBalance = invoice.balance;
+				var koBalance = model.invoice().totals.rawTotal();
+				var jsBalance = calculateAmounts(invoice).total_amount;
+				if (phpBalance == koBalance && koBalance == jsBalance) {
+					// do nothing
+				} else {
+					var invitationKey = invoice.invitations[0].invitation_key;
+					window.onerror(invitationKey + ': Balances do not match | PHP: ' + phpBalance + ', JS: ' + jsBalance + ', KO: ' + koBalance);
+				}
+			}
+		@endif
+
 		@if ( ! $account->live_preview)
 			return;
 		@endif
-        var invoice = createInvoiceModel();
+
 		var design  = getDesignJavascript();
 		if (!design) return;
+
         generatePDF(invoice, design, force, cb);
 	}
 
@@ -1223,6 +1246,11 @@
         $('#recurrButton').html(enableLabel + "<span class='glyphicon glyphicon-repeat'></span>");
 		$('#saveButton').html(actionLabel + "<span class='glyphicon glyphicon-globe'></span>");
     }
+
+	function onAddItemClick() {
+		model.forceShowItems(true);
+		$('#addItemButton').hide();
+	}
 
 	function onEmailClick() {
         if (!NINJA.isRegistered) {
@@ -1361,7 +1389,7 @@
             return false;
         }
 
-        @if ($invoice->is_deleted)
+        @if ($invoice->is_deleted || $invoice->isClientTrashed())
             if ($('#bulk_action').val() != 'restore') {
                 return false;
             }

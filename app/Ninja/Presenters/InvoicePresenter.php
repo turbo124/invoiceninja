@@ -38,6 +38,14 @@ class InvoicePresenter extends EntityPresenter
         return $account->formatMoney($invoice->balance, $invoice->client);
     }
 
+    public function partial()
+    {
+        $invoice = $this->entity;
+        $account = $invoice->account;
+
+        return $account->formatMoney($invoice->partial, $invoice->client);
+    }
+
     public function requestedAmount()
     {
         $invoice = $this->entity;
@@ -235,8 +243,12 @@ class InvoicePresenter extends EntityPresenter
                 $actions[] = ['url' => 'javascript:onConvertClick()', 'label' => trans('texts.convert_to_invoice')];
             }
         } elseif ($entityType == ENTITY_INVOICE) {
-            if ($invoice->quote_id) {
-                $actions[] = ['url' => url("quotes/{$invoice->quote_id}/edit"), 'label' => trans('texts.view_quote')];
+            if ($invoice->quote_id && $invoice->quote) {
+                $actions[] = ['url' => url("quotes/{$invoice->quote->public_id}/edit"), 'label' => trans('texts.view_quote')];
+            }
+
+            if ($invoice->onlyHasTasks()) {
+                $actions[] = ['url' => 'javascript:onAddItemClick()', 'label' => trans('texts.add_item')];
             }
 
             if ($invoice->canBePaid()) {
@@ -310,5 +322,23 @@ class InvoicePresenter extends EntityPresenter
         }
 
         return $link;
+    }
+
+    public function calendarEvent($subColors = false)
+    {
+        $data = parent::calendarEvent();
+        $invoice = $this->entity;
+        $entityType = $invoice->getEntityType();
+
+        $data->title = trans("texts.{$entityType}") . ' ' . $invoice->invoice_number . ' | ' . $this->amount() . ' | ' . $this->client();
+        $data->start = $invoice->due_date ?: $invoice->invoice_date;
+
+        if ($subColors) {
+            $data->borderColor = $data->backgroundColor = $invoice->present()->statusColor();
+        } else {
+            $data->borderColor = $data->backgroundColor = $invoice->isQuote() ? '#716cb1' : '#377eb8';
+        }
+
+        return $data;
     }
 }

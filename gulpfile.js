@@ -76,6 +76,10 @@ elixir(function(mix) {
         bowerDir + '/tablesorter/dist/css/widget.grouping.min.css'
     ], 'public/css/tablesorter.css');
 
+    mix.styles([
+        bowerDir + '/fullcalendar/dist/fullcalendar.css'
+    ], 'public/css/fullcalendar.css');
+
 
     /**
      * JS configuration
@@ -93,6 +97,11 @@ elixir(function(mix) {
     mix.scripts([
         bowerDir + '/bootstrap-daterangepicker/daterangepicker.js'
     ], 'public/js/daterangepicker.min.js');
+
+    mix.scripts([
+        bowerDir + '/fullcalendar/dist/fullcalendar.js',
+        bowerDir + '/fullcalendar/dist/locale-all.js',
+    ], 'public/js/fullcalendar.min.js');
 
     mix.scripts([
         bowerDir + '/card/dist/card.js',

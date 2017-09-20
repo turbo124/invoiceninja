@@ -198,6 +198,18 @@ class OnlinePaymentController extends BaseController
         }
     }
 
+    public function completeSource($invitationKey, $gatewayType)
+    {
+        if (! $invitation = $this->invoiceRepo->findInvoiceByInvitation($invitationKey)) {
+            return response()->view('error', [
+                'error' => trans('texts.invoice_not_found'),
+                'hideHeader' => true,
+            ]);
+        }
+
+        return redirect()->to('view/' . $invitation->invitation_key);
+    }
+
     /**
      * @param $paymentDriver
      * @param $exception
@@ -287,7 +299,9 @@ class OnlinePaymentController extends BaseController
 
             return response()->json(['message' => $result]);
         } catch (Exception $exception) {
-            //Utils::logError($exception->getMessage(), 'PHP');
+            if (! Utils::isNinjaProd()) {
+                Utils::logError($exception->getMessage(), 'HOOK');
+            }
 
             return response()->json(['message' => $exception->getMessage()], 500);
         }

@@ -1031,12 +1031,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hillelcoren/omnipay-wepay.git",
-                "reference": "f8bb3e4010c236018e4bd936f1b930b87f17e063"
+                "reference": "b4a30ccfbc392b14b83017c827a3b603c2c7bf92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hillelcoren/omnipay-wepay/zipball/f8bb3e4010c236018e4bd936f1b930b87f17e063",
-                "reference": "f8bb3e4010c236018e4bd936f1b930b87f17e063",
+                "url": "https://api.github.com/repos/hillelcoren/omnipay-wepay/zipball/b4a30ccfbc392b14b83017c827a3b603c2c7bf92",
+                "reference": "b4a30ccfbc392b14b83017c827a3b603c2c7bf92",
                 "shasum": ""
             },
             "require": {
@@ -1068,7 +1068,7 @@
             "support": {
                 "source": "https://github.com/hillelcoren/omnipay-wepay/tree/address-fix"
             },
-            "time": "2016-12-12 18:28:29"
+            "time": "2017-09-13 16:09:30"
         },
         {
             "name": "container-interop/container-interop",
@@ -1433,12 +1433,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hillelcoren/omnipay-gocardlessv2.git",
-                "reference": "a264ac71dcdb7c03f42f17cb52c650d87e42f8e0"
+                "reference": "4eb63d8591de9a3da610c74480a7344617791235"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hillelcoren/omnipay-gocardlessv2/zipball/a264ac71dcdb7c03f42f17cb52c650d87e42f8e0",
-                "reference": "a264ac71dcdb7c03f42f17cb52c650d87e42f8e0",
+                "url": "https://api.github.com/repos/hillelcoren/omnipay-gocardlessv2/zipball/4eb63d8591de9a3da610c74480a7344617791235",
+                "reference": "4eb63d8591de9a3da610c74480a7344617791235",
                 "shasum": ""
             },
             "require": {
@@ -1509,9 +1509,9 @@
                 "purchase"
             ],
             "support": {
-                "source": "https://github.com/hillelcoren/omnipay-gocardlessv2/tree/master"
+                "source": "https://github.com/hillelcoren/omnipay-gocardlessv2/tree/payment-fix"
             },
-            "time": "2017-08-21 18:05:05"
+            "time": "2017-09-07 10:13:36"
         },
         {
             "name": "digitickets/omnipay-realex",

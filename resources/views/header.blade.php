@@ -337,7 +337,6 @@
             'products' => false,
             'invoices' => false,
             'payments' => false,
-            'recurring_invoices' => 'recurring',
             'credits' => false,
             'quotes' => false,
             'tasks' => false,
@@ -364,7 +363,6 @@
                 'products',
                 'invoices',
                 'payments',
-                'recurring_invoices',
                 'credits',
                 'quotes',
                 'tasks',
@@ -449,6 +447,10 @@
           @if (Session::has('error'))
               <div class="alert alert-danger">{!! Session::get('error') !!}</div>
           @endif
+
+          <div class="pull-right">
+              @yield('top-right')
+          </div>
 
           @if (!isset($showBreadcrumbs) || $showBreadcrumbs)
             {!! Form::breadcrumbs((isset($entity) && $entity->exists) ? $entity->present()->statusLabel : false) !!}

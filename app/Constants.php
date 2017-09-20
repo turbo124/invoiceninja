@@ -38,6 +38,7 @@ if (! defined('APP_NAME')) {
     define('ENTITY_EXPENSE_CATEGORY', 'expense_category');
     define('ENTITY_PROJECT', 'project');
     define('ENTITY_RECURRING_EXPENSE', 'recurring_expense');
+    define('ENTITY_CUSTOMER', 'customer');
 
     define('INVOICE_TYPE_STANDARD', 1);
     define('INVOICE_TYPE_QUOTE', 2);
@@ -169,6 +170,7 @@ if (! defined('APP_NAME')) {
     define('IMPORT_INVOICEABLE', 'Invoiceable');
     define('IMPORT_INVOICEPLANE', 'InvoicePlane');
     define('IMPORT_HARVEST', 'Harvest');
+    define('IMPORT_STRIPE', 'Stripe');
 
     define('MAX_NUM_CLIENTS', 100);
     define('MAX_NUM_CLIENTS_PRO', 20000);
@@ -307,7 +309,7 @@ if (! defined('APP_NAME')) {
     define('NINJA_APP_URL', env('NINJA_APP_URL', 'https://app.invoiceninja.com'));
     define('NINJA_DOCS_URL', env('NINJA_DOCS_URL', 'http://docs.invoiceninja.com/en/latest'));
     define('NINJA_DATE', '2000-01-01');
-    define('NINJA_VERSION', '3.6.1' . env('NINJA_VERSION_SUFFIX'));
+    define('NINJA_VERSION', '3.7.1' . env('NINJA_VERSION_SUFFIX'));
 
     define('SOCIAL_LINK_FACEBOOK', env('SOCIAL_LINK_FACEBOOK', 'https://www.facebook.com/invoiceninja'));
     define('SOCIAL_LINK_TWITTER', env('SOCIAL_LINK_TWITTER', 'https://twitter.com/invoiceninja'));
@@ -401,6 +403,8 @@ if (! defined('APP_NAME')) {
     define('PAYMENT_TYPE_MAESTRO', 21);
     define('PAYMENT_TYPE_SOLO', 22);
     define('PAYMENT_TYPE_SWITCH', 23);
+    define('PAYMENT_TYPE_ALIPAY', 28);
+    define('PAYMENT_TYPE_SOFORT', 29);
 
     define('PAYMENT_METHOD_STATUS_NEW', 'new');
     define('PAYMENT_METHOD_STATUS_VERIFICATION_FAILED', 'verification_failed');
@@ -412,11 +416,17 @@ if (! defined('APP_NAME')) {
     define('GATEWAY_TYPE_BITCOIN', 4);
     define('GATEWAY_TYPE_DWOLLA', 5);
     define('GATEWAY_TYPE_CUSTOM', 6);
+    define('GATEWAY_TYPE_ALIPAY', 7);
+    define('GATEWAY_TYPE_SOFORT', 8);
     define('GATEWAY_TYPE_TOKEN', 'token');
 
-    define('REMINDER1', 'reminder1');
-    define('REMINDER2', 'reminder2');
-    define('REMINDER3', 'reminder3');
+    define('TEMPLATE_INVOICE', 'invoice');
+    define('TEMPLATE_QUOTE', 'quote');
+    define('TEMPLATE_PARTIAL', 'partial');
+    define('TEMPLATE_PAYMENT', 'payment');
+    define('TEMPLATE_REMINDER1', 'reminder1');
+    define('TEMPLATE_REMINDER2', 'reminder2');
+    define('TEMPLATE_REMINDER3', 'reminder3');
 
     define('RESET_FREQUENCY_DAILY', 1);
     define('RESET_FREQUENCY_WEEKLY', 2);

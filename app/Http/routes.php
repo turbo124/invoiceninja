@@ -33,6 +33,7 @@ Route::group(['middleware' => ['lookup:contact', 'auth:client']], function () {
     Route::get('approve/{invitation_key}', 'QuoteController@approve');
     Route::get('payment/{invitation_key}/{gateway_type?}/{source_id?}', 'OnlinePaymentController@showPayment');
     Route::post('payment/{invitation_key}', 'OnlinePaymentController@doPayment');
+    Route::get('complete_source/{invitation_key}/{gateway_type}', 'OnlinePaymentController@completeSource');
     Route::match(['GET', 'POST'], 'complete/{invitation_key?}/{gateway_type?}', 'OnlinePaymentController@offsitePayment');
     Route::get('bank/{routing_number}', 'OnlinePaymentController@getBankInfo');
     Route::get('client/payment_methods', 'ClientPortalController@paymentMethods');
@@ -87,7 +88,7 @@ Route::get('/signup', ['as' => 'signup', 'uses' => 'Auth\AuthController@getRegis
 Route::post('/signup', ['as' => 'signup', 'uses' => 'Auth\AuthController@postRegister']);
 Route::get('/login', ['as' => 'login', 'uses' => 'Auth\AuthController@getLoginWrapper']);
 Route::get('/logout', ['as' => 'logout', 'uses' => 'Auth\AuthController@getLogoutWrapper']);
-Route::get('/recover_password', ['as' => 'forgot', 'uses' => 'Auth\PasswordController@getEmail']);
+Route::get('/recover_password', ['as' => 'forgot', 'uses' => 'Auth\PasswordController@getEmailWrapper']);
 Route::get('/password/reset/{token}', ['as' => 'forgot', 'uses' => 'Auth\PasswordController@getReset']);
 Route::get('/auth/{provider}', 'Auth\AuthController@authLogin');
 
@@ -146,6 +147,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::post('clients/bulk', 'ClientController@bulk');
     Route::get('clients/statement/{client_id}/{status_id?}/{start_date?}/{end_date?}', 'ClientController@statement');
 
+    Route::get('time_tracker', 'TimeTrackerController@index');
     Route::resource('tasks', 'TaskController');
     Route::get('api/tasks/{client_id?}', 'TaskController@getDatatable');
     Route::get('tasks/create/{client_id?}/{project_id?}', 'TaskController@create');
@@ -156,6 +158,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::post('projects', 'ProjectController@store');
     Route::put('projects/{projects}', 'ProjectController@update');
     Route::get('projects/{projects}/edit', 'ProjectController@edit');
+    Route::get('projects/{projects}', 'ProjectController@edit');
     Route::post('projects/bulk', 'ProjectController@bulk');
 
     Route::get('api/recurring_invoices/{client_id?}', 'InvoiceController@getRecurringDatatable');
@@ -246,6 +249,8 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
 
     Route::get('reports', 'ReportController@showReports');
     Route::post('reports', 'ReportController@showReports');
+    Route::get('calendar', 'CalendarController@showCalendar');
+    Route::get('calendar_events', 'CalendarController@loadEvents');
 });
 
 Route::group([

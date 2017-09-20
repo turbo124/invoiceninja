@@ -173,9 +173,29 @@ function ViewModel(data) {
         }
         invoice = self.invoice();
         for (var i=0; i<invoice.invoice_items_with_tasks().length; ++i) {
-            var item = invoice.invoice_items()[i];
+            var item = invoice.invoice_items_with_tasks()[i];
             if (! item.isEmpty()) {
                 self.hasTasksCached = true;
+                return true;
+            }
+        }
+        return false;
+    });
+
+    self.hasItemsCached = false;
+    self.forceShowItems = ko.observable(false);
+    self.hasItems = ko.computed(function() {
+        if (self.forceShowItems()) {
+            return true;
+        }
+        if (self.hasItemsCached) {
+            return true;
+        }
+        invoice = self.invoice();
+        for (var i=0; i<invoice.invoice_items_without_tasks().length; ++i) {
+            var item = invoice.invoice_items_without_tasks()[i];
+            if (! item.isEmpty()) {
+                self.hasItemsCached = true;
                 return true;
             }
         }
@@ -534,10 +554,7 @@ function InvoiceModel(data) {
             total = NINJA.parseFloat(total) + customValue2;
         }
 
-        var paid = self.totals.rawPaidToDate();
-        if (paid > 0) {
-            total -= paid;
-        }
+        total -= self.totals.rawPaidToDate();
 
         return total;
     });
@@ -562,10 +579,10 @@ function InvoiceModel(data) {
         return self.default_footer() && self.invoice_footer() != self.default_footer();
     }
 
-    self.applyInclusivTax = function(taxRate) {
+    self.applyInclusiveTax = function(taxRate) {
         for (var i=0; i<self.invoice_items().length; i++) {
             var item = self.invoice_items()[i];
-            item.applyInclusivTax(taxRate);
+            item.applyInclusiveTax(taxRate);
         }
     }
 
@@ -578,7 +595,7 @@ function InvoiceModel(data) {
         if (taxKey.substr(0, 1) != 1) {
             return;
         }
-        self.applyInclusivTax(taxRate);
+        self.applyInclusiveTax(taxRate);
     }
 
     self.onTax2Change = function(obj, event) {
@@ -590,7 +607,7 @@ function InvoiceModel(data) {
         if (taxKey.substr(0, 1) != 1) {
             return;
         }
-        self.applyInclusivTax(taxRate);
+        self.applyInclusiveTax(taxRate);
     }
 
     self.isAmountDiscountChanged = function(obj, event) {
@@ -878,7 +895,7 @@ function ItemModel(data) {
 
     this.onSelect = function() {}
 
-    self.applyInclusivTax = function(taxRate) {
+    self.applyInclusiveTax = function(taxRate) {
         if ( ! taxRate) {
             return;
         }
@@ -891,7 +908,7 @@ function ItemModel(data) {
             var taxKey = $(event.currentTarget).val();
             var taxRate = parseFloat(self.tax_rate1());
             if (taxKey.substr(0, 1) == 1) {
-                self.applyInclusivTax(taxRate);
+                self.applyInclusiveTax(taxRate);
             }
         }
     }
@@ -901,7 +918,7 @@ function ItemModel(data) {
             var taxKey = $(event.currentTarget).val();
             var taxRate = parseFloat(self.tax_rate2());
             if (taxKey.substr(0, 1) == 1) {
-                self.applyInclusivTax(taxRate);
+                self.applyInclusiveTax(taxRate);
             }
         }
     }
