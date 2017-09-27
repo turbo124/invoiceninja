@@ -655,7 +655,7 @@ $LANG = array(
     'created_by_invoice' => 'Created by :invoice',
     'primary_user' => 'Primary User',
     'help' => 'Help',
-    'customize_help' => '<p>We use <a href="http://pdfmake.org/" target="_blank">pdfmake</a> to define the invoice designs declaratively. The pdfmake <a href="http://pdfmake.org/playground.html" target="_blank">playground</a> provide\'s a great way to see the library in action.</p>
+    'customize_help' => '<p>We use <a href="http://pdfmake.org/" target="_blank">pdfmake</a> to define the invoice designs declaratively. The pdfmake <a href="http://pdfmake.org/playground.html" target="_blank">playground</a> provides a great way to see the library in action.</p>
                         <p>You can access a child property using dot notation. For example to show the client name you could use <code>$client.name</code>.</p>
                         <p>If you need help figuring something out post a question to our <a href="https://www.invoiceninja.com/forums/forum/support/" target="_blank">support forum</a> with the design you\'re using.</p>',
     'invoice_due_date' => 'Due Date',
@@ -2450,6 +2450,20 @@ $LANG = array(
 
     'what_are_you_working_on' => 'What are you working on?',
     'time_tracker' => 'Time Tracker',
+    'refresh' => 'Refresh',
+    'filter_sort' => 'Filter/Sort',
+    'no_description' => 'No Description',
+    'time_tracker_login' => 'Time Tracker Login',
+    'save_or_discard' => 'Save or discard your changes',
+    'discard_changes' => 'Discard Changes',
+    'tasks_not_enabled' => 'Tasks are not enabled.',
+    'started_task' => 'Successfully started task',
+    'create_client' => 'Create Client',
+
+    'download_desktop_app' => 'Download the desktop app',
+    'download_iphone_app' => 'Download the iPhone app',
+    'download_android_app' => 'Download the Android app',
+    'time_tracker_mobile_help' => 'Double tap a task to select it',
 
 );
 
