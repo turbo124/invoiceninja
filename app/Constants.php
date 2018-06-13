@@ -47,6 +47,7 @@ if (! defined('APP_NAME')) {
     define('ENTITY_PROPOSAL_SNIPPET', 'proposal_snippet');
     define('ENTITY_PROPOSAL_CATEGORY', 'proposal_category');
     define('ENTITY_PROPOSAL_INVITATION', 'proposal_invitation');
+    define('ENTITY_TICKET', 'ticket');
 
     $permissionEntities = [
         ENTITY_CLIENT,
@@ -60,6 +61,7 @@ if (! defined('APP_NAME')) {
         ENTITY_PROPOSAL,
         ENTITY_QUOTE,
         'reports',
+        ENTITY_TICKET,
         ENTITY_TASK,
         ENTITY_VENDOR,
         ENTITY_RECURRING_INVOICE,
@@ -662,6 +664,14 @@ if (! defined('APP_NAME')) {
 
     // Fix for mPDF: https://github.com/kartik-v/yii2-mpdf/issues/9
     define('_MPDF_TTFONTDATAPATH', storage_path('framework/cache/'));
+
+
+    /** Tickets constants */
+    define('TICKET_PRIORITY_LOW', 10);
+    define('TICKET_PRIORITY_MEDIUM', 20);
+    define('TICKET_PRIORITY_HIGH', 30);
+
+
 
     function uctrans($text, $data = [])
     {

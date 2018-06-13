@@ -163,6 +163,8 @@ return [
         PragmaRX\Google2FALaravel\ServiceProvider::class,
         'Chumper\Datatable\DatatableServiceProvider',
         Laravel\Tinker\TinkerServiceProvider::class,
+        App\Providers\MultipleConfigMailerServiceProvider::class,
+
 
         /*
          * Application Service Providers...
@@ -274,6 +276,7 @@ return [
         'CurlUtils' => App\Libraries\CurlUtils::class,
         'Domain' => App\Constants\Domain::class,
         'Google2FA' => PragmaRX\Google2FALaravel\Facade::class,
+        'Multimail' => App\Ninja\MultiMail\Multimail::class,
 
     ],
 
