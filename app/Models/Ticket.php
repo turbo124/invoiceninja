@@ -1,0 +1,100 @@
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Laracasts\Presenter\PresentableTrait;
+
+class ticket extends Model
+{
+    use PresentableTrait;
+    use SoftDeletes;
+
+    /**
+     * @var string
+     */
+    protected $presenter = 'App\Ninja\Presenters\TicketPresenter';
+
+    /**
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
+
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'subject',
+        'description',
+        'private_notes',
+        'due_date',
+        'ccs',
+        'priority_id',
+        'agent_id',
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function account()
+    {
+        return $this->belongsTo('App\Models\Account');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User')->withTrashed();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function client()
+    {
+        return $this->belongsTo('App\Models\Client')->withTrashed();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function category()
+    {
+        return $this->belongsTo('App\Models\TicketCategory');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function comments()
+    {
+        return $this->hasMany('App\Models\TicketComment');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function templates()
+    {
+        return $this->hasMany('App\Models\TicketTemplate');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEntityType()
+    {
+        return ENTITY_TICKET;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoute()
+    {
+        return "/tickets/{$this->public_id}";
+    }
+}

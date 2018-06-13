@@ -48,6 +48,11 @@ if (! defined('APP_NAME')) {
     define('ENTITY_PROPOSAL_CATEGORY', 'proposal_category');
     define('ENTITY_PROPOSAL_INVITATION', 'proposal_invitation');
     define('ENTITY_TICKET', 'ticket');
+    define('ENTITY_TICKET_COMMENT', 'ticket_comment');
+    define('ENTITY_TICKET_STATUS', 'ticket_status');
+    define('ENTITY_TICKET_CATEGORY', 'ticket_category');
+    define('ENTITY_TICKET_RELATION', 'ticket_relation');
+    define('ENTITY_TICKET_TEMPLATE', 'ticket_template');
 
     $permissionEntities = [
         ENTITY_CLIENT,
