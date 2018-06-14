@@ -342,6 +342,7 @@ class EntityModel extends Eloquent
             'self-update' => 'download',
             'reports' => 'th-list',
             'projects' => 'briefcase',
+            'tickets' => 'life-ring',
         ];
 
         return array_get($icons, $entityType);

@@ -581,6 +581,7 @@ if (! defined('APP_NAME')) {
     define('FEATURE_MORE_INVOICE_DESIGNS', 'more_invoice_designs');
     define('FEATURE_QUOTES', 'quotes');
     define('FEATURE_TASKS', 'tasks');
+    define('FEATURE_TICKETS', 'tickets');
     define('FEATURE_EXPENSES', 'expenses');
     define('FEATURE_REPORTS', 'reports');
     define('FEATURE_BUY_NOW_BUTTONS', 'buy_now_buttons');
@@ -676,7 +677,12 @@ if (! defined('APP_NAME')) {
     define('TICKET_PRIORITY_MEDIUM', 20);
     define('TICKET_PRIORITY_HIGH', 30);
 
-
+    /* Default ticket statuses - Category - support*/
+    $supportTicketStatuses = [
+        trans('texts.'.'new'),
+        'open',
+        'closed',
+    ];
 
     function uctrans($text, $data = [])
     {

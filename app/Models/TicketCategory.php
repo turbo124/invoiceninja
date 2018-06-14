@@ -1,10 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Eloquent;
 
-class TicketCategory extends Model
+
+class TicketCategory extends Eloquent
 {
     /**
      * @return mixed

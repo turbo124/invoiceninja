@@ -2615,6 +2615,7 @@ $LANG = array(
     'module_quote' => 'Quotes & Proposals',
     'module_task' => 'Tasks & Projects',
     'module_expense' => 'Expenses & Vendors',
+    'module_ticket' => 'Tickets',
     'reminders' => 'Reminders',
     'send_client_reminders' => 'Send email reminders',
     'can_view_tasks' => 'Tasks are visible in the portal',
@@ -2847,7 +2848,12 @@ $LANG = array(
     'send_notifications_for' => 'Send Notifications For',
     'all_invoices' => 'All Invoices',
     'my_invoices' => 'My Invoices',
-
+    'tickets' => 'Tickets',
+    'new_ticket' => 'New Ticket',
+    'open' => 'Open',
+    'new' => 'New',
+    'closed' => 'Closed',
+    'reopened' => 'Reopened',
 );
 
 return $LANG;

@@ -2,28 +2,28 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Ticket;
+use App\Models\TicketStatus;
 use Auth;
 use DB;
 use Utils;
 
-class TicketRepository extends BaseRepository
+class TicketStatusRepository extends BaseRepository
 {
     public function getClassName()
     {
-        return 'App\Models\Ticket';
+        return 'App\Models\TicketStatus';
     }
 
     public function all()
     {
-        return Ticket::scope()->get();
+        return TicketStatus::scope()->get();
     }
 
     public function find($filter = null, $userId = false)
     {
-        $query = DB::table('tickets')
-                ->where('tickets.account_id', '=', Auth::user()->account_id)
-                ->leftjoin('clients', 'clients.id', '=', 'tickets.client_id')
+        $query = DB::table('ticket_statuses')
+                ->where('ticket_statuses.account_id', '=', Auth::user()->account_id)
+                ->leftjoin('clients', 'clients.id', '=', 'ticket_statuses.client_id')
                 ->leftJoin('contacts', 'contacts.client_id', '=', 'clients.id')
                 ->where('clients.deleted_at', '=', null)
                 ->where('contacts.deleted_at', '=', null)
@@ -41,23 +41,23 @@ class TicketRepository extends BaseRepository
         }
 
         if ($userId) {
-            $query->where('tickets.user_id', '=', $userId);
+            $query->where('ticket_statuses.user_id', '=', $userId);
         }
 
         return $query;
     }
 
-    public function save($input, $ticket = false)
+    public function save($input, $ticketStatus = false)
     {
-        if (! $ticket) {
-            $ticket = Ticket::createNew();
+        if (! $ticketStatus) {
+            $ticketStatus = TicketStatus::createNew();
         }
 
-        $ticket->fill($input);
+        $ticketStatus->fill($input);
 
-        $ticket->save();
+        $ticketStatus->save();
 
-        return $ticket;
+        return $ticketStatus;
     }
 
 }

@@ -23,7 +23,7 @@ class TicketService extends BaseService
     /**
      * CreditService constructor.
      *
-     * @param ticketRepository $creditRepo
+     * @param ticketRepository $ticketRepo
      * @param DatatableService  $datatableService
      */
     public function __construct(TicketRepository $ticketRepo, DatatableService $datatableService)

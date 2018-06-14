@@ -1,10 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
-class TicketComment extends Model
+class TicketComment extends EntityModel
 {
     /**
      * @return mixed

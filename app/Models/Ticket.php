@@ -1,12 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
 
-class ticket extends Model
+class Ticket extends EntityModel
 {
     use PresentableTrait;
     use SoftDeletes;

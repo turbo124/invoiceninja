@@ -21,6 +21,7 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('agent_id');
             $table->unsignedInteger('public_id');
             $table->unsignedInteger('priority_id')->default(1);
+            $table->unsignedInteger('category_id');
             $table->boolean('is_deleted')->default(0);
             $table->boolean('is_internal')->default(0);
             $table->unsignedInteger('status_id');
@@ -35,20 +36,16 @@ class AddTicketsSchema extends Migration
             $table->dateTime('due_date');
             $table->dateTime('closed');
             $table->dateTime('reopened');
+            $table->timestamps();
+            $table->softDeletes();
         });
-
-
-        Schema::table('tickets', function ($table) {
-            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('ticket_categories');
-            $table->foreign('status_id')->references('id')->on('ticket_statuses');
-        });
-
 
         Schema::create('ticket_categories', function ($table) {
             $table->increments('id');
-            $table->text('description');
+            $table->text('name');
+            $table->string('key', 255);
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('ticket_statuses', function ($table) {
@@ -64,14 +61,9 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('public_id');
             $table->unsignedInteger('sort_order');
             $table->boolean('is_deleted')->default(0);
+            $table->timestamps();
+            $table->softDeletes();
         });
-
-        Schema::table('ticket_statuses', function ($table) {
-            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('ticket_categories');
-        });
-
 
         Schema::create('ticket_relations', function ($table) {
             $table->increments('id');
@@ -80,11 +72,6 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('ticket_id');
         });
 
-        Schema::table('ticket_relations', function ($table) {
-            $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
-        });
-
-
         Schema::create('ticket_templates', function ($table) {
             $table->increments('id');
             $table->string('name', 255);
@@ -92,13 +79,9 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('account_id');
             $table->unsignedInteger('public_id');
+            $table->timestamps();
+            $table->softDeletes();
         });
-
-        Schema::table('ticket_templates', function ($table) {
-            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
-
 
         Schema::create('ticket_comments', function ($table) {
             $table->increments('id');
@@ -109,6 +92,31 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('ticket_id');
             $table->unsignedInteger('public_id');
             $table->boolean('is_deleted')->default(0);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+
+        Schema::table('tickets', function ($table) {
+            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('ticket_categories');
+            $table->foreign('status_id')->references('id')->on('ticket_statuses');
+        });
+
+        Schema::table('ticket_statuses', function ($table) {
+            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('ticket_categories');
+        });
+
+        Schema::table('ticket_relations', function ($table) {
+            $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
+        });
+
+        Schema::table('ticket_templates', function ($table) {
+            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::table('ticket_comments', function ($table) {
@@ -126,12 +134,13 @@ class AddTicketsSchema extends Migration
      */
     public function down()
     {
-        Schema::drop('tickets');
-        Schema::drop('ticket_categories');
         Schema::drop('ticket_statuses');
+        Schema::drop('ticket_categories');
         Schema::drop('ticket_templates');
         Schema::drop('ticket_relations');
         Schema::drop('ticket_comments');
+        Schema::drop('tickets');
+
 
     }
 }

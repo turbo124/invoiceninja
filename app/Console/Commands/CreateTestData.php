@@ -2,11 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Models\TicketCategory;
+use App\Models\TicketComment;
 use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Repositories\ClientRepository;
 use App\Ninja\Repositories\ExpenseRepository;
 use App\Ninja\Repositories\InvoiceRepository;
 use App\Ninja\Repositories\PaymentRepository;
+use App\Ninja\Repositories\TicketRepository;
+use App\Ninja\Repositories\TicketStatusRepository;
 use App\Ninja\Repositories\VendorRepository;
 use App\Ninja\Repositories\TaskRepository;
 use App\Ninja\Repositories\ProjectRepository;
@@ -48,8 +52,13 @@ class CreateTestData extends Command
      * @param ExpenseRepository $expenseRepo
      * @param TaskRepository $taskRepo
      * @param AccountRepository $accountRepo
+     * @param TicketRepository $ticketRepo
+     * @param TicketStatusRepository $ticketStatusRepo
      */
+
     public function __construct(
+        TicketStatusRepository $ticketStatusRepository,
+        TicketRepository $ticketRepository,
         ClientRepository $clientRepo,
         InvoiceRepository $invoiceRepo,
         PaymentRepository $paymentRepo,
@@ -71,6 +80,8 @@ class CreateTestData extends Command
         $this->taskRepo = $taskRepo;
         $this->projectRepo = $projectRepo;
         $this->accountRepo = $accountRepo;
+        $this->ticketRepo = $ticketRepository;
+        $this->ticketStatusRepo = $ticketRepository;
     }
 
     /**
@@ -134,6 +145,104 @@ class CreateTestData extends Command
             $this->createInvoices($client);
             $this->createInvoices($client, true);
             $this->createTasks($client);
+            $this->createTicketStubs($client);
+            $this->createTickets($client);
+
+        }
+    }
+
+    /**
+     * @param $client
+     */
+    private function createTicketStubs($client)
+    {
+        /* Create Ticket Category*/
+
+        $ticketCategory = new TicketCategory();
+        $ticketCategory->name = 'Support';
+        $ticketCategory->key = 'support';
+        $ticketCategory->save();
+
+        /* Create Default Ticket Statuses*/
+
+        $ticketStatusSupport = [
+            'name'=> trans('texts.new'),
+            'trigger_column' =>'',
+            'trigger_threshold' =>'',
+            'color' =>'#fff',
+            'description' =>'Newly created ticket.',
+            'category_id' => $ticketCategory->id,
+            'sort_order' => 1,
+            'is_deleted' => 0,
+        ];
+
+        $ticketStatus = $this->ticketStatusRepo->save($ticketStatusSupport);
+        $this->info('Ticket Status: '. $ticketStatus->name);
+
+        $ticketStatusSupport = [
+            'name'=> trans('texts.open'),
+            'trigger_column' =>'',
+            'trigger_threshold' =>'',
+            'color' =>'#fff',
+            'description' =>'Open ticket - replied.',
+            'category_id' => $ticketCategory->id,
+            'sort_order' => 2,
+            'is_deleted' =>0,
+        ];
+
+        $ticketStatus = $this->ticketStatusRepo->save($ticketStatusSupport);
+        $this->info('Ticket Status: '. $ticketStatus->name);
+
+        $ticketStatusSupport = [
+            'name'=> trans('texts.closed'),
+            'trigger_column' =>'',
+            'trigger_threshold' =>'',
+            'color' =>'#fff',
+            'description' =>'Closed ticket - resolved.',
+            'category_id' => $ticketCategory->id,
+            'sort_order' => 3,
+            'is_deleted' => 0,
+        ];
+
+        $ticketStatus = $this->ticketStatusRepo->save($ticketStatusSupport);
+        $this->info('Ticket Status: '. $ticketStatus->name);
+    }
+
+    /**
+     * @param $client
+     */
+    private function createTickets($client)
+    {
+        for ($i = 0; $i < $this->count; $i++)
+        {
+            $data = [
+                'priority_id'=> TICKET_PRIORITY_LOW,
+                'is_deleted'=> (bool)random_int(0, 1),
+                'is_internal'=> (bool)random_int(0, 1),
+                'status_id'=> random_int(1,3),
+                'category_id'=> 1,
+                'subject'=> $this->faker->realText(10),
+                'description'=> $this->realText(50),
+                'tags'=> json_encode($this->faker->words($nb = 5, $asText = false)),
+                'private_notes'=> $this->realText(50),
+                'ccs'=> json_encode('test','email','contact','keys','here'),
+                'contact_key'=> '10101010101010',
+                'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
+            ];
+
+            $ticket = $this->ticketRepo->save($data);
+
+                $ticketComment = TicketComment::createNew($ticket);
+                $ticketComment->description = $this->faker->realText(70);
+                $ticketComment->contact_key = '10101010101010';
+                $ticketComment->save();
+
+                $ticketComment = TicketComment::createNew($ticket);
+                $ticketComment->description = $this->faker->realText(40);
+                $ticketComment->user_id = 1;
+                $ticketComment->save();
+
+            $this->info('Ticket: '. $ticket->public_id);
         }
     }
 

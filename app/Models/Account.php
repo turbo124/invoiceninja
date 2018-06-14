@@ -215,6 +215,7 @@ class Account extends Eloquent
         ENTITY_QUOTE => 4,
         ENTITY_TASK => 8,
         ENTITY_EXPENSE => 16,
+        ENTITY_TICKET => 32,
     ];
 
     public static $dashboardSections = [
@@ -1141,6 +1142,8 @@ class Account extends Eloquent
             case FEATURE_TASKS:
             case FEATURE_EXPENSES:
             case FEATURE_QUOTES:
+            case FEATURE_TICKETS:
+
                 return true;
 
             case FEATURE_CUSTOMIZE_INVOICE_DESIGN:
@@ -1722,6 +1725,7 @@ class Account extends Eloquent
             ENTITY_VENDOR,
             ENTITY_PROJECT,
             ENTITY_PROPOSAL,
+            ENTITY_TICKET,
         ])) {
             return true;
         }

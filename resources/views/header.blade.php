@@ -396,6 +396,7 @@
                 'tasks',
                 'expenses',
                 'vendors',
+                'tickets',
             ] as $option)
                 @if (in_array($option, ['dashboard', 'settings'])
                     || Auth::user()->can('view', substr($option, 0, -1))

@@ -11,4 +11,5 @@ return [
         'from' => ['address' => env('MAILGUN_MAIL_FROM_ADDRESS'), 'name' => env('MAILGUN_MAIL_FROM_NAME')],
         'pretend' => false,
     ],
+    'postmark' => env('POSTMARK_API_TICKET_TOKEN', ''),
 ];
