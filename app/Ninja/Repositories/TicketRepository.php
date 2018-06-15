@@ -21,13 +21,28 @@ class TicketRepository extends BaseRepository
 
     public function find($filter = null, $userId = false)
     {
+
         $query = DB::table('tickets')
-                ->where('tickets.account_id', '=', Auth::user()->account_id)
-                ->leftjoin('clients', 'clients.id', '=', 'tickets.client_id')
-                ->leftJoin('contacts', 'contacts.client_id', '=', 'clients.id')
-                ->where('clients.deleted_at', '=', null)
-                ->where('contacts.deleted_at', '=', null)
-                ->where('contacts.is_primary', '=', true);
+            ->where('tickets.account_id', '=', Auth::user()->account_id)
+            ->leftjoin('clients', 'clients.id', '=', 'tickets.client_id')
+            ->leftJoin('contacts', 'contacts.client_id', '=', 'clients.id')
+            ->leftJoin('ticket_statuses', 'ticket_statuses.id', '=', 'tickets.status_id')
+            ->where('clients.deleted_at', '=', null)
+            ->where('contacts.deleted_at', '=', null)
+            ->where('contacts.is_primary', '=', true)
+            ->select(
+                'tickets.public_id',
+                'tickets.user_id',
+                'tickets.deleted_at',
+                'tickets.created_at',
+                'tickets.is_deleted',
+                'tickets.private_notes',
+                'tickets.subject',
+                'ticket_statuses.name as status',
+                DB::raw("COALESCE(NULLIF(clients.name,''), NULLIF(CONCAT(contacts.first_name, ' ', contacts.last_name),''), NULLIF(contacts.email,'')) client_name"),
+                'clients.user_id as client_user_id',
+                'clients.public_id as client_public_id'
+            );
 
         $this->applyFilters($query, ENTITY_TICKET);
 

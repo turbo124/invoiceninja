@@ -262,6 +262,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::post('/update_setup', 'AppController@updateSetup');
 
     Route::resource('tickets', 'TicketController');
+    Route::get('api/tickets', 'TicketController@getDatatable');
 
     // vendor
     Route::resource('vendors', 'VendorController');

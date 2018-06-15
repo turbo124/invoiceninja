@@ -24,6 +24,7 @@ class Ticket extends EntityModel
      * @var array
      */
     protected $fillable = [
+        'client_id',
         'subject',
         'description',
         'private_notes',
@@ -31,6 +32,10 @@ class Ticket extends EntityModel
         'ccs',
         'priority_id',
         'agent_id',
+        'category_id',
+        'is_deleted',
+        'is_internal',
+        'status_id',
     ];
 
     /**
@@ -96,4 +101,6 @@ class Ticket extends EntityModel
     {
         return "/tickets/{$this->public_id}";
     }
+
+
 }

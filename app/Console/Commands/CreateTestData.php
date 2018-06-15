@@ -81,7 +81,7 @@ class CreateTestData extends Command
         $this->projectRepo = $projectRepo;
         $this->accountRepo = $accountRepo;
         $this->ticketRepo = $ticketRepository;
-        $this->ticketStatusRepo = $ticketRepository;
+        $this->ticketStatusRepo = $ticketStatusRepository;
     }
 
     /**
@@ -217,15 +217,17 @@ class CreateTestData extends Command
         {
             $data = [
                 'priority_id'=> TICKET_PRIORITY_LOW,
+                'category_id'=> 1,
+                'client_id' => $client->id,
                 'is_deleted'=> (bool)random_int(0, 1),
                 'is_internal'=> (bool)random_int(0, 1),
                 'status_id'=> random_int(1,3),
                 'category_id'=> 1,
                 'subject'=> $this->faker->realText(10),
-                'description'=> $this->realText(50),
+                'description'=> $this->faker->realText(50),
                 'tags'=> json_encode($this->faker->words($nb = 5, $asText = false)),
-                'private_notes'=> $this->realText(50),
-                'ccs'=> json_encode('test','email','contact','keys','here'),
+                'private_notes'=> $this->faker->realText(50),
+                'ccs'=> json_encode(['test','email','contact','keys','here']),
                 'contact_key'=> '10101010101010',
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
             ];
@@ -235,12 +237,14 @@ class CreateTestData extends Command
                 $ticketComment = TicketComment::createNew($ticket);
                 $ticketComment->description = $this->faker->realText(70);
                 $ticketComment->contact_key = '10101010101010';
-                $ticketComment->save();
+                //$ticketComment->save();
+                $ticket->comments()->save($ticketComment);
 
                 $ticketComment = TicketComment::createNew($ticket);
                 $ticketComment->description = $this->faker->realText(40);
                 $ticketComment->user_id = 1;
-                $ticketComment->save();
+                //$ticketComment->save();
+                $ticket->comments()->save($ticketComment);
 
             $this->info('Ticket: '. $ticket->public_id);
         }

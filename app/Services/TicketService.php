@@ -51,19 +51,13 @@ class TicketService extends BaseService
         return $this->ticketRepo->save($data, $ticket);
     }
 
-    /**
-     * @param $ticketPublicId
-     * @param $search
-     * @param mixed $userId
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getDatatable($search, $userId)
+
+    public function getDatatable($search)
     {
         // we don't support bulk edit and hide the client on the individual client page
         $datatable = new TicketDatatable();
 
-        $query = $this->ticketRepo->find($search, $userId);
+        $query = $this->ticketRepo->find($search);
 
         return $this->datatableService->createDatatable($datatable, $query);
     }

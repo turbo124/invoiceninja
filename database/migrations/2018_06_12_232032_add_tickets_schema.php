@@ -21,7 +21,6 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('agent_id');
             $table->unsignedInteger('public_id');
             $table->unsignedInteger('priority_id')->default(1);
-            $table->unsignedInteger('category_id');
             $table->boolean('is_deleted')->default(0);
             $table->boolean('is_internal')->default(0);
             $table->unsignedInteger('status_id');
