@@ -2849,6 +2849,7 @@ $LANG = array(
     'all_invoices' => 'All Invoices',
     'my_invoices' => 'My Invoices',
     'tickets' => 'Tickets',
+    'ticket_number' => 'Ticket #',
     'new_ticket' => 'New Ticket',
     'open' => 'Open',
     'new' => 'New',

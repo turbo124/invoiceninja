@@ -31,6 +31,7 @@ class TicketRepository extends BaseRepository
             ->where('contacts.deleted_at', '=', null)
             ->where('contacts.is_primary', '=', true)
             ->select(
+                'tickets.public_id as ticket_number',
                 'tickets.public_id',
                 'tickets.user_id',
                 'tickets.deleted_at',
@@ -39,6 +40,7 @@ class TicketRepository extends BaseRepository
                 'tickets.private_notes',
                 'tickets.subject',
                 'ticket_statuses.name as status',
+                'tickets.contact_key',
                 DB::raw("COALESCE(NULLIF(clients.name,''), NULLIF(CONCAT(contacts.first_name, ' ', contacts.last_name),''), NULLIF(contacts.email,'')) client_name"),
                 'clients.user_id as client_user_id',
                 'clients.public_id as client_public_id'

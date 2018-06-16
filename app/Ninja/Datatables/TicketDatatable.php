@@ -17,7 +17,7 @@ class TicketDatatable extends EntityDatatable
 
         return [
             [
-                'public_id',
+                trans('ticket_number'),
 
                 function ($model) use ($entityType) {
                         if(Auth::user()->can('view', [ENTITY_TICKET, $model])) {
@@ -42,7 +42,8 @@ class TicketDatatable extends EntityDatatable
             [
                 'contact',
                 function ($model) {
-                    return link_to("clients/{$model->public_id}", $model->contact ?: '')->toHtml();
+                    //return link_to("clients/{$model->public_id}", $model->getContact($model->contact_key) ?: '')->toHtml();
+                    return link_to("clients/{$model->public_id}", $model->contact_key ?: '')->toHtml();
                 },
             ],
             [

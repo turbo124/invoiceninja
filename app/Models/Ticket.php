@@ -102,5 +102,19 @@ class Ticket extends EntityModel
         return "/tickets/{$this->public_id}";
     }
 
+    /**
+     * @param $key
+     *
+     * @return string
+     */
+    public function getContact($key)
+    {
+        $contact = Contact::withTrashed()->where('contact_key', '=', $key)->first();
+        if ($contact && ! $contact->is_deleted) {
+            return $contact->getFullName();
+        } else {
+            return null;
+        }
+    }
 
 }
