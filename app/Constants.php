@@ -680,8 +680,8 @@ if (! defined('APP_NAME')) {
     /* Default ticket statuses - Category - support*/
     $supportTicketStatuses = [
         trans('texts.'.'new'),
-        'open',
-        'closed',
+        trans('texts.'.'open'),
+        trans('texts.'.'closed'),
     ];
 
     function uctrans($text, $data = [])

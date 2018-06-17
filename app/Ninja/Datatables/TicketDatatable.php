@@ -69,6 +69,16 @@ class TicketDatatable extends EntityDatatable
 
     public function actions()
     {
-        return [];
+        return [
+                [
+                    trans('texts.edit_ticket'),
+                    function ($model) {
+                        if(Auth::user()->can('edit', [ENTITY_TICKET, $model]))
+                            return URL::to("tickets/{$model->public_id}/edit");
+                        elseif(Auth::user()->can('view', [ENTITY_TICKET, $model]))
+                            return URL::to("tickets/{$model->public_id}");
+                    },
+                ],
+        ];
     }
 }

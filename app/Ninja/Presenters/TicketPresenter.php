@@ -2,9 +2,7 @@
 
 namespace App\Ninja\Presenters;
 
-use Laracasts\Presenter\Presenter;
-
-class TicketPresenter extends Presenter
+class TicketPresenter extends EntityPresenter
 {
 
 }
