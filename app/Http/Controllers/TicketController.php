@@ -63,9 +63,9 @@ class TicketController extends BaseController
     private static function getViewModel($ticket = false)
     {
         return [
-          //  'client' => $ticket->client(),
-          //  'comments' => $ticket->comments(),
-          //  'account' => Auth::user()->account,
+            'status' => $ticket->status(),
+            'comments' => $ticket->comments(),
+            'account' => Auth::user()->account,
         ];
     }
 

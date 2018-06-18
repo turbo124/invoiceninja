@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Libraries\Utils;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
 
@@ -89,6 +90,14 @@ class Ticket extends EntityModel
     /**
      * @return mixed
      */
+    public function status()
+    {
+        return $this->belongsTo('App\Models\TicketStatus');
+    }
+
+    /**
+     * @return mixed
+     */
     public function getEntityType()
     {
         return ENTITY_TICKET;
@@ -103,18 +112,50 @@ class Ticket extends EntityModel
     }
 
     /**
-     * @param $key
      *
      * @return string
      */
-    public function getContact($key)
+    public function getContactName()
     {
-        $contact = Contact::withTrashed()->where('contact_key', '=', $key)->first();
+        $contact = Contact::withTrashed()->where('contact_key', '=', $this->contact_key)->first();
         if ($contact && ! $contact->is_deleted) {
             return $contact->getFullName();
         } else {
             return null;
         }
     }
+
+    /**
+     *
+     * @return string
+     */
+    public function getPriorityName()
+    {
+        switch($this->priority_id)
+        {
+            case TICKET_PRIORITY_LOW:
+                return trans('texts.low');
+                break;
+            case TICKET_PRIORITY_MEDIUM:
+                return trans('texts.medium');
+                break;
+            case TICKET_PRIORITY_HIGH:
+                return trans('texts.high');
+                break;
+        }
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getDueDate()
+    {
+        if($this->duedate)
+            return Utils::fromSqlDateTime($this->duedate);
+        else
+            return trans('texts.no_due_date');
+    }
+
 
 }

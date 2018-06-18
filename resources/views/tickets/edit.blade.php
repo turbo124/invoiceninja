@@ -1,5 +1,10 @@
 @extends('header')
 
+<style>
+    .td-left {width:1%; white-space:nowrap; text-align: right;}
+</style>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 @section('content')
 
     {!! Former::open($url)
@@ -15,19 +20,57 @@
         {!! Former::populate($ticket) !!}
     @endif
 
-    <div role="tabpanel" class="pull-left" style="margin-left:40px; margin-top:30px;">
+    <div class="panel panel-default">
+        <table width="100%">
+            <tr>
+                <td width="50%">
+                    <table class="table table-striped dataTable" >
+                        <tbody>
+                        <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->id !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td>{!! $ticket->status->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.priority') !!}:</td><td>{!! $ticket->getPriorityName() !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td><td>{!! $ticket->getDueDate() !!}</td></tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="50%">
+                    <table class="table table-striped dataTable" >
+                        <tbody>
+                        <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_message') !!}:</td><td></td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_response') !!}:</td><td></td></tr>
+                        <tr><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
+        @foreach($ticket->comments as $comment)
+        <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" >{!! $comment->getCommentHeader() !!}</h3>
+        <div>
+            <p>
+               {!! $comment->description !!}
+            </p>
+        </div>
+       @endforeach
+    </div>
+
+    <div role="tabpanel" class="panel-default" style="margin-top:30px;">
 
         <ul class="nav nav-tabs" role="tablist" style="border: none">
-            <li role="presentation" class="active"><a href="#public_notes" aria-controls="notes" role="tab" data-toggle="tab">{{ trans('texts.public_notes') }}</a></li>
+            <li role="presentation" class="active"><a href="#linked_objects" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.linked_objects") }}</a></li>
             <li role="presentation"><a href="#private_notes" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.private_notes") }}</a></li>
-            <li role="presentation"><a href="#terms" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.terms") }}</a></li>
-            <li role="presentation"><a href="#footer" aria-controls="footer" role="tab" data-toggle="tab">{{ trans("texts.footer") }}</a></li>
+            <li role="presentation"><a href="#tags" aria-controls="footer" role="tab" data-toggle="tab">{{ trans("texts.tags") }}</a></li>
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
                 <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                         {{ trans("texts.documents") }}
-                        @if ($count = ($invoice->countDocuments($expenses)))
-                            ({{ $count }})
-                        @endif
                     </a></li>
             @endif
         </ul>
@@ -80,23 +123,7 @@
                                 <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
                             </div>
                         </div>
-                        @if ($invoice->hasExpenseDocuments() || $expenses->count())
-                            <h4>{{trans('texts.documents_from_expenses')}}</h4>
-                            @foreach($invoice->expenses as $expense)
-                                @if ($expense->invoice_documents)
-                                    @foreach($expense->documents as $document)
-                                        <div>{{$document->name}}</div>
-                                    @endforeach
-                                @endif
-                            @endforeach
-                            @foreach($expenses as $expense)
-                                @if ($expense->invoice_documents)
-                                    @foreach($expense->documents as $document)
-                                        <div>{{$document->name}}</div>
-                                    @endforeach
-                                @endif
-                            @endforeach
-                        @endif
+
                     </div>
                 </div>
             @endif
@@ -110,7 +137,9 @@
         {!! Former::close() !!}
 
     <script>
-
+        $( function() {
+            $( "#accordion" ).accordion();
+        } );
 
     </script>
 

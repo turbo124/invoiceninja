@@ -2860,6 +2860,16 @@ $LANG = array(
     'new' => 'New',
     'closed' => 'Closed',
     'reopened' => 'Reopened',
+    'priority' => 'Priority',
+    'last_message' => 'Last Message',
+    'last_response' => 'Last Response',
+    'comment' => 'Comments',
+    'tags' => 'Tags',
+    'linked_objects' => 'Linked Objects',
+    'low' => 'Low',
+    'medium' => 'Medium',
+    'high' => 'High',
+    'no_due_date' => 'No due date set',
 );
 
 return $LANG;

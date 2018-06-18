@@ -677,6 +677,13 @@ if (! defined('APP_NAME')) {
     define('TICKET_PRIORITY_MEDIUM', 20);
     define('TICKET_PRIORITY_HIGH', 30);
 
+    $supportTicketPriorities = [
+        trans('texts.'.'low'),
+        trans('texts.'.'medium'),
+        trans('texts.'.'high'),
+    ];
+
+
     /* Default ticket statuses - Category - support*/
     $supportTicketStatuses = [
         trans('texts.'.'new'),
