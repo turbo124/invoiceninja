@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TicketRequest;
+use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,7 @@ class TicketController extends BaseController
 
         $data = array_merge($this->getViewmodel($ticket), [
             'ticket' => $ticket,
+            'statuses' => TicketStatus::scope()->get(),
             'entity' => $ticket,
             'method' => 'PUT',
             'url' => 'tickets/' . $ticket->public_id,

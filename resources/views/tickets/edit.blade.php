@@ -51,6 +51,42 @@
         </table>
     </div>
 
+    <div class="panel panel-default">
+        <table width="100%">
+            <tr>
+                <td width="50%">
+                    <table class="table table-striped dataTable" >
+                        <tbody>
+                        <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->id !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td>
+                                {!! Former::select('status_id')->addOption('','')->label('')
+                                ->fromQuery($statuses, 'name', 'id') !!}
+                            </td></tr>
+
+
+                        <tr><td class="td-left">{!! trans('texts.priority') !!}:</td><td>{!! $ticket->getPriorityName() !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td><td>{!! $ticket->getDueDate() !!}</td></tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="50%">
+                    <table class="table table-striped dataTable" >
+                        <tbody>
+                        <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_message') !!}:</td><td></td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_response') !!}:</td><td></td></tr>
+                        <tr><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
         @foreach($ticket->comments as $comment)
         <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" >{!! $comment->getCommentHeader() !!}</h3>

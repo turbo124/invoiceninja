@@ -114,6 +114,7 @@ class CreateTestData extends Command
             Auth::loginUsingId(1);
         }
 
+        $this->createTicketStubs();
         $this->createClients();
         $this->createVendors();
         $this->createOtherObjects();
@@ -145,7 +146,6 @@ class CreateTestData extends Command
             $this->createInvoices($client);
             $this->createInvoices($client, true);
             $this->createTasks($client);
-            $this->createTicketStubs($client);
             $this->createTickets($client);
 
         }
@@ -154,7 +154,7 @@ class CreateTestData extends Command
     /**
      * @param $client
      */
-    private function createTicketStubs($client)
+    private function createTicketStubs()
     {
         /* Create Ticket Category*/
 
