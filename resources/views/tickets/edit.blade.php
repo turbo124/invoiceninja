@@ -97,6 +97,7 @@
                         <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.last_message') !!}:</td><td></td></tr>
                         <tr><td class="td-left">{!! trans('texts.last_response') !!}:</td><td></td></tr>
+                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td></td></tr>
                         <tr><td></td><td></td></tr>
                         </tbody>
                     </table>

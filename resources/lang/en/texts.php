@@ -2870,6 +2870,8 @@ $LANG = array(
     'medium' => 'Medium',
     'high' => 'High',
     'no_due_date' => 'No due date set',
+    'assigned_to' => 'Assigned to',
+
 );
 
 return $LANG;
