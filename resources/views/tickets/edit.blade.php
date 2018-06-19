@@ -1,8 +1,16 @@
 @extends('header')
 
+@section('head')
+    @parent
+
+    <script src="{{ asset('js/jquery.datetimepicker.js') }}" type="text/javascript"></script>
+    <link href="{{ asset('css/jquery.datetimepicker.css') }}" rel="stylesheet" type="text/css"/>
+@stop
+
 <style>
     .td-left {width:1%; white-space:nowrap; text-align: right;}
 </style>
+
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 @section('content')
@@ -58,16 +66,26 @@
                     <table class="table table-striped dataTable" >
                         <tbody>
                         <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->id !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td>
+                            <td>
                                 {!! Former::select('status_id')->addOption('','')->label('')
-                                ->fromQuery($statuses, 'name', 'id') !!}
-                            </td></tr>
-
-
-                        <tr><td class="td-left">{!! trans('texts.priority') !!}:</td><td>{!! $ticket->getPriorityName() !!}</td></tr>
+                                ->fromQuery($ticket->getAccountStatusArray(), 'name', 'id') !!}
+                            </td>
+                        </tr>
+                        <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
+                            <td>
+                                {!! Former::select('priority_id')->addOption('','')->label('')
+                                ->fromQuery($ticket->getPriorityArray(), 'name', 'id') !!}
+                            </td>
+                        </tr>
                         <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td><td>{!! $ticket->getDueDate() !!}</td></tr>
+                        <tr ><td class="td-left">{!! trans('texts.due_date') !!}:</td>
+                            <td>
+                                <input id="due_date" type="text" data-bind="dateTimePicker"
+                                       class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}" value="{{ $ticket->getDueDate() }}"/>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </td>
@@ -85,6 +103,8 @@
                 </td>
             </tr>
         </table>
+
+
     </div>
 
     <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
@@ -154,11 +174,6 @@
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
                 <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9">
                     <div id="document-upload">
-                        <div class="dropzone">
-                            <div data-bind="foreach: documents">
-                                <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
-                            </div>
-                        </div>
 
                     </div>
                 </div>
@@ -172,10 +187,28 @@
 
         {!! Former::close() !!}
 
-    <script>
+    <script type="text/javascript">
         $( function() {
             $( "#accordion" ).accordion();
         } );
+
+        // Add moment support to the datetimepicker
+        Date.parseDate = function( input, format ){
+            return moment(input, format).toDate();
+        };
+        Date.prototype.dateFormat = function( format ){
+            return moment(this).format(format);
+        };
+
+        jQuery('#due_date').datetimepicker({
+            lazyInit: true,
+            validateOnBlur: false,
+            step: '{{ env('TASK_TIME_STEP', 15) }}',
+            value: '{{ $ticket->getDueDate() }}',
+            format: '{{ $datetimeFormat }}',
+            formatDate: '{{ $account->getMomentDateFormat() }}',
+            formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
+        });
 
     </script>
 

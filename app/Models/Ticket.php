@@ -151,10 +151,33 @@ class Ticket extends EntityModel
      */
     public function getDueDate()
     {
-        if($this->duedate)
-            return Utils::fromSqlDateTime($this->duedate);
+        if($this->due_date)
+            return Utils::fromSqlDateTime($this->due_date);
         else
             return trans('texts.no_due_date');
+    }
+
+    /**
+     * @return array
+     *
+     * Ticket status can be client specific,
+     * need to return statuses per account.
+     */
+    public function getAccountStatusArray()
+    {
+        return TicketStatus::where('account_id', '=', $this->account->id)->get();
+    }
+
+    /**
+     * @return array
+     */
+    public function getPriorityArray()
+    {
+        return [
+            ['id'=>TICKET_PRIORITY_LOW, 'name'=> trans('texts.low')],
+            ['id'=>TICKET_PRIORITY_MEDIUM, 'name'=> trans('texts.medium')],
+            ['id'=>TICKET_PRIORITY_HIGH, 'name'=> trans('texts.high')],
+        ];
     }
 
 

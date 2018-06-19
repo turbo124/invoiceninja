@@ -49,11 +49,12 @@ class TicketController extends BaseController
 
         $data = array_merge($this->getViewmodel($ticket), [
             'ticket' => $ticket,
-            'statuses' => TicketStatus::scope()->get(),
             'entity' => $ticket,
             'method' => 'PUT',
             'url' => 'tickets/' . $ticket->public_id,
             'title' => trans('texts.edit_ticket'),
+            'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
+            'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
         ]);
 
         return View::make('tickets.edit', $data);
