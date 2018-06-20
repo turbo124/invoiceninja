@@ -53,12 +53,13 @@ class CreateTestData extends Command
      * @param TaskRepository $taskRepo
      * @param AccountRepository $accountRepo
      * @param TicketRepository $ticketRepo
+     * @param ProjectRepository $projectRepo
      * @param TicketStatusRepository $ticketStatusRepo
      */
 
     public function __construct(
-        TicketStatusRepository $ticketStatusRepository,
-        TicketRepository $ticketRepository,
+        TicketStatusRepository $ticketStatusRepo,
+        TicketRepository $ticketRepo,
         ClientRepository $clientRepo,
         InvoiceRepository $invoiceRepo,
         PaymentRepository $paymentRepo,
@@ -80,8 +81,8 @@ class CreateTestData extends Command
         $this->taskRepo = $taskRepo;
         $this->projectRepo = $projectRepo;
         $this->accountRepo = $accountRepo;
-        $this->ticketRepo = $ticketRepository;
-        $this->ticketStatusRepo = $ticketStatusRepository;
+        $this->ticketRepo = $ticketRepo;
+        $this->ticketStatusRepo = $ticketStatusRepo;
     }
 
     /**
@@ -228,7 +229,7 @@ class CreateTestData extends Command
                 'tags'=> json_encode($this->faker->words($nb = 5, $asText = false)),
                 'private_notes'=> $this->faker->realText(50),
                 'ccs'=> json_encode(['test','email','contact','keys','here']),
-                'contact_key'=> '10101010101010',
+                'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
             ];
 
@@ -236,7 +237,7 @@ class CreateTestData extends Command
 
                 $ticketComment = TicketComment::createNew($ticket);
                 $ticketComment->description = $this->faker->realText(70);
-                $ticketComment->contact_key = '10101010101010';
+                $ticketComment->contact_key = $client->getPrimaryContact()->contact_key;
                 //$ticketComment->save();
                 $ticket->comments()->save($ticketComment);
 

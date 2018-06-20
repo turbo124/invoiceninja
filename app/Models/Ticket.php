@@ -37,6 +37,7 @@ class Ticket extends EntityModel
         'is_deleted',
         'is_internal',
         'status_id',
+        'contact_key',
     ];
 
     /**
@@ -76,7 +77,7 @@ class Ticket extends EntityModel
      */
     public function comments()
     {
-        return $this->hasMany('App\Models\TicketComment');
+        return $this->hasMany('App\Models\TicketComment')->orderBy('created_at', 'DESC');
     }
 
     /**
@@ -180,5 +181,16 @@ class Ticket extends EntityModel
         ];
     }
 
+    /**
+     * @return string
+     */
+    public function agent()
+    {
+        $user = User::where('id', '=', $this->agent_id)->first();
+        if($user)
+            return $user->getFullName();
+        else
+            return trans('texts.unassigned');
+    }
 
 }

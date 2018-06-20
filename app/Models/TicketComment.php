@@ -7,6 +7,8 @@ use App\Libraries\Utils;
 
 class TicketComment extends EntityModel
 {
+    protected $touches = ['ticket'];
+
     /**
      * @return mixed
      */

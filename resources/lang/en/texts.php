@@ -2861,8 +2861,7 @@ $LANG = array(
     'closed' => 'Closed',
     'reopened' => 'Reopened',
     'priority' => 'Priority',
-    'last_message' => 'Last Message',
-    'last_response' => 'Last Response',
+    'last_updated' => 'Last Updated',
     'comment' => 'Comments',
     'tags' => 'Tags',
     'linked_objects' => 'Linked Objects',
@@ -2871,6 +2870,7 @@ $LANG = array(
     'high' => 'High',
     'no_due_date' => 'No due date set',
     'assigned_to' => 'Assigned to',
+    'reply' => 'Reply',
 
 );
 

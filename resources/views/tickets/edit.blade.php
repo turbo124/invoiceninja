@@ -9,6 +9,7 @@
 
 <style>
     .td-left {width:1%; white-space:nowrap; text-align: right;}
+    #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
 </style>
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -27,7 +28,7 @@
     @if ($ticket)
         {!! Former::populate($ticket) !!}
     @endif
-
+    <!--
     <div class="panel panel-default">
         <table width="100%">
             <tr>
@@ -38,7 +39,6 @@
                         <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td>{!! $ticket->status->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.priority') !!}:</td><td>{!! $ticket->getPriorityName() !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td><td>{!! $ticket->getDueDate() !!}</td></tr>
                         </tbody>
                     </table>
@@ -49,8 +49,8 @@
                         <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.last_message') !!}:</td><td></td></tr>
-                        <tr><td class="td-left">{!! trans('texts.last_response') !!}:</td><td></td></tr>
+                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_updated') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->updated_at) !!}</td></tr>
                         <tr><td></td><td></td></tr>
                         </tbody>
                     </table>
@@ -58,7 +58,7 @@
             </tr>
         </table>
     </div>
-
+    -->
     <div class="panel panel-default">
         <table width="100%">
             <tr>
@@ -66,51 +66,51 @@
                     <table class="table table-striped dataTable" >
                         <tbody>
                         <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->id !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td>
-                            <td>
-                                {!! Former::select('status_id')->addOption('','')->label('')
-                                ->fromQuery($ticket->getAccountStatusArray(), 'name', 'id') !!}
-                            </td>
-                        </tr>
-                        <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
-                            <td>
-                                {!! Former::select('priority_id')->addOption('','')->label('')
-                                ->fromQuery($ticket->getPriorityArray(), 'name', 'id') !!}
-                            </td>
-                        </tr>
                         <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
-                        <tr ><td class="td-left">{!! trans('texts.due_date') !!}:</td>
-                            <td>
-                                <input id="due_date" type="text" data-bind="dateTimePicker"
-                                       class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}" value="{{ $ticket->getDueDate() }}"/>
+                        <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td>
+                            <td>{!! $ticket->agent() !!} {!! Icon::create('random') !!}
                             </td>
                         </tr>
+                        <tr><td></td><td></td></tr>
                         </tbody>
                     </table>
                 </td>
                 <td width="50%">
                     <table class="table table-striped dataTable" >
                         <tbody>
-                        <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.last_message') !!}:</td><td></td></tr>
-                        <tr><td class="td-left">{!! trans('texts.last_response') !!}:</td><td></td></tr>
-                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td></td></tr>
-                        <tr><td></td><td></td></tr>
+                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_updated') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->updated_at) !!}</td></tr>
+                        <tr ><td class="td-left">{!! trans('texts.due_date') !!}:</td>
+                            <td>
+                                <input id="due_date" type="text" data-bind="dateTimePicker"
+                                       class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}" value="{{ $ticket->getDueDate() }}"/>
+                            </td>
+                        </tr>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td>
+                            <td>
+                                {!! Former::select('status_id')->label('')
+                                ->fromQuery($ticket->getAccountStatusArray(), 'name', 'id') !!}
+                            </td>
+                        </tr>
+                        <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
+                            <td>
+                                {!! Former::select('priority_id')->label('')
+                                ->fromQuery($ticket->getPriorityArray(), 'name', 'id') !!}
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </td>
             </tr>
         </table>
-
-
     </div>
 
     <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
         @foreach($ticket->comments as $comment)
-        <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" >{!! $comment->getCommentHeader() !!}</h3>
+        <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" id="accordion">{!! $comment->getCommentHeader() !!}</h3>
         <div>
             <p>
                {!! $comment->description !!}
@@ -118,6 +118,27 @@
         </div>
        @endforeach
     </div>
+
+    <div class="panel panel-default" style="margin-top:30px; width: 100%; padding-bottom: 0px !important">
+        <div class="panel-heading">
+            <h3 class="panel-title">{!! trans('texts.reply') !!}</h3>
+        </div>
+
+        <div class="panel-body" style="width:100%;">
+            {!! Former::textarea('ticket_comments[description]')->label(trans(''))->columns(200) !!}
+        </div>
+
+                <span class="btn-group" style="padding-right:8px; padding-left:14px;">
+                    {!! DropdownButton::normal(trans('texts.reply'))
+                    ->withContents([
+                    ['label'=>trans('reply and close'),'url'=>'tickets/sdsds'],
+                    ])
+                    ->large()
+                    ->dropup() !!}
+                </span>
+
+    </div>
+
 
     <div role="tabpanel" class="panel-default" style="margin-top:30px;">
 
