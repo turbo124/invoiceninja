@@ -5,6 +5,10 @@
 
     <script src="{{ asset('js/jquery.datetimepicker.js') }}" type="text/javascript"></script>
     <link href="{{ asset('css/jquery.datetimepicker.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>v
 @stop
 
 <style>
@@ -119,26 +123,30 @@
        @endforeach
     </div>
 
-    <div class="panel panel-default" style="margin-top:30px; width: 100%; padding-bottom: 0px !important">
+    <div id="summernote" style="margin-top: 30px;"><p>Hello Summernote</p></div>
+
+    <div class="panel-default" style="margin-top:30px; width: 100%; padding-bottom: 0px !important">
         <div class="panel-heading">
             <h3 class="panel-title">{!! trans('texts.reply') !!}</h3>
         </div>
 
-        <div class="panel-body" style="width:100%;">
-            {!! Former::textarea('ticket_comments[description]')->label(trans(''))->columns(200) !!}
+        <div class="panel-body">
+            {!! Former::textarea('ticket_comments[description]')->label(null)->style('width: 100%')->rows(10) !!}
         </div>
-
-                <span class="btn-group" style="padding-right:8px; padding-left:14px;">
-                    {!! DropdownButton::normal(trans('texts.reply'))
-                    ->withContents([
-                    ['label'=>trans('reply and close'),'url'=>'tickets/sdsds'],
-                    ])
-                    ->large()
-                    ->dropup() !!}
-                </span>
 
     </div>
 
+
+    <center class="center">
+        <span class="btn-group" style="padding-right:8px; padding-left:14px;">
+            {!! DropdownButton::normal(trans('texts.reply'))
+            ->withContents([
+            ['label'=>trans('reply and close'),'url'=>'tickets/sdsds'],
+            ])
+            ->large()
+            ->dropup() !!}
+        </span>
+    </center>
 
     <div role="tabpanel" class="panel-default" style="margin-top:30px;">
 
@@ -232,6 +240,10 @@
             formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
         });
 
+
+        $(document).ready(function() {
+            $('#summernote').summernote();
+        });
     </script>
 
 @stop
