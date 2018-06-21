@@ -1187,6 +1187,7 @@ class Utils
             'invoice_id',
             'credit_id',
             'invitation_id',
+            'ticket_id',
         ];
 
         $fields1 = $entity1->getAttributes();

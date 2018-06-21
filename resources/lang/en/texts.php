@@ -795,6 +795,7 @@ $LANG = array(
     'activity_53' => ':contact reopened ticket :ticket',
     'activity_54' => ':user reopened ticket :ticket',
     'activity_55' => ':contact replied ticket :ticket',
+    'activity_56' => ':user viewed ticket :ticket',
 
     'payment' => 'Payment',
     'system' => 'System',

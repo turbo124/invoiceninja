@@ -127,6 +127,13 @@ class AddTicketsSchema extends Migration
             $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
         });
 
+        Schema::table('activities', function ($table) {
+            $table->unsignedInteger('ticket_id')->nullable();
+        });
+
+        Schema::table('activities', function ($table) {
+           $table->index('ticket_id');
+        });
     }
 
     /**

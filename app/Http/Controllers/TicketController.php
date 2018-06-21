@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TicketUserViewed;
 use App\Http\Requests\TicketRequest;
 use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
@@ -9,6 +10,7 @@ use App\Services\TicketService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Session;
 
 class TicketController extends BaseController
 {
@@ -47,6 +49,8 @@ class TicketController extends BaseController
     {
         $ticket = $request->entity();
 
+        event(new TicketUserViewed($ticket));
+        
         $data = array_merge($this->getViewmodel($ticket), [
             'ticket' => $ticket,
             'entity' => $ticket,
