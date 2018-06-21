@@ -95,6 +95,9 @@ class AddTicketsSchema extends Migration
             $table->softDeletes();
         });
 
+        Schema::table('documents', function ($table) {
+            $table->unsignedInteger('ticket_id');
+        });
 
         Schema::table('tickets', function ($table) {
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');

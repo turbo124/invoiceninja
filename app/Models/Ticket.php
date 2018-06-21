@@ -99,6 +99,14 @@ class Ticket extends EntityModel
     /**
      * @return mixed
      */
+    public function documents()
+    {
+        return $this->hasMany('App\Models\Document')->orderBy('id');
+    }
+
+    /**
+     * @return mixed
+     */
     public function getEntityType()
     {
         return ENTITY_TICKET;

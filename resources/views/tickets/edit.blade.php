@@ -5,18 +5,14 @@
 
     <script src="{{ asset('js/jquery.datetimepicker.js') }}" type="text/javascript"></script>
     <link href="{{ asset('css/jquery.datetimepicker.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
-    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>v
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 @stop
 
 <style>
     .td-left {width:1%; white-space:nowrap; text-align: right;}
     #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
 </style>
-
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 @section('content')
 
@@ -123,8 +119,6 @@
        @endforeach
     </div>
 
-    <div id="summernote" style="margin-top: 30px;"><p>Hello Summernote</p></div>
-
     <div class="panel-default" style="margin-top:30px; width: 100%; padding-bottom: 0px !important">
         <div class="panel-heading">
             <h3 class="panel-title">{!! trans('texts.reply') !!}</h3>
@@ -136,17 +130,20 @@
 
     </div>
 
-
-    <center class="center">
-        <span class="btn-group" style="padding-right:8px; padding-left:14px;">
-            {!! DropdownButton::normal(trans('texts.reply'))
+    <div class="row">
+        <center class="buttons">
+            {!! DropdownButton::normal(trans('texts.more_actions'))
             ->withContents([
-            ['label'=>trans('reply and close'),'url'=>'tickets/sdsds'],
+            ['label'=>trans('texts.split_ticket'),'url'=>'tickets/sdsds'],
+            ['label'=>trans('texts.merge_ticket'),'url'=>'tickets/sdsds'],
+            ['label'=>trans('texts.mark_spam'),'url'=>'tickets/sdsds'],
             ])
             ->large()
             ->dropup() !!}
-        </span>
-    </center>
+            {!! Button::danger(trans('texts.close_ticket'))->large() !!}
+            {!! Button::primary(trans('texts.update_ticket'))->large() !!}
+        </center>
+    </div>
 
     <div role="tabpanel" class="panel-default" style="margin-top:30px;">
 
@@ -201,13 +198,15 @@
                                     </div>
                                 </div>') !!}
             </div>
-            @if ($account->hasFeature(FEATURE_DOCUMENTS))
                 <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9">
                     <div id="document-upload">
-
+                        <div class="dropzone">
+                            <div data-bind="foreach: documents">
+                                <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            @endif
         </div>
 
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
@@ -218,6 +217,8 @@
         {!! Former::close() !!}
 
     <script type="text/javascript">
+
+        <!-- Initialize ticket comment accordion -->
         $( function() {
             $( "#accordion" ).accordion();
         } );
@@ -230,6 +231,7 @@
             return moment(this).format(format);
         };
 
+        <!-- Initialize date time picker for due date -->
         jQuery('#due_date').datetimepicker({
             lazyInit: true,
             validateOnBlur: false,
@@ -241,9 +243,17 @@
         });
 
 
-        $(document).ready(function() {
-            $('#summernote').summernote();
-        });
+        <!-- Initialize drop zone file uploader -->
+        $('.main-form').submit(function(){
+            if($('#document-upload .dropzone .fallback input').val())$(this).attr('enctype', 'multipart/form-data')
+            else $(this).removeAttr('enctype')
+        })
+
+        var documents = {!! $ticket->documents()->get() !!};
+
+        @include('partials.dropzone', ['documentSource' => 'documents'])
+
+
     </script>
 
 @stop

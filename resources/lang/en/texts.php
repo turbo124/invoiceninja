@@ -787,6 +787,15 @@ $LANG = array(
     'activity_45' => ':user deleted task :task',
     'activity_46' => ':user restored task :task',
     'activity_47' => ':user updated expense :expense',
+    'activity_48' => ':user updated ticket :ticket',
+    'activity_49' => ':user closed ticket :ticket',
+    'activity_50' => ':user merged ticket :ticket',
+    'activity_51' => ':user split ticket :ticket',
+    'activity_52' => ':contact opened ticket :ticket',
+    'activity_53' => ':contact reopened ticket :ticket',
+    'activity_54' => ':user reopened ticket :ticket',
+    'activity_55' => ':contact replied ticket :ticket',
+
     'payment' => 'Payment',
     'system' => 'System',
     'signature' => 'Email Signature',
@@ -2871,6 +2880,13 @@ $LANG = array(
     'no_due_date' => 'No due date set',
     'assigned_to' => 'Assigned to',
     'reply' => 'Reply',
+    'close_ticket' => 'Close Ticket',
+    'reopen_ticket' => 'Reopen Ticket',
+    'open_ticket' => 'Open Ticket',
+    'split_ticket' => 'Split Ticket',
+    'merge_ticket' => 'Merge Ticket',
+    'update_ticket' => 'Update Ticket',
+    'mark_spam' => 'Mark as Spam',
 
 );
 
