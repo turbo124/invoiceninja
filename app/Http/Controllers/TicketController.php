@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\TicketUserViewed;
 use App\Http\Requests\TicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
@@ -15,10 +16,15 @@ use Illuminate\Support\Facades\Session;
 class TicketController extends BaseController
 {
 
+    /**
+     * TicketController constructor.
+     * @param TicketService $ticketService
+     */
     public function __construct(TicketService $ticketService)
     {
         $this->ticketService = $ticketService;
     }
+
     /**
      * @return \Illuminate\Contracts\View\View
      */
@@ -31,6 +37,10 @@ class TicketController extends BaseController
         ]);
     }
 
+    /**
+     * @param null $clientPublicId
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getDatatable($clientPublicId = null)
     {
         $search = Input::get('sSearch');
@@ -38,6 +48,10 @@ class TicketController extends BaseController
         return $this->ticketService->getDatatable($search);
     }
 
+    /**
+     * @param $publicId
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function show($publicId)
     {
         Session::reflash();
@@ -45,23 +59,19 @@ class TicketController extends BaseController
         return redirect("tickets/$publicId/edit");
     }
 
+    /**
+     * @param TicketRequest $request
+     * @return mixed
+     */
     public function edit(TicketRequest $request)
     {
         $ticket = $request->entity();
 
         event(new TicketUserViewed($ticket));
         
-        $data = array_merge($this->getViewmodel($ticket), [
-            'ticket' => $ticket,
-            'entity' => $ticket,
-            'method' => 'PUT',
-            'url' => 'tickets/' . $ticket->public_id,
-            'title' => trans('texts.edit_ticket'),
-            'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
-            'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
-        ]);
+        $data = $this->getViewmodel($ticket);
 
-        return View::make('tickets.edit', $data);
+            return View::make('tickets.edit', $data);
     }
 
     /**
@@ -73,7 +83,40 @@ class TicketController extends BaseController
             'status' => $ticket->status(),
             'comments' => $ticket->comments(),
             'account' => Auth::user()->account,
+            'url' => 'tickets/' . $ticket->public_id,
+            'ticket' => $ticket,
+            'entity' => $ticket,
+            'title' => trans('texts.edit_ticket'),
+            'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
+            'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
+            'method' => 'PUT',
+
         ];
+    }
+
+
+    /**
+     * @param UpdateTicketRequest $request
+     */
+    public function update(UpdateTicketRequest $request)
+    {
+        $data = $request->input();
+        //$data['documents'] = $request->file('documents');
+        $data['document_ids'] = $request->document_ids;
+
+        $action = Input::get('action');
+        $entityType = Input::get('entityType');
+
+        $ticket = $this->ticketService->save($data, $request->entity());
+        $entityType = $ticket->getEntityType();
+
+        $message = trans("texts.updated_{$entityType}");
+        Session::flash('message', $message);
+
+        $data = array_merge($this->getViewmodel($ticket), $data);
+
+        return View::make('tickets.edit', $data);
+
     }
 
 }

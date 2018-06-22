@@ -43,6 +43,7 @@ class DocumentRepository extends BaseRepository
                         'documents.invoice_id',
                         'documents.expense_id',
                         'documents.user_id',
+                        'documents.ticket_id',
                         'invoices.public_id as invoice_public_id',
                         'invoices.user_id as invoice_user_id',
                         'expenses.public_id as expense_public_id',

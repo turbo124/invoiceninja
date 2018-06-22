@@ -2,6 +2,7 @@
 
 namespace App\Ninja\Repositories;
 
+use App\Models\Document;
 use App\Models\Ticket;
 use Auth;
 use DB;
@@ -71,8 +72,20 @@ class TicketRepository extends BaseRepository
         }
 
         $ticket->fill($input);
-
         $ticket->save();
+
+        if (! empty($input['document_ids'])) {
+            $document_ids = array_map('intval', $input['document_ids']);
+
+            foreach ($document_ids as $document_id) {
+                $document = Document::scope($document_id)->first();
+                if ($document && Auth::user()->can('edit', $document)) {
+
+                    $document->ticket_id = $ticket->id;
+                    $document->save();
+                }
+            }
+        }
 
         return $ticket;
     }

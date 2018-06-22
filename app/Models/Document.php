@@ -25,6 +25,7 @@ class Document extends EntityModel
         'invoice_id',
         'expense_id',
         'is_default',
+        'ticket_id',
     ];
 
     /**
@@ -136,6 +137,14 @@ class Document extends EntityModel
     public function expense()
     {
         return $this->belongsTo('App\Models\Expense')->withTrashed();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function ticket()
+    {
+        return $this->belongsTo('App\Models\Ticket')->withTrashed();
     }
 
     /**

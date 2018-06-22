@@ -28,6 +28,10 @@
     @if ($ticket)
         {!! Former::populate($ticket) !!}
     @endif
+
+    <div style="display:none">
+        {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
+    </div>
     <!--
     <div class="panel panel-default">
         <table width="100%">
@@ -134,14 +138,14 @@
         <center class="buttons">
             {!! DropdownButton::normal(trans('texts.more_actions'))
             ->withContents([
-            ['label'=>trans('texts.split_ticket'),'url'=>'tickets/sdsds'],
-            ['label'=>trans('texts.merge_ticket'),'url'=>'tickets/sdsds'],
+            ['label'=>trans('texts.ticket_split'),'url'=>'tickets/sdsds'],
+            ['label'=>trans('texts.ticket_merge'),'url'=>'tickets/sdsds'],
             ['label'=>trans('texts.mark_spam'),'url'=>'tickets/sdsds'],
             ])
             ->large()
             ->dropup() !!}
-            {!! Button::danger(trans('texts.close_ticket'))->large() !!}
-            {!! Button::primary(trans('texts.update_ticket'))->large() !!}
+            {!! Button::danger(trans('texts.ticket_close'))->large() !!}
+            {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
         </center>
     </div>
 
@@ -154,6 +158,9 @@
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
                 <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                         {{ trans("texts.documents") }}
+                        @if ($ticket->documents()->count() >= 1)
+                            ({{ $ticket->documents()->count() }})
+                        @endif
                     </a></li>
             @endif
         </ul>
@@ -173,30 +180,10 @@
                         ->label(null)->style('width: 100%')->rows(4) !!}
             </div>
             <div role="tabpanel" class="tab-pane" id="terms">
-                {!! Former::textarea('terms')
-                        ->data_bind("value:terms, placeholder: terms_placeholder, valueUpdate: 'afterkeydown'")
-                        ->label(false)->style('width: 100%')->rows(4)
-                        ->help('<div class="checkbox">
-                                    <label>
-                                        <input name="set_default_terms" type="checkbox" style="width: 16px" data-bind="checked: set_default_terms"/>'.trans('texts.save_as_default_terms').'
-                                    </label>
-                                    <div class="pull-right" data-bind="visible: showResetTerms()">
-                                        <a href="#" onclick="return resetTerms()" title="'. trans('texts.reset_terms_help') .'">' . trans("texts.reset_terms") . '</a>
-                                    </div>
-                                </div>') !!}
+
             </div>
             <div role="tabpanel" class="tab-pane" id="footer">
-                {!! Former::textarea('invoice_footer')
-                        ->data_bind("value:invoice_footer, placeholder: footer_placeholder, valueUpdate: 'afterkeydown'")
-                        ->label(false)->style('width: 100%')->rows(4)
-                        ->help('<div class="checkbox">
-                                    <label>
-                                        <input name="set_default_footer" type="checkbox" style="width: 16px" data-bind="checked: set_default_footer"/>'.trans('texts.save_as_default_footer').'
-                                    </label>
-                                    <div class="pull-right" data-bind="visible: showResetFooter()">
-                                        <a href="#" onclick="return resetFooter()" title="'. trans('texts.reset_footer_help') .'">' . trans("texts.reset_footer") . '</a>
-                                    </div>
-                                </div>') !!}
+
             </div>
                 <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9">
                     <div id="document-upload">
@@ -205,6 +192,11 @@
                                 <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
                             </div>
                         </div>
+                        @if ($ticket->documents())
+                            @foreach($ticket->documents() as $document)
+                                <div>{{$document->name}}</div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
         </div>
@@ -218,9 +210,16 @@
 
     <script type="text/javascript">
 
-        <!-- Initialize ticket comment accordion -->
+        <!-- Initialize ticket_comment accordion -->
         $( function() {
             $( "#accordion" ).accordion();
+
+            window.model = new ViewModel({!! $ticket !!});
+
+            ko.applyBindings(model);
+
+            @include('partials.dropzone', ['documentSource' => 'model.documents()'])
+
         } );
 
         // Add moment support to the datetimepicker
@@ -249,9 +248,72 @@
             else $(this).removeAttr('enctype')
         })
 
-        var documents = {!! $ticket->documents()->get() !!};
+            var ViewModel = function (data) {
+                var self = this;
 
-        @include('partials.dropzone', ['documentSource' => 'documents'])
+                self.documents = ko.observableArray();
+
+                self.mapping = {
+                    'documents': {
+                        create: function (options) {
+                            return new DocumentModel(options.data);
+                        }
+                    }
+                }
+
+                if (data) {
+                    ko.mapping.fromJS(data, self.mapping, this);
+                }
+
+                self.addDocument = function() {
+                    var documentModel = new DocumentModel();
+                    self.documents.push(documentModel);
+                    return documentModel;
+                }
+
+                self.removeDocument = function(doc) {
+                    var public_id = doc.public_id?doc.public_id():doc;
+                    self.documents.remove(function(document) {
+                        return document.public_id() == public_id;
+                    });
+                }
+            };
+
+
+        function DocumentModel(data) {
+            var self = this;
+            self.public_id = ko.observable(0);
+            self.size = ko.observable(0);
+            self.name = ko.observable('');
+            self.type = ko.observable('');
+            self.url = ko.observable('');
+
+            self.update = function(data){
+                ko.mapping.fromJS(data, {}, this);
+            }
+
+            if (data) {
+                self.update(data);
+            }
+        }
+
+        function addDocument(file) {
+            file.index = model.documents().length;
+            model.addDocument({name:file.name, size:file.size, type:file.type});
+        }
+
+        function addedDocument(file, response) {
+            model.documents()[file.index].update(response.document);
+        }
+
+        function deleteDocument(file) {
+            model.removeDocument(file.public_id);
+        }
+
+        function submitAction() {
+            $('.main-form').submit();
+        }
+
 
 
     </script>

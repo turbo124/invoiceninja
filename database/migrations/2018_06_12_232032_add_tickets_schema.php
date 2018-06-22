@@ -96,7 +96,7 @@ class AddTicketsSchema extends Migration
         });
 
         Schema::table('documents', function ($table) {
-            $table->unsignedInteger('ticket_id');
+            $table->unsignedInteger('ticket_id')->nullable();
         });
 
         Schema::table('tickets', function ($table) {
