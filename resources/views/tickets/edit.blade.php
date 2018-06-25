@@ -129,7 +129,7 @@
         </div>
 
         <div class="panel-body">
-            {!! Former::textarea('ticket_comments[description]')->label(null)->style('width: 100%')->rows(10) !!}
+            {!! Former::textarea('comment')->label(null)->style('width: 100%')->rows(10) !!}
         </div>
 
     </div>

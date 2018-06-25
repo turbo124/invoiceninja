@@ -4,6 +4,7 @@ namespace App\Ninja\Repositories;
 
 use App\Models\Document;
 use App\Models\Ticket;
+use App\Models\TicketComment;
 use Auth;
 use DB;
 use Utils;
@@ -74,6 +75,16 @@ class TicketRepository extends BaseRepository
         $ticket->fill($input);
         $ticket->save();
 
+        /* handle new comment */
+        if(isset($input['comment']) && strlen($input['comment']) >=1) {
+            $ticketComment = TicketComment::createNew($ticket);
+            $ticketComment->description = $input['comment'];
+            $ticket->comments()->save($ticketComment);
+
+            //todo fire notification here:
+        }
+
+        /* if document IDs exist update ticket_id in document table */
         if (! empty($input['document_ids'])) {
             $document_ids = array_map('intval', $input['document_ids']);
 

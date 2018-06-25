@@ -66,6 +66,7 @@ class TicketController extends BaseController
     public function edit(TicketRequest $request)
     {
         $ticket = $request->entity();
+        $ticket = $ticket->fresh();
 
         event(new TicketUserViewed($ticket));
         
