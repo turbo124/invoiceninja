@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\Ticket\TicketSendNotificationEmail;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Ninja\Repositories\TicketRepository;
 
@@ -48,6 +49,8 @@ class TicketService extends BaseService
      */
     public function save($data, $ticket = false)
     {
+        $this->processTicket($data, $ticket);
+
         return $this->ticketRepo->save($data, $ticket);
     }
 
@@ -60,5 +63,12 @@ class TicketService extends BaseService
         $query = $this->ticketRepo->find($search);
 
         return $this->datatableService->createDatatable($datatable, $query);
+    }
+
+    private function processTicket($data, $ticket) {
+
+        /* If comment added to ticket fire notifications */
+        if(strlen($data['comment']) >= 1)
+            $this->dispatch(new TicketSendNotificationEmail($data, $ticket));
     }
 }

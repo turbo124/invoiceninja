@@ -107,6 +107,14 @@ class Ticket extends EntityModel
     /**
      * @return mixed
      */
+    public function contact()
+    {
+        return $this->belongsTo('App\Models\Contact', 'contact_key', 'contact_key');
+    }
+
+    /**
+     * @return mixed
+     */
     public function getEntityType()
     {
         return ENTITY_TICKET;
@@ -200,5 +208,46 @@ class Ticket extends EntityModel
         else
             return trans('texts.unassigned');
     }
+
+
+    /**
+     * @return string
+     */
+
+    public function getCCs()
+    {
+        $ccEmailArray = [];
+        $ccs = json_decode($this->ccs, true);
+
+        if(!is_array($ccs))
+            return null;
+
+        foreach($ccs as $contact_key) {
+            $c = Contact::where('contact_key', '=', $contact_key)->first();
+            array_push($ccEmailArray, strtolower($c->email));
+        }
+
+        return implode(", ", $ccEmailArray);
+    }
+
+    public function getTicketReplyTo()
+    {
+
+    }
+
+    public function getTicketFromName()
+    {
+        return env("TICKET_SUPPORT_EMAIL_NAME","");
+    }
+
+    public function getTicketFromEmail()
+    {
+        return env("TICKET_SUPPORT_EMAIL","");
+    }
+
+
+
+
+
 
 }

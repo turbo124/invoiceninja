@@ -37,8 +37,7 @@ class TicketMailer
         ];
 
         $toEmail = strtolower($toEmail);
-        $replyEmail = $fromEmail;
-        $fromEmail = CONTACT_EMAIL;
+        $replyEmail = $data['replyTo'];
 
         if (Utils::isSelfHost() && config('app.debug')) {
             \Log::info("Sending email - To: {$toEmail} | Reply: {$replyEmail} | From: $fromEmail");
