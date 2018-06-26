@@ -102,11 +102,7 @@ class TicketController extends BaseController
     public function update(UpdateTicketRequest $request)
     {
         $data = $request->input();
-        //$data['documents'] = $request->file('documents');
         $data['document_ids'] = $request->document_ids;
-
-        $action = Input::get('action');
-        $entityType = Input::get('entityType');
 
         $ticket = $this->ticketService->save($data, $request->entity());
         $entityType = $ticket->getEntityType();

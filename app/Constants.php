@@ -53,6 +53,7 @@ if (! defined('APP_NAME')) {
     define('ENTITY_TICKET_CATEGORY', 'ticket_category');
     define('ENTITY_TICKET_RELATION', 'ticket_relation');
     define('ENTITY_TICKET_TEMPLATE', 'ticket_template');
+    define('ENTITY_TICKET_INVITATION', 'ticket_invitation');
 
     $permissionEntities = [
         ENTITY_CLIENT,

@@ -134,6 +134,38 @@ class AddTicketsSchema extends Migration
         Schema::table('activities', function ($table) {
            $table->index('ticket_id');
         });
+
+        Schema::create('ticket_invitations', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('account_id');
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('contact_id');
+            $table->unsignedInteger('ticket_id')->index();
+            $table->string('invitation_key')->index()->unique();
+            $table->timestamps();
+            $table->softDeletes();
+            $table->timestamp('sent_date')->nullable();
+            $table->timestamp('viewed_date')->nullable();
+            $table->timestamp('opened_date')->nullable();
+            $table->string('message_id')->nullable();
+            $table->text('email_error')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('cascade');
+            $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
+
+            $table->unsignedInteger('public_id')->index();
+            $table->unique(['account_id', 'public_id']);
+        });
+
+        Schema::create('lookup_ticket_invitations', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('lookup_account_id')->index();
+            $table->string('invitation_key')->unique();
+            $table->string('message_id')->nullable()->unique();
+
+            $table->foreign('lookup_account_id')->references('id')->on('lookup_accounts')->onDelete('cascade');
+        });
     }
 
     /**
@@ -143,12 +175,14 @@ class AddTicketsSchema extends Migration
      */
     public function down()
     {
-        Schema::drop('ticket_statuses');
-        Schema::drop('ticket_categories');
-        Schema::drop('ticket_templates');
-        Schema::drop('ticket_relations');
-        Schema::drop('ticket_comments');
-        Schema::drop('tickets');
+        Schema::dropIfExists('ticket_statuses');
+        Schema::dropIfExists('ticket_categories');
+        Schema::dropIfExists('ticket_templates');
+        Schema::dropIfExists('ticket_relations');
+        Schema::dropIfExists('ticket_comments');
+        Schema::dropIfExists('tickets');
+        Schema::dropIfExists('lookup_ticket_invitations');
+        Schema::dropIfExists('ticket_invitations');
 
 
     }
