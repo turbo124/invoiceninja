@@ -10,6 +10,8 @@ use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
 
@@ -114,6 +116,12 @@ class TicketController extends BaseController
 
         return View::make('tickets.edit', $data);
 
+    }
+
+    public function inbound(Request $request)
+    {
+        $payload = $request;
+        Log::error($payload);
     }
 
 }
