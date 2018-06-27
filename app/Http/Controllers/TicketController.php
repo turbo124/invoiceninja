@@ -122,6 +122,7 @@ class TicketController extends BaseController
     {
         $payload = $request;
         Log::error(Request::post());
+        Log::error($request->all());
     }
 
 }
