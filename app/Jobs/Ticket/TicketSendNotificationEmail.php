@@ -38,7 +38,7 @@ class TicketSendNotificationEmail extends Job implements ShouldQueue
         $data['bccEmail'] = $this->ticket->getCCs();
         $data['text'] = $this->ticketData['comment'];
         $data['replyTo'] = 'ticket-123@support.invoiceninja.com';
-        //$toEmail = strtolower($this->ticket->contact->email);
+        //$toEmail = strtolower($this->ticket->contact->email); //todo
         $toEmail = 'david@romulus.com.au';
         $fromEmail = $this->ticket->getTicketFromEmail();
         $fromName = $this->ticket->getTicketFromName();
