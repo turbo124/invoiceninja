@@ -25,6 +25,7 @@ class AddTicketsSchema extends Migration
             $table->boolean('is_internal')->default(0);
             $table->unsignedInteger('status_id');
             $table->unsignedInteger('category_id');
+            $table->string('ticket_number');
             $table->text('subject');
             $table->text('description');
             $table->longtext('tags');
@@ -166,6 +167,20 @@ class AddTicketsSchema extends Migration
 
             $table->foreign('lookup_account_id')->references('id')->on('lookup_accounts')->onDelete('cascade');
         });
+
+        Schema::create('account_ticket_settings', function ($table){
+            $table->increments('id');
+            $table->unsignedInteger('account_id')->index();
+            $table->timestamps();
+
+            $table->string('local_part')->unique(); //allows a user to specify a custom *@support.invoiceninja.com domain
+            $table->string('domain_name');
+
+            $table->string('from_name');
+
+            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
+        });
+
     }
 
     /**
@@ -180,10 +195,9 @@ class AddTicketsSchema extends Migration
         Schema::dropIfExists('ticket_templates');
         Schema::dropIfExists('ticket_relations');
         Schema::dropIfExists('ticket_comments');
+        Schema::dropIfExists('account_ticket_settings');
         Schema::dropIfExists('tickets');
         Schema::dropIfExists('lookup_ticket_invitations');
         Schema::dropIfExists('ticket_invitations');
-
-
     }
 }

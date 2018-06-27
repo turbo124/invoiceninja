@@ -2887,6 +2887,7 @@ $LANG = array(
     'ticket_split' => 'Split Ticket',
     'ticket_merge' => 'Merge Ticket',
     'ticket_update' => 'Update Ticket',
+    'ticket_settings' => 'Ticket Settings',
     'updated_ticket' => 'Ticket Updated',
     'mark_spam' => 'Mark as Spam',
 

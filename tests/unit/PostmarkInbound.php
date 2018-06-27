@@ -7,6 +7,11 @@ class PostmarkInbound extends PHPUnit_Framework_TestCase{
         $this->inbound = new \App\Ninja\Tickets\Inbound\TicketFactory(file_get_contents('inbound.json'));
     }
 
+    public function testTo()
+    {
+        $this->assertEquals($this->inbound->to(), '451d9b70cf9364d23ff6f9d51d870251569e+ahoy@inbound.postmarkapp.com');
+    }
+
     public function testSubject()
     {
         $this->assertEquals($this->inbound->subject(), 'This is an inbound message');

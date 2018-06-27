@@ -187,6 +187,7 @@ class Account extends Eloquent
         ACCOUNT_LOCALIZATION,
         ACCOUNT_PAYMENTS,
         ACCOUNT_TAX_RATES,
+        ACCOUNT_TICKETS,
         ACCOUNT_PRODUCTS,
         ACCOUNT_NOTIFICATIONS,
         ACCOUNT_IMPORT_EXPORT,
@@ -288,6 +289,14 @@ class Account extends Eloquent
         //CUSTOM_MESSAGE_UNAPPROVED_PROPOSAL,
         //CUSTOM_MESSAGE_APPROVED_PROPOSAL,
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function account_ticket_settings()
+    {
+        return $this->hasOne('App\Models\AccountTicketSettings');
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

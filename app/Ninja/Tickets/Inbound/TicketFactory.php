@@ -56,6 +56,7 @@ class TicketFactory {
      */
     public function __call($name, $arguments)
     {
+        $name = ucfirst($name);
         return ($this->source->$name) ? $this->source->$name : FALSE;
     }
 
@@ -64,7 +65,12 @@ class TicketFactory {
      */
     public function to()
     {
-        $this->source->To;
+        return $this->source->To;
+    }
+
+    public function originalRecipient()
+    {
+        return $this->source->OriginalRecipient;
     }
 
     /**
