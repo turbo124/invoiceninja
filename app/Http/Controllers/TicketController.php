@@ -122,9 +122,8 @@ class TicketController extends BaseController
     public function inbound(Request $request)
     {
         $payload = $request;
-        Log::error(Request::post());
         Log::error(Response::all());
-        
+
         //Log::error($request->all());
     }
 
