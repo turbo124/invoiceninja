@@ -228,7 +228,7 @@ class CreateTestData extends Command
                 'description'=> $this->faker->realText(50),
                 'tags'=> json_encode($this->faker->words($nb = 5, $asText = false)),
                 'private_notes'=> $this->faker->realText(50),
-                'ccs'=> json_encode(['test','email','contact','keys','here']),
+                'ccs'=> json_encode([]),
                 'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
             ];

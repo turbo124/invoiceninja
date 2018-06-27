@@ -12,6 +12,7 @@ Route::get('/log_error', 'HomeController@logError');
 Route::get('/invoice_now', 'HomeController@invoiceNow');
 Route::get('/keep_alive', 'HomeController@keepAlive');
 Route::post('/get_started', 'AccountController@getStarted');
+Route::post('tickets/inbound', 'TicketController@inbound');
 
 // Client visible pages
 Route::group(['middleware' => ['lookup:contact', 'auth:client']], function () {
@@ -263,7 +264,6 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
 
     Route::resource('tickets', 'TicketController');
     Route::get('api/tickets', 'TicketController@getDatatable');
-    Route::post('tickets/inbound', 'TicketController@inbound');
 
     // vendor
     Route::resource('vendors', 'VendorController');
