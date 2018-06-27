@@ -168,6 +168,14 @@ class TicketFactory {
     }
 
     /**
+     * @return Subject
+     */
+    public function subject()
+    {
+        return $this->source->Subject;
+    }
+
+    /**
      * @return bool
      */
     public function hasAttachments()
