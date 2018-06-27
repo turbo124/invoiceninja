@@ -4,17 +4,23 @@ namespace App\Ninja\Tickets\Inbound;
 
 Class Attachment extends TicketFactory {
 
+
+    /**
+     * @var Attachment
+     */
+    protected $attachment;
+
     /**
      * Attachment constructor.
      * @param bool $attachment
      */
     public function __construct($attachment)
     {
-        $this->Attachment = $attachment;
-        $this->Name = $this->Attachment->Name;
-        $this->ContentType = $this->Attachment->ContentType;
-        $this->ContentLength = $this->Attachment->ContentLength;
-        $this->Content = $this->Attachment->Content;
+        $this->attachment = $attachment;
+        $this->name = $this->attachment->name;
+        $this->contentType = $this->attachment->contentType;
+        $this->contentLength = $this->attachment->contentLength;
+        $this->content = $this->attachment->content;
     }
 
     /**
@@ -22,15 +28,15 @@ Class Attachment extends TicketFactory {
      */
     private function _read()
     {
-        return base64_decode(chunk_split($this->Attachment->Content));
+        return base64_decode(chunk_split($this->attachment->Content));
     }
 
     /**
      * @param $directory
      */
-    public function Download($directory)
+    public function download($directory)
     {
-        file_put_contents($directory . $this->Name, $this->_read());
+        file_put_contents($directory . $this->name, $this->_read());
     }
 
 }

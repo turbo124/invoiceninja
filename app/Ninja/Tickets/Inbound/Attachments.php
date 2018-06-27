@@ -4,6 +4,12 @@ namespace App\Ninja\Tickets\Inbound;
 
 Class Attachments extends TicketFactory  implements \Iterator {
 
+
+    /**
+     * @var Attachments
+     */
+    protected $attachments;
+
     /**
      * Attachments constructor.
      * @param bool $attachments
