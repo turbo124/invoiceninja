@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateTicketRequest;
 use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -122,7 +123,9 @@ class TicketController extends BaseController
     {
         $payload = $request;
         Log::error(Request::post());
-        Log::error($request->all());
+        Log::error(Response::all());
+        
+        //Log::error($request->all());
     }
 
 }
