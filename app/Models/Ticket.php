@@ -38,6 +38,7 @@ class Ticket extends EntityModel
         'is_internal',
         'status_id',
         'contact_key',
+        'ticket_number',
     ];
 
     /**
@@ -253,7 +254,7 @@ Ticket::creating(function ($ticket) {
 });
 
 Ticket::created(function ($ticket) {
-    $ticket->account->account_ticket_settings->ticket_number_start = $ticket->ticket_number++;
+    $ticket->account->account_ticket_settings->ticket_number_start = $ticket->ticket_number+1;
     $ticket->account->account_ticket_settings->save();
 });
 

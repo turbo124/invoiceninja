@@ -22,6 +22,7 @@ use App\Models\ExpenseCategory;
 use Auth;
 use Faker\Factory;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Utils;
 
 /**
@@ -217,6 +218,8 @@ class CreateTestData extends Command
     {
         for ($i = 0; $i < $this->count; $i++)
         {
+            $maxTicketNumber = max(DB::table('tickets')->max('ticket_number'), $client->account->account_ticket_settings->ticket_number_start);
+
             $data = [
                 'priority_id'=> TICKET_PRIORITY_LOW,
                 'category_id'=> 1,
@@ -232,7 +235,7 @@ class CreateTestData extends Command
                 'ccs'=> json_encode([]),
                 'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
-                'ticket_number'=>Ticket::max('ticket_number') ?: 1,
+                'ticket_number' => $maxTicketNumber,
             ];
 
             $ticket = $this->ticketRepo->save($data);
@@ -249,7 +252,7 @@ class CreateTestData extends Command
                 //$ticketComment->save();
                 $ticket->comments()->save($ticketComment);
 
-            $this->info('Ticket: '. $ticket->public_id);
+            $this->info('Ticket: - '. $ticket->ticket_number. ' - ' . $client->account->account_ticket_settings->ticket_number_start. ' - ' . $maxTicketNumber);
         }
     }
 
