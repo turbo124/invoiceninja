@@ -521,6 +521,7 @@ class AccountController extends BaseController
     private function showTickets()
     {
         $data = [
+            'account' => Auth::user()->account,
             'account_ticket_settings' => AccountTicketSettings::where('account_id', Auth::user()->account_id),
             'title' => trans('texts.ticket_settings'),
             'section' => ACCOUNT_TICKETS,
@@ -1261,6 +1262,7 @@ class AccountController extends BaseController
             $user->email = $email;
             $user->phone = trim(Input::get('phone'));
             $user->dark_mode = Input::get('dark_mode');
+            $user->signature = Input::get('signature');
 
             if (! Auth::user()->is_admin) {
                 $user->notify_sent = Input::get('notify_sent');
@@ -1287,6 +1289,86 @@ class AccountController extends BaseController
 
             return Redirect::to('settings/'.ACCOUNT_USER_DETAILS);
         }
+    }
+
+    private function saveUserAvatar($avatar, $user)
+    {
+        $account = $user->account;
+
+        /* Logo image file */
+        if ($uploaded = $avatar) {
+            $path = $avatar->getRealPath();
+            $disk = $account->getLogoDisk();
+            $extension = strtolower($uploaded->getClientOriginalExtension());
+
+            if (empty(Document::$types[$extension]) && ! empty(Document::$extraExtensions[$extension])) {
+                $documentType = Document::$extraExtensions[$extension];
+            } else {
+                $documentType = $extension;
+            }
+
+            if (! in_array($documentType, ['jpeg', 'png', 'gif'])) {
+                Session::flash('warning', 'Unsupported file type');
+            } else {
+                $documentTypeData = Document::$types[$documentType];
+
+                $filePath = $uploaded->path();
+                $size = filesize($filePath);
+
+                if ($size / 1000 > MAX_DOCUMENT_SIZE) {
+                    Session::flash('error', trans('texts.logo_warning_too_large'));
+                } else {
+                    if ($documentType != 'gif') {
+                        $user->avatar = com_create_guid().'.'.$documentType;
+
+                        try {
+                            $imageSize = getimagesize($filePath);
+                            $user->avatar_width = $imageSize[0];
+                            $user->avatar_height = $imageSize[1];
+                            $user->avatar_size = $size;
+
+                            // make sure image isn't interlaced
+                            if (extension_loaded('fileinfo')) {
+                                $image = Image::make($path);
+                                $image->interlace(false);
+                                $imageStr = (string) $image->encode($documentType);
+                                $disk->put($user->avatar, $imageStr);
+                                $user->avatar_size = strlen($imageStr);
+                            } else {
+                                if (Utils::isInterlaced($filePath)) {
+                                    $user->clearAvatar();
+                                    Session::flash('error', trans('texts.logo_warning_invalid'));
+                                } else {
+                                    $stream = fopen($filePath, 'r');
+                                    $disk->getDriver()->putStream($user->avatar, $stream, ['mimetype' => $documentTypeData['mime']]);
+                                    fclose($stream);
+                                }
+                            }
+                        } catch (Exception $exception) {
+                            $user->clearAvatar();
+                            Session::flash('error', trans('texts.logo_warning_invalid'));
+                        }
+                    } else {
+                        if (extension_loaded('fileinfo')) {
+                            $user->avatar = com_create_guid().'.png';
+                            $image = Image::make($path);
+                            $image = Image::canvas($image->width(), $image->height(), '#FFFFFF')->insert($image);
+                            $imageStr = (string) $image->encode('png');
+                            $disk->put($user->avatar, $imageStr);
+
+                            $user->avatar_size = strlen($imageStr);
+                            $user->avatar_width = $image->width();
+                            $user->avatar_height = $image->height();
+                        } else {
+                            Session::flash('error', trans('texts.logo_warning_fileinfo'));
+                        }
+                    }
+                }
+            }
+
+            $user->save();
+        }
+
     }
 
     /**

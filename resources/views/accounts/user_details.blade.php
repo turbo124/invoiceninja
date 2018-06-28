@@ -2,6 +2,14 @@
 
 @section('content')
     @parent
+    <link href="{{ asset('css/quill.snow.css') }}" rel="stylesheet" type="text/css"/>
+    <script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
+
+    <style type="text/css">
+        .iframe_url {
+            display: none;
+        }
+    </style>
 
     {!! Former::open_for_files()->addClass('warn-on-exit')->rules(array(
         'first_name' => 'required',
@@ -38,6 +46,23 @@
                 {!! Former::text('last_name') !!}
                 {!! Former::text('email') !!}
                 {!! Former::text('phone') !!}
+                {!! Former::file('avatar')
+                    ->max(2, 'MB')
+                    ->accept('image')
+                    ->label(trans('texts.avatar'))
+                    ->inlineHelp(trans('texts.logo_help')) !!}
+
+                @if ($account->hasLogo())
+                    <div class="form-group">
+                        <div class="col-lg-4 col-sm-4"></div>
+                        <div class="col-lg-8 col-sm-8">
+                            <a href="{{ $account->getLogoUrl(true) }}" target="_blank">
+                                {!! HTML::image($account->getLogoUrl(true), 'Logo', ['style' => 'max-width:300px']) !!}
+                            </a> &nbsp;
+                            <a href="#" onclick="deleteLogo()">{{ trans('texts.remove_logo') }}</a>
+                        </div>
+                    </div>
+                @endif
 
                 <br/>
 
@@ -87,6 +112,20 @@
                     @endif
                 @endif
 
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{!! trans('texts.signature') !!}</h3>
+                </div>
+                <div class="panel-body">
+                    {!! Former::textarea('signature')->style('display:none')->raw() !!}
+                    <div id="signatureEditor" class="form-control" style="min-height:160px" onclick="focusEditor()"></div>
+                    <div class="pull-right" style="padding-top:10px;text-align:right">
+                        {!! Button::normal(trans('texts.raw'))->withAttributes(['onclick' => 'showRaw()'])->small() !!}
+                    </div>
+                    @include('partials/quill_toolbar', ['name' => 'signature'])
                 </div>
             </div>
 
@@ -273,7 +312,47 @@
                 window.location = '{{ URL::to('/auth_unlink') }}';
             });
         }
+
+
+        var editor = false;
+        $(function() {
+            editor = new Quill('#signatureEditor', {
+                modules: {
+                    'toolbar': { container: '#signatureToolbar' },
+                    'link-tooltip': true
+                },
+                theme: 'snow'
+            });
+            editor.setHTML($('#signature').val());
+            editor.on('text-change', function(delta, source) {
+                if (source == 'api') {
+                    return;
+                }
+                var html = editor.getHTML();
+                $('#signature').val(html);
+                NINJA.formIsChanged = true;
+            });
+        });
+
+        function focusEditor() {
+            editor.focus();
+        }
+
+        function showRaw() {
+            var signature = $('#signature').val();
+            $('#raw-textarea').val(formatXml(signature));
+            $('#rawModal').modal('show');
+        }
+
+        function updateRaw() {
+            var value = $('#raw-textarea').val();
+            editor.setHTML(value);
+            $('#signature').val(value);
+        }
+
     </script>
+
+
 
 @stop
 

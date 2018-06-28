@@ -467,6 +467,14 @@ class User extends Authenticatable
 
         return true;
     }
+
+    public function clearAvatar()
+    {
+        $this->avatar = '';
+        $this->avatar_width = 0;
+        $this->avatar_height = 0;
+        $this->avatar_size = 0;
+    }
 }
 
 User::created(function ($user)

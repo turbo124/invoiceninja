@@ -245,9 +245,23 @@ class Ticket extends EntityModel
         return env("TICKET_SUPPORT_EMAIL","");
     }
 
-
-
-
-
-
 }
+
+
+
+Ticket::creating(function ($ticket) {
+});
+
+Ticket::created(function ($ticket) {
+    $ticket->account->account_ticket_settings->ticket_number_start = $ticket->ticket_number++;
+    $ticket->account->account_ticket_settings->save();
+});
+
+Ticket::updating(function ($ticket) {
+});
+
+Ticket::updated(function ($ticket) {
+});
+
+Expense::deleting(function ($ticket) {
+});

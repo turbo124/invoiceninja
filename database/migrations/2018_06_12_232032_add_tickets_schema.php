@@ -174,13 +174,48 @@ class AddTicketsSchema extends Migration
             $table->timestamps();
 
             $table->string('local_part')->unique(); //allows a user to specify a custom *@support.invoiceninja.com domain
-            $table->string('domain_name');
+            $table->string('from_name', 255); //define the from email addresses name
 
-            $table->string('from_name');
+            $table->boolean('client_upload')->default(true);
+            $table->unsignedInteger('max_file_size')->default(0);
+            $table->string('mime_types');
+
+            $table->unsignedInteger('ticket_master_id');
+
+            $table->unsignedInteger('new_ticket_template_id');
+            $table->unsignedInteger('close_ticket_template_id');
+            $table->unsignedInteger('update_ticket_template_id');
+
+            $table->unsignedInteger('default_priority');
+            $table->string('ticket_number_prefix');
+            $table->unsignedInteger('ticket_number_start');
+
+            $table->boolean('alert_new_ticket')->default(true);
+            $table->longtext('alert_new_ticket_email');
+            $table->boolean('alert_new_comment')->default(true);
+            $table->longtext('alert_new_comment_email');
+            $table->boolean('alert_ticket_assign_agent')->default(true);
+            $table->longtext('alert_ticket_assign_email');
+            $table->boolean('alert_ticket_transfer_agent')->default(true);
+            $table->longtext('alert_ticket_transfer_email');
+            $table->boolean('alert_ticket_overdue_agent')->default(true);
+            $table->longtext('alert_ticket_overdue_email');
+
+            $table->boolean('show_agent_details')->default(true);
+            $table->string('postmark_api_token');
 
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
+            $table->foreign('ticket_master_id')->references('id')->on('users')->onDelete('cascade');
         });
 
+
+        Schema::table('users', function ($table) {
+            $table->string('avatar', 255);
+            $table->unsignedInteger('avatar_width');
+            $table->unsignedInteger('avatar_height');
+            $table->unsignedInteger('avatar_size');
+            $table->text('signature');
+        });
     }
 
     /**

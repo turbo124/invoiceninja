@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\TicketComment;
 use App\Ninja\Repositories\AccountRepository;
@@ -231,6 +232,7 @@ class CreateTestData extends Command
                 'ccs'=> json_encode([]),
                 'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
+                'ticket_number'=>Ticket::max('ticket_number') ?: 1,
             ];
 
             $ticket = $this->ticketRepo->save($data);
