@@ -340,6 +340,7 @@ Route::group([
     Route::post('settings/company_details', 'AccountController@updateDetails');
     Route::post('settings/{section?}', 'AccountController@doSection');
     Route::post('remove_logo', 'AccountController@removeLogo');
+    Route::post('remove_avatar', 'AccountController@removeAvatar');
 
     Route::post('/export', 'ExportController@doExport');
     Route::post('/import', 'ImportController@doImport');

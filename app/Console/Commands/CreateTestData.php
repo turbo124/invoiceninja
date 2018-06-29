@@ -218,7 +218,7 @@ class CreateTestData extends Command
     {
         for ($i = 0; $i < $this->count; $i++)
         {
-            $maxTicketNumber = max(DB::table('tickets')->max('ticket_number'), $client->account->account_ticket_settings->ticket_number_start);
+            $maxTicketNumber = Ticket::getNextTicketNumber(Auth::user()->account->id);
 
             $data = [
                 'priority_id'=> TICKET_PRIORITY_LOW,
@@ -235,7 +235,7 @@ class CreateTestData extends Command
                 'ccs'=> json_encode([]),
                 'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
-                'ticket_number' => $maxTicketNumber,
+                'ticket_number' => $maxTicketNumber ? $maxTicketNumber : 1,
             ];
 
             $ticket = $this->ticketRepo->save($data);

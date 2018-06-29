@@ -246,6 +246,18 @@ class Ticket extends EntityModel
         return env("TICKET_SUPPORT_EMAIL","");
     }
 
+    public static function getNextTicketNumber($accountId)
+    {
+
+        $ticket = Ticket::whereAccountId($accountId)->withTrashed()->orderBy('ticket_number', 'DESC')->first();
+
+        if ($ticket) {
+            return max($ticket->ticket_number + 1, $ticket->account->account_ticket_settings->ticket_number_start);
+        } else {
+            return 1;
+        }
+    }
+
 }
 
 

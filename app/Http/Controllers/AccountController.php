@@ -1296,12 +1296,11 @@ class AccountController extends BaseController
 
     private function saveUserAvatar($avatar, $user)
     {
-        $account = $user->account;
 
         /* Logo image file */
         if ($uploaded = $avatar) {
             $path = $avatar->getRealPath();
-            $disk = $account->getAvatarDisk();
+            $disk = $user->getAvatarDisk();
             $extension = strtolower($uploaded->getClientOriginalExtension());
 
             if (empty(Document::$types[$extension]) && ! empty(Document::$extraExtensions[$extension])) {
