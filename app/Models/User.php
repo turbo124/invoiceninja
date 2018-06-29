@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Events\UserSettingsChanged;
 use App\Events\UserSignedUp;
 use App\Libraries\Utils;
+use App\Models\Traits\HasAvatar;
 use Event;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,6 +22,7 @@ class User extends Authenticatable
     use PresentableTrait;
     use SoftDeletes;
     use Notifiable;
+    use HasAvatar;
 
     /**
      * @var string
@@ -54,6 +56,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'signature',
+        'avatar',
     ];
 
     /**
@@ -468,13 +472,7 @@ class User extends Authenticatable
         return true;
     }
 
-    public function clearAvatar()
-    {
-        $this->avatar = '';
-        $this->avatar_width = 0;
-        $this->avatar_height = 0;
-        $this->avatar_size = 0;
-    }
+
 }
 
 User::created(function ($user)

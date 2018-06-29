@@ -1233,6 +1233,7 @@ class AccountController extends BaseController
      */
     public function saveUserDetails()
     {
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $email = trim(strtolower(Input::get('email')));
@@ -1282,6 +1283,8 @@ class AccountController extends BaseController
                 }
             }
 
+            $this->saveUserAvatar(Input::file('avatar'), $user);
+
             $user->save();
 
             event(new UserSettingsChanged());
@@ -1298,7 +1301,7 @@ class AccountController extends BaseController
         /* Logo image file */
         if ($uploaded = $avatar) {
             $path = $avatar->getRealPath();
-            $disk = $account->getLogoDisk();
+            $disk = $account->getAvatarDisk();
             $extension = strtolower($uploaded->getClientOriginalExtension());
 
             if (empty(Document::$types[$extension]) && ! empty(Document::$extraExtensions[$extension])) {
@@ -1319,7 +1322,7 @@ class AccountController extends BaseController
                     Session::flash('error', trans('texts.logo_warning_too_large'));
                 } else {
                     if ($documentType != 'gif') {
-                        $user->avatar = com_create_guid().'.'.$documentType;
+                        $user->avatar = str_random(21).'.'.$documentType;
 
                         try {
                             $imageSize = getimagesize($filePath);
@@ -1350,7 +1353,7 @@ class AccountController extends BaseController
                         }
                     } else {
                         if (extension_loaded('fileinfo')) {
-                            $user->avatar = com_create_guid().'.png';
+                            $user->avatar = str_random(32).'.png';
                             $image = Image::make($path);
                             $image = Image::canvas($image->width(), $image->height(), '#FFFFFF')->insert($image);
                             $imageStr = (string) $image->encode('png');
@@ -1437,6 +1440,25 @@ class AccountController extends BaseController
         Session::flash('message', trans('texts.removed_logo'));
 
         return Redirect::to('settings/'.ACCOUNT_COMPANY_DETAILS);
+    }
+
+    public function removeAvatar()
+    {
+        $user = Auth::user();
+
+        if (! Utils::isNinjaProd() && $user->hasAvatar()) {
+            $user->getAvatarDisk()->delete($user->avatar);
+        }
+
+        $user->avatar = null;
+        $user->avatar_size = null;
+        $user->avatar_width = null;
+        $user->avatar_height = null;
+        $user->save();
+
+        Session::flash('message', trans('texts.removed_logo'));
+
+        return Redirect::to('settings/'.ACCOUNT_USER_DETAILS);
     }
 
     /**

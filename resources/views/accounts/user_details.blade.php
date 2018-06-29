@@ -52,12 +52,12 @@
                     ->label(trans('texts.avatar'))
                     ->inlineHelp(trans('texts.logo_help')) !!}
 
-                @if ($account->hasLogo())
+                @if ($user->hasAvatar())
                     <div class="form-group">
                         <div class="col-lg-4 col-sm-4"></div>
                         <div class="col-lg-8 col-sm-8">
-                            <a href="{{ $account->getLogoUrl(true) }}" target="_blank">
-                                {!! HTML::image($account->getLogoUrl(true), 'Logo', ['style' => 'max-width:300px']) !!}
+                            <a href="{{ $user->getAvatarUrl(true) }}" target="_blank">
+                                {!! HTML::image($user->getAvatarUrl(true), 'Logo', ['style' => 'max-width:300px']) !!}
                             </a> &nbsp;
                             <a href="#" onclick="deleteLogo()">{{ trans('texts.remove_logo') }}</a>
                         </div>
@@ -214,6 +214,11 @@
 
     {!! Former::close() !!}
 
+
+
+    {!! Form::open(['url' => 'remove_avatar', 'class' => 'removeAvatarForm']) !!}
+    {!! Form::close() !!}
+
     <script type="text/javascript">
 
         $(function() {
@@ -350,9 +355,19 @@
             $('#signature').val(value);
         }
 
+
+
+        $(function() {
+            $('#country_id').combobox();
+        });
+
+        function deleteLogo() {
+            sweetConfirm(function() {
+                $('.removeAvatarForm').submit();
+            });
+        }
+
     </script>
-
-
 
 @stop
 
