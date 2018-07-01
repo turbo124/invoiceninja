@@ -266,8 +266,9 @@ Ticket::creating(function ($ticket) {
 });
 
 Ticket::created(function ($ticket) {
-    $ticket->account->account_ticket_settings->ticket_number_start = $ticket->ticket_number+1;
-    $ticket->account->account_ticket_settings->save();
+    $account_ticket_settings = $ticket->account->account_ticket_settings;
+    $account_ticket_settings->ticket_number_start = $ticket->ticket_number+1;
+    $account_ticket_settings->save();
 });
 
 Ticket::updating(function ($ticket) {

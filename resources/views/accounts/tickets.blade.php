@@ -18,6 +18,7 @@
     !!}
 
     {{ Former::populate($account_ticket_settings) }}
+    {{ Former::populateField('local_part', $account_ticket_settings->local_part) }}
 
     @include('accounts.nav', ['selected' => ACCOUNT_TICKETS])
 

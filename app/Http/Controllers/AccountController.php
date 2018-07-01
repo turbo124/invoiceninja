@@ -522,7 +522,7 @@ class AccountController extends BaseController
     {
         $data = [
             'account' => Auth::user()->account,
-            'account_ticket_settings' => AccountTicketSettings::where('account_id', Auth::user()->account_id),
+            'account_ticket_settings' => Auth::user()->account->account_ticket_settings,
             'title' => trans('texts.ticket_settings'),
             'section' => ACCOUNT_TICKETS,
         ];

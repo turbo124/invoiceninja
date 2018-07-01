@@ -2924,6 +2924,7 @@ $LANG = array(
     'ticket_master_help' => 'Has the ability to assign and transfer tickets. Assigned as the default agent for all tickets.',
     'show_agent_details' => 'Show agent details on responses',
     'avatar' => 'Avatar',
+    'remove_avatar' => 'Remove avatar',
 );
 
 return $LANG;

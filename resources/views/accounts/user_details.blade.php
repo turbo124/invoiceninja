@@ -23,6 +23,7 @@
     {{ Former::populateField('last_name', $user->last_name) }}
     {{ Former::populateField('email', $user->email) }}
     {{ Former::populateField('phone', $user->phone) }}
+    {{ Former::populateField('signature', $user->signature) }}
     {{ Former::populateField('dark_mode', intval($user->dark_mode)) }}
     {{ Former::populateField('enable_two_factor', $user->google_2fa_secret ? 1 : 0) }}
 
@@ -59,7 +60,7 @@
                             <a href="{{ $user->getAvatarUrl(true) }}" target="_blank">
                                 {!! HTML::image($user->getAvatarUrl(true), 'Logo', ['style' => 'max-width:300px']) !!}
                             </a> &nbsp;
-                            <a href="#" onclick="deleteLogo()">{{ trans('texts.remove_logo') }}</a>
+                            <a href="#" onclick="deleteLogo()">{{ trans('texts.remove_avatar') }}</a>
                         </div>
                     </div>
                 @endif
@@ -150,6 +151,31 @@
                 ->submit()->large()
                 ->appendIcon(Icon::create('floppy-disk')) !!}
     </center>
+
+
+    <div class="modal fade" id="rawModal" tabindex="-1" role="dialog" aria-labelledby="rawModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="rawModalLabel">{{ trans('texts.raw_html') }}</h4>
+                </div>
+
+                <div class="container" style="width: 100%; padding-bottom: 0px !important">
+                    <div class="panel panel-default">
+                        <div class="modal-body">
+                            <textarea id="raw-textarea" rows="20" style="width:100%"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('texts.close') }}</button>
+                    <button type="button" onclick="updateRaw()" class="btn btn-success" data-dismiss="modal">{{ trans('texts.update') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -354,8 +380,6 @@
             editor.setHTML(value);
             $('#signature').val(value);
         }
-
-
 
         $(function() {
             $('#country_id').combobox();
