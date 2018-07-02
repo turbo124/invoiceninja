@@ -31,7 +31,8 @@ class SaveTicketSettings extends Request
     {
         $input = $this->all();
 
-        $maxTicketNumber = Ticket::scope()->max('ticket_number');
+        //ensure we
+        $maxTicketNumber = Ticket::scope()->withTrashed()->max('ticket_number');
 
         if($input['ticket_number_start'] <= $maxTicketNumber){
 

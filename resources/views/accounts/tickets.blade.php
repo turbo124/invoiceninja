@@ -171,25 +171,45 @@
                         ->label(trans('texts.new_ticket_notification_list'))
                         ->help('alert_new_ticket_email_help') !!}
 
-                    {!! Former::checkbox('alert_update_ticket')
+                    {!! Former::checkbox('alert_new_comment')
                        ->text(trans('texts.enable'))
-                       ->label(trans('texts.alert_update_ticket'))
+                       ->label(trans('texts.alert_comment_ticket'))
                        ->value(1) !!}
 
-                    {!! Former::text('alert_ticket_update_email')
+                    {!! Former::text('alert_new_comment_email')
                         ->placeholder('texts.comma_separated_values')
                         ->label(trans('texts.update_ticket_notification_list'))
-                        ->help('alert_update_ticket_email_help') !!}
+                        ->help('alert_comment_ticket_email_help') !!}
 
-                    {!! Former::checkbox('alert_close_ticket')
+                    {!! Former::checkbox('alert_ticket_assign_agent')
                        ->text(trans('texts.enable'))
-                       ->label(trans('texts.alert_close_ticket'))
+                       ->label(trans('texts.alert_ticket_assign_agent'))
                        ->value(1) !!}
 
-                    {!! Former::text('alert_ticket_close_email')
+                    {!! Former::text('alert_ticket_assign_email')
                         ->placeholder('texts.comma_separated_values')
-                        ->label(trans('texts.close_ticket_notification_list'))
-                        ->help('alert_close_ticket_email_help') !!}
+                        ->label(trans('texts.alert_ticket_assign_agent_notifications'))
+                        ->help('alert_ticket_assign_agent_help') !!}
+
+                    {!! Former::checkbox('alert_ticket_transfer_agent')
+                      ->text(trans('texts.enable'))
+                      ->label(trans('texts.alert_ticket_transfer_agent'))
+                      ->value(1) !!}
+
+                    {!! Former::text('alert_ticket_transfer_email')
+                        ->placeholder('texts.comma_separated_values')
+                        ->label(trans('texts.alert_ticket_transfer_email'))
+                        ->help('alert_ticket_transfer_email_help') !!}
+
+                    {!! Former::checkbox('alert_ticket_overdue_agent')
+                          ->text(trans('texts.enable'))
+                          ->label(trans('texts.alert_ticket_overdue_agent'))
+                          ->value(1) !!}
+
+                    {!! Former::text('alert_ticket_overdue_email')
+                        ->placeholder('texts.comma_separated_values')
+                        ->label(trans('texts.alert_ticket_overdue_email'))
+                        ->help('alert_ticket_overdue_email_help') !!}
 
                     {!! Former::checkbox('show_agent_details')
                        ->text(trans('texts.enable'))
