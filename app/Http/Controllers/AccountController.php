@@ -8,6 +8,7 @@ use App\Events\UserSettingsChanged;
 use App\Events\UserSignedUp;
 use App\Http\Requests\SaveClientPortalSettings;
 use App\Http\Requests\SaveEmailSettings;
+use App\Http\Requests\SaveTicketSettings;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
 use App\Models\AccountGateway;
@@ -518,6 +519,9 @@ class AccountController extends BaseController
         return View::make('accounts.products', $data);
     }
 
+    /**
+     * @return mixed
+     */
     private function showTickets()
     {
         $data = [
@@ -765,8 +769,6 @@ class AccountController extends BaseController
             return self::saveProducts();
         } elseif ($section === ACCOUNT_TAX_RATES) {
             return self::saveTaxRates();
-        } elseif ($section === ACCOUNT_TICKETS) {
-            return self::saveTickets();
         } elseif ($section === ACCOUNT_PAYMENT_TERMS) {
             return self::savePaymetTerms();
         } elseif ($section === ACCOUNT_MANAGEMENT) {
@@ -950,10 +952,10 @@ class AccountController extends BaseController
      * @return \Illuminate\Http\RedirectResponse
      */
 
-    private function saveTickets()
+    public function saveTickets(SaveTicketSettings $request)
     {
         $account_ticket_settings = Auth::user()->account->account_ticket_settings;
-        $account_ticket_settings->fill(Input::all());
+        $account_ticket_settings->fill($request->all());
         $account_ticket_settings->save();
 
         Session::flash('message', trans('texts.updated_settings'));
@@ -1294,6 +1296,10 @@ class AccountController extends BaseController
         }
     }
 
+    /**
+     * @param $avatar
+     * @param $user
+     */
     private function saveUserAvatar($avatar, $user)
     {
 
@@ -1441,6 +1447,9 @@ class AccountController extends BaseController
         return Redirect::to('settings/'.ACCOUNT_COMPANY_DETAILS);
     }
 
+    /**
+     * @return mixed
+     */
     public function removeAvatar()
     {
         $user = Auth::user();

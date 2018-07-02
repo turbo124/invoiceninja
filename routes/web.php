@@ -144,6 +144,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
 
     Route::get('settings/user_details', 'AccountController@showUserDetails');
     Route::post('settings/user_details', 'AccountController@saveUserDetails');
+    Route::post('settings/tickets', 'AccountController@saveTickets');
     Route::post('settings/payment_gateway_limits', 'AccountGatewayController@savePaymentGatewayLimits');
     Route::post('users/change_password', 'UserController@changePassword');
     Route::get('settings/enable_two_factor', 'TwoFactorController@setupTwoFactor');

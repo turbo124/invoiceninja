@@ -25,7 +25,7 @@ class AddTicketsSchema extends Migration
             $table->boolean('is_internal')->default(0);
             $table->unsignedInteger('status_id');
             $table->unsignedInteger('category_id');
-            $table->string('ticket_number');
+            $table->unsignedInteger('ticket_number');
             $table->text('subject');
             $table->text('description');
             $table->longtext('tags');
