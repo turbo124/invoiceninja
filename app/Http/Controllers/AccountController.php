@@ -32,6 +32,7 @@ use App\Ninja\Repositories\ReferralRepository;
 use App\Services\AuthService;
 use App\Services\PaymentService;
 use App\Services\TemplateService;
+use Monolog\Handler\Curl\Util;
 use Nwidart\Modules\Facades\Module;
 use Auth;
 use Cache;
@@ -524,6 +525,7 @@ class AccountController extends BaseController
      */
     private function showTickets()
     {
+
         $data = [
             'account' => Auth::user()->account,
             'account_ticket_settings' => Auth::user()->account->account_ticket_settings,

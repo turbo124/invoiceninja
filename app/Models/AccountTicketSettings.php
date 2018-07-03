@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Libraries\Utils;
 use Eloquent;
 
 /**
@@ -41,6 +42,13 @@ class AccountTicketSettings extends Eloquent
     {
         return $this->hasOne('App\Models\User', 'id', 'ticket_master_id');
     }
+
+    public function max_file_sizes()
+    {
+        $utils = new Utils();
+        return $utils->getMaxFileUploadSizes();
+    }
+
 
 
 }

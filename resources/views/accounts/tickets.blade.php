@@ -51,11 +51,7 @@
                         {!! Former::select('ticket_master')
                             ->text(trans('texts.ticket_master'))
                             ->help(trans('texts.ticket_master_help'))
-                            ->options([
-                            TICKET_PRIORITY_LOW => trans('texts.low'),
-                            TICKET_PRIORITY_MEDIUM => trans('texts.medium'),
-                            TICKET_PRIORITY_HIGH => trans('texts.high'),
-                        ])
+                            ->fromQuery($account->users, 'displayName', 'id')
                          !!}
                     </div>
 
@@ -95,12 +91,7 @@
                     <div id="max_file_size">
                         {!! Former::select('max_file_size')
                             ->text(trans('texts.max_file_size'))
-                            ->options([
-                            AUTO_BILL_OFF => trans('texts.off'),
-                            AUTO_BILL_OPT_IN => trans('texts.opt_in'),
-                            AUTO_BILL_OPT_OUT => trans('texts.opt_out'),
-                            AUTO_BILL_ALWAYS => trans('texts.always'),
-                        ])
+                            ->fromQuery($account_ticket_settings->max_file_sizes())
                         ->help(trans('texts.max_file_size_help'))
                          !!}
                     </div>
@@ -217,6 +208,13 @@
                        ->value(1) !!}
 
                 </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{!! trans('texts.templates') !!}</h3>
+                </div>
+                <div class="panel-body form-padding-right">
             </div>
         </div>
 
