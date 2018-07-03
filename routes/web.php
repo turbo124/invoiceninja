@@ -19,6 +19,7 @@ Route::group(['middleware' => ['lookup:contact', 'auth:client']], function () {
     Route::get('view/{invitation_key}', 'ClientPortalController@viewInvoice');
     Route::get('proposal/{proposal_invitation_key}/download', 'ClientPortalProposalController@downloadProposal');
     Route::get('proposal/{proposal_invitation_key}', 'ClientPortalProposalController@viewProposal');
+    Route::get('ticket/{ticket_invitation_key}', 'ClientPortalTicketController@viewTicket');
     Route::get('download/{invitation_key}', 'ClientPortalController@download');
     Route::put('authorize/{invitation_key}', 'ClientPortalController@authorizeInvoice');
     Route::get('view', 'HomeController@viewLogo');

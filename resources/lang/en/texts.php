@@ -2931,6 +2931,7 @@ $LANG = array(
     'show_agent_details' => 'Show agent details on responses',
     'avatar' => 'Avatar',
     'remove_avatar' => 'Remove avatar',
+    'ticket_not_found' => 'Ticket not found',
 );
 
 return $LANG;

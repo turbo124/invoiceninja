@@ -5,6 +5,7 @@ namespace App\Ninja\Repositories;
 use App\Models\Document;
 use App\Models\Ticket;
 use App\Models\TicketComment;
+use App\Models\TicketInvitation;
 use Auth;
 use DB;
 use Utils;
@@ -98,7 +99,73 @@ class TicketRepository extends BaseRepository
             }
         }
 
+        //ticket invitations - create if none exists for primary contact
+        $found = false;
+
+        foreach($ticket->invitations as $invite) {
+
+            if($invite->contact_id == $ticket->contact->id)
+                $found = true;
+
+        }
+
+        if (! $found)
+            $this->createTicketInvite($ticket, $ticket->contact->id);
+
+
+        /*
+         * iterate through ticket ccs and ensure an invite exists for ticket CC's - todo v2.0
+
+            foreach(explode(",", $ticket->ccs) as $ccKey) {
+
+            $contact = Contact::where('contact_key', '=', $ccKey)->first();
+
+            if($contact->id)
+            }
+        */
+
         return $ticket;
+    }
+
+    private function createTicketInvite($ticket, $contactId) {
+
+        $ticketInvitation = TicketInvitation::createNew();
+        $ticketInvitation->ticket_id = $ticket->id;
+        $ticketInvitation->contact_id = $contactId;
+        $ticketInvitation->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
+        $ticketInvitation->save();
+
+    }
+
+    /**
+     * @param $invitationKey
+     *
+     * @return Invitation|bool
+     */
+    public function findInvitationByKey($invitationKey)
+    {
+        // check for extra params at end of value (from website feature)
+        list($invitationKey) = explode('&', $invitationKey);
+        $invitationKey = substr($invitationKey, 0, RANDOM_KEY_LENGTH);
+
+        /** @var \App\Models\Invitation $invitation */
+        $invitation = TicketInvitation::where('invitation_key', '=', $invitationKey)->first();
+        if (! $invitation) {
+            return false;
+        }
+
+        $ticket = $invitation->ticket;
+
+        if (! $ticket || $ticket->is_deleted)
+            return false;
+
+
+        $client = $ticket->client;
+
+        if (! $client || $client->is_deleted)
+            return false;
+
+        return $invitation;
     }
 
 }

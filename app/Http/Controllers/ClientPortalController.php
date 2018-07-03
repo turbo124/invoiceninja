@@ -627,7 +627,7 @@ class ClientPortalController extends BaseController
         return $this->documentRepo->getClientDatatable($contact->id, ENTITY_DOCUMENT, Input::get('sSearch'));
     }
 
-    private function returnError($error = false)
+    public function returnError($error = false)
     {
         if (request()->phantomjs) {
             abort(404);

@@ -116,6 +116,14 @@ class Ticket extends EntityModel
     /**
      * @return mixed
      */
+    public function invitations()
+    {
+        return $this->hasMany('App\Models\TicketInvitation')->orderBy('ticket_invitations.contact_id');
+    }
+
+    /**
+     * @return mixed
+     */
     public function getEntityType()
     {
         return ENTITY_TICKET;

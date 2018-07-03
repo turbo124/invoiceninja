@@ -5,7 +5,7 @@ namespace App\Models;
 use Eloquent;
 
 /**
- * Class ExpenseCategory.
+ * Class LookupTicketInvitation.
  */
 class LookupTicketInvitation extends LookupModel
 {
