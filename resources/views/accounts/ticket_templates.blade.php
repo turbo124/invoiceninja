@@ -28,8 +28,15 @@
                     {!! Former::text('name')
                              ->label(trans('texts.name'))
                     !!}
-                </div>
 
+
+                    {!! Former::textarea('name')
+                             ->label(trans('texts.description'))
+                             ->style('width: 100%')
+                             ->rows(10)
+                    !!}
+                </div>
+                <!--
                 <div class="panel-body">
                     {!! Former::textarea('description')->style('display:none')->label('texts.description')->raw() !!}
                     <div id="descriptionEditor" class="form-control" style="min-height:160px" onclick="focusEditor()"></div>
@@ -38,6 +45,7 @@
                     </div>
                     @include('partials/quill_toolbar', ['name' => 'description'])
                 </div>
+                -->
             </div>
 
         </div>
@@ -66,7 +74,7 @@
             </div>
         </div>
     </div>
-    
+
     <center>
         {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk')) !!}
     </center>

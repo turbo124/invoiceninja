@@ -67,7 +67,7 @@ class TicketTemplateController extends BaseController
 
         $data = self::getViewModel();
         $data['method'] = 'POST';
-        $data['title'] = trans('texts.new_template');
+        $data['title'] = trans('texts.add_template');
 
         return View::make('accounts.ticket_templates', $data);
 

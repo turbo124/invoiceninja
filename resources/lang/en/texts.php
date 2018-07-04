@@ -2933,6 +2933,7 @@ $LANG = array(
     'remove_avatar' => 'Remove avatar',
     'ticket_not_found' => 'Ticket not found',
     'add_template' => 'Add Template',
+    'ticket_template' => 'Ticket Templates',
 );
 
 return $LANG;
