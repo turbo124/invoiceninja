@@ -3,13 +3,6 @@
 @section('content')
     @parent
 
-    <style type="text/css">
-
-        #logo {
-            padding-top: 6px;
-        }
-
-    </style>
 
     {!! Former::open_for_files()
             ->addClass('warn-on-exit')
@@ -210,12 +203,26 @@
                 </div>
             </div>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{!! trans('texts.templates') !!}</h3>
-                </div>
-                <div class="panel-body form-padding-right">
-            </div>
+            {!! Button::primary(trans('texts.add_template'))
+            ->asLinkTo(URL::to('/ticket_template/create'))
+            ->withAttributes(['class' => 'pull-right'])
+            ->appendIcon(Icon::create('plus-sign')) !!}
+
+
+            {!! Datatable::table()
+            ->addColumn(
+              trans('texts.gateway'),
+              trans('texts.limits'),
+              trans('texts.fees'),
+              trans('texts.action'))
+            ->setUrl(url('api/ticketTemplates/'))
+            ->setOptions('sPaginationType', 'bootstrap')
+            ->setOptions('bFilter', false)
+            ->setOptions('bAutoWidth', false)
+            ->setOptions('aoColumns', [[ "sWidth"=> "20%" ], ["sWidth"=> "20%"], ["sWidth"=> "30%"], ["sWidth"=> "20%"]])
+            ->setOptions('aoColumnDefs', [['bSortable'=>false, 'aTargets'=>[1, 2, 3]]])
+            ->render('datatable') !!}
+
         </div>
 
 

@@ -2932,6 +2932,7 @@ $LANG = array(
     'avatar' => 'Avatar',
     'remove_avatar' => 'Remove avatar',
     'ticket_not_found' => 'Ticket not found',
+    'add_template' => 'Add Template',
 );
 
 return $LANG;

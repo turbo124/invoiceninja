@@ -5,12 +5,6 @@
     <link href="{{ asset('css/quill.snow.css') }}" rel="stylesheet" type="text/css"/>
     <script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
 
-    <style type="text/css">
-        .iframe_url {
-            display: none;
-        }
-    </style>
-
     {!! Former::open_for_files()->addClass('warn-on-exit')->rules(array(
         'first_name' => 'required',
         'last_name' => 'required',
