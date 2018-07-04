@@ -25,11 +25,11 @@ class TicketTemplateRepository extends BaseRepository
         $query = DB::table('ticket_templates')
             ->where('ticket_templates.account_id', '=', Auth::user()->account_id)
             ->select(
-                'tickets.name',
+                'ticket_templates.name',
                 'ticket_templates.public_id',
                 'ticket_templates.description',
-                'tickets.deleted_at',
-                'tickets.created_at'
+                'ticket_templates.deleted_at',
+                'ticket_templates.created_at'
             );
 
         if ($userId) {

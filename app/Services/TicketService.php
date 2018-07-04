@@ -63,9 +63,10 @@ class TicketService extends BaseService
 
     public function getTemplateDatatable()
     {
-        $datatable = new TicketTemplateDatatable();
+        $datatable = new TicketTemplateDatatable(false);
         $query = $this->ticketTemplateRepo->find();
         return $this->datatableService->createDatatable($datatable, $query);
+
 
     }
 

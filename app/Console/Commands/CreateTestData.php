@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\TicketComment;
+use App\Models\TicketTemplate;
 use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Repositories\ClientRepository;
 use App\Ninja\Repositories\ExpenseRepository;
@@ -118,6 +119,7 @@ class CreateTestData extends Command
         }
 
         $this->createTicketStubs();
+        $this->createTicketTemplates();
         $this->createClients();
         $this->createVendors();
         $this->createOtherObjects();
@@ -152,6 +154,33 @@ class CreateTestData extends Command
             $this->createTickets($client);
 
         }
+    }
+
+    private function createTicketTemplates()
+    {
+        $ticketTemplate = TicketTemplate::createNew();
+        $ticketTemplate->name = 'Default response';
+        $ticketTemplate->description = $this->faker->realText(50);
+        $ticketTemplate->save();
+
+        $ticketTemplate = TicketTemplate::createNew();
+        $ticketTemplate->name = 'Updated ticket';
+        $ticketTemplate->description = $this->faker->realText(50);
+        $ticketTemplate->save();
+
+
+        $ticketTemplate = TicketTemplate::createNew();
+        $ticketTemplate->name = 'Ticket closed';
+        $ticketTemplate->description = $this->faker->realText(50);
+        $ticketTemplate->save();
+
+
+        $ticketTemplate = TicketTemplate::createNew();
+        $ticketTemplate->name = 'Generic response';
+        $ticketTemplate->description = $this->faker->realText(50);
+        $ticketTemplate->save();
+
+
     }
 
     /**

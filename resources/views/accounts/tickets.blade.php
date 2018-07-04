@@ -203,36 +203,40 @@
                 </div>
             </div>
 
+
+            <center>
+                {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk')) !!}
+            </center>
+
             {!! Button::primary(trans('texts.add_template'))
             ->asLinkTo(URL::to('/ticket_template/create'))
             ->withAttributes(['class' => 'pull-right'])
             ->appendIcon(Icon::create('plus-sign')) !!}
-
-
-            {!! Datatable::table()
-            ->addColumn(
-              trans('texts.gateway'),
-              trans('texts.limits'),
-              trans('texts.fees'),
-              trans('texts.action'))
-            ->setUrl(url('api/ticketTemplates/'))
-            ->setOptions('sPaginationType', 'bootstrap')
-            ->setOptions('bFilter', false)
-            ->setOptions('bAutoWidth', false)
-            ->setOptions('aoColumns', [[ "sWidth"=> "20%" ], ["sWidth"=> "20%"], ["sWidth"=> "30%"], ["sWidth"=> "20%"]])
-            ->setOptions('aoColumnDefs', [['bSortable'=>false, 'aTargets'=>[1, 2, 3]]])
-            ->render('datatable') !!}
-
         </div>
-
-
+        {!! Former::close() !!}
     </div>
 
-    <center>
-        {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk')) !!}
-    </center>
+        @include('partials.bulk_form', ['entityType' => ENTITY_TICKET_TEMPLATE])
 
-    {!! Former::close() !!}
+            {!! Datatable::table()
+              ->addColumn(
+                trans('texts.name'),
+                trans('texts.description'),
+                trans('texts.action'))
+              ->setUrl(url('api/ticket_templates/'))
+              ->setOptions('sPaginationType', 'bootstrap')
+              ->setOptions('bFilter', false)
+              ->setOptions('bAutoWidth', false)
+              ->setOptions('aoColumnDefs', [['bSortable'=>false, 'aTargets'=>[1]]])
+              ->render('datatable') !!}
 
 
+
+
+
+
+
+    <script>
+        window.onDatatableReady = actionListHandler;
+    </script>
 @stop
