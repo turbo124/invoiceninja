@@ -380,7 +380,7 @@ if (! defined('APP_NAME')) {
     define('NINJA_APP_URL', env('NINJA_APP_URL', 'https://app.invoiceninja.com'));
     define('NINJA_DOCS_URL', env('NINJA_DOCS_URL', 'http://docs.invoiceninja.com/en/latest'));
     define('NINJA_DATE', '2000-01-01');
-    define('NINJA_VERSION', '4.4.4' . env('NINJA_VERSION_SUFFIX'));
+    define('NINJA_VERSION', '4.5.0' . env('NINJA_VERSION_SUFFIX'));
     define('NINJA_TERMS_VERSION', '1.0.1');
 
     define('SOCIAL_LINK_FACEBOOK', env('SOCIAL_LINK_FACEBOOK', 'https://www.facebook.com/invoiceninja'));
@@ -450,7 +450,7 @@ if (! defined('APP_NAME')) {
     define('TEST_PASSWORD', 'password');
     define('API_SECRET', 'API_SECRET');
     define('DEFAULT_API_PAGE_SIZE', 15);
-    define('MAX_API_PAGE_SIZE', 500);
+    define('MAX_API_PAGE_SIZE', 5000);
 
     define('IOS_DEVICE', env('IOS_DEVICE', ''));
     define('ANDROID_DEVICE', env('ANDROID_DEVICE', ''));
