@@ -2938,6 +2938,9 @@ $LANG = array(
     'ticket_not_found' => 'Ticket not found',
     'add_template' => 'Add Template',
     'ticket_template' => 'Ticket Templates',
+    'updated_ticket_template' => 'Updated Ticket Template',
+    'created_ticket_template' => 'Created Ticket Template',
+
 );
 
 return $LANG;

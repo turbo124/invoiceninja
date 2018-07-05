@@ -268,7 +268,8 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::get('api/tickets', 'TicketController@getDatatable');
     Route::get('api/ticket_templates', 'TicketTemplateController@getDatatable');
     Route::get('ticket_template/create', 'TicketTemplateController@create');
-    Route::post('ticket_template/create', 'TicketTemplateController@save');
+    Route::get('ticket_templates/{public_id}/edit', 'TicketTemplateController@edit');
+    Route::post('ticket_template/create', 'TicketTemplateController@store');
 
     // vendor
     Route::resource('vendors', 'VendorController');
