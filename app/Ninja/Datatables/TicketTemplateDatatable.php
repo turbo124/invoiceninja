@@ -24,7 +24,7 @@ class TicketTemplateDatatable extends EntityDatatable
             [
                 'description',
                 function ($model) {
-                    return $model->description;
+                    return substr($model->description, 0, 30);
                 }
             ],
         ];
@@ -39,25 +39,7 @@ class TicketTemplateDatatable extends EntityDatatable
                     return URL::to("ticket_templates/{$model->public_id}/edit");
                 },
                 function ($model) {
-                    return true;
-                },
-            ],
-            [
-                trans('texts.edit'),
-                function ($model) {
-                    return URL::to("ticket_templates/{$model->public_id}/edit");
-                },
-                function ($model) {
-                    return true;
-                },
-            ],
-            [
-                trans('texts.edit'),
-                function ($model) {
-                    return URL::to("ticket_templates/{$model->public_id}/edit");
-                },
-                function ($model) {
-                    return true;
+                    return Auth::user()->canCreateOrEdit(ENTITY_TICKET);
                 },
             ],
         ];

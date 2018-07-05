@@ -11,7 +11,8 @@
         }
     </style>
 
-    {!! Former::open_for_files()
+    {!! Former::open($url)
+            ->method($method)
             ->addClass('warn-on-exit')
             ->autocomplete('on')
             ->rules([

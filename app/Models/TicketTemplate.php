@@ -20,8 +20,6 @@ class TicketTemplate extends EntityModel
     protected $fillable = [
         'name',
         'description',
-        'user_id',
-        'account_id',
     ];
 
     /**
@@ -36,10 +34,15 @@ class TicketTemplate extends EntityModel
     /**
      * @return mixed
      */
+
     public function account()
     {
         return $this->belongsTo('App\Models\Account');
     }
+
+    /**
+     * @return mixed
+     */
 
     public function user()
     {

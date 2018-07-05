@@ -9,15 +9,34 @@ use Utils;
 
 class TicketTemplateRepository extends BaseRepository
 {
+
+    /**
+     * @return string
+     */
+
     public function getClassName()
     {
+
         return 'App\Models\TicketTemplate';
+
     }
+
+    /**
+     * @return mixed
+     */
 
     public function all()
     {
+
         return TicketTemplate::scope()->get();
+
     }
+
+    /**
+     * @param null $filter
+     * @param bool $userId
+     * @return mixed
+     */
 
     public function find($filter = null, $userId = false)
     {
@@ -32,24 +51,30 @@ class TicketTemplateRepository extends BaseRepository
                 'ticket_templates.created_at'
             );
 
-        if ($userId) {
+        if ($userId)
             $query->where('ticket_templates.user_id', '=', $userId);
-        }
 
-        return $query;
+            return $query;
+
     }
+
+    /**
+     * @param $input
+     * @param bool $ticketTemplate
+     * @return bool|mixed
+     */
 
     public function save($input, $ticketTemplate = false)
     {
-        if (! $ticketTemplate) {
+        if (! $ticketTemplate)
             $ticketTemplate = TicketTemplate::createNew();
-        }
+
 
         $ticketTemplate->fill($input);
+
         $ticketTemplate->save();
 
-
-        return $ticketTemplate;
+            return $ticketTemplate;
     }
 
 }

@@ -2940,6 +2940,10 @@ $LANG = array(
     'ticket_template' => 'Ticket Templates',
     'updated_ticket_template' => 'Updated Ticket Template',
     'created_ticket_template' => 'Created Ticket Template',
+    'archive_ticket_template' => 'Archive Template',
+    'restore_ticket_template' => 'Restore Template',
+    'archived_ticket_template' => 'Successfully archived template',
+    'restored_ticket_template' => 'Successfully restored template',
 
 );
 
