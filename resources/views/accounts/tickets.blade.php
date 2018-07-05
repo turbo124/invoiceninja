@@ -201,19 +201,21 @@
                        ->value(1) !!}
 
                 </div>
+
+                <center>
+                    {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk')) !!}
+                </center>
             </div>
 
-
-            <center>
-                {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk')) !!}
-            </center>
 
             {!! Button::primary(trans('texts.add_template'))
             ->asLinkTo(URL::to('/ticket_template/create'))
             ->withAttributes(['class' => 'pull-right'])
             ->appendIcon(Icon::create('plus-sign')) !!}
+
         </div>
         {!! Former::close() !!}
+
     </div>
 
         @include('partials.bulk_form', ['entityType' => ENTITY_TICKET_TEMPLATE])
