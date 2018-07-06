@@ -64,11 +64,12 @@
                                 {!! Former::text('local_part')
                                         ->placeholder('texts.local_part_placeholder')
                                         ->label(trans('texts.local_part'))
-                                        ->help('local_part_help') !!}
+                                        ->help('texts.local_part_help') !!}
 
                                 {!! Former::text('from_name')
                                         ->placeholder('texts.from_name_placeholder')
-                                        ->label(trans('texts.from_name')) !!}
+                                        ->label(trans('texts.from_name'))
+                                        ->help('texts.from_name_help')!!}
 
                             </div>
 

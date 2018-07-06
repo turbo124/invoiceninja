@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Ticket;
 use App\Ninja\Datatables\TicketTemplateDatatable;
 use App\Ninja\Repositories\TicketTemplateRepository;
 
@@ -57,5 +58,24 @@ class TicketTemplateService extends BaseService
 
             return $this->datatableService->createDatatable($datatable, $query);
 
+    }
+
+    public function processVariables($template, array $data)
+    {
+
+    }
+
+    private function getVariables(Ticket $ticket)
+    {
+        return [
+            '$ticket_number' => $ticket->ticket_number,
+            '$ticket_status' => $ticket->status->name,
+            '$client' => $ticket->client->getDisplayName(),
+            '$contact' => $ticket->getContactName(),
+            '$priority' => $ticket->getPriorityName(),
+            '$due_date' => $ticket->getDueDate(),
+            '$agent' => $ticket->agent(),
+
+        ];
     }
 }

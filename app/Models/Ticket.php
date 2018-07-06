@@ -259,11 +259,11 @@ class Ticket extends EntityModel
 
         $ticket = Ticket::whereAccountId($accountId)->withTrashed()->orderBy('ticket_number', 'DESC')->first();
 
-        if ($ticket) {
+        if ($ticket) 
             return max($ticket->ticket_number + 1, $ticket->account->account_ticket_settings->ticket_number_start);
-        } else {
+        else
             return 1;
-        }
+
     }
 
 }
