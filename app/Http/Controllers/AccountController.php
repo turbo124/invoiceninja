@@ -23,6 +23,7 @@ use App\Models\License;
 use App\Models\PaymentTerm;
 use App\Models\Product;
 use App\Models\TaxRate;
+use App\Models\TicketTemplate;
 use App\Models\User;
 use App\Models\AccountEmailSettings;
 use App\Ninja\Mailers\ContactMailer;
@@ -529,6 +530,7 @@ class AccountController extends BaseController
         $data = [
             'account' => Auth::user()->account,
             'account_ticket_settings' => Auth::user()->account->account_ticket_settings,
+            'templates' => TicketTemplate::scope()->get(),
             'title' => trans('texts.ticket_settings'),
             'section' => ACCOUNT_TICKETS,
         ];
