@@ -1,1 +1,5 @@
-{{ nl2br($text) }}
+@extends('emails.master')
+
+@section('body')
+{{$body}}
+@stop
