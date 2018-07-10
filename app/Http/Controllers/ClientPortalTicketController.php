@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Libraries\Utils;
 use App\Models\Invitation;
+use App\Models\Ticket;
 use App\Ninja\Repositories\TicketRepository;
+use App\Services\TicketService;
+
 
 class ClientPortalTicketController extends ClientPortalController
 {
 
     private $ticketRepo;
 
-    public function __construct(TicketRepository $ticketRepo)
+    private $ticketService;
+
+    public function __construct(TicketRepository $ticketRepo, TicketService $ticketService)
     {
         $this->ticketRepo = $ticketRepo;
+        $this->ticketService = $ticketService;
     }
 
     public function index()
@@ -32,14 +39,23 @@ class ClientPortalTicketController extends ClientPortalController
         $data = [
             'color' => $color,
             'account' => $account,
-            'title' => trans('texts.credits'),
-            'entityType' => ENTITY_CREDIT,
-            'columns' => Utils::trans(['credit_date', 'credit_amount', 'credit_balance', 'notes']),
+            'title' => trans('texts.tickets'),
+            'entityType' => ENTITY_TICKET,
+            'columns' => Utils::trans(['ticket_number', 'subject', 'created_at', 'status']),
             'sortColumn' => 0,
         ];
 
         return response()->view('public_list', $data);
 
+    }
+
+    public function ticketDatatable()
+    {
+        if (! $contact = $this->getContact()) {
+            return false;
+        }
+
+        return $this->ticketService->getClientDatatable($contact->client->id);
     }
 
     public function viewTicket($invitationKey)
@@ -57,9 +73,22 @@ class ClientPortalTicketController extends ClientPortalController
             'ticketInvitation' => $invitation,
         ];
 
-
             return view('invited.ticket', $data);
 
+    }
+
+    public function view($ticketid)
+    {
+        if (! $contact = $this->getContact())
+            $this->returnError();
+
+        $account = $contact->account;
+
+        $ticket = Ticket::whereAccountId($account->id)->where('id', '=', Ticket::getPrivateId($ticketid))->get();
+
+        dd($ticket);
+
+        //what is the best way to harvest the ticket? via invitation?
     }
 
 }

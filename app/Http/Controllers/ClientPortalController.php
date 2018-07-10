@@ -640,7 +640,7 @@ class ClientPortalController extends BaseController
         ]);
     }
 
-    private function getContact()
+    public function getContact()
     {
         $contactKey = session('contact_key');
 
@@ -1047,4 +1047,6 @@ class ClientPortalController extends BaseController
         return view('clients.statement', $data);
 
     }
+
+
 }

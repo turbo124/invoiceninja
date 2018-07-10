@@ -1,8 +1,11 @@
 <?php
 namespace App\Services;
 use App\Jobs\Ticket\TicketSendNotificationEmail;
+use App\Libraries\Utils;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Ninja\Repositories\TicketRepository;
+use Illuminate\Support\Facades\DB;
+use DataTable;
 
 /**
  * Class ticketService.
@@ -78,6 +81,40 @@ class TicketService extends BaseService
 
             return $this->datatableService->createDatatable($datatable, $query);
 
+    }
+
+    public function getClientDatatable($clientId)
+    {
+        $query = DB::table('tickets')
+            ->leftjoin('ticket_statuses', 'tickets.status_id', '=', 'ticket_statuses.id')
+            ->where('tickets.client_id', '=', $clientId)
+            ->where('tickets.is_deleted', '=', false)
+            ->select(
+                'tickets.description',
+                'tickets.subject',
+                'tickets.ticket_number',
+                'tickets.created_at',
+                'tickets.updated_at',
+                'tickets.deleted_at',
+                'tickets.is_deleted',
+                'ticket_statuses.name as ticketStatus'
+            );
+
+        $table = \Datatable::query($query)
+            ->addColumn('ticket_number', function ($model) {
+                return link_to('/client/tickets/'.$model->ticket_number, $model->ticket_number)->toHtml();
+            })
+            ->addColumn('subject', function ($model) {
+                return $model->subject;
+            })
+            ->addColumn('created_at', function ($model) {
+                return Utils::fromSqlDateTime($model->created_at);
+            })
+            ->addColumn('status', function ($model) {
+                return $model->ticketStatus;
+            });
+
+        return $table->make();
     }
 
     /**

@@ -121,7 +121,7 @@
                     @endif
                     @if(isset($account) && $account->enable_client_portal_dashboard)
                         <li {!! Request::is('*client/tickets') ? 'class="active"' : '' !!}>
-                            {!! link_to('/client/tickets', trans('texts.tickets') ) !!}
+                            {!! link_to('client/tickets', trans('texts.tickets') ) !!}
                         </li>
                     @endif
                     @if ($account->enable_portal_password && request()->contact->password)
