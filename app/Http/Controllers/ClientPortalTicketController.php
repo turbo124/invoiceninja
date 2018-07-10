@@ -86,9 +86,16 @@ class ClientPortalTicketController extends ClientPortalController
 
         $ticket = Ticket::whereAccountId($account->id)->where('id', '=', Ticket::getPrivateId($ticketid))->get();
 
-        dd($ticket);
+        $ticket->load('status', 'comments', 'account', 'agent', 'documents', 'contact');
 
-        //what is the best way to harvest the ticket? via invitation?
+        //dd($ticket);
+
+        $data = [
+            'ticket' => $ticket,
+        ];
+
+
+        return view('tickets.portal.ticket_view', $data);
     }
 
 }
