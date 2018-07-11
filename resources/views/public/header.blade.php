@@ -120,7 +120,7 @@
                         </li>
                     @endif
                     @if(isset($account) && $account->enable_client_portal_dashboard)
-                        <li {!! Request::is('*client/tickets') ? 'class="active"' : '' !!}>
+                        <li {!! Request::is('*client/tickets*') ? 'class="active"' : '' !!}>
                             {!! link_to('client/tickets', trans('texts.tickets') ) !!}
                         </li>
                     @endif

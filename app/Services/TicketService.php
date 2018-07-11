@@ -91,6 +91,7 @@ class TicketService extends BaseService
             ->where('tickets.is_deleted', '=', false)
             ->select(
                 'tickets.description',
+                'tickets.public_id',
                 'tickets.subject',
                 'tickets.ticket_number',
                 'tickets.created_at',
@@ -102,7 +103,7 @@ class TicketService extends BaseService
 
         $table = \Datatable::query($query)
             ->addColumn('ticket_number', function ($model) {
-                return link_to('/client/tickets/'.$model->ticket_number, $model->ticket_number)->toHtml();
+                return link_to('/client/tickets/'.$model->public_id, $model->ticket_number)->toHtml();
             })
             ->addColumn('subject', function ($model) {
                 return $model->subject;

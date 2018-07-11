@@ -84,14 +84,19 @@ class ClientPortalTicketController extends ClientPortalController
 
         $account = $contact->account;
 
-        $ticket = Ticket::whereAccountId($account->id)->where('id', '=', Ticket::getPrivateId($ticketid))->get();
+        $ticket = Ticket::whereAccountId($account->id)
+                            ->where('id', '=', Ticket::getPrivateId($ticketid))
+                            ->with('status', 'comments', 'documents')
+                            ->first();
 
-        $ticket->load('status', 'comments', 'account', 'agent', 'documents', 'contact');
-
-        //dd($ticket);
 
         $data = [
+            'color' => $account->primary_color ? $account->primary_color : '#0b4d78',
             'ticket' => $ticket,
+            'contact' => $contact,
+            'account' => $account,
+            //'title' => trans('texts.ticket')." ".$ticket->ticket_number,
+            'entityType' => ENTITY_TICKET,
         ];
 
 
