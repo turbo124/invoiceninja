@@ -2862,6 +2862,7 @@ $LANG = array(
     'send_notifications_for' => 'Send Notifications For',
     'all_invoices' => 'All Invoices',
     'my_invoices' => 'My Invoices',
+    'ticket' => 'Ticket',
     'tickets' => 'Tickets',
     'ticket_number' => 'Ticket #',
     'new_ticket' => 'New Ticket',

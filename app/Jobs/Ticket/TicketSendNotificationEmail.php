@@ -19,12 +19,26 @@ class TicketSendNotificationEmail extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
 
+    /**
+     * @var Ticket
+     */
     protected $ticket;
 
+    /**
+     * @var array
+     */
     protected $ticketData;
 
+    /**
+     * @var mixed
+     */
     protected $server;
 
+    /**
+     * TicketSendNotificationEmail constructor.
+     * @param array $ticketData
+     * @param Ticket $ticket
+     */
     public function __construct(array $ticketData, Ticket $ticket)
     {
         $this->ticket = $ticket;
@@ -32,6 +46,9 @@ class TicketSendNotificationEmail extends Job implements ShouldQueue
         $this->server = config('database.default');
     }
 
+    /**
+     * @param TicketMailer $mailer
+     */
     public function handle(TicketMailer $mailer)
     {
         //harvest list of contacts to email;

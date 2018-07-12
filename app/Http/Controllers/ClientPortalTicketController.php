@@ -7,21 +7,36 @@ use App\Models\Invitation;
 use App\Models\Ticket;
 use App\Ninja\Repositories\TicketRepository;
 use App\Services\TicketService;
+use Illuminate\Support\Facades\Request;
 
 
 class ClientPortalTicketController extends ClientPortalController
 {
 
+    /**
+     * @var TicketRepository
+     */
     private $ticketRepo;
 
+    /**
+     * @var TicketService
+     */
     private $ticketService;
 
+    /**
+     * ClientPortalTicketController constructor.
+     * @param TicketRepository $ticketRepo
+     * @param TicketService $ticketService
+     */
     public function __construct(TicketRepository $ticketRepo, TicketService $ticketService)
     {
         $this->ticketRepo = $ticketRepo;
         $this->ticketService = $ticketService;
     }
 
+    /**
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         if (! $contact = $this->getContact()) {
@@ -49,6 +64,9 @@ class ClientPortalTicketController extends ClientPortalController
 
     }
 
+    /**
+     * @return bool
+     */
     public function ticketDatatable()
     {
         if (! $contact = $this->getContact()) {
@@ -58,6 +76,10 @@ class ClientPortalTicketController extends ClientPortalController
         return $this->ticketService->getClientDatatable($contact->client->id);
     }
 
+    /**
+     * @param $invitationKey
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function viewTicket($invitationKey)
     {
         if (! $invitation = $this->ticketRepo->findInvitationByKey($invitationKey)) {
@@ -77,7 +99,11 @@ class ClientPortalTicketController extends ClientPortalController
 
     }
 
-    public function view($ticketid)
+    /**
+     * @param $ticketid
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function view($ticketId)
     {
         if (! $contact = $this->getContact())
             $this->returnError();
@@ -85,22 +111,49 @@ class ClientPortalTicketController extends ClientPortalController
         $account = $contact->account;
 
         $ticket = Ticket::whereAccountId($account->id)
-                            ->where('id', '=', Ticket::getPrivateId($ticketid))
+                            ->where('id', '=', Ticket::getPrivateId($ticketId))
+                            ->where('is_internal', '=', false)
                             ->with('status', 'comments', 'documents')
                             ->first();
 
+        if(!$ticket)
+            $this->returnError();
 
-        $data = [
-            'color' => $account->primary_color ? $account->primary_color : '#0b4d78',
-            'ticket' => $ticket,
-            'contact' => $contact,
-            'account' => $account,
-            //'title' => trans('texts.ticket')." ".$ticket->ticket_number,
-            'entityType' => ENTITY_TICKET,
-        ];
+        $data['method'] = 'PUT';
+        $data['entityType'] = ENTITY_TICKET;
 
+        $data = array_merge($data, self::getViewModel($contact, $ticket));
 
         return view('tickets.portal.ticket_view', $data);
     }
+
+    /**
+     *
+     */
+    public function update(Request $request)
+    {
+        $data = $request->input();
+        $data['document_ids'] = $request->document_ids;
+
+        $ticket = $this->ticketService->save($data, $request->entity());
+    }
+
+
+    private static function getViewModel($contact, $ticket = false)
+    {
+
+        return [
+            'color' => $contact->account->primary_color ? $contact->account->primary_color : '#0b4d78',
+            'ticket' => $ticket,
+            'contact' => $contact,
+            'account' => $ticket->account,
+            'title' => trans('texts.ticket')." ".$ticket->ticket_number,
+            'comments' => $ticket->comments(),
+            'url' => 'client/tickets/' . $ticket->public_id,
+            'timezone' => $ticket->account->timezone ? $ticket->account->timezone->name : DEFAULT_TIMEZONE,
+            'datetimeFormat' => $contact->account->getMomentDateTimeFormat(),
+        ];
+    }
+
 
 }

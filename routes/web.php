@@ -45,6 +45,7 @@ Route::group(['middleware' => ['lookup:contact', 'auth:client']], function () {
     Route::get('client/payments', 'ClientPortalController@paymentIndex');
     Route::get('client/tickets', 'ClientPortalTicketController@index');
     Route::get('client/tickets/{ticketId}', 'ClientPortalTicketController@view');
+    Route::put('client/tickets/{ticketId}', 'ClientPortalTicketController@update');
     Route::get('client/tasks', 'ClientPortalController@taskIndex');
     Route::get('client/dashboard/{contact_key?}', 'ClientPortalController@dashboard');
     Route::get('client/documents/js/{documents}/{filename}', 'ClientPortalController@getDocumentVFSJS');
