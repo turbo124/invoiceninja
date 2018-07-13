@@ -77,8 +77,12 @@
 
     <div class="row">
         <center class="buttons">
+            @if($ticket->status->id == 3)
+            {!! Button::warning(trans('texts.ticket_reopen'))->large() !!}
+            @else
             {!! Button::danger(trans('texts.ticket_close'))->large() !!}
             {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+            @endif
         </center>
     </div>
 

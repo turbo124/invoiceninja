@@ -39,20 +39,16 @@ class ClientPortalTicketController extends ClientPortalController
      */
     public function index()
     {
-        if (! $contact = $this->getContact()) {
+        $contact = $this->getContact();
+
+        if ((!$contact || (!$contact->account->enable_client_portal)))
             return $this->returnError();
-        }
 
-        $account = $contact->account;
 
-        if (! $account->enable_client_portal) {
-            return $this->returnError();
-        }
-
-        $color = $account->primary_color ? $account->primary_color : '#0b4d78';
+       $account = $contact->account;
 
         $data = [
-            'color' => $color,
+            'color' => $account->primary_color ? $account->primary_color : '#0b4d78',
             'account' => $account,
             'title' => trans('texts.tickets'),
             'entityType' => ENTITY_TICKET,
