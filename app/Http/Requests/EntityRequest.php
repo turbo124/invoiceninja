@@ -46,10 +46,16 @@ class EntityRequest extends Request
             return null;
         }
 
+        //support client portal side Scopes
+        $accountId = false;
+
+        if(Input::get('account_id'))
+            $accountId = Input::get('account_id');
+
         if (method_exists($class, 'trashed')) {
-            $this->entity = $class::scope($publicId)->withTrashed()->firstOrFail();
+            $this->entity = $class::scope($publicId, $accountId)->withTrashed()->firstOrFail();
         } else {
-            $this->entity = $class::scope($publicId)->firstOrFail();
+            $this->entity = $class::scope($publicId, $accountId)->firstOrFail();
         }
 
         return $this->entity;

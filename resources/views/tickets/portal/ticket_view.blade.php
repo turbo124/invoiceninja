@@ -24,6 +24,8 @@
 
     <div style="display:none">
         {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
+        {!! Former::hidden('account_id')->value($ticket->account_id) !!}
+        {!! Former::hidden('public_id')->value($ticket->public_id) !!}
     </div>
 
     <div class="panel panel-default">

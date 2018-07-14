@@ -115,6 +115,19 @@ class EntityModel extends Eloquent
         }
     }
 
+    public static function getPortalPrivateId($publicId, $accountId)
+    {
+        if(! $publicId)
+            return null;
+
+        $className = get_called_class();
+
+        if(method_exists($className, 'trashed'))
+            return $className::scope($publicId, $accountId)->withTrashed()->value('id');
+        else
+            return $className::scope($publicId, $accountId)->value('id');
+    }
+
     /**
      * @return string
      */

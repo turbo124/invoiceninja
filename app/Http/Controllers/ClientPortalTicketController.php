@@ -7,7 +7,6 @@ use App\Libraries\Utils;
 use App\Models\Ticket;
 use App\Ninja\Repositories\TicketRepository;
 use App\Services\TicketService;
-use Illuminate\Http\Request;
 
 
 class ClientPortalTicketController extends ClientPortalController
@@ -107,7 +106,7 @@ class ClientPortalTicketController extends ClientPortalController
         $account = $contact->account;
 
         $ticket = Ticket::whereAccountId($account->id)
-                            ->where('id', '=', Ticket::getPrivateId($ticketId))
+                            ->where('id', '=', Ticket::getPortalPrivateId($ticketId, $account->id))
                             ->where('is_internal', '=', false)
                             ->with('status', 'comments', 'documents')
                             ->first();
@@ -136,7 +135,9 @@ class ClientPortalTicketController extends ClientPortalController
 
         $ticket = $this->ticketService->save($data, $request->entity());
 
-        return $this->view($ticket->id);
+        Session::reflash();
+
+        return redirect("tickets/$request->public_id/edit");
     }
 
 
