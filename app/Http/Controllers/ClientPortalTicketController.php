@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateClientPortalTicketRequest;
 use App\Libraries\Utils;
-use App\Models\Invitation;
 use App\Models\Ticket;
 use App\Ninja\Repositories\TicketRepository;
 use App\Services\TicketService;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 
 class ClientPortalTicketController extends ClientPortalController
@@ -126,12 +126,17 @@ class ClientPortalTicketController extends ClientPortalController
     /**
      *
      */
-    public function update(Request $request)
+    public function update(UpdateClientPortalTicketRequest $request)
     {
+        $contact = $this->getContact();
+
         $data = $request->input();
         $data['document_ids'] = $request->document_ids;
+        $data['contact_key'] = $contact->contact_key;
 
         $ticket = $this->ticketService->save($data, $request->entity());
+
+        return $this->view($ticket->id);
     }
 
 
