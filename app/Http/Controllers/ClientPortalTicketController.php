@@ -139,12 +139,12 @@ class ClientPortalTicketController extends ClientPortalController
 
         $ticket = $this->ticketService->save($data, $request->entity());
 
-
+        if(!$ticket)
+            $this->returnError();
 
         $data = array_merge($data, self::getViewModel($contact, $ticket));
 
-        $message = trans('texts.updated_ticket');
-        Session::flash('message', $message);
+        Session::flash('message', trans('texts.updated_ticket'));
 
         return view('tickets.portal.ticket_view', $data);
     }

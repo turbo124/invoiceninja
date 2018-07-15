@@ -39,6 +39,8 @@ class Ticket extends EntityModel
         'status_id',
         'contact_key',
         'ticket_number',
+        'reopened',
+        'closed',
     ];
 
     /**

@@ -26,6 +26,9 @@
         {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
         {!! Former::hidden('account_id')->value($ticket->account_id) !!}
         {!! Former::hidden('public_id')->value($ticket->public_id) !!}
+        {!! Former::hidden('status_id')->value($ticket->status_id)->id('status_id') !!}
+        {!! Former::hidden('closed')->value($ticket->closed)->id('closed') !!}
+        {!! Former::hidden('reopened')->value($ticket->reopened)->id('reopened') !!}
     </div>
 
     <div class="panel panel-default">
@@ -53,6 +56,12 @@
                 </td>
             </tr>
         </table>
+    </div>
+
+    <div style="height:80px;">
+        <div class="pull-right">
+            {!! Button::info(trans('texts.show_hide_all'))->large()->withAttributes(['onclick' => 'toggleAllComments()']) !!}
+        </div>
     </div>
 
     <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
@@ -256,14 +265,20 @@
         function reopenAction() {
 
             if(checkCommentText('{{ trans('texts.reopen_reason') }}')){
-
+                $('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#closed').val(null);
+                $('#status_id').val(2);
+                $('.main-form').submit();
             }
 
         }
 
         function closeAction() {
             if(checkCommentText('{{ trans('texts.close_reason') }}')) {
-
+                $('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#reopened').val(null);
+                $('#status_id').val(3);
+                $('.main-form').submit();
             }
 
         }
@@ -281,6 +296,10 @@
             }
 
 
+        }
+
+        function toggleAllComments() {
+            $(".ui-accordion-content").toggle();
         }
 
     </script>

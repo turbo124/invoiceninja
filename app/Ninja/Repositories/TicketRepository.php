@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\Ticket;
 use App\Models\TicketComment;
 use App\Models\TicketInvitation;
+use App\Models\TicketStatus;
 use Auth;
 use DB;
 use Utils;
@@ -80,6 +81,10 @@ class TicketRepository extends BaseRepository
         if(isset($input['comment']) && strlen($input['comment']) >=1) {
             $ticketComment = TicketComment::createNew($ticket);
             $ticketComment->description = $input['comment'];
+
+            if(isset($input['contact_key']))
+                $ticketComment->contact_key = $input['contact_key'];
+
             $ticket->comments()->save($ticketComment);
 
             //todo fire notification here:
