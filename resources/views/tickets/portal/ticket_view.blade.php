@@ -80,9 +80,9 @@
     <div class="row">
         <center class="buttons">
             @if($ticket->status->id == 3)
-            {!! Button::warning(trans('texts.ticket_reopen'))->large() !!}
+            {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
             @else
-            {!! Button::danger(trans('texts.ticket_close'))->large() !!}
+            {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
             {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
             @endif
         </center>
@@ -131,6 +131,37 @@
 
     {!! Former::close() !!}
 
+
+
+    <!--
+   Modals
+    -->
+
+
+
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="error" aria-hidden="true">
+        <div class="modal-dialog" style="min-width:150px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="recurringModalLabel">{{ trans('texts.error_title') }}</h4>
+                </div>
+
+                <div class="container" style="width: 100%; padding-bottom: 0px !important">
+                    <div class="panel panel-default">
+                        <div class="panel-body" id="ticket_message">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">{{ trans('texts.close') }}</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script type="text/javascript">
 
         <!-- Initialize ticket_comment accordion -->
@@ -144,25 +175,6 @@
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
         } );
-
-        // Add moment support to the datetimepicker
-        Date.parseDate = function( input, format ){
-            return moment(input, format).toDate();
-        };
-        Date.prototype.dateFormat = function( format ){
-            return moment(this).format(format);
-        };
-
-        <!-- Initialize date time picker for due date -->
-        jQuery('#due_date').datetimepicker({
-            lazyInit: true,
-            validateOnBlur: false,
-            step: '{{ env('TASK_TIME_STEP', 15) }}',
-            value: '{{ $ticket->getDueDate() }}',
-            format: '{{ $datetimeFormat }}',
-            formatDate: '{{ $account->getMomentDateFormat() }}',
-            formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
-        });
 
 
         <!-- Initialize drop zone file uploader -->
@@ -234,10 +246,42 @@
         }
 
         function submitAction() {
-            $('.main-form').submit();
+
+            if(checkCommentText('{{ trans('texts.enter_ticket_message') }}')) {
+                $('.main-form').submit();
+            }
+
         }
 
+        function reopenAction() {
 
+            if(checkCommentText('{{ trans('texts.reopen_reason') }}')){
+
+            }
+
+        }
+
+        function closeAction() {
+            if(checkCommentText('{{ trans('texts.close_reason') }}')) {
+
+            }
+
+        }
+
+        function checkCommentText(errorString) {
+
+            if( $('#comment').val().length < 1 ) {
+                $('#ticket_message').text(errorString);
+                $('#errorModal').modal('show');
+
+                return false;
+            }
+            else {
+                return true;
+            }
+
+
+        }
 
     </script>
 

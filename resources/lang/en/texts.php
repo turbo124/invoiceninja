@@ -2947,6 +2947,10 @@ $LANG = array(
     'restore_ticket_template' => 'Restore Template',
     'archived_ticket_template' => 'Successfully archived template',
     'restored_ticket_template' => 'Successfully restored template',
+    'close_reason' => 'Let us know why you are closing this ticket',
+    'reopen_reason' => 'Les us know why you are reopening this ticket',
+    'enter_ticket_message' => 'Please enter a message to update the ticket',
+
 
 );
 

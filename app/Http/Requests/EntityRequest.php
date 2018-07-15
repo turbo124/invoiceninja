@@ -46,7 +46,7 @@ class EntityRequest extends Request
             return null;
         }
 
-        //support client portal side Scopes
+        //Support Client Portal Scopes
         $accountId = false;
 
         if(Input::get('account_id'))

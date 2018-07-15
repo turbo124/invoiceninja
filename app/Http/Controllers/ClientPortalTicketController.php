@@ -7,6 +7,7 @@ use App\Libraries\Utils;
 use App\Models\Ticket;
 use App\Ninja\Repositories\TicketRepository;
 use App\Services\TicketService;
+use Illuminate\Support\Facades\Session;
 
 
 class ClientPortalTicketController extends ClientPortalController
@@ -130,14 +131,22 @@ class ClientPortalTicketController extends ClientPortalController
         $contact = $this->getContact();
 
         $data = $request->input();
+
         $data['document_ids'] = $request->document_ids;
         $data['contact_key'] = $contact->contact_key;
+        $data['method'] = 'PUT';
+        $data['entityType'] = ENTITY_TICKET;
 
         $ticket = $this->ticketService->save($data, $request->entity());
 
-        Session::reflash();
 
-        return redirect("tickets/$request->public_id/edit");
+
+        $data = array_merge($data, self::getViewModel($contact, $ticket));
+
+        $message = trans('texts.updated_ticket');
+        Session::flash('message', $message);
+
+        return view('tickets.portal.ticket_view', $data);
     }
 
 
