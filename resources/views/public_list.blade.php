@@ -49,6 +49,13 @@
             </div>
         @endif
 
+        @if($entityType == ENTITY_TICKET)
+            {!! Button::primary(trans('texts.new_ticket'))
+            ->asLinkTo(URL::to('/client/tickets/create'))
+            ->withAttributes(['class' => 'pull-right'])
+            ->appendIcon(Icon::create('plus-sign')) !!}
+        @endif
+
         <h3>{{ $title }}</h3>
 
 		{!! Datatable::table()

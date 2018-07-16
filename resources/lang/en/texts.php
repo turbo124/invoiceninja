@@ -2951,7 +2951,7 @@ $LANG = array(
     'reopen_reason' => 'Les us know why you are reopening this ticket',
     'enter_ticket_message' => 'Please enter a message to update the ticket',
     'show_hide_all' => 'Show / Hide all',
-
+    'subject_required' => 'Subject required',
 
 
 );

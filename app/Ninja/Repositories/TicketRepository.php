@@ -2,11 +2,13 @@
 
 namespace App\Ninja\Repositories;
 
+use App\Models\Contact;
 use App\Models\Document;
 use App\Models\Ticket;
 use App\Models\TicketComment;
 use App\Models\TicketInvitation;
 use App\Models\TicketStatus;
+use App\Models\User;
 use Auth;
 use DB;
 use Utils;
@@ -71,16 +73,28 @@ class TicketRepository extends BaseRepository
     public function save($input, $ticket = false)
     {
         if (! $ticket) {
-            $ticket = Ticket::createNew();
+
+            $user = false;
+
+            if($contact = Contact::where('contact_key', '=', $input['contact_key'])->first()) {
+                //if client is creating the ticket, we need to harvest the ticket_master_user
+                $ticket = Ticket::createNew($user = User::where('id', '=', $contact->account->account_ticket_settings->ticket_master_id)->first());
+                $ticket->client_id = $contact->client_id;
+                $ticket->agent_id = $user->id;
+                $ticket->ticket_number = Ticket::getNextTicketNumber($contact->account->id);
+                $ticket->priority_id = TICKET_PRIORITY_LOW;
+            }
+            else
+                $ticket = Ticket::createNew();
         }
 
         $ticket->fill($input);
         $ticket->save();
 
         /* handle new comment */
-        if(isset($input['comment']) && strlen($input['comment']) >=1) {
+        if(isset($input['description']) && strlen($input['description']) >=1) {
             $ticketComment = TicketComment::createNew($ticket);
-            $ticketComment->description = $input['comment'];
+            $ticketComment->description = $input['description'];
 
             if(isset($input['contact_key']))
                 $ticketComment->contact_key = $input['contact_key'];
@@ -115,7 +129,7 @@ class TicketRepository extends BaseRepository
         }
 
         if (! $found)
-            $this->createTicketInvite($ticket, $ticket->contact->id);
+            $this->createTicketInvite($ticket, $ticket->contact->id, $user);
 
 
         /*
@@ -132,9 +146,13 @@ class TicketRepository extends BaseRepository
         return $ticket;
     }
 
-    private function createTicketInvite($ticket, $contactId) {
+    private function createTicketInvite($ticket, $contactId, $user = false) {
 
-        $ticketInvitation = TicketInvitation::createNew();
+        if($user)
+            $ticketInvitation = TicketInvitation::createNew($user);
+        else
+            $ticketInvitation = TicketInvitation::createNew();
+
         $ticketInvitation->ticket_id = $ticket->id;
         $ticketInvitation->contact_id = $contactId;
         $ticketInvitation->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));

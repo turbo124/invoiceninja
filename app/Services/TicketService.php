@@ -61,7 +61,7 @@ class TicketService extends BaseService
     public function save($data, $ticket = false)
     {
 
-        $this->processTicket($data, $ticket);
+        //$this->processTicket($data, $ticket); //todo after CRUD
 
             return $this->ticketRepo->save($data, $ticket);
 

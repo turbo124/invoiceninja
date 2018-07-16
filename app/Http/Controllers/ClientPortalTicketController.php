@@ -7,6 +7,7 @@ use App\Libraries\Utils;
 use App\Models\Ticket;
 use App\Ninja\Repositories\TicketRepository;
 use App\Services\TicketService;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 
 
@@ -109,10 +110,10 @@ class ClientPortalTicketController extends ClientPortalController
         $ticket = Ticket::whereAccountId($account->id)
                             ->where('id', '=', Ticket::getPortalPrivateId($ticketId, $account->id))
                             ->where('is_internal', '=', false)
-                            ->with('status', 'comments', 'documents')
+                            ->with('status', 'comments', 'documents', 'account')
                             ->first();
 
-        if(!$ticket)
+
             $this->returnError();
 
         $data['method'] = 'PUT';
@@ -149,6 +150,39 @@ class ClientPortalTicketController extends ClientPortalController
         return view('tickets.portal.ticket_view', $data);
     }
 
+    public function create()
+    {
+
+        if (! $contact = $this->getContact())
+            $this->returnError();
+
+        $data['method'] = 'POST';
+        $data['entityType'] = ENTITY_TICKET;
+
+        $data = array_merge($data, self::getViewModel($contact));
+
+        return view('tickets.portal.ticket_view', $data);
+
+    }
+
+    public function store(UpdateClientPortalTicketRequest $request)
+    {
+
+        if (! $contact = $this->getContact())
+            $this->returnError();
+
+        $data = $request->input();
+
+        $data['document_ids'] = $request->document_ids;
+        $data['contact_key'] = $contact->contact_key;
+
+        $ticket = $this->ticketService->save($data, $request->entity());
+
+        Session::flash('message', trans('texts.updated_ticket'));
+
+        return Redirect::to('/client/tickets/'.$ticket->public_id);
+    }
+
 
     private static function getViewModel($contact, $ticket = false)
     {
@@ -157,11 +191,11 @@ class ClientPortalTicketController extends ClientPortalController
             'color' => $contact->account->primary_color ? $contact->account->primary_color : '#0b4d78',
             'ticket' => $ticket,
             'contact' => $contact,
-            'account' => $ticket->account,
-            'title' => trans('texts.ticket')." ".$ticket->ticket_number,
-            'comments' => $ticket->comments(),
-            'url' => 'client/tickets/' . $ticket->public_id,
-            'timezone' => $ticket->account->timezone ? $ticket->account->timezone->name : DEFAULT_TIMEZONE,
+            'account' => $contact->account,
+            'title' => $ticket ? trans('texts.ticket')." ".$ticket->ticket_number : trans('texts.new_ticket'),
+            'comments' => $ticket ? $ticket->comments() :null,
+            'url' => $ticket ? 'client/tickets/' . $ticket->public_id : 'client/tickets/create',
+            //'timezone' => $ticket ? $ticket->account->timezone->name : DEFAULT_TIMEZONE,
             'datetimeFormat' => $contact->account->getMomentDateTimeFormat(),
         ];
     }

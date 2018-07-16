@@ -1,13 +1,19 @@
 @extends('public.header')
 
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+@section('content')
+    @parent
+    <link href="{{ asset('css/quill.snow.css') }}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
 
-    <style>
+    <style type="text/css">
+        textarea {
+            min-height: 150px !important;
+        }
+
         .td-left {width:1%; white-space:nowrap; text-align: right;}
         #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
     </style>
-
-@section('content')
 
     {!! Former::open($url)
             ->addClass('col-lg-10 col-lg-offset-1 warn-on-exit main-form')
@@ -16,6 +22,7 @@
             ->rules([
                 'name' => 'required',
                 'client_id' => 'required',
+                'subject' => 'required',
             ]) !!}
 
     @if ($ticket)
@@ -24,13 +31,19 @@
 
     <div style="display:none">
         {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
-        {!! Former::hidden('account_id')->value($ticket->account_id) !!}
+        {!! Former::hidden('account_id')->value($account->id) !!}
+        {!! Former::hidden('category_id')->value(1) !!}
+        {!! Former::hidden('status_id')->value(1) !!}
+        @if($ticket)
         {!! Former::hidden('public_id')->value($ticket->public_id) !!}
         {!! Former::hidden('status_id')->value($ticket->status_id)->id('status_id') !!}
         {!! Former::hidden('closed')->value($ticket->closed)->id('closed') !!}
         {!! Former::hidden('reopened')->value($ticket->reopened)->id('reopened') !!}
+        {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
+        @endif
     </div>
 
+    @if($ticket)
     <div class="panel panel-default">
         <table width="100%">
             <tr>
@@ -57,7 +70,9 @@
             </tr>
         </table>
     </div>
+    @endif
 
+    @if($ticket)
     <div style="height:80px;">
         <div class="pull-right">
             {!! Button::info(trans('texts.show_hide_all'))->large()->withAttributes(['onclick' => 'toggleAllComments()']) !!}
@@ -74,37 +89,64 @@
             </div>
         @endforeach
     </div>
+    @endif
 
-    <div class="panel-default" style="margin-top:30px; width: 100%; padding-bottom: 0px !important">
+    <div class="panel panel-default" style="margin-top:30px; padding-bottom: 0px !important">
         <div class="panel-heading">
-            <h3 class="panel-title">{!! trans('texts.reply') !!}</h3>
+            <h3 class="panel-title">
+                @if($ticket)
+                    {!! trans('texts.reply') !!}
+                @else
+                    {!! trans('texts.new_ticket') !!}
+                @endif</h3>
         </div>
 
         <div class="panel-body">
-            {!! Former::textarea('comment')->label(null)->style('width: 100%')->rows(10)->forceValue(null) !!}
+
+            @if(!$ticket)
+            {{trans('texts.subject')}}
+            {!! Former::small_text('subject')
+                     ->label('')
+                     ->id('subject')
+                     ->style('width:100%;')
+            !!}
+
+
+            {{ trans('texts.description') }}
+            @endif
+            {!! Former::textarea('description')->label(trans('texts.description'))->style('display:none')->raw() !!}
+
+            <div id="descriptionEditor" class="form-control" style="min-height:160px" onclick="focusEditor()"></div>
+
+            <div class="pull-left">
+                @include('partials/quill_toolbar', ['name' => 'description'])
+            </div>
+
         </div>
 
     </div>
 
-    <div class="row">
-        <center class="buttons">
-            @if($ticket->status->id == 3)
-            {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
-            @else
-            {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
-            {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
-            @endif
-        </center>
-    </div>
+        <div class="row">
+            <center class="buttons">
+                @if($ticket && $ticket->status->id == 3)
+                {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
+                @elseif(!$ticket)
+                {!! Button::primary(trans('texts.ticket_open'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+                @else
+                {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
+                {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+                @endif
+            </center>
+        </div>
 
-    <div role="tabpanel" class="panel-default" style="margin-top:30px;">
+    <div role="tabpanel" class="panel panel-default" style="margin-top:30px;">
 
         <ul class="nav nav-tabs" role="tablist" style="border: none">
             <li role="presentation" class="active"><a href="#linked_objects" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.linked_objects") }}</a></li>
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
                 <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                         {{ trans("texts.documents") }}
-                        @if ($ticket->documents()->count() >= 1)
+                        @if ($ticket && $ticket->documents()->count() >= 1)
                             ({{ $ticket->documents()->count() }})
                         @endif
                     </a></li>
@@ -117,14 +159,14 @@
         <div class="tab-content" style="padding-right:12px;max-width:600px;">
             <div role="tabpanel" class="tab-pane active" id="linked_objects" style="padding-bottom:44px;">
             </div>
-            <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9">
+            <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9;">
                 <div id="document-upload">
                     <div class="dropzone">
                         <div data-bind="foreach: documents">
                             <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
                         </div>
                     </div>
-                    @if ($ticket->documents())
+                    @if ($ticket && $ticket->documents())
                         @foreach($ticket->documents() as $document)
                             <div>{{$document->name}}</div>
                         @endforeach
@@ -136,9 +178,9 @@
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 4) }}
 
-    </div>
+        {!! Former::close() !!}
 
-    {!! Former::close() !!}
+    </div>
 
 
 
@@ -182,6 +224,9 @@
             ko.applyBindings(model);
 
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
+
+
+            $('#description').text('');
 
         } );
 
@@ -285,11 +330,15 @@
 
         function checkCommentText(errorString) {
 
-            if( $('#comment').val().length < 1 ) {
+            if( $('#description').val().length < 1 ) {
                 $('#ticket_message').text(errorString);
                 $('#errorModal').modal('show');
 
                 return false;
+            }
+            else if( $('#subject').val().length < 1 ) {
+                $('#ticket_message').text('{{ trans('texts.subject_required') }}');
+                $('#errorModal').modal('show');
             }
             else {
                 return true;
@@ -300,6 +349,31 @@
 
         function toggleAllComments() {
             $(".ui-accordion-content").toggle();
+        }
+
+
+        var editor = false;
+        $(function() {
+            editor = new Quill('#descriptionEditor', {
+                modules: {
+                    'toolbar': { container: '#descriptionToolbar' },
+                    'link-tooltip': true
+                },
+                theme: 'snow'
+            });
+            editor.setHTML($('#description').val());
+            editor.on('text-change', function(delta, source) {
+                if (source == 'api') {
+                    return;
+                }
+                var html = editor.getHTML();
+                $('#description').val(html);
+                NINJA.formIsChanged = true;
+            });
+        });
+
+        function focusEditor() {
+            editor.focus();
         }
 
     </script>

@@ -38,16 +38,16 @@
                 </div>
                 <div class="panel-body form-padding-right">
 
-
-                        {{trans('texts.name')}}
+                    {{trans('texts.name')}}
                     {!! Former::small_text('name')
                              ->label('')->style('width:100%;')
                     !!}
 
-                        {{ trans('texts.description') }}
+                    {{ trans('texts.description') }}
 
-                        {!! Former::textarea('description')->label(trans('texts.description'))->style('display:none')->raw() !!}
-                        <div id="descriptionEditor" class="form-control" style="min-height:160px" onclick="focusEditor()"></div>
+                    {!! Former::textarea('description')->label(trans('texts.description'))->style('display:none')->raw() !!}
+
+                    <div id="descriptionEditor" class="form-control" style="min-height:160px" onclick="focusEditor()"></div>
 
                     <div class="pull-left">
                         @include('partials/quill_toolbar', ['name' => 'description'])
