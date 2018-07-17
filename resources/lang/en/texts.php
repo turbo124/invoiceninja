@@ -103,6 +103,7 @@ $LANG = array(
           <li>":YEAR+1 yearly subscription" >> "2015 Yearly Subscription"</li>
           <li>"Retainer payment for :QUARTER+1" >> "Retainer payment for Q2"</li>
         </ul>',
+    'recurring_quotes' => 'Recurring Quotes',
     'in_total_revenue' => 'in total revenue',
     'billed_client' => 'billed client',
     'billed_clients' => 'billed clients',
@@ -653,6 +654,8 @@ $LANG = array(
     'current_user' => 'Current User',
     'new_recurring_invoice' => 'New Recurring Invoice',
     'recurring_invoice' => 'Recurring Invoice',
+    'new_recurring_quote' => 'New recurring quote',
+    'recurring_quote' => 'Recurring Quote',
     'recurring_too_soon' => 'It\'s too soon to create the next recurring invoice, it\'s scheduled for :date',
     'created_by_invoice' => 'Created by :invoice',
     'primary_user' => 'Primary User',
@@ -822,6 +825,12 @@ $LANG = array(
     'deleted_recurring_invoice' => 'Successfully deleted recurring invoice',
     'restore_recurring_invoice' => 'Restore Recurring Invoice',
     'restored_recurring_invoice' => 'Successfully restored recurring invoice',
+    'archive_recurring_quote' => 'Archive Recurring Quote',
+    'archived_recurring_quote' => 'Successfully archived recurring quote',
+    'delete_recurring_quote' => 'Delete Recurring Quote',
+    'deleted_recurring_quote' => 'Successfully deleted recurring quote',
+    'restore_recurring_quote' => 'Restore Recurring Quote',
+    'restored_recurring_quote' => 'Successfully restored recurring quote',
     'archived' => 'Archived',
     'untitled_account' => 'Untitled Company',
     'before' => 'Before',
@@ -2952,6 +2961,8 @@ $LANG = array(
     'enter_ticket_message' => 'Please enter a message to update the ticket',
     'show_hide_all' => 'Show / Hide all',
     'subject_required' => 'Subject required',
+    'mobile_refresh_warning' => 'If you\'re using the mobile app you may need to do a full refresh.',
+    'enable_proposals_for_background' => 'To upload a background image :link to enable the proposals module.',
 
 
 );

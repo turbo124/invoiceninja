@@ -19,6 +19,7 @@ if (! defined('APP_NAME')) {
     define('ENTITY_INVOICE_ITEM', 'invoice_item');
     define('ENTITY_INVITATION', 'invitation');
     define('ENTITY_RECURRING_INVOICE', 'recurring_invoice');
+    define('ENTITY_RECURRING_QUOTE', 'recurring_quote');
     define('ENTITY_PAYMENT', 'payment');
     define('ENTITY_CREDIT', 'credit');
     define('ENTITY_QUOTE', 'quote');
@@ -71,6 +72,7 @@ if (! defined('APP_NAME')) {
         ENTITY_TASK,
         ENTITY_VENDOR,
         ENTITY_RECURRING_INVOICE,
+        ENTITY_RECURRING_QUOTE
     ];
 
     define('PERMISSION_ENTITIES', json_encode($permissionEntities));
@@ -380,7 +382,7 @@ if (! defined('APP_NAME')) {
     define('NINJA_APP_URL', env('NINJA_APP_URL', 'https://app.invoiceninja.com'));
     define('NINJA_DOCS_URL', env('NINJA_DOCS_URL', 'http://docs.invoiceninja.com/en/latest'));
     define('NINJA_DATE', '2000-01-01');
-    define('NINJA_VERSION', '4.5.0' . env('NINJA_VERSION_SUFFIX'));
+    define('NINJA_VERSION', '4.5.1' . env('NINJA_VERSION_SUFFIX'));
     define('NINJA_TERMS_VERSION', '1.0.1');
 
     define('SOCIAL_LINK_FACEBOOK', env('SOCIAL_LINK_FACEBOOK', 'https://www.facebook.com/invoiceninja'));
