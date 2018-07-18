@@ -113,9 +113,6 @@ class ClientPortalTicketController extends ClientPortalController
                             ->with('status', 'comments', 'documents', 'account')
                             ->first();
 
-
-            $this->returnError();
-
         $data['method'] = 'PUT';
         $data['entityType'] = ENTITY_TICKET;
 
@@ -139,6 +136,7 @@ class ClientPortalTicketController extends ClientPortalController
         $data['entityType'] = ENTITY_TICKET;
 
         $ticket = $this->ticketService->save($data, $request->entity());
+        $ticket->load('documents');
 
         if(!$ticket)
             $this->returnError();

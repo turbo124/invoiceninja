@@ -2,6 +2,7 @@
 
 namespace App\Ninja\Repositories;
 
+use App\Models\Contact;
 use App\Models\Document;
 use DB;
 use Form;
@@ -90,7 +91,15 @@ class DocumentRepository extends BaseRepository
         }
 
         $hash = sha1_file($filePath);
-        $filename = \Auth::user()->account->account_key.'/'.$hash.'.'.$documentType;
+
+        if($contactKey = session('contact_key')) {
+            $contact = Contact::where('contact_key', '=', $contactKey)->first();
+            $account = $contact->account;
+        }
+        else
+            $account = \Auth::user()->account;
+
+        $filename = $account->account_key.'/'.$hash.'.'.$documentType;
 
         $document = Document::createNew();
         $document->fill($data);
@@ -137,7 +146,7 @@ class DocumentRepository extends BaseRepository
                     $previewType = 'png';
                 }
 
-                $document->preview = \Auth::user()->account->account_key.'/'.$hash.'.'.$documentType.'.x'.DOCUMENT_PREVIEW_SIZE.'.'.$previewType;
+                $document->preview = $account->account_key.'/'.$hash.'.'.$documentType.'.x'.DOCUMENT_PREVIEW_SIZE.'.'.$previewType;
                 if (! $disk->exists($document->preview)) {
                     // We haven't created a preview yet
                     $imgManager = new ImageManager($imgManagerConfig);

@@ -13,6 +13,8 @@
 
         .td-left {width:1%; white-space:nowrap; text-align: right;}
         #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
+
+
     </style>
 
     {!! Former::open($url)
@@ -126,25 +128,24 @@
 
     </div>
 
-        <div class="row">
-            <center class="buttons">
-                @if($ticket && $ticket->status->id == 3)
-                {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
-                @elseif(!$ticket)
-                {!! Button::primary(trans('texts.ticket_open'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
-                @else
-                {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
-                {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
-                @endif
-            </center>
-        </div>
+    <div class="row">
+        <center class="buttons">
+            @if($ticket && $ticket->status->id == 3)
+            {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
+            @elseif(!$ticket)
+            {!! Button::primary(trans('texts.ticket_open'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+            @else
+            {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
+            {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+            @endif
+        </center>
+    </div>
 
     <div role="tabpanel" class="panel panel-default" style="margin-top:30px;">
 
         <ul class="nav nav-tabs" role="tablist" style="border: none">
-            <li role="presentation" class="active"><a href="#linked_objects" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.linked_objects") }}</a></li>
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
-                <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
+                <li role="presentation" class="active"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                         {{ trans("texts.documents") }}
                         @if ($ticket && $ticket->documents()->count() >= 1)
                             ({{ $ticket->documents()->count() }})
@@ -156,10 +157,9 @@
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 0) }}
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 0) }}
 
-        <div class="tab-content" style="padding-right:12px;max-width:600px;">
-            <div role="tabpanel" class="tab-pane active" id="linked_objects" style="padding-bottom:44px;">
-            </div>
-            <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9;">
+        <div class="tab-content" style="padding-right:12px;">
+
+            <div role="tabpanel" class="tab-pane active" id="attached-documents" style="position:relative; z-index:9;">
                 <div id="document-upload">
                     <div class="dropzone">
                         <div data-bind="foreach: documents">
@@ -178,9 +178,9 @@
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 4) }}
 
-        {!! Former::close() !!}
 
     </div>
+    {!! Former::close() !!}
 
 
 
@@ -223,7 +223,7 @@
 
             ko.applyBindings(model);
 
-            @include('partials.dropzone', ['documentSource' => 'model.documents()'])
+            @include('partials.client_dropzone', ['documentSource' => 'model.documents()'])
 
 
             $('#description').text('');
