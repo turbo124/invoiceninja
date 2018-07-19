@@ -89,6 +89,7 @@ class TicketService extends BaseService
             ->leftjoin('ticket_statuses', 'tickets.status_id', '=', 'ticket_statuses.id')
             ->where('tickets.client_id', '=', $clientId)
             ->where('tickets.is_deleted', '=', false)
+            ->where('tickets.is_internal', '=', false)
             ->select(
                 'tickets.description',
                 'tickets.public_id',
