@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Models\Document;
 use DB;
 use Form;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManager;
 use Utils;
 
@@ -92,16 +93,19 @@ class DocumentRepository extends BaseRepository
 
         $hash = sha1_file($filePath);
 
+        $ticketMaster = false;
+
         if($contactKey = session('contact_key')) {
             $contact = Contact::where('contact_key', '=', $contactKey)->first();
             $account = $contact->account;
+            $ticketMaster = $account->account_ticket_settings->ticket_master;
         }
         else
             $account = \Auth::user()->account;
 
         $filename = $account->account_key.'/'.$hash.'.'.$documentType;
 
-        $document = Document::createNew();
+        $document = Document::createNew($ticketMaster);
         $document->fill($data);
 
         if ($isProposal) {

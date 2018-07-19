@@ -107,11 +107,10 @@ class ClientPortalTicketController extends ClientPortalController
 
         $account = $contact->account;
 
-        $ticket = Ticket::whereAccountId($account->id)
-                            ->where('id', '=', Ticket::getPortalPrivateId($ticketId, $account->id))
-                            ->where('is_internal', '=', false)
-                            ->with('status', 'comments', 'documents', 'account')
-                            ->first();
+        $ticket = Ticket::scope(Ticket::getPortalPrivateId($ticketId, $account->id), $account->id)
+                        ->where('is_internal', '=', false)
+                        ->with('status', 'comments', 'documents', 'account')
+                        ->first();
 
         $data['method'] = 'PUT';
         $data['entityType'] = ENTITY_TICKET;

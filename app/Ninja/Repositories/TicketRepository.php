@@ -11,6 +11,7 @@ use App\Models\TicketStatus;
 use App\Models\User;
 use Auth;
 use DB;
+use Illuminate\Support\Facades\Log;
 use Utils;
 
 class TicketRepository extends BaseRepository
@@ -72,13 +73,16 @@ class TicketRepository extends BaseRepository
 
     public function save($input, $ticket = false)
     {
+        if(Auth::user())
+            $user = Auth::user();
+        elseif($contact = Contact::getContactIfLoggedIn())
+            $user = User::where('id', '=', $contact->account->account_ticket_settings->ticket_master_id)->first();
+
         if (! $ticket) {
 
-            $user = false;
-
-            if($contact = Contact::where('contact_key', '=', $input['contact_key'])->first()) {
+            if($contact) {
                 //if client is creating the ticket, we need to harvest the ticket_master_user
-                $ticket = Ticket::createNew($user = User::where('id', '=', $contact->account->account_ticket_settings->ticket_master_id)->first());
+                $ticket = Ticket::createNew($user);
                 $ticket->client_id = $contact->client_id;
                 $ticket->agent_id = $user->id;
                 $ticket->ticket_number = Ticket::getNextTicketNumber($contact->account->id);
@@ -109,8 +113,9 @@ class TicketRepository extends BaseRepository
             $document_ids = array_map('intval', $input['document_ids']);
 
             foreach ($document_ids as $document_id) {
-                $document = Document::scope($document_id)->first();
-                if ($document && Auth::user()->can('edit', $document)) {
+                $document = Document::scope($document_id, $ticket->account_id)->first();
+                if ($document) {
+                //    if ($document && Auth::user()->can('edit', $document)) {
 
                     $document->ticket_id = $ticket->id;
                     $document->save();
@@ -146,12 +151,9 @@ class TicketRepository extends BaseRepository
         return $ticket;
     }
 
-    private function createTicketInvite($ticket, $contactId, $user = false) {
+    private function createTicketInvite($ticket, $contactId, $user) {
 
-        if($user)
-            $ticketInvitation = TicketInvitation::createNew($user);
-        else
-            $ticketInvitation = TicketInvitation::createNew();
+        $ticketInvitation = TicketInvitation::createNew($user);
 
         $ticketInvitation->ticket_id = $ticket->id;
         $ticketInvitation->contact_id = $contactId;

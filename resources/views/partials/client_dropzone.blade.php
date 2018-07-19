@@ -5,7 +5,7 @@ window.dropzone = new Dropzone('#document-upload .dropzone', {
     url: {!! json_encode(url('client/tickets/documents')) !!},
     params: {
         '_token': '{{ Session::token() }}',
-        'is_default': {{ isset($isDefault) && $isDefault ? '1' : '0' }},
+        'is_default': {{ isset($isDefault) && $isDefault ? '1' : '0' }}
     },
     acceptedFiles: {!! json_encode(implode(',',\App\Models\Document::$allowedMimes)) !!},
     addRemoveLinks: true,

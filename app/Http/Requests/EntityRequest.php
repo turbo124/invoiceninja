@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Libraries\HistoryUtils;
+use App\Models\Contact;
 use App\Models\EntityModel;
 use Input;
 use Utils;
@@ -51,6 +52,8 @@ class EntityRequest extends Request
 
         if(Input::get('account_id'))
             $accountId = Input::get('account_id');
+        elseif($contact = Contact::getContactIfLoggedIn())
+            $accountId = $contact->account->id;
 
         if (method_exists($class, 'trashed')) {
             $this->entity = $class::scope($publicId, $accountId)->withTrashed()->firstOrFail();

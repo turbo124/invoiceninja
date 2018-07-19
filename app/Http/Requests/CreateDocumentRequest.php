@@ -20,6 +20,9 @@ class CreateDocumentRequest extends DocumentRequest
      */
     public function authorize()
     {
+        if(session('contact_key'))
+            return true;
+
         if (! $this->user()->hasFeature(FEATURE_DOCUMENTS)) {
             return false;
         }
