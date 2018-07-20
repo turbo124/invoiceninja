@@ -5,7 +5,16 @@
 
     <script src="{{ asset('js/jquery.datetimepicker.js') }}" type="text/javascript"></script>
     <link href="{{ asset('css/jquery.datetimepicker.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('css/quill.snow.css') }}" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
+
+    <style type="text/css">
+
+        .td-left {width:1%; white-space:nowrap; text-align: right;}
+        #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
+
+    </style>
 
 @stop
 
@@ -27,6 +36,7 @@
 
     @if ($ticket)
         {!! Former::populate($ticket) !!}
+        {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
     @endif
 
     <div style="display:none">
@@ -82,6 +92,14 @@
         </table>
     </div>
 
+    @if($ticket)
+    <div style="height:80px;">
+        <div class="pull-right">
+            {!! Button::info(trans('texts.show_hide_all'))->large()->withAttributes(['onclick' => 'toggleAllComments()']) !!}
+        </div>
+    </div>
+    @endif
+
     <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
         @foreach($ticket->comments as $comment)
         <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" id="accordion">{!! $comment->getCommentHeader() !!}</h3>
@@ -93,13 +111,36 @@
        @endforeach
     </div>
 
-    <div class="panel-default" style="margin-top:30px; width: 100%; padding-bottom: 0px !important">
+    <div class="panel panel-default" style="margin-top:30px; padding-bottom: 0px !important">
         <div class="panel-heading">
-            <h3 class="panel-title">{!! trans('texts.reply') !!}</h3>
+            <h3 class="panel-title">
+                @if($ticket)
+                    {!! trans('texts.reply') !!}
+                @else
+                    {!! trans('texts.new_ticket') !!}
+                @endif</h3>
         </div>
 
         <div class="panel-body">
-            {!! Former::textarea('comment')->label(null)->style('width: 100%')->rows(10)->forceValue(null) !!}
+
+            @if(!$ticket)
+                {{trans('texts.subject')}}
+                {!! Former::small_text('subject')
+                         ->label('')
+                         ->id('subject')
+                         ->style('width:100%;')
+                !!}
+
+                {{ trans('texts.description') }}
+            @endif
+            {!! Former::textarea('description')->label(trans('texts.description'))->style('display:none')->raw() !!}
+
+            <div id="descriptionEditor" class="form-control" style="max-height:300px;" onclick="focusEditor()"></div>
+
+            <div class="pull-left">
+                @include('partials/quill_toolbar', ['name' => 'description'])
+            </div>
+
         </div>
 
     </div>
@@ -116,6 +157,7 @@
             ->dropup() !!}
             {!! Button::danger(trans('texts.ticket_close'))->large() !!}
             {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+
         </center>
     </div>
 
@@ -178,6 +220,35 @@
 
         {!! Former::close() !!}
 
+
+
+    <!--
+     Modals
+    -->
+
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="error" aria-hidden="true">
+        <div class="modal-dialog" style="min-width:150px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="recurringModalLabel">{{ trans('texts.error_title') }}</h4>
+                </div>
+
+                <div class="container" style="width: 100%; padding-bottom: 0px !important">
+                    <div class="panel panel-default">
+                        <div class="panel-body" id="ticket_message">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">{{ trans('texts.close') }}</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script type="text/javascript">
 
         <!-- Initialize ticket_comment accordion -->
@@ -187,6 +258,8 @@
             window.model = new ViewModel({!! $ticket !!});
 
             ko.applyBindings(model);
+
+            $('#description').text('');
 
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
@@ -280,12 +353,81 @@
             model.removeDocument(file.public_id);
         }
 
-        function submitAction() {
-            $('.main-form').submit();
+        function toggleAllComments() {
+            $(".ui-accordion-content").toggle();
         }
 
 
+        function submitAction() {
 
+            if(checkCommentText('{{ trans('texts.enter_ticket_message') }}')) {
+                $('.main-form').submit();
+            }
+
+        }
+
+        function reopenAction() {
+
+            if(checkCommentText('{{ trans('texts.reopen_reason') }}')){
+                $('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#closed').val(null);
+                $('#status_id').val(2);
+                $('.main-form').submit();
+            }
+
+        }
+
+        function closeAction() {
+            if(checkCommentText('{{ trans('texts.close_reason') }}')) {
+                $('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#reopened').val(null);
+                $('#status_id').val(3);
+                $('.main-form').submit();
+            }
+
+        }
+
+        function checkCommentText(errorString) {
+
+            if( $('#description').val().length < 1 ) {
+                $('#ticket_message').text(errorString);
+                $('#errorModal').modal('show');
+
+                return false;
+            }
+            else if($('#subject').val().length < 1 ) {
+                $('#ticket_message').text('{{ trans('texts.subject_required') }}');
+                $('#errorModal').modal('show');
+            }
+            else {
+                return true;
+            }
+
+        }
+
+        var editor = false;
+        $(function() {
+            editor = new Quill('#descriptionEditor', {
+                modules: {
+                    'toolbar': { container: '#descriptionToolbar' },
+                    'link-tooltip': true
+                },
+                theme: 'snow'
+            });
+            editor.setHTML($('#description').val());
+            editor.on('text-change', function(delta, source) {
+                if (source == 'api') {
+                    return;
+                }
+                var html = editor.getHTML();
+                $('#description').val(html);
+                NINJA.formIsChanged = true;
+            });
+        });
+
+        function focusEditor() {
+            editor.focus();
+        }
     </script>
 
 @stop
