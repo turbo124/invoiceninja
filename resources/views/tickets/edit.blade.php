@@ -36,8 +36,22 @@
 
     @if ($ticket)
         {!! Former::populate($ticket) !!}
-        {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
     @endif
+
+    <div style="display:none">
+        {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
+        {!! Former::hidden('account_id')->value($account->id) !!}
+        {!! Former::hidden('category_id')->value(1) !!}
+        @if($ticket)
+            {!! Former::hidden('public_id')->value($ticket->public_id) !!}
+            {!! Former::hidden('status_id')->value($ticket->status_id)->id('status_id') !!}
+            {!! Former::hidden('closed')->value($ticket->closed)->id('closed') !!}
+            {!! Former::hidden('reopened')->value($ticket->reopened)->id('reopened') !!}
+            {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
+        @else
+            {!! Former::hidden('status_id')->value(1) !!}
+        @endif
+    </div>
 
     <div style="display:none">
         {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
@@ -54,10 +68,7 @@
                         <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td>
-                            <td>{!! $ticket->agent() !!} {!! Icon::create('random') !!}
-                            </td>
-                        </tr>
+                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td>{!! $ticket->agent() !!} {!! Icon::create('random') !!}</td></tr>
                         <tr><td></td><td></td></tr>
                         </tbody>
                     </table>
@@ -73,12 +84,7 @@
                                        class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}" value="{{ $ticket->getDueDate() }}"/>
                             </td>
                         </tr>
-                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td>
-                            <td>
-                                {!! Former::select('status_id')->label('')
-                                ->fromQuery($ticket->getAccountStatusArray(), 'name', 'id') !!}
-                            </td>
-                        </tr>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td> {!! $ticket->status->name !!} </td></tr>
                         <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
                             <td>
                                 {!! Former::select('priority_id')->label('')
@@ -155,18 +161,22 @@
             ])
             ->large()
             ->dropup() !!}
-            {!! Button::danger(trans('texts.ticket_close'))->large() !!}
-            {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
 
+            @if($ticket && $ticket->status->id == 3)
+                {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
+            @elseif(!$ticket)
+                {!! Button::primary(trans('texts.ticket_open'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+            @else
+                {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
+                {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+            @endif
         </center>
     </div>
 
     <div role="tabpanel" class="panel-default" style="margin-top:30px;">
 
         <ul class="nav nav-tabs" role="tablist" style="border: none">
-            <li role="presentation" class="active"><a href="#linked_objects" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.linked_objects") }}</a></li>
-            <li role="presentation"><a href="#private_notes" aria-controls="terms" role="tab" data-toggle="tab">{{ trans("texts.private_notes") }}</a></li>
-            <li role="presentation"><a href="#tags" aria-controls="footer" role="tab" data-toggle="tab">{{ trans("texts.tags") }}</a></li>
+            <li role="presentation" class="active"><a href="#private_notes" aria-controls="private_notes" role="tab" data-toggle="tab">{{ trans("texts.private_notes") }}</a></li>
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
                 <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                         {{ trans("texts.documents") }}
@@ -181,38 +191,32 @@
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 0) }}
 
         <div class="tab-content" style="padding-right:12px;max-width:600px;">
-            <div role="tabpanel" class="tab-pane active" id="public_notes" style="padding-bottom:44px;">
-                {!! Former::textarea('public_notes')
-                        ->data_bind("value: public_notes, valueUpdate: 'afterkeydown'")
-                        ->label(null)->style('width: 100%')->rows(4)->label(null) !!}
-            </div>
-            <div role="tabpanel" class="tab-pane" id="private_notes" style="padding-bottom:44px">
+
+            <div role="tabpanel" class="tab-pane active" id="private_notes" style="padding-bottom:44px">
                 {!! Former::textarea('private_notes')
                         ->data_bind("value: private_notes, valueUpdate: 'afterkeydown'")
                         ->label(null)->style('width: 100%')->rows(4) !!}
             </div>
-            <div role="tabpanel" class="tab-pane" id="terms">
 
-            </div>
-            <div role="tabpanel" class="tab-pane" id="footer">
-
-            </div>
-                <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9">
-                    <div id="document-upload">
-                        <div class="dropzone">
-                            <div data-bind="foreach: documents">
-                                <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
-                            </div>
+            <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative;z-index:9">
+                <div id="document-upload">
+                    <div class="dropzone">
+                        <div data-bind="foreach: documents">
+                            <input type="hidden" name="document_ids[]" data-bind="value: public_id"/>
                         </div>
-                        @if ($ticket->documents())
-                            @foreach($ticket->documents() as $document)
-                                <div>{{$document->name}}</div>
-                            @endforeach
-                        @endif
                     </div>
+                    @if ($ticket->documents())
+                        @foreach($ticket->documents() as $document)
+                            <div>{{$document->name}}</div>
+                        @endforeach
+                    @endif
                 </div>
-        </div>
+            </div>
 
+        </div>
+        <div class="pull-right">
+            {!! Button::primary(trans('texts.save'))->large()->withAttributes(['onclick' => 'saveAction()']) !!}
+        </div>
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 4) }}
 
@@ -357,6 +361,11 @@
             $(".ui-accordion-content").toggle();
         }
 
+
+        function saveAction() {
+            $('#description').val('');
+            $('.main-form').submit();
+        }
 
         function submitAction() {
 

@@ -108,6 +108,7 @@ class TicketController extends BaseController
         $data['document_ids'] = $request->document_ids;
 
         $ticket = $this->ticketService->save($data, $request->entity());
+        $ticket->load('documents');
         $entityType = $ticket->getEntityType();
 
         $message = trans("texts.updated_{$entityType}");
