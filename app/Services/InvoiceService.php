@@ -64,7 +64,7 @@ class InvoiceService extends BaseService
     public function bulk($ids, $action)
     {
         if ($action == 'download') {
-            $invoices = $this->getRepo()->findByPublicIdsWithTrashed($ids);
+            $invoices = $this->getRepo()->findByPublicIdsWi1thTrashed($ids);
             dispatch(new DownloadInvoices(Auth::user(), $invoices));
             return count($invoices);
         } else {
