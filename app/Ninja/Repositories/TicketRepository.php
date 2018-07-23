@@ -34,6 +34,7 @@ class TicketRepository extends BaseRepository
             ->leftjoin('clients', 'clients.id', '=', 'tickets.client_id')
             ->leftJoin('contacts', 'contacts.client_id', '=', 'clients.id')
             ->leftJoin('ticket_statuses', 'ticket_statuses.id', '=', 'tickets.status_id')
+            //->where('tickets.is_deleted', '=', false)
             ->where('clients.deleted_at', '=', null)
             ->where('contacts.deleted_at', '=', null)
             ->where('contacts.is_primary', '=', true)
