@@ -39,7 +39,7 @@ class TicketRepository extends BaseRepository
             ->where('contacts.deleted_at', '=', null)
             ->where('contacts.is_primary', '=', true)
             ->select(
-                'tickets.public_id as ticket_number',
+                'tickets.ticket_number',
                 'tickets.public_id',
                 'tickets.user_id',
                 'tickets.deleted_at',

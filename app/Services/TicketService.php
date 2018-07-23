@@ -77,6 +77,7 @@ class TicketService extends BaseService
         // we don't support bulk edit and hide the client on the individual client page
         $datatable = new TicketDatatable();
 
+        //$search = Input::get('sSearch');
         $query = $this->ticketRepo->find($search);
 
             return $this->datatableService->createDatatable($datatable, $query);

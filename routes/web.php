@@ -306,7 +306,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::put('ticket_templates/{public_id}', 'TicketTemplateController@update');
     Route::post('ticket_template/create', 'TicketTemplateController@store');
     Route::post('ticket_templates/bulk', 'TicketTemplateController@bulk');
-
+    Route::post('tickets/bulk', 'TicketController@bulk');
 
     // vendor
     Route::resource('vendors', 'VendorController');

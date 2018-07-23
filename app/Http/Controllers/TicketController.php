@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\TicketUserViewed;
 use App\Http\Requests\TicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
+use App\Libraries\Utils;
 use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
@@ -118,6 +119,27 @@ class TicketController extends BaseController
 
         return View::make('tickets.edit', $data);
 
+    }
+
+    public function bulk()
+    {
+        $action = Input::get('action');
+        $ids = Input::get('public_id') ? Input::get('public_id') : Input::get('ids');
+
+        if ($action == 'purge' && ! auth()->user()->is_admin) {
+            return redirect('dashboard')->withError(trans('texts.not_authorized'));
+        }
+
+        $count = $this->ticketService->bulk($ids, $action);
+
+        $message = Utils::pluralize($action.'d_ticket', $count);
+        Session::flash('message', $message);
+
+        if ($action == 'purge') {
+            return redirect('dashboard')->withMessage($message);
+        } else {
+            return $this->returnBulk(ENTITY_TICKET, $action, $ids);
+        }
     }
 
     public function inbound(Request $request)
