@@ -21,11 +21,11 @@ class TicketDatatable extends EntityDatatable
 
                 function ($model) use ($entityType) {
                         if(Auth::user()->can('view', [ENTITY_TICKET, $model])) {
-                            $str = link_to("{$entityType}s/{$model->public_id}/edit", $model->public_id, ['class' => Utils::getEntityRowClass($model)])->toHtml();
+                            $str = link_to("{$entityType}s/{$model->public_id}/edit", $model->ticket_number, ['class' => Utils::getEntityRowClass($model)])->toHtml();
                             return $this->addNote($str, $model->private_notes);
                         }
                         else
-                            return $model->public_id;
+                            return $model->ticket_number;
                     },
             ],
             [

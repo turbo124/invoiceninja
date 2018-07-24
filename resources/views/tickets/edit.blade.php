@@ -63,7 +63,7 @@
                 <td width="50%">
                     <table class="table table-striped dataTable" >
                         <tbody>
-                        <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->id !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->ticket_number !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>

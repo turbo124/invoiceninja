@@ -249,11 +249,13 @@ class CreateTestData extends Command
         {
             $maxTicketNumber = Ticket::getNextTicketNumber(Auth::user()->account->id);
 
+            $isDeletedRandom = (bool)random_int(0, 1);
+
             $data = [
                 'priority_id'=> TICKET_PRIORITY_LOW,
                 'category_id'=> 1,
                 'client_id' => $client->id,
-                'is_deleted'=> (bool)random_int(0, 1),
+                'is_deleted'=> $isDeletedRandom,
                 'is_internal'=> (bool)random_int(0, 1),
                 'status_id'=> random_int(1,3),
                 'category_id'=> 1,
@@ -265,6 +267,7 @@ class CreateTestData extends Command
                 'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
                 'ticket_number' => $maxTicketNumber ? $maxTicketNumber : 1,
+                'deleted_at' => $isDeletedRandom ? date('Y-m-d G:i:s') : null,
             ];
 
             $ticket = $this->ticketRepo->save($data);
