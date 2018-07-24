@@ -61,10 +61,13 @@ class TicketService extends BaseService
     public function save($data, $ticket = false)
     {
 
+        $deltaAttributes = $ticket->getDirty();
+
+        $ticket = $this->ticketRepo->save($data, $ticket);
+
         //$this->processTicket($data, $ticket); //todo after CRUD
 
-            return $this->ticketRepo->save($data, $ticket);
-
+        return $ticket;
     }
 
     /**

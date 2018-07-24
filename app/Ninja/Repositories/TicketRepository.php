@@ -69,6 +69,10 @@ class TicketRepository extends BaseRepository
             $query->where('tickets.user_id', '=', $userId);
         }
 
+        if(!Auth::user()->can('view', ENTITY_TICKET))
+            $query->where('tickets.agent_id', '=', Auth::user()->id);
+
+
         return $query;
     }
 

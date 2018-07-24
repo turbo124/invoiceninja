@@ -68,7 +68,22 @@
                         <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td>{!! $ticket->agent() !!} {!! Icon::create('random') !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td>
+                                @if(Auth::user()->id == Auth::user()->account->account_ticket_settings->ticket_master->id)
+                                    <div id="">
+                                        {!! Former::select('agent_id')
+                                            ->label('')
+                                            ->text(trans('texts.ticket_master'))
+                                            ->fromQuery($account->users, 'displayName', 'id')
+                                         !!}
+                                        <span>
+                                            {!! Button::primary(trans('texts.save'))->small()->withAttributes(['onclick' => 'saveAction()']) !!}
+                                        </span>
+                                    </div>
+                                @else
+                                {!! $ticket->agent() !!} {!! Icon::create('random') !!}
+                                @endif
+                                </td></tr>
                         <tr><td></td><td></td></tr>
                         </tbody>
                     </table>

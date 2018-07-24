@@ -49,7 +49,8 @@
                             </div>
 
                             <div id="">
-                                {!! Former::select('ticket_master')
+                                {!! Former::select('ticket_master_id')
+                                    ->label(trans('texts.ticket_master'))
                                     ->text(trans('texts.ticket_master'))
                                     ->help(trans('texts.ticket_master_help'))
                                     ->fromQuery($account->users, 'displayName', 'id')
