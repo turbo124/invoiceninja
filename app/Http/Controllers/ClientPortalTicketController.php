@@ -108,7 +108,7 @@ class ClientPortalTicketController extends ClientPortalController
         $account = $contact->account;
 
         $ticket = Ticket::scope($ticketId, $account->id)
-                        ->with('status', 'comments', 'documents', 'account')
+                        //->with('status', 'comments', 'documents', 'account')
                         ->first();
 
         $data['method'] = 'PUT';

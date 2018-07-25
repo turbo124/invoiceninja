@@ -19,6 +19,10 @@ use App\Services\TicketTemplateService;
 class AgentDelta
 {
 
+    /**
+     * @param Ticket $updatedTicket
+     * @param Ticket $originalTicket
+     */
     public static function agentTicketChange(Ticket $updatedTicket, Ticket $originalTicket)
     {
        $accountTicketSettings = $updatedTicket->account->account_ticket_settings;
@@ -30,6 +34,10 @@ class AgentDelta
 
     }
 
+    /**
+     * @param Ticket $updatedTicket
+     * @param AccountTicketSettings $accountTicketSettings
+     */
     public function sendAgentNotificationEmail(Ticket $updatedTicket, AccountTicketSettings $accountTicketSettings)
     {
         $ticketMailer = new TicketMailer();
@@ -40,15 +48,23 @@ class AgentDelta
         $data['replyTo'] = $accountTicketSettings->ticket_master()->email;
         //$toEmail = strtolower($agent->email); //todo
         $toEmail = 'david@romulus.com.au';
-        $fromEmail = $this->ticket->getTicketFromEmail();
+        $fromEmail = $accountTicketSettings->ticket_master()->email;
         $fromName = trans('texts.ticket_master');
         $subject = trans('texts.ticket_assignment', ['ticket_number' => $updatedTicket->ticket_number, 'agent' =>$updatedTicket->agent()]);
         $view = 'ticket_template';
+
+        if (Utils::isSelfHost() && config('app.debug')) {
+            \Log::info("Sending email - To: {$toEmail} | Reply: {$fromEmail} | From: {$subject}");
 
         $ticketMailer->sendTo($toEmail, $fromEmail, $fromName, $subject, $view, $data);
 
     }
 
+    /**
+     * @param Ticket $ticket
+     * @param $accountTicketSettings
+     * @return array
+     */
     public function buildTicketBodyResponse(Ticket $ticket, $accountTicketSettings)
     {
         $ticketVariables = TicketTemplateService::getVariables($ticket);

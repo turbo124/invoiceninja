@@ -213,7 +213,7 @@ class Ticket extends EntityModel
     */
     public function agentName()
     {
-        if($this->agent->getName())
+        if($this->agent && $this->agent->getName())
             return $this->agent->getName();
         else
             return trans('texts.unassigned');

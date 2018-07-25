@@ -128,7 +128,7 @@ class TicketMailer
      * @return bool
      */
     private function handleSuccess($data, $messageId = false)
-    {
+    {//todo boiler plate from invoice invites which needs to be adapted to tickets
         if (isset($data['invitation'])) {
             $invitation = $data['invitation'];
             $invoice = $invitation->invoice;
