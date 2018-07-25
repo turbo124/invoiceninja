@@ -2968,6 +2968,7 @@ $LANG = array(
     'subject_required' => 'Subject required',
     'mobile_refresh_warning' => 'If you\'re using the mobile app you may need to do a full refresh.',
     'enable_proposals_for_background' => 'To upload a background image :link to enable the proposals module.',
+    'ticket_assignment' => 'Ticket :ticket_number has been assigned to :agent',
 
 
 );

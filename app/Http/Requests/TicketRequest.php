@@ -6,12 +6,6 @@ class TicketRequest extends EntityRequest
 {
     protected $entityType = ENTITY_TICKET;
 
-    public function authorize()
-    {
-        $ticket = parent::entity();
-
-
-    }
 
     public function entity()
     {

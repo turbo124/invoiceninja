@@ -210,16 +210,20 @@ class Ticket extends EntityModel
 
     /**
      * @return string
-     */
-    public function agent()
+    */
+    public function agentName()
     {
-        $user = User::where('id', '=', $this->agent_id)->first();
-        if($user)
-            return $user->getFullName();
+        if($this->agent->getName())
+            return $this->agent->getName();
         else
             return trans('texts.unassigned');
     }
 
+
+    public function agent()
+    {
+        return $this->hasOne('App\Models\User', 'id', 'agent_id');
+    }
 
     /**
      * @return string
@@ -248,12 +252,12 @@ class Ticket extends EntityModel
 
     public function getTicketFromName()
     {
-        return env("TICKET_SUPPORT_EMAIL_NAME","");
+        return config('ninja.tickets.ticket_support_email_name');
     }
 
     public function getTicketFromEmail()
     {
-        return env("TICKET_SUPPORT_EMAIL","");
+        return config('ninja.tickets.ticket_support_email');
     }
 
     public static function getNextTicketNumber($accountId)

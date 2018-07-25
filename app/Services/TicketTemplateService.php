@@ -65,7 +65,7 @@ class TicketTemplateService extends BaseService
 
     }
 
-    private function getVariables(Ticket $ticket)
+    public static function getVariables(Ticket $ticket)
     {
         return [
             '$ticket_number' => $ticket->ticket_number,

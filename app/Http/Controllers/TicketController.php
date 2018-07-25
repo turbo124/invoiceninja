@@ -80,27 +80,6 @@ class TicketController extends BaseController
     }
 
     /**
-     * @return array
-     */
-    private static function getViewModel($ticket = false)
-    {
-        return [
-            'status' => $ticket->status(),
-            'comments' => $ticket->comments(),
-            'account' => Auth::user()->account,
-            'url' => 'tickets/' . $ticket->public_id,
-            'ticket' => $ticket,
-            'entity' => $ticket,
-            'title' => trans('texts.edit_ticket'),
-            'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
-            'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
-            'method' => 'PUT',
-
-        ];
-    }
-
-
-    /**
      * @param UpdateTicketRequest $request
      */
     public function update(UpdateTicketRequest $request)
@@ -121,6 +100,9 @@ class TicketController extends BaseController
 
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function bulk()
     {
         $action = Input::get('action');
@@ -142,12 +124,35 @@ class TicketController extends BaseController
         }
     }
 
+    /**
+     * @param Request $request
+     */
     public function inbound(Request $request)
     {
         $payload = $request;
         //Log::error(Response::all());
         Log::error(Request::all());
         //Log::error($request->all());
+    }
+
+    /**
+     * @return array
+     */
+    private static function getViewModel($ticket = false)
+    {
+        return [
+            'status' => $ticket->status(),
+            'comments' => $ticket->comments(),
+            'account' => Auth::user()->account,
+            'url' => 'tickets/' . $ticket->public_id,
+            'ticket' => $ticket,
+            'entity' => $ticket,
+            'title' => trans('texts.edit_ticket'),
+            'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
+            'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
+            'method' => 'PUT',
+
+        ];
     }
 
 }

@@ -1,5 +1,6 @@
 <?php
 namespace App\Services;
+use App\Jobs\Ticket\TicketDelta;
 use App\Jobs\Ticket\TicketSendNotificationEmail;
 use App\Libraries\Utils;
 use App\Ninja\Datatables\TicketDatatable;
@@ -60,14 +61,20 @@ class TicketService extends BaseService
 
     public function save($data, $ticket = false)
     {
+        /**
+         * If any model attributes have changed we may need to fire events which can respond to these changes
+         */
 
-        $deltaAttributes = $ticket->getDirty();
+        $deltaAttributes = $ticket->getDirty();  //returns an array of changed attributes
+        $originalTicket = $ticket->getOriginal(); //returns the original model object
 
-        $ticket = $this->ticketRepo->save($data, $ticket);
+        $updatedTicket = $this->ticketRepo->save($data, $ticket);
+
+        $this->dispatch(new TicketDelta($deltaAttributes, $originalTicket, $updatedTicket));
 
         //$this->processTicket($data, $ticket); //todo after CRUD
 
-        return $ticket;
+        return $updatedTicket;
     }
 
     /**

@@ -48,4 +48,11 @@ return [
         'subscription_key' => env('MSBOT_LUIS_SUBSCRIPTION_KEY'),
     ],
 
+    //Tickets
+    'tickets' => [
+        'ticket_support_domain' => env('TICKET_SUPPORT_DOMAIN'),
+        'ticket_support_email' => env('TICKET_SUPPORT_EMAIL'),
+        'ticket_support_email_name' => env('TICKET_SUPPORT_EMAIL_NAME'),
+    ],
+
 ];
