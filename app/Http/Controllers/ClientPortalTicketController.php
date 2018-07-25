@@ -107,8 +107,7 @@ class ClientPortalTicketController extends ClientPortalController
 
         $account = $contact->account;
 
-        $ticket = Ticket::scope(Ticket::getPortalPrivateId($ticketId, $account->id), $account->id)
-                        ->where('is_internal', '=', false)
+        $ticket = Ticket::scope($ticketId, $account->id)
                         ->with('status', 'comments', 'documents', 'account')
                         ->first();
 

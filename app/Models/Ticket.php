@@ -144,7 +144,7 @@ class Ticket extends EntityModel
      * @return string
      */
     public function getContactName()
-    {
+    {   return 'duh';
         $contact = Contact::withTrashed()->where('contact_key', '=', $this->contact_key)->first();
         if ($contact && ! $contact->is_deleted) {
             return $contact->getFullName();

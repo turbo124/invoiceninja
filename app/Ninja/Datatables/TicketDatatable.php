@@ -2,6 +2,7 @@
 
 namespace App\Ninja\Datatables;
 
+use App\Models\Contact;
 use Auth;
 use URL;
 use Utils;
@@ -42,8 +43,7 @@ class TicketDatatable extends EntityDatatable
             [
                 'contact',
                 function ($model) {
-                    //return link_to("clients/{$model->public_id}", $model->getContact($model->contact_key) ?: '')->toHtml();
-                    return link_to("clients/{$model->public_id}", $model->contact_key ?: '')->toHtml();
+                    return link_to("clients/{$model->client_public_id}", Contact::getContactByContactKey($model->contact_key)->getName() ?: '')->toHtml();
                 },
             ],
             [
