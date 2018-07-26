@@ -78,6 +78,8 @@ class TicketRepository extends BaseRepository
 
     public function save($input, $ticket = false)
     {
+        $contact = false;
+
         if(Auth::user())
             $user = Auth::user();
         elseif($contact = Contact::getContactIfLoggedIn())

@@ -165,16 +165,6 @@
                                 ->label(trans('texts.alert_ticket_assign_agent_notifications'))
                                 ->help('alert_ticket_assign_agent_help') !!}
 
-                            {!! Former::checkbox('alert_ticket_transfer_agent')
-                              ->text(trans('texts.enable'))
-                              ->label(trans('texts.alert_ticket_transfer_agent'))
-                              ->value(1) !!}
-
-                            {!! Former::text('alert_ticket_transfer_email')
-                                ->placeholder('texts.comma_separated_values')
-                                ->label(trans('texts.alert_ticket_transfer_email'))
-                                ->help('alert_ticket_transfer_email_help') !!}
-
                             {!! Former::checkbox('alert_ticket_overdue_agent')
                                   ->text(trans('texts.enable'))
                                   ->label(trans('texts.alert_ticket_overdue_agent'))

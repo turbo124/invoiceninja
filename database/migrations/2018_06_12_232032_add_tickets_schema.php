@@ -76,8 +76,8 @@ class AddTicketsSchema extends Migration
             $table->increments('id');
             $table->string('name', 255);
             $table->text('description');
-            $table->unsignedInteger('user_id');
-            $table->unsignedInteger('account_id');
+            $table->unsignedInteger('account_id')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('public_id');
             $table->timestamps();
             $table->softDeletes();
@@ -192,13 +192,11 @@ class AddTicketsSchema extends Migration
 
             $table->boolean('alert_new_ticket')->default(true);
             $table->longtext('alert_new_ticket_email');
-            $table->boolean('alert_new_comment')->default(true);
+            $table->unsignedInteger('alert_new_comment')->default(0);
             $table->longtext('alert_new_comment_email');
-            $table->boolean('alert_ticket_assign_agent')->default(true);
+            $table->unsignedInteger('alert_ticket_assign_agent')->default(0);
             $table->longtext('alert_ticket_assign_email');
-            $table->boolean('alert_ticket_transfer_agent')->default(true);
-            $table->longtext('alert_ticket_transfer_email');
-            $table->boolean('alert_ticket_overdue_agent')->default(true);
+            $table->unsignedInteger('alert_ticket_overdue_agent')->default(0);
             $table->longtext('alert_ticket_overdue_email');
 
             $table->boolean('show_agent_details')->default(true);

@@ -119,7 +119,7 @@ class CreateTestData extends Command
         }
 
         $this->createTicketStubs();
-        $this->createTicketTemplates();
+        //$this->createTicketTemplates();
         $this->createClients();
         $this->createVendors();
         $this->createOtherObjects();
@@ -249,13 +249,12 @@ class CreateTestData extends Command
         {
             $maxTicketNumber = Ticket::getNextTicketNumber(Auth::user()->account->id);
 
-            $isDeletedRandom = (bool)random_int(0, 1);
 
             $data = [
                 'priority_id'=> TICKET_PRIORITY_LOW,
                 'category_id'=> 1,
                 'client_id' => $client->id,
-                'is_deleted'=> $isDeletedRandom,
+                'is_deleted'=> 0,
                 'is_internal'=> (bool)random_int(0, 1),
                 'status_id'=> random_int(1,3),
                 'category_id'=> 1,
@@ -267,7 +266,6 @@ class CreateTestData extends Command
                 'contact_key'=> $client->getPrimaryContact()->contact_key,
                 'due_date'=> date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
                 'ticket_number' => $maxTicketNumber ? $maxTicketNumber : 1,
-                'deleted_at' => $isDeletedRandom ? date('Y-m-d G:i:s') : null,
             ];
 
             $ticket = $this->ticketRepo->save($data);
@@ -275,16 +273,14 @@ class CreateTestData extends Command
                 $ticketComment = TicketComment::createNew($ticket);
                 $ticketComment->description = $this->faker->realText(70);
                 $ticketComment->contact_key = $client->getPrimaryContact()->contact_key;
-                //$ticketComment->save();
                 $ticket->comments()->save($ticketComment);
 
                 $ticketComment = TicketComment::createNew($ticket);
                 $ticketComment->description = $this->faker->realText(40);
                 $ticketComment->user_id = 1;
-                //$ticketComment->save();
                 $ticket->comments()->save($ticketComment);
 
-            $this->info('Ticket: - '. $ticket->ticket_number. ' - ' . $client->account->account_ticket_settings->ticket_number_start. ' - ' . $maxTicketNumber);
+            $this->info("Ticket: - {$ticket->ticket_number} - {$client->account->account_ticket_settings->ticket_number_start} - {$maxTicketNumber}");
         }
     }
 

@@ -31,8 +31,6 @@ class AccountTicketSettings extends Eloquent
         'alert_new_comment_email',
         'alert_ticket_assign_agent',
         'alert_ticket_assign_email',
-        'alert_ticket_transfer_agent',
-        'alert_ticket_transfer_email',
         'alert_ticket_overdue_agent',
         'alert_ticket_overdue_email',
         'show_agent_details',
