@@ -223,7 +223,7 @@
 
             ko.applyBindings(model);
 
-            @include('partials.client_dropzone', ['documentSource' => 'model.documents()'])
+            @include('partials.client_dropzone', ['documentSource' => 'model.documents()', 'account_ticket_settings' => $account_ticket_settings])
 
 
             $('#description').text('');

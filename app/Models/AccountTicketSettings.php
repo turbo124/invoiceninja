@@ -25,8 +25,6 @@ class AccountTicketSettings extends Eloquent
         'update_ticket_template_id',
         'default_priority',
         'ticket_number_start',
-        'alert_new_ticket',
-        'alert_new_ticket_email',
         'alert_new_comment',
         'alert_new_comment_email',
         'alert_ticket_assign_agent',

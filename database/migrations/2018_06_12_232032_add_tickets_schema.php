@@ -190,8 +190,6 @@ class AddTicketsSchema extends Migration
             $table->string('ticket_number_prefix');
             $table->unsignedInteger('ticket_number_start');
 
-            $table->boolean('alert_new_ticket')->default(true);
-            $table->longtext('alert_new_ticket_email');
             $table->unsignedInteger('alert_new_comment')->default(0);
             $table->longtext('alert_new_comment_email');
             $table->unsignedInteger('alert_ticket_assign_agent')->default(0);

@@ -110,7 +110,7 @@
                             <div id="">
                                 {!! Former::select('new_ticket_template_id')
                                     ->text(trans('texts.new_ticket_template_id'))
-                                    ->addOption('','')
+                                    ->addOption('','0')
                                     ->fromQuery($templates, "name", "id")
                                 ->help(trans('texts.new_ticket_autoresponder_help'))
                                  !!}
@@ -119,7 +119,7 @@
                             <div id="">
                                 {!! Former::select('update_ticket_template_id')
                                     ->text(trans('texts.update_ticket_template_id'))
-                                    ->addOption('','')
+                                    ->addOption('','0')
                                     ->fromQuery($templates, "name", "id")
                                 ->help(trans('texts.update_ticket_autoresponder_help'))
                                  !!}
@@ -128,47 +128,48 @@
                             <div id="">
                                 {!! Former::select('close_ticket_template_id')
                                     ->text(trans('texts.close_ticket_template_id'))
-                                    ->addOption('','')
+                                    ->addOption('','0')
                                     ->fromQuery($templates, "name", "id")
                                 ->help(trans('texts.close_ticket_autoresponder_help'))
                                  !!}
                             </div>
 
-
-                            {!! Former::checkbox('alert_new_ticket')
-                                ->text(trans('texts.enable'))
-                                ->label(trans('texts.alert_new_ticket'))
-                                ->value(1) !!}
-
-                            {!! Former::text('alert_new_ticket_email')
-                                ->placeholder('texts.comma_separated_values')
-                                ->label(trans('texts.new_ticket_notification_list'))
-                                ->help('alert_new_ticket_email_help') !!}
-
-                            {!! Former::checkbox('alert_new_comment')
-                               ->text(trans('texts.enable'))
-                               ->label(trans('texts.alert_comment_ticket'))
-                               ->value(1) !!}
+                            <div id="">
+                                {!! Former::select('alert_new_comment')
+                                    ->text(trans('texts.alert_new_comment'))
+                                    ->addOption('','0')
+                                    ->fromQuery($templates, "name", "id")
+                                ->help(trans('texts.alert_comment_ticket_help'))
+                                 !!}
+                            </div>
 
                             {!! Former::text('alert_new_comment_email')
                                 ->placeholder('texts.comma_separated_values')
                                 ->label(trans('texts.update_ticket_notification_list'))
                                 ->help('alert_comment_ticket_email_help') !!}
 
-                            {!! Former::checkbox('alert_ticket_assign_agent')
-                               ->text(trans('texts.enable'))
-                               ->label(trans('texts.alert_ticket_assign_agent'))
-                               ->value(1) !!}
+                            <div id="">
+                                {!! Former::select('alert_ticket_assign_agent')
+                                    ->text(trans('texts.alert_ticket_assign_agent'))
+                                    ->addOption('','0')
+                                    ->fromQuery($templates, "name", "id")
+                                ->help(trans('texts.alert_ticket_assign_agent_hel'))
+                                 !!}
+                            </div>
 
                             {!! Former::text('alert_ticket_assign_email')
                                 ->placeholder('texts.comma_separated_values')
                                 ->label(trans('texts.alert_ticket_assign_agent_notifications'))
                                 ->help('alert_ticket_assign_agent_help') !!}
 
-                            {!! Former::checkbox('alert_ticket_overdue_agent')
-                                  ->text(trans('texts.enable'))
-                                  ->label(trans('texts.alert_ticket_overdue_agent'))
-                                  ->value(1) !!}
+                            <div id="">
+                                {!! Former::select('alert_ticket_overdue_agent')
+                                    ->text(trans('texts.alert_ticket_overdue_agent'))
+                                    ->addOption('','0')
+                                    ->fromQuery($templates, "name", "id")
+                                ->help(trans('texts.alert_ticket_overdue_agent_help'))
+                                 !!}
+                            </div>
 
                             {!! Former::text('alert_ticket_overdue_email')
                                 ->placeholder('texts.comma_separated_values')

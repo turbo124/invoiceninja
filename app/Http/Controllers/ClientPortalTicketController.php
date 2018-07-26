@@ -193,6 +193,7 @@ class ClientPortalTicketController extends ClientPortalController
             'url' => $ticket ? 'client/tickets/' . $ticket->public_id : 'client/tickets/create',
             //'timezone' => $ticket ? $ticket->account->timezone->name : DEFAULT_TIMEZONE,
             'datetimeFormat' => $contact->account->getMomentDateTimeFormat(),
+            'account_ticket_settings' => $contact->account->account_ticket_settings
         ];
     }
 
