@@ -53,7 +53,7 @@ class AgentDelta
         $subject = trans('texts.ticket_assignment', ['ticket_number' => $updatedTicket->ticket_number, 'agent' =>$updatedTicket->agent()]);
         $view = 'ticket_template';
 
-        if (Utils::isSelfHost() && config('app.debug')) {
+        if (Utils::isSelfHost() && config('app.debug'))
             \Log::info("Sending email - To: {$toEmail} | Reply: {$fromEmail} | From: {$subject}");
 
         $ticketMailer->sendTo($toEmail, $fromEmail, $fromName, $subject, $view, $data);
