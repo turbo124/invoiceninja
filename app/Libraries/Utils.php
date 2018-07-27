@@ -1498,7 +1498,7 @@ class Utils
         $selectArray = [];
 
         while($maxUploadSize > 100) {
-            array_push($selectArray, $maxUploadSize);
+            array_push($selectArray, [$maxUploadSize => $maxUploadSize]);
             $maxUploadSize = $maxUploadSize / 2;
         }
 
