@@ -74,7 +74,7 @@ class TicketTemplateService extends BaseService
             '$contact' => $ticket->getContactName(),
             '$priority' => $ticket->getPriorityName(),
             '$due_date' => $ticket->getDueDate(),
-            '$agent' => $ticket->agent(),
+            '$agent' => $ticket->agent->getName(),
             '$status' => $ticket->status->name,
             '$subject' => $ticket->subject,
             '$description' => $ticket->description,

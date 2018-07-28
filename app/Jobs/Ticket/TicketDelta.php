@@ -21,12 +21,12 @@ class TicketDelta extends Job implements ShouldQueue
     use InteractsWithQueue, SerializesModels;
 
     /**
-     * @var array
+     * @var
      */
     protected $deltaAttributes;
 
     /**
-     * @var array
+     * @var
      */
     protected $originalTicket;
 
@@ -46,7 +46,7 @@ class TicketDelta extends Job implements ShouldQueue
      * @param array $originalTicket
      * @param  $updatedTicket
      */
-    public function __construct(array $deltaAttributes, array $originalTicket, $updatedTicket)
+    public function __construct($deltaAttributes, $originalTicket, $updatedTicket)
     {
         $this->deltaAttributes = $deltaAttributes;
         $this->originalTicket = $originalTicket;

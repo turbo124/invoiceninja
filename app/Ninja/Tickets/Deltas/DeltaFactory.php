@@ -3,6 +3,7 @@
 namespace App\Ninja\Tickets\Deltas;
 
 use App\Models\Ticket;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class DeltaFactory
@@ -30,7 +31,7 @@ class DeltaFactory
     /**
      * DeltaFactory constructor.
      */
-    public function __construct(array $originalTicket, array $changedAttributes, $updatedTicket)
+    public function __construct($originalTicket, $changedAttributes, $updatedTicket)
     {
         $this->originalTicket = $originalTicket;
         $this->changedAttributes = $changedAttributes;
@@ -42,8 +43,14 @@ class DeltaFactory
      */
     public function process()
     {
-        foreach($this->changedAttributes as $attribute)
-            $this->performDeltaAction($attribute);
+
+        if(!$this->originalTicket) {
+            $this->performDeltaAction('new_ticket');
+        }
+        elseif(count($this->changedAttributes) > 0) {
+            foreach ($this->changedAttributes as $attribute)
+                $this->performDeltaAction($attribute);
+        }
     }
 
 
@@ -59,12 +66,16 @@ class DeltaFactory
      * 5. Ticket overdue (to agent)
      *
      */
-    private function performDeltaAction($modelAttribute)
+    private function performDeltaAction($attribute)
     {
-        switch($modelAttribute)
+        switch($attribute)
         {
             case 'agent_id':
-                AgentDelta::agentTicketChange($this->updatedTicket, $this->originalTicket);
+                AgentDelta::handle($this->updatedTicket, $this->originalTicket);
+            break;
+
+            case 'new_ticket':
+                NewTicketDelta::handle($this->updatedTicket);
             break;
 
         }

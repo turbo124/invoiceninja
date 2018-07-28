@@ -272,6 +272,11 @@ class Ticket extends EntityModel
 
     }
 
+    public function getTicketTemplate($templateId)
+    {
+        return TicketTemplate::where('id', '=', $templateId)->first();
+    }
+
 }
 
 

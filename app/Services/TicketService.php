@@ -65,8 +65,13 @@ class TicketService extends BaseService
          * If any model attributes have changed we may need to fire events which can respond to these changes
          */
 
-        $deltaAttributes = $ticket->getDirty();  //returns an array of changed attributes
-        $originalTicket = $ticket->getOriginal(); //returns the original model object
+        $deltaAttributes = null;
+        $originalTicket = null;
+
+        if($ticket) {
+            $deltaAttributes = $ticket->getDirty();  //returns an array of changed attributes
+            $originalTicket = $ticket->getOriginal(); //returns the original model object
+        }
 
         $updatedTicket = $this->ticketRepo->save($data, $ticket);
 

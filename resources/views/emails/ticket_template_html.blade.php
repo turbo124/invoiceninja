@@ -1,5 +1,5 @@
-@extends('emails.master')
+@extends('emails.master_contact')
 
 @section('body')
-{{$body}}
+{!! $body !!}
 @stop
