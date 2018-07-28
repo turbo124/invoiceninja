@@ -9,17 +9,11 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="{{ asset('js/quill.min.js') }}" type="text/javascript"></script>
 
-    <style type="text/css">
-
-        .td-left {width:1%; white-space:nowrap; text-align: right;}
-        #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
-
-    </style>
-
 @stop
 
 <style>
-    .td-left {width:1%; white-space:nowrap; text-align: right;}
+    .td-left {width:1%; white-space:nowrap; text-align: right; height:40px;}
+    .td-right {width:1%; white-space:nowrap; text-align: left; height:40px;}
     #accordion .ui-accordion-header {background: #033e5e; color: #fff;}
 </style>
 
@@ -60,15 +54,15 @@
     <div class="panel panel-default">
         <table width="100%">
             <tr>
-                <td width="50%">
-                    <table class="table table-striped dataTable" >
+                <td width="50%" style="vertical-align:top;">
+                    <table class="table table-striped datatable">
                         <tbody>
-                        <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td>{!! $ticket->ticket_number !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td>{!! $ticket->category->name !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td>{!! substr($ticket->subject, 0, 30) !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.client') !!}:</td><td>{!! $ticket->client->name !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.contact') !!}:</td><td>{!! $ticket->getContactName() !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td>
+                        <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td class="td-right">{!! $ticket->ticket_number !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td class="td-right">{!! $ticket->category->name !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td class="td-right">{!! substr($ticket->subject, 0, 30) !!}</td></tr>
+                        <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td><td class="td-right">{!! $ticket->client->name !!}</td></tr>
+                        <tr><td class="td-left" style="height:77px">{!! trans('texts.contact') !!}:</td><td class="td-right">{!! $ticket->getContactName() !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td class="td-right">
                                 @if(Auth::user()->id == Auth::user()->account->account_ticket_settings->ticket_master->id)
                                     <div id="">
                                         {!! Former::select('agent_id')
@@ -76,42 +70,49 @@
                                             ->text(trans('texts.ticket_master'))
                                             ->fromQuery($account->users, 'displayName', 'id')
                                          !!}
-                                        <span>
-                                            {!! Button::primary(trans('texts.save'))->small()->withAttributes(['onclick' => 'saveAction()']) !!}
-                                        </span>
                                     </div>
                                 @else
                                 {!! $ticket->agent() !!} {!! Icon::create('random') !!}
                                 @endif
                                 </td></tr>
-                        <tr><td></td><td></td></tr>
                         </tbody>
                     </table>
                 </td>
-                <td width="50%">
-                    <table class="table table-striped dataTable" >
+                <td width="50%" style="vertical-align:top;">
+                    <table class="table table-striped datatable">
                         <tbody>
-                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.last_updated') !!}:</td><td>{!! \App\Libraries\Utils::fromSqlDateTime($ticket->updated_at) !!}</td></tr>
-                        <tr ><td class="td-left">{!! trans('texts.due_date') !!}:</td>
-                            <td>
-                                <input id="due_date" type="text" data-bind="dateTimePicker"
+                        <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td class="td-right">{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.last_updated') !!}:</td><td class="td-right">{!! \App\Libraries\Utils::fromSqlDateTime($ticket->updated_at) !!}</td></tr>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td class="td-right"> {!! $ticket->status->name !!} </td></tr>
+
+                        <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td>
+                            <td class="td-right">
+                                <input id="due_date" type="text" data-bind="dateTimePicker" name="due_date"
                                        class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}" value="{{ $ticket->getDueDate() }}"/>
                             </td>
                         </tr>
-                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td> {!! $ticket->status->name !!} </td></tr>
                         <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
-                            <td>
+                            <td class="td-right">
                                 {!! Former::select('priority_id')->label('')
                                 ->fromQuery($ticket->getPriorityArray(), 'name', 'id') !!}
                             </td>
                         </tr>
+                        <tr>
+                            <td></td>
+                            <td><span class="pull-right">
+                                {!! Button::primary(trans('texts.save'))->small()->withAttributes(['onclick' => 'saveAction()']) !!}
+                            </span></td>
+                        </tr>
+
                         </tbody>
                     </table>
                 </td>
             </tr>
         </table>
     </div>
+
+
+
 
     @if($ticket)
     <div style="height:80px;">
@@ -378,7 +379,12 @@
 
 
         function saveAction() {
+            var dateTimeFormat = '{{ $datetimeFormat }}';
+            var timezone = '{{ $timezone }}';
+            var dateTime = $('#due_date').val();
+
             $('#description').val('');
+            $('#due_date').val(new Date(dateTime).toISOString().slice(0, 19).replace('T', ' '));
             $('.main-form').submit();
         }
 
@@ -451,6 +457,17 @@
 
         function focusEditor() {
             editor.focus();
+        }
+
+        function convertToSeconds(str) {
+            if (!str) {
+                return 0;
+            }
+            if (str.indexOf(':') >= 0) {
+                return moment.duration(str).asSeconds();
+            } else {
+                return parseFloat(str) * 60 * 60;
+            }
         }
     </script>
 

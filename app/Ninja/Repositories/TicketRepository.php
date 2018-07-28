@@ -99,6 +99,7 @@ class TicketRepository extends BaseRepository
                 $ticket = Ticket::createNew();
         }
 
+        //$input['due_date'] = Utils::timestampToDateTimeString($input['due_date']);
         $ticket->fill($input);
         $ticket->save();
 
