@@ -302,6 +302,8 @@
             format: '{{ $datetimeFormat }}',
             formatDate: '{{ $account->getMomentDateFormat() }}',
             formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
+            validateOnBlur: false
+
         });
 
 
@@ -379,10 +381,14 @@
 
 
         function saveAction() {
+
             var dateTimeFormat = '{{ $datetimeFormat }}';
             var timezone = '{{ $timezone }}';
-            var dateTime = $('#due_date').val();
+            var dateTime = moment($('#due_date').val(), dateTimeFormat);
 
+            /*
+            alert(moment.unix(dateTime).tz(timezone).format(dateTimeFormat));
+            */
             $('#description').val('');
             $('#due_date').val(new Date(dateTime).toISOString().slice(0, 19).replace('T', ' '));
             $('.main-form').submit();
@@ -391,7 +397,7 @@
         function submitAction() {
 
             if(checkCommentText('{{ trans('texts.enter_ticket_message') }}')) {
-                $('.main-form').submit();
+                saveAction();
             }
 
         }
@@ -402,7 +408,7 @@
                 $('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
                 $('#closed').val(null);
                 $('#status_id').val(2);
-                $('.main-form').submit();
+                saveAction();
             }
 
         }
@@ -412,7 +418,7 @@
                 $('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
                 $('#reopened').val(null);
                 $('#status_id').val(3);
-                $('.main-form').submit();
+                saveAction();
             }
 
         }
