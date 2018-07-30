@@ -143,6 +143,7 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('contact_id');
             $table->unsignedInteger('ticket_id')->index();
             $table->string('invitation_key')->index()->unique();
+            $table->string('ticket_hash')->index()->unique();
             $table->timestamps();
             $table->softDeletes();
             $table->timestamp('sent_date')->nullable();
@@ -163,6 +164,7 @@ class AddTicketsSchema extends Migration
             $table->increments('id');
             $table->unsignedInteger('lookup_account_id')->index();
             $table->string('invitation_key')->unique();
+            $table->string('ticket_hash')->unique();
             $table->string('message_id')->nullable()->unique();
 
             $table->foreign('lookup_account_id')->references('id')->on('lookup_accounts')->onDelete('cascade');

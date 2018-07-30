@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Constants\Domain;
 use App\Libraries\Utils;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
@@ -281,6 +282,23 @@ class Ticket extends EntityModel
     {
         return TicketTemplate::where('id', '=', $templateId)->first();
     }
+
+    public function getTicketEmailFormat()
+    {
+        if(!Utils::isNinjaProd())
+            $domain = config('ninja.tickets.ticket_support_domain');
+        else
+            $domain = Domain::getSupportDomainFromId($this->account->domain_id);
+
+        return $this->ticket_number.'+'.$this->getContactTicketHash().'@'.$domain;
+    }
+
+    public function getContactTicketHash()
+    {
+        $ticketInvitation = TicketInvitation::whereTicketId($this->id)->whereContactId($this->contact->id)->first();
+        return $ticketInvitation->ticket_hash;
+    }
+
 
 }
 

@@ -41,4 +41,15 @@ class Domain
                 return config('services.postmark_token_2');
         }
     }
+
+    public static function getSupportDomainFromId($id)
+    {
+        switch($id)
+        {
+            case static::INVOICENINJA_COM:
+                return config('ninja.tickets.ticket_support_domain');
+            case static::INVOICE_SERVICES:
+                return config('ninja.tickets.ticket_support_domain_2');
+        }
+    }
 }

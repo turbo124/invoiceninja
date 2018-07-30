@@ -166,6 +166,7 @@ class TicketRepository extends BaseRepository
         $ticketInvitation->ticket_id = $ticket->id;
         $ticketInvitation->contact_id = $contactId;
         $ticketInvitation->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
+        $ticketInvitation->ticket_hash = strtolower(str_random(RANDOM_KEY_LENGTH));
         $ticketInvitation->save();
 
     }

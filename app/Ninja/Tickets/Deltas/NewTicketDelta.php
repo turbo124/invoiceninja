@@ -25,12 +25,11 @@ class NewTicketDelta extends BaseDelta
 
             $ticketMailer = new TicketMailer();
             //$agent = User::whereAccountId($accountTicketSettings->account->id)->whereId($updatedTicket->agent_id)->first();
-            Log::error('entered function');
 
             $data['bccEmail'] = $accountTicketSettings->alert_ticket_assign_email;
             $data['body'] = parent::buildTicketBodyResponse($newTicket, $accountTicketSettings, $accountTicketSettings->new_ticket_template_id);
             $data['account'] = $newTicket->account;
-            $data['replyTo'] = $accountTicketSettings->ticket_master->email;
+            $data['replyTo'] = $newTicket->getTicketEmailFormat();
 
             //$toEmail = strtolower($updatedTicket->agent->email); //todo else $agent->email
             $toEmail = 'david@romulus.com.au';

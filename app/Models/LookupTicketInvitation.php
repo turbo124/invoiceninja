@@ -15,6 +15,7 @@ class LookupTicketInvitation extends LookupModel
     protected $fillable = [
         'lookup_account_id',
         'invitation_key',
+        'ticket_hash',
         'message_id',
     ];
 
