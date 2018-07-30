@@ -299,6 +299,7 @@
             validateOnBlur: false,
             step: '{{ env('TASK_TIME_STEP', 15) }}',
             value: '{{ $ticket->getDueDate() }}',
+            minDate: '{{ $ticket->getMinDueDate() }}',
             format: '{{ $datetimeFormat }}',
             formatDate: '{{ $account->getMomentDateFormat() }}',
             formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',

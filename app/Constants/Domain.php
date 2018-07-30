@@ -30,4 +30,15 @@ class Domain
     {
         return 'maildelivery@' . static::getDomainFromId($id);
     }
+
+    public static function getPostmarkTokenFromId($id)
+    {
+        switch($id)
+        {
+            case static::INVOICENINJA_COM:
+                return config('services.postmark_token');
+            case static::INVOICE_SERVICES:
+                return config('services.postmark_token_2');
+        }
+    }
 }

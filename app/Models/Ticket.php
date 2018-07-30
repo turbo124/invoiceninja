@@ -185,6 +185,11 @@ class Ticket extends EntityModel
             return trans('texts.no_due_date');
     }
 
+    public function getMinDueDate()
+    {
+        return Utils::fromSqlDateTime($this->created_at);
+    }
+
     /**
      * @return array
      *
