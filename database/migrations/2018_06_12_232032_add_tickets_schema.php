@@ -175,7 +175,7 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('account_id')->index();
             $table->timestamps();
 
-            $table->string('local_part')->unique(); //allows a user to specify a custom *@support.invoiceninja.com domain
+            $table->string('local_part'); //allows a user to specify a custom *@support.invoiceninja.com domain
             $table->string('from_name', 255); //define the from email addresses name
 
             $table->boolean('client_upload')->default(true);
