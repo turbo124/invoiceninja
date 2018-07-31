@@ -59,7 +59,7 @@ class DeltaFactory
      *
      * Possible actions.
      *
-     * 1. New ticket response (to client)
+     * 1. New ticket (response to client)
      * 2. Updated ticket (to client)
      * 3. Assign ticket (to agent)
      * 4. Close ticket (to client)
