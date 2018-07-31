@@ -59,22 +59,6 @@
                         </div>
                     </div>
 
-                    <div role="tabpanel" class="tab-pane" id="domain" >
-                            <div class="panel-body form-padding-right" >
-
-                                {!! Former::text('local_part')
-                                        ->placeholder('texts.local_part_placeholder')
-                                        ->label(trans('texts.local_part'))
-                                        ->help('texts.local_part_help') !!}
-
-                                {!! Former::text('from_name')
-                                        ->placeholder('texts.from_name_placeholder')
-                                        ->label(trans('texts.from_name'))
-                                        ->help('texts.from_name_help')!!}
-
-                            </div>
-
-                    </div>
 
                     <div role="tabpanel" class="tab-pane" id="attachments" >
                         <div class="panel-body form-padding-right" >

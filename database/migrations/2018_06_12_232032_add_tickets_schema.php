@@ -207,6 +207,24 @@ class AddTicketsSchema extends Migration
         });
 
 
+        $accounts = \App\Models\Account::all();
+
+            foreach ($accounts as $account){
+
+                if(!$account->account_ticket_settings) {
+
+                    $user = $account->users()->whereIsAdmin(1)->first();
+                    
+                    $accountTicketSettings = new AccountTicketSettings();
+                    $accountTicketSettings->ticket_master_id = $user->id;
+
+                    $account->account_ticket_settings()->save($accountTicketSettings);
+                }
+
+            }
+
+
+
         Schema::table('users', function ($table) {
             $table->string('avatar', 255);
             $table->unsignedInteger('avatar_width');
