@@ -215,7 +215,7 @@ class AddTicketsSchema extends Migration
 
                     $user = $account->users()->whereIsAdmin(1)->first();
                     
-                    $accountTicketSettings = new AccountTicketSettings();
+                    $accountTicketSettings = new \App\Models\AccountTicketSettings();
                     $accountTicketSettings->ticket_master_id = $user->id;
 
                     $account->account_ticket_settings()->save($accountTicketSettings);
