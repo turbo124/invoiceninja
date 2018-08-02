@@ -17,7 +17,7 @@ class AddTicketsSchema extends Migration
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('account_id');
-            $table->unsignedInteger('client_id');
+            $table->unsignedInteger('client_id')->nullable();
             $table->unsignedInteger('agent_id');
             $table->unsignedInteger('public_id');
             $table->unsignedInteger('priority_id')->default(1);

@@ -152,9 +152,14 @@ class TicketController extends BaseController
     public function inbound(TicketInboundRequest $request)
     {
         $ticket = $request->entity();
-        //Log::error(Response::all());
-        Log::error(Request::all());
-        //Log::error($request->all());
+
+        if(!$ticket) {
+            //spam
+        }
+        else {
+
+        }
+
     }
 
 }
