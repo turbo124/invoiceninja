@@ -15,4 +15,13 @@ class TicketInboundRequest extends Request
         Log::error($postmarkObject);
     }
 
+    public function rules()
+    {
+        return [];
+    }
+
+    public function authorise()
+    {
+        return true;
+    }
 }
