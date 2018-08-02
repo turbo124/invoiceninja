@@ -9,9 +9,9 @@ class TicketInboundRequest extends Request
 {
     public function entity()
     {
-        $postmarkObject = new InboundTicketFactory(request());
+        $postmarkObject = new InboundTicketFactory(request()->getContent());
 
-        Log::error(request());
+        Log::error(request()->getContent());
         Log::error($postmarkObject);
     }
 
