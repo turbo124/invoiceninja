@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\LookupAccount;
+use App\Models\LookupTicketInvitation;
 use App\Ninja\Tickets\Inbound\InboundTicketFactory;
 use Closure;
 use Illuminate\Http\Request;
@@ -21,18 +23,25 @@ class InboundTicketCheck
     public function handle(Request $request, Closure $next)
     {
 
+        if (! config('multi_db_enabled'))
+            return $next($request);
+
+
         $inbound = new InboundTicketFactory($request->input());
 
         if($inbound->mailboxHash()){
             //check if we can find the ticket_hash
-            //if exists - process ticket.
+            LookupTicketInvitation::setServerByField('ticket_hash', $inbound->mailboxHash());
+
         }
-        elseif($inbound->to()) {
-            //check if this is an email to a catch all email address
-            //if exists - fire a new ticket creation
-            //new tickets can only be accepted this way from EXISTING contacts, so we need to ensure it is from a
-            //existing contact. $inbound->fromFull
+
+        if($inbound->to()) {
+
+            $parts = explode("@", $inbound->to());
+
+            LookupAccount::setServerByField('support_email_local_part', $parts[0]);
         }
+
         return $next($request);
     }
 }

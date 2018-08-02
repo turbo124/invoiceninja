@@ -25,7 +25,6 @@ Route::group(['middleware' => ['lookup:contact']], function () {
     Route::post('/client/recover_password', ['as' => 'forgot', 'uses' => 'ClientAuth\ForgotPasswordController@sendResetLinkEmail']);
     Route::post('/client/password/reset', ['as' => 'forgot', 'uses' => 'ClientAuth\ResetPasswordController@reset']);
     Route::get('/proposal/image/{account_key}/{document_key}/{filename?}', 'ClientPortalProposalController@getProposalImage');
-    Route::post('/tickets/inbound', 'TicketController@inbound');
 });
 
 // Client visible pages
@@ -96,6 +95,10 @@ Route::group(['middleware' => 'lookup:license'], function () {
         Route::post('/signup/register', 'AccountController@doRegister');
         Route::get('/news_feed/{user_type}/{version}/', 'HomeController@newsFeed');
     }
+});
+
+Route::group(['middleware' => 'ticket'], function () {
+    Route::post('/tickets/inbound', 'TicketController@inbound');
 });
 
 Route::group(['middleware' => 'lookup:postmark'], function () {

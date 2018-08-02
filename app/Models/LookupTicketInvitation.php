@@ -45,4 +45,5 @@ class LookupTicketInvitation extends LookupModel
         config(['database.default' => $current]);
     }
 
+
 }

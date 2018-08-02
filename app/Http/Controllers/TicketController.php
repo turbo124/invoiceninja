@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\TicketUserViewed;
+use App\Http\Requests\TicketInboundRequest;
 use App\Http\Requests\TicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Libraries\Utils;
@@ -124,16 +125,6 @@ class TicketController extends BaseController
         }
     }
 
-    /**
-     * @param Request $request
-     */
-    public function inbound(Request $request)
-    {
-        $payload = $request;
-        //Log::error(Response::all());
-        Log::error(Request::all());
-        //Log::error($request->all());
-    }
 
     /**
      * @return array
@@ -153,6 +144,17 @@ class TicketController extends BaseController
             'method' => 'PUT',
 
         ];
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function inbound(TicketInboundRequest $request)
+    {
+        $ticket = $request->entity();
+        //Log::error(Response::all());
+        Log::error(Request::all());
+        //Log::error($request->all());
     }
 
 }
