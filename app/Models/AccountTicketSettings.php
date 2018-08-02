@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Libraries\Utils;
 use Eloquent;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class AccountTicketSettings.
@@ -14,7 +15,7 @@ class AccountTicketSettings extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'local_part',
+        'support_email_local_part',
         'from_name',
         'client_upload',
         'postmark_api_token',
@@ -35,6 +36,11 @@ class AccountTicketSettings extends Eloquent
         'ticket_master_id',
     ];
 
+    public function account()
+    {
+        return $this->belongsTo('App\Models\Account');
+    }
+
     public function ticket_master()
     {
         return $this->hasOne('App\Models\User', 'id', 'ticket_master_id');
@@ -46,6 +52,31 @@ class AccountTicketSettings extends Eloquent
         return $utils->getMaxFileUploadSizes();
     }
 
+    public static function checkUniqueLocalPart($localPart, Account $account)
+    {
+        if (config('multi_db_enabled')) {
+            $result = LookupAccount::where('support_email_local_part', '=', $localPart)
+                                            ->where('account_key', '!=', $account->account_key)->get();
+        }
+        else {
+            $result = AccountTicketSettings::where('support_email_local_part', '=', $localPart)
+                                            ->where('account_id', '!=', $account->id)->get();
+        }
 
+        if(count($result) == 0)
+            return false;
+        else
+            return true;
+    }
 
 }
+
+
+AccountTicketSettings::updating(function (AccountTicketSettings $accountTicketSettings) {
+
+    $dirty = $accountTicketSettings->getDirty();
+    if (array_key_exists('support_email_local_part', $dirty)) {
+        LookupAccount::updateSupportLocalPart($accountTicketSettings->account->account_key, $dirty['support_email_local_part']);
+    }
+
+});

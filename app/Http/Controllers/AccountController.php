@@ -967,6 +967,14 @@ class AccountController extends BaseController
         return Redirect::to('settings/'.ACCOUNT_TICKETS);
     }
 
+    public function checkUniqueLocalPart()
+    {
+        if(AccountTicketSettings::checkUniqueLocalPart(Input::get('support_email_local_part'), Auth::user()->account))
+            return RESULT_SUCCESS;
+        else
+            return RESULT_FAILURE;
+    }
+
     /**
      * @return \Illuminate\Http\RedirectResponse
      */

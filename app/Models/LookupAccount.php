@@ -15,6 +15,7 @@ class LookupAccount extends LookupModel
     protected $fillable = [
         'lookup_company_id',
         'account_key',
+        'support_email_local_part',
     ];
 
     public function lookupCompany()
@@ -72,6 +73,25 @@ class LookupAccount extends LookupModel
 
         config(['database.default' => $current]);
     }
+
+    public static function updateSupportLocalPart($accountKey, $support_email_local_part)
+    {
+        if (! env('MULTI_DB_ENABLED')) {
+            return;
+        }
+
+        $current = config('database.default');
+        config(['database.default' => DB_NINJA_LOOKUP]);
+
+        $lookupAccount = LookupAccount::whereAccountKey($accountKey)
+            ->firstOrFail();
+
+        $lookupAccount->support_email_local_part = $support_email_local_part ?: null;
+        $lookupAccount->save();
+
+        config(['database.default' => $current]);
+    }
+
 
     public static function validateField($field, $value, $account = false)
     {

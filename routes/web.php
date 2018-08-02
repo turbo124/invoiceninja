@@ -293,7 +293,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::post('ticket_template/create', 'TicketTemplateController@store');
     Route::post('ticket_templates/bulk', 'TicketTemplateController@bulk');
     Route::post('tickets/bulk', 'TicketController@bulk');
-
+    Route::post('api/tickets/checkSupportLocalPart', 'AccountController@checkUniqueLocalPart');
     // vendor
     Route::resource('vendors', 'VendorController');
     Route::get('api/vendors', 'VendorController@getDatatable');

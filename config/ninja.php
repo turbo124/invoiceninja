@@ -71,4 +71,6 @@ return [
         'ticket_support_email_name' => env('TICKET_SUPPORT_EMAIL_NAME'),
     ],
 
+    'multi_db_enabled' => env('MULTI_DB_ENABLED', false),
+
 ];

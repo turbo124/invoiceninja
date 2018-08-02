@@ -175,7 +175,7 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('account_id')->index();
             $table->timestamps();
 
-            $table->string('local_part'); //allows a user to specify a custom *@support.invoiceninja.com domain
+            $table->string('support_email_local_part')->unique()->nullable(); //allows a user to specify a custom *@support.invoiceninja.com domain
             $table->string('from_name', 255); //define the from email addresses name
 
             $table->boolean('client_upload')->default(true);
@@ -204,6 +204,11 @@ class AddTicketsSchema extends Migration
 
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->foreign('ticket_master_id')->references('id')->on('users')->onDelete('cascade');
+        });
+
+
+        Schema::table('lookup_accounts', function ($table) {
+            $table->string('support_email_local_part')->unique()->nullable();
         });
 
 

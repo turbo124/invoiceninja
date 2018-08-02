@@ -11,7 +11,7 @@
     !!}
 
     {{ Former::populate($account_ticket_settings) }}
-    {{ Former::populateField('local_part', $account_ticket_settings->local_part) }}
+    {{ Former::populateField('local_part', $account_ticket_settings->support_email_local_part) }}
 
     @include('accounts.nav', ['selected' => ACCOUNT_TICKETS])
 
@@ -59,6 +59,33 @@
                         </div>
                     </div>
 
+                    <div role="tabpanel" class="tab-pane" id="domain" >
+                            <div class="panel-body form-padding-right" >
+
+                                <div class="alert alert-danger" role="alert" id="local_part_unavailable">
+                                    {!! trans('texts.local_part_unavailable')  !!}
+                                </div>
+
+                                <div class="alert alert-success" role="alert" id="local_part_available">
+                                    {!! trans('texts.local_part_available')  !!}
+                                </div>
+
+                                <div class="input-group">
+                                {!! Former::text('support_email_local_part')
+                                        ->placeholder('texts.local_part_placeholder')
+                                        ->label(trans('texts.local_part'))
+                                        ->append(Button::info(trans('texts.search'))->withAttributes(['onclick' => 'checkSupportEmail()']))
+                                        ->help('texts.local_part_help') !!}
+
+
+                                {!! Former::text('from_name')
+                                        ->placeholder('texts.from_name_placeholder')
+                                        ->label(trans('texts.from_name'))
+                                        ->help('texts.from_name_help')!!}
+
+                            </div>
+
+                    </div>
 
                     <div role="tabpanel" class="tab-pane" id="attachments" >
                         <div class="panel-body form-padding-right" >
@@ -199,7 +226,7 @@
             </div>
 
             <center>
-                {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk')) !!}
+                {!! Button::success(trans('texts.save'))->submit()->large()->appendIcon(Icon::create('floppy-disk'))->withAttributes(['id'=>'saveButton']) !!}
             </center>
 
         </div>
@@ -208,5 +235,37 @@
 
 <script>
     window.onDatatableReady = actionListHandler;
+
+    $( function() {
+
+        $('#local_part_unavailable').hide();
+        $('#local_part_available').hide();
+
+    });
+
+    function checkSupportEmail()
+    {
+        $.ajax({
+            type: "POST",
+            url : "/api/tickets/checkSupportLocalPart",
+            data: { support_email_local_part: $('#support_email_local_part').val() },
+            success: function(msg){
+
+                if(msg == '{{ RESULT_SUCCESS }}') {
+                    $('#local_part_available').fadeOut();
+                     $('#local_part_unavailable').fadeIn();
+                }
+                else {
+                    $('#local_part_unavailable').fadeOut();
+                    $('#local_part_available').fadeIn();
+
+                }
+            }
+
+
+        });
+    }
+
+
 </script>
 @stop
