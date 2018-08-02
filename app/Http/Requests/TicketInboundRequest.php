@@ -20,7 +20,7 @@ class TicketInboundRequest extends Request
         return [];
     }
 
-    public function authorise()
+    public function authorize()
     {
         return true;
     }
