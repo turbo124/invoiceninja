@@ -70,7 +70,6 @@
                                     {!! trans('texts.local_part_available')  !!}
                                 </div>
 
-                                <div class="input-group">
                                 {!! Former::text('support_email_local_part')
                                         ->placeholder('texts.local_part_placeholder')
                                         ->label(trans('texts.local_part'))
