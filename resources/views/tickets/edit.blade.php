@@ -42,6 +42,8 @@
             {!! Former::hidden('closed')->value($ticket->closed)->id('closed') !!}
             {!! Former::hidden('reopened')->value($ticket->reopened)->id('reopened') !!}
             {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
+            {!! Former::hidden('contact_key')->value($ticket->contact_key)->id('contact_key') !!}
+            {!! Former::hidden('client_id')->value($ticket->client_id)->id('client_id') !!}
         @else
             {!! Former::hidden('status_id')->value(1) !!}
         @endif
@@ -60,7 +62,20 @@
                         <tr><td class="td-left">{!! trans('texts.ticket_number')!!}</td><td class="td-right">{!! $ticket->ticket_number !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td class="td-right">{!! $ticket->category->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td class="td-right">{!! substr($ticket->subject, 0, 30) !!}</td></tr>
+                        @if($ticket->client_id)
                         <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td><td class="td-right">{!! $ticket->client->name !!}</td></tr>
+                        @else
+                        <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td>
+                        <td class="td-right">
+                        {!! Former::select('client')
+                        ->label('')
+                        ->addOption('', '')
+                        ->data_bind("dropdown: client, dropdownOptions: {highlighter: comboboxHighlighter}")
+                        ->addClass('client-input')
+                        ->addGroupClass('client_select closer-row') !!}
+                        </td></tr>
+                        @endif
+
                         <tr><td class="td-left" style="height:77px">{!! trans('texts.contact') !!}:</td><td class="td-right">{!! $ticket->getContactName() !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.assigned_to') !!}:</td><td class="td-right">
                                 @if(Auth::user()->id == Auth::user()->account->account_ticket_settings->ticket_master->id)
@@ -270,15 +285,66 @@
     </div>
 
     <script type="text/javascript">
+        <!-- Initialize client sleector -->
+        @if($clients)
+
+        var clients = {!! $clients !!};
+        var clientMap = {};
+        var $clientSelect = $('select#client');
+
+        $(function() {
+            // create client dictionary
+
+            for (var i=0; i<clients.length; i++) {
+                var client = clients[i];
+                clientMap[client.public_id] = client;
+                @if (! $ticket->id)
+                    if (!getClientDisplayName(client)) {
+                        continue;
+                    }
+                @endif
+                var clientName = client.name || '';
+                for (var j=0; j<client.contacts.length; j++) {
+                    var contact = client.contacts[j];
+                    var contactName = getContactDisplayNameWithEmail(contact);
+                        if (clientName && contactName) {
+                            clientName += '<br/>  • ';
+                        }
+                    if (contactName) {
+                        clientName += contactName;
+                    }
+                }
+                $clientSelect.append(new Option(clientName, client.public_id));
+            }
+
+            //harvest and set the client_id and contact_id here
+            var $input = $('select#client');
+            $input.combobox().on('change', function(e) {
+                var clientId = parseInt($('input[name=client]').val(), 10) || 0;
+
+                if (clientId > 0) {
+
+                    for (var j=0; j<client.contacts.length; j++) {
+                        var contact = client.contacts[j];
+
+                        if(contact.email == $('#contact_key').val()) {
+                            $('#contact_key').val(contact.contact_key);
+                            $('#client_id').val(clientId);
+                        }
+                    }
+                }
+            });
+
+        });
+        @endif
+
 
         <!-- Initialize ticket_comment accordion -->
         $( function() {
             $( "#accordion" ).accordion();
 
             window.model = new ViewModel({!! $ticket !!});
-
             ko.applyBindings(model);
-
             $('#description').text('');
 
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
@@ -318,7 +384,6 @@
                 var self = this;
 
                 self.documents = ko.observableArray();
-
                 self.mapping = {
                     'documents': {
                         create: function (options) {
@@ -387,9 +452,6 @@
             var timezone = '{{ $timezone }}';
             var dateTime = moment($('#due_date').val(), dateTimeFormat);
 
-            /*
-            alert(moment.unix(dateTime).tz(timezone).format(dateTimeFormat));
-            */
             $('#description').val('');
             $('#due_date').val(new Date(dateTime).toISOString().slice(0, 19).replace('T', ' '));
             $('.main-form').submit();

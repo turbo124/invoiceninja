@@ -7,6 +7,7 @@ use App\Http\Requests\TicketInboundRequest;
 use App\Http\Requests\TicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Libraries\Utils;
+use App\Models\Client;
 use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
@@ -71,13 +72,17 @@ class TicketController extends BaseController
     public function edit(TicketRequest $request)
     {
         $ticket = $request->entity();
-        //$ticket = $ticket->fresh();
+        $clients = false;
+
+        //If we are missing a client from the ticket, load clients for assignment
+        if(!$ticket->client_id)
+            $clients = $this->ticketService->findClientsByContactEmail($ticket->contact_key);
+
+        $data = array_merge(self::getViewModel($ticket, $clients));
 
         event(new TicketUserViewed($ticket));
-        
-        $data = $this->getViewmodel($ticket);
 
-            return View::make('tickets.edit', $data);
+        return View::make('tickets.edit', $data);
     }
 
     /**
@@ -87,6 +92,8 @@ class TicketController extends BaseController
     {
         $data = $request->input();
         $data['document_ids'] = $request->document_ids;
+        $data['client_id'] = $request->client_id;
+        $data['contact_key'] = $request->contact_key;
 
         $ticket = $this->ticketService->save($data, $request->entity());
         $ticket->load('documents');
@@ -129,9 +136,10 @@ class TicketController extends BaseController
     /**
      * @return array
      */
-    private static function getViewModel($ticket = false)
+    private static function getViewModel($ticket = false, $clients = false)
     {
         return [
+            'clients' => $clients,
             'status' => $ticket->status(),
             'comments' => $ticket->comments(),
             'account' => Auth::user()->account,

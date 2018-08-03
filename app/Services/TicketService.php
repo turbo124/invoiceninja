@@ -3,8 +3,10 @@ namespace App\Services;
 use App\Jobs\Ticket\TicketDelta;
 use App\Jobs\Ticket\TicketSendNotificationEmail;
 use App\Libraries\Utils;
+use App\Models\Client;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Ninja\Repositories\TicketRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use DataTable;
 
@@ -147,6 +149,18 @@ class TicketService extends BaseService
 
         if(strlen($data['comment']) >= 1)
             $this->dispatch(new TicketSendNotificationEmail($data, $ticket));
+    }
+
+    public function findClientsByContactEmail($email){
+
+        $clients = Client::scope()->with('contacts')->whereHas('contacts', function ($query) use($email){
+            $query->where('contacts.email', '=', $email);
+        });
+
+        if (!Auth::user()->hasPermission('view_client'))
+            $clients = $clients->where('clients.user_id', '=', Auth::user()->id);
+
+        return $clients->get();
     }
 
 }
