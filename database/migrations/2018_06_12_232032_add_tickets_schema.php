@@ -237,6 +237,25 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('avatar_size');
             $table->text('signature');
         });
+
+
+
+        if(!Utils::isNinja()) {
+            Schema::table('activities', function ($table) {
+                $table->index(['contact_id', 'account_id']);
+                $table->index(['payment_id', 'account_id']);
+                $table->index(['invitation_id', 'account_id']);
+                $table->index(['user_id', 'account_id']);
+                $table->index(['invoice_id', 'account_id']);
+                $table->index(['client_id', 'account_id']);
+            });
+
+
+            Schema::table('invitations', function ($table) {
+                $table->index(['deleted_at', 'invoice_id']);
+            });
+        }
+
     }
 
     /**
