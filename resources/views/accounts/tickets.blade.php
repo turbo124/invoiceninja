@@ -257,7 +257,6 @@
                 else {
                     $('#local_part_unavailable').fadeOut();
                     $('#local_part_available').fadeIn();
-
                 }
             }
 

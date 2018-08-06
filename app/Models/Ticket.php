@@ -299,6 +299,24 @@ class Ticket extends EntityModel
         return $ticketInvitation->ticket_hash;
     }
 
+    public function getClientMergeableTickets()
+    {
+        return Ticket::scope()
+            ->where('client_id', '=', $this->client_id)
+            ->where('status_id', '!=', 3)
+            ->get();
+    }
+
+    public function isMergeAble()
+    {
+        if($this->status_id == 3)
+            return false;
+        elseif($this->is_deleted)
+            return false;
+        else
+            return true;
+    }
+
 
 }
 

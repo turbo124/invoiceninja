@@ -2974,6 +2974,8 @@ $LANG = array(
     'enable_proposals_for_background' => 'To upload a background image :link to enable the proposals module.',
     'ticket_assignment' => 'Ticket :ticket_number has been assigned to :agent',
     'payment_reference' => 'Payment Reference',
+    'merge' => 'Merge',
+    'merge_prompt' => 'Enter ticket number to merge into',
 
 );
 

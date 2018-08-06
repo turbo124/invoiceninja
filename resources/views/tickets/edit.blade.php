@@ -186,9 +186,7 @@
         <center class="buttons">
             {!! DropdownButton::normal(trans('texts.more_actions'))
             ->withContents([
-            ['label'=>trans('texts.ticket_split'),'url'=>'tickets/sdsds'],
-            ['label'=>trans('texts.ticket_merge'),'url'=>'tickets/sdsds'],
-            ['label'=>trans('texts.mark_spam'),'url'=>'tickets/sdsds'],
+            ['label'=>trans('texts.ticket_merge'),'url'=>'/tickets/merge/'. $ticket->public_id ],
             ])
             ->large()
             ->dropup() !!}
@@ -244,6 +242,7 @@
                 </div>
             </div>
 
+
         </div>
         <div class="pull-right">
             {!! Button::primary(trans('texts.save'))->large()->withAttributes(['onclick' => 'saveAction()']) !!}
@@ -285,57 +284,58 @@
     </div>
 
     <script type="text/javascript">
-        <!-- Initialize client sleector -->
+
+        <!-- Initialize client selector -->
         @if($clients)
 
-        var clients = {!! $clients !!};
-        var clientMap = {};
-        var $clientSelect = $('select#client');
+            var clients = {!! $clients !!};
+            var clientMap = {};
+            var $clientSelect = $('select#client');
 
-        $(function() {
-            // create client dictionary
+            $(function() {
+                // create client dictionary
 
-            for (var i=0; i<clients.length; i++) {
-                var client = clients[i];
-                clientMap[client.public_id] = client;
-                @if (! $ticket->id)
-                    if (!getClientDisplayName(client)) {
-                        continue;
-                    }
-                @endif
-                var clientName = client.name || '';
-                for (var j=0; j<client.contacts.length; j++) {
-                    var contact = client.contacts[j];
-                    var contactName = getContactDisplayNameWithEmail(contact);
-                        if (clientName && contactName) {
-                            clientName += '<br/>  • ';
+                for (var i=0; i<clients.length; i++) {
+                    var client = clients[i];
+                    clientMap[client.public_id] = client;
+                    @if (! $ticket->id)
+                        if (!getClientDisplayName(client)) {
+                            continue;
                         }
-                    if (contactName) {
-                        clientName += contactName;
-                    }
-                }
-                $clientSelect.append(new Option(clientName, client.public_id));
-            }
-
-            //harvest and set the client_id and contact_id here
-            var $input = $('select#client');
-            $input.combobox().on('change', function(e) {
-                var clientId = parseInt($('input[name=client]').val(), 10) || 0;
-
-                if (clientId > 0) {
-
+                    @endif
+                    var clientName = client.name || '';
                     for (var j=0; j<client.contacts.length; j++) {
                         var contact = client.contacts[j];
-
-                        if(contact.email == $('#contact_key').val()) {
-                            $('#contact_key').val(contact.contact_key);
-                            $('#client_id').val(clientId);
+                        var contactName = getContactDisplayNameWithEmail(contact);
+                            if (clientName && contactName) {
+                                clientName += '<br/>  • ';
+                            }
+                        if (contactName) {
+                            clientName += contactName;
                         }
                     }
+                    $clientSelect.append(new Option(clientName, client.public_id));
                 }
-            });
 
-        });
+                //harvest and set the client_id and contact_id here
+                var $input = $('select#client');
+                $input.combobox().on('change', function(e) {
+                    var clientId = parseInt($('input[name=client]').val(), 10) || 0;
+
+                    if (clientId > 0) {
+
+                        for (var j=0; j<client.contacts.length; j++) {
+                            var contact = client.contacts[j];
+
+                            if(contact.email == $('#contact_key').val()) {
+                                $('#contact_key').val(contact.contact_key);
+                                $('#client_id').val(clientId);
+                            }
+                        }
+                    }
+                });
+
+            });
         @endif
 
 
@@ -538,6 +538,8 @@
                 return parseFloat(str) * 60 * 60;
             }
         }
+
+
     </script>
 
 @stop

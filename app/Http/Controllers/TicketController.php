@@ -8,6 +8,7 @@ use App\Http\Requests\TicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Libraries\Utils;
 use App\Models\Client;
+use App\Models\Ticket;
 use App\Models\TicketStatus;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
@@ -150,7 +151,6 @@ class TicketController extends BaseController
             'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
             'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
             'method' => 'PUT',
-
         ];
     }
 
@@ -169,5 +169,19 @@ class TicketController extends BaseController
         }
 
     }
+
+    public function merge(TicketRequest $request)
+    {
+        $ticket = $request->entity();
+
+        $data = [
+        'mergeableTickets' => $ticket->getClientMergeableTickets(),
+        ];
+
+        $data = array_merge($this->getViewmodel($ticket), $data);
+
+        return View::make('tickets.edit', $this->getViewmodel($ticket));
+    }
+
 
 }
