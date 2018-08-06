@@ -175,12 +175,21 @@ class TicketController extends BaseController
         $ticket = Ticket::scope($publicId)->first();
 
         $data = [
-        'mergeableTickets' => $ticket->getClientMergeableTickets(),
+            'mergeableTickets' => $ticket->getClientMergeableTickets(),
+            'ticket' => $ticket,
+            'account' => Auth::user()->account,
+            'title' => trans('texts.ticket_merge'),
+            'method' => 'POST',
+            'url' => 'tickets/merge/',
+            'entity' => $ticket,
         ];
 
-        $data = array_merge($this->getViewmodel($ticket), $data);
-
         return View::make('tickets.merge', $data);
+    }
+
+    public function actionMerge()
+    {
+
     }
 
 

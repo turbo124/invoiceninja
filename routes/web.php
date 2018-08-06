@@ -298,6 +298,7 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::post('tickets/bulk', 'TicketController@bulk');
     Route::post('api/tickets/checkSupportLocalPart', 'AccountController@checkUniqueLocalPart');
     Route::get('tickets/merge/{public_id}', 'TicketController@merge');
+    Route::post('tickets/merge/', 'TicketController@actionMerge');
 
     // vendor
     Route::resource('vendors', 'VendorController');
