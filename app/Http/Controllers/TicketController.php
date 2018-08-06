@@ -170,9 +170,9 @@ class TicketController extends BaseController
 
     }
 
-    public function merge(TicketRequest $request)
+    public function merge($publicId)
     {
-        $ticket = $request->entity();
+        $ticket = Ticket::scope($publicId)->first();
 
         $data = [
         'mergeableTickets' => $ticket->getClientMergeableTickets(),
@@ -180,7 +180,7 @@ class TicketController extends BaseController
 
         $data = array_merge($this->getViewmodel($ticket), $data);
 
-        return View::make('tickets.edit', $this->getViewmodel($ticket));
+        return View::make('tickets.merge', $data);
     }
 
 
