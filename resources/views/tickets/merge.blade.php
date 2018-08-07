@@ -25,12 +25,13 @@
     @endif
 
 
-    <div class="panel panel-default"></div>
+    <div class="panel panel-default">
+
         <div class="panel-heading">
             <h3 class="panel-title">{{ trans('texts.ticket_merge') }}</h3>
         </div>
 
-        <div class="panel-body" style="background: #e3e3e3;">
+        <div class="panel-body">
 
             <div class="row">
 
@@ -45,11 +46,10 @@
                     <br>
                     {!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}
                 </div>
+
             </div>
 
             <div class="row">
-
-                <hr>
 
                 <div class="col-md-3">
                 </div>
@@ -65,14 +65,25 @@
 
             </div>
 
-            <div class="row">
-                <hr>
-                {!! Icon::create('download-alt') !!}
-            </div>
+        </div>
+
+    </div>
+
+    <div style="text-align: center; width: 100%;">
+    <hr>
+        <b> {{ trans('texts.merge_placeholder', ['ticket' =>$ticket->ticket_number]) }}</b>
+    <hr>
+    </div>
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ trans('texts.select_ticket') }}</h3>
+        </div>
+
+        <div class="panel-body">
 
             <div class="row">
-
-                <hr>
 
                 <div class="col-md-3">
                 {!! trans('texts.ticket_number') !!}
@@ -105,16 +116,9 @@
 
         </div>
 
-
     </div>
 
-
-
-
-
-
     {!! Former::close() !!}
-
 
 
     <script type="text/javascript">
@@ -151,6 +155,23 @@
 
         $('.main-form').submit();
 
+    }
+
+
+
+
+
+
+
+
+
+    var ViewModel = function(data) {
+        var self = this;
+
+        self.merged_parent_ticket_id = ko.observable();
+        self.old_ticket_comment = ko.observable();
+        self.updated_ticket_comment = ko.observable();
+        self.ticket = 
     }
 </script>
 

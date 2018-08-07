@@ -58,6 +58,8 @@ class AddTicketsSchema extends Migration
             $table->boolean('is_internal')->default(0);
             $table->unsignedInteger('status_id');
             $table->unsignedInteger('category_id');
+            $table->unsignedInteger('merged_parent_ticket_id')->nullable();
+            $table->unsignedInteger('parent_ticket_id')->nullable();
             $table->unsignedInteger('ticket_number');
             $table->text('subject');
             $table->text('description');

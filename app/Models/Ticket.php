@@ -42,6 +42,8 @@ class Ticket extends EntityModel
         'ticket_number',
         'reopened',
         'closed',
+        'merged_parent_ticket_id',
+        'parent_ticket_id',
     ];
 
     /**
@@ -122,6 +124,18 @@ class Ticket extends EntityModel
     public function invitations()
     {
         return $this->hasMany('App\Models\TicketInvitation')->orderBy('ticket_invitations.contact_id');
+    }
+
+    public function parentTicket() {
+        return $this->belongsToOne(static::class, 'parent_ticket_id');
+    }
+
+    public function childTickets() {
+        return $this->hasMany(static::class, 'parent_ticket_id');
+    }
+
+    public function mergedTicketParent() {
+        return $this->belongsToOne(static::class, 'merged_parent_ticket_id');
     }
 
     /**

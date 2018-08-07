@@ -2976,6 +2976,12 @@ $LANG = array(
     'payment_reference' => 'Payment Reference',
     'merge' => 'Merge',
     'merge_prompt' => 'Enter ticket number to merge into',
+    'merge_from_to' => 'Ticket #:old_ticket  merged into Ticket #:new_ticket',
+    'merge_closed_ticket_text' => 'This ticket was closed and merged into :new_ticket - :subject',
+    'merge_updated_ticket_text' => 'Ticket #:old_ticket was closed and merged into this ticket',
+    'merge_placeholder' => 'Merge ticket #:ticket into the following ticket',
+    'select_ticket' => 'Select Ticket',
+
 
 );
 
