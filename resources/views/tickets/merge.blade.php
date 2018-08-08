@@ -17,11 +17,12 @@
         ->autocomplete('off')
         ->method($method)
         ->rules([
-            'parent' => 'required',
+            'updated_ticket_id' => 'required',
         ]) !!}
 
     @if ($ticket)
         {!! Former::populate($ticket) !!}
+        {!! Former::hidden('public_id') !!}
     @endif
 
 
@@ -56,8 +57,9 @@
 
                 <div class="col-md-9">
 
-                {!! Former::textarea('closing_note')
+                {!! Former::textarea('old_ticket_text')
                             ->label('')
+                            ->data_bind("value: old_ticket_text")
                             ->help('This ticket will be closed with the following comment')
                             !!}
 
@@ -91,15 +93,16 @@
 
                 <div class="col-md-9">
 
-                    {!! Former::select('parent')
+                    {!! Former::select('updated_ticket_id')
                             ->label('')
                             ->help('Select ticket to merge into')
                             ->addOption('', '')
-                            ->data_bind("dropdown: merge, dropdownOptions: {highlighter: comboboxHighlighter}")
+                            ->data_bind("dropdown: updated_ticket_id, dropdownOptions: {highlighter: comboboxHighlighter}")
                             ->addClass('pull-right')
                             ->addGroupClass('') !!}
 
-                    {!! Former::textarea('updating_note')
+                    {!! Former::textarea('updated_ticket_comment')
+                                ->data_bind("value: updated_ticket_comment")
                                 ->label('')
                                 ->help('This ticket will be updated with the following comment')
                                 !!}
@@ -123,12 +126,13 @@
 
     <script type="text/javascript">
 
+
+
     <!-- Init mergeable tickets -->
     @if($mergeableTickets)
         var mergeableTickets = {!! $mergeableTickets !!};
         var ticketMap = {};
-        var $ticketSelect = $('select#parent');
-        var parentTicketId = false;
+        var $ticketSelect = $('select#updated_ticket_id');
 
         $(function() {
             for(var i=0; i<mergeableTickets.length; i++){
@@ -137,19 +141,22 @@
                 $ticketSelect.append(new Option(' # ' + ticket.ticket_number + ' :: ' + ticket.subject, ticket.public_id));
             }
 
-
-            //harvest and set the client_id and contact_id here
-            var $input = $('select#parent');
+            var $input = $('select#updated_ticket_id');
             $input.combobox().on('change', function(e) {
-                var selectedTicketid = parseInt($('input[name=merge]').val(), 10) || 0;
+                var selectedTicketid = parseInt($('input[name=updated_ticket_id]').val(), 10) || 0;
 
                 if (selectedTicketid > 0) {
-                    parentTicketId = selectedTicketid;
+                    model.updated_ticket_id = selectedTicketid;
+                    model.updateTicketText();
                 }
             });
         });
     @endif
 
+    $(function() {
+        window.model = new ViewModel({!! $ticket !!});
+        ko.applyBindings(model);
+    });
 
     function submitAction() {
 
@@ -158,20 +165,26 @@
     }
 
 
-
-
-
-
-
-
-
     var ViewModel = function(data) {
         var self = this;
 
-        self.merged_parent_ticket_id = ko.observable();
         self.old_ticket_comment = ko.observable();
         self.updated_ticket_comment = ko.observable();
-        self.ticket = 
+        self.public_id = data.public_id;
+        self.updated_ticket_id = ko.observable();
+        self.old_ticket_text = ko.observable();
+
+        self.updateTicketText = function() {
+            var transOldTicketText = '{{ trans('texts.merge_closed_ticket_text',['old_ticket' => $ticket->ticket_number]) }}';
+            var transUpdatedTicketText = '{{ trans('texts.merge_updated_ticket_text',['old_ticket' => $ticket->ticket_number]) }}';
+
+            if (self.updated_ticket_id) {
+                var ticket = ticketMap[self.updated_ticket_id];
+                self.old_ticket_text(transOldTicketText.replace(':new_ticket', ticket.ticket_number).replace(':subject', ticket.subject));
+                self.updated_ticket_comment(transUpdatedTicketText);
+            }
+        }
+
     }
 </script>
 

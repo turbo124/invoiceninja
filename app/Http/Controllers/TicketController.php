@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\TicketUserViewed;
 use App\Http\Requests\TicketInboundRequest;
+use App\Http\Requests\TicketMergeRequest;
 use App\Http\Requests\TicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Libraries\Utils;
@@ -91,11 +92,13 @@ class TicketController extends BaseController
      */
     public function update(UpdateTicketRequest $request)
     {
-        $data = $request->input();
         $data['document_ids'] = $request->document_ids;
-        $data['client_id'] = $request->client_id;
-        $data['contact_key'] = $request->contact_key;
 
+
+        if($request->data)
+            $data = (array)$request->data;
+
+        dd($request->input());
         $ticket = $this->ticketService->save($data, $request->entity());
         $ticket->load('documents');
         $entityType = $ticket->getEntityType();
@@ -187,9 +190,15 @@ class TicketController extends BaseController
         return View::make('tickets.merge', $data);
     }
 
-    public function actionMerge()
+    public function actionMerge(TicketMergeRequest $request)
     {
+        $ticket = $request->entity();
+        dd($ticket);
 
+        $this->ticketService->mergeTicket($ticket, $request->input());
+
+        Session::reflash();
+        return redirect("tickets/$request->updated_ticket_id/edit");
     }
 
 

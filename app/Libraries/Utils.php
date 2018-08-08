@@ -781,6 +781,22 @@ class Utils
         }
     }
 
+    public static function toSqlDateTime($date, $formatResult = true)
+    {
+        if (! $date) {
+            return;
+        }
+
+        $format = Session::get(SESSION_DATE_FORMAT, DEFAULT_DATE_FORMAT);
+        $dateTime = DateTime::createFromFormat($format, $date);
+dd($dateTime);
+        if (! $dateTime) {
+            return $date;
+        } else {
+            return $formatResult ? $dateTime->format('Y-m-d H:i:s') : $dateTime;
+        }
+    }
+
     public static function fromSqlDate($date, $formatResult = true)
     {
         if (! $date || $date == '0000-00-00') {

@@ -29,21 +29,12 @@
             ]) !!}
 
     @if ($ticket)
-        {!! Former::populate($ticket) !!}
     @endif
 
     <div style="display:none">
-        {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
-        {!! Former::hidden('account_id')->value($account->id) !!}
         {!! Former::hidden('category_id')->value(1) !!}
         @if($ticket)
-            {!! Former::hidden('public_id')->value($ticket->public_id) !!}
-            {!! Former::hidden('status_id')->value($ticket->status_id)->id('status_id') !!}
-            {!! Former::hidden('closed')->value($ticket->closed)->id('closed') !!}
-            {!! Former::hidden('reopened')->value($ticket->reopened)->id('reopened') !!}
-            {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
-            {!! Former::hidden('contact_key')->value($ticket->contact_key)->id('contact_key') !!}
-            {!! Former::hidden('client_id')->value($ticket->client_id)->id('client_id') !!}
+
         @else
             {!! Former::hidden('status_id')->value(1) !!}
         @endif
@@ -102,8 +93,8 @@
 
                         <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td>
                             <td class="td-right">
-                                <input id="due_date" type="text" data-bind="dateTimePicker" name="due_date"
-                                       class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}" value="{{ $ticket->getDueDate() }}"/>
+                                <input type="text" data-bind="value: due_date.pretty"
+                                       class="form-control time-input" placeholder=" {{  $ticket->getDueDate() ?: trans('texts.due_date') }}" id="due_date"/>
                             </td>
                         </tr>
                         <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
@@ -328,8 +319,8 @@
                             var contact = client.contacts[j];
 
                             if(contact.email == $('#contact_key').val()) {
-                                $('#contact_key').val(contact.contact_key);
-                                $('#client_id').val(clientId);
+                                model.contact_key = contact.contact_key;
+                                model.client_id = clientId;
                             }
                         }
                     }
@@ -344,12 +335,14 @@
             $( "#accordion" ).accordion();
 
             window.model = new ViewModel({!! $ticket !!});
+            console.log('ouch');
             ko.applyBindings(model);
             $('#description').text('');
 
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
         } );
+
 
         // Add moment support to the datetimepicker
         Date.parseDate = function( input, format ){
@@ -364,14 +357,14 @@
             lazyInit: true,
             validateOnBlur: false,
             step: '{{ env('TASK_TIME_STEP', 15) }}',
-            value: '{{ $ticket->getDueDate() }}',
             minDate: '{{ $ticket->getMinDueDate() }}',
             format: '{{ $datetimeFormat }}',
             formatDate: '{{ $account->getMomentDateFormat() }}',
             formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
+            timezone: '{{ $timezone }}',
             validateOnBlur: false
+            });
 
-        });
 
 
         <!-- Initialize drop zone file uploader -->
@@ -382,6 +375,18 @@
 
             var ViewModel = function (data) {
                 var self = this;
+                var dateTimeFormat = '{{ $datetimeFormat }}';
+                var timezone = '{{ $timezone }}';
+
+                self.status_id = ko.observable(data.status_id);
+                self.closed = ko.observable(data.closed);
+                self.reopened = ko.observable(data.reopened);
+                self.subject = ko.observable(data.subject);
+                self.contact_key = ko.observable(data.contact_key);
+                self.client_id = ko.observable(data.client_id);
+                self.due_date = ko.observable(self.due_date);
+                self.public_id = ko.observable(data.public_id);
+                self.account_id = ko.observable(data.account_id);
 
                 self.documents = ko.observableArray();
                 self.mapping = {
@@ -391,6 +396,15 @@
                         }
                     }
                 }
+
+                self.due_date.pretty = ko.computed({
+                    read: function() {
+                        return self.due_date() ? moment(self.due_date()).format(dateTimeFormat) : '';
+                    },
+                    write: function(data) {
+                        self.due_date(moment($('#due_date').val(), dateTimeFormat).tz(timezone).format("YYYY-MM-DD HH:mm:ss"));
+                    }
+                });
 
                 if (data) {
                     ko.mapping.fromJS(data, self.mapping, this);
@@ -448,12 +462,8 @@
 
         function saveAction() {
 
-            var dateTimeFormat = '{{ $datetimeFormat }}';
-            var timezone = '{{ $timezone }}';
-            var dateTime = moment($('#due_date').val(), dateTimeFormat);
-
             $('#description').val('');
-            $('#due_date').val(new Date(dateTime).toISOString().slice(0, 19).replace('T', ' '));
+            //$('#due_date').val(new Date(dateTime).toISOString().slice(0, 19).replace('T', ' '));
             $('.main-form').submit();
         }
 
@@ -468,7 +478,7 @@
         function reopenAction() {
 
             if(checkCommentText('{{ trans('texts.reopen_reason') }}')){
-                $('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                //$('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
                 $('#closed').val(null);
                 $('#status_id').val(2);
                 saveAction();
@@ -478,8 +488,8 @@
 
         function closeAction() {
             if(checkCommentText('{{ trans('texts.close_reason') }}')) {
-                $('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
-                $('#reopened').val(null);
+                //$('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                //$('#reopened').val(null);
                 $('#status_id').val(3);
                 saveAction();
             }

@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Ninja\Tickets\Inbound\InboundTicketFactory;
 use App\Ninja\Tickets\Inbound\InboundTicketService;
-use Illuminate\Support\Facades\Log;
 
 class TicketInboundRequest extends Request
 {

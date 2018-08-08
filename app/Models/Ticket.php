@@ -194,10 +194,11 @@ class Ticket extends EntityModel
      */
     public function getDueDate()
     {
-        if($this->due_date)
-            return Utils::fromSqlDateTime($this->due_date);
-        else
+        if (! $this->due_date || $this->due_date == '0000-00-00 00:00:00')
             return trans('texts.no_due_date');
+        else
+            return Utils::fromSqlDateTime($this->due_date);
+
     }
 
     public function getMinDueDate()
@@ -317,6 +318,7 @@ class Ticket extends EntityModel
     {
         return Ticket::scope()
             ->where('client_id', '=', $this->client_id)
+            ->where('public_id', '!=', $this->public_id)
             ->where('status_id', '!=', 3)
             ->get();
     }

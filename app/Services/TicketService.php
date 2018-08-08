@@ -151,6 +151,19 @@ class TicketService extends BaseService
             $this->dispatch(new TicketSendNotificationEmail($data, $ticket));
     }
 
+    public function mergeTicket(Ticket $ticket, $data) {
+
+        //close $ticket with merge $data['old_ticket_comment'] -> set $ticket->merged_parent_ticket_id to 'updated_ticket_id';
+        $ticket->merged_parent_ticket_id = $data['updated_ticket_id'];
+
+            $ticketComment = TicketComment::createNew($ticket);
+            $ticketComment->description = $data['old_ticket_comment'];
+        
+        $ticket->comments()->save($ticketComment);
+
+        //update new $ticket->['updated_ticket_id']; with comment ['updated_ticket_comment']
+    }
+
     public function findClientsByContactEmail($email){
 
         $clients = Client::scope()->with('contacts')->whereHas('contacts', function ($query) use($email){
