@@ -55,7 +55,7 @@ class TicketDatatable extends EntityDatatable
             [
                 'status',
                 function ($model) {
-                    return $model->status;
+                    return $model->merged_parent_ticket_id ? trans('texts.merged') : $model->status;
                 }
             ],
             [

@@ -98,7 +98,7 @@
                         <tbody>
                         <tr><td class="td-left">{!! trans('texts.created_at') !!}:</td><td class="td-right">{!! \App\Libraries\Utils::fromSqlDateTime($ticket->created_at) !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.last_updated') !!}:</td><td class="td-right">{!! \App\Libraries\Utils::fromSqlDateTime($ticket->updated_at) !!}</td></tr>
-                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td class="td-right"> {!! $ticket->status->name !!} </td></tr>
+                        <tr><td class="td-left">{!! trans('texts.status') !!}:</td><td class="td-right"> {!! $ticket->getStatusName() !!} </td></tr>
 
                         <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td>
                             <td class="td-right">
@@ -112,13 +112,32 @@
                                 ->fromQuery($ticket->getPriorityArray(), 'name', 'id') !!}
                             </td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td><span class="pull-right">
-                                {!! Button::primary(trans('texts.save'))->small()->withAttributes(['onclick' => 'saveAction()']) !!}
-                            </span></td>
-                        </tr>
 
+                        @if(!$ticket->merged_parent_ticket_id)
+                            <tr>
+                                <td></td>
+                                <td><span class="pull-right">
+                                        {!! Button::primary(trans('texts.save'))->small()->withAttributes(['onclick' => 'saveAction()']) !!}
+                                    </span></td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td class="td-left">{!! trans('texts.parent_ticket') !!}:</td>
+                                <td> {!!  link_to("tickets/{$ticket->merged_ticket_parent->public_id}", $ticket->merged_ticket_parent->public_id ?: '')->toHtml() !!}
+                                </td>
+                            </tr>
+                        @endif
+
+                        @if(count($ticket->merged_children) > 0)
+                            <tr>
+                                <td class="td-left">{!! trans('texts.linked_tickets') !!}:</td>
+                                <td>
+                                    @foreach($ticket->merged_children as $child)
+                                       {{ trans('texts.ticket_number') }} {!! link_to("tickets/{$child->public_id}", $child->public_id ?: '')->toHtml() !!} <br>
+                                    @endforeach
+                                </td>
+                            </tr>
+                        @endif
                         </tbody>
                     </table>
                 </td>
@@ -184,6 +203,7 @@
 
     <div class="row">
         <center class="buttons">
+            @if(!$ticket->merged_parent_ticket_id)
             {!! DropdownButton::normal(trans('texts.more_actions'))
             ->withContents([
             ['label'=>trans('texts.ticket_merge'),'url'=>'/tickets/merge/'. $ticket->public_id ],
@@ -191,13 +211,16 @@
             ->large()
             ->dropup() !!}
 
-            @if($ticket && $ticket->status->id == 3)
-                {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
-            @elseif(!$ticket)
-                {!! Button::primary(trans('texts.ticket_open'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
-            @else
-                {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
-                {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+
+                @if($ticket && $ticket->status->id == 3)
+                    {!! Button::warning(trans('texts.ticket_reopen'))->large()->withAttributes(['onclick' => 'reopenAction()']) !!}
+                @elseif(!$ticket)
+                    {!! Button::primary(trans('texts.ticket_open'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+                @else
+                    {!! Button::danger(trans('texts.ticket_close'))->large()->withAttributes(['onclick' => 'closeAction()']) !!}
+                    {!! Button::primary(trans('texts.ticket_update'))->large()->withAttributes(['onclick' => 'submitAction()']) !!}
+                @endif
+
             @endif
         </center>
     </div>
@@ -244,9 +267,11 @@
 
 
         </div>
+        @if(!$ticket->merged_parent_ticket_id)
         <div class="pull-right">
             {!! Button::primary(trans('texts.save'))->large()->withAttributes(['onclick' => 'saveAction()']) !!}
         </div>
+        @endif
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 4) }}
 
@@ -396,8 +421,6 @@
 
             self.due_date.pretty = ko.computed({
                 read: function() {
-                    console.log(moment(self.due_date()).format(dateTimeFormat));
-
                     return self.due_date() ? moment(self.due_date()).format(dateTimeFormat) : '';
                 },
                 write: function(data) {

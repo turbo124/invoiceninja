@@ -15,6 +15,7 @@ use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;

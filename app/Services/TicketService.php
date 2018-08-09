@@ -96,7 +96,8 @@ class TicketService extends BaseService
                 'tickets.updated_at',
                 'tickets.deleted_at',
                 'tickets.is_deleted',
-                'ticket_statuses.name as ticketStatus'
+                'ticket_statuses.name as ticketStatus',
+                'tickets.merged_parent_ticket_id'
             );
 
         $table = \Datatable::query($query)
@@ -110,7 +111,7 @@ class TicketService extends BaseService
                 return Utils::fromSqlDateTime($model->created_at);
             })
             ->addColumn('status', function ($model) {
-                return $model->ticketStatus;
+                return $model->merged_parent_ticket_id ? trans('texts.merged') : $model->ticketStatus;
             });
 
         return $table->make();
@@ -133,20 +134,20 @@ class TicketService extends BaseService
     public function mergeTicket(Ticket $ticket, $data) {
 
         //Close ticket
-        $data['merged_parent_ticket_id'] = $data['updated_ticket_id'];
+        $data['merged_parent_ticket_id'] = Ticket::getPrivateId($data['updated_ticket_id']);
         $data['closed'] = \Carbon::now();
 
             $ticketComment = TicketComment::createNew($ticket);
             $ticketComment->description = $data['old_ticket_comment'];
         
         $ticket->comments()->save($ticketComment);
-
         $this->save($data, $ticket);
 
         //Update parent ticket
         $updatedTicket = Ticket::scope($data['updated_ticket_id'])->first();
-            $updatedTicketComment = TicketComment::createNew($updatedTicket);
-            $ticketComment->description = $data['updated_ticket_comment'];
+
+        $updatedTicketComment = TicketComment::createNew($updatedTicket);
+        $updatedTicketComment->description = $data['updated_ticket_comment'];
 
         $updatedTicket->comments()->save($updatedTicketComment);
 

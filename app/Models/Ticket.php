@@ -126,16 +126,24 @@ class Ticket extends EntityModel
         return $this->hasMany('App\Models\TicketInvitation')->orderBy('ticket_invitations.contact_id');
     }
 
-    public function parentTicket() {
-        return $this->belongsToOne(static::class, 'parent_ticket_id');
+    public function parent_ticket()
+    {
+        return $this->belongsTo(static::class, 'parent_ticket_id');
     }
 
-    public function childTickets() {
+    public function child_tickets()
+    {
         return $this->hasMany(static::class, 'parent_ticket_id');
     }
 
-    public function mergedTicketParent() {
-        return $this->belongsToOne(static::class, 'merged_parent_ticket_id');
+    public function merged_ticket_parent()
+    {
+        return $this->belongsTo(static::class, 'merged_parent_ticket_id');
+    }
+
+    public function merged_children()
+    {
+        return $this->hasMany(static::class, 'merged_parent_ticket_id');
     }
 
     /**
@@ -241,6 +249,15 @@ class Ticket extends EntityModel
     }
 
 
+    public function getStatusName()
+    {
+        if($this->merged_parent_ticket_id)
+            return trans('texts.merged');
+        else
+            return $this->status->name;
+
+    }
+
     public function agent()
     {
         return $this->hasOne('App\Models\User', 'id', 'agent_id');
@@ -319,6 +336,7 @@ class Ticket extends EntityModel
         return Ticket::scope()
             ->where('client_id', '=', $this->client_id)
             ->where('public_id', '!=', $this->public_id)
+            ->where('merged_parent_ticket_id', '=', NULL)
             ->where('status_id', '!=', 3)
             ->get();
     }
@@ -328,6 +346,8 @@ class Ticket extends EntityModel
         if($this->status_id == 3)
             return false;
         elseif($this->is_deleted)
+            return false;
+        elseif($this->merged_parent_ticket_id != null)
             return false;
         else
             return true;
