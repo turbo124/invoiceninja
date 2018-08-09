@@ -48,8 +48,10 @@ class DeltaFactory
             $this->performDeltaAction('new_ticket');
         }
         elseif(count($this->changedAttributes) > 0) {
-            foreach ($this->changedAttributes as $attribute)
-                $this->performDeltaAction($attribute);
+            foreach ($this->changedAttributes as $key => $value)
+                Log::error($key);
+                Log::error($value);
+                $this->performDeltaAction($key);
         }
     }
 
@@ -76,6 +78,18 @@ class DeltaFactory
 
             case 'new_ticket':
                 NewTicketDelta::handle($this->updatedTicket);
+            break;
+
+            case 'closed':
+
+            break;
+
+            case 'due_date':
+
+            break;
+
+            case 'priority_id':
+
             break;
 
         }

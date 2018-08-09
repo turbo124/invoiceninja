@@ -2,6 +2,7 @@
 
 namespace App\Ninja\Repositories;
 
+use App\Jobs\Ticket\TicketDelta;
 use App\Models\Contact;
 use App\Models\Document;
 use App\Models\Ticket;
@@ -13,9 +14,13 @@ use Auth;
 use DB;
 use Illuminate\Support\Facades\Log;
 use Utils;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class TicketRepository extends BaseRepository
 {
+
+    use DispatchesJobs;
+
     public function getClassName()
     {
         return 'App\Models\Ticket';
@@ -79,7 +84,7 @@ class TicketRepository extends BaseRepository
     public function save($input, $ticket = false)
     {
         $contact = false;
-
+        $oldTicket = $ticket;
         if(Auth::user())
             $user = Auth::user();
         elseif($contact = Contact::getContactIfLoggedIn())
@@ -99,21 +104,23 @@ class TicketRepository extends BaseRepository
                 $ticket = Ticket::createNew();
         }
 
-        //$input['due_date'] = Utils::toSqlDateTime($input['due_date']);
-            $ticket->fill($input);
-            $ticket->save();
+        $ticket->fill($input);
+        $changedAttributes = $ticket->getDirty();
+        $ticket->save();
+
+        $this->dispatch(new TicketDelta($changedAttributes, $oldTicket, $ticket));
+
 
         /* handle new comment */
         if(isset($input['description']) && strlen($input['description']) >=1) {
             $ticketComment = TicketComment::createNew($ticket);
             $ticketComment->description = $input['description'];
 
-            if(isset($input['contact_key']))
+            if(!Auth::user())
                 $ticketComment->contact_key = $input['contact_key'];
 
             $ticket->comments()->save($ticketComment);
 
-            //todo fire notification here:
         }
 
         /* if document IDs exist update ticket_id in document table */

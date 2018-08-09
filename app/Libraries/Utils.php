@@ -789,7 +789,7 @@ class Utils
 
         $format = Session::get(SESSION_DATE_FORMAT, DEFAULT_DATE_FORMAT);
         $dateTime = DateTime::createFromFormat($format, $date);
-dd($dateTime);
+
         if (! $dateTime) {
             return $date;
         } else {

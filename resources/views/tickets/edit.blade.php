@@ -29,12 +29,21 @@
             ]) !!}
 
     @if ($ticket)
+        {!! Former::populate($ticket) !!}
     @endif
 
     <div style="display:none">
+        {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
+        {!! Former::hidden('account_id')->value($account->id) !!}
         {!! Former::hidden('category_id')->value(1) !!}
         @if($ticket)
-
+            {!! Former::hidden('public_id')->value($ticket->public_id) !!}
+            {!! Former::hidden('status_id')->value($ticket->status_id)->id('status_id') !!}
+            {!! Former::hidden('closed')->value($ticket->closed)->id('closed') !!}
+            {!! Former::hidden('reopened')->value($ticket->reopened)->id('reopened') !!}
+            {!! Former::hidden('subject')->value($ticket->subject)->id('subject') !!}
+            {!! Former::hidden('contact_key')->value($ticket->contact_key)->id('contact_key') !!}
+            {!! Former::hidden('client_id')->value($ticket->client_id)->id('client_id') !!}
         @else
             {!! Former::hidden('status_id')->value(1) !!}
         @endif
@@ -54,17 +63,17 @@
                         <tr><td class="td-left">{!! trans('texts.category') !!}:</td><td class="td-right">{!! $ticket->category->name !!}</td></tr>
                         <tr><td class="td-left">{!! trans('texts.subject')!!}:</td><td class="td-right">{!! substr($ticket->subject, 0, 30) !!}</td></tr>
                         @if($ticket->client_id)
-                        <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td><td class="td-right">{!! $ticket->client->name !!}</td></tr>
+                            <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td><td class="td-right">{!! $ticket->client->name !!}</td></tr>
                         @else
-                        <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td>
-                        <td class="td-right">
-                        {!! Former::select('client')
-                        ->label('')
-                        ->addOption('', '')
-                        ->data_bind("dropdown: client, dropdownOptions: {highlighter: comboboxHighlighter}")
-                        ->addClass('client-input')
-                        ->addGroupClass('client_select closer-row') !!}
-                        </td></tr>
+                            <tr><td class="td-left" style="height:60px">{!! trans('texts.client') !!}:</td>
+                                <td class="td-right">
+                                    {!! Former::select('client')
+                                    ->label('')
+                                    ->addOption('', '')
+                                    ->data_bind("dropdown: client, dropdownOptions: {highlighter: comboboxHighlighter}")
+                                    ->addClass('client-input')
+                                    ->addGroupClass('client_select closer-row') !!}
+                                </td></tr>
                         @endif
 
                         <tr><td class="td-left" style="height:77px">{!! trans('texts.contact') !!}:</td><td class="td-right">{!! $ticket->getContactName() !!}</td></tr>
@@ -78,9 +87,9 @@
                                          !!}
                                     </div>
                                 @else
-                                {!! $ticket->agent() !!} {!! Icon::create('random') !!}
+                                    {!! $ticket->agent() !!} {!! Icon::create('random') !!}
                                 @endif
-                                </td></tr>
+                            </td></tr>
                         </tbody>
                     </table>
                 </td>
@@ -93,8 +102,8 @@
 
                         <tr><td class="td-left">{!! trans('texts.due_date') !!}:</td>
                             <td class="td-right">
-                                <input type="text" data-bind="value: due_date.pretty"
-                                       class="form-control time-input" placeholder=" {{  $ticket->getDueDate() ?: trans('texts.due_date') }}" id="due_date"/>
+                                <input id="due_date" type="text" data-bind="value: due_date.pretty" name="due_date"
+                                       class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}"/>
                             </td>
                         </tr>
                         <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
@@ -121,22 +130,22 @@
 
 
     @if($ticket)
-    <div style="height:80px;">
-        <div class="pull-right">
-            {!! Button::info(trans('texts.show_hide_all'))->large()->withAttributes(['onclick' => 'toggleAllComments()']) !!}
+        <div style="height:80px;">
+            <div class="pull-right">
+                {!! Button::info(trans('texts.show_hide_all'))->large()->withAttributes(['onclick' => 'toggleAllComments()']) !!}
+            </div>
         </div>
-    </div>
     @endif
 
     <div class="panel-default ui-accordion ui-widget ui-helper-reset" id="accordion" role="tablist">
         @foreach($ticket->comments as $comment)
-        <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" id="accordion">{!! $comment->getCommentHeader() !!}</h3>
-        <div>
-            <p>
-               {!! $comment->description !!}
-            </p>
-        </div>
-       @endforeach
+            <h3 class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" role="tab" id="accordion">{!! $comment->getCommentHeader() !!}</h3>
+            <div>
+                <p>
+                    {!! $comment->description !!}
+                </p>
+            </div>
+        @endforeach
     </div>
 
     <div class="panel panel-default" style="margin-top:30px; padding-bottom: 0px !important">
@@ -243,11 +252,11 @@
 
     </div>
 
-        {!! Former::close() !!}
+    {!! Former::close() !!}
 
 
 
-    <!--
+            <!--
      Modals
     -->
 
@@ -277,56 +286,56 @@
     <script type="text/javascript">
 
         <!-- Initialize client selector -->
-        @if($clients)
+                @if($clients)
 
-            var clients = {!! $clients !!};
-            var clientMap = {};
-            var $clientSelect = $('select#client');
+        var clients = {!! $clients !!};
+        var clientMap = {};
+        var $clientSelect = $('select#client');
 
-            $(function() {
-                // create client dictionary
+        $(function() {
+            // create client dictionary
 
-                for (var i=0; i<clients.length; i++) {
-                    var client = clients[i];
-                    clientMap[client.public_id] = client;
-                    @if (! $ticket->id)
-                        if (!getClientDisplayName(client)) {
-                            continue;
-                        }
-                    @endif
-                    var clientName = client.name || '';
+            for (var i=0; i<clients.length; i++) {
+                var client = clients[i];
+                clientMap[client.public_id] = client;
+                @if (! $ticket->id)
+                if (!getClientDisplayName(client)) {
+                    continue;
+                }
+                        @endif
+                var clientName = client.name || '';
+                for (var j=0; j<client.contacts.length; j++) {
+                    var contact = client.contacts[j];
+                    var contactName = getContactDisplayNameWithEmail(contact);
+                    if (clientName && contactName) {
+                        clientName += '<br/>  • ';
+                    }
+                    if (contactName) {
+                        clientName += contactName;
+                    }
+                }
+                $clientSelect.append(new Option(clientName, client.public_id));
+            }
+
+            //harvest and set the client_id and contact_id here
+            var $input = $('select#client');
+            $input.combobox().on('change', function(e) {
+                var clientId = parseInt($('input[name=client]').val(), 10) || 0;
+
+                if (clientId > 0) {
+
                     for (var j=0; j<client.contacts.length; j++) {
                         var contact = client.contacts[j];
-                        var contactName = getContactDisplayNameWithEmail(contact);
-                            if (clientName && contactName) {
-                                clientName += '<br/>  • ';
-                            }
-                        if (contactName) {
-                            clientName += contactName;
+
+                        if(contact.email == $('#contact_key').val()) {
+                            $('#contact_key').val(contact.contact_key);
+                            $('#client_id').val(clientId);
                         }
                     }
-                    $clientSelect.append(new Option(clientName, client.public_id));
                 }
-
-                //harvest and set the client_id and contact_id here
-                var $input = $('select#client');
-                $input.combobox().on('change', function(e) {
-                    var clientId = parseInt($('input[name=client]').val(), 10) || 0;
-
-                    if (clientId > 0) {
-
-                        for (var j=0; j<client.contacts.length; j++) {
-                            var contact = client.contacts[j];
-
-                            if(contact.email == $('#contact_key').val()) {
-                                model.contact_key = contact.contact_key;
-                                model.client_id = clientId;
-                            }
-                        }
-                    }
-                });
-
             });
+
+        });
         @endif
 
 
@@ -335,14 +344,12 @@
             $( "#accordion" ).accordion();
 
             window.model = new ViewModel({!! $ticket !!});
-            console.log('ouch');
             ko.applyBindings(model);
             $('#description').text('');
 
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
         } );
-
 
         // Add moment support to the datetimepicker
         Date.parseDate = function( input, format ){
@@ -361,10 +368,9 @@
             format: '{{ $datetimeFormat }}',
             formatDate: '{{ $account->getMomentDateFormat() }}',
             formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
-            timezone: '{{ $timezone }}',
             validateOnBlur: false
-            });
 
+        });
 
 
         <!-- Initialize drop zone file uploader -->
@@ -373,56 +379,51 @@
             else $(this).removeAttr('enctype')
         })
 
-            var ViewModel = function (data) {
-                var self = this;
-                var dateTimeFormat = '{{ $datetimeFormat }}';
-                var timezone = '{{ $timezone }}';
+        var ViewModel = function (data) {
+            var self = this;
+            var dateTimeFormat = '{{ $datetimeFormat }}';
+            var timezone = '{{ $timezone }}';
 
-                self.status_id = ko.observable(data.status_id);
-                self.closed = ko.observable(data.closed);
-                self.reopened = ko.observable(data.reopened);
-                self.subject = ko.observable(data.subject);
-                self.contact_key = ko.observable(data.contact_key);
-                self.client_id = ko.observable(data.client_id);
-                self.due_date = ko.observable(self.due_date);
-                self.public_id = ko.observable(data.public_id);
-                self.account_id = ko.observable(data.account_id);
-
-                self.documents = ko.observableArray();
-                self.mapping = {
-                    'documents': {
-                        create: function (options) {
-                            return new DocumentModel(options.data);
-                        }
+            self.documents = ko.observableArray();
+            self.due_date = ko.observable(data.due_date);
+            self.mapping = {
+                'documents': {
+                    create: function (options) {
+                        return new DocumentModel(options.data);
                     }
                 }
+            }
 
-                self.due_date.pretty = ko.computed({
-                    read: function() {
-                        return self.due_date() ? moment(self.due_date()).format(dateTimeFormat) : '';
-                    },
-                    write: function(data) {
-                        self.due_date(moment($('#due_date').val(), dateTimeFormat).tz(timezone).format("YYYY-MM-DD HH:mm:ss"));
-                    }
+            self.due_date.pretty = ko.computed({
+                read: function() {
+                    console.log(moment(self.due_date()).format(dateTimeFormat));
+
+                    return self.due_date() ? moment(self.due_date()).format(dateTimeFormat) : '';
+                },
+                write: function(data) {
+                    self.due_date(moment($('#due_date').val(), dateTimeFormat, timezone).format("YYYY-MM-DD HH:mm:ss"));
+
+                }
+            });
+
+
+            if (data) {
+                ko.mapping.fromJS(data, self.mapping, this);
+            }
+
+            self.addDocument = function() {
+                var documentModel = new DocumentModel();
+                self.documents.push(documentModel);
+                return documentModel;
+            }
+
+            self.removeDocument = function(doc) {
+                var public_id = doc.public_id?doc.public_id():doc;
+                self.documents.remove(function(document) {
+                    return document.public_id() == public_id;
                 });
-
-                if (data) {
-                    ko.mapping.fromJS(data, self.mapping, this);
-                }
-
-                self.addDocument = function() {
-                    var documentModel = new DocumentModel();
-                    self.documents.push(documentModel);
-                    return documentModel;
-                }
-
-                self.removeDocument = function(doc) {
-                    var public_id = doc.public_id?doc.public_id():doc;
-                    self.documents.remove(function(document) {
-                        return document.public_id() == public_id;
-                    });
-                }
-            };
+            }
+        };
 
 
         function DocumentModel(data) {
@@ -462,8 +463,11 @@
 
         function saveAction() {
 
-            $('#description').val('');
-            //$('#due_date').val(new Date(dateTime).toISOString().slice(0, 19).replace('T', ' '));
+            var dateTimeFormat = '{{ $datetimeFormat }}';
+            var timezone = '{{ $timezone }}';
+            var dateTime = moment($('#due_date').val(), dateTimeFormat).tz(timezone).format("YYYY-MM-DD HH:mm:ss")
+
+            $('#due_date').val(dateTime);
             $('.main-form').submit();
         }
 
@@ -478,7 +482,7 @@
         function reopenAction() {
 
             if(checkCommentText('{{ trans('texts.reopen_reason') }}')){
-                //$('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
                 $('#closed').val(null);
                 $('#status_id').val(2);
                 saveAction();
@@ -488,8 +492,8 @@
 
         function closeAction() {
             if(checkCommentText('{{ trans('texts.close_reason') }}')) {
-                //$('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
-                //$('#reopened').val(null);
+                $('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#reopened').val(null);
                 $('#status_id').val(3);
                 saveAction();
             }

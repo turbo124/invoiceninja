@@ -1,9 +1,11 @@
 <?php
 namespace App\Services;
-use App\Jobs\Ticket\TicketDelta;
+
 use App\Jobs\Ticket\TicketSendNotificationEmail;
 use App\Libraries\Utils;
 use App\Models\Client;
+use App\Models\Ticket;
+use App\Models\TicketComment;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Ninja\Repositories\TicketRepository;
 use Illuminate\Support\Facades\Auth;
@@ -37,10 +39,8 @@ class TicketService extends BaseService
 
     public function __construct(TicketRepository $ticketRepo, DatatableService $datatableService)
     {
-
         $this->ticketRepo = $ticketRepo;
         $this->datatableService = $datatableService;
-
     }
 
     /**
@@ -49,9 +49,7 @@ class TicketService extends BaseService
 
     protected function getRepo()
     {
-
         return $this->ticketRepo;
-
     }
 
     /**
@@ -63,25 +61,9 @@ class TicketService extends BaseService
 
     public function save($data, $ticket = false)
     {
-        /**
-         * If any model attributes have changed we may need to fire events which can respond to these changes
-         */
+        $ticket = $this->ticketRepo->save($data, $ticket);
 
-        $deltaAttributes = null;
-        $originalTicket = null;
-
-        if($ticket) {
-            $deltaAttributes = $ticket->getDirty();  //returns an array of changed attributes
-            $originalTicket = $ticket->getOriginal(); //returns the original model object
-        }
-
-        $updatedTicket = $this->ticketRepo->save($data, $ticket);
-
-        $this->dispatch(new TicketDelta($deltaAttributes, $originalTicket, $updatedTicket));
-
-        //$this->processTicket($data, $ticket); //todo after CRUD
-
-        return $updatedTicket;
+        return $ticket;
     }
 
     /**
@@ -91,14 +73,11 @@ class TicketService extends BaseService
 
     public function getDatatable($search)
     {
-        // we don't support bulk edit and hide the client on the individual client page
         $datatable = new TicketDatatable();
 
-        //$search = Input::get('sSearch');
         $query = $this->ticketRepo->find($search);
 
-            return $this->datatableService->createDatatable($datatable, $query);
-
+        return $this->datatableService->createDatatable($datatable, $query);
     }
 
     public function getClientDatatable($clientId)
@@ -144,24 +123,35 @@ class TicketService extends BaseService
 
     private function processTicket($data, $ticket)
     {
-
         /* If comment added to ticket fire notifications */
 
         if(strlen($data['comment']) >= 1)
             $this->dispatch(new TicketSendNotificationEmail($data, $ticket));
+
     }
 
     public function mergeTicket(Ticket $ticket, $data) {
 
-        //close $ticket with merge $data['old_ticket_comment'] -> set $ticket->merged_parent_ticket_id to 'updated_ticket_id';
-        $ticket->merged_parent_ticket_id = $data['updated_ticket_id'];
+        //Close ticket
+        $data['merged_parent_ticket_id'] = $data['updated_ticket_id'];
+        $data['closed'] = \Carbon::now();
 
             $ticketComment = TicketComment::createNew($ticket);
             $ticketComment->description = $data['old_ticket_comment'];
         
         $ticket->comments()->save($ticketComment);
 
-        //update new $ticket->['updated_ticket_id']; with comment ['updated_ticket_comment']
+        $this->save($data, $ticket);
+
+        //Update parent ticket
+        $updatedTicket = Ticket::scope($data['updated_ticket_id'])->first();
+            $updatedTicketComment = TicketComment::createNew($updatedTicket);
+            $ticketComment->description = $data['updated_ticket_comment'];
+
+        $updatedTicket->comments()->save($updatedTicketComment);
+
+        $updatedTicket->save();
+
     }
 
     public function findClientsByContactEmail($email){

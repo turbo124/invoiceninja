@@ -89,18 +89,30 @@ class TicketController extends BaseController
 
     /**
      * @param UpdateTicketRequest $request
+     *
+     * Updating a ticket can change the following:
+     *
+     * Priority
+     * Status
+     * Ticket closed
+     * Ticket reopened
+     * Comment updated (agent / client)
+     * Due Date
+     *
+     * We need to pass a action variable so we can handle the appropriate workflow
+     *
      */
+
     public function update(UpdateTicketRequest $request)
     {
+        $data = $request->input();
         $data['document_ids'] = $request->document_ids;
+        $ticket = $request->entity();
 
 
-        if($request->data)
-            $data = (array)$request->data;
-
-        dd($request->input());
-        $ticket = $this->ticketService->save($data, $request->entity());
+        $ticket = $this->ticketService->save($data, $ticket);
         $ticket->load('documents');
+
         $entityType = $ticket->getEntityType();
 
         $message = trans("texts.updated_{$entityType}");
@@ -193,7 +205,6 @@ class TicketController extends BaseController
     public function actionMerge(TicketMergeRequest $request)
     {
         $ticket = $request->entity();
-        dd($ticket);
 
         $this->ticketService->mergeTicket($ticket, $request->input());
 

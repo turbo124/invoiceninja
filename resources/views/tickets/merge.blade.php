@@ -57,9 +57,9 @@
 
                 <div class="col-md-9">
 
-                {!! Former::textarea('old_ticket_text')
+                {!! Former::textarea('old_ticket_comment')
                             ->label('')
-                            ->data_bind("value: old_ticket_text")
+                            ->data_bind("value: old_ticket_comment")
                             ->help('This ticket will be closed with the following comment')
                             !!}
 
@@ -172,7 +172,6 @@
         self.updated_ticket_comment = ko.observable();
         self.public_id = data.public_id;
         self.updated_ticket_id = ko.observable();
-        self.old_ticket_text = ko.observable();
 
         self.updateTicketText = function() {
             var transOldTicketText = '{{ trans('texts.merge_closed_ticket_text',['old_ticket' => $ticket->ticket_number]) }}';
@@ -180,7 +179,7 @@
 
             if (self.updated_ticket_id) {
                 var ticket = ticketMap[self.updated_ticket_id];
-                self.old_ticket_text(transOldTicketText.replace(':new_ticket', ticket.ticket_number).replace(':subject', ticket.subject));
+                self.old_ticket_comment(transOldTicketText.replace(':new_ticket', ticket.ticket_number).replace(':subject', ticket.subject));
                 self.updated_ticket_comment(transUpdatedTicketText);
             }
         }
