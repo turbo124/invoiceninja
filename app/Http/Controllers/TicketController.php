@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\TicketUserViewed;
+use App\Http\Requests\CreateTicketRequest;
 use App\Http\Requests\TicketInboundRequest;
 use App\Http\Requests\TicketMergeRequest;
 use App\Http\Requests\TicketRequest;
@@ -151,6 +152,21 @@ class TicketController extends BaseController
         }
     }
 
+    public function create(CreateTicketRequest $request, $parentTicketId = 0)
+    {
+        $parentTicket = Ticket::scope($parentTicketId)->first();
+
+        $data = [
+            'users' => User::whereAccountId(Auth::user()->account_id)->get(),
+            'parent_ticket' => $parentTicket,
+            'url' => 'tickets/internal/'.$parentTicketId,
+            'method' => 'POST',
+            'title' => trans('texts.new_internal_ticket'),
+            'account' => Auth::user()->account,
+        ];
+
+        return View::make('tickets.internal', $data);
+    }
 
     /**
      * @return array
@@ -215,21 +231,7 @@ class TicketController extends BaseController
         return redirect("tickets/$request->updated_ticket_id/edit");
     }
 
-    public function newInternal($parentTicketId)
-    {
-        $parentTicket = Ticket::scope($parentTicketId)->first();
 
-        $data = [
-            'users' => User::whereAccountId(Auth::user()->account_id)->get(),
-            'parent_ticket' => $parentTicket,
-            'url' => 'tickets/internal/'.$parentTicketId,
-            'method' => 'POST',
-            'title' => trans('texts.new_internal_ticket'),
-            'account' => Auth::user()->account,
-        ];
-
-        return View::make('tickets.internal', $data);
-    }
 
 
 

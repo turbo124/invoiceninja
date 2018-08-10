@@ -287,8 +287,8 @@ Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
     Route::get('/resend_confirmation', 'AccountController@resendConfirmation');
     Route::post('/update_setup', 'AppController@updateSetup');
 
+    Route::get('/tickets/create/{parent_ticket_id}', 'TicketController@create');
     Route::resource('tickets', 'TicketController');
-    Route::get('/tickets/createInternal/{parent_ticket_id}', 'TicketController@newInternal');
     Route::get('api/tickets', 'TicketController@getDatatable');
     Route::get('api/ticket_templates', 'TicketTemplateController@getDatatable');
     Route::get('ticket_template/create', 'TicketTemplateController@create');
