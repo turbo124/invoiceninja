@@ -152,20 +152,29 @@ class TicketController extends BaseController
         }
     }
 
-    public function create(CreateTicketRequest $request, $parentTicketId = 0)
+    public function create(TicketRequest $request, $parentTicketId = 0)
     {
+
         $parentTicket = Ticket::scope($parentTicketId)->first();
 
         $data = [
             'users' => User::whereAccountId(Auth::user()->account_id)->get(),
+            'is_internal' => $request->parent_ticket_id ? true : false,
             'parent_ticket' => $parentTicket,
-            'url' => 'tickets/internal/'.$parentTicketId,
+            'url' => 'tickets/',
             'method' => 'POST',
             'title' => trans('texts.new_internal_ticket'),
             'account' => Auth::user()->account,
+            'account_ticket_settings' => Auth::user()->account->account_ticket_settings,
+
         ];
 
-        return View::make('tickets.internal', $data);
+        return View::make('tickets.new_ticket', $data);
+    }
+
+    public function store(CreateTicketRequest $request)
+    {
+
     }
 
     /**
@@ -173,6 +182,7 @@ class TicketController extends BaseController
      */
     private static function getViewModel($ticket = false, $clients = false)
     {
+
         return [
             'clients' => $clients,
             'status' => $ticket->status(),

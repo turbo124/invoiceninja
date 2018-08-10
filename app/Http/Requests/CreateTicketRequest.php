@@ -26,7 +26,8 @@ class CreateTicketRequest extends Request
     {
 
         $rules = [
-            'client_id' => 'required',
+            'subject' => 'required',
+            'description' => 'required',
         ];
 
 
