@@ -10,7 +10,9 @@ use App\Http\Requests\UpdateTicketRequest;
 use App\Libraries\Utils;
 use App\Models\Client;
 use App\Models\Ticket;
+use App\Models\TicketComment;
 use App\Models\TicketStatus;
+use App\Models\User;
 use App\Ninja\Datatables\TicketDatatable;
 use App\Services\TicketService;
 use Illuminate\Http\Response;
@@ -212,6 +214,24 @@ class TicketController extends BaseController
         Session::reflash();
         return redirect("tickets/$request->updated_ticket_id/edit");
     }
+
+    public function newInternal($parentTicketId)
+    {
+        $parentTicket = Ticket::scope($parentTicketId)->first();
+
+        $data = [
+            'users' => User::whereAccountId(Auth::user()->account_id)->get(),
+            'parent_ticket' => $parentTicket,
+            'url' => 'tickets/internal/'.$parentTicketId,
+            'method' => 'POST',
+            'title' => trans('texts.new_internal_ticket'),
+            'account' => Auth::user()->account,
+        ];
+
+        return View::make('tickets.internal', $data);
+    }
+
+
 
 
 }

@@ -2984,6 +2984,8 @@ $LANG = array(
     'merge_updated_ticket_text' => 'Ticket #:old_ticket was closed and merged into this ticket',
     'merge_placeholder' => 'Merge ticket #:ticket into the following ticket',
     'select_ticket' => 'Select Ticket',
+    'new_internal_ticket' => 'New internal ticket',
+    'createInternal' => 'Internal',
 
 
 );

@@ -1,7 +1,7 @@
 @extends('header')
 
 @section('head')
-    @parent
+@parent
 
     <script src="{{ asset('js/jquery.datetimepicker.js') }}" type="text/javascript"></script>
     <link href="{{ asset('css/jquery.datetimepicker.css') }}" rel="stylesheet" type="text/css"/>
@@ -90,6 +90,18 @@
                                     {!! $ticket->agent() !!} {!! Icon::create('random') !!}
                                 @endif
                             </td></tr>
+
+                            @if(!$ticket->is_internal)
+                                <tr>
+                                    <td class="td-left"></td>
+                                    <td class="td-right"><span class="pull-right">
+                                            {!! Button::primary(trans('texts.new_internal_ticket'))
+                                                    ->asLinkTo(URL::to('/tickets/createInternal/'.$ticket->public_id))
+                                                    ->withAttributes(['class' => 'pull-right'])
+                                                    ->appendIcon(Icon::create('plus-sign')) !!}
+                                        </span></td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </td>
@@ -487,10 +499,7 @@
         function saveAction() {
 
             var dateTimeFormat = '{{ $datetimeFormat }}';
-            var timezone = '{{ $timezone }}';
-            var dateTime = moment($('#due_date').val(), dateTimeFormat).tz(timezone).format("YYYY-MM-DD HH:mm:ss")
-
-            $('#due_date').val(dateTime);
+            $('#due_date').val(moment($('#due_date').val(), dateTimeFormat).format("YYYY-MM-DD HH:mm:ss"));
             $('.main-form').submit();
         }
 
@@ -505,7 +514,7 @@
         function reopenAction() {
 
             if(checkCommentText('{{ trans('texts.reopen_reason') }}')){
-                $('#reopened').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#reopened').val(moment().format("YYYY-MM-DD HH:mm:ss"));
                 $('#closed').val(null);
                 $('#status_id').val(2);
                 saveAction();
@@ -515,7 +524,7 @@
 
         function closeAction() {
             if(checkCommentText('{{ trans('texts.close_reason') }}')) {
-                $('#closed').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+                $('#closed').val(moment().format("YYYY-MM-DD HH:mm:ss"));
                 $('#reopened').val(null);
                 $('#status_id').val(3);
                 saveAction();
@@ -564,18 +573,6 @@
         function focusEditor() {
             editor.focus();
         }
-
-        function convertToSeconds(str) {
-            if (!str) {
-                return 0;
-            }
-            if (str.indexOf(':') >= 0) {
-                return moment.duration(str).asSeconds();
-            } else {
-                return parseFloat(str) * 60 * 60;
-            }
-        }
-
 
     </script>
 
