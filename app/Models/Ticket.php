@@ -228,7 +228,7 @@ class Ticket extends EntityModel
     /**
      * @return array
      */
-    public function getPriorityArray()
+    public static function getPriorityArray()
     {
         return [
             ['id'=>TICKET_PRIORITY_LOW, 'name'=> trans('texts.low')],

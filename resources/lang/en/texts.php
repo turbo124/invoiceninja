@@ -2976,6 +2976,7 @@ $LANG = array(
     'payment_reference' => 'Payment Reference',
     'merge' => 'Merge',
     'merged' => 'Merged',
+    'agent' => 'Agent',
     'parent_ticket' => 'Parent Ticket',
     'linked_tickets' => 'Linked Tickets',
     'merge_prompt' => 'Enter ticket number to merge into',
@@ -2985,7 +2986,7 @@ $LANG = array(
     'merge_placeholder' => 'Merge ticket #:ticket into the following ticket',
     'select_ticket' => 'Select Ticket',
     'new_internal_ticket' => 'New internal ticket',
-    'createInternal' => 'Internal',
+    'internal_ticket' => 'Internal ticket',
 
 
 );

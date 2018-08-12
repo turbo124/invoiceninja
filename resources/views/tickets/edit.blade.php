@@ -96,7 +96,7 @@
                                     <td class="td-left"></td>
                                     <td class="td-right"><span class="pull-right">
                                             {!! Button::primary(trans('texts.new_internal_ticket'))
-                                                    ->asLinkTo(URL::to('/tickets/createInternal/'.$ticket->public_id))
+                                                    ->asLinkTo(URL::to('/tickets/create/'.$ticket->public_id))
                                                     ->withAttributes(['class' => 'pull-right'])
                                                     ->appendIcon(Icon::create('plus-sign')) !!}
                                         </span></td>
@@ -121,7 +121,7 @@
                         <tr><td class="td-left">{!! trans('texts.priority') !!}:</td>
                             <td class="td-right">
                                 {!! Former::select('priority_id')->label('')
-                                ->fromQuery($ticket->getPriorityArray(), 'name', 'id') !!}
+                                ->fromQuery(\App\Models\Ticket::getPriorityArray(), 'name', 'id') !!}
                             </td>
                         </tr>
 
@@ -406,7 +406,6 @@
             formatDate: '{{ $account->getMomentDateFormat() }}',
             formatTime: '{{ $account->military_time ? 'H:mm' : 'h:mm A' }}',
             validateOnBlur: false
-
         });
 
 

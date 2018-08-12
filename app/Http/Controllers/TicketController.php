@@ -165,8 +165,8 @@ class TicketController extends BaseController
             'method' => 'POST',
             'title' => trans('texts.new_internal_ticket'),
             'account' => Auth::user()->account,
-            'account_ticket_settings' => Auth::user()->account->account_ticket_settings,
-
+            'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
+            'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
         ];
 
         return View::make('tickets.new_ticket', $data);

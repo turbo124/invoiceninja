@@ -58,22 +58,119 @@
 
 
             {{ trans('texts.description') }}
-        {!! Former::textarea('description')->label(trans('texts.description'))->style('display:none')->raw() !!}
 
-            <div id="descriptionEditor" class="form-control" style="min-height:160px" onclick="focusEditor()"></div>
+            {!! Former::textarea('description')->label(trans('texts.description'))->style('display:none')->raw() !!}
+
+            <div id="descriptionEditor" class="form-control" style="min-height:160px; max-height:160px;" onclick="focusEditor()"></div>
 
             <div class="pull-left">
                 @include('partials/quill_toolbar', ['name' => 'description'])
             </div>
+
         </div>
+
+        <div class="panel-body">
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    {{ trans('texts.client') }}
+                </div>
+
+                <div class="col-md-9">
+
+                    {!! Former::select('client_id')
+                            ->label('')
+                            ->addOption('', '')
+                            ->data_bind("dropdown: client_id, dropdownOptions: {highlighter: comboboxHighlighter}")
+                            ->addClass('pull-right')
+                            ->addGroupClass('') !!}
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    {{ trans('texts.agent') }}
+                </div>
+
+                <div class="col-md-9">
+                    {!! Former::select('agent_id')
+                           ->label('')
+                           ->addOption('', '')
+                           ->data_bind("dropdown: agent_id, dropdownOptions: {highlighter: comboboxHighlighter}")
+                           ->addClass('pull-right')
+                           ->addGroupClass('') !!}
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    {{ trans('texts.priority') }}
+                </div>
+                <div class="col-md-9">
+                    {!! Former::select('priority_id')->label('')
+                               ->fromQuery(\App\Models\Ticket::getPriorityArray(), 'name', 'id') !!}
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    {{trans('texts.due_date') }}
+                </div>
+
+                <div class="col-md-9">
+                    <input id="due_date" type="text" data-bind="value: due_date.pretty" name="due_date"
+                           class="form-control time-input time-input-end" placeholder="{{ trans('texts.due_date') }}"/>
+                </div>
+
+            </div>
+
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-3">
+                    {{ trans('texts.internal_ticket') }}
+                </div>
+
+                <div class="col-md-9">
+                    {!! Former::checkbox('is_internal')->label('') !!}
+                </div>
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    {{ trans('texts.parent_ticket') }}
+                </div>
+
+                <div class="col-md-9">
+
+                    {!! Former::select('parent_ticket')
+                            ->label('')
+                            ->addOption('', '')
+                            ->data_bind("dropdown: parent_ticket, dropdownOptions: {highlighter: comboboxHighlighter}")
+                            ->addClass('pull-right')
+                            ->addGroupClass('') !!}
+
+                </div>
+
+            </div>
+
+        </div>
+
 
     </div>
 
-    <div role="tabpanel" class="panel panel-default" style="margin-top:30px;">
+    <div role="tabpanel" class="panel-default" style="margin-top:30px;">
 
         <ul class="nav nav-tabs" role="tablist" style="border: none">
+            <li role="presentation" class="active"><a href="#private_notes" aria-controls="private_notes" role="tab" data-toggle="tab">{{ trans("texts.private_notes") }}</a></li>
             @if ($account->hasFeature(FEATURE_DOCUMENTS))
-                <li role="presentation" class="active"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
+                <li role="presentation"><a href="#attached-documents" aria-controls="attached-documents" role="tab" data-toggle="tab">
                         {{ trans("texts.documents") }}
 
                     </a></li>
@@ -85,7 +182,13 @@
 
         <div class="tab-content" style="padding-right:12px;">
 
-            <div role="tabpanel" class="tab-pane active" id="attached-documents" style="position:relative; z-index:9;">
+            <div role="tabpanel" class="tab-pane active" id="private_notes" style="padding-bottom:44px">
+                {!! Former::textarea('private_notes')
+                        ->data_bind("value: private_notes, valueUpdate: 'afterkeydown'")
+                        ->label(null)->style('width: 100%')->rows(4) !!}
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="attached-documents" style="position:relative; z-index:9;">
                 <div id="document-upload">
                     <div class="dropzone">
                         <div data-bind="foreach: documents">
@@ -112,7 +215,7 @@
 
             window.model = new ViewModel('');
 
-            @include('partials.client_dropzone', ['documentSource' => 'model.documents()', 'account_ticket_settings' => $account_ticket_settings])
+            @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
         });
 
@@ -122,10 +225,29 @@
             else $(this).removeAttr('enctype')
         })
 
+        <!-- Initialize date time picker for due date -->
+        jQuery('#due_date').datetimepicker({
+            lazyInit: true,
+            validateOnBlur: false,
+            step: '{{ env('TASK_TIME_STEP', 15) }}',
+            minDate: 'moment()',
+            validateOnBlur: false
+        });
+
         var ViewModel = function (data) {
             var self = this;
 
             self.documents = ko.observableArray();
+            self.due_date = ko.observable();
+            self.priority_id = ko.observable();
+            self.agent_id = ko.observable();
+            self.is_internal = ko.observable();
+            self.subject = ko.observable();
+            self.description = ko.observable();
+            self.client_id = ko.observable();
+            self.parent_ticket_id = ko.observable();
+            self.private_notes = ko.observable();
+
 
             self.mapping = {
                 'documents': {
@@ -134,6 +256,16 @@
                     }
                 }
             }
+
+            self.due_date.pretty = ko.computed({
+                read: function() {
+                    return self.due_date() ? moment(self.due_date()).format(dateTimeFormat) : '';
+                },
+                write: function(data) {
+                    self.due_date(moment($('#due_date').val(), dateTimeFormat, timezone).format("YYYY-MM-DD HH:mm:ss"));
+
+                }
+            });
 
             if (data) {
                 ko.mapping.fromJS(data, self.mapping, this);
@@ -151,6 +283,8 @@
                     return document.public_id() == public_id;
                 });
             }
+
+
         };
 
 
