@@ -32,7 +32,7 @@
         {!! Former::text('data')->data_bind('value: ko.mapping.toJSON(model)') !!}
         {!! Former::hidden('category_id')->value(1) !!}
         @if($parent_ticket)
-        {!! Former::hidden('parent_ticket_id')->value($parent_ticket->public_id) !!}
+            {!! Former::hidden('parent_ticket_id')->value($parent_ticket->public_id) !!}
         @endif
         {!! Former::hidden('status_id')->value(1) !!}
     </div>
@@ -164,7 +164,6 @@
 
         </div>
 
-
     </div>
 
     <div role="tabpanel" class="panel-default" style="margin-top:30px;">
@@ -205,8 +204,14 @@
         {{ Former::setOption('TwitterBootstrap3.labelWidths.large', 4) }}
         {{ Former::setOption('TwitterBootstrap3.labelWidths.small', 4) }}
 
-
     </div>
+
+    <div class="row">
+        <center class="buttons">
+            {!! Button::primary(trans('texts.create_ticket'))->large()->withAttributes(['onclick' => 'saveAction()']) !!}
+        </center>
+    </div>
+
     {!! Former::close() !!}
 
 
@@ -215,14 +220,11 @@
         $( function() {
 
             window.model = new ViewModel('');
-            ko.applyBindings(model);
-
 
             var clients = {!! $account->clients !!};
             var clientMap = {};
             var $clientSelect = $('select#client_id');
 
-            $(function() {
                 // create client dictionary
                 for (var i=0; i<clients.length; i++) {
                     var client = clients[i];
@@ -258,14 +260,13 @@
                     }
                 });
 
-            });
+
 
             //create user dictionary
             var users = {!! $account->users !!};
             var userMap = {};
             var $userSelect = $('select#agent_id');
 
-            $(function() {
                 // create client dictionary
                 for (var i=0; i<users.length; i++) {
                     var user = users[i];
@@ -287,7 +288,7 @@
                     }
                 });
 
-            });
+
 
 
             //create user dictionary
@@ -295,7 +296,6 @@
             var ticketMap = {};
             var $ticketSelect = $('select#parent_ticket_id');
 
-            $(function() {
                 // create client dictionary
                 for (var i=0; i<parent_tickets.length; i++) {
                     var ticket = parent_tickets[i];
@@ -317,7 +317,8 @@
                     }
                 });
 
-            });
+
+            ko.applyBindings(model);
 
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
@@ -342,9 +343,11 @@
             var self = this;
             var parentTicketId = false;
             var isInternal = false;
+            var dateTimeFormat = '{{ $datetimeFormat }}';
+            var timezone = '{{ $timezone }}';
 
             @if($parent_ticket)
-                parentTicketId = {{ $parent_ticket->public_id }}};
+                parentTicketId = {{ $parent_ticket->public_id }};
                 isInternal = true;
             @endif
 
@@ -368,7 +371,6 @@
             }
 
             self.isParentTicketVisible = function() {
-                console.log(model.is_internal);
                 return model.is_internal;
             }
 
@@ -377,7 +379,7 @@
                     return self.due_date() ? moment(self.due_date()).format(dateTimeFormat) : '';
                 },
                 write: function(data) {
-                    self.due_date(moment($('#due_date').val(), dateTimeFormat, timezone).format("YYYY-MM-DD HH:mm:ss"));
+                    //self.due_date(moment($('#due_date').val(), dateTimeFormat, timezone).format("YYYY-MM-DD HH:mm:ss"));
 
                 }
             });

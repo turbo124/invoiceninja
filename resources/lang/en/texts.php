@@ -2987,6 +2987,7 @@ $LANG = array(
     'select_ticket' => 'Select Ticket',
     'new_internal_ticket' => 'New internal ticket',
     'internal_ticket' => 'Internal ticket',
+    'create_ticket' => 'Create ticket',
 
 
 );

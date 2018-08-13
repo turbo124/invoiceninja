@@ -90,18 +90,6 @@
                                     {!! $ticket->agent() !!} {!! Icon::create('random') !!}
                                 @endif
                             </td></tr>
-
-                            @if(!$ticket->is_internal)
-                                <tr>
-                                    <td class="td-left"></td>
-                                    <td class="td-right"><span class="pull-right">
-                                            {!! Button::primary(trans('texts.new_internal_ticket'))
-                                                    ->asLinkTo(URL::to('/tickets/create/'.$ticket->public_id))
-                                                    ->withAttributes(['class' => 'pull-right'])
-                                                    ->appendIcon(Icon::create('plus-sign')) !!}
-                                        </span></td>
-                                </tr>
-                            @endif
                         </tbody>
                     </table>
                 </td>
@@ -218,7 +206,8 @@
             @if(!$ticket->merged_parent_ticket_id)
             {!! DropdownButton::normal(trans('texts.more_actions'))
             ->withContents([
-            ['label'=>trans('texts.ticket_merge'),'url'=>'/tickets/merge/'. $ticket->public_id ],
+                ['label'=>trans('texts.ticket_merge'),'url'=>'/tickets/merge/'. $ticket->public_id ],
+                ['label'=>trans('texts.new_internal_ticket'), 'url'=>'/tickets/create/'.$ticket->public_id],
             ])
             ->large()
             ->dropup() !!}
