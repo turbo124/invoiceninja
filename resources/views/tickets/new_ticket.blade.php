@@ -138,12 +138,12 @@
                 <div class="col-md-9">
                     {!! Former::checkbox('is_internal')
                                 ->label('')
-                                ->data_bind("checked: is_internal, event:{change: ping()}") !!}
+                                ->data_bind("checked: is_internal") !!}
                 </div>
             </div>
 
 
-            <div class="row" data-bind="if: is_visible">
+            <div class="row" data-bind="visible: isParentTicketVisible()">
 
                 <div class="col-md-3">
                     {{ trans('texts.parent_ticket') }}
@@ -151,10 +151,10 @@
 
                 <div class="col-md-9">
 
-                    {!! Former::select('parent_ticket')
+                    {!! Former::select('parent_ticket_id')
                             ->label('')
                             ->addOption('', '')
-                            ->data_bind("dropdown: parent_ticket, dropdownOptions: {highlighter: comboboxHighlighter}")
+                            ->data_bind("dropdown: parent_ticket_id, dropdownOptions: {highlighter: comboboxHighlighter}")
                             ->addClass('pull-right')
                             ->addGroupClass('') !!}
 
@@ -288,6 +288,37 @@
                 });
 
             });
+
+
+            //create user dictionary
+            var parent_tickets = {!! $parent_tickets !!};
+            var ticketMap = {};
+            var $ticketSelect = $('select#parent_ticket_id');
+
+            $(function() {
+                // create client dictionary
+                for (var i=0; i<parent_tickets.length; i++) {
+                    var ticket = parent_tickets[i];
+                    ticketMap[ticket.public_id] = ticket;
+
+                    var ticketName = '{{ trans('texts.ticket_number') }}' + '' + ticket.ticket_number;
+                    $ticketSelect.append(new Option(ticketName, ticket.public_id));
+                }
+
+                //harvest and set the client_id and contact_id here
+                var $input = $('select#parent_ticket_id');
+                $input.combobox().on('change', function(e) {
+                    var parentTicketId = parseInt($('input[name=parent_ticket_id]').val(), 10) || 0;
+
+                    if (parentTicketId > 0) {
+
+                        model.parent_ticket_id(parentTicketId);
+
+                    }
+                });
+
+            });
+
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
         });
@@ -336,8 +367,9 @@
                 }
             }
 
-            self.ping = function() {
-                console.log(model.is_internal());
+            self.isParentTicketVisible = function() {
+                console.log(model.is_internal);
+                return model.is_internal;
             }
 
             self.due_date.pretty = ko.computed({
@@ -352,10 +384,6 @@
 
             if (data) {
                 ko.mapping.fromJS(data, self.mapping, this);
-            }
-
-            self.malaka = function() {
-                console.log('fuuuck');
             }
 
             self.addDocument = function() {
