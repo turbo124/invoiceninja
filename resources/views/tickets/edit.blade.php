@@ -323,7 +323,7 @@
     <script type="text/javascript">
 
         <!-- Initialize client selector -->
-                @if($clients)
+        @if($clients)
 
         var clients = {!! $clients !!};
         var clientMap = {};

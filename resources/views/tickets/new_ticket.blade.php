@@ -136,12 +136,14 @@
                 </div>
 
                 <div class="col-md-9">
-                    {!! Former::checkbox('is_internal')->label('') !!}
+                    {!! Former::checkbox('is_internal')
+                                ->label('')
+                                ->data_bind("checked: is_internal, event:{change: ping()}") !!}
                 </div>
             </div>
 
 
-            <div class="row">
+            <div class="row" data-bind="if: is_visible">
 
                 <div class="col-md-3">
                     {{ trans('texts.parent_ticket') }}
@@ -211,10 +213,81 @@
     <script type="text/javascript">
 
         $( function() {
-            $( "#accordion" ).accordion();
 
             window.model = new ViewModel('');
+            ko.applyBindings(model);
 
+
+            var clients = {!! $account->clients !!};
+            var clientMap = {};
+            var $clientSelect = $('select#client_id');
+
+            $(function() {
+                // create client dictionary
+                for (var i=0; i<clients.length; i++) {
+                    var client = clients[i];
+                    clientMap[client.public_id] = client;
+
+                    if (!getClientDisplayName(client)) {
+                        continue;
+                    }
+
+                    var clientName = client.name || '';
+                    for (var j=0; j<client.contacts.length; j++) {
+                        var contact = client.contacts[j];
+                        var contactName = getContactDisplayNameWithEmail(contact);
+                        if (clientName && contactName) {
+                            clientName += ' • ';
+                        }
+                        if (contactName) {
+                            clientName += contactName;
+                        }
+                    }
+                    $clientSelect.append(new Option(clientName, client.public_id));
+                }
+
+                //harvest and set the client_id and contact_id here
+                var $input = $('select#client_id');
+                $input.combobox().on('change', function(e) {
+                    var clientId = parseInt($('input[name=client_id]').val(), 10) || 0;
+
+                    if (clientId > 0) {
+
+                        model.client_id(clientId);
+
+                    }
+                });
+
+            });
+
+            //create user dictionary
+            var users = {!! $account->users !!};
+            var userMap = {};
+            var $userSelect = $('select#agent_id');
+
+            $(function() {
+                // create client dictionary
+                for (var i=0; i<users.length; i++) {
+                    var user = users[i];
+                    userMap[user.public_id] = user;
+
+                    var userName = user.first_name + ' ' + user.last_name || '';
+                    $userSelect.append(new Option(userName, user.public_id));
+                }
+
+                //harvest and set the client_id and contact_id here
+                var $input = $('select#agent_id');
+                $input.combobox().on('change', function(e) {
+                    var agentId = parseInt($('input[name=agent_id]').val(), 10) || 0;
+
+                    if (agentId > 0) {
+
+                        model.agent_id(agentId);
+
+                    }
+                });
+
+            });
             @include('partials.dropzone', ['documentSource' => 'model.documents()'])
 
         });
@@ -236,18 +309,24 @@
 
         var ViewModel = function (data) {
             var self = this;
+            var parentTicketId = false;
+            var isInternal = false;
+
+            @if($parent_ticket)
+                parentTicketId = {{ $parent_ticket->public_id }}};
+                isInternal = true;
+            @endif
 
             self.documents = ko.observableArray();
             self.due_date = ko.observable();
             self.priority_id = ko.observable();
             self.agent_id = ko.observable();
-            self.is_internal = ko.observable();
+            self.is_internal = ko.observable(isInternal);
             self.subject = ko.observable();
             self.description = ko.observable();
             self.client_id = ko.observable();
-            self.parent_ticket_id = ko.observable();
+            self.parent_ticket_id = ko.observable(parentTicketId);
             self.private_notes = ko.observable();
-
 
             self.mapping = {
                 'documents': {
@@ -255,6 +334,10 @@
                         return new DocumentModel(options.data);
                     }
                 }
+            }
+
+            self.ping = function() {
+                console.log(model.is_internal());
             }
 
             self.due_date.pretty = ko.computed({
@@ -269,6 +352,10 @@
 
             if (data) {
                 ko.mapping.fromJS(data, self.mapping, this);
+            }
+
+            self.malaka = function() {
+                console.log('fuuuck');
             }
 
             self.addDocument = function() {

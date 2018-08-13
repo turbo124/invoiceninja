@@ -160,11 +160,11 @@ class TicketController extends BaseController
         $data = [
             'users' => User::whereAccountId(Auth::user()->account_id)->get(),
             'is_internal' => $request->parent_ticket_id ? true : false,
-            'parent_ticket' => $parentTicket,
+            'parent_ticket' => $parentTicket ?: false,
             'url' => 'tickets/',
             'method' => 'POST',
             'title' => trans('texts.new_internal_ticket'),
-            'account' => Auth::user()->account,
+            'account' => Auth::user()->account->load('clients.contacts', 'users'),
             'timezone' => Auth::user()->account->timezone ? Auth::user()->account->timezone->name : DEFAULT_TIMEZONE,
             'datetimeFormat' => Auth::user()->account->getMomentDateTimeFormat(),
         ];
