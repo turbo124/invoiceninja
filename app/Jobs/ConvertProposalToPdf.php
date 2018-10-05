@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
 use App\Libraries\CurlUtils;
 
 class ConvertProposalToPdf extends Job

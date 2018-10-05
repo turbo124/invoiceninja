@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Carbon;
 use DB;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Laracasts\Presenter\PresentableTrait;
-use App\Models\Traits\HasCustomMessages;
 use Utils;
+use Carbon;
+use App\Models\Traits\HasCustomMessages;
+use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Client.
@@ -368,7 +368,7 @@ class Client extends EntityModel
     {
         if ($this->name) {
             return $this->name;
-        } else if ($contact = $this->getPrimaryContact()) {
+        } elseif ($contact = $this->getPrimaryContact()) {
             return $contact->getDisplayName();
         }
     }
@@ -414,7 +414,7 @@ class Client extends EntityModel
         ];
 
         foreach ($fields as $field) {
-            if ($this->$field != $this->{'shipping_' . $field}) {
+            if ($this->$field != $this->{'shipping_'.$field}) {
                 return false;
             }
         }
@@ -438,7 +438,7 @@ class Client extends EntityModel
 
         foreach ($fields as $field) {
             if ($shipping) {
-                $field = 'shipping_' . $field;
+                $field = 'shipping_'.$field;
             }
             if ($this->$field) {
                 return true;
@@ -455,9 +455,9 @@ class Client extends EntityModel
     {
         if ($this->created_at == '0000-00-00 00:00:00') {
             return '---';
-        } else {
-            return $this->created_at->format('m/d/y h:i a');
         }
+
+        return $this->created_at->format('m/d/y h:i a');
     }
 
     /**
@@ -554,7 +554,6 @@ class Client extends EntityModel
 
         return $this->account->country ? $this->account->country->iso_3166_2 : 'US';
     }
-
 
     /**
      * @param $isQuote

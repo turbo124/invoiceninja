@@ -49,7 +49,7 @@ class CreatePaymentAPIRequest extends PaymentRequest
         ];
 
         if ($this->payment_type_id == PAYMENT_TYPE_CREDIT) {
-            $rules['payment_type_id'] = 'has_credit:' . $invoice->client->public_id . ',' . $this->amount;
+            $rules['payment_type_id'] = 'has_credit:'.$invoice->client->public_id.','.$this->amount;
         }
 
         return $rules;

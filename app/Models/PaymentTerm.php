@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Cache;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -43,7 +42,7 @@ class PaymentTerm extends EntityModel
         }
 
         foreach ($terms as $term) {
-            $term->name = trans('texts.payment_terms_net') . ' ' . $term->getNumDays();
+            $term->name = trans('texts.payment_terms_net').' '.$term->getNumDays();
         }
 
         return $terms->sortBy('num_days');

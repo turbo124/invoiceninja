@@ -2,8 +2,6 @@
 
 namespace App\Constants;
 
-use App\Libraries\Utils;
-
 class Domain
 {
     const INVOICENINJA_COM = 1;
@@ -23,11 +21,11 @@ class Domain
 
     public static function getLinkFromId($id)
     {
-        return 'https://app.' . static::getDomainFromId($id);
+        return 'https://app.'.static::getDomainFromId($id);
     }
 
     public static function getEmailFromId($id)
     {
-        return 'maildelivery@' . static::getDomainFromId($id);
+        return 'maildelivery@'.static::getDomainFromId($id);
     }
 }

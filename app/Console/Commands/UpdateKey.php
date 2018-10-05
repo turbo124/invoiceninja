@@ -2,18 +2,18 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use App\Models\AccountGateway;
-use App\Models\BankAccount;
-use App\Models\User;
-use Artisan;
 use Crypt;
+use Artisan;
+use App\Models\User;
+use App\Models\BankAccount;
+use App\Models\AccountGateway;
+use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Laravel\LegacyEncrypter\McryptEncrypter;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Class UpdateKey
+ * Class UpdateKey.
  */
 class UpdateKey extends Command
 {
@@ -29,14 +29,14 @@ class UpdateKey extends Command
 
     public function fire()
     {
-        $this->info(date('r') . ' Running UpdateKey...');
+        $this->info(date('r').' Running UpdateKey...');
 
         if ($database = $this->option('database')) {
             config(['database.default' => $database]);
         }
 
         if (! env('APP_KEY') || ! env('APP_CIPHER')) {
-            $this->info(date('r') . ' Error: app key and cipher are not set');
+            $this->info(date('r').' Error: app key and cipher are not set');
             exit;
         }
 
@@ -75,7 +75,7 @@ class UpdateKey extends Command
         }
 
         // check if we can write to the .env file
-        $envPath = base_path() . '/.env';
+        $envPath = base_path().'/.env';
         $envWriteable = file_exists($envPath) && @fopen($envPath, 'a');
 
         if ($key = $this->option('key')) {
@@ -109,7 +109,7 @@ class UpdateKey extends Command
             $user->save();
         }
 
-        $message = date('r') . ' Successfully updated ';
+        $message = date('r').' Successfully updated ';
         if ($envWriteable) {
             if ($legacy) {
                 $message .= 'the key, set the cipher in the .env file to AES-256-CBC';
@@ -118,9 +118,9 @@ class UpdateKey extends Command
             }
         } else {
             if ($legacy) {
-                $message .= 'the data, make sure to set the new cipher/key: AES-256-CBC/' . $key;
+                $message .= 'the data, make sure to set the new cipher/key: AES-256-CBC/'.$key;
             } else {
-                $message .= 'the data, make sure to set the new key: ' . $key;
+                $message .= 'the data, make sure to set the new key: '.$key;
             }
         }
         $this->info($message);

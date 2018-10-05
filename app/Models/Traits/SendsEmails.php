@@ -2,9 +2,9 @@
 
 namespace App\Models\Traits;
 
-use App\Constants\Domain;
 use Utils;
 use HTMLUtils;
+use App\Constants\Domain;
 
 /**
  * Class SendsEmails.
@@ -43,6 +43,7 @@ trait SendsEmails
 
             if ($value) {
                 $value = preg_replace("/\r\n|\r|\n/", ' ', $value);
+
                 return HTMLUtils::sanitizeHTML($value);
             }
         }
@@ -65,10 +66,10 @@ trait SendsEmails
         $template = '<div>$client,</div><br />';
 
         if ($this->hasFeature(FEATURE_CUSTOM_EMAILS) && $this->email_design_id != EMAIL_DESIGN_PLAIN) {
-            $template .= '<div>' . trans("texts.{$entityType}_message_button", ['amount' => '$amount']) . '</div><br />' .
+            $template .= '<div>'.trans("texts.{$entityType}_message_button", ['amount' => '$amount']).'</div><br />'.
                          '<div style="text-align:center;">$viewButton</div><br />';
         } else {
-            $template .= '<div>' . trans("texts.{$entityType}_message", ['amount' => '$amount']) . '</div><br />' .
+            $template .= '<div>'.trans("texts.{$entityType}_message", ['amount' => '$amount']).'</div><br />'.
                          '<div>$viewLink</div><br />';
         }
 
@@ -76,7 +77,7 @@ trait SendsEmails
             $template .= "$message<p/>";
         }
 
-        return $template . '$emailSignature';
+        return $template.'$emailSignature';
     }
 
     /**
@@ -113,7 +114,7 @@ trait SendsEmails
      */
     public function getTemplateView($view = '')
     {
-        return $this->getEmailDesignId() == EMAIL_DESIGN_PLAIN ? $view : 'design' . $this->getEmailDesignId();
+        return $this->getEmailDesignId() == EMAIL_DESIGN_PLAIN ? $view : 'design'.$this->getEmailDesignId();
     }
 
     /**
@@ -124,9 +125,9 @@ trait SendsEmails
         if ($this->isPro() && $this->email_footer) {
             // Add line breaks if HTML isn't already being used
             return strip_tags($this->email_footer) == $this->email_footer ? nl2br($this->email_footer) : $this->email_footer;
-        } else {
-            return '<p><div>' . trans('texts.email_signature') . "\n<br>\$account</div></p>";
         }
+
+        return '<p><div>'.trans('texts.email_signature')."\n<br>\$account</div></p>";
     }
 
     /**
@@ -176,11 +177,11 @@ trait SendsEmails
         $settings = $this->account_email_settings;
 
         if ($subject) {
-            $settings->{"email_subject_" . $type} = $subject;
+            $settings->{'email_subject_'.$type} = $subject;
         }
 
         if ($body) {
-            $settings->{"email_template_" . $type} = $body;
+            $settings->{'email_template_'.$type} = $body;
         }
 
         $settings->save();

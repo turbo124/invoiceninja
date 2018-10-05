@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Input;
+use Response;
+use App\Models\Client;
 use App\Http\Requests\ClientRequest;
 use App\Http\Requests\CreateClientRequest;
 use App\Http\Requests\UpdateClientRequest;
-use App\Models\Client;
 use App\Ninja\Repositories\ClientRepository;
-use Input;
-use Response;
 
 class ClientApiController extends BaseAPIController
 {

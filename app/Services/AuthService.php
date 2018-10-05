@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Events\UserLoggedIn;
-use App\Ninja\Repositories\AccountRepository;
-use App\Models\LookupUser;
 use Auth;
 use Input;
+use Utils;
 use Session;
 use Socialite;
-use Utils;
+use App\Models\LookupUser;
+use App\Events\UserLoggedIn;
+use App\Ninja\Repositories\AccountRepository;
 
 /**
  * Class AuthService.
@@ -76,21 +76,21 @@ class AuthService
                 } else {
                     Session::flash('message', trans('texts.updated_settings'));
 
-                    return redirect()->to('/settings/' . ACCOUNT_USER_DETAILS);
+                    return redirect()->to('/settings/'.ACCOUNT_USER_DETAILS);
                 }
             } else {
                 Session::flash('error', $result);
             }
         } else {
-            LookupUser::setServerByField('oauth_user_key', $providerId . '-' . $oauthUserId);
+            LookupUser::setServerByField('oauth_user_key', $providerId.'-'.$oauthUserId);
             if ($user = $this->accountRepo->findUserByOauth($providerId, $oauthUserId)) {
                 if ($user->google_2fa_secret) {
                     session(['2fa:user:id' => $user->id]);
-                    return redirect('/validate_two_factor/' . $user->account->account_key);
-                } else {
-                    Auth::login($user);
-                    event(new UserLoggedIn());
+
+                    return redirect('/validate_two_factor/'.$user->account->account_key);
                 }
+                Auth::login($user);
+                event(new UserLoggedIn());
             } else {
                 Session::flash('error', trans('texts.invalid_credentials'));
 
@@ -98,7 +98,7 @@ class AuthService
             }
         }
 
-        $redirectTo = Input::get('redirect_to') ? SITE_URL . '/' . ltrim(Input::get('redirect_to'), '/') : 'dashboard';
+        $redirectTo = Input::get('redirect_to') ? SITE_URL.'/'.ltrim(Input::get('redirect_to'), '/') : 'dashboard';
 
         return redirect()->to($redirectTo);
     }

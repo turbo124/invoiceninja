@@ -2,16 +2,15 @@
 
 namespace App\Providers;
 
-use Form;
-use Illuminate\Support\ServiceProvider;
-use Request;
 use URL;
-use Utils;
-use Validator;
+use Form;
 use Queue;
-use Illuminate\Queue\Events\JobProcessing;
+use Utils;
+use Request;
+use Validator;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Events\JobProcessing;
 
 /**
  * Class AppServiceProvider.
@@ -20,8 +19,6 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -43,13 +40,13 @@ class AppServiceProvider extends ServiceProvider
                 $contents = $image;
             }
 
-            return $contents ? 'data:image/jpeg;base64,' . base64_encode($contents) : '';
+            return $contents ? 'data:image/jpeg;base64,'.base64_encode($contents) : '';
         });
 
         Form::macro('nav_link', function ($url, $text) {
             //$class = ( Request::is($url) || Request::is($url.'/*') || Request::is($url2.'/*') ) ? ' class="active"' : '';
             $class = (Request::is($url) || Request::is($url.'/*')) ? ' class="active"' : '';
-            $title = trans("texts.$text")  . Utils::getProLabel($text);
+            $title = trans("texts.$text").Utils::getProLabel($text);
 
             return '<li'.$class.'><a href="'.URL::to($url).'">'.$title.'</a></li>';
         });
@@ -72,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Form::macro('flatButton', function ($label, $color) {
-            return '<input type="button" value="' . trans("texts.{$label}") . '" style="background-color:' . $color . ';border:0 none;border-radius:5px;padding:12px 40px;margin:0 6px;cursor:hand;display:inline-block;font-size:14px;color:#fff;text-transform:none;font-weight:bold;"/>';
+            return '<input type="button" value="'.trans("texts.{$label}").'" style="background-color:'.$color.';border:0 none;border-radius:5px;padding:12px 40px;margin:0 6px;cursor:hand;display:inline-block;font-size:14px;color:#fff;text-transform:none;font-weight:bold;"/>';
         });
 
         Form::macro('emailViewButton', function ($link = '#', $entityType = ENTITY_INVOICE) {
@@ -96,7 +93,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Form::macro('breadcrumbs', function ($status = false) {
-
             $str = '<ol class="breadcrumb">';
 
             // Get the breadcrumbs by exploding the current path.
@@ -135,7 +131,7 @@ class AppServiceProvider extends ServiceProvider
                     $str .= "<li class='active'>$name</li>";
                 } else {
                     if (count($crumbs) > 2 && $crumbs[1] == 'proposals' && $crumb != 'proposals') {
-                        $crumb = 'proposals/' . $crumb;
+                        $crumb = 'proposals/'.$crumb;
                     }
                     $str .= '<li>'.link_to($crumb, $name).'</li>';
                 }
@@ -145,7 +141,7 @@ class AppServiceProvider extends ServiceProvider
                 $str .= $status;
             }
 
-            return $str . '</ol>';
+            return $str.'</ol>';
         });
 
         Form::macro('human_filesize', function ($bytes, $decimals = 1) {
@@ -154,7 +150,7 @@ class AppServiceProvider extends ServiceProvider
             if ($factor == 0) {
                 $decimals = 0;
             }// There aren't fractional bytes
-            return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . @$size[$factor];
+            return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).' '.@$size[$factor];
         });
 
         Validator::extend('positive', function ($attribute, $value, $parameters) {
@@ -202,7 +198,7 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
 
-            return ((strstr($value, '{$idNumber}') !== false || strstr($value, '{$clientIdNumber}') != false) && (strstr($value, '{$clientCounter}')));
+            return (strstr($value, '{$idNumber}') !== false || strstr($value, '{$clientIdNumber}') != false) && (strstr($value, '{$clientCounter}'));
         });
 
         Validator::extend('valid_invoice_items', function ($attribute, $value, $parameters) {
@@ -227,8 +223,6 @@ class AppServiceProvider extends ServiceProvider
      * This service provider is a great spot to register your various container
      * bindings with the application. As you can see, we are registering our
      * "Registrar" implementation here. You can add your own bindings too!
-     *
-     * @return void
      */
     public function register()
     {

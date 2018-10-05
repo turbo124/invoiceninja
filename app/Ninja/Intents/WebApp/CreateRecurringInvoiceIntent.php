@@ -14,7 +14,7 @@ class CreateRecurringInvoiceIntent extends BaseIntent
 
         //$invoiceItems = $this->requestInvoiceItems();
 
-        $url = '/recurring_invoices/create/' . $clientPublicId . '?';
+        $url = '/recurring_invoices/create/'.$clientPublicId.'?';
         $url .= $this->requestFieldsAsString(Invoice::$requestFields);
 
         $url = rtrim($url, '?');

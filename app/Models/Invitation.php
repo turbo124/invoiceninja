@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\LookupInvitation;
-use App\Models\Traits\Inviteable;
 use Utils;
+use App\Models\Traits\Inviteable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Invitation.
@@ -70,8 +69,7 @@ class Invitation extends EntityModel
     }
 }
 
-Invitation::creating(function ($invitation)
-{
+Invitation::creating(function ($invitation) {
     LookupInvitation::createNew($invitation->account->account_key, [
         'invitation_key' => $invitation->invitation_key,
     ]);
@@ -84,8 +82,7 @@ Invitation::updating(function ($invitation) {
     }
 });
 
-Invitation::deleted(function ($invitation)
-{
+Invitation::deleted(function ($invitation) {
     if ($invitation->forceDeleting) {
         LookupInvitation::deleteWhere([
             'invitation_key' => $invitation->invitation_key,

@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Transformers;
 
-use App\Models\Account;
-use App\Models\Client;
 use App\Models\Task;
+use App\Models\Client;
+use App\Models\Account;
 
 /**
  * @SWG\Definition(definition="Task", @SWG\Xml(name="Task"))
@@ -32,9 +32,9 @@ class TaskTransformer extends EntityTransformer
             $transformer = new ClientTransformer($this->account, $this->serializer);
 
             return $this->includeItem($task->client, $transformer, 'client');
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function includeProject(Task $task)
@@ -43,9 +43,9 @@ class TaskTransformer extends EntityTransformer
             $transformer = new ProjectTransformer($this->account, $this->serializer);
 
             return $this->includeItem($task->project, $transformer, 'project');
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function transform(Task $task)

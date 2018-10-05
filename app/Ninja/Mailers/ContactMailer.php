@@ -2,17 +2,17 @@
 
 namespace App\Ninja\Mailers;
 
-use App\Events\InvoiceWasEmailed;
-use App\Events\QuoteWasEmailed;
-use App\Models\Invoice;
-use App\Models\Proposal;
-use App\Models\Payment;
-use App\Services\TemplateService;
-use App\Jobs\ConvertInvoiceToUbl;
+use Mail;
+use Cache;
 use Event;
 use Utils;
-use Cache;
-use Mail;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\Proposal;
+use App\Events\QuoteWasEmailed;
+use App\Events\InvoiceWasEmailed;
+use App\Jobs\ConvertInvoiceToUbl;
+use App\Services\TemplateService;
 
 class ContactMailer extends Mailer
 {
@@ -63,8 +63,8 @@ class ContactMailer extends Mailer
         }
 
         $account->loadLocalizationSettings($client);
-        $emailTemplate = !empty($template['body']) ? $template['body'] : $account->getEmailTemplate($reminder ?: $entityType);
-        $emailSubject = !empty($template['subject']) ? $template['subject'] : $account->getEmailSubject($reminder ?: $entityType);
+        $emailTemplate = ! empty($template['body']) ? $template['body'] : $account->getEmailTemplate($reminder ?: $entityType);
+        $emailSubject = ! empty($template['subject']) ? $template['subject'] : $account->getEmailSubject($reminder ?: $entityType);
 
         $sent = false;
         $pdfString = false;
@@ -224,9 +224,9 @@ class ContactMailer extends Mailer
 
         if ($response === true) {
             return true;
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     /**
@@ -405,10 +405,11 @@ class ContactMailer extends Mailer
                 Mail::raw('Account Throttle', function ($message) use ($errorEmail, $account) {
                     $message->to($errorEmail)
                             ->from(CONTACT_EMAIL)
-                            ->subject("Email throttle triggered for account " . $account->id);
+                            ->subject('Email throttle triggered for account '.$account->id);
                 });
             }
             Cache::put("throttle_notified:{$key}", true, 60 * 24);
+
             return true;
         }
 

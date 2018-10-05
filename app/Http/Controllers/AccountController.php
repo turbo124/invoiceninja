@@ -2,52 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use URL;
+use Auth;
+use File;
+use View;
+use Cache;
+use Image;
+use Input;
+use Utils;
+use Request;
+use Session;
+use Redirect;
+use Response;
+use stdClass;
+use Exception;
+use Validator;
+use App\Models\User;
+use App\Models\Account;
+use App\Models\Gateway;
+use App\Models\Invoice;
+use App\Models\License;
+use App\Models\Product;
+use App\Models\TaxRate;
+use App\Models\Document;
+use App\Models\Affiliate;
+use App\Models\GatewayType;
+use App\Events\UserSignedUp;
+use App\Models\InvoiceDesign;
+use App\Services\AuthService;
+use App\Models\AccountGateway;
+use App\Services\PaymentService;
+use App\Ninja\Mailers\UserMailer;
+use App\Services\TemplateService;
 use App\Events\SubdomainWasRemoved;
 use App\Events\SubdomainWasUpdated;
 use App\Events\UserSettingsChanged;
-use App\Events\UserSignedUp;
-use App\Http\Requests\SaveClientPortalSettings;
-use App\Http\Requests\SaveEmailSettings;
-use App\Http\Requests\UpdateAccountRequest;
-use App\Models\Account;
-use App\Models\AccountGateway;
-use App\Models\Affiliate;
-use App\Models\Document;
-use App\Models\Gateway;
-use App\Models\GatewayType;
-use App\Models\Invoice;
-use App\Models\InvoiceDesign;
-use App\Models\License;
-use App\Models\PaymentTerm;
-use App\Models\Product;
-use App\Models\TaxRate;
-use App\Models\User;
+use Nwidart\Modules\Facades\Module;
 use App\Models\AccountEmailSettings;
 use App\Ninja\Mailers\ContactMailer;
-use App\Ninja\Mailers\UserMailer;
+use App\Http\Requests\SaveEmailSettings;
+use App\Http\Requests\UpdateAccountRequest;
 use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Repositories\ReferralRepository;
-use App\Services\AuthService;
-use App\Services\PaymentService;
-use App\Services\TemplateService;
-use Nwidart\Modules\Facades\Module;
-use Auth;
-use Cache;
-use File;
-use Image;
-use Input;
-use Redirect;
-use Request;
-use Response;
-use Session;
-use stdClass;
-use Exception;
-use URL;
-use Utils;
-
-use Validator;
-use View;
-use App\Jobs\PurgeClientData;
+use App\Http\Requests\SaveClientPortalSettings;
 
 /**
  * Class AccountController.
@@ -142,7 +139,7 @@ class AccountController extends BaseController
         }
 
         if ($redirectTo = Input::get('redirect_to')) {
-            $redirectTo = SITE_URL . '/' . ltrim($redirectTo, '/');
+            $redirectTo = SITE_URL.'/'.ltrim($redirectTo, '/');
         } else {
             $redirectTo = Input::get('sign_up') ? 'dashboard' : 'invoices/create';
         }
@@ -197,29 +194,29 @@ class AccountController extends BaseController
 
         if ($newPlan['price'] > $credit) {
             $invitation = $this->accountRepo->enablePlan($newPlan, $credit);
-            return Redirect::to('view/' . $invitation->invitation_key);
-        } else {
-            if ($plan == PLAN_FREE) {
-                $company->discount = 0;
 
-                $ninjaClient = $this->accountRepo->getNinjaClient($account);
-                $ninjaClient->send_reminders = false;
-                $ninjaClient->save();
-            } else {
-                $company->plan_term = $term;
-                $company->plan_price = $newPlan['price'];
-                $company->num_users = $numUsers;
-                $company->plan_expires = date_create()->modify($term == PLAN_TERM_MONTHLY ? '+1 month' : '+1 year')->format('Y-m-d');
-            }
-
-            $company->trial_plan = null;
-            $company->plan = $plan;
-            $company->save();
-
-            Session::flash('message', trans('texts.updated_plan'));
-
-            return Redirect::to('settings/account_management');
+            return Redirect::to('view/'.$invitation->invitation_key);
         }
+        if ($plan == PLAN_FREE) {
+            $company->discount = 0;
+
+            $ninjaClient = $this->accountRepo->getNinjaClient($account);
+            $ninjaClient->send_reminders = false;
+            $ninjaClient->save();
+        } else {
+            $company->plan_term = $term;
+            $company->plan_price = $newPlan['price'];
+            $company->num_users = $numUsers;
+            $company->plan_expires = date_create()->modify($term == PLAN_TERM_MONTHLY ? '+1 month' : '+1 year')->format('Y-m-d');
+        }
+
+        $company->trial_plan = null;
+        $company->plan = $plan;
+        $company->save();
+
+        Session::flash('message', trans('texts.updated_plan'));
+
+        return Redirect::to('settings/account_management');
     }
 
     /**
@@ -306,20 +303,19 @@ class AccountController extends BaseController
             return self::showPaymentTerms();
         } elseif ($section === ACCOUNT_SYSTEM_SETTINGS) {
             return self::showSystemSettings();
-        } else {
-            $view = "accounts.{$section}";
-            if (! view()->exists($view)) {
-                return redirect('/settings/company_details');
-            }
+        }
+        $view = "accounts.{$section}";
+        if (! view()->exists($view)) {
+            return redirect('/settings/company_details');
+        }
 
-            $data = [
+        $data = [
                 'account' => Account::with('users')->findOrFail(Auth::user()->account_id),
                 'title' => trans("texts.{$section}"),
                 'section' => $section,
             ];
 
-            return View::make($view, $data);
-        }
+        return View::make($view, $data);
     }
 
     /**
@@ -814,7 +810,7 @@ class AccountController extends BaseController
     private function saveCustomizeDesign()
     {
         $designId = intval(Input::get('design_id')) ?: CUSTOM_DESIGN1;
-        $field = 'custom_design' . ($designId - 10);
+        $field = 'custom_design'.($designId - 10);
 
         if (Auth::user()->account->hasFeature(FEATURE_CUSTOMIZE_INVOICE_DESIGN)) {
             $account = Auth::user()->account;
@@ -827,7 +823,7 @@ class AccountController extends BaseController
             Session::flash('message', trans('texts.updated_settings'));
         }
 
-        return Redirect::to('settings/' . ACCOUNT_CUSTOMIZE_DESIGN . '?design_id=' . $designId);
+        return Redirect::to('settings/'.ACCOUNT_CUSTOMIZE_DESIGN.'?design_id='.$designId);
     }
 
     /**
@@ -840,12 +836,11 @@ class AccountController extends BaseController
         // check subdomain is unique in the lookup tables
         if (request()->subdomain) {
             if (! \App\Models\LookupAccount::validateField('subdomain', request()->subdomain, $account)) {
-                return Redirect::to('settings/' . ACCOUNT_CLIENT_PORTAL)
+                return Redirect::to('settings/'.ACCOUNT_CLIENT_PORTAL)
                     ->withError(trans('texts.subdomain_taken'))
                     ->withInput();
             }
         }
-
 
         (bool) $fireUpdateSubdomainEvent = false;
 
@@ -865,8 +860,7 @@ class AccountController extends BaseController
             event(new SubdomainWasUpdated($account));
         }
 
-
-        return redirect('settings/' . ACCOUNT_CLIENT_PORTAL)
+        return redirect('settings/'.ACCOUNT_CLIENT_PORTAL)
             ->with('message', trans('texts.updated_settings'));
     }
 
@@ -883,7 +877,7 @@ class AccountController extends BaseController
         $settings->fill($request->all());
         $settings->save();
 
-        return redirect('settings/' . ACCOUNT_EMAIL_SETTINGS)
+        return redirect('settings/'.ACCOUNT_EMAIL_SETTINGS)
             ->with('message', trans('texts.updated_settings'));
     }
 
@@ -982,64 +976,62 @@ class AccountController extends BaseController
                 return Redirect::to('settings/'.ACCOUNT_INVOICE_SETTINGS)
                     ->withErrors($validator)
                     ->withInput();
-            } else {
-                $account = Auth::user()->account;
-                $account->custom_value1 = Input::get('custom_value1');
-                $account->custom_value2 = Input::get('custom_value2');
-                $account->custom_invoice_taxes1 = Input::get('custom_invoice_taxes1') ? true : false;
-                $account->custom_invoice_taxes2 = Input::get('custom_invoice_taxes2') ? true : false;
-                $account->custom_fields = request()->custom_fields;
-                $account->invoice_number_padding = Input::get('invoice_number_padding');
-                $account->invoice_number_counter = Input::get('invoice_number_counter');
-                $account->quote_number_prefix = Input::get('quote_number_prefix');
-                $account->share_counter = Input::get('share_counter') ? true : false;
-                $account->invoice_terms = Input::get('invoice_terms');
-                $account->invoice_footer = Input::get('invoice_footer');
-                $account->quote_terms = Input::get('quote_terms');
-                $account->auto_convert_quote = Input::get('auto_convert_quote');
-                $account->auto_archive_quote = Input::get('auto_archive_quote');
-                $account->auto_archive_invoice = Input::get('auto_archive_invoice');
-                $account->auto_email_invoice = Input::get('auto_email_invoice');
-                $account->recurring_invoice_number_prefix = Input::get('recurring_invoice_number_prefix');
+            }
+            $account = Auth::user()->account;
+            $account->custom_value1 = Input::get('custom_value1');
+            $account->custom_value2 = Input::get('custom_value2');
+            $account->custom_invoice_taxes1 = Input::get('custom_invoice_taxes1') ? true : false;
+            $account->custom_invoice_taxes2 = Input::get('custom_invoice_taxes2') ? true : false;
+            $account->custom_fields = request()->custom_fields;
+            $account->invoice_number_padding = Input::get('invoice_number_padding');
+            $account->invoice_number_counter = Input::get('invoice_number_counter');
+            $account->quote_number_prefix = Input::get('quote_number_prefix');
+            $account->share_counter = Input::get('share_counter') ? true : false;
+            $account->invoice_terms = Input::get('invoice_terms');
+            $account->invoice_footer = Input::get('invoice_footer');
+            $account->quote_terms = Input::get('quote_terms');
+            $account->auto_convert_quote = Input::get('auto_convert_quote');
+            $account->auto_archive_quote = Input::get('auto_archive_quote');
+            $account->auto_archive_invoice = Input::get('auto_archive_invoice');
+            $account->auto_email_invoice = Input::get('auto_email_invoice');
+            $account->recurring_invoice_number_prefix = Input::get('recurring_invoice_number_prefix');
 
-                $account->client_number_prefix = trim(Input::get('client_number_prefix'));
-                $account->client_number_pattern = trim(Input::get('client_number_pattern'));
-                $account->client_number_counter = Input::get('client_number_counter');
-                $account->credit_number_counter = Input::get('credit_number_counter');
-                $account->credit_number_prefix = trim(Input::get('credit_number_prefix'));
-                $account->credit_number_pattern = trim(Input::get('credit_number_pattern'));
-                $account->reset_counter_frequency_id = Input::get('reset_counter_frequency_id');
-                $account->reset_counter_date = $account->reset_counter_frequency_id ? Utils::toSqlDate(Input::get('reset_counter_date')) : null;
+            $account->client_number_prefix = trim(Input::get('client_number_prefix'));
+            $account->client_number_pattern = trim(Input::get('client_number_pattern'));
+            $account->client_number_counter = Input::get('client_number_counter');
+            $account->credit_number_counter = Input::get('credit_number_counter');
+            $account->credit_number_prefix = trim(Input::get('credit_number_prefix'));
+            $account->credit_number_pattern = trim(Input::get('credit_number_pattern'));
+            $account->reset_counter_frequency_id = Input::get('reset_counter_frequency_id');
+            $account->reset_counter_date = $account->reset_counter_frequency_id ? Utils::toSqlDate(Input::get('reset_counter_date')) : null;
 
-                if (Input::has('recurring_hour')) {
-                    $account->recurring_hour = Input::get('recurring_hour');
-                }
+            if (Input::has('recurring_hour')) {
+                $account->recurring_hour = Input::get('recurring_hour');
+            }
 
-                if (! $account->share_counter) {
-                    $account->quote_number_counter = Input::get('quote_number_counter');
-                }
+            if (! $account->share_counter) {
+                $account->quote_number_counter = Input::get('quote_number_counter');
+            }
 
-                foreach ([ENTITY_INVOICE, ENTITY_QUOTE, ENTITY_CLIENT] as $entityType) {
-                    if (Input::get("{$entityType}_number_type") == 'prefix') {
-                        $account->{"{$entityType}_number_prefix"} = trim(Input::get("{$entityType}_number_prefix"));
-                        $account->{"{$entityType}_number_pattern"} = null;
-                    } else {
-                        $account->{"{$entityType}_number_pattern"} = trim(Input::get("{$entityType}_number_pattern"));
-                        $account->{"{$entityType}_number_prefix"} = null;
-                    }
-                }
-
-                if (! $account->share_counter
-                    && $account->invoice_number_prefix == $account->quote_number_prefix
-                    && $account->invoice_number_pattern == $account->quote_number_pattern) {
-                    Session::flash('error', trans('texts.invalid_counter'));
-
-                    return Redirect::to('settings/'.ACCOUNT_INVOICE_SETTINGS)->withInput();
+            foreach ([ENTITY_INVOICE, ENTITY_QUOTE, ENTITY_CLIENT] as $entityType) {
+                if (Input::get("{$entityType}_number_type") == 'prefix') {
+                    $account->{"{$entityType}_number_prefix"} = trim(Input::get("{$entityType}_number_prefix"));
+                    $account->{"{$entityType}_number_pattern"} = null;
                 } else {
-                    $account->save();
-                    Session::flash('message', trans('texts.updated_settings'));
+                    $account->{"{$entityType}_number_pattern"} = trim(Input::get("{$entityType}_number_pattern"));
+                    $account->{"{$entityType}_number_prefix"} = null;
                 }
             }
+
+            if (! $account->share_counter
+                    && $account->invoice_number_prefix == $account->quote_number_prefix
+                    && $account->invoice_number_pattern == $account->quote_number_pattern) {
+                Session::flash('error', trans('texts.invalid_counter'));
+
+                return Redirect::to('settings/'.ACCOUNT_INVOICE_SETTINGS)->withInput();
+            }
+            $account->save();
+            Session::flash('message', trans('texts.updated_settings'));
         }
 
         return Redirect::to('settings/'.ACCOUNT_INVOICE_SETTINGS);
@@ -1206,7 +1198,7 @@ class AccountController extends BaseController
         $email = trim(strtolower(Input::get('email')));
 
         if (! \App\Models\LookupUser::validateField('email', $email, $user)) {
-            return Redirect::to('settings/' . ACCOUNT_USER_DETAILS)
+            return Redirect::to('settings/'.ACCOUNT_USER_DETAILS)
                 ->withError(trans('texts.email_taken'))
                 ->withInput();
         }
@@ -1223,39 +1215,38 @@ class AccountController extends BaseController
             return Redirect::to('settings/'.ACCOUNT_USER_DETAILS)
                 ->withErrors($validator)
                 ->withInput();
-        } else {
-            $user->first_name = trim(Input::get('first_name'));
-            $user->last_name = trim(Input::get('last_name'));
-            $user->username = $email;
-            $user->email = $email;
-            $user->phone = trim(Input::get('phone'));
-            $user->dark_mode = Input::get('dark_mode');
-
-            if (! Auth::user()->is_admin) {
-                $user->notify_sent = Input::get('notify_sent');
-                $user->notify_viewed = Input::get('notify_viewed');
-                $user->notify_paid = Input::get('notify_paid');
-                $user->notify_approved = Input::get('notify_approved');
-                $user->only_notify_owned = Input::get('only_notify_owned');
-            }
-
-            if ($user->google_2fa_secret && ! Input::get('enable_two_factor')) {
-                $user->google_2fa_secret = null;
-            }
-
-            if (Utils::isNinja()) {
-                if (Input::get('referral_code') && ! $user->referral_code) {
-                    $user->referral_code = strtolower(str_random(RANDOM_KEY_LENGTH));
-                }
-            }
-
-            $user->save();
-
-            event(new UserSettingsChanged());
-            Session::flash('message', trans('texts.updated_settings'));
-
-            return Redirect::to('settings/'.ACCOUNT_USER_DETAILS);
         }
+        $user->first_name = trim(Input::get('first_name'));
+        $user->last_name = trim(Input::get('last_name'));
+        $user->username = $email;
+        $user->email = $email;
+        $user->phone = trim(Input::get('phone'));
+        $user->dark_mode = Input::get('dark_mode');
+
+        if (! Auth::user()->is_admin) {
+            $user->notify_sent = Input::get('notify_sent');
+            $user->notify_viewed = Input::get('notify_viewed');
+            $user->notify_paid = Input::get('notify_paid');
+            $user->notify_approved = Input::get('notify_approved');
+            $user->only_notify_owned = Input::get('only_notify_owned');
+        }
+
+        if ($user->google_2fa_secret && ! Input::get('enable_two_factor')) {
+            $user->google_2fa_secret = null;
+        }
+
+        if (Utils::isNinja()) {
+            if (Input::get('referral_code') && ! $user->referral_code) {
+                $user->referral_code = strtolower(str_random(RANDOM_KEY_LENGTH));
+            }
+        }
+
+        $user->save();
+
+        event(new UserSettingsChanged());
+        Session::flash('message', trans('texts.updated_settings'));
+
+        return Redirect::to('settings/'.ACCOUNT_USER_DETAILS);
     }
 
     /**
@@ -1344,9 +1335,9 @@ class AccountController extends BaseController
 
         if ($email) {
             return 'taken';
-        } else {
-            return 'available';
         }
+
+        return 'available';
     }
 
     /**
@@ -1366,7 +1357,7 @@ class AccountController extends BaseController
         ];
 
         if (! $user->registered) {
-            $rules['new_email'] .= ',' . Auth::user()->id . ',id';
+            $rules['new_email'] .= ','.Auth::user()->id.',id';
         }
 
         $validator = Validator::make(Input::all(), $rules);
@@ -1395,24 +1386,23 @@ class AccountController extends BaseController
             Auth::loginUsingId($newUser->id);
 
             return RESULT_SUCCESS;
-        } else {
-            $user->first_name = $firstName;
-            $user->last_name = $lastName;
-            $user->email = $email;
-            $user->username = $user->email;
-            $user->password = bcrypt($password);
-            $user->registered = true;
-            $user->acceptLatestTerms($ip);
-            $user->save();
-
-            $user->account->startTrial(PLAN_PRO);
-
-            if (Input::get('go_pro') == 'true') {
-                session([REQUESTED_PRO_PLAN => true]);
-            }
-
-            return "{$user->first_name} {$user->last_name}";
         }
+        $user->first_name = $firstName;
+        $user->last_name = $lastName;
+        $user->email = $email;
+        $user->username = $user->email;
+        $user->password = bcrypt($password);
+        $user->registered = true;
+        $user->acceptLatestTerms($ip);
+        $user->save();
+
+        $user->account->startTrial(PLAN_PRO);
+
+        if (Input::get('go_pro') == 'true') {
+            session([REQUESTED_PRO_PLAN => true]);
+        }
+
+        return "{$user->first_name} {$user->last_name}";
     }
 
     /**
@@ -1573,7 +1563,7 @@ class AccountController extends BaseController
         ];
 
         // create the email view
-        $view = 'emails.' . $account->getTemplateView(ENTITY_INVOICE) . '_html';
+        $view = 'emails.'.$account->getTemplateView(ENTITY_INVOICE).'_html';
         $data = array_merge($data, [
             'body' => $templateService->processVariables($template, $data),
             'entityType' => ENTITY_INVOICE,

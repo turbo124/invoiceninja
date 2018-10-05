@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Str;
+use Lang;
+use Cache;
+use Event;
 use Utils;
+use Cookie;
+use App\Models\User;
+use App\Events\UserLoggedIn;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Event;
-use Cache;
-use Lang;
-use Str;
-use Cookie;
-use App\Events\UserLoggedIn;
 use App\Http\Requests\ValidateTwoFactorRequest;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
 {
@@ -40,8 +40,6 @@ class LoginController extends Controller
 
     /**
      * Create a new controller instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -64,7 +62,7 @@ class LoginController extends Controller
         if (Utils::isNinja() && ! Utils::isTravis()) {
             // make sure the user is on SITE_URL/login to ensure OAuth works
             $requestURL = request()->url();
-            $loginURL = SITE_URL . '/login';
+            $loginURL = SITE_URL.'/login';
             $subdomain = Utils::getSubdomain(request()->url());
             if ($requestURL != $loginURL && ! strstr($subdomain, 'webapp-')) {
                 return redirect()->to($loginURL);
@@ -86,6 +84,7 @@ class LoginController extends Controller
 
         if ($user && $user->failed_logins >= MAX_FAILED_LOGINS) {
             session()->flash('error', trans('texts.invalid_credentials'));
+
             return redirect()->to('login');
         }
 
@@ -108,7 +107,7 @@ class LoginController extends Controller
             if (config('app.log') == 'single') {
                 file_put_contents(storage_path('logs/failed-logins.log'), $stacktrace, FILE_APPEND);
             } else {
-                Utils::logError('[failed login] ' . $stacktrace);
+                Utils::logError('[failed login] '.$stacktrace);
             }
             if ($user) {
                 $user->failed_logins = $user->failed_logins + 1;
@@ -122,7 +121,8 @@ class LoginController extends Controller
     /**
      * Get the failed login response instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendFailedLoginResponse(Request $request)
@@ -137,8 +137,9 @@ class LoginController extends Controller
     /**
      * Send the post-authentication response.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param \Illuminate\Http\Request                   $request
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
      * @return \Illuminate\Http\Response
      */
     private function authenticated(Request $request, Authenticatable $user)
@@ -146,7 +147,7 @@ class LoginController extends Controller
         if ($user->google_2fa_secret) {
             $cookie = false;
             if ($user->remember_2fa_token) {
-                $cookie = Cookie::get('remember_2fa_' . sha1($user->id));
+                $cookie = Cookie::get('remember_2fa_'.sha1($user->id));
             }
 
             if ($cookie && hash_equals($user->remember_2fa_token, $cookie)) {
@@ -154,7 +155,8 @@ class LoginController extends Controller
             } else {
                 auth()->logout();
                 session()->put('2fa:user:id', $user->id);
-                return redirect('/validate_two_factor/' . $user->account->account_key);
+
+                return redirect('/validate_two_factor/'.$user->account->account_key);
             }
         }
 
@@ -164,7 +166,6 @@ class LoginController extends Controller
     }
 
     /**
-     *
      * @return \Illuminate\Http\Response
      */
     public function getValidateToken()
@@ -177,15 +178,15 @@ class LoginController extends Controller
     }
 
     /**
+     * @param App\Http\Requests\ValidateSecretRequest $request
      *
-     * @param  App\Http\Requests\ValidateSecretRequest $request
      * @return \Illuminate\Http\Response
      */
     public function postValidateToken(ValidateTwoFactorRequest $request)
     {
         //get user id and create cache key
         $userId = session()->pull('2fa:user:id');
-        $key = $userId . ':' . $request->totp;
+        $key = $userId.':'.$request->totp;
 
         //use cache to store token to blacklist
         Cache::add($key, true, 4);
@@ -201,7 +202,7 @@ class LoginController extends Controller
                 $user->save();
             }
             $minutes = $trust == 30 ? 60 * 27 * 30 : 2628000;
-            cookie()->queue('remember_2fa_' . sha1($user->id), $user->remember_2fa_token, $minutes);
+            cookie()->queue('remember_2fa_'.sha1($user->id), $user->remember_2fa_token, $minutes);
         }
 
         return redirect()->intended($this->redirectTo);
@@ -229,7 +230,7 @@ class LoginController extends Controller
         $response = self::logout($request);
 
         $reason = htmlentities(request()->reason);
-        if (!empty($reason) && Lang::has("texts.{$reason}_logout")) {
+        if (! empty($reason) && Lang::has("texts.{$reason}_logout")) {
             session()->flash('warning', trans("texts.{$reason}_logout"));
         }
 

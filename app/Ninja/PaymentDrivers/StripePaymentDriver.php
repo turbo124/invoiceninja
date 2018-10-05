@@ -2,13 +2,13 @@
 
 namespace App\Ninja\PaymentDrivers;
 
-use App\Models\Payment;
-use App\Models\Invitation;
-use App\Models\PaymentMethod;
-use App\Models\GatewayType;
 use Cache;
 use Exception;
+use App\Models\Payment;
+use App\Models\Invitation;
+use App\Models\GatewayType;
 use App\Models\PaymentType;
+use App\Models\PaymentMethod;
 
 class StripePaymentDriver extends BasePaymentDriver
 {
@@ -91,9 +91,9 @@ class StripePaymentDriver extends BasePaymentDriver
 
         if (array_get($result, 'object') == 'list') {
             return true;
-        } else {
-            return $result;
         }
+
+        return $result;
     }
 
     public function shouldUseSource()
@@ -190,9 +190,8 @@ class StripePaymentDriver extends BasePaymentDriver
             $this->tokenResponse = $tokenResponse->getData();
 
             return parent::createToken();
-        } else {
-            throw new Exception($tokenResponse->getMessage());
         }
+        throw new Exception($tokenResponse->getMessage());
     }
 
     public function creatingCustomer($customer)
@@ -234,7 +233,7 @@ class StripePaymentDriver extends BasePaymentDriver
         if ($this->isGatewayType(GATEWAY_TYPE_CREDIT_CARD)
             || $this->isGatewayType(GATEWAY_TYPE_APPLE_PAY)
             || $this->isGatewayType(GATEWAY_TYPE_TOKEN)) {
-            $paymentMethod->expiration = $source['exp_year'] . '-' . $source['exp_month'] . '-01';
+            $paymentMethod->expiration = $source['exp_year'].'-'.$source['exp_month'].'-01';
             $paymentMethod->payment_type_id = PaymentType::parseCardType($source['brand']);
         } elseif ($this->isGatewayType(GATEWAY_TYPE_BANK_TRANSFER)) {
             $paymentMethod->routing_number = $source['routing_number'];
@@ -287,9 +286,8 @@ class StripePaymentDriver extends BasePaymentDriver
 
         if ($response->isSuccessful()) {
             return true;
-        } else {
-            throw new Exception($response->getMessage());
         }
+        throw new Exception($response->getMessage());
     }
 
     private function getPlaidToken($publicToken, $accountId)
@@ -329,9 +327,8 @@ class StripePaymentDriver extends BasePaymentDriver
 
             if ($body && ! empty($body['message'])) {
                 throw new Exception($body['message']);
-            } else {
-                throw new Exception($e->getMessage());
             }
+            throw new Exception($e->getMessage());
         }
     }
 
@@ -346,8 +343,8 @@ class StripePaymentDriver extends BasePaymentDriver
         // Also, it doesn't want to urlencode without putting numbers inside the brackets
         $result = $this->makeStripeCall(
             'POST',
-            'customers/' . $customer->token . '/sources/' . $paymentMethod->source_reference . '/verify',
-            'amounts[]=' . intval($amount1) . '&amounts[]=' . intval($amount2)
+            'customers/'.$customer->token.'/sources/'.$paymentMethod->source_reference.'/verify',
+            'amounts[]='.intval($amount1).'&amounts[]='.intval($amount2)
         );
 
         if (is_string($result) && $result != 'This bank account has already been verified.') {
@@ -411,12 +408,11 @@ class StripePaymentDriver extends BasePaymentDriver
                     'amount' => $this->invoice()->getRequestedAmount(),
                     'source' => $response,
                 ]);
-            } else {
-                return redirect($response['redirect']['url']);
             }
-        } else {
-            throw new Exception($response);
+
+            return redirect($response['redirect']['url']);
         }
+        throw new Exception($response);
     }
 
     public function makeStripeCall($method, $url, $body = null)

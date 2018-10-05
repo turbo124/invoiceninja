@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\ClientAuth;
 
-use Password;
 use Config;
+use Password;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Http\Request;
 
 class ResetPasswordController extends Controller
 {
@@ -32,8 +32,6 @@ class ResetPasswordController extends Controller
 
     /**
      * Create a new controller instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -56,8 +54,7 @@ class ResetPasswordController extends Controller
     {
         return view('auth.passwords.reset')->with([
             'token' => $token,
-            'url' => '/client/password/reset'
+            'url' => '/client/password/reset',
         ]);
     }
-
 }

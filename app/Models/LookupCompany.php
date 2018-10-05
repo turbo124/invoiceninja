@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
-
 /**
  * Class ExpenseCategory.
  */
@@ -26,5 +24,4 @@ class LookupCompany extends LookupModel
     {
         return $this->dbServer->name;
     }
-
 }

@@ -2,14 +2,14 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Activity;
-use App\Models\Client;
-use App\Models\Invitation;
-use Auth;
 use DB;
-use Request;
-use Utils;
 use App;
+use Auth;
+use Utils;
+use Request;
+use App\Models\Client;
+use App\Models\Activity;
+use App\Models\Invitation;
 
 class ActivityRepository
 {
