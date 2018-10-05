@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Import;
 
-use Carbon;
-use League\Fractal\TransformerAbstract;
 use Utils;
+use Carbon;
 use Exception;
+use League\Fractal\TransformerAbstract;
 
 /**
  * Class BaseTransformer.
@@ -50,7 +50,6 @@ class BaseTransformer extends TransformerAbstract
 
         return isset($this->maps[ENTITY_VENDOR][$name]);
     }
-
 
     /**
      * @param $key
@@ -99,8 +98,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getClientId($name)
     {
@@ -111,8 +108,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getProduct($data, $key, $field, $default = false)
     {
@@ -129,8 +124,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getContact($email)
     {
@@ -145,8 +138,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getCustomer($key)
     {
@@ -161,8 +152,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getCountryId($name)
     {
@@ -173,8 +162,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getCountryIdBy2($name)
     {
@@ -185,8 +172,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getTaxRate($name)
     {
@@ -197,8 +182,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getTaxName($name)
     {
@@ -224,8 +207,6 @@ class BaseTransformer extends TransformerAbstract
      * @param string $format
      * @param mixed  $data
      * @param mixed  $field
-     *
-     * @return null
      */
     public function getDate($data, $field)
     {
@@ -265,25 +246,23 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $invoiceNumber
-     *
-     * @return null
      */
     public function getInvoiceId($invoiceNumber)
     {
         $invoiceNumber = $this->getInvoiceNumber($invoiceNumber);
         $invoiceNumber = strtolower($invoiceNumber);
+
         return isset($this->maps[ENTITY_INVOICE][$invoiceNumber]) ? $this->maps[ENTITY_INVOICE][$invoiceNumber] : null;
     }
 
     /**
      * @param $invoiceNumber
-     *
-     * @return null
      */
     public function getInvoicePublicId($invoiceNumber)
     {
         $invoiceNumber = $this->getInvoiceNumber($invoiceNumber);
         $invoiceNumber = strtolower($invoiceNumber);
+
         return isset($this->maps['invoices'][$invoiceNumber]) ? $this->maps['invoices'][$invoiceNumber]->public_id : null;
     }
 
@@ -302,8 +281,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $invoiceNumber
-     *
-     * @return null
      */
     public function getInvoiceClientId($invoiceNumber)
     {
@@ -315,8 +292,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getVendorId($name)
     {
@@ -327,8 +302,6 @@ class BaseTransformer extends TransformerAbstract
 
     /**
      * @param $name
-     *
-     * @return null
      */
     public function getExpenseCategoryId($name)
     {

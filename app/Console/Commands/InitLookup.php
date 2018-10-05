@@ -2,17 +2,17 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use DB;
 use Mail;
 use Exception;
 use App\Models\DbServer;
-use App\Models\LookupCompany;
-use App\Models\LookupAccount;
 use App\Models\LookupUser;
+use App\Models\LookupAccount;
+use App\Models\LookupCompany;
 use App\Models\LookupContact;
-use App\Models\LookupAccountToken;
+use Illuminate\Console\Command;
 use App\Models\LookupInvitation;
+use App\Models\LookupAccountToken;
 
 class InitLookup extends Command
 {
@@ -35,8 +35,6 @@ class InitLookup extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -60,7 +58,7 @@ class InitLookup extends Command
         if ($this->option('subdomain')) {
             $this->logMessage('Updating subdomains...');
             $this->popuplateSubdomains();
-        } else if ($this->option('truncate')) {
+        } elseif ($this->option('truncate')) {
             $this->logMessage('Truncating data...');
             $this->truncateTables();
         } else {
@@ -70,19 +68,19 @@ class InitLookup extends Command
                         ->where('id', '>=', $this->option('company_id') ?: 1)
                         ->count();
 
-            for ($i=0; $i<$count; $i += (int) $this->option('page_size')) {
+            for ($i = 0; $i < $count; $i += (int) $this->option('page_size')) {
                 $this->initCompanies($dbServer->id, $i);
             }
         }
 
-        $this->logMessage('Results: ' . ($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
+        $this->logMessage('Results: '.($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
 
         if ($this->option('validate')) {
             if ($errorEmail = env('ERROR_EMAIL')) {
                 Mail::raw($this->log, function ($message) use ($errorEmail, $database) {
                     $message->to($errorEmail)
                             ->from(CONTACT_EMAIL)
-                            ->subject("Check-Lookups [{$database}]: " . strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
+                            ->subject("Check-Lookups [{$database}]: ".strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
                 });
             } elseif (! $this->isValid) {
                 throw new Exception('Check lookups failed!!');
@@ -136,7 +134,6 @@ class InitLookup extends Command
         $update = $this->option('update');
 
         foreach ($data as $companyId => $company) {
-
             $lookupCompany = false;
             if ($validate || $update) {
                 $lookupCompany = LookupCompany::whereDbServerId($dbServerId)->whereCompanyId($companyId)->first();
@@ -153,7 +150,6 @@ class InitLookup extends Command
             }
 
             foreach ($company as $accountKey => $account) {
-
                 $lookupAccount = false;
                 if ($validate || $update) {
                     $lookupAccount = LookupAccount::whereLookupCompanyId($lookupCompany->id)->whereAccountKey($accountKey)->first();
@@ -165,7 +161,7 @@ class InitLookup extends Command
                 if (! $lookupAccount) {
                     $lookupAccount = LookupAccount::create([
                         'lookup_company_id' => $lookupCompany->id,
-                        'account_key' => $accountKey
+                        'account_key' => $accountKey,
                     ]);
                 }
 
@@ -273,7 +269,7 @@ class InitLookup extends Command
         config(['database.default' => $this->option('database')]);
 
         $accounts = DB::table('accounts')->whereCompanyId($companyId)->orderBy('id')->get([
-            'id', 'account_key'
+            'id', 'account_key',
         ]);
         foreach ($accounts as $account) {
             $data[$account->account_key] = $this->parseAccount($account->id);
@@ -302,13 +298,13 @@ class InitLookup extends Command
             $data['users'][] = [
                 'email' => $user->email,
                 'user_id' => $user->id,
-                'oauth_user_key' => ($user->oauth_provider_id && $user->oauth_user_id) ? ($user->oauth_provider_id . '-' . $user->oauth_user_id) : null,
+                'oauth_user_key' => ($user->oauth_provider_id && $user->oauth_user_id) ? ($user->oauth_provider_id.'-'.$user->oauth_user_id) : null,
                 'referral_code' => $user->referral_code,
             ];
         }
 
         $contacts = DB::table('contacts')->whereAccountId($accountId)->orderBy('id')->get([
-            'contact_key'
+            'contact_key',
         ]);
         foreach ($contacts as $contact) {
             $data['contacts'][] = [
@@ -318,7 +314,7 @@ class InitLookup extends Command
 
         $invitations = DB::table('invitations')->whereAccountId($accountId)->orderBy('id')->get([
             'invitation_key',
-            'message_id'
+            'message_id',
         ]);
         foreach ($invitations as $invitation) {
             $data['invitations'][] = [
@@ -328,7 +324,7 @@ class InitLookup extends Command
         }
 
         $tokens = DB::table('account_tokens')->whereAccountId($accountId)->orderBy('id')->get([
-            'token'
+            'token',
         ]);
         foreach ($tokens as $token) {
             $data['tokens'][] = [
@@ -341,9 +337,9 @@ class InitLookup extends Command
 
     private function logMessage($str)
     {
-        $str = date('Y-m-d h:i:s') . ' ' . $str;
+        $str = date('Y-m-d h:i:s').' '.$str;
         $this->info($str);
-        $this->log .= $str . "\n";
+        $this->log .= $str."\n";
     }
 
     private function logError($str)
@@ -376,5 +372,4 @@ class InitLookup extends Command
             ['validate', null, InputOption::VALUE_OPTIONAL, 'Validate', null],
         ];
     }
-
 }

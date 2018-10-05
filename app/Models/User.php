@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-use App\Events\UserSettingsChanged;
-use App\Events\UserSignedUp;
-use App\Libraries\Utils;
 use Event;
+use Session;
+use App\Libraries\Utils;
+use App\Events\UserSignedUp;
+use App\Events\UserSettingsChanged;
+use Illuminate\Notifications\Notifiable;
+use Laracasts\Presenter\PresentableTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laracasts\Presenter\PresentableTrait;
-use Session;
-use App\Models\LookupUser;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * Class User.
@@ -199,9 +198,9 @@ class User extends Authenticatable
             return $this->getFullName();
         } elseif ($this->email) {
             return $this->email;
-        } else {
-            return trans('texts.guest');
         }
+
+        return trans('texts.guest');
     }
 
     /**
@@ -211,9 +210,9 @@ class User extends Authenticatable
     {
         if ($this->first_name || $this->last_name) {
             return $this->first_name.' '.$this->last_name;
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -242,9 +241,9 @@ class User extends Authenticatable
     {
         if ($this->email) {
             return parent::afterSave($success = true, $forced = false);
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -331,8 +330,6 @@ class User extends Authenticatable
         return Utils::isNinjaProd() && $this->email != $this->getOriginal('email');
     }
 
-
-
     /**
      * Checks to see if the user has the required permission.
      *
@@ -341,38 +338,34 @@ class User extends Authenticatable
      *
      * @return bool
      */
-
     public function hasPermission($permission, $requireAll = false)
     {
         if ($this->is_admin) {
             return true;
         } elseif (is_string($permission)) {
-
-            if( is_array(json_decode($this->permissions,1)) && in_array($permission, json_decode($this->permissions,1)) ) {
+            if (is_array(json_decode($this->permissions, 1)) && in_array($permission, json_decode($this->permissions, 1))) {
                 return true;
             }
-
         } elseif (is_array($permission)) {
+            if ($requireAll) {
+                return count(array_intersect($permission, json_decode($this->permissions, 1))) == count($permission);
+            }
 
-            if ($requireAll)
-                return count(array_intersect($permission, json_decode($this->permissions,1))) == count( $permission );
-            else
-                return count(array_intersect($permission, json_decode($this->permissions,1))) > 0;
-
+            return count(array_intersect($permission, json_decode($this->permissions, 1))) > 0;
         }
 
         return false;
     }
 
-
     public function viewModel($model, $entityType)
     {
-        if($this->hasPermission('view_'.$entityType))
+        if ($this->hasPermission('view_'.$entityType)) {
             return true;
-        elseif($model->user_id == $this->id)
+        } elseif ($model->user_id == $this->id) {
             return true;
-        else
-            return false;
+        }
+
+        return false;
     }
 
     /**
@@ -395,7 +388,7 @@ class User extends Authenticatable
 
     public function filterIdByEntity($entity)
     {
-        return $this->hasPermission('view_' . $entity) ? false : $this->id;
+        return $this->hasPermission('view_'.$entity) ? false : $this->id;
     }
 
     public function caddAddUsers()
@@ -495,8 +488,7 @@ class User extends Authenticatable
     }
 }
 
-User::created(function ($user)
-{
+User::created(function ($user) {
     LookupUser::createNew($user->account->account_key, [
         'email' => $user->email,
         'user_id' => $user->id,
@@ -521,15 +513,14 @@ User::updated(function ($user) {
     User::onUpdatedUser($user);
 });
 
-User::deleted(function ($user)
-{
+User::deleted(function ($user) {
     if (! $user->email) {
         return;
     }
 
     if ($user->forceDeleting) {
         LookupUser::deleteWhere([
-            'email' => $user->email
+            'email' => $user->email,
         ]);
     }
 });

@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Ninja\Datatables\RecurringInvoiceDatatable;
-use App\Ninja\Repositories\InvoiceRepository;
 use Auth;
 use Utils;
+use App\Ninja\Repositories\InvoiceRepository;
+use App\Ninja\Datatables\RecurringInvoiceDatatable;
 
 class RecurringInvoiceService extends BaseService
 {

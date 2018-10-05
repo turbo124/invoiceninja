@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreatePaymentRequest;
-use App\Http\Requests\PaymentRequest;
-use App\Http\Requests\UpdatePaymentRequest;
+use Auth;
+use View;
+use Cache;
+use Input;
+use Utils;
+use Session;
+use DropdownButton;
 use App\Models\Client;
-use App\Models\Payment;
 use App\Models\Credit;
 use App\Models\Invoice;
-use App\Ninja\Datatables\PaymentDatatable;
-use App\Ninja\Mailers\ContactMailer;
-use App\Ninja\Repositories\PaymentRepository;
+use App\Models\Payment;
 use App\Services\PaymentService;
-use Auth;
-use Cache;
-use DropdownButton;
-use Input;
-use Session;
-use Utils;
-use View;
+use App\Ninja\Mailers\ContactMailer;
+use App\Http\Requests\PaymentRequest;
+use App\Ninja\Datatables\PaymentDatatable;
+use App\Http\Requests\CreatePaymentRequest;
+use App\Http\Requests\UpdatePaymentRequest;
+use App\Ninja\Repositories\PaymentRepository;
 
 class PaymentController extends BaseController
 {
@@ -218,7 +218,7 @@ class PaymentController extends BaseController
             Session::flash('message', trans($credit ? 'texts.created_payment_and_credit' : 'texts.created_payment'));
         }
 
-        return redirect()->to($payment->client->getRoute() . '#payments');
+        return redirect()->to($payment->client->getRoute().'#payments');
     }
 
     /**

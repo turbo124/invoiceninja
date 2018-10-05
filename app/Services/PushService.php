@@ -77,9 +77,9 @@ class PushService
 
         if (count((array) $devices) >= 1) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -122,9 +122,9 @@ class PushService
     {
         if ($invoice->isType(INVOICE_TYPE_QUOTE)) {
             return trans('texts.notification_quote_sent_subject', ['invoice' => $invoice->invoice_number, 'client' => $invoice->client->name]);
-        } else {
-            return trans('texts.notification_invoice_sent_subject', ['invoice' => $invoice->invoice_number, 'client' => $invoice->client->name]);
         }
+
+        return trans('texts.notification_invoice_sent_subject', ['invoice' => $invoice->invoice_number, 'client' => $invoice->client->name]);
     }
 
     /**
@@ -156,8 +156,8 @@ class PushService
     {
         if ($invoice->isType(INVOICE_TYPE_QUOTE)) {
             return trans('texts.notification_quote_viewed_subject', ['invoice' => $invoice->invoice_number, 'client' => $invoice->client->name]);
-        } else {
-            return trans('texts.notification_invoice_viewed_subject', ['invoice' => $invoice->invoice_number, 'client' => $invoice->client->name]);
         }
+
+        return trans('texts.notification_invoice_viewed_subject', ['invoice' => $invoice->invoice_number, 'client' => $invoice->client->name]);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Ninja\PaymentDrivers;
 
-use Braintree\Customer;
-use Exception;
-use Session;
 use Utils;
+use Session;
+use Exception;
+use Braintree\Customer;
 use App\Models\GatewayType;
 use App\Models\PaymentType;
 
@@ -81,7 +81,7 @@ class BraintreePaymentDriver extends BasePaymentDriver
     {
         $data = parent::paymentDetails($paymentMethod);
 
-        $deviceData = array_get($this->input, 'device_data') ?: Session::get($this->invitation->id . 'device_data');
+        $deviceData = array_get($this->input, 'device_data') ?: Session::get($this->invitation->id.'device_data');
 
         if ($deviceData) {
             $data['device_data'] = $deviceData;
@@ -109,7 +109,8 @@ class BraintreePaymentDriver extends BasePaymentDriver
             if ($tokenResponse->isSuccessful()) {
                 $customerReference = $tokenResponse->getCustomerData()->id;
             } else {
-                Utils::logError('Failed to create Braintree customer: ' . $tokenResponse->getMessage());
+                Utils::logError('Failed to create Braintree customer: '.$tokenResponse->getMessage());
+
                 return false;
             }
         }
@@ -125,7 +126,8 @@ class BraintreePaymentDriver extends BasePaymentDriver
             if ($tokenResponse->isSuccessful()) {
                 $this->tokenResponse = $tokenResponse->getData()->paymentMethod;
             } else {
-                Utils::logError('Failed to create Braintree token: ' . $tokenResponse->getMessage());
+                Utils::logError('Failed to create Braintree token: '.$tokenResponse->getMessage());
+
                 return false;
             }
         }
@@ -161,7 +163,7 @@ class BraintreePaymentDriver extends BasePaymentDriver
         if ($this->isGatewayType(GATEWAY_TYPE_CREDIT_CARD)) {
             $paymentMethod->payment_type_id = PaymentType::parseCardType($response->cardType);
             $paymentMethod->last4 = $response->last4;
-            $paymentMethod->expiration = $response->expirationYear . '-' . $response->expirationMonth . '-01';
+            $paymentMethod->expiration = $response->expirationYear.'-'.$response->expirationMonth.'-01';
         } elseif ($this->isGatewayType(GATEWAY_TYPE_PAYPAL)) {
             $paymentMethod->email = $response->email;
             $paymentMethod->payment_type_id = PAYMENT_TYPE_PAYPAL;
@@ -182,9 +184,8 @@ class BraintreePaymentDriver extends BasePaymentDriver
 
         if ($response->isSuccessful()) {
             return true;
-        } else {
-            throw new Exception($response->getMessage());
         }
+        throw new Exception($response->getMessage());
     }
 
     protected function attemptVoidPayment($response, $payment, $amount)
@@ -217,10 +218,10 @@ class BraintreePaymentDriver extends BasePaymentDriver
     {
         try {
             $this->createTransactionToken();
+
             return true;
         } catch (Exception $exception) {
             return get_class($exception);
         }
     }
-
 }

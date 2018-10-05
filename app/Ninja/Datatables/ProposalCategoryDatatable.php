@@ -2,9 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
-use Utils;
+use Auth;
 
 class ProposalCategoryDatatable extends EntityDatatable
 {
@@ -17,11 +16,11 @@ class ProposalCategoryDatatable extends EntityDatatable
             [
                 'name',
                 function ($model) {
-                    if (Auth::user()->can('view', [ENTITY_PROPOSAL_CATEGORY, $model]) )
+                    if (Auth::user()->can('view', [ENTITY_PROPOSAL_CATEGORY, $model])) {
                         return link_to("proposals/categories/{$model->public_id}/edit", $model->name)->toHtml();
-                    else
-                        return $model->name;
+                    }
 
+                    return $model->name;
                 },
             ],
         ];

@@ -2,20 +2,17 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
+use DB;
+use Auth;
+use Exception;
 use App\Models\Document;
 use App\Models\LookupAccount;
-use Auth;
-use DB;
-use Exception;
 use App\Ninja\Mailers\UserMailer;
 
 class PurgeAccountData extends Job
 {
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(UserMailer $userMailer)
     {

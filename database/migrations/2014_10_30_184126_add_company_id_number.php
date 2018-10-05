@@ -6,15 +6,13 @@ class AddCompanyIdNumber extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
         Schema::table('accounts', function ($table) {
             $table->string('id_number')->nullable();
         });
-        
+
         Schema::table('clients', function ($table) {
             $table->string('id_number')->nullable();
         });
@@ -22,8 +20,6 @@ class AddCompanyIdNumber extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

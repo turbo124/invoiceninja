@@ -3,22 +3,21 @@
 namespace App\Models;
 
 use App;
-use App\Events\UserSettingsChanged;
-use App\Models\LookupAccount;
-use App\Models\Traits\GeneratesNumbers;
-use App\Models\Traits\PresentsInvoice;
-use App\Models\Traits\SendsEmails;
-use App\Models\Traits\HasLogo;
-use App\Models\Traits\HasCustomMessages;
 use Cache;
+use Event;
+use Utils;
 use Carbon;
+use Session;
 use DateTime;
 use Eloquent;
-use Event;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Traits\HasLogo;
+use App\Models\Traits\SendsEmails;
+use App\Events\UserSettingsChanged;
+use App\Models\Traits\PresentsInvoice;
+use App\Models\Traits\GeneratesNumbers;
+use App\Models\Traits\HasCustomMessages;
 use Laracasts\Presenter\PresentableTrait;
-use Session;
-use Utils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Account.
@@ -578,9 +577,9 @@ class Account extends Eloquent
 
         if ($gatewayId) {
             return $this->getGatewayConfig($gatewayId) != false;
-        } else {
-            return $this->account_gateways->count() > 0;
         }
+
+        return $this->account_gateways->count() > 0;
     }
 
     /**
@@ -633,7 +632,6 @@ class Account extends Eloquent
         return false;
     }
 
-
     /**
      * @return string
      */
@@ -677,9 +675,9 @@ class Account extends Eloquent
     {
         if ($this->timezone) {
             return $this->timezone->name;
-        } else {
-            return 'US/Eastern';
         }
+
+        return 'US/Eastern';
     }
 
     public function getDate($date = 'now')
@@ -991,8 +989,6 @@ class Account extends Eloquent
     /**
      * @param $userId
      * @param $name
-     *
-     * @return null
      */
     public function getToken($userId, $name)
     {
@@ -1338,8 +1334,9 @@ class Account extends Eloquent
                 'term' => $this->company->plan_term,
                 'active' => $plan_active,
             ];
-        } else {
-            return [
+        }
+
+        return [
                 'company_id' => $this->company->id,
                 'num_users' => 1,
                 'plan_price' => 0,
@@ -1349,7 +1346,6 @@ class Account extends Eloquent
                 'expires' => $trial_expires,
                 'active' => $trial_active,
             ];
-        }
     }
 
     /**
@@ -1490,9 +1486,9 @@ class Account extends Eloquent
             return GATEWAY_BRAINTREE;
         } elseif ($this->isGatewayConfigured(GATEWAY_WEPAY)) {
             return GATEWAY_WEPAY;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -1642,17 +1638,11 @@ class Account extends Eloquent
         return ($this->hasFeature(FEATURE_CUSTOMIZE_INVOICE_DESIGN) && $this->body_font_id) ? $this->body_font_id : DEFAULT_BODY_FONT;
     }
 
-    /**
-     * @return null
-     */
     public function getHeaderFontName()
     {
         return Utils::getFromCache($this->getHeaderFontId(), 'fonts')['name'];
     }
 
-    /**
-     * @return null
-     */
     public function getBodyFontName()
     {
         return Utils::getFromCache($this->getBodyFontId(), 'fonts')['name'];
@@ -1870,19 +1860,19 @@ class Account extends Eloquent
             }
 
             return $url;
-        } else {
-            return url('/');
         }
+
+        return url('/');
     }
 
-    public function requiresAddressState() {
+    public function requiresAddressState()
+    {
         return true;
         //return ! $this->country_id || $this->country_id == DEFAULT_COUNTRY;
     }
 }
 
-Account::creating(function ($account)
-{
+Account::creating(function ($account) {
     LookupAccount::createAccount($account->account_key, $account->company_id);
 });
 
@@ -1904,9 +1894,8 @@ Account::updated(function ($account) {
     Event::fire(new UserSettingsChanged());
 });
 
-Account::deleted(function ($account)
-{
+Account::deleted(function ($account) {
     LookupAccount::deleteWhere([
-        'account_key' => $account->account_key
+        'account_key' => $account->account_key,
     ]);
 });

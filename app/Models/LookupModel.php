@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent;
 use Cache;
+use Eloquent;
 
 /**
  * Class ExpenseCategory.
@@ -34,7 +34,7 @@ class LookupModel extends Eloquent
         if ($lookupAccount) {
             $data['lookup_account_id'] = $lookupAccount->id;
         } else {
-            abort(500, 'Lookup account not found for ' . $accountKey);
+            abort(500, 'Lookup account not found for '.$accountKey);
         }
 
         static::create($data);
@@ -54,7 +54,6 @@ class LookupModel extends Eloquent
         static::where($where)->delete();
 
         config(['database.default' => $current]);
-
     }
 
     public static function setServerByField($field, $value)
@@ -70,6 +69,7 @@ class LookupModel extends Eloquent
         // check if we've cached this lookup
         if (env('MULTI_DB_CACHE_ENABLED') && $server = Cache::get($key)) {
             static::setDbServer($server);
+
             return;
         }
 

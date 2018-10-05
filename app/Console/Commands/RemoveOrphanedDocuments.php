@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Document;
 use DateTime;
+use App\Models\Document;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -32,7 +32,7 @@ class RemoveOrphanedDocuments extends Command
         $documents = Document::whereRaw('invoice_id IS NULL AND expense_id IS NULL AND updated_at <= ?', [new DateTime('-1 hour')])
             ->get();
 
-        $this->info($documents->count() . ' orphaned document(s) found');
+        $this->info($documents->count().' orphaned document(s) found');
 
         foreach ($documents as $document) {
             $document->delete();

@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Client;
-use App\Models\Credit;
 use DB;
 use Utils;
+use App\Models\Client;
+use App\Models\Credit;
 
 class CreditRepository extends BaseRepository
 {
@@ -33,7 +33,7 @@ class CreditRepository extends BaseRepository
                         'credits.amount',
                         'credits.balance',
                         'credits.credit_date as credit_date_sql',
-                        DB::raw("CONCAT(credits.credit_date, credits.created_at) as credit_date"),
+                        DB::raw('CONCAT(credits.credit_date, credits.created_at) as credit_date'),
                         'contacts.first_name',
                         'contacts.last_name',
                         'contacts.email',

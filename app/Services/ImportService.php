@@ -2,42 +2,39 @@
 
 namespace App\Services;
 
+use Auth;
+use File;
+use Cache;
+use Excel;
+use Utils;
+use Carbon;
+use stdClass;
+use Exception;
 use App\Models\Client;
+use App\Models\Vendor;
+use League\Csv\Reader;
 use App\Models\Contact;
-use App\Models\EntityModel;
 use App\Models\Expense;
-use App\Models\ExpenseCategory;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
-use App\Models\Vendor;
+use League\Csv\Statement;
+use App\Models\EntityModel;
+use League\Fractal\Manager;
+use App\Models\ExpenseCategory;
 use App\Models\AccountGatewayToken;
 use App\Ninja\Import\BaseTransformer;
+use App\Ninja\Serializers\ArraySerializer;
 use App\Ninja\Repositories\ClientRepository;
-use App\Ninja\Repositories\CustomerRepository;
+use App\Ninja\Repositories\VendorRepository;
 use App\Ninja\Repositories\ContactRepository;
-use App\Ninja\Repositories\ExpenseCategoryRepository;
 use App\Ninja\Repositories\ExpenseRepository;
 use App\Ninja\Repositories\InvoiceRepository;
 use App\Ninja\Repositories\PaymentRepository;
 use App\Ninja\Repositories\ProductRepository;
-use App\Ninja\Repositories\VendorRepository;
 use App\Ninja\Repositories\TaxRateRepository;
-use App\Ninja\Serializers\ArraySerializer;
-use Auth;
-use Cache;
-use Excel;
-use Exception;
-use File;
-use League\Fractal\Manager;
-use parsecsv;
-use Session;
-use stdClass;
-use Utils;
-use Carbon;
-use League\Csv\Reader;
-use League\Csv\Statement;
-
+use App\Ninja\Repositories\CustomerRepository;
+use App\Ninja\Repositories\ExpenseCategoryRepository;
 
 /**
  * Class ImportService.
@@ -126,13 +123,13 @@ class ImportService
     /**
      * ImportService constructor.
      *
-     * @param Manager           $manager
-     * @param ClientRepository  $clientRepo
+     * @param Manager            $manager
+     * @param ClientRepository   $clientRepo
      * @param CustomerRepository $customerRepo
-     * @param InvoiceRepository $invoiceRepo
-     * @param PaymentRepository $paymentRepo
-     * @param ContactRepository $contactRepo
-     * @param ProductRepository $productRepo
+     * @param InvoiceRepository  $invoiceRepo
+     * @param PaymentRepository  $paymentRepo
+     * @param ContactRepository  $contactRepo
+     * @param ProductRepository  $productRepo
      */
     public function __construct(
         Manager $manager,
@@ -449,7 +446,7 @@ class ImportService
 
         // update the entity maps
         if ($entityType != ENTITY_CUSTOMER) {
-            $mapFunction = 'add' . ucwords($entity->getEntityType()) . 'ToMaps';
+            $mapFunction = 'add'.ucwords($entity->getEntityType()).'ToMaps';
             if (method_exists($this, $mapFunction)) {
                 $this->$mapFunction($entity);
             }
@@ -553,7 +550,7 @@ class ImportService
         $data = [];
 
         foreach ($files as $entityType => $filename) {
-            $class = 'App\\Models\\' . ucwords($entityType);
+            $class = 'App\\Models\\'.ucwords($entityType);
             $columns = $class::getImportColumns();
             $map = $class::getImportMap();
 
@@ -644,7 +641,7 @@ class ImportService
                 }
                 try {
                     $date = new Carbon($row[$index]);
-                } catch(Exception $e) {
+                } catch (Exception $e) {
                     $data['warning'] = 'invalid_date';
                 }
             }
@@ -754,7 +751,7 @@ class ImportService
         ];
         $source = IMPORT_CSV;
 
-        $path = env('FILE_IMPORT_PATH') ?: storage_path() . '/import';
+        $path = env('FILE_IMPORT_PATH') ?: storage_path().'/import';
         $fileName = sprintf('%s/%s_%s_%s.csv', $path, Auth::user()->account_id, $timestamp, $entityType);
         $data = $this->getCsvData($fileName);
         $this->checkData($entityType, count($data));
@@ -810,7 +807,7 @@ class ImportService
     private function convertToObject($entityType, $data, $map)
     {
         $obj = new stdClass();
-        $class = 'App\\Models\\' . ucwords($entityType);
+        $class = 'App\\Models\\'.ucwords($entityType);
         $columns = $class::getImportColumns();
 
         foreach ($columns as $column) {
@@ -1038,12 +1035,12 @@ class ImportService
         $skipped = [];
 
         if ($includeSettings) {
-            $message = trans('texts.imported_settings') . '<br/>';
+            $message = trans('texts.imported_settings').'<br/>';
         }
 
         foreach ($results as $entityType => $entityResults) {
             if ($count = count($entityResults[RESULT_SUCCESS])) {
-                $message .= trans("texts.created_{$entityType}s", ['count' => $count]) . '<br/>';
+                $message .= trans("texts.created_{$entityType}s", ['count' => $count]).'<br/>';
             }
             if (count($entityResults[RESULT_FAILURE])) {
                 $skipped = array_merge($skipped, $entityResults[RESULT_FAILURE]);
@@ -1051,9 +1048,9 @@ class ImportService
         }
 
         if (count($skipped)) {
-            $message .= '<p/>' . trans('texts.failed_to_import') . '<br/>';
+            $message .= '<p/>'.trans('texts.failed_to_import').'<br/>';
             foreach ($skipped as $skip) {
-                $message .= json_encode($skip) . '<br/>';
+                $message .= json_encode($skip).'<br/>';
             }
         }
 
@@ -1067,7 +1064,7 @@ class ImportService
         while (! file_exists($fileName)) {
             $counter++;
             if ($counter > 60) {
-                throw new Exception('File not found: ' . $fileName);
+                throw new Exception('File not found: '.$fileName);
             }
             sleep(2);
         }

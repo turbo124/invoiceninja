@@ -11,7 +11,7 @@ class ProjectPresenter extends EntityPresenter
         $data = parent::calendarEvent();
         $project = $this->entity;
 
-        $data->title = trans('texts.project') . ': ' . $project->name;
+        $data->title = trans('texts.project').': '.$project->name;
         $data->start = $project->due_date;
 
         if ($subColors) {
@@ -28,11 +28,11 @@ class ProjectPresenter extends EntityPresenter
      */
     public function taskRate()
     {
-      if (floatval($this->entity->task_rate)) {
-          return Utils::roundSignificant($this->entity->task_rate);
-      } else {
-          return '';
-      }
+        if (floatval($this->entity->task_rate)) {
+            return Utils::roundSignificant($this->entity->task_rate);
+        }
+
+        return '';
     }
 
     /**
@@ -40,11 +40,10 @@ class ProjectPresenter extends EntityPresenter
      */
     public function defaultTaskRate()
     {
-      if ($rate = $this->taskRate()) {
-          return $rate;
-      } else {
-          return $this->entity->client->present()->defaultTaskRate;
-      }
-    }
+        if ($rate = $this->taskRate()) {
+            return $rate;
+        }
 
+        return $this->entity->client->present()->defaultTaskRate;
+    }
 }

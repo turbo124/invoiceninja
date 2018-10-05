@@ -13,7 +13,7 @@ class NavigateToIntent extends BaseIntent
         $location = str_replace(' ', '_', $location);
 
         if (in_array($location, array_merge(Account::$basicSettings, Account::$advancedSettings))) {
-            $location = '/settings/' . $location;
+            $location = '/settings/'.$location;
         } elseif (in_array($location, ['report', 'reports'])) {
             $location = '/reports';
         } elseif ($location == 'settings') {

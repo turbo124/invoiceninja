@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Eloquent;
-use Omnipay;
 use Utils;
+use Omnipay;
+use Eloquent;
 
 /**
  * Class Gateway.
@@ -209,9 +209,9 @@ class Gateway extends Eloquent
                 'name' => '',
                 'text' => '',
             ];
-        } else {
-            return Omnipay::create($this->provider)->getDefaultParameters();
         }
+
+        return Omnipay::create($this->provider)->getDefaultParameters();
     }
 
     public function isCustom()

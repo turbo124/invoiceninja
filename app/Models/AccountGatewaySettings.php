@@ -63,7 +63,7 @@ class AccountGatewaySettings extends EntityModel
         }
 
         if (floatval($this->fee_percent) != 0) {
-            $parts[] = (floor($this->fee_percent * 1000) / 1000) . '%';
+            $parts[] = (floor($this->fee_percent * 1000) / 1000).'%';
         }
 
         return join(' + ', $parts);

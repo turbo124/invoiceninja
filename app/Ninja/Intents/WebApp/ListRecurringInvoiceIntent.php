@@ -11,7 +11,7 @@ class ListRecurringInvoiceIntent extends BaseIntent
         $this->loadStates(ENTITY_RECURRING_INVOICE);
 
         if ($client = $this->requestClient()) {
-            $url = $client->present()->url . '#recurring_invoices';
+            $url = $client->present()->url.'#recurring_invoices';
         } else {
             $url = '/recurring_invoices';
         }
