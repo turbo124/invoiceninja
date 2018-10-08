@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Ninja\Repositories\DashboardRepository;
 use App\Ninja\Transformers\ActivityTransformer;
-use Auth;
 
 class DashboardApiController extends BaseAPIController
 {

@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Utils;
 use Carbon;
 use Eloquent;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
-use Utils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Company.
@@ -78,9 +78,9 @@ class Company extends Eloquent
 
         if ($this->plan_term == PLAN_TERM_MONTHLY) {
             return $this->discount_expires->gt($date);
-        } else {
-            return $this->discount_expires->subMonths(11)->gt($date);
         }
+
+        return $this->discount_expires->subMonths(11)->gt($date);
     }
 
     public function discountedPrice($price)
@@ -142,7 +142,7 @@ class Company extends Eloquent
             $difference = $this->created_at->diffInWeeks();
             if ($difference >= $weeks && $discount > $this->discount) {
                 $this->discount = $discount;
-                $this->promo_expires = date_create()->modify($validFor . ' days')->format('Y-m-d');
+                $this->promo_expires = date_create()->modify($validFor.' days')->format('Y-m-d');
                 $this->save();
 
                 return true;
@@ -212,8 +212,7 @@ class Company extends Eloquent
     }
 }
 
-Company::deleted(function ($company)
-{
+Company::deleted(function ($company) {
     if (! env('MULTI_DB_ENABLED')) {
         return;
     }

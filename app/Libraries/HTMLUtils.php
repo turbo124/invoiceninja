@@ -50,8 +50,9 @@ class HTMLUtils
         return $purifier->purify($html);
     }
 
-    public static function sanitizeJS($js) {
-        if(!stripos($js, '<script')) {
+    public static function sanitizeJS($js)
+    {
+        if (! stripos($js, '<script')) {
             $js = "<script type=\"text/javascript\">{$js}</script>";
         }
 
@@ -65,9 +66,9 @@ class HTMLUtils
 
         if ($previous == $current) {
             return url($fallback);
-        } else {
-            return $previous;
         }
+
+        return $previous;
     }
 
     public static function getEnvForAccount($field, $default = '')
@@ -75,7 +76,7 @@ class HTMLUtils
         $key = '';
 
         if ($user = auth()->user()) {
-            $key .= $user->account->id . '_';
+            $key .= $user->account->id.'_';
         }
 
         $key .= $field;

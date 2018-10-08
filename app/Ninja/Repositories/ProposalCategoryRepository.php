@@ -2,10 +2,9 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\ProposalCategory;
-use Auth;
 use DB;
-use Utils;
+use Auth;
+use App\Models\ProposalCategory;
 
 class ProposalCategoryRepository extends BaseRepository
 {

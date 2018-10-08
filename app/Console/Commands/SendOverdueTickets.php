@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\SendOverdueTicketNotification;
-use App\Models\Ticket;
 use Carbon\Carbon;
+use App\Models\Ticket;
 use Illuminate\Console\Command;
+use App\Jobs\SendOverdueTicketNotification;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -25,38 +25,35 @@ class SendOverdueTickets extends Command
 
     public function __construct()
     {
-
         parent::__construct();
-
     }
 
     public function fire()
     {
-        $this->info(date('r') . ' Running SendOverdueTickets...');
+        $this->info(date('r').' Running SendOverdueTickets...');
 
-        if ($database = $this->option('database'))
+        if ($database = $this->option('database')) {
             config(['database.default' => $database]);
+        }
 
         $this->sendReminders();
 
-        $this->info(date('r') . ' Done');
+        $this->info(date('r').' Done');
     }
 
     private function sendReminders()
     {
-
         $tickets = Ticket::with('account', 'account.account_ticket_settings')
             ->where('due_date', '<', Carbon::now())
-            ->whereIn('status_id', [1,2])
+            ->whereIn('status_id', [1, 2])
             ->where('overdue_notification_sent', '=', 0)
             ->whereHas('account.account_ticket_settings', function ($query) {
                 $query->where('alert_ticket_overdue_agent_id', '>', '0');
             })->get();
 
-
-        foreach($tickets as $ticket)
+        foreach ($tickets as $ticket) {
             dispatch(new SendOverdueTicketNotification($ticket));
-
+        }
     }
 
     /**

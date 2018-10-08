@@ -2,12 +2,12 @@
 
 namespace App\Ninja\Transformers;
 
-use App\Models\Account;
 use App\Models\User;
+use App\Models\Account;
 
 class UserAccountTransformer extends EntityTransformer
 {
-	   /**
+    /**
      * @SWG\Property(property="account_key", type="string", example="123456")
      * @SWG\Property(property="name", type="string", example="John Doe")
      * @SWG\Property(property="token", type="string", example="Token")
@@ -57,7 +57,7 @@ class UserAccountTransformer extends EntityTransformer
      * @var array
      */
     protected $availableIncludes = [
-		'users',
+        'users',
         'tax_rates',
         'expense_categories',
         'account_email_settings',
@@ -83,7 +83,7 @@ class UserAccountTransformer extends EntityTransformer
         return $this->includeItem($user, $transformer, 'user');
     }
 
-	/**
+    /**
      * @param Account $account
      *
      * @return \League\Fractal\Resource\Collection
@@ -95,7 +95,7 @@ class UserAccountTransformer extends EntityTransformer
         return $this->includeCollection($this->account->custom_payment_terms, $transformer, 'payment_terms');
     }
 
-	/**
+    /**
      * @param Account $account
      *
      * @return \League\Fractal\Resource\Collection
@@ -106,7 +106,6 @@ class UserAccountTransformer extends EntityTransformer
 
         return $this->includeCollection($this->account->users, $transformer, 'users');
     }
-
 
     /**
      * @param Account $account
@@ -192,7 +191,7 @@ class UserAccountTransformer extends EntityTransformer
             'custom_fields' => $account->custom_fields ?: '',
             'invoice_fields' => $account->invoice_fields ?: '',
             'custom_messages' => $account->custom_messages,
-			'email_footer' => $account->getEmailFooter(),
+            'email_footer' => $account->getEmailFooter(),
             'email_subject_invoice' => $account->getEmailSubject(ENTITY_INVOICE),
             'email_subject_quote' => $account->getEmailSubject(ENTITY_QUOTE),
             'email_subject_payment' => $account->getEmailSubject(ENTITY_PAYMENT),

@@ -2,12 +2,11 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Credit;
-use App\Models\Invoice;
-use App\Models\Payment;
 use DB;
-use Utils;
 use Auth;
+use Utils;
+use App\Models\Credit;
+use App\Models\Payment;
 
 class PaymentRepository extends BaseRepository
 {
@@ -39,7 +38,7 @@ class PaymentRepository extends BaseRepository
                         'clients.public_id as client_public_id',
                         'clients.user_id as client_user_id',
                         'payments.amount',
-                        DB::raw("CONCAT(payments.payment_date, payments.created_at) as date"),
+                        DB::raw('CONCAT(payments.payment_date, payments.created_at) as date'),
                         'payments.payment_date',
                         'payments.payment_status_id',
                         'payments.payment_type_id',

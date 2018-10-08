@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Ninja\Mailers\ContactMailer;
-use App\Ninja\Mailers\UserMailer;
-use App\Ninja\Repositories\AccountRepository;
-use App\Services\UserService;
+use URL;
 use Auth;
+use View;
 use Input;
-use Password;
-use Redirect;
+use Utils;
 use Request;
 use Session;
-use URL;
-use Utils;
+use Password;
+use Redirect;
 use Validator;
-use View;
+use App\Models\User;
+use App\Services\UserService;
+use App\Ninja\Mailers\UserMailer;
+use App\Ninja\Mailers\ContactMailer;
+use App\Ninja\Repositories\AccountRepository;
 
 class UserController extends BaseController
 {
@@ -37,7 +37,7 @@ class UserController extends BaseController
 
     public function index()
     {
-        return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+        return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
     }
 
     public function getDatatable()
@@ -105,19 +105,19 @@ class UserController extends BaseController
         if (! Auth::user()->registered) {
             Session::flash('error', trans('texts.register_to_add_user'));
 
-            return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+            return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
         }
 
         if (! Auth::user()->confirmed) {
             Session::flash('error', trans('texts.confirmation_required', ['link' => link_to('/resend_confirmation', trans('texts.click_here'))]));
 
-            return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+            return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
         }
 
         if (Utils::isNinja() && ! Auth::user()->caddAddUsers()) {
             Session::flash('error', trans('texts.max_users_reached'));
 
-            return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+            return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
         }
 
         $data = [
@@ -143,7 +143,7 @@ class UserController extends BaseController
             $user->delete();
         } else {
             if (! Auth::user()->caddAddUsers()) {
-                return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT)
+                return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT)
                     ->with('error', trans('texts.max_users_reached'));
             }
 
@@ -152,7 +152,7 @@ class UserController extends BaseController
 
         Session::flash('message', trans("texts.{$action}d_user"));
 
-        return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+        return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
     }
 
     /**
@@ -162,9 +162,8 @@ class UserController extends BaseController
      */
     public function save($userPublicId = false)
     {
-
         if (! Auth::user()->hasFeature(FEATURE_USERS)) {
-            return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+            return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
         }
 
         $rules = [
@@ -238,13 +237,12 @@ class UserController extends BaseController
 
         Session::flash('message', $message);
 
-        return Redirect::to('users/' . $user->public_id . '/edit');
+        return Redirect::to('users/'.$user->public_id.'/edit');
     }
 
-    private function formatUserPermissions(array $permissions) {
-
-        return json_encode(array_diff(array_values($permissions),[0]));
-
+    private function formatUserPermissions(array $permissions)
+    {
+        return json_encode(array_diff(array_values($permissions), [0]));
     }
 
     public function sendConfirmation($userPublicId)
@@ -255,7 +253,7 @@ class UserController extends BaseController
         $this->userMailer->sendConfirmation($user, Auth::user());
         Session::flash('message', trans('texts.sent_invite'));
 
-        return Redirect::to('settings/' . ACCOUNT_USER_MANAGEMENT);
+        return Redirect::to('settings/'.ACCOUNT_USER_MANAGEMENT);
     }
 
     /**
@@ -280,25 +278,23 @@ class UserController extends BaseController
                 $token = Password::getRepository()->create($user);
 
                 return Redirect::to("/password/reset/{$token}");
-            } else {
-                if (Auth::check()) {
-                    if (Session::has(REQUESTED_PRO_PLAN)) {
-                        Session::forget(REQUESTED_PRO_PLAN);
-                        $url = '/settings/account_management?upgrade=true';
-                    } else {
-                        $url = '/dashboard';
-                    }
-                } else {
-                    $url = '/login';
-                }
-
-                return Redirect::to($url)->with('message', $notice_msg);
             }
-        } else {
-            $error_msg = trans('texts.wrong_confirmation');
+            if (Auth::check()) {
+                if (Session::has(REQUESTED_PRO_PLAN)) {
+                    Session::forget(REQUESTED_PRO_PLAN);
+                    $url = '/settings/account_management?upgrade=true';
+                } else {
+                    $url = '/dashboard';
+                }
+            } else {
+                $url = '/login';
+            }
 
-            return Redirect::to('/login')->with('error', $error_msg);
+            return Redirect::to($url)->with('message', $notice_msg);
         }
+        $error_msg = trans('texts.wrong_confirmation');
+
+        return Redirect::to('/login')->with('error', $error_msg);
     }
 
     public function changePassword()
@@ -348,9 +344,9 @@ class UserController extends BaseController
         preg_match('/\/[0-9*][\/edit]*$/', $referer, $matches);
         if (count($matches)) {
             return Redirect::to('/dashboard');
-        } else {
-            return Redirect::to($referer);
         }
+
+        return Redirect::to($referer);
     }
 
     public function viewAccountByKey($accountKey)

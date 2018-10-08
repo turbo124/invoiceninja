@@ -5,8 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 
 /**
- * Class VendorPolicy
- * @package App\Policies
+ * Class VendorPolicy.
  */
 class VendorPolicy extends EntityPolicy
 {
@@ -18,9 +17,9 @@ class VendorPolicy extends EntityPolicy
      */
     public function create(User $user)
     {
-        if (! $this->createPermission($user, ENTITY_VENDOR))
+        if (! $this->createPermission($user, ENTITY_VENDOR)) {
             return false;
-
+        }
 
         return $user->hasFeature(FEATURE_EXPENSES);
     }

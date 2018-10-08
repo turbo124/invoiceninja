@@ -10,9 +10,6 @@ use Utils;
  */
 class BaseRepository
 {
-    /**
-     * @return null
-     */
     public function getClassName()
     {
         return null;
@@ -36,7 +33,7 @@ class BaseRepository
      */
     private function getEventClass($entity, $type)
     {
-        return 'App\Events\\' . ucfirst($entity->getEntityType()) . 'Was' . $type;
+        return 'App\Events\\'.ucfirst($entity->getEntityType()).'Was'.$type;
     }
 
     /**
@@ -150,27 +147,27 @@ class BaseRepository
     {
         $table = Utils::pluralizeEntityType($table ?: $entityType);
 
-        if ($filter = session('entity_state_filter:' . $entityType, STATUS_ACTIVE)) {
+        if ($filter = session('entity_state_filter:'.$entityType, STATUS_ACTIVE)) {
             $filters = explode(',', $filter);
             $query->where(function ($query) use ($filters, $table) {
-                $query->whereNull($table . '.id');
+                $query->whereNull($table.'.id');
 
                 if (in_array(STATUS_ACTIVE, $filters)) {
-                    $query->orWhereNull($table . '.deleted_at');
+                    $query->orWhereNull($table.'.deleted_at');
                 }
                 if (in_array(STATUS_ARCHIVED, $filters)) {
                     $query->orWhere(function ($query) use ($table) {
-                        $query->whereNotNull($table . '.deleted_at');
+                        $query->whereNotNull($table.'.deleted_at');
 
                         if (! in_array($table, ['users'])) {
-                            $query->where($table . '.is_deleted', '=', 0);
+                            $query->where($table.'.is_deleted', '=', 0);
                         }
                     });
                 }
                 if (in_array(STATUS_DELETED, $filters)) {
                     $query->orWhere(function ($query) use ($table) {
-                        $query->whereNotNull($table . '.deleted_at')
-                              ->where($table . '.is_deleted', '=', 1);
+                        $query->whereNotNull($table.'.deleted_at')
+                              ->where($table.'.is_deleted', '=', 1);
                     });
                 }
             });

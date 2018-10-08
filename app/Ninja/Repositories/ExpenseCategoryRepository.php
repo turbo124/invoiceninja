@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\ExpenseCategory;
-use Auth;
 use DB;
+use Auth;
+use App\Models\ExpenseCategory;
 
 class ExpenseCategoryRepository extends BaseRepository
 {

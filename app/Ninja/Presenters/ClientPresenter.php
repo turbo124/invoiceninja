@@ -62,21 +62,21 @@ class ClientPresenter extends EntityPresenter
         $prefix = $addressType == ADDRESS_BILLING ? '' : 'shipping_';
         $client = $this->entity;
 
-        if ($address1 = $client->{$prefix . 'address1'}) {
-            $str .= e($address1) . '<br/>';
+        if ($address1 = $client->{$prefix.'address1'}) {
+            $str .= e($address1).'<br/>';
         }
-        if ($address2 = $client->{$prefix . 'address2'}) {
-            $str .= e($address2) . '<br/>';
+        if ($address2 = $client->{$prefix.'address2'}) {
+            $str .= e($address2).'<br/>';
         }
         if ($cityState = $this->getCityState($addressType)) {
-            $str .= e($cityState) . '<br/>';
+            $str .= e($cityState).'<br/>';
         }
-        if ($country = $client->{$prefix . 'country'}) {
-            $str .= e($country->getName()) . '<br/>';
+        if ($country = $client->{$prefix.'country'}) {
+            $str .= e($country->getName()).'<br/>';
         }
 
         if ($str && $showHeader) {
-            $str = '<b>' . trans('texts.' . $addressType) . '</b><br/>' . $str;
+            $str = '<b>'.trans('texts.'.$addressType).'</b><br/>'.$str;
         }
 
         return $str;
@@ -89,30 +89,29 @@ class ClientPresenter extends EntityPresenter
     {
         $client = $this->entity;
         $prefix = $addressType == ADDRESS_BILLING ? '' : 'shipping_';
-        $swap = $client->{$prefix . 'country'} && $client->{$prefix . 'country'}->swap_postal_code;
+        $swap = $client->{$prefix.'country'} && $client->{$prefix.'country'}->swap_postal_code;
 
-        $city = e($client->{$prefix . 'city'});
-        $state = e($client->{$prefix . 'state'});
-        $postalCode = e($client->{$prefix . 'postal_code'});
+        $city = e($client->{$prefix.'city'});
+        $state = e($client->{$prefix.'state'});
+        $postalCode = e($client->{$prefix.'postal_code'});
 
         if ($city || $state || $postalCode) {
             return Utils::cityStateZip($city, $state, $postalCode, $swap);
-        } else {
-            return false;
         }
-    }
 
+        return false;
+    }
 
     /**
      * @return string
      */
     public function taskRate()
     {
-      if (floatval($this->entity->task_rate)) {
-          return Utils::roundSignificant($this->entity->task_rate);
-      } else {
-          return '';
-      }
+        if (floatval($this->entity->task_rate)) {
+            return Utils::roundSignificant($this->entity->task_rate);
+        }
+
+        return '';
     }
 
     /**
@@ -120,11 +119,10 @@ class ClientPresenter extends EntityPresenter
      */
     public function defaultTaskRate()
     {
-      if ($rate = $this->taskRate()) {
-          return $rate;
-      } else {
-          return $this->entity->account->present()->taskRate;
-      }
-    }
+        if ($rate = $this->taskRate()) {
+            return $rate;
+        }
 
+        return $this->entity->account->present()->taskRate;
+    }
 }

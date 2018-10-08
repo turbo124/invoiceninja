@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use URL;
 use Auth;
 use Input;
-use Redirect;
 use Session;
-use URL;
+use Redirect;
 
 class BlueVineController extends BaseController
 {
@@ -22,7 +22,7 @@ class BlueVineController extends BaseController
             'business_annual_revenue' => intval(Input::get('annual_revenue')),
             'business_monthly_average_bank_balance' => intval(Input::get('average_bank_balance')),
             'business_inception_date' => date('Y-m-d', strtotime(Input::get('business_inception'))),
-            'partner_internal_business_id' => 'ninja_account_' . $user->account_id,
+            'partner_internal_business_id' => 'ninja_account_'.$user->account_id,
         ];
 
         if (! empty(Input::get('quote_type_factoring'))) {
@@ -38,7 +38,7 @@ class BlueVineController extends BaseController
         $api_client = new \GuzzleHttp\Client();
         try {
             $response = $api_client->request('POST',
-                'https://app.bluevine.com/api/v1/user/register_external?' . http_build_query([
+                'https://app.bluevine.com/api/v1/user/register_external?'.http_build_query([
                     'external_register_token' => env('BLUEVINE_PARTNER_TOKEN'),
                     'c' => env('BLUEVINE_PARTNER_UNIQUE_ID'),
                     'signup_parent_url' => URL::to('/bluevine/completed'),
@@ -55,11 +55,11 @@ class BlueVineController extends BaseController
                     'error' => true,
                     'message' => $response_data->reason,
                 ]);
-            } else {
-                return response()->json([
+            }
+
+            return response()->json([
                     'error' => true,
                 ]);
-            }
         }
 
         $company = $user->account->company;

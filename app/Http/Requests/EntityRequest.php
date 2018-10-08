@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Libraries\HistoryUtils;
-use App\Models\Contact;
-use App\Models\EntityModel;
 use Input;
 use Utils;
+use App\Models\Contact;
+use App\Models\EntityModel;
+use App\Libraries\HistoryUtils;
 
 class EntityRequest extends Request
 {
@@ -23,7 +23,7 @@ class EntityRequest extends Request
 
         // The entity id can appear as invoices, invoice_id, public_id or id
         $publicId = false;
-        $field = $this->entityType . '_id';
+        $field = $this->entityType.'_id';
         if (! empty($this->$field)) {
             $publicId = $this->$field;
         }
@@ -50,16 +50,16 @@ class EntityRequest extends Request
         //Support Client Portal Scopes
         $accountId = false;
 
-        if(Input::get('account_id'))
+        if (Input::get('account_id')) {
             $accountId = Input::get('account_id');
-        elseif($contact = Contact::getContactIfLoggedIn())
+        } elseif ($contact = Contact::getContactIfLoggedIn()) {
             $accountId = $contact->account->id;
+        }
 
         if (method_exists($class, 'trashed')) {
             $this->entity = $class::scope($publicId, $accountId)->withTrashed()->firstOrFail();
         } else {
             $this->entity = $class::scope($publicId, $accountId)->firstOrFail();
-
         }
 
         return $this->entity;
@@ -75,6 +75,7 @@ class EntityRequest extends Request
         if ($this->entity()) {
             if ($this->user()->can('view', $this->entity())) {
                 HistoryUtils::trackViewed($this->entity());
+
                 return true;
             }
         } else {

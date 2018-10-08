@@ -37,8 +37,8 @@ return [
         |
         */
 
-        'cloud_key' => env('PHANTOMJS_CLOUD_KEY')
+        'cloud_key' => env('PHANTOMJS_CLOUD_KEY'),
 
-    ]
+    ],
 
 ];
