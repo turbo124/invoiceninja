@@ -173,7 +173,6 @@ class MultiDatabaseUserProvider implements UserProvider
         $databases = ['db-ninja-1', 'db-ninja-2'];
 
         foreach ($databases as $database) {
-
             $this->setDB($database);
             //Log::error('database name = '. DB::getDatabaseName());
 
@@ -192,36 +191,35 @@ class MultiDatabaseUserProvider implements UserProvider
             }
 
             $user = $query->get();
-            
-          //  Log::error(print_r($user,1));
-          //  Log::error($database);
+
+            //  Log::error(print_r($user,1));
+            //  Log::error($database);
 
             if (count($user) >= 1) {
-                    Log::error('found a DB!');
-                    break;
+                Log::error('found a DB!');
+                break;
             }
         }
     }
 
     private function setDB($database)
     {
-       // DB::disconnect('db-ninja-1');
-       // DB::purge('db-ninja-1');
-       // DB::purge('db-ninja-2');
-       // DB::purge('default');
+        // DB::disconnect('db-ninja-1');
+        // DB::purge('db-ninja-1');
+        // DB::purge('db-ninja-2');
+        // DB::purge('default');
 
-        $db_name = config("database.connections.".$database.".database");
-
+        $db_name = config('database.connections.'.$database.'.database');
 
         config(['database.default' => $database]);
 
         //Config::set('database.connections.default.database', Config::get('database.connections.' . $database . '.database'));
-        $this->conn = app('db')->connection(config("database.connections.database.".$database.".".$db_name));
-      //  $this->conn = DB::connection(config("database.connections.".$database));
-    
+        $this->conn = app('db')->connection(config('database.connections.database.'.$database.'.'.$db_name));
+        //  $this->conn = DB::connection(config("database.connections.".$database));
+
         //DB::connection(config("database.connections.database.".$database.".".$db_name));
 
-        Log::error('if this works the new DB name should = '. Config::get('database.connections.' . $database . '.database') .' does it ? = '. DB::getDatabaseName());
+        Log::error('if this works the new DB name should = '.Config::get('database.connections.'.$database.'.database').' does it ? = '.DB::getDatabaseName());
 
         /*
         Log::error('trying to make connection for ' . $database);
