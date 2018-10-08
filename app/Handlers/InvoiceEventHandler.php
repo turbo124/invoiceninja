@@ -2,8 +2,8 @@
 
 namespace App\Handlers;
 
-use App\Ninja\Mailers\ContactMailer;
 use App\Ninja\Mailers\UserMailer;
+use App\Ninja\Mailers\ContactMailer;
 
 class InvoiceEventHandler
 {
@@ -43,7 +43,7 @@ class InvoiceEventHandler
     private function sendNotifications($invoice, $type, $payment = null)
     {
         foreach ($invoice->account->users as $user) {
-            if ($user->{'notify_' . $type}) {
+            if ($user->{'notify_'.$type}) {
                 $this->userMailer->sendNotification($user, $invoice, $type, $payment);
             }
         }

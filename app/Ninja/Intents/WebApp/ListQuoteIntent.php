@@ -12,7 +12,7 @@ class ListQuoteIntent extends InvoiceIntent
         $this->loadStatuses(ENTITY_QUOTE);
 
         if ($client = $this->requestClient()) {
-            $url = $client->present()->url . '#quotes';
+            $url = $client->present()->url.'#quotes';
         } else {
             $url = '/quotes';
         }

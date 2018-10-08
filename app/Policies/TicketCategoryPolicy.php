@@ -5,8 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 
 /**
- * Class TicketCategoryPolicy
- * @package App\Policies
+ * Class TicketCategoryPolicy.
  */
 class TicketCategoryPolicy extends EntityPolicy
 {
@@ -18,9 +17,9 @@ class TicketCategoryPolicy extends EntityPolicy
      */
     public function create(User $user)
     {
-        if (! $this->createPermission($user, ENTITY_TICKET_CATEGORY))
+        if (! $this->createPermission($user, ENTITY_TICKET_CATEGORY)) {
             return false;
-
+        }
 
         return $user->hasFeature(FEATURE_TICKETS);
     }

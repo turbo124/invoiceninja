@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use Utils;
 use stdClass;
-use App\Models\Account;
 use Faker\Factory;
+use App\Models\Account;
 use Illuminate\Console\Command;
 
 /**
@@ -25,7 +25,6 @@ class CreateLuisData extends Command
 
     /**
      * CreateLuisData constructor.
-     *
      */
     public function __construct()
     {
@@ -152,11 +151,11 @@ class CreateLuisData extends Command
             ]);
             $intents[] = $this->createIntent('ListEntity', "show me {$client}'s {$entityTypePlural}", [
                 $entityTypePlural => 'EntityType',
-                $client . '\'s' => 'Name',
+                $client.'\'s' => 'Name',
             ]);
             $intents[] = $this->createIntent('ListEntity', "show me {$client}'s active {$entityTypePlural}", [
                 $entityTypePlural => 'EntityType',
-                $client . '\'s'  => 'Name',
+                $client.'\'s'  => 'Name',
                 'active' => 'Filter',
             ]);
         }
@@ -190,7 +189,7 @@ class CreateLuisData extends Command
         $intent->entities = [];
 
         foreach ($entities as $value => $entity) {
-            $startPos = strpos($text, (string)$value);
+            $startPos = strpos($text, (string) $value);
             if (! $startPos) {
                 dd("Failed to find {$value} in {$text}");
             }
@@ -203,7 +202,6 @@ class CreateLuisData extends Command
 
         return $intent;
     }
-
 
     /**
      * @return array

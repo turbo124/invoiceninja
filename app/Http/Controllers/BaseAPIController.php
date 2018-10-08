@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EntityModel;
-use App\Ninja\Serializers\ArraySerializer;
 use Auth;
 use Input;
-use League\Fractal\Manager;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
-use League\Fractal\Serializer\JsonApiSerializer;
+use Utils;
 use Request;
 use Response;
-use Utils;
+use App\Models\EntityModel;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use League\Fractal\Resource\Collection;
+use App\Ninja\Serializers\ArraySerializer;
+use League\Fractal\Serializer\JsonApiSerializer;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
 /**
  * @SWG\Swagger(
@@ -82,7 +82,7 @@ class BaseAPIController extends Controller
             $action = 'markSent';
         }
 
-        $repo = Utils::toCamelCase($this->entityType) . 'Repo';
+        $repo = Utils::toCamelCase($this->entityType).'Repo';
 
         $this->$repo->$action($entity);
 
@@ -104,16 +104,16 @@ class BaseAPIController extends Controller
         }
 
         if (Input::get('updated_at') > 0) {
-                $updatedAt = intval(Input::get('updated_at'));
-                $query->where('updated_at', '>=', date('Y-m-d H:i:s', $updatedAt));
+            $updatedAt = intval(Input::get('updated_at'));
+            $query->where('updated_at', '>=', date('Y-m-d H:i:s', $updatedAt));
         }
 
         if (Input::get('client_id') > 0) {
-                $clientPublicId = Input::get('client_id');
-                $filter = function ($query) use ($clientPublicId) {
+            $clientPublicId = Input::get('client_id');
+            $filter = function ($query) use ($clientPublicId) {
                 $query->where('public_id', '=', $clientPublicId);
-             };
-             $query->whereHas('client', $filter);
+            };
+            $query->whereHas('client', $filter);
         }
 
         if (! Utils::hasPermission('view_'.$this->entityType)) {
@@ -240,10 +240,10 @@ class BaseAPIController extends Controller
     protected function fileReponse($name, $data)
     {
         header('Content-Type: application/pdf');
-        header('Content-Length: ' . strlen($data));
-        header('Content-disposition: attachment; filename="' . $name . '"');
+        header('Content-Length: '.strlen($data));
+        header('Content-disposition: attachment; filename="'.$name.'"');
         header('Cache-Control: public, must-revalidate, max-age=0');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
         return $data;
     }

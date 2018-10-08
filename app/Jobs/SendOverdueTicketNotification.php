@@ -3,10 +3,10 @@
 namespace App\Jobs;
 
 use App\Models\Ticket;
-use App\Ninja\Tickets\Actions\TicketOverdue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Ninja\Tickets\Actions\TicketOverdue;
 
 /**
  * Class SendOverdueTicketNotification.
@@ -27,9 +27,9 @@ class SendOverdueTicketNotification extends Job implements ShouldQueue
 
     /**
      * Create a new job instance.
-
+     *
      * @param Ticket $ticket
-     * @param mixed   $type
+     * @param mixed  $type
      */
     public function __construct(Ticket $ticket)
     {
@@ -44,8 +44,6 @@ class SendOverdueTicketNotification extends Job implements ShouldQueue
      */
     public function handle(TicketOverdue $ticketOverdue)
     {
-
         $ticketOverdue->fire($this->ticket);
-
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Ninja\Mailers\ContactMailer;
-use Illuminate\Bus\Queueable;
 use Monolog\Logger;
+use Illuminate\Bus\Queueable;
+use App\Ninja\Mailers\ContactMailer;
 
 abstract class Job
 {

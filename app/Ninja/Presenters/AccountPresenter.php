@@ -2,13 +2,13 @@
 
 namespace App\Ninja\Presenters;
 
+use Utils;
 use Carbon;
 use Domain;
-use App\Models\TaxRate;
-use App\Models\Account;
-use Laracasts\Presenter\Presenter;
 use stdClass;
-use Utils;
+use App\Models\Account;
+use App\Models\TaxRate;
+use Laracasts\Presenter\Presenter;
 
 /**
  * Class AccountPresenter.
@@ -42,7 +42,7 @@ class AccountPresenter extends Presenter
             $str .= ' - ';
         }
 
-        return $str . $account->getCityState();
+        return $str.$account->getCityState();
     }
 
     /**
@@ -60,9 +60,9 @@ class AccountPresenter extends Presenter
     {
         if (floatval($this->entity->task_rate)) {
             return Utils::roundSignificant($this->entity->task_rate);
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -108,7 +108,7 @@ class AccountPresenter extends Presenter
             $terms = 0;
         }
 
-        return trans('texts.payment_terms_net') . ' ' . $terms;
+        return trans('texts.payment_terms_net').' '.$terms;
     }
 
     public function dueDatePlaceholder()
@@ -159,18 +159,18 @@ class AccountPresenter extends Presenter
 
     public function dateRangeOptions()
     {
-        $yearStart = Carbon::parse($this->entity->financialYearStart() ?: date('Y') . '-01-01');
+        $yearStart = Carbon::parse($this->entity->financialYearStart() ?: date('Y').'-01-01');
         $month = $yearStart->month - 1;
         $year = $yearStart->year;
         $lastYear = $year - 1;
 
         $str = '{
-            "' . trans('texts.last_7_days') . '": [moment().subtract(6, "days"), moment()],
-            "' . trans('texts.last_30_days') . '": [moment().subtract(29, "days"), moment()],
-            "' . trans('texts.this_month') . '": [moment().startOf("month"), moment().endOf("month")],
-            "' . trans('texts.last_month') . '": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")],
-            "' . trans('texts.this_year') . '": [moment().date(1).month(' . $month . ').year(' . $year . '), moment()],
-            "' . trans('texts.last_year') . '": [moment().date(1).month(' . $month . ').year(' . $lastYear . '), moment().date(1).month(' . $month . ').year(' . $year . ').subtract(1, "day")],
+            "'.trans('texts.last_7_days').'": [moment().subtract(6, "days"), moment()],
+            "'.trans('texts.last_30_days').'": [moment().subtract(29, "days"), moment()],
+            "'.trans('texts.this_month').'": [moment().startOf("month"), moment().endOf("month")],
+            "'.trans('texts.last_month').'": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")],
+            "'.trans('texts.this_year').'": [moment().date(1).month('.$month.').year('.$year.'), moment()],
+            "'.trans('texts.last_year').'": [moment().date(1).month('.$month.').year('.$lastYear.'), moment().date(1).month('.$month.').year('.$year.').subtract(1, "day")],
         }';
 
         return $str;
@@ -182,11 +182,11 @@ class AccountPresenter extends Presenter
         $options = [];
 
         foreach ($rates as $rate) {
-            $name = $rate->name . ' ' . ($rate->rate + 0) . '%';
+            $name = $rate->name.' '.($rate->rate + 0).'%';
             if ($rate->is_inclusive) {
-                $name .= ' - ' . trans('texts.inclusive');
+                $name .= ' - '.trans('texts.inclusive');
             }
-            $options[($rate->is_inclusive ? '1 ' : '0 ') . $rate->rate . ' ' . $rate->name] = e($name);
+            $options[($rate->is_inclusive ? '1 ' : '0 ').$rate->rate.' '.$rate->name] = e($name);
         }
 
         return $options;
@@ -223,15 +223,15 @@ class AccountPresenter extends Presenter
         $account = $this->entity;
         $data = [];
 
-        for ($i=1; $i<=3; $i++) {
-            $label = trans('texts.custom_design' . $i);
-            if (! $account->{'custom_design' . $i}) {
-                $label .= ' - ' . trans('texts.empty');
+        for ($i = 1; $i <= 3; $i++) {
+            $label = trans('texts.custom_design'.$i);
+            if (! $account->{'custom_design'.$i}) {
+                $label .= ' - '.trans('texts.empty');
             }
 
             $data[] = [
-                'url' => url('/settings/customize_design?design_id=') . ($i + 10),
-                'label' => $label
+                'url' => url('/settings/customize_design?design_id=').($i + 10),
+                'label' => $label,
             ];
         }
 
@@ -245,7 +245,7 @@ class AccountPresenter extends Presenter
         if (Utils::isNinjaProd()) {
             $url = 'https://';
             $url .= $account->subdomain ?: 'app';
-            $url .= '.' . Domain::getDomainFromId($account->domain_id);
+            $url .= '.'.Domain::getDomainFromId($account->domain_id);
         } else {
             $url = trim(SITE_URL, '/');
         }
@@ -254,11 +254,11 @@ class AccountPresenter extends Presenter
 
         if (Utils::isNinja()) {
             if (! $account->subdomain) {
-                $url .= '?account_key=' . $account->account_key;
+                $url .= '?account_key='.$account->account_key;
             }
         } else {
             if (Account::count() > 1) {
-                $url .= '?account_key=' . $account->account_key;
+                $url .= '?account_key='.$account->account_key;
             }
         }
 

@@ -2,9 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
-use Str;
 use URL;
+use Auth;
 use Utils;
 
 class ProductDatatable extends EntityDatatable
@@ -39,7 +38,7 @@ class ProductDatatable extends EntityDatatable
             [
                 'tax_rate',
                 function ($model) {
-                    return $model->tax_rate ? ($model->tax_name . ' ' . ($model->tax_rate + 0) . '%') : '';
+                    return $model->tax_rate ? ($model->tax_name.' '.($model->tax_rate + 0).'%') : '';
                 },
                 $account->invoice_item_taxes,
             ],
@@ -48,15 +47,15 @@ class ProductDatatable extends EntityDatatable
                 function ($model) {
                     return $model->custom_value1;
                 },
-                $account->customLabel('product1')
+                $account->customLabel('product1'),
             ],
             [
                 'custom_value2',
                 function ($model) {
                     return $model->custom_value2;
                 },
-                $account->customLabel('product2')
-            ]
+                $account->customLabel('product2'),
+            ],
         ];
     }
 

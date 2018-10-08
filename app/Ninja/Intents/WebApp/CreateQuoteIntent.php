@@ -14,7 +14,7 @@ class CreateQuoteIntent extends BaseIntent
 
         //$invoiceItems = $this->requestInvoiceItems();
 
-        $url = '/quotes/create/' . $clientPublicId . '?';
+        $url = '/quotes/create/'.$clientPublicId.'?';
         $url .= $this->requestFieldsAsString(Invoice::$requestFields);
 
         $url = rtrim($url, '?');

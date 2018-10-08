@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use App\Libraries\Finance;
-use App\Libraries\Login;
-use App\Models\BankSubaccount;
-use App\Models\Expense;
-use App\Models\Vendor;
-use App\Ninja\Datatables\BankAccountDatatable;
-use App\Ninja\Repositories\BankAccountRepository;
-use App\Ninja\Repositories\ExpenseRepository;
-use App\Ninja\Repositories\VendorRepository;
 use Hash;
-use stdClass;
 use Utils;
 use Carbon;
+use stdClass;
+use App\Models\Vendor;
+use App\Models\Expense;
+use App\Libraries\Login;
+use App\Libraries\Finance;
+use App\Models\BankSubaccount;
+use App\Ninja\Repositories\VendorRepository;
+use App\Ninja\Repositories\ExpenseRepository;
+use App\Ninja\Datatables\BankAccountDatatable;
+use App\Ninja\Repositories\BankAccountRepository;
 
 /**
  * Class BankAccountService.
@@ -139,6 +139,7 @@ class BankAccountService extends BaseService
             return $data;
         } catch (\Exception $e) {
             Utils::logError($e);
+
             return false;
         }
     }
@@ -317,9 +318,9 @@ class BankAccountService extends BaseService
             return 'work_phone';
         } elseif (strpos($value, '.') !== false) {
             return 'private_notes';
-        } else {
-            return 'city';
         }
+
+        return 'city';
     }
 
     public function getDatatable($accountId)

@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 
 class FileLoader extends \Illuminate\Translation\FileLoader
 {
-
     /**
      * The overlay path for the loader.
      *
@@ -17,10 +16,9 @@ class FileLoader extends \Illuminate\Translation\FileLoader
     /**
      * Create a new file loader instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $path
-     * @param  string  $overlayPath
-     * @return void
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param string                            $path
+     * @param string                            $overlayPath
      */
     public function __construct(Filesystem $files, $path, $overlayPath)
     {
@@ -31,9 +29,10 @@ class FileLoader extends \Illuminate\Translation\FileLoader
     /**
      * Load the messages for the given locale.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     public function load($locale, $group, $namespace = null)

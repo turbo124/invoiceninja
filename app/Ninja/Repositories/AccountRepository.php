@@ -2,31 +2,31 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Account;
-use App\Models\AccountEmailSettings;
-use App\Models\AccountGateway;
-use App\Models\AccountTicketSettings;
-use App\Models\AccountToken;
-use App\Models\Client;
-use App\Models\Company;
-use App\Models\Contact;
-use App\Models\Credit;
-use App\Models\Invitation;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
-use App\Models\Language;
-use App\Models\User;
-use App\Models\UserAccount;
-use App\Models\LookupUser;
+use URL;
 use Auth;
 use Input;
-use Request;
+use Utils;
 use Schema;
+use Request;
 use Session;
 use stdClass;
-use URL;
-use Utils;
 use Validator;
+use App\Models\User;
+use App\Models\Client;
+use App\Models\Credit;
+use App\Models\Account;
+use App\Models\Company;
+use App\Models\Contact;
+use App\Models\Invoice;
+use App\Models\Language;
+use App\Models\Invitation;
+use App\Models\LookupUser;
+use App\Models\InvoiceItem;
+use App\Models\UserAccount;
+use App\Models\AccountToken;
+use App\Models\AccountGateway;
+use App\Models\AccountEmailSettings;
+use App\Models\AccountTicketSettings;
 
 class AccountRepository
 {
@@ -53,10 +53,9 @@ class AccountRepository
                 if (env('PARTNER_CAMPAIGN') && hash_equals(Input::get('utm_campaign'), env('PARTNER_CAMPAIGN'))) {
                     $company->applyFreeYear();
                 }
-            } else {
-                //$company->applyDiscount(.5);
-                //session()->flash('warning', $company->present()->promoMessage());
             }
+            //$company->applyDiscount(.5);
+            //session()->flash('warning', $company->present()->promoMessage());
 
             $company->save();
         }
@@ -132,6 +131,7 @@ class AccountRepository
         $accountTicketSettings->ticket_number_start = 1;
 
         $account->account_ticket_settings()->save($accountTicketSettings);
+
         return $account;
     }
 
@@ -152,7 +152,7 @@ class AccountRepository
             \Mail::raw($ip, function ($message) use ($ip, $errorEmail) {
                 $message->to($errorEmail)
                         ->from(CONTACT_EMAIL)
-                        ->subject('Duplicate company for IP: ' . $ip);
+                        ->subject('Duplicate company for IP: '.$ip);
             });
             if ($count >= 15) {
                 abort();
@@ -215,7 +215,7 @@ class AccountRepository
             if (! $client->is_deleted) {
                 if ($client->name) {
                     $data['clients'][] = [
-                        'value' => ($client->id_number ? $client->id_number . ': ' : '') . $client->name,
+                        'value' => ($client->id_number ? $client->id_number.': ' : '').$client->name,
                         'tokens' => implode(',', [$client->name, $client->id_number, $client->vat_number, $client->work_phone]),
                         'url' => $client->present()->url,
                     ];
@@ -223,14 +223,14 @@ class AccountRepository
 
                 if ($client->custom_value1) {
                     $data[$account->present()->customLabel('client1')][] = [
-                        'value' => "{$client->custom_value1}: " . $client->getDisplayName(),
+                        'value' => "{$client->custom_value1}: ".$client->getDisplayName(),
                         'tokens' => $client->custom_value1,
                         'url' => $client->present()->url,
                     ];
                 }
                 if ($client->custom_value2) {
                     $data[$account->present()->customLabel('client2')][] = [
-                        'value' => "{$client->custom_value2}: " . $client->getDisplayName(),
+                        'value' => "{$client->custom_value2}: ".$client->getDisplayName(),
                         'tokens' => $client->custom_value2,
                         'url' => $client->present()->url,
                     ];
@@ -248,7 +248,7 @@ class AccountRepository
             foreach ($client->invoices as $invoice) {
                 $entityType = $invoice->getEntityType();
                 $data["{$entityType}s"][] = [
-                    'value' => $invoice->getDisplayName() . ': ' . $client->getDisplayName(),
+                    'value' => $invoice->getDisplayName().': '.$client->getDisplayName(),
                     'tokens' => implode(',', [$invoice->invoice_number, $invoice->po_number]),
                     'url' => $invoice->present()->url,
                 ];
@@ -294,10 +294,10 @@ class AccountRepository
         foreach ($entityTypes as $entityType) {
             $features[] = [
                 "new_{$entityType}",
-                Utils::pluralizeEntityType($entityType) . '/create',
+                Utils::pluralizeEntityType($entityType).'/create',
             ];
             $features[] = [
-                'list_' . Utils::pluralizeEntityType($entityType),
+                'list_'.Utils::pluralizeEntityType($entityType),
                 Utils::pluralizeEntityType($entityType),
             ];
         }
@@ -332,8 +332,8 @@ class AccountRepository
 
         foreach ($features as $feature) {
             $data[] = [
-                'value' => trans('texts.' . $feature[0]),
-                'tokens' => trans('texts.' . $feature[0]),
+                'value' => trans('texts.'.$feature[0]),
+                'tokens' => trans('texts.'.$feature[0]),
                 'url' => URL::to($feature[1]),
             ];
         }
@@ -422,7 +422,7 @@ class AccountRepository
 
         if ($plan == PLAN_ENTERPRISE) {
             $min = Utils::getMinNumUsers($num_users);
-            $item->notes .= "\n\n###" . trans('texts.min_to_max_users', ['min' => $min, 'max' => $num_users]);
+            $item->notes .= "\n\n###".trans('texts.min_to_max_users', ['min' => $min, 'max' => $num_users]);
         }
 
         // Don't change this without updating the regex in PaymentService->createPayment()
@@ -440,50 +440,48 @@ class AccountRepository
 
     public function getNinjaAccount()
     {
-        $account = Account::where('account_key', 'LIKE', substr(NINJA_ACCOUNT_KEY, 0, 30) . '%')->orderBy('id')->first();
+        $account = Account::where('account_key', 'LIKE', substr(NINJA_ACCOUNT_KEY, 0, 30).'%')->orderBy('id')->first();
 
         if ($account) {
             return $account;
-        } else {
-            $company = new Company();
-            $company->save();
+        }
+        $company = new Company();
+        $company->save();
 
-            $account = new Account();
-            $account->name = 'Invoice Ninja';
-            $account->work_email = 'contact@invoiceninja.com';
-            $account->work_phone = '(800) 763-1948';
-            $account->account_key = NINJA_ACCOUNT_KEY;
-            $account->company_id = $company->id;
-            $account->save();
+        $account = new Account();
+        $account->name = 'Invoice Ninja';
+        $account->work_email = 'contact@invoiceninja.com';
+        $account->work_phone = '(800) 763-1948';
+        $account->account_key = NINJA_ACCOUNT_KEY;
+        $account->company_id = $company->id;
+        $account->save();
 
-            $emailSettings = new AccountEmailSettings();
-            $account->account_email_settings()->save($emailSettings);
+        $emailSettings = new AccountEmailSettings();
+        $account->account_email_settings()->save($emailSettings);
 
-            $user = new User();
-            $user->registered = true;
-            $user->confirmed = true;
-            $user->email = NINJA_ACCOUNT_EMAIL;
-            $user->username = NINJA_ACCOUNT_EMAIL;
-            $user->password = strtolower(str_random(RANDOM_KEY_LENGTH));
-            $user->first_name = 'Invoice';
-            $user->last_name = 'Ninja';
-            $user->notify_sent = true;
-            $user->notify_paid = true;
-            $account->users()->save($user);
+        $user = new User();
+        $user->registered = true;
+        $user->confirmed = true;
+        $user->email = NINJA_ACCOUNT_EMAIL;
+        $user->username = NINJA_ACCOUNT_EMAIL;
+        $user->password = strtolower(str_random(RANDOM_KEY_LENGTH));
+        $user->first_name = 'Invoice';
+        $user->last_name = 'Ninja';
+        $user->notify_sent = true;
+        $user->notify_paid = true;
+        $account->users()->save($user);
 
+        $account_ticket_settings = new AccountTicketSettings();
+        $account_ticket_settings->ticket_master_id = $user->id;
+        $account->account_ticket_settings()->save($account_ticket_settings);
 
-            $account_ticket_settings = new AccountTicketSettings();
-            $account_ticket_settings->ticket_master_id = $user->id;
-            $account->account_ticket_settings()->save($account_ticket_settings);
-
-            if ($config = env(NINJA_GATEWAY_CONFIG)) {
-                $accountGateway = new AccountGateway();
-                $accountGateway->user_id = $user->id;
-                $accountGateway->gateway_id = NINJA_GATEWAY_ID;
-                $accountGateway->public_id = 1;
-                $accountGateway->setConfig(json_decode($config));
-                $account->account_gateways()->save($accountGateway);
-            }
+        if ($config = env(NINJA_GATEWAY_CONFIG)) {
+            $accountGateway = new AccountGateway();
+            $accountGateway->user_id = $user->id;
+            $accountGateway->gateway_id = NINJA_GATEWAY_ID;
+            $accountGateway->public_id = 1;
+            $accountGateway->setConfig(json_decode($config));
+            $account->account_gateways()->save($accountGateway);
         }
 
         return $account;
@@ -541,7 +539,7 @@ class AccountRepository
 
     public function updateUserFromOauth($user, $firstName, $lastName, $email, $providerId, $oauthUserId)
     {
-        if (! LookupUser::validateField('oauth_user_key', $providerId . '-' . $oauthUserId)) {
+        if (! LookupUser::validateField('oauth_user_key', $providerId.'-'.$oauthUserId)) {
             return trans('texts.oauth_taken');
         }
 
@@ -556,6 +554,7 @@ class AccountRepository
 
             if ($validator->fails()) {
                 $messages = $validator->messages();
+
                 return $messages->first('email');
             }
 
@@ -584,7 +583,7 @@ class AccountRepository
             return false;
         }
 
-        $url = (Utils::isNinjaDev() ? SITE_URL : NINJA_APP_URL) . '/signup/register';
+        $url = (Utils::isNinjaDev() ? SITE_URL : NINJA_APP_URL).'/signup/register';
         $data = '';
         $fields = [
             'first_name' => urlencode($user->first_name),
@@ -619,9 +618,9 @@ class AccountRepository
 
         if ($accounts) {
             return $this->getUserAccounts($accounts, $with);
-        } else {
-            return [$user];
         }
+
+        return [$user];
     }
 
     public function findUser($user, $accountKey)
@@ -766,14 +765,14 @@ class AccountRepository
 
     public function findWithReminders()
     {
-        return Account::whereHas('account_email_settings', function($query) {
+        return Account::whereHas('account_email_settings', function ($query) {
             $query->whereRaw('enable_reminder1 = 1 OR enable_reminder2 = 1 OR enable_reminder3 = 1 OR enable_reminder4 = 1');
         })->get();
     }
 
     public function findWithFees()
     {
-        return Account::whereHas('account_email_settings', function($query) {
+        return Account::whereHas('account_email_settings', function ($query) {
             $query->where('late_fee1_amount', '>', 0)
                     ->orWhere('late_fee1_percent', '>', 0)
                     ->orWhere('late_fee2_amount', '>', 0)

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TaskRequest;
-use App\Http\Requests\UpdateTaskRequest;
-use App\Models\Task;
-use App\Ninja\Repositories\TaskRepository;
-use App\Ninja\Transformers\TaskTransformer;
 use Auth;
 use Input;
 use Response;
+use App\Models\Task;
+use App\Http\Requests\TaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
+use App\Ninja\Repositories\TaskRepository;
+use App\Ninja\Transformers\TaskTransformer;
 
 class TaskApiController extends BaseAPIController
 {

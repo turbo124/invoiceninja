@@ -2,45 +2,45 @@
 
 return [
 
-	/*
-	|--------------------------------------------------------------------------
-	| Third Party Services
-	|--------------------------------------------------------------------------
-	|
-	| This file is for storing the credentials for third party services such
-	| as Stripe, Mailgun, Mandrill, and others. This file provides a sane
-	| default location for this type of information, allowing packages
-	| to have a conventional place to find your various credentials.
-	|
-	*/
+    /*
+    |--------------------------------------------------------------------------
+    | Third Party Services
+    |--------------------------------------------------------------------------
+    |
+    | This file is for storing the credentials for third party services such
+    | as Stripe, Mailgun, Mandrill, and others. This file provides a sane
+    | default location for this type of information, allowing packages
+    | to have a conventional place to find your various credentials.
+    |
+    */
 
     'postmark' => env('POSTMARK_API_TOKEN', ''),
-	'postmark_ticket' => env('POSTMARK_API_TICKET_TOKEN'),
-	'postmark_ticket_2' => env('POSTMARK_API_TICKET_TOKEN_2'),
+    'postmark_ticket' => env('POSTMARK_API_TICKET_TOKEN'),
+    'postmark_ticket_2' => env('POSTMARK_API_TICKET_TOKEN_2'),
 
-	'mailgun' => [
-		'domain' => env('MAILGUN_DOMAIN',''),
-		'secret' => env('MAILGUN_SECRET',''),
-	],
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN', ''),
+        'secret' => env('MAILGUN_SECRET', ''),
+    ],
 
-	'mandrill' => [
-		'secret' => '',
-	],
-	
-	'sparkpost' => [
+    'mandrill' => [
+        'secret' => '',
+    ],
+
+    'sparkpost' => [
                 'secret' => env('SPARKPOST_API_KEY'),
         ],
 
-	'ses' => [
-		'key' => '',
-		'secret' => '',
-		'region' => 'us-east-1',
-	],
+    'ses' => [
+        'key' => '',
+        'secret' => '',
+        'region' => 'us-east-1',
+    ],
 
-	'stripe' => [
-		'model'  => 'User',
-		'secret' => '',
-	],
+    'stripe' => [
+        'model'  => 'User',
+        'secret' => '',
+    ],
 
     'github' => [
         'client_id' => env('GITHUB_CLIENT_ID'),

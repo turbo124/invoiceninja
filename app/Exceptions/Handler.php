@@ -2,20 +2,20 @@
 
 namespace App\Exceptions;
 
-use Exception;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Foundation\Validation\ValidationException;
-use Illuminate\Http\Exception\HttpResponseException;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Session\TokenMismatchException;
-use Redirect;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Utils;
 use Request;
+use Redirect;
+use Exception;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class Handler.
@@ -68,12 +68,13 @@ class Handler extends ExceptionHandler
                 return false;
             }
             // Log 404s to a separate file
-            $errorStr = date('Y-m-d h:i:s') . ' ' . $e->getMessage() . ' URL:' . request()->url() . "\n" . json_encode(Utils::prepareErrorData('PHP')) . "\n\n";
+            $errorStr = date('Y-m-d h:i:s').' '.$e->getMessage().' URL:'.request()->url()."\n".json_encode(Utils::prepareErrorData('PHP'))."\n\n";
             if (config('app.log') == 'single') {
                 @file_put_contents(storage_path('logs/not-found.log'), $errorStr, FILE_APPEND);
             } else {
-                Utils::logError('[not found] ' . $errorStr);
+                Utils::logError('[not found] '.$errorStr);
             }
+
             return false;
         } elseif ($e instanceof HttpResponseException) {
             return false;
@@ -81,16 +82,17 @@ class Handler extends ExceptionHandler
 
         if (! Utils::isTravis()) {
             Utils::logError(Utils::getErrorString($e));
-            $stacktrace = date('Y-m-d h:i:s') . ' ' . $e->getMessage() . ': ' . $e->getTraceAsString() . "\n\n";
+            $stacktrace = date('Y-m-d h:i:s').' '.$e->getMessage().': '.$e->getTraceAsString()."\n\n";
             if (config('app.log') == 'single') {
                 @file_put_contents(storage_path('logs/stacktrace.log'), $stacktrace, FILE_APPEND);
             } else {
-                Utils::logError('[stacktrace] ' . $stacktrace);
+                Utils::logError('[stacktrace] '.$stacktrace);
             }
+
             return false;
-        } else {
-            return parent::report($e);
         }
+
+        return parent::report($e);
     }
 
     /**
@@ -106,15 +108,14 @@ class Handler extends ExceptionHandler
         $value = Request::header('X-Ninja-Token');
 
         if ($e instanceof ModelNotFoundException) {
-
-            if( isset($value) && strlen($value) > 1 ){
+            if (isset($value) && strlen($value) > 1) {
                 $headers = \App\Libraries\Utils::getApiHeaders();
                 $response = json_encode(['message' => 'record does not exist'], JSON_PRETTY_PRINT);
 
                 return Response::make($response, 404, $headers);
             }
-            else
-                return Redirect::to('/');
+
+            return Redirect::to('/');
         }
 
         if (! class_exists('Utils')) {
@@ -176,16 +177,17 @@ class Handler extends ExceptionHandler
             ];
 
             return response()->view('error', $data, 500);
-        } else {
-            return parent::render($request, $e);
         }
+
+        return parent::render($request, $e);
     }
 
     /**
      * Convert an authentication exception into an unauthenticated response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @param \Illuminate\Http\Request                 $request
+     * @param \Illuminate\Auth\AuthenticationException $exception
+     *
      * @return \Illuminate\Http\Response
      */
     protected function unauthenticated($request, AuthenticationException $exception)

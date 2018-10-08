@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Intents;
 
-use App\Models\Invoice;
-use App\Models\InvoiceStatus;
 use Auth;
 use Exception;
+use App\Models\Invoice;
+use App\Models\InvoiceStatus;
 
 class InvoiceIntent extends BaseIntent
 {
@@ -89,7 +89,7 @@ class InvoiceIntent extends BaseIntent
                         $item['tax_rate1'] = $taxRate->rate;
                     }
                     */
-                    
+
                     $invoiceItems[] = $item;
                 }
             }
@@ -120,7 +120,7 @@ class InvoiceIntent extends BaseIntent
         }
 
         if (count($statusIds) || $this->hasField('Filter', 'all')) {
-            session(['entity_status_filter:' . $entityType => join(',', $statusIds)]);
+            session(['entity_status_filter:'.$entityType => join(',', $statusIds)]);
         }
     }
 }
