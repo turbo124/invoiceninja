@@ -6,8 +6,6 @@ class AddInvoiceFooter extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -22,8 +20,6 @@ class AddInvoiceFooter extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

@@ -3,8 +3,7 @@
 namespace App\Models;
 
 /**
- * Class TicketRelation
- * @package App\Models
+ * Class TicketRelation.
  */
 class TicketRelation extends EntityModel
 {
@@ -32,5 +31,4 @@ class TicketRelation extends EntityModel
     {
         return $this->belongsTo('App\Models\Ticket');
     }
-
 }

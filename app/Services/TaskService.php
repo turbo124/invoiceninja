@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Ninja\Datatables\ProjectTaskDatatable;
-use App\Ninja\Datatables\TaskDatatable;
-use App\Ninja\Repositories\TaskRepository;
 use Auth;
 use Utils;
+use App\Ninja\Datatables\TaskDatatable;
+use App\Ninja\Repositories\TaskRepository;
+use App\Ninja\Datatables\ProjectTaskDatatable;
 
 /**
  * Class TaskService.

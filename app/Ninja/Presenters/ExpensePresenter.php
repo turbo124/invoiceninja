@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Presenters;
 
-use Carbon;
 use Utils;
+use Carbon;
 
 /**
  * Class ExpensePresenter.
@@ -73,16 +73,15 @@ class ExpensePresenter extends EntityPresenter
         $data = parent::calendarEvent();
         $expense = $this->entity;
 
-        $data->title = trans('texts.expense')  . ' ' . $this->amount() . ' | ' . $this->category();
+        $data->title = trans('texts.expense').' '.$this->amount().' | '.$this->category();
 
-        $data->title = trans('texts.expense') . ' ' . $this->amount();
+        $data->title = trans('texts.expense').' '.$this->amount();
         if ($category = $this->category()) {
-            $data->title .= ' | ' . $category;
+            $data->title .= ' | '.$category;
         }
         if ($this->public_notes) {
-            $data->title .= ' | ' . $this->public_notes;
+            $data->title .= ' | '.$this->public_notes;
         }
-
 
         $data->start = $expense->expense_date;
 

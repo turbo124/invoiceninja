@@ -3,7 +3,6 @@
 namespace App\Ninja\PaymentDrivers;
 
 use Omnipay;
-use Session;
 use App\Models\Payment;
 
 class GoCardlessV2RedirectPaymentDriver extends BasePaymentDriver

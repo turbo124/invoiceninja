@@ -4,15 +4,14 @@ namespace App\Policies;
 
 use App\Models\User;
 
-
 /**
- * Class ProposalCategoryPolicy
- * @package App\Policies
+ * Class ProposalCategoryPolicy.
  */
 class ProposalCategoryPolicy extends EntityPolicy
 {
     /**
      * @param User $user
+     *
      * @return mixed
      */
     public function create(User $user)

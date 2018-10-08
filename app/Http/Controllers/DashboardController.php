@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
-use App\Models\Currency;
-use App\Models\Expense;
-use App\Ninja\Repositories\DashboardRepository;
 use Auth;
-use App\Libraries\MoneyUtils;
-use Utils;
 use View;
+use Utils;
+use App\Models\Client;
+use App\Models\Expense;
+use App\Models\Currency;
+use App\Libraries\MoneyUtils;
+use App\Ninja\Repositories\DashboardRepository;
 
 /**
  * Class DashboardController.
@@ -46,7 +46,7 @@ class DashboardController extends BaseController
 
         // calculate paid to date totals
         $paidToDateTotal = 0;
-        foreach($paidToDate as $item) {
+        foreach ($paidToDate as $item) {
             $paidToDateTotal += ($item->value * $item->exchange_rate);
         }
 
@@ -84,7 +84,6 @@ class DashboardController extends BaseController
                 Utils::logError($e);
                 $balancesTotals += $item->value;
             }
-
         }
 
         // calculate expenses totals

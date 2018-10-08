@@ -2,19 +2,16 @@
 
 namespace App\Jobs\Ticket;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Auth;
-use App;
+use App\Jobs\Job;
 use App\Models\Ticket;
 use App\Ninja\Mailers\TicketMailer;
-use App\Jobs\Job;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
  * Class TicketSendNotificationEmail.
  */
-
 class TicketSendNotificationEmail extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
@@ -36,7 +33,8 @@ class TicketSendNotificationEmail extends Job implements ShouldQueue
 
     /**
      * TicketSendNotificationEmail constructor.
-     * @param array $ticketData
+     *
+     * @param array  $ticketData
      * @param Ticket $ticket
      */
     public function __construct(array $ticketData, Ticket $ticket)
@@ -63,6 +61,5 @@ class TicketSendNotificationEmail extends Job implements ShouldQueue
         $view = 'ticket';
 
         $mailer->sendTo($toEmail, $fromEmail, $fromName, $subject, $view, $data);
-
     }
 }

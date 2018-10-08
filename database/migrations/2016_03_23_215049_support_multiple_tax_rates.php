@@ -6,8 +6,6 @@ class SupportMultipleTaxRates extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -48,8 +46,6 @@ class SupportMultipleTaxRates extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

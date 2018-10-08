@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 class UpdateClientPortalTicketRequest extends TicketRequest
 {
-
     public function authorize()
     {
         return true;

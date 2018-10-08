@@ -149,7 +149,7 @@
                     //
                     // add the url
                     //
-                    
+
                     $currentTagfill = $tagfill;
                     if ($display_url != $link_url && ! preg_match('@title=@msi', $currentTagfill) && $auto_title) {
                         $display_quoted = preg_quote($display_url, '!');

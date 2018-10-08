@@ -12,9 +12,6 @@ class BaseService
 {
     use DispatchesJobs;
 
-    /**
-     * @return null
-     */
     protected function getRepo()
     {
         return null;

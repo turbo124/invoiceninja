@@ -6,8 +6,6 @@ class AddTaskProjects extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -72,14 +70,12 @@ class AddTaskProjects extends Migration
                 $table->boolean('is_public')->default(false);
             });
         }
-        
+
         DB::table('invoices')->update(['is_public' => true]);
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

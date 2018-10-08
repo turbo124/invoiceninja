@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
+use Auth;
 use Utils;
 
 class VendorDatatable extends EntityDatatable
@@ -18,6 +18,7 @@ class VendorDatatable extends EntityDatatable
                 'name',
                 function ($model) {
                     $str = link_to("vendors/{$model->public_id}", $model->name ?: '')->toHtml();
+
                     return $this->addNote($str, $model->private_notes);
                 },
             ],

@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Transformers;
 
-use App\Models\Account;
 use Auth;
+use App\Models\Account;
 use League\Fractal\TransformerAbstract;
 
 class EntityTransformer extends TransformerAbstract
@@ -41,9 +41,9 @@ class EntityTransformer extends TransformerAbstract
             return $date->getTimestamp();
         } elseif (is_string($date)) {
             return strtotime($date);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function getDefaultIncludes()
