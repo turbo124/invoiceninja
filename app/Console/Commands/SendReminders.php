@@ -70,7 +70,7 @@ class SendReminders extends Command
         $this->userMailer = $userMailer;
     }
 
-    public function fire()
+    public function handle()
     {
         $this->info(date('r') . ' Running SendReminders...');
 

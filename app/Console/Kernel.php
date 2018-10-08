@@ -13,27 +13,7 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [
-        'App\Console\Commands\SendRecurringInvoices',
-        'App\Console\Commands\RemoveOrphanedDocuments',
-        'App\Console\Commands\ResetData',
-        'App\Console\Commands\CheckData',
-        'App\Console\Commands\PruneData',
-        'App\Console\Commands\CreateTestData',
-        'App\Console\Commands\CreateLuisData',
-        'App\Console\Commands\SendRenewalInvoices',
-        'App\Console\Commands\ChargeRenewalInvoices',
-        'App\Console\Commands\SendReminders',
-        'App\Console\Commands\TestOFX',
-        'App\Console\Commands\MakeModule',
-        'App\Console\Commands\MakeClass',
-        'App\Console\Commands\InitLookup',
-        'App\Console\Commands\CalculatePayouts',
-        'App\Console\Commands\UpdateKey',
-        'App\Console\Commands\MobileLocalization',
-        'App\Console\Commands\SendOverdueTickets',
-        'App\Console\Commands\MakeModuleSettings',
-    ];
+    protected $commands = [];
 
     /**
      * Define the application's command schedule.
@@ -56,5 +36,11 @@ class Kernel extends ConsoleKernel
             ->command('ninja:send-reminders')
             ->sendOutputTo($logFile)
             ->daily();
+    }
+
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
+        require base_path('routes/console.php');
     }
 }
