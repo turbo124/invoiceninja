@@ -1,16 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 use App\Models\Subscription;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Migrations\Migration;
 
 class AddSubdomainToLookups extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -105,8 +102,6 @@ class AddSubdomainToLookups extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {
@@ -149,6 +144,5 @@ class AddSubdomainToLookups extends Migration
         Schema::table('accounts', function ($table) {
             $table->dropColumn('inclusive_taxes');
         });
-
     }
 }

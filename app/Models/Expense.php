@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Utils;
 use App\Events\ExpenseWasCreated;
 use App\Events\ExpenseWasUpdated;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
-use Utils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Expense.
@@ -160,7 +160,6 @@ class Expense extends EntityModel
         return $this->belongsTo('App\Models\RecurringExpense');
     }
 
-
     /**
      * @return mixed
      */
@@ -170,9 +169,9 @@ class Expense extends EntityModel
             return $this->transaction_id;
         } elseif ($this->public_notes) {
             return Utils::truncateString($this->public_notes, 16);
-        } else {
-            return '#' . $this->public_id;
         }
+
+        return '#'.$this->public_id;
     }
 
     /**
@@ -282,7 +281,6 @@ class Expense extends EntityModel
         $statuses[EXPENSE_STATUS_PAID] = trans('texts.paid');
         $statuses[EXPENSE_STATUS_UNPAID] = trans('texts.unpaid');
 
-
         return $statuses;
     }
 
@@ -303,7 +301,7 @@ class Expense extends EntityModel
         $label = trans("texts.{$label}");
 
         if ($paymentDate) {
-            $label = trans('texts.paid') . ' | ' . $label;
+            $label = trans('texts.paid').' | '.$label;
         }
 
         return $label;
@@ -314,14 +312,14 @@ class Expense extends EntityModel
         if ($invoiceId) {
             if (floatval($balance) > 0) {
                 return 'default';
-            } else {
-                return 'success';
             }
+
+            return 'success';
         } elseif ($shouldBeInvoiced) {
             return 'warning';
-        } else {
-            return 'primary';
         }
+
+        return 'primary';
     }
 
     public function statusClass()

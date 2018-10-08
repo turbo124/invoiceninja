@@ -2,20 +2,20 @@
 
 namespace App\Listeners;
 
-use Illuminate\Queue\Events\JobExceptionOccurred;
-use App\Events\InvoiceInvitationWasViewed;
-use App\Events\InvoiceWasCreated;
-use App\Events\InvoiceWasUpdated;
-use App\Events\InvoiceWasEmailed;
+use Auth;
+use Utils;
+use App\Models\Activity;
 use App\Events\PaymentFailed;
+use App\Events\PaymentWasVoided;
+use App\Events\InvoiceWasCreated;
+use App\Events\InvoiceWasEmailed;
+use App\Events\InvoiceWasUpdated;
 use App\Events\PaymentWasCreated;
 use App\Events\PaymentWasDeleted;
 use App\Events\PaymentWasRefunded;
 use App\Events\PaymentWasRestored;
-use App\Events\PaymentWasVoided;
-use App\Models\Activity;
-use Auth;
-use Utils;
+use App\Events\InvoiceInvitationWasViewed;
+use Illuminate\Queue\Events\JobExceptionOccurred;
 
 /**
  * Class InvoiceListener.

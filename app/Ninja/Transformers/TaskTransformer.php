@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Transformers;
 
-use App\Models\Account;
-use App\Models\Client;
 use App\Models\Task;
+use App\Models\Client;
+use App\Models\Account;
 
 /**
  * @SWG\Definition(definition="Task", @SWG\Xml(name="Task"))
@@ -19,8 +19,8 @@ class TaskTransformer extends EntityTransformer
      * @SWG\Property(property="archived_at", type="integer", example=1451160233, readOnly=true)
      * @SWG\Property(property="invoice_id", type="integer", example=1)
      * @SWG\Property(property="recurring_invoice_id", type="integer", example=1, readOnly=true)
-     * @SWG\Property(property="client_id", type="integer", example=1) 
-     * @SWG\Property(property="project_id", type="integer", example=1) 
+     * @SWG\Property(property="client_id", type="integer", example=1)
+     * @SWG\Property(property="project_id", type="integer", example=1)
      * @SWG\Property(property="is_deleted", type="boolean", example=false, readOnly=true)
      * @SWG\Property(property="time_log", type="string", example="Time Log")
      * @SWG\Property(property="is_running", type="boolean", example=false)
@@ -43,9 +43,9 @@ class TaskTransformer extends EntityTransformer
             $transformer = new ClientTransformer($this->account, $this->serializer);
 
             return $this->includeItem($task->client, $transformer, 'client');
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function includeProject(Task $task)
@@ -54,9 +54,9 @@ class TaskTransformer extends EntityTransformer
             $transformer = new ProjectTransformer($this->account, $this->serializer);
 
             return $this->includeItem($task->project, $transformer, 'project');
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function transform(Task $task)

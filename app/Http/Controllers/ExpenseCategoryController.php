@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateExpenseCategoryRequest;
-use App\Http\Requests\ExpenseCategoryRequest;
-use App\Http\Requests\UpdateExpenseCategoryRequest;
-use App\Ninja\Datatables\ExpenseCategoryDatatable;
-use App\Ninja\Repositories\ExpenseCategoryRepository;
-use App\Services\ExpenseCategoryService;
+use View;
 use Input;
 use Session;
-use View;
+use App\Services\ExpenseCategoryService;
+use App\Http\Requests\ExpenseCategoryRequest;
+use App\Ninja\Datatables\ExpenseCategoryDatatable;
+use App\Http\Requests\CreateExpenseCategoryRequest;
+use App\Http\Requests\UpdateExpenseCategoryRequest;
+use App\Ninja\Repositories\ExpenseCategoryRepository;
 
 class ExpenseCategoryController extends BaseController
 {
@@ -62,7 +62,7 @@ class ExpenseCategoryController extends BaseController
         $data = [
             'category' => $category,
             'method' => 'PUT',
-            'url' => 'expense_categories/' . $category->public_id,
+            'url' => 'expense_categories/'.$category->public_id,
             'title' => trans('texts.edit_category'),
         ];
 

@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use App\Constants\Domain;
 use App\Libraries\Utils;
+use App\Constants\Domain;
 use App\Services\TicketTemplateService;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class Ticket
- * @package App\Models
+ * Class Ticket.
  */
 class Ticket extends EntityModel
 {
@@ -52,7 +51,6 @@ class Ticket extends EntityModel
         'user_id',
     ];
 
-
     /**
      * @return array
      */
@@ -82,15 +80,14 @@ class Ticket extends EntityModel
     }
 
     /**
-     * Used for ticket autocomplete
+     * Used for ticket autocomplete.
      *
      * @return string
      */
     public static function templateVariables()
     {
-
-        $arr[]['description'] ='$ticketNumber';
-        $arr[]['description'] ='$ticketStatus';
+        $arr[]['description'] = '$ticketNumber';
+        $arr[]['description'] = '$ticketStatus';
         $arr[]['description'] = '$client';
         $arr[]['description'] = '$contact';
         $arr[]['description'] = '$priority';
@@ -100,7 +97,6 @@ class Ticket extends EntityModel
         $arr[]['description'] = '$subject';
         $arr[]['description'] = '$description';
         $arr[]['description'] = '$signature';
-
 
         return json_encode($arr);
     }
@@ -234,7 +230,6 @@ class Ticket extends EntityModel
     }
 
     /**
-     *
      * @return string
      */
     public function getContactName()
@@ -242,19 +237,17 @@ class Ticket extends EntityModel
         $contact = Contact::withTrashed()->where('contact_key', '=', $this->contact_key)->first();
         if ($contact && ! $contact->is_deleted) {
             return $contact->getFullName();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
-     *
      * @return string
      */
     public function getPriorityName()
     {
-        switch($this->priority_id)
-        {
+        switch ($this->priority_id) {
             case TICKET_PRIORITY_LOW:
                 return trans('texts.low');
             case TICKET_PRIORITY_MEDIUM:
@@ -269,8 +262,7 @@ class Ticket extends EntityModel
      */
     public function getStatus()
     {
-        switch($this->status_id)
-        {
+        switch ($this->status_id) {
             case TICKET_STATUS_NEW:
                 return trans('texts.new');
             case TICKET_STATUS_OPEN:
@@ -282,18 +274,16 @@ class Ticket extends EntityModel
         }
     }
 
-
     /**
-     *
      * @return string
      */
     public function getDueDate()
     {
-        if (! $this->due_date || $this->due_date == '0000-00-00 00:00:00')
+        if (! $this->due_date || $this->due_date == '0000-00-00 00:00:00') {
             return trans('texts.no_due_date');
-        else
-            return Utils::fromSqlDateTime($this->due_date);
+        }
 
+        return Utils::fromSqlDateTime($this->due_date);
     }
 
     /**
@@ -321,12 +311,12 @@ class Ticket extends EntityModel
      */
     public function agentName()
     {
-        if($this->agent && $this->agent->getName())
+        if ($this->agent && $this->agent->getName()) {
             return $this->agent->getName();
-        else
-            return trans('texts.unassigned');
-    }
+        }
 
+        return trans('texts.unassigned');
+    }
 
     /**
      * @return mixed
@@ -338,6 +328,7 @@ class Ticket extends EntityModel
 
     /**
      * @param bool $entityType
+     *
      * @return array
      */
     public static function getStatuses($entityType = false)
@@ -348,17 +339,16 @@ class Ticket extends EntityModel
             TICKET_STATUS_CLOSED => trans('texts.closed'),
             TICKET_STATUS_MERGED => trans('texts.merged'),
         ];
-
     }
 
     /**
      * @param $statusId
+     *
      * @return array|\Illuminate\Contracts\Translation\Translator|null|string
      */
     public static function getStatusNameById($statusId)
     {
-        switch($statusId)
-        {
+        switch ($statusId) {
             case TICKET_STATUS_NEW:
                 return trans('texts.new');
             case TICKET_STATUS_OPEN:
@@ -381,21 +371,21 @@ class Ticket extends EntityModel
     /**
      * @return string
      */
-
     public function getCCs()
     {
         $ccEmailArray = [];
         $ccs = json_decode($this->ccs, true);
 
-        if(!is_array($ccs))
+        if (! is_array($ccs)) {
             return null;
+        }
 
-        foreach($ccs as $contact_key) {
+        foreach ($ccs as $contact_key) {
             $c = Contact::where('contact_key', '=', $contact_key)->first();
             array_push($ccEmailArray, strtolower($c->email));
         }
 
-        return implode(", ", $ccEmailArray);
+        return implode(', ', $ccEmailArray);
     }
 
     /**
@@ -416,24 +406,25 @@ class Ticket extends EntityModel
 
     /**
      * @param $accountId
+     *
      * @return int|mixed
      */
     public static function getNextTicketNumber($accountId)
     {
-
         $ticket = Ticket::whereAccountId($accountId)->withTrashed()->orderBy('id', 'DESC')->first();
 
         $account = Account::where('id', '=', $accountId)->first();
 
-        if ($ticket)
+        if ($ticket) {
             return str_pad($ticket->account->account_ticket_settings->ticket_number_start, $ticket->account->invoice_number_padding, '0', STR_PAD_LEFT);
-        else
-            return str_pad(1, $account->invoice_number_padding, '0', STR_PAD_LEFT);
+        }
 
+        return str_pad(1, $account->invoice_number_padding, '0', STR_PAD_LEFT);
     }
 
     /**
      * @param $templateId
+     *
      * @return mixed
      */
     public function getTicketTemplate($templateId)
@@ -446,15 +437,17 @@ class Ticket extends EntityModel
      */
     public function getTicketEmailFormat()
     {
-        if(!Utils::isNinjaProd())
+        if (! Utils::isNinjaProd()) {
             $domain = config('ninja.tickets.ticket_support_domain');
-        else
+        } else {
             $domain = Domain::getSupportDomainFromId($this->account->domain_id);
+        }
 
-        if($this->is_internal == true)
+        if ($this->is_internal == true) {
             return $this->account->account_ticket_settings->support_email_local_part.'+'.$this->ticket_number.'@'.$domain;
-        else
-            return $this->ticket_number.'+'.$this->getContactTicketHash().'@'.$domain;
+        }
+
+        return $this->ticket_number.'+'.$this->getContactTicketHash().'@'.$domain;
     }
 
     /**
@@ -463,6 +456,7 @@ class Ticket extends EntityModel
     public function getContactTicketHash()
     {
         $ticketInvitation = TicketInvitation::whereTicketId($this->id)->whereContactId($this->contact->id)->first();
+
         return $ticketInvitation->ticket_hash;
     }
 
@@ -473,14 +467,14 @@ class Ticket extends EntityModel
     {
         $getInternal = false;
 
-        if($this->is_internal == true)
+        if ($this->is_internal == true) {
             $getInternal = true;
-
+        }
 
         return Ticket::scope()
             ->where('client_id', '=', $this->client_id)
             ->where('public_id', '!=', $this->public_id)
-            ->where('merged_parent_ticket_id', '=', NULL)
+            ->where('merged_parent_ticket_id', '=', null)
             ->where('status_id', '!=', 3)
             ->where('is_internal', '=', $getInternal)
             ->get();
@@ -491,14 +485,15 @@ class Ticket extends EntityModel
      */
     public function isMergeAble()
     {
-        if($this->status_id == 3)
+        if ($this->status_id == 3) {
             return false;
-        elseif($this->is_deleted)
+        } elseif ($this->is_deleted) {
             return false;
-        elseif($this->merged_parent_ticket_id != null)
+        } elseif ($this->merged_parent_ticket_id != null) {
             return false;
-        else
-            return true;
+        }
+
+        return true;
     }
 
     /**
@@ -511,28 +506,23 @@ class Ticket extends EntityModel
 
     public static function buildTicketBody(Ticket $ticket, string $response) : string
     {
-
         $ticketVariables = TicketTemplateService::getVariables($ticket);
 
         return str_replace(array_keys($ticketVariables), array_values($ticketVariables), $response);
-
     }
-
 }
 
-
-
 Ticket::creating(
-/**
- * @param $ticket
- */
+    /**
+     * @param $ticket
+     */
     function ($ticket) {
     });
 
 Ticket::created(
-/**
- * @param $ticket
- */
+    /**
+     * @param $ticket
+     */
     function ($ticket) {
         $account_ticket_settings = $ticket->account->account_ticket_settings;
         $account_ticket_settings->increment('ticket_number_start', 1);
@@ -540,22 +530,22 @@ Ticket::created(
     });
 
 Ticket::updating(
-/**
- * @param $ticket
- */
+    /**
+     * @param $ticket
+     */
     function ($ticket) {
     });
 
 Ticket::updated(
-/**
- * @param $ticket
- */
+    /**
+     * @param $ticket
+     */
     function ($ticket) {
     });
 
 Expense::deleting(
-/**
- * @param $ticket
- */
+    /**
+     * @param $ticket
+     */
     function ($ticket) {
     });

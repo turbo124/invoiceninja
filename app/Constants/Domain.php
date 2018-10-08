@@ -2,8 +2,6 @@
 
 namespace App\Constants;
 
-use App\Libraries\Utils;
-
 class Domain
 {
     const INVOICENINJA_COM = 1;
@@ -23,18 +21,17 @@ class Domain
 
     public static function getLinkFromId($id)
     {
-        return 'https://app.' . static::getDomainFromId($id);
+        return 'https://app.'.static::getDomainFromId($id);
     }
 
     public static function getEmailFromId($id)
     {
-        return 'maildelivery@' . static::getDomainFromId($id);
+        return 'maildelivery@'.static::getDomainFromId($id);
     }
 
     public static function getPostmarkTokenFromId($id)
     {
-        switch($id)
-        {
+        switch ($id) {
             case static::INVOICENINJA_COM:
                 return config('services.postmark_token');
             case static::INVOICE_SERVICES:
@@ -44,8 +41,7 @@ class Domain
 
     public static function getSupportDomainFromId($id)
     {
-        switch($id)
-        {
+        switch ($id) {
             case static::INVOICENINJA_COM:
                 return config('ninja.tickets.ticket_support_domain');
             case static::INVOICE_SERVICES:

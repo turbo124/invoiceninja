@@ -2,7 +2,6 @@
 
 namespace App\Ninja\Presenters;
 
-use Str;
 use stdClass;
 
 class InvoiceItemPresenter extends EntityPresenter
@@ -22,13 +21,13 @@ class InvoiceItemPresenter extends EntityPresenter
     {
         $item = $this->entity;
 
-        return $item->tax_name1 . ' ' . $item->tax_rate1 . '%';
+        return $item->tax_name1.' '.$item->tax_rate1.'%';
     }
 
     public function tax2()
     {
         $item = $this->entity;
 
-        return $item->tax_name2 . ' ' . $item->tax_rate2 . '%';
+        return $item->tax_name2.' '.$item->tax_rate2.'%';
     }
 }

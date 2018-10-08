@@ -2,12 +2,10 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\RecurringExpense;
-use App\Models\Expense;
-use App\Models\Vendor;
-use Auth;
 use DB;
 use Utils;
+use App\Models\Expense;
+use App\Models\RecurringExpense;
 
 class RecurringExpenseRepository extends BaseRepository
 {
@@ -85,7 +83,6 @@ class RecurringExpenseRepository extends BaseRepository
                       ->orWhere('clients.name', 'like', '%'.$filter.'%')
                       ->orWhere('vendors.name', 'like', '%'.$filter.'%')
                       ->orWhere('expense_categories.name', 'like', '%'.$filter.'%');
-                ;
             });
         }
 

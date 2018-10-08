@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateBankAccountRequest;
-use App\Models\Account;
-use App\Models\BankAccount;
-use App\Ninja\Repositories\BankAccountRepository;
-use App\Services\BankAccountService;
 use Auth;
+use File;
+use View;
 use Cache;
 use Crypt;
-use File;
-use Illuminate\Http\Request;
 use Input;
-use Redirect;
-use Session;
 use Utils;
-use View;
+use Session;
+use Redirect;
+use App\Models\Account;
+use App\Models\BankAccount;
+use Illuminate\Http\Request;
+use App\Services\BankAccountService;
+use App\Http\Requests\CreateBankAccountRequest;
+use App\Ninja\Repositories\BankAccountRepository;
 
 class BankAccountController extends BaseController
 {
@@ -33,7 +33,7 @@ class BankAccountController extends BaseController
 
     public function index()
     {
-        return Redirect::to('settings/' . ACCOUNT_BANKS);
+        return Redirect::to('settings/'.ACCOUNT_BANKS);
     }
 
     public function getDatatable()
@@ -80,7 +80,7 @@ class BankAccountController extends BaseController
 
         Session::flash('message', trans('texts.archived_bank_account'));
 
-        return Redirect::to('settings/' . ACCOUNT_BANKS);
+        return Redirect::to('settings/'.ACCOUNT_BANKS);
     }
 
     public function validateAccount()

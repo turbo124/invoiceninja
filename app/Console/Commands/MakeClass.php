@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Str;
-use Nwidart\Modules\Commands\GeneratorCommand;
+use Illuminate\Console\Command;
 use Nwidart\Modules\Support\Stub;
-
+use Nwidart\Modules\Commands\GeneratorCommand;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 class MakeClass extends GeneratorCommand
 {
@@ -57,10 +56,10 @@ class MakeClass extends GeneratorCommand
     public function getTemplateContents()
     {
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
-        $path = str_replace('/', '\\', config('modules.paths.generator.' . $this->argument('class')));
+        $path = str_replace('/', '\\', config('modules.paths.generator.'.$this->argument('class')));
 
-        return (new Stub('/' . $this->argument('prefix') . $this->argument('class') . '.stub', [
-            'NAMESPACE' => $this->getClassNamespace($module) . '\\' . $path,
+        return (new Stub('/'.$this->argument('prefix').$this->argument('class').'.stub', [
+            'NAMESPACE' => $this->getClassNamespace($module).'\\'.$path,
             'LOWER_NAME' => $module->getLowerName(),
             'CLASS' => $this->getClass(),
             'STUDLY_NAME' => Str::studly($module->getLowerName()),
@@ -74,9 +73,9 @@ class MakeClass extends GeneratorCommand
     public function getDestinationFilePath()
     {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
-        $seederPath = $this->laravel['modules']->config('paths.generator.'  . $this->argument('class'));
+        $seederPath = $this->laravel['modules']->config('paths.generator.'.$this->argument('class'));
 
-        return $path . $seederPath . '/' . $this->getFileName() . '.php';
+        return $path.$seederPath.'/'.$this->getFileName().'.php';
     }
 
     /**
@@ -88,7 +87,7 @@ class MakeClass extends GeneratorCommand
             return $this->option('filename');
         }
 
-        return studly_case($this->argument('prefix')) . studly_case($this->argument('name')) . Str::studly($this->argument('class'));
+        return studly_case($this->argument('prefix')).studly_case($this->argument('name')).Str::studly($this->argument('class'));
     }
 
     protected function getColumns()
@@ -103,9 +102,9 @@ class MakeClass extends GeneratorCommand
             }
             $field = explode(':', $field)[0];
             $str .= '[
-                \''. $field . '\',
+                \''.$field.'\',
                 function ($model) {
-                    return $model->' . $field . ';
+                    return $model->'.$field.';
                 }
             ],';
         }
@@ -128,9 +127,9 @@ class MakeClass extends GeneratorCommand
             $type = $parts[1];
 
             if ($type == 'text') {
-                $str .= "{!! Former::textarea('" . $field . "') !!}\n";
+                $str .= "{!! Former::textarea('".$field."') !!}\n";
             } else {
-                $str .= "{!! Former::text('" . $field . "') !!}\n";
+                $str .= "{!! Former::text('".$field."') !!}\n";
             }
         }
 
@@ -148,7 +147,7 @@ class MakeClass extends GeneratorCommand
                 continue;
             }
             $field = explode(':', $field)[0];
-            $str .= "'" . $module->getLowerName() . ".{$field}', ";
+            $str .= "'".$module->getLowerName().".{$field}', ";
         }
 
         return $str;
@@ -165,7 +164,7 @@ class MakeClass extends GeneratorCommand
                 continue;
             }
             $field = explode(':', $field)[0];
-            $str .= "'{$field}' => $" . $module->getLowerName() . "->$field,\n            ";
+            $str .= "'{$field}' => $".$module->getLowerName()."->$field,\n            ";
         }
 
         return rtrim($str);

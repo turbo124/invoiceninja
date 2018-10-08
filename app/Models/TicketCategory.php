@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Eloquent;
 
-
 class TicketCategory extends Eloquent
 {
     /**

@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Task;
-use Utils;
 use Auth;
+use Utils;
+use App\Models\Task;
 
 class TaskReport extends AbstractReport
 {

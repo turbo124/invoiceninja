@@ -4,9 +4,9 @@ namespace App\Jobs;
 
 use App\Models\Payment;
 use App\Ninja\Mailers\UserMailer;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Traits\SerialisesDeletedModels;
 
 /**
@@ -50,7 +50,7 @@ class SendNotificationEmail extends Job implements ShouldQueue
 
     /**
      * Create a new job instance.
-
+     *
      * @param UserMailer    $userMailer
      * @param ContactMailer $contactMailer
      * @param PushService   $pushService

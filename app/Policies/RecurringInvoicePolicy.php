@@ -5,13 +5,13 @@ namespace App\Policies;
 use App\Models\User;
 
 /**
- * Class RecurringInvoicePolicy
- * @package App\Policies
+ * Class RecurringInvoicePolicy.
  */
 class RecurringInvoicePolicy extends EntityPolicy
 {
     /**
      * @param User $user
+     *
      * @return bool
      */
     public function create(User $user)

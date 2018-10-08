@@ -2,36 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\InvoiceInvitationWasViewed;
-use App\Events\QuoteInvitationWasViewed;
-use App\Models\Account;
-use App\Models\Contact;
-use App\Models\Document;
-use App\Models\Gateway;
-use App\Models\Invitation;
-use App\Models\PaymentMethod;
-use App\Ninja\Repositories\ActivityRepository;
-use App\Ninja\Repositories\CreditRepository;
-use App\Ninja\Repositories\DocumentRepository;
-use App\Ninja\Repositories\InvoiceRepository;
-use App\Ninja\Repositories\PaymentRepository;
-use App\Ninja\Repositories\TaskRepository;
-use App\Services\PaymentService;
-use App\Jobs\Client\GenerateStatementData;
+use URL;
 use Auth;
-use Barracuda\ArchiveStream\ZipArchive;
+use View;
 use Cache;
+use Input;
+use Utils;
+use Request;
+use Session;
+use Redirect;
+use Response;
 use Datatable;
 use Exception;
-use Input;
-use Redirect;
-use Request;
-use Response;
-use Session;
-use URL;
-use Utils;
 use Validator;
-use View;
+use App\Models\Account;
+use App\Models\Contact;
+use App\Models\Gateway;
+use App\Models\Document;
+use App\Models\Invitation;
+use App\Models\PaymentMethod;
+use App\Services\PaymentService;
+use Barracuda\ArchiveStream\ZipArchive;
+use App\Events\QuoteInvitationWasViewed;
+use App\Events\InvoiceInvitationWasViewed;
+use App\Jobs\Client\GenerateStatementData;
+use App\Ninja\Repositories\TaskRepository;
+use App\Ninja\Repositories\CreditRepository;
+use App\Ninja\Repositories\InvoiceRepository;
+use App\Ninja\Repositories\PaymentRepository;
+use App\Ninja\Repositories\ActivityRepository;
+use App\Ninja\Repositories\DocumentRepository;
 
 class ClientPortalController extends BaseController
 {
@@ -68,8 +68,9 @@ class ClientPortalController extends BaseController
         $account = $invoice->account;
 
         if (request()->silent) {
-            session(['silent:' . $client->id => true]);
-            return redirect(request()->url() . (request()->borderless ? '?borderless=true' : ''));
+            session(['silent:'.$client->id => true]);
+
+            return redirect(request()->url().(request()->borderless ? '?borderless=true' : ''));
         }
 
         if (! $account->checkSubdomain(Request::server('HTTP_HOST'))) {
@@ -78,7 +79,7 @@ class ClientPortalController extends BaseController
             ]);
         }
 
-        if (! Input::has('phantomjs') && ! session('silent:' . $client->id) && ! Session::has($invitation->invitation_key)
+        if (! Input::has('phantomjs') && ! session('silent:'.$client->id) && ! Session::has($invitation->invitation_key)
             && (! Auth::check() || Auth::user()->account_id != $invoice->account_id)) {
             if ($invoice->isType(INVOICE_TYPE_QUOTE)) {
                 event(new QuoteInvitationWasViewed($invoice, $invitation));
@@ -212,10 +213,10 @@ class ClientPortalController extends BaseController
         $pdfString = $invoice->getPDFString($invitation, $decode);
 
         header('Content-Type: application/pdf');
-        header('Content-Length: ' . strlen($pdfString));
-        header('Content-disposition: attachment; filename="' . $invoice->getFileName() . '"');
+        header('Content-Length: '.strlen($pdfString));
+        header('Content-disposition: attachment; filename="'.$invoice->getFileName().'"');
         header('Cache-Control: public, must-revalidate, max-age=0');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
         return $pdfString;
     }
@@ -232,7 +233,7 @@ class ClientPortalController extends BaseController
             $invitation->save();
         }
 
-        session(['authorized:' . $invitation->invitation_key => true]);
+        session(['authorized:'.$invitation->invitation_key => true]);
 
         return RESULT_SUCCESS;
     }
@@ -252,7 +253,8 @@ class ClientPortalController extends BaseController
         $account = $client->account;
 
         if (request()->silent) {
-            session(['silent:' . $client->id => true]);
+            session(['silent:'.$client->id => true]);
+
             return redirect(request()->url());
         }
 
@@ -263,6 +265,7 @@ class ClientPortalController extends BaseController
             return $this->returnError();
         } elseif (! $account->enable_client_portal_dashboard) {
             session()->reflash();
+
             return redirect()->to('/client/invoices/');
         }
 
@@ -301,10 +304,10 @@ class ClientPortalController extends BaseController
             ->addColumn('activity_type_id', function ($model) {
                 $data = [
                     'client' => Utils::getClientDisplayName($model),
-                    'user' => $model->is_system ? ('<i>' . trans('texts.system') . '</i>') : ($model->account_name),
+                    'user' => $model->is_system ? ('<i>'.trans('texts.system').'</i>') : ($model->account_name),
                     'invoice' => $model->invoice,
                     'contact' => Utils::getClientDisplayName($model),
-                    'payment' => $model->payment ? ' ' . $model->payment : '',
+                    'payment' => $model->payment ? ' '.$model->payment : '',
                     'credit' => $model->payment_amount ? Utils::formatMoney($model->credit, $model->currency_id, $model->country_id) : '',
                     'payment_amount' => $model->payment_amount ? Utils::formatMoney($model->payment_amount, $model->currency_id, $model->country_id) : null,
                     'adjustment' => $model->adjustment ? Utils::formatMoney($model->adjustment, $model->currency_id, $model->country_id) : null,
@@ -478,7 +481,7 @@ class ClientPortalController extends BaseController
 
     private function getPaymentStatusLabel($model)
     {
-        $label = trans('texts.status_' . strtolower($model->payment_status_name));
+        $label = trans('texts.status_'.strtolower($model->payment_status_name));
         $class = 'default';
         switch ($model->payment_status_id) {
             case PAYMENT_STATUS_PENDING:
@@ -938,12 +941,12 @@ class ClientPortalController extends BaseController
     {
         $message = '';
         if ($accountGateway && $accountGateway->gateway) {
-            $message = $accountGateway->gateway->name . ': ';
+            $message = $accountGateway->gateway->name.': ';
         }
         $message .= $error ?: trans('texts.payment_method_error');
 
         Session::flash('error', $message);
-        Utils::logError("Payment Method Error [{$type}]: " . ($exception ? Utils::getErrorString($exception) : $message), 'PHP', true);
+        Utils::logError("Payment Method Error [{$type}]: ".($exception ? Utils::getErrorString($exception) : $message), 'PHP', true);
     }
 
     public function setAutoBill()
@@ -1033,7 +1036,8 @@ class ClientPortalController extends BaseController
             ->withMessage(trans('texts.updated_client_details'));
     }
 
-    public function statement() {
+    public function statement()
+    {
         if (! $contact = $this->getContact()) {
             return $this->returnError();
         }
@@ -1067,8 +1071,5 @@ class ClientPortalController extends BaseController
         ];
 
         return view('clients.statement', $data);
-
     }
-
-
 }
