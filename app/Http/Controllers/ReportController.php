@@ -112,11 +112,11 @@ class ReportController extends BaseController
                 'start_date' => $params['startDate'],
                 'end_date' => $params['endDate'],
             ];
-            $report = dispatch(new RunReport(auth()->user(), $reportType, $config, $isExport));
+            $report = dispatch_now(new RunReport(auth()->user(), $reportType, $config, $isExport));
             $params = array_merge($params, $report->exportParams);
             switch ($action) {
                 case 'export':
-                    return dispatch(new ExportReportResults(auth()->user(), $format, $reportType, $params))->export($format);
+                    return dispatch_now(new ExportReportResults(auth()->user(), $format, $reportType, $params))->export($format);
                     break;
                 case 'schedule':
                     self::schedule($params, $config);
