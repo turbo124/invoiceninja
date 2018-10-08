@@ -24,8 +24,6 @@ class MakeModule extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -57,78 +55,78 @@ class MakeModule extends Command
         $progressBar->setFormat('custom');
 
         $this->info("Creating module: {$name}...");
-        $progressBar->setMessage("Starting module creation...");
+        $progressBar->setMessage('Starting module creation...');
         Artisan::call('module:make', ['name' => [$name]]);
         $progressBar->advance();
 
         if (! $plain) {
-            $progressBar->setMessage("Creating migrations...");
+            $progressBar->setMessage('Creating migrations...');
             Artisan::call('module:make-migration', ['name' => "create_{$lower}_table", '--fields' => $fields, 'module' => $name]);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating models...");
+            $progressBar->setMessage('Creating models...');
             Artisan::call('module:make-model', ['model' => $name, 'module' => $name, '--fillable' => $fillable]);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating views...");
+            $progressBar->setMessage('Creating views...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'views', '--fields' => $fields, '--filename' => 'edit.blade']);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating datatables...");
+            $progressBar->setMessage('Creating datatables...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'datatable', '--fields' => $fields]);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating repositories...");
+            $progressBar->setMessage('Creating repositories...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'repository', '--fields' => $fields]);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating presenters...");
+            $progressBar->setMessage('Creating presenters...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'presenter']);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating requests...");
+            $progressBar->setMessage('Creating requests...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'request']);
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'request', 'prefix' => 'create']);
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'request', 'prefix' => 'update']);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating api-controllers...");
+            $progressBar->setMessage('Creating api-controllers...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'api-controller']);
             $progressBar->advance();
 
-            $progressBar->setMessage("Creating transformers...");
+            $progressBar->setMessage('Creating transformers...');
             Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'transformer', '--fields' => $fields]);
             $progressBar->advance();
 
             // if the migrate flag was specified, run the migrations
             if ($migrate) {
-                $progressBar->setMessage("Running migrations...");
+                $progressBar->setMessage('Running migrations...');
                 Artisan::call('module:migrate', ['module' => $name]);
                 $progressBar->advance();
             }
         }
 
-        $progressBar->setMessage("Creating policies...");
+        $progressBar->setMessage('Creating policies...');
         Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'policy']);
         $progressBar->advance();
 
-        $progressBar->setMessage("Creating auth-providers...");
+        $progressBar->setMessage('Creating auth-providers...');
         Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'auth-provider']);
         $progressBar->advance();
 
-        $progressBar->setMessage("Creating translations...");
+        $progressBar->setMessage('Creating translations...');
         Artisan::call('ninja:make-class', ['name' => $name, 'module' => $name, 'class' => 'lang', '--filename' => 'texts']);
         $progressBar->advance();
 
-        $progressBar->setMessage("Dumping module auto-load...");
+        $progressBar->setMessage('Dumping module auto-load...');
         Artisan::call('module:dump');
         $progressBar->finish();
         $progressBar->clear();
 
         $this->info('Done');
 
-        if (!$migrate && !$plain) {
-            $this->info("==> Migrations were not run because the --migrate flag was not specified.");
+        if (! $migrate && ! $plain) {
+            $this->info('==> Migrations were not run because the --migrate flag was not specified.');
             $this->info("==> Use the following command to run the migrations:\nphp artisan module:migrate $name");
         }
     }

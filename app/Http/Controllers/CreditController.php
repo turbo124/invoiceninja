@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateCreditRequest;
-use App\Http\Requests\CreditRequest;
-use App\Http\Requests\UpdateCreditRequest;
+use URL;
+use View;
+use Input;
+use Utils;
+use Session;
+use Redirect;
 use App\Models\Client;
 use App\Models\Credit;
-use App\Ninja\Datatables\CreditDatatable;
-use App\Ninja\Repositories\CreditRepository;
 use App\Services\CreditService;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Utils;
-use View;
+use App\Http\Requests\CreditRequest;
+use App\Ninja\Datatables\CreditDatatable;
+use App\Http\Requests\CreateCreditRequest;
+use App\Http\Requests\UpdateCreditRequest;
+use App\Ninja\Repositories\CreditRepository;
 
 class CreditController extends BaseController
 {

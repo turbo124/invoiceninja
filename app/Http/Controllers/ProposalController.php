@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateProposalRequest;
-use App\Http\Requests\ProposalRequest;
-use App\Http\Requests\UpdateProposalRequest;
-use App\Jobs\SendInvoiceEmail;
-use App\Jobs\ConvertProposalToPdf;
-use App\Models\Invoice;
-use App\Models\Proposal;
-use App\Models\ProposalTemplate;
-use App\Ninja\Mailers\ContactMailer;
-use App\Ninja\Datatables\ProposalDatatable;
-use App\Ninja\Repositories\ProposalRepository;
-use App\Services\ProposalService;
 use Auth;
+use View;
 use Input;
 use Session;
-use View;
+use App\Models\Invoice;
+use App\Models\Proposal;
+use App\Jobs\SendInvoiceEmail;
+use App\Models\ProposalTemplate;
+use App\Services\ProposalService;
+use App\Jobs\ConvertProposalToPdf;
+use App\Ninja\Mailers\ContactMailer;
+use App\Http\Requests\ProposalRequest;
+use App\Ninja\Datatables\ProposalDatatable;
+use App\Http\Requests\CreateProposalRequest;
+use App\Http\Requests\UpdateProposalRequest;
+use App\Ninja\Repositories\ProposalRepository;
 
 class ProposalController extends BaseController
 {
@@ -87,7 +87,7 @@ class ProposalController extends BaseController
             'proposal' => $proposal,
             'entity' => $proposal,
             'method' => 'PUT',
-            'url' => 'proposals/' . $proposal->public_id,
+            'url' => 'proposals/'.$proposal->public_id,
             'title' => trans('texts.edit_proposal'),
             'invoices' => Invoice::scope()->with('client.contacts', 'client.country')->withActiveOrSelected($proposal->invoice_id)->unapprovedQuotes($proposal->invoice_id)->orderBy('id')->get(),
             'invoicePublicId' => $proposal->invoice ? $proposal->invoice->public_id : null,

@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateProposalCategoryRequest;
-use App\Http\Requests\ProposalCategoryRequest;
-use App\Http\Requests\UpdateProposalCategoryRequest;
-use App\Models\Invoice;
-use App\Models\ProposalCategory;
-use App\Ninja\Datatables\ProposalCategoryDatatable;
-use App\Ninja\Repositories\ProposalCategoryRepository;
-use App\Services\ProposalCategoryService;
 use Auth;
+use View;
 use Input;
 use Session;
-use View;
+use App\Models\Invoice;
+use App\Models\ProposalCategory;
+use App\Services\ProposalCategoryService;
+use App\Http\Requests\ProposalCategoryRequest;
+use App\Ninja\Datatables\ProposalCategoryDatatable;
+use App\Http\Requests\CreateProposalCategoryRequest;
+use App\Http\Requests\UpdateProposalCategoryRequest;
+use App\Ninja\Repositories\ProposalCategoryRepository;
 
 class ProposalCategoryController extends BaseController
 {
@@ -80,7 +80,7 @@ class ProposalCategoryController extends BaseController
             'account' => auth()->user()->account,
             'category' => $proposalCategory,
             'method' => 'PUT',
-            'url' => 'proposals/categories/' . $proposalCategory->public_id,
+            'url' => 'proposals/categories/'.$proposalCategory->public_id,
             'title' => trans('texts.edit_proposal_category'),
         ];
 

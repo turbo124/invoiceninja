@@ -48,16 +48,16 @@ class TicketComment extends EntityModel
      */
     public function getCommentHeader()
     {
-        if(filter_var($this->contact_key, FILTER_VALIDATE_EMAIL))
-            return $this->ticket->contact_key. ' @ '. Utils::fromSqlDateTime($this->updated_at); // some kind of contact
-        elseif($this->contact_key)
-            return $this->ticket->getContactName(). ' @ ' . Utils::fromSqlDateTime($this->updated_at); //client replied
-        elseif($this->agent_id)
-            return $this->agent->getName(). ' @ ' . Utils::fromSqlDateTime($this->updated_at); //staff replied
-        else
-            return $this->user->getName(). ' @ ' . Utils::fromSqlDateTime($this->updated_at); //ticket master replied
+        if (filter_var($this->contact_key, FILTER_VALIDATE_EMAIL)) {
+            return $this->ticket->contact_key.' @ '.Utils::fromSqlDateTime($this->updated_at);
+        } // some kind of contact
+        elseif ($this->contact_key) {
+            return $this->ticket->getContactName().' @ '.Utils::fromSqlDateTime($this->updated_at);
+        } //client replied
+        elseif ($this->agent_id) {
+            return $this->agent->getName().' @ '.Utils::fromSqlDateTime($this->updated_at);
+        } //staff replied
 
-
+        return $this->user->getName().' @ '.Utils::fromSqlDateTime($this->updated_at); //ticket master replied
     }
-
 }

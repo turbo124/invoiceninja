@@ -2,11 +2,8 @@
 
 namespace App\Jobs;
 
-use App;
 use Str;
-use Utils;
 use Carbon;
-use App\Jobs\Job;
 
 class RunReport extends Job
 {
@@ -20,8 +17,6 @@ class RunReport extends Job
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -34,7 +29,7 @@ class RunReport extends Job
         $config['subgroup'] = ! empty($config['subgroup']) ? $config['subgroup'] : false; // don't yet support charts in export
 
         $isExport = $this->isExport;
-        $reportClass = '\\App\\Ninja\\Reports\\' . Str::studly($reportType) . 'Report';
+        $reportClass = '\\App\\Ninja\\Reports\\'.Str::studly($reportType).'Report';
 
         if (! empty($config['range'])) {
             switch ($config['range']) {

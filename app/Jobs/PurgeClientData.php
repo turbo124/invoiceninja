@@ -2,13 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
-use App\Models\Invoice;
-use App\Models\LookupAccount;
-use DB;
-use Exception;
-use App\Libraries\HistoryUtils;
 use Utils;
+use App\Libraries\HistoryUtils;
 
 class PurgeClientData extends Job
 {
@@ -19,8 +14,6 @@ class PurgeClientData extends Job
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -37,7 +30,7 @@ class PurgeClientData extends Job
         if (config('app.log') == 'single') {
             @file_put_contents(storage_path('logs/purged-clients.log'), $message, FILE_APPEND);
         } else {
-            Utils::logError('[purged client] ' . $message);
+            Utils::logError('[purged client] '.$message);
         }
 
         $invoices = $client->invoices()->withTrashed()->get();

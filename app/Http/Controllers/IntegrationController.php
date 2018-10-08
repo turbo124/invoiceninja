@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Subscription;
-use Auth;
 use Input;
-use Response;
 use Utils;
+use Response;
+use App\Models\Subscription;
 
 /**
  * Class IntegrationController.

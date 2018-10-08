@@ -2,18 +2,18 @@
 
 namespace App\Console\Commands;
 
+use Auth;
+use Utils;
+use DateTime;
+use Exception;
 use App\Models\Account;
 use App\Models\Invoice;
+use App\Jobs\SendInvoiceEmail;
+use Illuminate\Console\Command;
 use App\Models\RecurringExpense;
 use App\Ninja\Repositories\InvoiceRepository;
-use App\Ninja\Repositories\RecurringExpenseRepository;
-use App\Jobs\SendInvoiceEmail;
-use DateTime;
-use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Auth;
-use Exception;
-use Utils;
+use App\Ninja\Repositories\RecurringExpenseRepository;
 
 /**
  * Class SendRecurringInvoices.
@@ -50,7 +50,7 @@ class SendRecurringInvoices extends Command
 
     public function handle()
     {
-        $this->info(date('r') . ' Running SendRecurringInvoices...');
+        $this->info(date('r').' Running SendRecurringInvoices...');
 
         if ($database = $this->option('database')) {
             config(['database.default' => $database]);
@@ -60,7 +60,7 @@ class SendRecurringInvoices extends Command
         $this->createInvoices();
         $this->createExpenses();
 
-        $this->info(date('r') . ' Done');
+        $this->info(date('r').' Done');
     }
 
     private function resetCounters()
@@ -82,7 +82,7 @@ class SendRecurringInvoices extends Command
             ->whereRaw('is_deleted IS FALSE AND deleted_at IS NULL AND is_recurring IS TRUE AND is_public IS TRUE AND frequency_id > 0 AND start_date <= ? AND (end_date IS NULL OR end_date >= ?)', [$today, $today])
             ->orderBy('id', 'asc')
             ->get();
-        $this->info(date('r ') . $invoices->count() . ' recurring invoice(s) found');
+        $this->info(date('r ').$invoices->count().' recurring invoice(s) found');
 
         foreach ($invoices as $recurInvoice) {
             $shouldSendToday = $recurInvoice->shouldSendToday();
@@ -91,7 +91,7 @@ class SendRecurringInvoices extends Command
                 continue;
             }
 
-            $this->info(date('r') . ' Processing Invoice: '. $recurInvoice->id);
+            $this->info(date('r').' Processing Invoice: '.$recurInvoice->id);
 
             $account = $recurInvoice->account;
             $account->loadLocalizationSettings($recurInvoice->client);
@@ -100,13 +100,13 @@ class SendRecurringInvoices extends Command
             try {
                 $invoice = $this->invoiceRepo->createRecurringInvoice($recurInvoice);
                 if ($invoice && ! $invoice->isPaid() && $account->auto_email_invoice) {
-                    $this->info(date('r') . ' Not billed - Sending Invoice');
+                    $this->info(date('r').' Not billed - Sending Invoice');
                     dispatch(new SendInvoiceEmail($invoice, $invoice->user_id));
                 } elseif ($invoice) {
-                    $this->info(date('r') . ' Successfully billed invoice');
+                    $this->info(date('r').' Successfully billed invoice');
                 }
             } catch (Exception $exception) {
-                $this->info(date('r') . ' Error: ' . $exception->getMessage());
+                $this->info(date('r').' Error: '.$exception->getMessage());
                 Utils::logError($exception);
             }
 
@@ -122,7 +122,7 @@ class SendRecurringInvoices extends Command
                         ->whereRaw('is_deleted IS FALSE AND deleted_at IS NULL AND start_date <= ? AND (end_date IS NULL OR end_date >= ?)', [$today, $today])
                         ->orderBy('id', 'asc')
                         ->get();
-        $this->info(date('r ') . $expenses->count() . ' recurring expenses(s) found');
+        $this->info(date('r ').$expenses->count().' recurring expenses(s) found');
 
         foreach ($expenses as $expense) {
             $shouldSendToday = $expense->shouldSendToday();
@@ -131,7 +131,7 @@ class SendRecurringInvoices extends Command
                 continue;
             }
 
-            $this->info(date('r') . ' Processing Expense: '. $expense->id);
+            $this->info(date('r').' Processing Expense: '.$expense->id);
             $this->recurringExpenseRepo->createRecurringExpense($expense);
         }
     }

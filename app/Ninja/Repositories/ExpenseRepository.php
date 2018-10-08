@@ -2,13 +2,13 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Document;
-use App\Models\Expense;
-use App\Models\Vendor;
-use App\Models\Client;
-use Auth;
 use DB;
+use Auth;
 use Utils;
+use App\Models\Client;
+use App\Models\Vendor;
+use App\Models\Expense;
+use App\Models\Document;
 
 class ExpenseRepository extends BaseRepository
 {
@@ -77,7 +77,7 @@ class ExpenseRepository extends BaseRepository
                         'expenses.deleted_at',
                         'expenses.exchange_rate',
                         'expenses.expense_date as expense_date_sql',
-                        DB::raw("CONCAT(expenses.expense_date, expenses.created_at) as expense_date"),
+                        DB::raw('CONCAT(expenses.expense_date, expenses.created_at) as expense_date'),
                         'expenses.id',
                         'expenses.is_deleted',
                         'expenses.private_notes',
@@ -113,7 +113,7 @@ class ExpenseRepository extends BaseRepository
 
         $this->applyFilters($query, ENTITY_EXPENSE);
 
-        if ($statuses = session('entity_status_filter:' . ENTITY_EXPENSE)) {
+        if ($statuses = session('entity_status_filter:'.ENTITY_EXPENSE)) {
             $statuses = explode(',', $statuses);
             $query->where(function ($query) use ($statuses) {
                 $query->whereNull('expenses.id');
@@ -151,7 +151,6 @@ class ExpenseRepository extends BaseRepository
                       ->orWhere('clients.name', 'like', '%'.$filter.'%')
                       ->orWhere('vendors.name', 'like', '%'.$filter.'%')
                       ->orWhere('expense_categories.name', 'like', '%'.$filter.'%');
-                ;
             });
         }
 

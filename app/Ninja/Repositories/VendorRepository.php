@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Vendor;
 use DB;
 use Utils;
+use App\Models\Vendor;
 
 // vendor
 class VendorRepository extends BaseRepository
@@ -99,9 +99,9 @@ class VendorRepository extends BaseRepository
         usort($vendorcontacts, function ($left, $right) {
             if (isset($right['is_primary']) && isset($left['is_primary'])) {
                 return $right['is_primary'] - $left['is_primary'];
-            } else {
-                return 0;
             }
+
+            return 0;
         });
 
         foreach ($vendorcontacts as $vendorcontact) {

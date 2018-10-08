@@ -12,7 +12,7 @@ class ExpenseCategoryPolicy extends EntityPolicy
      *
      * @return bool
      */
-    public  function create(User $user)
+    public function create(User $user)
     {
         return $user->is_admin;
     }
@@ -23,7 +23,7 @@ class ExpenseCategoryPolicy extends EntityPolicy
      *
      * @return bool
      */
-    public  function edit(User $user, $item)
+    public function edit(User $user, $item)
     {
         return $user->is_admin;
     }
@@ -34,7 +34,7 @@ class ExpenseCategoryPolicy extends EntityPolicy
      *
      * @return bool
      */
-    public  function view(User $user, $item, $entityType = null)
+    public function view(User $user, $item, $entityType = null)
     {
         return true;
     }
@@ -45,7 +45,7 @@ class ExpenseCategoryPolicy extends EntityPolicy
      *
      * @return bool
      */
-    public  function viewByOwner(User $user, $ownerUserId)
+    public function viewByOwner(User $user, $ownerUserId)
     {
         return true;
     }
@@ -56,7 +56,7 @@ class ExpenseCategoryPolicy extends EntityPolicy
      *
      * @return bool
      */
-    public  function editByOwner(User $user, $ownerUserId)
+    public function editByOwner(User $user, $ownerUserId)
     {
         return $user->is_admin;
     }

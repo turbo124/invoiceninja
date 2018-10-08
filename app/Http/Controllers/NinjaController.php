@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Affiliate;
-use App\Models\Country;
-use App\Models\License;
-use App\Ninja\Mailers\ContactMailer;
-use App\Ninja\Repositories\AccountRepository;
-use App\Libraries\CurlUtils;
+use URL;
 use Auth;
+use View;
 use Cache;
-use CreditCard;
 use Input;
+use Utils;
 use Omnipay;
 use Session;
-use URL;
-use Utils;
 use Validator;
-use View;
+use CreditCard;
+use App\Models\Country;
+use App\Models\License;
+use App\Models\Affiliate;
+use App\Libraries\CurlUtils;
+use App\Ninja\Mailers\ContactMailer;
+use App\Ninja\Repositories\AccountRepository;
 
 class NinjaController extends BaseController
 {
@@ -225,7 +225,7 @@ class NinjaController extends BaseController
 
             if (Session::has('return_url')) {
                 $data['redirectTo'] = Session::get('return_url')."?license_key={$license->license_key}&product_id=".Session::get('product_id');
-                $data['message'] = 'Redirecting to ' . Session::get('return_url');
+                $data['message'] = 'Redirecting to '.Session::get('return_url');
             }
 
             return View::make('public.license', $data);
@@ -266,24 +266,24 @@ class NinjaController extends BaseController
             }
 
             if ($productId == PRODUCT_INVOICE_DESIGNS) {
-                return file_get_contents(storage_path() . '/invoice_designs.txt');
-            } else {
-                return $license->created_at->format('Y-m-d');
+                return file_get_contents(storage_path().'/invoice_designs.txt');
             }
-        } else {
-            return RESULT_FAILURE;
+
+            return $license->created_at->format('Y-m-d');
         }
+
+        return RESULT_FAILURE;
     }
 
     private function error($type, $error, $accountGateway = false, $exception = false)
     {
         $message = '';
         if ($accountGateway && $accountGateway->gateway) {
-            $message = $accountGateway->gateway->name . ': ';
+            $message = $accountGateway->gateway->name.': ';
         }
         $message .= $error ?: trans('texts.payment_error');
         Session::flash('error', $message);
-        Utils::logError("Payment Error [{$type}]: " . ($exception ? Utils::getErrorString($exception) : $message), 'PHP', true);
+        Utils::logError("Payment Error [{$type}]: ".($exception ? Utils::getErrorString($exception) : $message), 'PHP', true);
     }
 
     public function hideWhiteLabelMessage()
@@ -305,7 +305,7 @@ class NinjaController extends BaseController
 
         $user = Auth::user();
         $account = $user->account;
-        $url = NINJA_APP_URL . '/buy_now';
+        $url = NINJA_APP_URL.'/buy_now';
         $contactKey = $user->primaryAccount()->account_key;
 
         $data = [
@@ -328,8 +328,8 @@ class NinjaController extends BaseController
 
         if ($url = CurlUtils::post($url, $data)) {
             return redirect($url);
-        } else {
-            return redirect()->back()->withError(trans('texts.error_refresh_page'));
         }
+
+        return redirect()->back()->withError(trans('texts.error_refresh_page'));
     }
 }

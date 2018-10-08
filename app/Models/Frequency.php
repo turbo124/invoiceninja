@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Str;
 use Cache;
 use Eloquent;
-use Str;
 
 /**
  * Class Frequency.
@@ -29,7 +29,7 @@ class Frequency extends Eloquent
 
         foreach (Cache::get('frequencies') as $frequency) {
             $name = Str::snake(str_replace(' ', '_', $frequency->name));
-            $data[$frequency->id] = trans('texts.freq_' . $name);
+            $data[$frequency->id] = trans('texts.freq_'.$name);
         }
 
         return $data;

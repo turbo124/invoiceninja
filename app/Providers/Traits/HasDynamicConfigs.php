@@ -2,10 +2,10 @@
 
 namespace App\Providers\Traits;
 
-
 trait HasDynamicConfigs
 {
-    public function mergeDynamicConfig($path, $key) {
+    public function mergeDynamicConfig($path, $key)
+    {
         $key = "modules.{$key}";
         $config = $this->app['config']->get($key, []);
 

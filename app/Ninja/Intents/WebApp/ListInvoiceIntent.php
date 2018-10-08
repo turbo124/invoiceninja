@@ -12,7 +12,7 @@ class ListInvoiceIntent extends InvoiceIntent
         $this->loadStatuses(ENTITY_INVOICE);
 
         if ($client = $this->requestClient()) {
-            $url = $client->present()->url . '#invoices';
+            $url = $client->present()->url.'#invoices';
         } else {
             $url = '/invoices';
         }

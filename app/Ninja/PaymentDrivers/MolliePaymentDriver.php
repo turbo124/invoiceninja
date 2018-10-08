@@ -2,9 +2,8 @@
 
 namespace App\Ninja\PaymentDrivers;
 
-use Exception;
-use App\Models\Invitation;
 use App\Models\Payment;
+use App\Models\Invitation;
 
 class MolliePaymentDriver extends BasePaymentDriver
 {
@@ -13,7 +12,7 @@ class MolliePaymentDriver extends BasePaymentDriver
         $data = parent::paymentDetails($paymentMethod);
 
         // Enable webhooks
-        $data['notifyUrl'] = url('/payment_hook/'. $this->account()->account_key . '/' . GATEWAY_MOLLIE);
+        $data['notifyUrl'] = url('/payment_hook/'.$this->account()->account_key.'/'.GATEWAY_MOLLIE);
 
         return $data;
     }
@@ -28,7 +27,7 @@ class MolliePaymentDriver extends BasePaymentDriver
     {
         $ref = array_get($input, 'id');
         $data = [
-          'transactionReference' => $ref
+          'transactionReference' => $ref,
         ];
 
         $response = $this->gateway()->fetchTransaction($data)->send();
@@ -38,8 +37,8 @@ class MolliePaymentDriver extends BasePaymentDriver
                             ->whereTransactionReference($ref)
                             ->first();
             if ($invitation) {
-              $this->invitation = $invitation;
-              $this->createPayment($ref);
+                $this->invitation = $invitation;
+                $this->createPayment($ref);
             }
         } else {
             // check if payment has failed
@@ -49,10 +48,10 @@ class MolliePaymentDriver extends BasePaymentDriver
             if ($payment) {
                 $payment->markFailed($response->getStatus());
             }
+
             return false;
         }
 
         return RESULT_SUCCESS;
     }
-
 }

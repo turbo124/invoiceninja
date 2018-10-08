@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Presenters;
 
-use Laracasts\Presenter\Presenter;
 use URL;
 use Utils;
 use stdClass;
+use Laracasts\Presenter\Presenter;
 
 class EntityPresenter extends Presenter
 {
@@ -14,7 +14,7 @@ class EntityPresenter extends Presenter
      */
     public function url()
     {
-        return SITE_URL . $this->path();
+        return SITE_URL.$this->path();
     }
 
     public function path()
@@ -27,7 +27,7 @@ class EntityPresenter extends Presenter
 
     public function editUrl()
     {
-        return $this->url() . '/edit';
+        return $this->url().'/edit';
     }
 
     public function statusLabel($label = false)
@@ -84,7 +84,7 @@ class EntityPresenter extends Presenter
         $entity = $this->entity;
         $entityType = $entity->getEntityType();
 
-        return sprintf('%s: %s', trans('texts.' . $entityType), $entity->getDisplayName());
+        return sprintf('%s: %s', trans('texts.'.$entityType), $entity->getDisplayName());
     }
 
     public function calendarEvent($subColors = false)
@@ -92,11 +92,10 @@ class EntityPresenter extends Presenter
         $entity = $this->entity;
 
         $data = new stdClass();
-        $data->id = $entity->getEntityType() . ':' . $entity->public_id;
+        $data->id = $entity->getEntityType().':'.$entity->public_id;
         $data->allDay = true;
         $data->url = $this->url();
 
         return $data;
     }
-
 }

@@ -27,7 +27,7 @@ class TaskPresenter extends EntityPresenter
 
     public function description()
     {
-        return substr($this->entity->description, 0, 40) . (strlen($this->entity->description) > 40 ? '...' : '');
+        return substr($this->entity->description, 0, 40).(strlen($this->entity->description) > 40 ? '...' : '');
     }
 
     public function project()
@@ -50,7 +50,7 @@ class TaskPresenter extends EntityPresenter
         }
 
         if ($description = trim($this->entity->description)) {
-            $str .= $description . "\n\n";
+            $str .= $description."\n\n";
         }
 
         $parts = json_decode($this->entity->time_log) ?: [];
@@ -64,13 +64,13 @@ class TaskPresenter extends EntityPresenter
                 $end = $part[1];
             }
 
-            $start = $account->formatDateTime('@' . intval($start));
-            $end = $account->formatTime('@' . intval($end));
+            $start = $account->formatDateTime('@'.intval($start));
+            $end = $account->formatTime('@'.intval($end));
 
             $times[] = "### {$start} - {$end}";
         }
 
-        return $str . implode("\n", $times);
+        return $str.implode("\n", $times);
     }
 
     public function calendarEvent($subColors = false)
@@ -82,10 +82,10 @@ class TaskPresenter extends EntityPresenter
 
         $data->title = trans('texts.task');
         if ($project = $this->project()) {
-            $data->title .= ' | ' . $project;
+            $data->title .= ' | '.$project;
         }
         if ($description = $this->description()) {
-            $data->title .= ' | ' . $description;
+            $data->title .= ' | '.$description;
         }
         $data->allDay = false;
 
