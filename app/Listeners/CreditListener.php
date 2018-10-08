@@ -2,10 +2,10 @@
 
 namespace App\Listeners;
 
-use App\Events\PaymentWasDeleted;
-use App\Models\Credit;
-use App\Ninja\Repositories\CreditRepository;
 use Carbon;
+use App\Models\Credit;
+use App\Events\PaymentWasDeleted;
+use App\Ninja\Repositories\CreditRepository;
 
 /**
  * Class CreditListener.

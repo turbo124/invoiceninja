@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TicketTemplate extends EntityModel
 {
-
     use SoftDeletes;
 
     /**
@@ -25,7 +24,6 @@ class TicketTemplate extends EntityModel
     /**
      * @return mixed
      */
-
     public function getEntityType()
     {
         return ENTITY_TICKET_TEMPLATE;
@@ -34,7 +32,6 @@ class TicketTemplate extends EntityModel
     /**
      * @return mixed
      */
-
     public function account()
     {
         return $this->belongsTo('App\Models\Account');
@@ -43,7 +40,6 @@ class TicketTemplate extends EntityModel
     /**
      * @return mixed
      */
-
     public function user()
     {
         return $this->belongsTo('App\Models\User');

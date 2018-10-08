@@ -3,22 +3,21 @@
 namespace App\Models;
 
 use App;
-use App\Events\UserSettingsChanged;
-use App\Models\LookupAccount;
-use App\Models\Traits\GeneratesNumbers;
-use App\Models\Traits\PresentsInvoice;
-use App\Models\Traits\SendsEmails;
-use App\Models\Traits\HasLogo;
-use App\Models\Traits\HasCustomMessages;
 use Cache;
+use Event;
+use Utils;
 use Carbon;
+use Session;
 use DateTime;
 use Eloquent;
-use Event;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Traits\HasLogo;
+use App\Models\Traits\SendsEmails;
+use App\Events\UserSettingsChanged;
+use App\Models\Traits\PresentsInvoice;
+use App\Models\Traits\GeneratesNumbers;
+use App\Models\Traits\HasCustomMessages;
 use Laracasts\Presenter\PresentableTrait;
-use Session;
-use Utils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Account.
@@ -565,21 +564,23 @@ class Account extends Eloquent
         return ! empty($labels->$field) ? $labels->$field : '';
     }
 
-    public function customFieldsOption($option) {
+    public function customFieldsOption($option)
+    {
         $options = $this->custom_fields_options;
 
         return ! empty($options->$option) ? $options->$option : '';
     }
 
-    public function setCustomFieldsOptionsAttribute($data) {
+    public function setCustomFieldsOptionsAttribute($data)
+    {
         $options = [];
 
-        if(! is_array($data)) {
+        if (! is_array($data)) {
             $data = json_decode($data);
         }
 
         foreach ($data as $key => $value) {
-            if($value) {
+            if ($value) {
                 $options[$key] = $value;
             }
         }
@@ -587,7 +588,8 @@ class Account extends Eloquent
         $this->attributes['custom_fields_options'] = count($options) ? json_encode($options) : null;
     }
 
-    public function getCustomFieldsOptionsAttribute($value) {
+    public function getCustomFieldsOptionsAttribute($value)
+    {
         return json_decode($value ?: '{}');
     }
 
@@ -604,9 +606,9 @@ class Account extends Eloquent
 
         if ($gatewayId) {
             return $this->getGatewayConfig($gatewayId) != false;
-        } else {
-            return $this->account_gateways->count() > 0;
         }
+
+        return $this->account_gateways->count() > 0;
     }
 
     /**
@@ -659,7 +661,6 @@ class Account extends Eloquent
         return false;
     }
 
-
     /**
      * @return string
      */
@@ -703,9 +704,9 @@ class Account extends Eloquent
     {
         if ($this->timezone) {
             return $this->timezone->name;
-        } else {
-            return 'US/Eastern';
         }
+
+        return 'US/Eastern';
     }
 
     public function getDate($date = 'now')
@@ -814,13 +815,11 @@ class Account extends Eloquent
         // set locale back
         App::setLocale($locale);
 
-        if(isset($this->custom_fields->invoice_text1) && $exchangeRateTranslation == strtolower($this->custom_fields->invoice_text1))
-        {
+        if (isset($this->custom_fields->invoice_text1) && $exchangeRateTranslation == strtolower($this->custom_fields->invoice_text1)) {
             return 1;
         }
 
-        if(isset($this->custom_fields->invoice_text2) && $exchangeRateTranslation == strtolower($this->custom_fields->invoice_text2))
-        {
+        if (isset($this->custom_fields->invoice_text2) && $exchangeRateTranslation == strtolower($this->custom_fields->invoice_text2)) {
             return 2;
         }
 
@@ -1043,8 +1042,6 @@ class Account extends Eloquent
     /**
      * @param $userId
      * @param $name
-     *
-     * @return null
      */
     public function getToken($userId, $name)
     {
@@ -1079,7 +1076,7 @@ class Account extends Eloquent
         if ($entityType === ENTITY_RECURRING_INVOICE) {
             $invoice->invoice_number = microtime(true);
             $invoice->is_recurring = true;
-        } else if($entityType == ENTITY_RECURRING_QUOTE) {
+        } elseif ($entityType == ENTITY_RECURRING_QUOTE) {
             $invoice->invoice_number = microtime(true);
             $invoice->is_recurring = true;
             $invoice->invoice_type_id = INVOICE_TYPE_QUOTE;
@@ -1397,8 +1394,9 @@ class Account extends Eloquent
                 'term' => $this->company->plan_term,
                 'active' => $plan_active,
             ];
-        } else {
-            return [
+        }
+
+        return [
                 'company_id' => $this->company->id,
                 'num_users' => 1,
                 'plan_price' => 0,
@@ -1408,7 +1406,6 @@ class Account extends Eloquent
                 'expires' => $trial_expires,
                 'active' => $trial_active,
             ];
-        }
     }
 
     /**
@@ -1549,9 +1546,9 @@ class Account extends Eloquent
             return GATEWAY_BRAINTREE;
         } elseif ($this->isGatewayConfigured(GATEWAY_WEPAY)) {
             return GATEWAY_WEPAY;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -1715,17 +1712,11 @@ class Account extends Eloquent
         return ($this->hasFeature(FEATURE_CUSTOMIZE_INVOICE_DESIGN) && $this->body_font_id) ? $this->body_font_id : DEFAULT_BODY_FONT;
     }
 
-    /**
-     * @return null
-     */
     public function getHeaderFontName()
     {
         return Utils::getFromCache($this->getHeaderFontId(), 'fonts')['name'];
     }
 
-    /**
-     * @return null
-     */
     public function getBodyFontName()
     {
         return Utils::getFromCache($this->getBodyFontId(), 'fonts')['name'];
@@ -1944,19 +1935,19 @@ class Account extends Eloquent
             }
 
             return $url;
-        } else {
-            return url('/');
         }
+
+        return url('/');
     }
 
-    public function requiresAddressState() {
+    public function requiresAddressState()
+    {
         return true;
         //return ! $this->country_id || $this->country_id == DEFAULT_COUNTRY;
     }
 }
 
-Account::creating(function ($account)
-{
+Account::creating(function ($account) {
     LookupAccount::createAccount($account->account_key, $account->company_id);
 });
 
@@ -1978,9 +1969,8 @@ Account::updated(function ($account) {
     Event::fire(new UserSettingsChanged());
 });
 
-Account::deleted(function ($account)
-{
+Account::deleted(function ($account) {
     LookupAccount::deleteWhere([
-        'account_key' => $account->account_key
+        'account_key' => $account->account_key,
     ]);
 });

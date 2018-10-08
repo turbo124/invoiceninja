@@ -11,7 +11,7 @@ class ListCreditIntent extends BaseIntent
         $this->loadStates(ENTITY_CREDIT);
 
         if ($client = $this->requestClient()) {
-            $url = $client->present()->url . '#credits';
+            $url = $client->present()->url.'#credits';
         } else {
             $url = '/credits';
         }

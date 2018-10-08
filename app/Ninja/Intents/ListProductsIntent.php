@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Intents;
 
-use App\Models\Product;
 use Auth;
+use App\Models\Product;
 
 class ListProductsIntent extends ProductIntent
 {

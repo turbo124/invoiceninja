@@ -17,7 +17,7 @@ class PayPalExpressPaymentDriver extends BasePaymentDriver
 
         $data['ButtonSource'] = 'InvoiceNinja_SP';
         $data['solutionType'] = 'Sole'; // show 'Pay with credit card' option
-        $data['transactionId'] = $data['transactionId'] . '-' . time();
+        $data['transactionId'] = $data['transactionId'].'-'.time();
 
         return $data;
     }
@@ -35,16 +35,16 @@ class PayPalExpressPaymentDriver extends BasePaymentDriver
 
         // PayPal doesn't allow being run in an iframe so we need to open in new tab
         if ($this->account()->iframe_url) {
-            return 'javascript:window.open("' . $url . '", "_blank")';
-        } else {
-            return $url;
+            return 'javascript:window.open("'.$url.'", "_blank")';
         }
+
+        return $url;
     }
 
     protected function updateClientFromOffsite($transRef, $paymentRef)
     {
         $response = $this->gateway()->fetchCheckout([
-            'token' => $transRef
+            'token' => $transRef,
         ])->send();
 
         $data = $response->getData();

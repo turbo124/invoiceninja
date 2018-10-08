@@ -47,5 +47,4 @@ class ContactService extends BaseService
 
         return $this->contactRepo->save($data, $contact);
     }
-
 }

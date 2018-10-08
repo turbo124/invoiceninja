@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\Libraries\Utils;
 use Eloquent;
-use Illuminate\Support\Facades\Log;
+use App\Libraries\Utils;
 
 /**
  * Class AccountTicketSettings.
@@ -51,6 +50,7 @@ class AccountTicketSettings extends Eloquent
     public function max_file_sizes()
     {
         $utils = new Utils();
+
         return $utils->getMaxFileUploadSizes();
     }
 
@@ -59,26 +59,22 @@ class AccountTicketSettings extends Eloquent
         if (config('ninja.multi_db_enabled')) {
             $result = LookupAccount::where('support_email_local_part', '=', $localPart)
                                             ->where('account_key', '!=', $account->account_key)->get();
-        }
-        else {
+        } else {
             $result = AccountTicketSettings::where('support_email_local_part', '=', $localPart)
                                             ->where('account_id', '!=', $account->id)->get();
         }
 
-        if(count($result) == 0)
+        if (count($result) == 0) {
             return false;
-        else
-            return true;
-    }
+        }
 
+        return true;
+    }
 }
 
-
 AccountTicketSettings::updating(function (AccountTicketSettings $accountTicketSettings) {
-
     $dirty = $accountTicketSettings->getDirty();
     if (array_key_exists('support_email_local_part', $dirty)) {
         LookupAccount::updateSupportLocalPart($accountTicketSettings->account->account_key, $dirty['support_email_local_part']);
     }
-
 });

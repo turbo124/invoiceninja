@@ -25,7 +25,7 @@ class TaskRequest extends EntityRequest
             }
         }
         */
-        
+
         // check if we're creating a new project
         if ($this->project_id == '-1') {
             $project = [

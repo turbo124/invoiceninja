@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
-use App\Models\Product;
 use App\Ninja\Repositories\ProductRepository;
 
 /**
@@ -184,12 +184,12 @@ class ProductApiController extends BaseAPIController
      *   )
      * )
      */
-     public function destroy(UpdateProductRequest $request)
-     {
-         $product = $request->entity();
+    public function destroy(UpdateProductRequest $request)
+    {
+        $product = $request->entity();
 
-         $this->productRepo->delete($product);
+        $this->productRepo->delete($product);
 
-         return $this->itemResponse($product);
-     }
+        return $this->itemResponse($product);
+    }
 }

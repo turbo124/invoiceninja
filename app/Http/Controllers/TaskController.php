@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateTaskRequest;
-use App\Http\Requests\TaskRequest;
-use App\Http\Requests\UpdateTaskRequest;
-use App\Models\Client;
-use App\Models\Project;
-use App\Models\Task;
-use App\Models\TaskStatus;
-use App\Ninja\Datatables\TaskDatatable;
-use App\Ninja\Repositories\InvoiceRepository;
-use App\Ninja\Repositories\TaskRepository;
-use App\Services\TaskService;
+use URL;
 use Auth;
-use DropdownButton;
+use View;
 use Input;
-use Redirect;
+use Utils;
 use Request;
 use Session;
-use URL;
-use Utils;
-use View;
+use Redirect;
+use DropdownButton;
+use App\Models\Task;
+use App\Models\Client;
+use App\Models\Project;
+use App\Models\TaskStatus;
+use App\Services\TaskService;
+use App\Http\Requests\TaskRequest;
+use App\Ninja\Datatables\TaskDatatable;
+use App\Http\Requests\CreateTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
+use App\Ninja\Repositories\TaskRepository;
+use App\Ninja\Repositories\InvoiceRepository;
 
 /**
  * Class TaskController.
@@ -243,16 +243,16 @@ class TaskController extends BaseController
 
         if (request()->wantsJson()) {
             $task->time_log = json_decode($task->time_log);
-            return $task->load(['client.contacts', 'project'])->toJson();
-        } else {
-            if ($publicId) {
-                Session::flash('message', trans('texts.updated_task'));
-            } else {
-                Session::flash('message', trans('texts.created_task'));
-            }
 
-            return Redirect::to("tasks/{$task->public_id}/edit");
+            return $task->load(['client.contacts', 'project'])->toJson();
         }
+        if ($publicId) {
+            Session::flash('message', trans('texts.updated_task'));
+        } else {
+            Session::flash('message', trans('texts.created_task'));
+        }
+
+        return Redirect::to("tasks/{$task->public_id}/edit");
     }
 
     /**
@@ -267,6 +267,7 @@ class TaskController extends BaseController
         if (in_array($action, ['resume', 'stop'])) {
             $this->taskRepo->save($ids, ['action' => $action]);
             Session::flash('message', trans($action == 'stop' ? 'texts.stopped_task' : 'texts.resumed_task'));
+
             return $this->returnBulk($this->entityType, $action, $ids);
         } elseif (strpos($action, 'update_status') === 0) {
             list($action, $statusPublicId) = explode(':', $action);
@@ -275,6 +276,7 @@ class TaskController extends BaseController
                 'task_status_sort_order' => 9999,
             ]);
             Session::flash('message', trans('texts.updated_task_status'));
+
             return $this->returnBulk($this->entityType, $action, $ids);
         } elseif ($action == 'invoice' || $action == 'add_to_invoice') {
             $tasks = Task::scope($ids)->with('account', 'client', 'project')->orderBy('project_id', 'id')->get();
@@ -314,22 +316,19 @@ class TaskController extends BaseController
 
             if ($action == 'invoice') {
                 return Redirect::to("invoices/create/{$clientPublicId}")->with('tasks', $data);
-            } else {
-                $invoiceId = Input::get('invoice_id');
-
-                return Redirect::to("invoices/{$invoiceId}/edit")->with('tasks', $data);
             }
-        } else {
-            $count = $this->taskService->bulk($ids, $action);
-            if (request()->wantsJson()) {
-                return response()->json($count);
-            } else {
-                $message = Utils::pluralize($action.'d_task', $count);
-                Session::flash('message', $message);
+            $invoiceId = Input::get('invoice_id');
 
-                return $this->returnBulk($this->entityType, $action, $ids);
-            }
+            return Redirect::to("invoices/{$invoiceId}/edit")->with('tasks', $data);
         }
+        $count = $this->taskService->bulk($ids, $action);
+        if (request()->wantsJson()) {
+            return response()->json($count);
+        }
+        $message = Utils::pluralize($action.'d_task', $count);
+        Session::flash('message', $message);
+
+        return $this->returnBulk($this->entityType, $action, $ids);
     }
 
     private function checkTimezone()

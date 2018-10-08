@@ -8,13 +8,9 @@ class AddTicketsSchema extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
-
-
         Schema::create('ticket_categories', function ($table) {
             $table->increments('id');
             $table->text('name');
@@ -55,12 +51,8 @@ class AddTicketsSchema extends Migration
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
-           // $table->foreign('status_id')->references('id')->on('ticket_statuses');
-
-
+            // $table->foreign('status_id')->references('id')->on('ticket_statuses');
         });
-
-
 
         Schema::create('ticket_relations', function ($table) {
             $table->increments('id');
@@ -70,7 +62,6 @@ class AddTicketsSchema extends Migration
             $table->text('entity_url');
 
             $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
-
         });
 
         Schema::create('ticket_templates', function ($table) {
@@ -109,13 +100,11 @@ class AddTicketsSchema extends Migration
             $table->unsignedInteger('ticket_id')->nullable();
         });
 
-
         Schema::table('activities', function ($table) {
             $table->unsignedInteger('ticket_id')->nullable();
 
             $table->index(['ticket_id', 'account_id']);
         });
-
 
         Schema::create('ticket_invitations', function ($table) {
             $table->increments('id');
@@ -151,7 +140,7 @@ class AddTicketsSchema extends Migration
             $table->foreign('lookup_account_id')->references('id')->on('lookup_accounts')->onDelete('cascade');
         });
 
-        Schema::create('account_ticket_settings', function ($table){
+        Schema::create('account_ticket_settings', function ($table) {
             $table->increments('id');
             $table->unsignedInteger('account_id')->index();
             $table->timestamps();
@@ -190,11 +179,9 @@ class AddTicketsSchema extends Migration
             $table->foreign('ticket_master_id')->references('id')->on('users')->onDelete('cascade');
         });
 
-
         Schema::table('lookup_accounts', function ($table) {
             $table->string('support_email_local_part')->unique()->nullable();
         });
-
 
         Schema::table('users', function ($table) {
             $table->string('avatar', 255);
@@ -204,8 +191,7 @@ class AddTicketsSchema extends Migration
             $table->text('signature');
         });
 
-        if(!Utils::isNinja()) {
-
+        if (! Utils::isNinja()) {
             Schema::table('activities', function ($table) {
                 $table->index(['contact_id', 'account_id']);
                 $table->index(['payment_id', 'account_id']);
@@ -215,12 +201,10 @@ class AddTicketsSchema extends Migration
                 $table->index(['client_id', 'account_id']);
             });
 
-
             Schema::table('invitations', function ($table) {
                 $table->index(['deleted_at', 'invoice_id']);
             });
         }
-
 
         /*
          *
@@ -229,46 +213,34 @@ class AddTicketsSchema extends Migration
          *
          * */
 
-
-
         $ticketCategory = new \App\Models\TicketCategory();
         $ticketCategory->name = 'Support';
         $ticketCategory->key = 'support';
         $ticketCategory->save();
 
-
         $accounts = \App\Models\Account::all();
 
-        foreach ($accounts as $account){
-
-            if(!$account->account_ticket_settings) {
-
+        foreach ($accounts as $account) {
+            if (! $account->account_ticket_settings) {
 
                 /* Create account_ticket_settings record for account */
 
                 $user = $account->users()->where('public_id', '=', 0)->orWhereNull('public_id')->first();
 
-                if($user) {
-
+                if ($user) {
                     $accountTicketSettings = new \App\Models\AccountTicketSettings();
                     $accountTicketSettings->ticket_master_id = $user->id;
 
                     $account->account_ticket_settings()->save($accountTicketSettings);
+                } else {
+                    \Illuminate\Support\Facades\Log::error('Account '.$account->id.'does not have a owner user');
                 }
-                else
-                    \Illuminate\Support\Facades\Log::error('Account '. $account->id .'does not have a owner user');
             }
-
         }
-
-
-
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {
@@ -281,7 +253,7 @@ class AddTicketsSchema extends Migration
         Schema::dropIfExists('ticket_invitations');
         Schema::dropIfExists('tickets');
 
-        if(!Utils::isNinja()) {
+        if (! Utils::isNinja()) {
             Schema::table('activities', function ($table) {
                 $table->dropIndex(['contact_id', 'account_id']);
                 $table->dropIndex(['payment_id', 'account_id']);
@@ -296,50 +268,50 @@ class AddTicketsSchema extends Migration
             });
         }
 
-        if(Schema::hasColumn('documents', 'ticket_id')) {
-            Schema::table('documents', function(Blueprint $table) {
+        if (Schema::hasColumn('documents', 'ticket_id')) {
+            Schema::table('documents', function (Blueprint $table) {
                 $table->dropColumn('ticket_id');
             });
         }
 
-        if(Schema::hasColumn('activities', 'ticket_id')) {
+        if (Schema::hasColumn('activities', 'ticket_id')) {
             Schema::table('activities', function ($table) {
                 $table->dropColumn('ticket_id');
                 $table->dropIndex(['ticket_id', 'account_id']);
             });
         }
 
-        if(Schema::hasColumn('lookup_accounts', 'support_email_local_part')) {
+        if (Schema::hasColumn('lookup_accounts', 'support_email_local_part')) {
             Schema::table('lookup_accounts', function ($table) {
                 $table->dropColumn('support_email_local_part');
             });
         }
 
-        if(Schema::hasColumn('users', 'avatar')) {
+        if (Schema::hasColumn('users', 'avatar')) {
             Schema::table('users', function ($table) {
                 $table->dropColumn('avatar');
             });
         }
 
-        if(Schema::hasColumn('users', 'avatar_width')) {
+        if (Schema::hasColumn('users', 'avatar_width')) {
             Schema::table('users', function ($table) {
                 $table->dropColumn('avatar_width');
             });
         }
 
-        if(Schema::hasColumn('users', 'avatar_height')) {
+        if (Schema::hasColumn('users', 'avatar_height')) {
             Schema::table('users', function ($table) {
                 $table->dropColumn('avatar_height');
             });
         }
 
-        if(Schema::hasColumn('users', 'avatar_size')) {
+        if (Schema::hasColumn('users', 'avatar_size')) {
             Schema::table('users', function ($table) {
                 $table->dropColumn('avatar_size');
             });
         }
 
-        if(Schema::hasColumn('users', 'signature')) {
+        if (Schema::hasColumn('users', 'signature')) {
             Schema::table('users', function ($table) {
                 $table->dropColumn('signature');
             });

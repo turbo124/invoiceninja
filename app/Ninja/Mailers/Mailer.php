@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Mailers;
 
-use App\Models\Invoice;
-use Exception;
 use Mail;
 use Utils;
+use Exception;
+use App\Models\Invoice;
 use Postmark\PostmarkClient;
 use Postmark\Models\PostmarkException;
 use Postmark\Models\PostmarkAttachment;
@@ -52,9 +52,9 @@ class Mailer
 
         if (config('services.postmark')) {
             return $this->sendPostmarkMail($toEmail, $fromEmail, $fromName, $replyEmail, $subject, $views, $data);
-        } else {
-            return $this->sendLaravelMail($toEmail, $fromEmail, $fromName, $replyEmail, $subject, $views, $data);
         }
+
+        return $this->sendLaravelMail($toEmail, $fromEmail, $fromName, $replyEmail, $subject, $views, $data);
     }
 
     private function sendLaravelMail($toEmail, $fromEmail, $fromName, $replyEmail, $subject, $views, $data = [])
@@ -62,7 +62,7 @@ class Mailer
         if (Utils::isSelfHost()) {
             if (isset($data['account'])) {
                 $account = $data['account'];
-                if (env($account->id . '_MAIL_FROM_ADDRESS')) {
+                if (env($account->id.'_MAIL_FROM_ADDRESS')) {
                     $fields = [
                         'driver',
                         'host',
@@ -75,8 +75,8 @@ class Mailer
                     ];
                     foreach ($fields as $field) {
                         $envKey = strtoupper(str_replace('.', '_', $field));
-                        if ($value = env($account->id . '_MAIL_' . $envKey)) {
-                            config(['mail.' . $field => $value]);
+                        if ($value = env($account->id.'_MAIL_'.$envKey)) {
+                            config(['mail.'.$field => $value]);
                         }
                     }
 
@@ -132,8 +132,8 @@ class Mailer
         if (isset($data['account'])) {
             $account = $data['account'];
             $logoName = $account->getLogoName();
-            if (strpos($htmlBody, 'cid:' . $logoName) !== false && $account->hasLogo()) {
-                $attachments[] = PostmarkAttachment::fromFile($account->getLogoPath(), $logoName, null, 'cid:' . $logoName);
+            if (strpos($htmlBody, 'cid:'.$logoName) !== false && $account->hasLogo()) {
+                $attachments[] = PostmarkAttachment::fromFile($account->getLogoPath(), $logoName, null, 'cid:'.$logoName);
             }
         }
 
@@ -180,9 +180,9 @@ class Mailer
             $response = $client->sendEmailBatch([$message]);
             if ($messageId = $response[0]->messageid) {
                 return $this->handleSuccess($data, $messageId);
-            } else {
-                return $this->handleFailure($data, $response[0]->message);
             }
+
+            return $this->handleFailure($data, $response[0]->message);
         } catch (PostmarkException $exception) {
             return $this->handleFailure($data, $exception->getMessage());
         } catch (Exception $exception) {

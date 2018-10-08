@@ -164,7 +164,6 @@ return [
         'Chumper\Datatable\DatatableServiceProvider',
         Laravel\Tinker\TinkerServiceProvider::class,
 
-
         /*
          * Application Service Providers...
          */

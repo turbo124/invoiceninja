@@ -67,7 +67,7 @@ if (! defined('APP_NAME')) {
         ENTITY_PROJECT,
         ENTITY_PROPOSAL,
         ENTITY_QUOTE,
-	      'dashboard',
+          'dashboard',
         'reports',
         ENTITY_TICKET,
         ENTITY_TASK,
@@ -181,7 +181,6 @@ if (! defined('APP_NAME')) {
     define('ACTIVITY_TYPE_USER_REOPEN_TICKET', 54);
     define('ACTIVITY_TYPE_CONTACT_REPLY_TICKET', 55);
     define('ACTIVITY_TYPE_USER_VIEW_TICKET', 56);
-
 
     define('DEFAULT_INVOICE_NUMBER', '0001');
     define('RECENTLY_VIEWED_LIMIT', 20);
@@ -381,7 +380,7 @@ if (! defined('APP_NAME')) {
     define('NINJA_APP_URL', env('NINJA_APP_URL', 'https://app.invoiceninja.com'));
     define('NINJA_DOCS_URL', env('NINJA_DOCS_URL', 'https://invoice-ninja.readthedocs.io/en/latest'));
     define('NINJA_DATE', '2000-01-01');
-    define('NINJA_VERSION', '4.5.5' . env('NINJA_VERSION_SUFFIX'));
+    define('NINJA_VERSION', '4.5.5'.env('NINJA_VERSION_SUFFIX'));
 
     define('NINJA_TERMS_VERSION', '1.0.1');
 
@@ -685,16 +684,15 @@ if (! defined('APP_NAME')) {
     // Fix for mPDF: https://github.com/kartik-v/yii2-mpdf/issues/9
     define('_MPDF_TTFONTDATAPATH', storage_path('framework/cache/'));
 
-
-    /** Tickets constants */
+    /* Tickets constants */
     define('TICKET_PRIORITY_LOW', 10);
     define('TICKET_PRIORITY_MEDIUM', 20);
     define('TICKET_PRIORITY_HIGH', 30);
 
     define('TICKET_STATUS_NEW', 1);
-    define('TICKET_STATUS_OPEN',2);
-    define('TICKET_STATUS_CLOSED',3);
-    define('TICKET_STATUS_MERGED',4);
+    define('TICKET_STATUS_OPEN', 2);
+    define('TICKET_STATUS_CLOSED', 3);
+    define('TICKET_STATUS_MERGED', 4);
 
     define('TICKET_CLIENT_NEW', 'ticket_client_new');
     define('TICKET_CLIENT_UPDATE', 'ticket_client_update');
@@ -717,7 +715,7 @@ if (! defined('APP_NAME')) {
         trans('texts.new'),
         trans('texts.open'),
         trans('texts.closed'),
-        trans('texts.merged')
+        trans('texts.merged'),
     ];
 
     function uctrans($text, $data = [])
@@ -743,12 +741,11 @@ if (! defined('APP_NAME')) {
 
         if ($locale == 'en') {
             return trans($text);
-        } else {
-            $string = trans($text);
-            $english = trans($text, [], 'en');
-
-            return $string != $english ? $string : '';
         }
+        $string = trans($text);
+        $english = trans($text, [], 'en');
+
+        return $string != $english ? $string : '';
     }
 
     // include modules in translations
