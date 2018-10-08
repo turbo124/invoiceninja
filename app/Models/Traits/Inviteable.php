@@ -2,8 +2,8 @@
 
 namespace App\Models\Traits;
 
-use Carbon;
 use Utils;
+use Carbon;
 
 /**
  * Class SendsEmails.
@@ -12,6 +12,7 @@ trait Inviteable
 {
     // If we're getting the link for PhantomJS to generate the PDF
     // we need to make sure it's served from our site
+
     /**
      * @param string $type
      * @param bool   $forceOnsite
@@ -70,7 +71,7 @@ trait Inviteable
             if ($this->$field && $this->field != '0000-00-00 00:00:00') {
                 $date = Utils::dateToString($this->$field);
                 $hasValue = true;
-                $parts[] = trans('texts.invitation_status_' . $status) . ': ' . $date;
+                $parts[] = trans('texts.invitation_status_'.$status).': '.$date;
             }
         }
 

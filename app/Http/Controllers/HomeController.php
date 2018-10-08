@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Libraries\Utils;
-use App\Models\Account;
-use App\Ninja\Mailers\Mailer;
 use Auth;
-use Input;
 use Mail;
-use Redirect;
-use Request;
-use Response;
-use Session;
 use View;
+use Input;
+use Request;
+use Session;
+use Redirect;
+use Response;
+use App\Models\Account;
+use App\Libraries\Utils;
+use App\Ninja\Mailers\Mailer;
 
 /**
  * Class HomeController.
@@ -47,9 +47,9 @@ class HomeController extends BaseController
             return Redirect::to('/setup');
         } elseif (Auth::check()) {
             return Redirect::to('/dashboard');
-        } else {
-            return Redirect::to('/login');
         }
+
+        return Redirect::to('/login');
     }
 
     /**
@@ -71,11 +71,12 @@ class HomeController extends BaseController
         }
 
         if (Auth::check()) {
-            $redirectTo = Input::get('redirect_to') ? SITE_URL . '/' . ltrim(Input::get('redirect_to'), '/') : 'invoices/create';
+            $redirectTo = Input::get('redirect_to') ? SITE_URL.'/'.ltrim(Input::get('redirect_to'), '/') : 'invoices/create';
+
             return Redirect::to($redirectTo)->with('sign_up', Input::get('sign_up'));
-        } else {
-            return View::make('public.invoice_now');
         }
+
+        return View::make('public.invoice_now');
     }
 
     /**
@@ -142,14 +143,14 @@ class HomeController extends BaseController
         $message = request()->contact_us_message;
 
         if (request()->include_errors) {
-            $message .= "\n\n" . join("\n", Utils::getErrors());
+            $message .= "\n\n".join("\n", Utils::getErrors());
         }
 
         Mail::raw($message, function ($message) {
             $subject = 'Customer Message [';
             if (Utils::isNinjaProd()) {
                 $subject .= str_replace('db-ninja-', '', config('database.default'));
-                $subject .= Auth::user()->present()->statusCode . '] ';
+                $subject .= Auth::user()->present()->statusCode.'] ';
             } else {
                 $subject .= 'Self-Host] | ';
             }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use PragmaRX\Google2FA\Google2FA;
 use Crypt;
+use PragmaRX\Google2FA\Google2FA;
 
 class TwoFactorController extends Controller
 {

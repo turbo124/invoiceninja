@@ -2,7 +2,6 @@
 
 namespace App\Models\Traits;
 
-use Utils;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -47,9 +46,6 @@ trait HasLogo
         $this->save();
     }
 
-    /**
-     * @return null
-     */
     public function getLogoRaw()
     {
         if (! $this->hasLogo()) {
@@ -81,7 +77,7 @@ trait HasLogo
 
         if ($adapter instanceof \League\Flysystem\Adapter\Local) {
             // Stored locally
-            $logoUrl = url('/logo/' . $this->logo);
+            $logoUrl = url('/logo/'.$this->logo);
 
             if ($cachebuster) {
                 $logoUrl .= '?no_cache='.time();
@@ -104,9 +100,9 @@ trait HasLogo
 
         if ($adapter instanceof \League\Flysystem\Adapter\Local) {
             return $adapter->applyPathPrefix($this->logo);
-        } else {
-            return Document::getDirectFileUrl($this->logo, $this->getLogoDisk());
         }
+
+        return Document::getDirectFileUrl($this->logo, $this->getLogoDisk());
     }
 
     /**

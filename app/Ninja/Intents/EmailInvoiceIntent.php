@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Intents;
 
-use App\Libraries\Skype\SkypeResponse;
 use Auth;
 use Exception;
+use App\Libraries\Skype\SkypeResponse;
 
 class EmailInvoiceIntent extends InvoiceIntent
 {
@@ -19,12 +19,12 @@ class EmailInvoiceIntent extends InvoiceIntent
         $contactMailer = app('App\Ninja\Mailers\ContactMailer');
         $contactMailer->sendInvoice($invoice);
 
-        $message = trans('texts.bot_emailed_' . $invoice->getEntityType());
+        $message = trans('texts.bot_emailed_'.$invoice->getEntityType());
 
         if (Auth::user()->notify_viewed) {
-            $message .= '<br/>' . trans('texts.bot_emailed_notify_viewed');
+            $message .= '<br/>'.trans('texts.bot_emailed_notify_viewed');
         } elseif (Auth::user()->notify_paid) {
-            $message .= '<br/>' . trans('texts.bot_emailed_notify_paid');
+            $message .= '<br/>'.trans('texts.bot_emailed_notify_paid');
         }
 
         return SkypeResponse::message($message);

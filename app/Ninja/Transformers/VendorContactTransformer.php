@@ -7,7 +7,7 @@ use App\Models\VendorContact;
 // vendor
 class VendorContactTransformer extends EntityTransformer
 {
-		/**
+    /**
      * @SWG\Property(property="id", type="integer", example=1, readOnly=true)
      * @SWG\Property(property="first_name", type="string", example="Luke")
      * @SWG\Property(property="last_name", type="string", example="Smith")

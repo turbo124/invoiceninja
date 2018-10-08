@@ -12,10 +12,10 @@ class DocumentRequest extends EntityRequest
     {
         $contact = Contact::getContactIfLoggedIn();
 
-        if($contact && $contact->account->hasFeature(FEATURE_DOCUMENTS))
+        if ($contact && $contact->account->hasFeature(FEATURE_DOCUMENTS)) {
             return true;
-        else
-            return $this->user()->can('view', $this->entity());
-    }
+        }
 
+        return $this->user()->can('view', $this->entity());
+    }
 }

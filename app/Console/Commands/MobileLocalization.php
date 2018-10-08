@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\DbServer;
-use App\Models\User;
-use App\Models\Company;
 use App\Libraries\CurlUtils;
+use Illuminate\Console\Command;
 
 class MobileLocalization extends Command
 {
@@ -24,11 +21,8 @@ class MobileLocalization extends Command
      */
     protected $description = 'Generate mobile localization resources';
 
-
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -96,10 +90,10 @@ class MobileLocalization extends Command
         $end = strpos($data, '},', $start);
         $data = substr($data, $start, $end - $start - 6);
 
-        $data = str_replace("\n", "", $data);
-        $data = str_replace("'", "\"", $data);
+        $data = str_replace("\n", '', $data);
+        $data = str_replace("'", '"', $data);
 
-        return json_decode('{' . $data . '}');
+        return json_decode('{'.$data.'}');
     }
 
     protected function getOptions()
@@ -108,5 +102,4 @@ class MobileLocalization extends Command
             ['type', null, InputOption::VALUE_OPTIONAL, 'Type', null],
         ];
     }
-
 }

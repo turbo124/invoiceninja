@@ -2,10 +2,10 @@
 
 namespace App\Models\Traits;
 
-use App\Models\Client;
-use App\Models\Invoice;
 use Auth;
 use Carbon;
+use App\Models\Client;
+use App\Models\Invoice;
 
 /**
  * Class GeneratesNumbers.
@@ -37,11 +37,11 @@ trait GeneratesNumbers
             if ($this->hasNumberPattern($entityType)) {
                 $number = $this->applyNumberPattern($entity, $counter);
             } else {
-                $number = $prefix . str_pad($counter, $this->invoice_number_padding, '0', STR_PAD_LEFT);
+                $number = $prefix.str_pad($counter, $this->invoice_number_padding, '0', STR_PAD_LEFT);
             }
 
             if ($entity->recurring_invoice_id) {
-                $number = $this->recurring_invoice_number_prefix . $number;
+                $number = $this->recurring_invoice_number_prefix.$number;
             }
 
             if ($entity->isEntityType(ENTITY_CLIENT)) {
@@ -57,7 +57,6 @@ trait GeneratesNumbers
                 return '';
             }
             $lastNumber = $number;
-
         } while ($check);
 
         // update the counter to be caught up
@@ -241,9 +240,9 @@ trait GeneratesNumbers
             return $this->credit_number_counter;
         } elseif ($entityType == ENTITY_QUOTE && ! $this->share_counter) {
             return $this->quote_number_counter;
-        } else {
-            return $this->invoice_number_counter;
         }
+
+        return $this->invoice_number_counter;
     }
 
     /**
@@ -270,12 +269,14 @@ trait GeneratesNumbers
                 $this->client_number_counter += 1;
             }
             $this->save();
+
             return;
         } elseif ($entity->isEntityType(ENTITY_CREDIT)) {
             if ($this->credit_number_counter > 0) {
                 $this->credit_number_counter += 1;
             }
             $this->save();
+
             return;
         }
 

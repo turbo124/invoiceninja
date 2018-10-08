@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
 use Postmark\PostmarkClient;
 
 class ReactivatePostmarkEmail extends Job
@@ -14,8 +13,6 @@ class ReactivatePostmarkEmail extends Job
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {

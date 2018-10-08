@@ -2,12 +2,12 @@
 
 namespace App\Ninja\PaymentDrivers;
 
-use App\Models\Payment;
-use App\Models\PaymentMethod;
-use Exception;
-use Session;
 use Utils;
+use Session;
+use Exception;
+use App\Models\Payment;
 use App\Models\PaymentType;
+use App\Models\PaymentMethod;
 
 class WePayPaymentDriver extends BasePaymentDriver
 {
@@ -55,7 +55,7 @@ class WePayPaymentDriver extends BasePaymentDriver
     {
         $data = parent::paymentDetails($paymentMethod);
 
-        if ($transactionId = Session::get($this->invitation->id . 'payment_ref')) {
+        if ($transactionId = Session::get($this->invitation->id.'payment_ref')) {
             $data['transaction_id'] = $transactionId;
         }
 
@@ -161,7 +161,7 @@ class WePayPaymentDriver extends BasePaymentDriver
         } else {
             $paymentMethod->last4 = $source->last_four;
             $paymentMethod->payment_type_id = PaymentType::parseCardType($source->credit_card_name);
-            $paymentMethod->expiration = $source->expiration_year . '-' . $source->expiration_month . '-01';
+            $paymentMethod->expiration = $source->expiration_year.'-'.$source->expiration_month.'-01';
             $paymentMethod->source_reference = $source->credit_card_id;
         }
 
@@ -181,9 +181,8 @@ class WePayPaymentDriver extends BasePaymentDriver
 
         if ($response->state == 'deleted') {
             return true;
-        } else {
-            throw new Exception(trans('texts.failed_remove_payment_method'));
         }
+        throw new Exception(trans('texts.failed_remove_payment_method'));
     }
 
     protected function refundDetails($payment, $amount)
@@ -244,9 +243,8 @@ class WePayPaymentDriver extends BasePaymentDriver
 
             if ($source->state == 'deleted') {
                 $paymentMethod->delete();
-            } else {
-                //$this->paymentService->convertPaymentMethodFromWePay($source, null, $paymentMethod)->save();
             }
+            //$this->paymentService->convertPaymentMethodFromWePay($source, null, $paymentMethod)->save();
 
             return 'Processed successfully';
         } elseif ($objectType == 'account') {
@@ -292,7 +290,7 @@ class WePayPaymentDriver extends BasePaymentDriver
                 $payment->recordRefund($checkout->refund->amount_refunded - $payment->refunded);
             }
             */
-            
+
             if ($checkout->state == 'captured') {
                 $payment->markComplete();
             } elseif ($checkout->state == 'cancelled') {
@@ -302,8 +300,8 @@ class WePayPaymentDriver extends BasePaymentDriver
             }
 
             return 'Processed successfully';
-        } else {
-            return 'Ignoring event';
         }
+
+        return 'Ignoring event';
     }
 }

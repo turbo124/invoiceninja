@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Utils;
 use App\Events\TaskWasCreated;
 use App\Events\TaskWasUpdated;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
-use Utils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Task.
@@ -100,16 +100,16 @@ class Task extends EntityModel
 
         if (count($parts)) {
             return Utils::timestampToDateTimeString($parts[0][0]);
-        } else {
-            return '';
         }
-    }
 
+        return '';
+    }
 
     public static function getTimeString($timestamp)
     {
         return Utils::timestampToDateTimeString($timestamp);
     }
+
     /**
      * @return string
      */
@@ -126,9 +126,9 @@ class Task extends EntityModel
             $index = count($parts) - 1;
 
             return $parts[$index][0];
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -162,9 +162,11 @@ class Task extends EntityModel
         return $duration;
     }
 
-    public function getTimeLog() {
+    public function getTimeLog()
+    {
         return $this->time_log;
     }
+
     /**
      * @return int
      */
@@ -201,9 +203,9 @@ class Task extends EntityModel
 
         if (count($part) == 1 || ! $part[1]) {
             return time() - $part[0];
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**
@@ -236,7 +238,7 @@ class Task extends EntityModel
 
     public function getName()
     {
-        return '#' . $this->public_id;
+        return '#'.$this->public_id;
     }
 
     public function getDisplayName()
@@ -245,16 +247,16 @@ class Task extends EntityModel
             return Utils::truncateString($this->description, 16);
         }
 
-        return '#' . $this->public_id;
+        return '#'.$this->public_id;
     }
 
     public function scopeDateRange($query, $startDate, $endDate)
     {
-        $query->whereRaw('cast(substring(time_log, 3, 10) as unsigned) <= ' . $endDate->modify('+1 day')->format('U'))
+        $query->whereRaw('cast(substring(time_log, 3, 10) as unsigned) <= '.$endDate->modify('+1 day')->format('U'))
             ->whereRaw('case
                 when is_running then unix_timestamp()
                 else cast(substring(time_log, length(time_log) - 11, 10) as unsigned)
-            end >= ' . $startDate->format('U'));
+            end >= '.$startDate->format('U'));
 
         return $query;
     }
@@ -292,7 +294,7 @@ class Task extends EntityModel
         }
 
         if ($isRunning) {
-            $label .= ' | ' . trans('texts.running');
+            $label .= ' | '.trans('texts.running');
         }
 
         return $label;
@@ -303,14 +305,14 @@ class Task extends EntityModel
         if ($invoiceNumber) {
             if (floatval($balance)) {
                 return 'default';
-            } else {
-                return 'success';
             }
+
+            return 'success';
         } elseif ($isRunning) {
             return 'primary';
-        } else {
-            return 'info';
         }
+
+        return 'info';
     }
 
     public function statusClass()

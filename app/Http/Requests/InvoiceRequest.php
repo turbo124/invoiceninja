@@ -16,38 +16,43 @@ class InvoiceRequest extends EntityRequest
      */
     public function authorize()
     {
-
         $invoice = parent::entity();
 
-        if ($invoice && $invoice->isQuote())
+        if ($invoice && $invoice->isQuote()) {
             $standardOrRecurringInvoice = ENTITY_QUOTE;
-        elseif($invoice && $invoice->is_recurring)
+        } elseif ($invoice && $invoice->is_recurring) {
             $standardOrRecurringInvoice = ENTITY_RECURRING_INVOICE;
-        else
+        } else {
             $standardOrRecurringInvoice = ENTITY_INVOICE;
+        }
 
-
-
-        if(request()->is('invoices/create*') && $this->user()->can('createEntity', ENTITY_INVOICE))
+        if (request()->is('invoices/create*') && $this->user()->can('createEntity', ENTITY_INVOICE)) {
             return true;
+        }
 
-        if(request()->is('recurring_invoices/create*') && $this->user()->can('createEntity', ENTITY_INVOICE))
+        if (request()->is('recurring_invoices/create*') && $this->user()->can('createEntity', ENTITY_INVOICE)) {
             return true;
+        }
 
-        if(request()->is('quotes/create*') && $this->user()->can('createEntity', ENTITY_QUOTE))
+        if (request()->is('quotes/create*') && $this->user()->can('createEntity', ENTITY_QUOTE)) {
             return true;
+        }
 
-        if($invoice && !$invoice->isQuote() && request()->is('*invoices/*/edit') && request()->isMethod('put') && $this->user()->can('edit', $invoice))
+        if ($invoice && ! $invoice->isQuote() && request()->is('*invoices/*/edit') && request()->isMethod('put') && $this->user()->can('edit', $invoice)) {
             return true;
+        }
 
-        if($invoice && $invoice->isQuote() && request()->is('*quotes/*/edit') && request()->isMethod('put') && $this->user()->can('edit', $invoice))
+        if ($invoice && $invoice->isQuote() && request()->is('*quotes/*/edit') && request()->isMethod('put') && $this->user()->can('edit', $invoice)) {
             return true;
+        }
 
-        if($invoice && !$invoice->isQuote() && request()->is('*invoices/*') && request()->isMethod('get') && $this->user()->can('view', $invoice, $standardOrRecurringInvoice))
+        if ($invoice && ! $invoice->isQuote() && request()->is('*invoices/*') && request()->isMethod('get') && $this->user()->can('view', $invoice, $standardOrRecurringInvoice)) {
             return true;
+        }
 
-        if($invoice && $invoice->isQuote() && request()->is('*quotes/*') && request()->isMethod('get') && $this->user()->can('view', $invoice, ENTITY_QUOTE))
+        if ($invoice && $invoice->isQuote() && request()->is('*quotes/*') && request()->isMethod('get') && $this->user()->can('view', $invoice, ENTITY_QUOTE)) {
             return true;
+        }
 
         if ($invoice) {
             HistoryUtils::trackViewed($invoice);
@@ -55,7 +60,6 @@ class InvoiceRequest extends EntityRequest
 
         return false;
     }
-
 
     public function entity()
     {

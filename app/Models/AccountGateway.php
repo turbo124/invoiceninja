@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Crypt;
 use Utils;
 use HTMLUtils;
-use Crypt;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class AccountGateway.
@@ -29,7 +29,7 @@ class AccountGateway extends EntityModel
      * @var array
      */
     protected $hidden = [
-        'config'
+        'config',
     ];
 
     /**
@@ -74,14 +74,14 @@ class AccountGateway extends EntityModel
     {
         $folder = 'App\\Ninja\\PaymentDrivers\\';
         $provider = str_replace('\\', '', $provider);
-        $class = $folder . $provider . 'PaymentDriver';
+        $class = $folder.$provider.'PaymentDriver';
         $class = str_replace('_', '', $class);
 
         if (class_exists($class)) {
             return $class;
-        } else {
-            return $folder . 'BasePaymentDriver';
         }
+
+        return $folder.'BasePaymentDriver';
     }
 
     /**
@@ -110,10 +110,11 @@ class AccountGateway extends EntityModel
                     return true;
                 }
             }
+
             return false;
-        } else {
-            return $this->gateway_id == $gatewayId;
         }
+
+        return $this->gateway_id == $gatewayId;
     }
 
     public function isCustom()
@@ -296,9 +297,9 @@ class AccountGateway extends EntityModel
     {
         if ($this->isGateway(GATEWAY_STRIPE)) {
             return strpos($this->getPublishableKey(), 'test') !== false;
-        } else {
-            return $this->getConfigField('testMode');
         }
+
+        return $this->getConfigField('testMode');
     }
 
     public function getCustomHtml($invitation)

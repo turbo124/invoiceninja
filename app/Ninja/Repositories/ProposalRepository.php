@@ -2,13 +2,12 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Proposal;
+use DB;
+use Auth;
 use App\Models\Invoice;
+use App\Models\Proposal;
 use App\Models\ProposalTemplate;
 use App\Models\ProposalInvitation;
-use Auth;
-use DB;
-use Utils;
 
 class ProposalRepository extends BaseRepository
 {
