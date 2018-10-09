@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\PaymentWasCreated;
 use Utils;
+use App\Events\PaymentWasCreated;
 
 /**
  * Class AnalyticsListener.
@@ -46,10 +46,10 @@ class AnalyticsListener
 
         $base = "v=1&tid={$analyticsId}&cid={$client->public_id}&cu={$currencyCode}&ti={$invoice->invoice_number}";
 
-        $url = $base . "&t=transaction&ta=ninja&tr={$amount}";
+        $url = $base."&t=transaction&ta=ninja&tr={$amount}";
         $this->sendAnalytics($url);
 
-        $url = $base . "&t=item&in={$item}&ip={$amount}&iq=1";
+        $url = $base."&t=item&in={$item}&ip={$amount}&iq=1";
         $this->sendAnalytics($url);
     }
 

@@ -35,7 +35,7 @@ class CurlUtils
         $response = curl_exec($curl);
 
         if ($error = curl_error($curl)) {
-            Utils::logError('CURL Error #' . curl_errno($curl) . ': ' . $error);
+            Utils::logError('CURL Error #'.curl_errno($curl).': '.$error);
         }
 
         curl_close($curl);
@@ -63,9 +63,9 @@ class CurlUtils
 
         if ($response->getStatus() === 200) {
             return $response->getContent();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public static function renderPDF($url, $filename)
@@ -76,7 +76,7 @@ class CurlUtils
 
         $client = Client::getInstance();
         $client->isLazy();
-        $client->getEngine()->addOption("--load-images=true");
+        $client->getEngine()->addOption('--load-images=true');
         $client->getEngine()->setPath($path);
 
         $request = $client->getMessageFactory()->createPdfRequest($url, 'GET');
@@ -90,9 +90,10 @@ class CurlUtils
         if ($response->getStatus() === 200) {
             $pdf = file_get_contents($filename);
             unlink($filename);
+
             return $pdf;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

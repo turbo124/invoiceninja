@@ -8,8 +8,6 @@ class EnterprisePlan extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -180,8 +178,6 @@ class EnterprisePlan extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

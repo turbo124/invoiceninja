@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Client;
 use Auth;
+use App\Models\Client;
 
 class AgingReport extends AbstractReport
 {
@@ -20,7 +20,6 @@ class AgingReport extends AbstractReport
             'balance' => [],
         ];
     }
-
 
     public function run()
     {
@@ -61,7 +60,7 @@ class AgingReport extends AbstractReport
                 //$this->addToTotals($client->currency_id, 'balance', $invoice->balance);
 
                 if ($subgroup == 'age') {
-                    $dimension = trans('texts.' .$invoice->present()->ageGroup);
+                    $dimension = trans('texts.'.$invoice->present()->ageGroup);
                 } else {
                     $dimension = $this->getDimension($client);
                 }

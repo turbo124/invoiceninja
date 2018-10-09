@@ -9,7 +9,7 @@ use App\Models\Activity;
  */
 class ActivityTransformer extends EntityTransformer
 {
-	  /**
+    /**
      * @SWG\Property(property="id", type="integer", example=1)
      * @SWG\Property(property="activity_type_id", type="integer", example=1)
      * @SWG\Property(property="client_id", type="integer", example=1)
@@ -23,7 +23,6 @@ class ActivityTransformer extends EntityTransformer
      * @SWG\Property(property="contact_id", type="integer", example=1)
      * @SWG\Property(property="task_id", type="integer", example=1)
      */
-
     protected $defaultIncludes = [];
 
     /**
@@ -51,9 +50,9 @@ class ActivityTransformer extends EntityTransformer
             'is_system' => $activity->is_system ? (bool) $activity->is_system : null,
             'contact_id' => $activity->contact_id ? (int) $activity->contact->public_id : null,
             'task_id' => $activity->task_id ? (int) $activity->task->public_id : null,
-			'notes' => $activity->notes ?: '',
-			'adjustment' => (float) $activity->adjustment,
-			'balance' => (float) $activity->balance,
+            'notes' => $activity->notes ?: '',
+            'adjustment' => (float) $activity->adjustment,
+            'balance' => (float) $activity->balance,
 
         ];
     }

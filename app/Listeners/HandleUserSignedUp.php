@@ -2,11 +2,11 @@
 
 namespace App\Listeners;
 
+use Auth;
+use Utils;
 use App\Events\UserSignedUp;
 use App\Ninja\Mailers\UserMailer;
 use App\Ninja\Repositories\AccountRepository;
-use Auth;
-use Utils;
 
 /**
  * Class HandleUserSignedUp.
@@ -39,8 +39,6 @@ class HandleUserSignedUp
      * Handle the event.
      *
      * @param UserSignedUp $event
-     *
-     * @return void
      */
     public function handle(UserSignedUp $event)
     {

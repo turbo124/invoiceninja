@@ -3,12 +3,10 @@
 namespace App\Ninja\Tickets\Inbound;
 
 /**
- * Class Attachments
- * @package App\Ninja\Tickets\Inbound
+ * Class Attachments.
  */
-Class Attachments implements \Iterator {
-
-
+class Attachments implements \Iterator
+{
     /**
      * @var Attachments
      */
@@ -16,79 +14,63 @@ Class Attachments implements \Iterator {
 
     /**
      * Attachments constructor.
+     *
      * @param bool $attachments
      */
     public function __construct($attachments)
     {
-
         $this->attachments = $attachments;
 
         $this->position = 0;
-
     }
 
     /**
      * @param $key
+     *
      * @return Attachment|bool
      */
-    function get($key) {
-
+    public function get($key)
+    {
         $this->position = $key;
 
-        if( ! empty($this->attachments[$key]))
+        if (! empty($this->attachments[$key])) {
             return new Attachment($this->attachments[$key]);
-        else
-            return FALSE;
+        }
 
+        return false;
     }
 
-    /**
-     *
-     */
-    function rewind()
+    public function rewind()
     {
-
         $this->position = 0;
-
     }
 
     /**
      * @return Attachment
      */
-    function current()
+    public function current()
     {
-
         return new Attachment($this->attachments[$this->position]);
-
     }
 
     /**
      * @return int
      */
-    function key()
+    public function key()
     {
-
         return $this->position;
-
     }
 
-    /**
-     *
-     */
-    function next()
+    public function next()
     {
-
-        ++$this->position;
-
+        $this->position++;
     }
 
     /**
      * @return bool
      */
-    function valid()
+    public function valid()
     {
-
         return isset($this->attachments[$this->position]);
-
     }
 }

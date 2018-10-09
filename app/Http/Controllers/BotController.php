@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Libraries\CurlUtils;
-use App\Libraries\Skype\SkypeResponse;
-use App\Models\SecurityCode;
-use App\Models\User;
-use App\Ninja\Intents\BaseIntent;
-use App\Ninja\Mailers\UserMailer;
+use DB;
 use Auth;
 use Cache;
-use DB;
-use Exception;
 use Input;
 use Utils;
+use Exception;
+use App\Models\User;
+use App\Libraries\CurlUtils;
+use App\Models\SecurityCode;
+use App\Ninja\Intents\BaseIntent;
+use App\Ninja\Mailers\UserMailer;
+use App\Libraries\Skype\SkypeResponse;
 
 class BotController extends Controller
 {
@@ -59,15 +59,15 @@ class BotController extends Controller
                     } else {
                         $response = SkypeResponse::message(trans('texts.email_not_found', ['email' => $text]));
                     }
-                // user sent the scurity code
+                    // user sent the scurity code
                 } elseif ($state === BOT_STATE_GET_CODE) {
                     if ($this->validateCode($text, $botUserId)) {
-                        $response = SkypeResponse::message(trans('texts.bot_welcome') . trans('texts.bot_help_message'));
+                        $response = SkypeResponse::message(trans('texts.bot_welcome').trans('texts.bot_help_message'));
                         $state = BOT_STATE_READY;
                     } else {
                         $response = SkypeResponse::message(trans('texts.invalid_code'));
                     }
-                // regular chat message
+                    // regular chat message
                 } else {
                     if ($text === 'help') {
                         $response = SkypeResponse::message(trans('texts.bot_help_message'));
@@ -106,9 +106,11 @@ class BotController extends Controller
 
         try {
             $intent = BaseIntent::createIntent(BOT_PLATFORM_WEB_APP, false, $data);
+
             return $intent->process();
         } catch (Exception $exception) {
             $message = sprintf('"%s"<br/>%s', $command, $exception->getMessage());
+
             return redirect()->back()->withWarning($message);
         }
     }
@@ -147,7 +149,7 @@ class BotController extends Controller
         $url = sprintf('%s/botstate/skype/conversations/%s', MSBOT_STATE_URL, '29:1C-OsU7OWBEDOYJhQUsDkYHmycOwOq9QOg5FVTwRX9ts');
 
         $headers = [
-            'Authorization: Bearer ' . $token,
+            'Authorization: Bearer '.$token,
         ];
 
         $response = CurlUtils::get($url, $headers);
@@ -175,13 +177,13 @@ class BotController extends Controller
         $url = sprintf('%s/botstate/skype/conversations/%s', MSBOT_STATE_URL, '29:1C-OsU7OWBEDOYJhQUsDkYHmycOwOq9QOg5FVTwRX9ts');
 
         $headers = [
-            'Authorization: Bearer ' . $token,
+            'Authorization: Bearer '.$token,
             'Content-Type: application/json',
         ];
 
         //echo "STATE<pre>" . htmlentities(json_encode($data), JSON_PRETTY_PRINT) . "</pre>";
 
-        $data = '{ eTag: "*", data: "' . addslashes(json_encode($data)) . '" }';
+        $data = '{ eTag: "*", data: "'.addslashes(json_encode($data)).'" }';
 
         CurlUtils::post($url, $data, $headers);
     }
@@ -191,7 +193,7 @@ class BotController extends Controller
         $url = sprintf('%s/conversations/%s/activities/', SKYPE_API_URL, $to);
 
         $headers = [
-            'Authorization: Bearer ' . $token,
+            'Authorization: Bearer '.$token,
         ];
 
         //echo "<pre>" . htmlentities(json_encode(json_decode($message), JSON_PRETTY_PRINT)) . "</pre>";
@@ -304,14 +306,14 @@ class BotController extends Controller
             if ($value['kid'] == $headers_arr['kid']) {
 
                 // 5 get public key from key info
-                $cert_txt = '-----BEGIN CERTIFICATE-----' . "\n" . chunk_split($value['x5c'][0], 64) . '-----END CERTIFICATE-----';
+                $cert_txt = '-----BEGIN CERTIFICATE-----'."\n".chunk_split($value['x5c'][0], 64).'-----END CERTIFICATE-----';
                 $cert_obj = openssl_x509_read($cert_txt);
                 $pkey_obj = openssl_pkey_get_public($cert_obj);
                 $pkey_arr = openssl_pkey_get_details($pkey_obj);
                 $pkey_txt = $pkey_arr['key'];
 
                 // 6 verify signature
-                $token_valid = openssl_verify($headers_enc . '.' . $claims_enc, $sig, $pkey_txt, OPENSSL_ALGO_SHA256);
+                $token_valid = openssl_verify($headers_enc.'.'.$claims_enc, $sig, $pkey_txt, OPENSSL_ALGO_SHA256);
             }
         }
 

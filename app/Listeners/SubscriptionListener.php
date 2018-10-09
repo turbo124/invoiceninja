@@ -2,38 +2,38 @@
 
 namespace App\Listeners;
 
-use App\Events\ClientWasCreated;
-use App\Events\ClientWasUpdated;
-use App\Events\ClientWasDeleted;
-use App\Events\ExpenseWasCreated;
-use App\Events\ExpenseWasUpdated;
-use App\Events\ExpenseWasDeleted;
-use App\Events\QuoteItemsWereCreated;
-use App\Events\QuoteItemsWereUpdated;
+use Utils;
+use App\Models\EntityModel;
+use League\Fractal\Manager;
+use App\Events\TaskWasCreated;
+use App\Events\TaskWasDeleted;
+use App\Events\TaskWasUpdated;
 use App\Events\QuoteWasDeleted;
-use App\Events\QuoteInvitationWasApproved;
+use App\Events\ClientWasCreated;
+use App\Events\ClientWasDeleted;
+use App\Events\ClientWasUpdated;
+use App\Events\VendorWasCreated;
+use App\Events\VendorWasDeleted;
+use App\Events\VendorWasUpdated;
+use App\Events\ExpenseWasCreated;
+use App\Events\ExpenseWasDeleted;
+use App\Events\ExpenseWasUpdated;
+use App\Events\InvoiceWasDeleted;
 use App\Events\PaymentWasCreated;
 use App\Events\PaymentWasDeleted;
+use League\Fractal\Resource\Item;
+use App\Events\QuoteItemsWereCreated;
+use App\Events\QuoteItemsWereUpdated;
 use App\Events\InvoiceItemsWereCreated;
 use App\Events\InvoiceItemsWereUpdated;
-use App\Events\InvoiceWasDeleted;
-use App\Events\VendorWasCreated;
-use App\Events\VendorWasUpdated;
-use App\Events\VendorWasDeleted;
-use App\Events\TaskWasCreated;
-use App\Events\TaskWasUpdated;
-use App\Events\TaskWasDeleted;
-use App\Models\EntityModel;
+use App\Events\QuoteInvitationWasApproved;
 use App\Ninja\Serializers\ArraySerializer;
+use App\Ninja\Transformers\TaskTransformer;
 use App\Ninja\Transformers\ClientTransformer;
-use App\Ninja\Transformers\InvoiceTransformer;
-use App\Ninja\Transformers\PaymentTransformer;
 use App\Ninja\Transformers\VendorTransformer;
 use App\Ninja\Transformers\ExpenseTransformer;
-use App\Ninja\Transformers\TaskTransformer;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Utils;
+use App\Ninja\Transformers\InvoiceTransformer;
+use App\Ninja\Transformers\PaymentTransformer;
 
 /**
  * Class SubscriptionListener.
@@ -67,7 +67,6 @@ class SubscriptionListener
         $this->checkSubscriptions(EVENT_DELETE_CLIENT, $event->client, $transformer);
     }
 
-
     /**
      * @param PaymentWasCreated $event
      */
@@ -85,7 +84,6 @@ class SubscriptionListener
         $transformer = new PaymentTransformer($event->payment->account);
         $this->checkSubscriptions(EVENT_DELETE_PAYMENT, $event->payment, $transformer, [ENTITY_CLIENT, ENTITY_INVOICE]);
     }
-
 
     /**
      * @param InvoiceWasCreated $event
@@ -113,7 +111,6 @@ class SubscriptionListener
         $transformer = new InvoiceTransformer($event->invoice->account);
         $this->checkSubscriptions(EVENT_DELETE_INVOICE, $event->invoice, $transformer, ENTITY_CLIENT);
     }
-
 
     /**
      * @param QuoteWasCreated $event
@@ -151,7 +148,6 @@ class SubscriptionListener
         $this->checkSubscriptions(EVENT_DELETE_QUOTE, $event->quote, $transformer, ENTITY_CLIENT);
     }
 
-
     /**
      * @param VendorWasCreated $event
      */
@@ -178,7 +174,6 @@ class SubscriptionListener
         $transformer = new VendorTransformer($event->vendor->account);
         $this->checkSubscriptions(EVENT_DELETE_VENDOR, $event->vendor, $transformer);
     }
-
 
     /**
      * @param ExpenseWasCreated $event
@@ -207,7 +202,6 @@ class SubscriptionListener
         $this->checkSubscriptions(EVENT_DELETE_EXPENSE, $event->expense, $transformer);
     }
 
-
     /**
      * @param TaskWasCreated $event
      */
@@ -234,7 +228,6 @@ class SubscriptionListener
         $transformer = new TaskTransformer($event->task->account);
         $this->checkSubscriptions(EVENT_DELETE_TASK, $event->task, $transformer);
     }
-
 
     /**
      * @param $eventId
@@ -287,7 +280,7 @@ class SubscriptionListener
         $url = $subscription->target_url;
 
         if (! Utils::isNinja() && $secret = env('SUBSCRIPTION_SECRET')) {
-            $url .= '?secret=' . $secret;
+            $url .= '?secret='.$secret;
         }
 
         $opts = [
@@ -310,5 +303,4 @@ class SubscriptionListener
             $subscription->delete();
         }
     }
-
 }

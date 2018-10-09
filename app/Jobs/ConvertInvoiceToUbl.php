@@ -4,19 +4,18 @@ namespace App\Jobs;
 
 use Utils;
 use Exception;
-use App\Jobs\Job;
-use CleverIt\UBL\Invoice\Generator;
-use CleverIt\UBL\Invoice\Invoice;
+use CleverIt\UBL\Invoice\Item;
 use CleverIt\UBL\Invoice\Party;
 use CleverIt\UBL\Invoice\Address;
-use CleverIt\UBL\Invoice\Country;
 use CleverIt\UBL\Invoice\Contact;
+use CleverIt\UBL\Invoice\Country;
+use CleverIt\UBL\Invoice\Invoice;
 use CleverIt\UBL\Invoice\TaxTotal;
-use CleverIt\UBL\Invoice\TaxSubTotal;
-use CleverIt\UBL\Invoice\TaxCategory;
+use CleverIt\UBL\Invoice\Generator;
 use CleverIt\UBL\Invoice\TaxScheme;
 use CleverIt\UBL\Invoice\InvoiceLine;
-use CleverIt\UBL\Invoice\Item;
+use CleverIt\UBL\Invoice\TaxCategory;
+use CleverIt\UBL\Invoice\TaxSubTotal;
 use CleverIt\UBL\Invoice\LegalMonetaryTotal;
 
 class ConvertInvoiceToUbl extends Job
@@ -119,7 +118,7 @@ class ConvertInvoiceToUbl extends Job
             ->setItem((new Item())
                 ->setName($item->product_key)
                 ->setDescription($item->description));
-                //->setSellersItemIdentification("1ABCD"));
+        //->setSellersItemIdentification("1ABCD"));
 
         $taxtotal = new TaxTotal();
         $itemTaxAmount1 = $itemTaxAmount2 = 0;

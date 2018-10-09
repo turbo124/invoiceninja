@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ExportReportResults;
-use App\Jobs\LoadPostmarkStats;
-use App\Jobs\RunReport;
-use App\Models\Account;
-use App\Models\ScheduledReport;
 use Auth;
+use View;
 use Input;
 use Utils;
-use View;
 use Carbon;
 use Validator;
-
+use App\Jobs\RunReport;
+use App\Models\Account;
+use App\Jobs\LoadPostmarkStats;
+use App\Models\ScheduledReport;
+use App\Jobs\ExportReportResults;
 
 /**
  * Class ReportController.
@@ -120,10 +119,12 @@ class ReportController extends BaseController
                     break;
                 case 'schedule':
                     self::schedule($params, $config);
+
                     return redirect('/reports');
                     break;
                 case 'cancel_schedule':
                     self::cancelSchdule();
+
                     return redirect('/reports');
                     break;
             }

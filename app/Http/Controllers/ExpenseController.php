@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateExpenseRequest;
-use App\Http\Requests\ExpenseRequest;
-use App\Http\Requests\UpdateExpenseRequest;
-use App\Models\Client;
-use App\Models\Expense;
-use App\Models\ExpenseCategory;
-use App\Models\TaxRate;
-use App\Models\Vendor;
-use App\Ninja\Datatables\ExpenseDatatable;
-use App\Ninja\Repositories\ExpenseRepository;
-use App\Ninja\Repositories\InvoiceRepository;
-use App\Services\ExpenseService;
+use URL;
 use Auth;
-use Cache;
+use View;
 use Input;
-use Redirect;
+use Utils;
 use Request;
 use Session;
-use URL;
-use Utils;
-use View;
+use Redirect;
+use App\Models\Client;
+use App\Models\Vendor;
+use App\Models\Expense;
+use App\Models\TaxRate;
+use App\Models\ExpenseCategory;
+use App\Services\ExpenseService;
+use App\Http\Requests\ExpenseRequest;
+use App\Ninja\Datatables\ExpenseDatatable;
+use App\Http\Requests\CreateExpenseRequest;
+use App\Http\Requests\UpdateExpenseRequest;
+use App\Ninja\Repositories\ExpenseRepository;
+use App\Ninja\Repositories\InvoiceRepository;
 
 class ExpenseController extends BaseController
 {
@@ -110,7 +109,7 @@ class ExpenseController extends BaseController
         $actions = [];
 
         if (! $clone) {
-            $actions[] = ['url' => 'javascript:submitAction("clone")', 'label' => trans("texts.clone_expense")];
+            $actions[] = ['url' => 'javascript:submitAction("clone")', 'label' => trans('texts.clone_expense')];
         }
         if ($expense->invoice) {
             $actions[] = ['url' => URL::to("invoices/{$expense->invoice->public_id}/edit"), 'label' => trans('texts.view_invoice')];
@@ -153,7 +152,7 @@ class ExpenseController extends BaseController
             $url = 'expenses';
         } else {
             $method = 'PUT';
-            $url = 'expenses/' . $expense->public_id;
+            $url = 'expenses/'.$expense->public_id;
         }
 
         $data = [
@@ -197,9 +196,9 @@ class ExpenseController extends BaseController
 
         if ($action == 'clone') {
             return redirect()->to(sprintf('expenses/%s/clone', $expense->public_id));
-        } else {
-            return redirect()->to("expenses/{$expense->public_id}/edit");
         }
+
+        return redirect()->to("expenses/{$expense->public_id}/edit");
     }
 
     public function store(CreateExpenseRequest $request)
@@ -267,13 +266,13 @@ class ExpenseController extends BaseController
                     return Redirect::to("invoices/create/{$clientPublicId}")
                             ->with('expenseCurrencyId', $currencyId)
                             ->with('expenses', $ids);
-                } else {
+                }
                     $invoiceId = Input::get('invoice_id');
 
                     return Redirect::to("invoices/{$invoiceId}/edit")
                             ->with('expenseCurrencyId', $currencyId)
                             ->with('expenses', $ids);
-                }
+
                 break;
 
             default:
