@@ -16,7 +16,6 @@ class PaymentTermTransformer extends EntityTransformer
      * @SWG\Property(property="archived_at", type="integer", example=1451160233, readOnly=true)
      * @SWG\Property(property="is_default", type="boolean", example=false)
      */
-
     public function __construct($account = null, $serializer = null, $paymentTerm = null)
     {
         parent::__construct($account, $serializer);
@@ -24,12 +23,11 @@ class PaymentTermTransformer extends EntityTransformer
         $this->paymentTerm = $paymentTerm;
     }
 
-
     public function transform(PaymentTerm $paymentTerm)
     {
         return array_merge($this->getDefaults($paymentTerm), [
             'num_days' => (int) $paymentTerm->num_days,
-            'name' => trans('texts.payment_terms_net') . ' ' . $paymentTerm->getNumDays(),
+            'name' => trans('texts.payment_terms_net').' '.$paymentTerm->getNumDays(),
             'updated_at' => $this->getTimestamp($paymentTerm->updated_at),
             'archived_at' => $this->getTimestamp($paymentTerm->deleted_at),
             'is_default' => (bool) $paymentTerm->account_id == 0 ? true : false,

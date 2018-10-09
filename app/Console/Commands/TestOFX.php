@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Services\BankAccountService;
 use Illuminate\Console\Command;
+use App\Services\BankAccountService;
 
 /**
  * Class TestOFX.

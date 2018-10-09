@@ -2,18 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\Account;
-use App\Models\Activity;
-use App\Models\Client;
+use App;
+use Auth;
+use Utils;
+use Exception;
 use App\Models\Credit;
 use App\Models\Invoice;
+use App\Models\Activity;
 use App\Ninja\Datatables\PaymentDatatable;
 use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Repositories\PaymentRepository;
-use Auth;
-use App;
-use Exception;
-use Utils;
 
 class PaymentService extends BaseService
 {
@@ -145,7 +143,7 @@ class PaymentService extends BaseService
             if (App::runningInConsole()) {
                 $mailer = app('App\Ninja\Mailers\UserMailer');
                 $mailer->sendMessage($invoice->user, $subject, $message, [
-                    'invoice' => $invoice
+                    'invoice' => $invoice,
                 ]);
             }
 
@@ -168,7 +166,6 @@ class PaymentService extends BaseService
 
         return $this->paymentRepo->save($input, $payment);
     }
-
 
     public function getDatatable($clientPublicId, $search)
     {
@@ -222,8 +219,8 @@ class PaymentService extends BaseService
             }
 
             return $successful;
-        } else {
-            return parent::bulk($ids, $action);
         }
+
+        return parent::bulk($ids, $action);
     }
 }

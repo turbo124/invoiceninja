@@ -2,8 +2,6 @@
 
 namespace App\Models\Traits;
 
-use Utils;
-
 /**
  * Class PresentsInvoice.
  */
@@ -38,9 +36,9 @@ trait PresentsInvoice
             }
 
             return $this->applyLabels($fields);
-        } else {
-            return $this->getDefaultInvoiceFields();
         }
+
+        return $this->getDefaultInvoiceFields();
     }
 
     public function getDefaultInvoiceFields()
@@ -98,7 +96,7 @@ trait PresentsInvoice
                 'product.hours',
                 'product.tax',
                 'product.line_total',
-            ]
+            ],
         ];
 
         if ($this->customLabel('invoice_text1')) {
@@ -218,7 +216,7 @@ trait PresentsInvoice
                 if (substr($fieldName, 0, 6) == 'custom') {
                     $fields[$section][$field] = $labels[$field];
                 } elseif (in_array($field, ['client.phone', 'client.email'])) {
-                    $fields[$section][$field] = trans('texts.contact_' . $fieldName);
+                    $fields[$section][$field] = trans('texts.contact_'.$fieldName);
                 } else {
                     $fields[$section][$field] = $labels[$fieldName];
                 }
@@ -242,13 +240,12 @@ trait PresentsInvoice
 
         if (isset($custom[$field]) && $custom[$field]) {
             return $custom[$field];
-        } else {
-            if ($override) {
-                $field = $override;
-            }
-            return $this->isEnglish() ? uctrans("texts.$field") : trans("texts.$field");
+        }
+        if ($override) {
+            $field = $override;
         }
 
+        return $this->isEnglish() ? uctrans("texts.$field") : trans("texts.$field");
     }
 
     /**
@@ -348,7 +345,7 @@ trait PresentsInvoice
             $translated = $this->isEnglish() ? uctrans("texts.$field") : trans("texts.$field");
             if (isset($custom[$field]) && $custom[$field]) {
                 $data[$field] = $custom[$field];
-                $data[$field . '_orig'] = $translated;
+                $data[$field.'_orig'] = $translated;
             } else {
                 $data[$field] = $translated;
             }
@@ -376,7 +373,8 @@ trait PresentsInvoice
         return $data;
     }
 
-    public function getCustomDesign($designId) {
+    public function getCustomDesign($designId)
+    {
         if ($designId == CUSTOM_DESIGN1) {
             return $this->custom_design1;
         } elseif ($designId == CUSTOM_DESIGN2) {
@@ -388,9 +386,10 @@ trait PresentsInvoice
         return null;
     }
 
-    public function hasInvoiceField($type, $field) {
+    public function hasInvoiceField($type, $field)
+    {
         $fields = $this->getInvoiceFields();
 
-        return isset($fields[$type . '_fields'][$field]);
+        return isset($fields[$type.'_fields'][$field]);
     }
 }

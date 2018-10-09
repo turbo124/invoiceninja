@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
+use Auth;
 use Utils;
 use App\Models\Invoice;
 
@@ -21,7 +21,7 @@ class RecurringInvoiceDatatable extends EntityDatatable
                     if ($model->frequency) {
                         $frequency = strtolower($model->frequency);
                         $frequency = preg_replace('/\s/', '_', $frequency);
-                        $label = trans('texts.freq_' . $frequency);
+                        $label = trans('texts.freq_'.$frequency);
                     } else {
                         $label = trans('texts.freq_inactive');
                     }
@@ -106,7 +106,7 @@ class RecurringInvoiceDatatable extends EntityDatatable
                 },
             ],
             [
-                trans("texts.clone_invoice"),
+                trans('texts.clone_invoice'),
                 function ($model) {
                     return URL::to("invoices/{$model->public_id}/clone");
                 },
@@ -115,7 +115,7 @@ class RecurringInvoiceDatatable extends EntityDatatable
                 },
             ],
             [
-                trans("texts.clone_quote"),
+                trans('texts.clone_quote'),
                 function ($model) {
                     return URL::to("quotes/{$model->public_id}/clone");
                 },

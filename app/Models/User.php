@@ -2,18 +2,16 @@
 
 namespace App\Models;
 
-use App\Events\UserSettingsChanged;
-use App\Events\UserSignedUp;
-use App\Libraries\Utils;
-use App\Models\Traits\HasAvatar;
 use Event;
+use Session;
+use App\Libraries\Utils;
+use App\Events\UserSignedUp;
+use App\Models\Traits\HasAvatar;
+use App\Events\UserSettingsChanged;
+use Illuminate\Notifications\Notifiable;
+use Laracasts\Presenter\PresentableTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Log;
-use Laracasts\Presenter\PresentableTrait;
-use Session;
-use App\Models\LookupUser;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * Class User.
@@ -212,9 +210,9 @@ class User extends Authenticatable
             return $this->getFullName();
         } elseif ($this->email) {
             return $this->email;
-        } else {
-            return trans('texts.guest');
         }
+
+        return trans('texts.guest');
     }
 
     /**
@@ -224,9 +222,9 @@ class User extends Authenticatable
     {
         if ($this->first_name || $this->last_name) {
             return $this->first_name.' '.$this->last_name;
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -255,9 +253,9 @@ class User extends Authenticatable
     {
         if ($this->email) {
             return parent::afterSave($success = true, $forced = false);
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -288,9 +286,6 @@ class User extends Authenticatable
         return MAX_NUM_VENDORS;
     }
 
-    /**
-     *
-     */
     public function clearSession()
     {
         $keys = [
@@ -347,8 +342,6 @@ class User extends Authenticatable
         return Utils::isNinjaProd() && $this->email != $this->getOriginal('email');
     }
 
-
-
     /**
      * Checks to see if the user has the required permission.
      *
@@ -357,24 +350,20 @@ class User extends Authenticatable
      *
      * @return bool
      */
-
     public function hasPermission($permission, $requireAll = false)
     {
         if ($this->is_admin) {
             return true;
         } elseif (is_string($permission)) {
-
-            if( is_array(json_decode($this->permissions,1)) && in_array($permission, json_decode($this->permissions,1)) ) {
+            if (is_array(json_decode($this->permissions, 1)) && in_array($permission, json_decode($this->permissions, 1))) {
                 return true;
             }
-
         } elseif (is_array($permission)) {
+            if ($requireAll) {
+                return count(array_intersect($permission, json_decode($this->permissions, 1))) == count($permission);
+            }
 
-            if ($requireAll)
-                return count(array_intersect($permission, json_decode($this->permissions,1))) == count( $permission );
-            else
-                return count(array_intersect($permission, json_decode($this->permissions,1))) > 0;
-
+            return count(array_intersect($permission, json_decode($this->permissions, 1))) > 0;
         }
 
         return false;
@@ -405,11 +394,12 @@ class User extends Authenticatable
 
     /**
      * @param $entity
+     *
      * @return bool|mixed
      */
     public function filterIdByEntity($entity)
     {
-        return $this->hasPermission('view_' . $entity) ? false : $this->id;
+        return $this->hasPermission('view_'.$entity) ? false : $this->id;
     }
 
     /**
@@ -437,17 +427,17 @@ class User extends Authenticatable
     /**
      * @param $entityType
      * @param bool $entity
+     *
      * @return bool
      */
     public function canCreateOrEdit($entityType, $entity = false)
     {
-        if($entity)
+        if ($entity) {
             return ($entity && $this->can('edit', $entity)) || ($entity && $this->can('create', $entity));
-        elseif($entityType)
+        } elseif ($entityType) {
             return $this->hasPermission('edit_'.$entityType) || $this->hasPermission('create_'.$entityType);
-
+        }
     }
-
 
     /**
      * @return mixed
@@ -488,6 +478,7 @@ class User extends Authenticatable
 
     /**
      * @param $ip
+     *
      * @return $this
      */
     public function acceptLatestTerms($ip)
@@ -501,6 +492,7 @@ class User extends Authenticatable
 
     /**
      * @param $entity
+     *
      * @return bool
      */
     public function ownsEntity($entity)
@@ -510,6 +502,7 @@ class User extends Authenticatable
 
     /**
      * @param $invoice
+     *
      * @return bool
      */
     public function shouldNotify($invoice)
@@ -528,7 +521,6 @@ class User extends Authenticatable
 
         return true;
     }
-
 
     public function permissionsMap()
     {
@@ -549,12 +541,9 @@ class User extends Authenticatable
     {
         return $this->id == $this->account->account_ticket_settings->ticket_master_id;
     }
-
-
 }
 
-User::created(function ($user)
-{
+User::created(function ($user) {
     LookupUser::createNew($user->account->account_key, [
         'email' => $user->email,
         'user_id' => $user->id,
@@ -579,15 +568,14 @@ User::updated(function ($user) {
     User::onUpdatedUser($user);
 });
 
-User::deleted(function ($user)
-{
+User::deleted(function ($user) {
     if (! $user->email) {
         return;
     }
 
     if ($user->forceDeleting) {
         LookupUser::deleteWhere([
-            'email' => $user->email
+            'email' => $user->email,
         ]);
     }
 });

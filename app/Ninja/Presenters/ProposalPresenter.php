@@ -2,7 +2,6 @@
 
 namespace App\Ninja\Presenters;
 
-use Utils;
 use DropdownButton;
 
 /**
@@ -16,15 +15,15 @@ class ProposalPresenter extends EntityPresenter
         $invitation = $proposal->invitations->first();
         $actions = [];
 
-        $actions[] = ['url' => $invitation->getLink('proposal'), 'label' => trans("texts.view_in_portal")];
+        $actions[] = ['url' => $invitation->getLink('proposal'), 'label' => trans('texts.view_in_portal')];
 
         $actions[] = DropdownButton::DIVIDER;
 
         if (! $proposal->trashed()) {
-            $actions[] = ['url' => 'javascript:onArchiveClick()', 'label' => trans("texts.archive_proposal")];
+            $actions[] = ['url' => 'javascript:onArchiveClick()', 'label' => trans('texts.archive_proposal')];
         }
         if (! $proposal->is_deleted) {
-            $actions[] = ['url' => 'javascript:onDeleteClick()', 'label' => trans("texts.delete_proposal")];
+            $actions[] = ['url' => 'javascript:onDeleteClick()', 'label' => trans('texts.delete_proposal')];
         }
 
         return $actions;

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use HTMLUtils;
 use Utils;
+use HTMLUtils;
 
 class SaveClientPortalSettings extends Request
 {

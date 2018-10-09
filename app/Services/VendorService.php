@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use Auth;
+use Utils;
 use App\Models\Vendor;
 use App\Ninja\Datatables\VendorDatatable;
 use App\Ninja\Repositories\NinjaRepository;
 use App\Ninja\Repositories\VendorRepository;
-use Auth;
-use Utils;
 
 /**
  * Class VendorService.

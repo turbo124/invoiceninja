@@ -46,16 +46,13 @@ class AuthServiceProvider extends ServiceProvider
      * Register any application authentication / authorization services.
      *
      * @param \Illuminate\Contracts\Auth\Access\Gate $gate
-     *
-     * @return void
      */
     public function boot()
     {
         foreach ($this->policies as $key => $policy) {
-
-            foreach (get_class_methods(new $policy) as $method)
+            foreach (get_class_methods(new $policy) as $method) {
                 Gate::define($method, "{$policy}@{$method}");
-
+            }
         }
 
         $this->registerPolicies();

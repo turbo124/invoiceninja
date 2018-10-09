@@ -2,9 +2,9 @@
 
 namespace App\Http\ViewComposers;
 
+use App\Models\Document;
 use Illuminate\View\View;
 use App\Models\ProposalSnippet;
-use App\Models\Document;
 
 /**
  * ClientPortalHeaderComposer.php.
@@ -17,8 +17,6 @@ class ProposalComposer
      * Bind data to the view.
      *
      * @param View $view
-     *
-     * @return void
      */
     public function compose(View $view)
     {
@@ -28,7 +26,6 @@ class ProposalComposer
             ->get();
 
         $view->with('snippets', $snippets);
-
 
         $documents = Document::scope()
             ->whereNull('invoice_id')

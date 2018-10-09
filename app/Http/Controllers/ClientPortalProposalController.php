@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\Document;
 use App\Models\Invitation;
-use App\Ninja\Repositories\ProposalRepository;
 use App\Jobs\ConvertProposalToPdf;
+use App\Ninja\Repositories\ProposalRepository;
 
 class ClientPortalProposalController extends BaseController
 {
@@ -41,9 +41,9 @@ class ClientPortalProposalController extends BaseController
 
         if (request()->phantomjs) {
             return $proposal->present()->htmlDocument;
-        } else {
-            return view('invited.proposal', $data);
         }
+
+        return view('invited.proposal', $data);
     }
 
     public function downloadProposal($invitationKey)

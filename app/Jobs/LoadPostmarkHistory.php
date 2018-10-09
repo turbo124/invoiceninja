@@ -2,9 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
-use Postmark\PostmarkClient;
 use stdClass;
+use Postmark\PostmarkClient;
 
 class LoadPostmarkHistory extends Job
 {
@@ -16,8 +15,6 @@ class LoadPostmarkHistory extends Job
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -42,7 +39,8 @@ class LoadPostmarkHistory extends Job
         return $response;
     }
 
-    private function loadBounceEvents() {
+    private function loadBounceEvents()
+    {
         $str = '';
         $response = $this->postmark->getBounces(5, 0, null, null, $this->email, $this->account->account_key);
 
@@ -61,7 +59,8 @@ class LoadPostmarkHistory extends Job
         return $str;
     }
 
-    private function loadEmailEvents() {
+    private function loadEmailEvents()
+    {
         $str = '';
         $response = $this->postmark->getOutboundMessages(5, 0, $this->email, null, $this->account->account_key);
 
@@ -79,7 +78,7 @@ class LoadPostmarkHistory extends Job
                     $str .= sprintf('<span class="text-muted">%s</span><br/>', $server);
                 }
             } else {
-                $str .= trans('texts.processing') . '...';
+                $str .= trans('texts.processing').'...';
             }
 
             $str .= '<p/>';

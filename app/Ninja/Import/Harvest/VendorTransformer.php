@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Import\Harvest;
 
-use App\Ninja\Import\BaseTransformer;
 use League\Fractal\Resource\Item;
+use App\Ninja\Import\BaseTransformer;
 
 // vendor
 /**

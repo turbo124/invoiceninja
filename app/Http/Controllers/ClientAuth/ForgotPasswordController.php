@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\ClientAuth;
 
-use Password;
-use Config;
 use Utils;
-use App\Models\Contact;
+use Config;
+use Password;
 use App\Models\Account;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
@@ -28,8 +28,6 @@ class ForgotPasswordController extends Controller
 
     /**
      * Create a new controller instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -44,8 +42,8 @@ class ForgotPasswordController extends Controller
     public function showLinkRequestForm()
     {
         $data = [
-        	'clientauth' => true,
-		];
+            'clientauth' => true,
+        ];
 
         return view('clientauth.passwords.email')->with($data);
     }

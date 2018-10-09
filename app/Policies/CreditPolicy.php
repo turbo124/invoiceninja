@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\User;
 
-
 class CreditPolicy extends EntityPolicy
 {
     public function create(User $user)

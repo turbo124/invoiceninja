@@ -6,8 +6,6 @@ class AddInvoiceDesignTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -489,14 +487,12 @@ class AddInvoiceDesignTable extends Migration
 		    doc.setFontType('normal');
 		    doc.text(layout.marginLeft, 790, 'Created by InvoiceNinja.com');
 		  }",
-          
+
         ]);
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

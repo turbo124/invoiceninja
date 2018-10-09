@@ -16,7 +16,7 @@ class InvoiceWasRestored extends Event
      * @var Invoice
      */
     public $invoice;
-    
+
     public $fromDeleted;
 
     /**

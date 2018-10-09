@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -9,7 +9,7 @@ return array(
     |
     */
 
-    'table' => array(
+    'table' => [
 
         /*
         |--------------------------------------------------------------------------
@@ -48,13 +48,13 @@ return array(
         |
         */
 
-        'options' => array(
+        'options' => [
 
-            "sPaginationType" => "full_numbers",
+            'sPaginationType' => 'full_numbers',
 
-            "bProcessing" => false
+            'bProcessing' => false,
 
-        ),
+        ],
 
         /*
         |--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ return array(
         |
         */
 
-        'callbacks' => array(),
+        'callbacks' => [],
 
         /*
         |--------------------------------------------------------------------------
@@ -82,7 +82,6 @@ return array(
 
         'noScript' => false,
 
-
         /*
         |--------------------------------------------------------------------------
         | Table view
@@ -95,7 +94,6 @@ return array(
 
         'table_view' => 'chumper.datatable::template',
 
-
         /*
         |--------------------------------------------------------------------------
         | Script view
@@ -107,7 +105,7 @@ return array(
         */
 
         'script_view' => 'chumper.datatable::javascript',
-        
+
         /*
           |--------------------------------------------------------------------------
           | Option view
@@ -116,11 +114,10 @@ return array(
           | Template used to render the options recursive
           |
         */
-        
-        'options_view' => config('chumper.datatable::options')
 
-    ),
+        'options_view' => config('chumper.datatable::options'),
 
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -129,7 +126,7 @@ return array(
     |
     */
 
-    'engine' => array(
+    'engine' => [
 
         /*
         |--------------------------------------------------------------------------
@@ -143,7 +140,6 @@ return array(
 
         'exactWordSearch' => false,
 
-    )
+    ],
 
-
-);
+];
