@@ -2,14 +2,14 @@
 
 namespace App\Ninja\Repositories;
 
+use DB;
+use Auth;
+use Utils;
+use Session;
+use App\Models\Task;
 use App\Models\Client;
 use App\Models\Project;
-use App\Models\Task;
 use App\Models\TaskStatus;
-use Auth;
-use Session;
-use DB;
-use Utils;
 
 class TaskRepository extends BaseRepository
 {
@@ -53,7 +53,7 @@ class TaskRepository extends BaseRepository
                         'tasks.time_log',
                         'tasks.time_log as duration',
                         'tasks.created_at',
-                        DB::raw("SUBSTRING(time_log, 3, 10) date"),
+                        DB::raw('SUBSTRING(time_log, 3, 10) date'),
                         'tasks.user_id',
                         'projects.name as project',
                         'projects.public_id as project_public_id',
@@ -71,7 +71,7 @@ class TaskRepository extends BaseRepository
 
         $this->applyFilters($query, ENTITY_TASK);
 
-        if ($statuses = session('entity_status_filter:' . ENTITY_TASK)) {
+        if ($statuses = session('entity_status_filter:'.ENTITY_TASK)) {
             $statuses = explode(',', $statuses);
             $query->where(function ($query) use ($statuses) {
                 if (in_array(TASK_STATUS_LOGGED, $statuses)) {
@@ -94,7 +94,6 @@ class TaskRepository extends BaseRepository
                     $query->whereIn('task_statuses.public_id', $statuses)
                         ->whereNull('tasks.invoice_id');
                 });
-
             });
         }
 
@@ -123,7 +122,7 @@ class TaskRepository extends BaseRepository
                         'tasks.description',
                         'tasks.time_log',
                         'tasks.time_log as duration',
-                        DB::raw("SUBSTRING(time_log, 3, 10) date"),
+                        DB::raw('SUBSTRING(time_log, 3, 10) date'),
                         'projects.name as project'
                     );
 
@@ -203,7 +202,7 @@ class TaskRepository extends BaseRepository
             } elseif ($data['action'] == 'stop' && $task->is_running) {
                 $timeLog[count($timeLog) - 1][1] = time();
                 $task->is_running = false;
-            } elseif ($data['action'] == 'offline'){
+            } elseif ($data['action'] == 'offline') {
                 $task->is_running = $data['is_running'] ? 1 : 0;
             }
         } elseif (isset($data['is_running'])) {

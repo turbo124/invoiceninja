@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Import\Stripe;
 
-use App\Ninja\Import\BaseTransformer;
-use League\Fractal\Resource\Item;
 use App\Models\PaymentType;
+use League\Fractal\Resource\Item;
+use App\Ninja\Import\BaseTransformer;
 
 /**
  * Class InvoiceTransformer.
@@ -44,10 +44,10 @@ class CustomerTransformer extends BaseTransformer
                     'payment_type_id' => PaymentType::parseCardType($data->card_brand),
                     'source_reference' => $data->card_id,
                     'last4' => $data->card_last4,
-                    'expiration' => $data->card_exp_year . '-' . $data->card_exp_month . '-01',
+                    'expiration' => $data->card_exp_year.'-'.$data->card_exp_month.'-01',
                     'email' => $contact->email,
                     'currency_id' => $account->getCurrencyId(),
-                ]
+                ],
             ];
         });
     }

@@ -2,12 +2,12 @@
 
 namespace App\Models\Traits;
 
+use Utils;
 use Carbon;
 use DateTime;
-use Utils;
 
 /**
- * Class HasRecurrence
+ * Class HasRecurrence.
  */
 trait HasRecurrence
 {
@@ -18,9 +18,9 @@ trait HasRecurrence
     {
         if (Utils::isSelfHost()) {
             return $this->shouldSendTodayNew();
-        } else {
-            return $this->shouldSendTodayOld();
         }
+
+        return $this->shouldSendTodayOld();
     }
 
     /**
@@ -45,22 +45,21 @@ trait HasRecurrence
 
         if (! $this->last_sent_date) {
             return true;
-        } else {
-            $date1 = new DateTime($this->last_sent_date);
-            $date2 = new DateTime();
-            $diff = $date2->diff($date1);
-            $daysSinceLastSent = $diff->format('%a');
-            $monthsSinceLastSent = ($diff->format('%y') * 12) + $diff->format('%m');
+        }
+        $date1 = new DateTime($this->last_sent_date);
+        $date2 = new DateTime();
+        $diff = $date2->diff($date1);
+        $daysSinceLastSent = $diff->format('%a');
+        $monthsSinceLastSent = ($diff->format('%y') * 12) + $diff->format('%m');
 
-            // check we don't send a few hours early due to timezone difference
-            if (Utils::isNinja() && Carbon::now()->format('Y-m-d') != Carbon::now($timezone)->format('Y-m-d')) {
-                return false;
-            }
+        // check we don't send a few hours early due to timezone difference
+        if (Utils::isNinja() && Carbon::now()->format('Y-m-d') != Carbon::now($timezone)->format('Y-m-d')) {
+            return false;
+        }
 
-            // check we never send twice on one day
-            if ($daysSinceLastSent == 0) {
-                return false;
-            }
+        // check we never send twice on one day
+        if ($daysSinceLastSent == 0) {
+            return false;
         }
 
         switch ($this->frequency_id) {
@@ -110,20 +109,19 @@ trait HasRecurrence
 
         if (! $this->last_sent_date) {
             return true;
-        } else {
-            // check we don't send a few hours early due to timezone difference
-            if (Utils::isNinja() && Carbon::now()->format('Y-m-d') != Carbon::now($timezone)->format('Y-m-d')) {
-                return false;
-            }
-
-            $nextSendDate = $this->getNextSendDate();
-
-            if (! $nextSendDate) {
-                return false;
-            }
-
-            return $this->account->getDateTime() >= $nextSendDate;
         }
+        // check we don't send a few hours early due to timezone difference
+        if (Utils::isNinja() && Carbon::now()->format('Y-m-d') != Carbon::now($timezone)->format('Y-m-d')) {
+            return false;
+        }
+
+        $nextSendDate = $this->getNextSendDate();
+
+        if (! $nextSendDate) {
+            return false;
+        }
+
+        return $this->account->getDateTime() >= $nextSendDate;
     }
 
     /**
@@ -138,7 +136,7 @@ trait HasRecurrence
         }
 
         $startDate = $this->getOriginal('last_sent_date') ?: $this->getOriginal('start_date');
-        $startDate .= ' ' . $this->account->recurring_hour . ':00:00';
+        $startDate .= ' '.$this->account->recurring_hour.':00:00';
         $timezone = $this->account->getTimezone();
 
         $rule = $this->getRecurrenceRule();
@@ -159,9 +157,6 @@ trait HasRecurrence
         return $dates;
     }
 
-    /**
-     * @return null
-     */
     public function getNextSendDate()
     {
         // expenses don't have an is_public flag
@@ -170,7 +165,7 @@ trait HasRecurrence
         }
 
         if ($this->start_date && ! $this->last_sent_date) {
-            $startDate = $this->getOriginal('start_date') . ' ' . $this->account->recurring_hour . ':00:00';
+            $startDate = $this->getOriginal('start_date').' '.$this->account->recurring_hour.':00:00';
 
             return $this->account->getDateTime($startDate);
         }
@@ -227,7 +222,7 @@ trait HasRecurrence
         }
 
         if ($this->end_date) {
-            $rule .= 'UNTIL=' . $this->getOriginal('end_date') . ' 24:00:00';
+            $rule .= 'UNTIL='.$this->getOriginal('end_date').' 24:00:00';
         }
 
         return $rule;

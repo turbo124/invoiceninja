@@ -28,7 +28,6 @@ return [
         'subscription_key' => env('MSBOT_LUIS_SUBSCRIPTION_KEY'),
     ],
 
-
     // Settings used by invoiceninja.com
     'video_urls' => [
         'all' => env('NINJA_VIDEOS_URL', 'https://www.youtube.com/channel/UCXAHcBvhW05PDtWYIq7WDFA/videos'),
@@ -53,7 +52,6 @@ return [
         'selfhost' => env('PRIVACY_POLICY_URL', 'https://www.invoiceninja.com/self-hosting-privacy-data-control/'),
     ],
 
-
     // Google maps
     'google_maps_enabled' => env('GOOGLE_MAPS_ENABLED', true),
     'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY', ''),
@@ -66,8 +64,8 @@ return [
 
     //Tickets
     'tickets' => [
-        'ticket_support_domain' => env('TICKET_SUPPORT_DOMAIN',''),
-        'ticket_support_domain_2' => env('TICKET_SUPPORT_DOMAIN_2',''),
+        'ticket_support_domain' => env('TICKET_SUPPORT_DOMAIN', ''),
+        'ticket_support_domain_2' => env('TICKET_SUPPORT_DOMAIN_2', ''),
     ],
 
     'multi_db_enabled' => env('MULTI_DB_ENABLED', false),

@@ -6,7 +6,7 @@ use Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class Scheduled Report
+ * Class Scheduled Report.
  */
 class ScheduledReport extends EntityModel
 {
@@ -40,7 +40,7 @@ class ScheduledReport extends EntityModel
     public function updateSendDate()
     {
         switch ($this->frequency) {
-            case REPORT_FREQUENCY_DAILY;
+            case REPORT_FREQUENCY_DAILY:
                 $this->send_date = Carbon::now()->addDay()->toDateString();
                 break;
             case REPORT_FREQUENCY_WEEKLY:
@@ -57,7 +57,8 @@ class ScheduledReport extends EntityModel
         $this->save();
     }
 
-    public function getEntityType() {
+    public function getEntityType()
+    {
         return '';
     }
 }

@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\UserSettingsChanged;
-use App\Models\Account;
-use App\Models\Industry;
-use App\Models\Invoice;
-use App\Ninja\Mailers\Mailer;
-use App\Ninja\Repositories\AccountRepository;
-use App\Services\EmailService;
-use Artisan;
-use Auth;
-use Cache;
-use Config;
 use DB;
+use Auth;
+use View;
+use Cache;
 use Event;
-use Exception;
 use Input;
+use Utils;
+use Config;
+use Artisan;
+use Session;
 use Redirect;
 use Response;
-use Session;
-use Utils;
-use View;
+use Exception;
+use App\Models\Account;
+use App\Models\Invoice;
+use App\Models\Industry;
+use App\Ninja\Mailers\Mailer;
+use App\Services\EmailService;
+use App\Events\UserSettingsChanged;
+use App\Ninja\Repositories\AccountRepository;
 
 class AppController extends BaseController
 {
@@ -125,7 +125,7 @@ class AppController extends BaseController
 
         if (! Utils::isDatabaseSetup()) {
             // == DB Migrate & Seed == //
-            $sqlFile = base_path() . '/database/setup.sql';
+            $sqlFile = base_path().'/database/setup.sql';
             DB::unprepared(file_get_contents($sqlFile));
         }
 
@@ -181,16 +181,16 @@ class AppController extends BaseController
         if ($mail) {
             $prefix = '';
             if (($user = auth()->user()) && Account::count() > 1) {
-                $prefix = $user->account_id . '_';
+                $prefix = $user->account_id.'_';
             }
-            $_ENV[$prefix . 'MAIL_DRIVER'] = $mail['driver'];
-            $_ENV[$prefix . 'MAIL_PORT'] = $mail['port'];
-            $_ENV[$prefix . 'MAIL_ENCRYPTION'] = $mail['encryption'];
-            $_ENV[$prefix . 'MAIL_HOST'] = $mail['host'];
-            $_ENV[$prefix . 'MAIL_USERNAME'] = $mail['username'];
-            $_ENV[$prefix . 'MAIL_FROM_NAME'] = $mail['from']['name'];
-            $_ENV[$prefix . 'MAIL_FROM_ADDRESS'] = $mail['from']['address'];
-            $_ENV[$prefix . 'MAIL_PASSWORD'] = $mail['password'];
+            $_ENV[$prefix.'MAIL_DRIVER'] = $mail['driver'];
+            $_ENV[$prefix.'MAIL_PORT'] = $mail['port'];
+            $_ENV[$prefix.'MAIL_ENCRYPTION'] = $mail['encryption'];
+            $_ENV[$prefix.'MAIL_HOST'] = $mail['host'];
+            $_ENV[$prefix.'MAIL_USERNAME'] = $mail['username'];
+            $_ENV[$prefix.'MAIL_FROM_NAME'] = $mail['from']['name'];
+            $_ENV[$prefix.'MAIL_FROM_ADDRESS'] = $mail['from']['address'];
+            $_ENV[$prefix.'MAIL_PASSWORD'] = $mail['password'];
             $_ENV['MAILGUN_DOMAIN'] = $mail['mailgun_domain'];
             $_ENV['MAILGUN_SECRET'] = $mail['mailgun_secret'];
         }
@@ -248,7 +248,7 @@ class AppController extends BaseController
 
         $data = [
             'text' => 'Test email',
-            'fromEmail' =>  $email
+            'fromEmail' =>  $email,
         ];
 
         try {
@@ -297,9 +297,13 @@ class AppController extends BaseController
                 $this->checkInnoDB();
 
                 $cacheCompiled = base_path('bootstrap/cache/compiled.php');
-                if (file_exists($cacheCompiled)) { unlink ($cacheCompiled); }
+                if (file_exists($cacheCompiled)) {
+                    unlink($cacheCompiled);
+                }
                 $cacheServices = base_path('bootstrap/cache/services.json');
-                if (file_exists($cacheServices)) { unlink ($cacheServices); }
+                if (file_exists($cacheServices)) {
+                    unlink($cacheServices);
+                }
 
                 Artisan::call('clear-compiled');
                 Artisan::call('cache:clear');
@@ -352,8 +356,8 @@ class AppController extends BaseController
         $tables = DB::select('SHOW TABLES');
         $sql = "SET sql_mode = 'ALLOW_INVALID_DATES';\n";
 
-        foreach($tables as $table) {
-            $fieldName = 'Tables_in_' . env('DB_DATABASE');
+        foreach ($tables as $table) {
+            $fieldName = 'Tables_in_'.env('DB_DATABASE');
             $sql .= "ALTER TABLE {$table->$fieldName} engine=InnoDB;\n";
         }
 
@@ -363,7 +367,7 @@ class AppController extends BaseController
     public function emailBounced()
     {
         $messageId = Input::get('MessageID');
-        $error = Input::get('Name') . ': ' . Input::get('Description');
+        $error = Input::get('Name').': '.Input::get('Description');
 
         return $this->emailService->markBounced($messageId, $error) ? RESULT_SUCCESS : RESULT_FAILURE;
     }
@@ -466,7 +470,7 @@ class AppController extends BaseController
             exit('Invalid command: Valid options are send-invoices, send-reminders or update-key');
         }
 
-        Artisan::call('ninja:' . $command, $options);
+        Artisan::call('ninja:'.$command, $options);
 
         return response(nl2br(Artisan::output()));
     }

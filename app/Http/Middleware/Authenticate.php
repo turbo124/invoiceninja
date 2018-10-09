@@ -2,15 +2,15 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Account;
-use App\Models\Contact;
-use App\Models\Invitation;
-use App\Models\ProposalInvitation;
-use App\Models\TicketInvitation;
 use Auth;
 use Utils;
 use Closure;
 use Session;
+use App\Models\Account;
+use App\Models\Contact;
+use App\Models\Invitation;
+use App\Models\TicketInvitation;
+use App\Models\ProposalInvitation;
 
 /**
  * Class Authenticate.
@@ -32,12 +32,13 @@ class Authenticate
 
         $invitationKey = false;
 
-        if($request->invitation_key)
+        if ($request->invitation_key) {
             $invitationKey = $request->invitation_key;
-        elseif($request->proposal_invitation_key)
+        } elseif ($request->proposal_invitation_key) {
             $invitationKey = $request->proposal_invitation_key;
-        elseif($request->ticket_invitation_key)
+        } elseif ($request->ticket_invitation_key) {
             $invitationKey = $request->ticket_invitation_key;
+        }
 
         if ($guard == 'client') {
             if (! empty($request->invitation_key) || ! empty($request->proposal_invitation_key) || ! empty($request->ticket_invitation_key)) {
@@ -109,23 +110,23 @@ class Authenticate
         if (! $authenticated) {
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
-            } else {
-                if ($guard == 'client') {
-                    $url = '/client/login';
-                    if (Utils::isNinjaProd()) {
-                        if ($account && Utils::getSubdomain() == 'app') {
-                            $url .= '?account_key=' . $account->account_key;
-                        }
-                    } else {
-                        if ($account && Account::count() > 1) {
-                            $url .= '?account_key=' . $account->account_key;
-                        }
+            }
+            if ($guard == 'client') {
+                $url = '/client/login';
+                if (Utils::isNinjaProd()) {
+                    if ($account && Utils::getSubdomain() == 'app') {
+                        $url .= '?account_key='.$account->account_key;
                     }
                 } else {
-                    $url = '/login';
+                    if ($account && Account::count() > 1) {
+                        $url .= '?account_key='.$account->account_key;
+                    }
                 }
-                return redirect()->guest($url);
+            } else {
+                $url = '/login';
             }
+
+            return redirect()->guest($url);
         }
 
         return $next($request);
@@ -156,9 +157,9 @@ class Authenticate
 
         if ($invitation && ! $invitation->is_deleted) {
             return $invitation;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -171,8 +172,8 @@ class Authenticate
         $contact = Contact::withTrashed()->where('contact_key', '=', $key)->first();
         if ($contact && ! $contact->is_deleted) {
             return $contact;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

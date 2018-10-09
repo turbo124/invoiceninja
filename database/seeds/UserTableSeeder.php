@@ -1,18 +1,17 @@
 <?php
 
-use App\Models\Account;
-use App\Models\AccountEmailSettings;
-use App\Models\AccountTicketSettings;
-use App\Models\Affiliate;
+use App\Models\Font;
+use App\Models\User;
 use App\Models\Client;
+use App\Models\Account;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Country;
-use App\Models\DateFormat;
-use App\Models\Font;
-use App\Models\InvoiceDesign;
 use App\Models\Product;
-use App\Models\User;
+use App\Models\Affiliate;
+use App\Models\InvoiceDesign;
+use App\Models\AccountEmailSettings;
+use App\Models\AccountTicketSettings;
 
 class UserTableSeeder extends Seeder
 {
@@ -48,7 +47,7 @@ class UserTableSeeder extends Seeder
         ]);
 
         $emailSettings = AccountEmailSettings::create([
-            'account_id' => $account->id
+            'account_id' => $account->id,
         ]);
 
         $user = User::create([

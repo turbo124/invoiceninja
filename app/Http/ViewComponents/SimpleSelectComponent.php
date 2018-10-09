@@ -2,9 +2,8 @@
 
 namespace App\Http\ViewComponents;
 
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\View;
-use App\Ninja\Repositories\ClientRepository;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SimpleSelectComponent implements Htmlable
 {
@@ -16,7 +15,8 @@ class SimpleSelectComponent implements Htmlable
     protected $secondaryItemLabel;
     protected $selectId;
 
-    public function __construct($entityType, $items, $itemLabel, $fieldLabel, $secondaryItemLabel = null, $module = null, $selectId = null) {
+    public function __construct($entityType, $items, $itemLabel, $fieldLabel, $secondaryItemLabel = null, $module = null, $selectId = null)
+    {
         $this->entityType = $entityType;
         $this->items = $items;
         $this->itemLabel = $itemLabel;
@@ -27,7 +27,7 @@ class SimpleSelectComponent implements Htmlable
         if ($selectId) {
             $this->selectId = $selectId;
         } else {
-            $this->selectId = $fieldLabel . '_id';
+            $this->selectId = $fieldLabel.'_id';
         }
     }
 

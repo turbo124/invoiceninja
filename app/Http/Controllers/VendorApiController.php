@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DeleteVendorRequest;
+use Utils;
+use Response;
+use App\Models\Vendor;
 use App\Http\Requests\VendorRequest;
 use App\Http\Requests\CreateVendorRequest;
+use App\Http\Requests\DeleteVendorRequest;
 use App\Http\Requests\UpdateVendorRequest;
-use App\Models\Vendor;
 use App\Ninja\Repositories\VendorRepository;
-use Input;
-use Response;
-use Utils;
 
 class VendorApiController extends BaseAPIController
 {

@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\InvoiceRequest;
-use App\Http\Requests\CreateInvoiceAPIRequest;
-use App\Http\Requests\UpdateInvoiceAPIRequest;
-use App\Jobs\SendInvoiceEmail;
-use App\Jobs\SendPaymentEmail;
+use Auth;
+use Input;
+use Utils;
+use Response;
+use Validator;
 use App\Models\Client;
 use App\Models\Contact;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Jobs\SendInvoiceEmail;
+use App\Jobs\SendPaymentEmail;
+use App\Services\InvoiceService;
+use App\Services\PaymentService;
+use App\Http\Requests\InvoiceRequest;
 use App\Ninja\Repositories\ClientRepository;
 use App\Ninja\Repositories\InvoiceRepository;
 use App\Ninja\Repositories\PaymentRepository;
-use App\Services\InvoiceService;
-use App\Services\PaymentService;
-use Auth;
-use Input;
-use Response;
-use Utils;
-use Validator;
+use App\Http\Requests\CreateInvoiceAPIRequest;
+use App\Http\Requests\UpdateInvoiceAPIRequest;
 
 class InvoiceApiController extends BaseAPIController
 {
@@ -349,8 +349,8 @@ class InvoiceApiController extends BaseAPIController
 
         // Workaround to support line item taxes w/Zapier
         foreach (['tax_rate1', 'tax_name1', 'tax_rate2', 'tax_name2'] as $field) {
-            if (isset($item['item_' . $field])) {
-                $item[$field] = $item['item_' . $field];
+            if (isset($item['item_'.$field])) {
+                $item[$field] = $item['item_'.$field];
             }
         }
 
@@ -478,8 +478,7 @@ class InvoiceApiController extends BaseAPIController
 
         if ($pdfString) {
             return $this->fileReponse($invoice->getFileName(), $pdfString);
-        } else {
-            abort(404);
         }
+        abort(404);
     }
 }

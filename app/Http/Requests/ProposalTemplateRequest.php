@@ -3,8 +3,7 @@
 namespace App\Http\Requests;
 
 /**
- * Class ProposalTemplateRequest
- * @package App\Http\Requests
+ * Class ProposalTemplateRequest.
  */
 class ProposalTemplateRequest extends EntityRequest
 {

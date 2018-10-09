@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
-
 /**
  * Class ExpenseCategory.
  */
@@ -43,5 +41,4 @@ class LookupInvitation extends LookupModel
 
         config(['database.default' => $current]);
     }
-
 }

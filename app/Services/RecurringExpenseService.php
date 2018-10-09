@@ -27,7 +27,7 @@ class RecurringExpenseService extends BaseService
      * CreditService constructor.
      *
      * @param RecurringExpenseRepository $creditRepo
-     * @param DatatableService  $datatableService
+     * @param DatatableService           $datatableService
      */
     public function __construct(RecurringExpenseRepository $recurringExpenseRepo, DatatableService $datatableService)
     {
