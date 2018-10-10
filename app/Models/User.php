@@ -39,5 +39,4 @@ class User extends Authenticatable
     protected $casts = [
         'settings' => 'object',
     ];
-
 }
