@@ -14,7 +14,7 @@ class SubscriptionDatatable extends EntityDatatable
             [
                 'event',
                 function ($model) {
-                    return trans('texts.subscription_event_' . $model->event);
+                    return trans('texts.subscription_event_'.$model->event);
                 },
             ],
             [

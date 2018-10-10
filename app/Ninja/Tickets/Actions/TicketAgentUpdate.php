@@ -2,29 +2,24 @@
 
 namespace App\Ninja\Tickets\Actions;
 
-use App\Libraries\Utils;
 use App\Models\Ticket;
+use App\Libraries\Utils;
 use App\Ninja\Mailers\TicketMailer;
-use Illuminate\Support\Facades\Log;
 
 /**
- * Class InboundAgentReply
- * @package App\Ninja\Tickets\Actions
+ * Class InboundAgentReply.
  */
 class TicketAgentUpdate extends BaseTicketAction
 {
-
     /**
-     * Handle a contact reply to an existing ticket
+     * Handle a contact reply to an existing ticket.
      */
-
     public function fire(Ticket $ticket)
     {
         $account = $ticket->account;
         $accountTicketSettings = $account->account_ticket_settings;
 
-        if($accountTicketSettings->update_ticket_template_id > 0 )
-        {
+        if ($accountTicketSettings->update_ticket_template_id > 0) {
             $toEmail = $ticket->contact->email;
             $fromEmail = $this->buildFromAddress($accountTicketSettings);
             $fromName = $accountTicketSettings->from_name;
@@ -37,7 +32,7 @@ class TicketAgentUpdate extends BaseTicketAction
                 'body' => parent::buildTicketBodyResponse($ticket, $accountTicketSettings, $accountTicketSettings->update_ticket_template_id),
                 'account' => $account,
                 'replyTo' => $ticket->getTicketEmailFormat(),
-                'invitation' => $ticket->invitations->first()
+                'invitation' => $ticket->invitations->first(),
             ];
 
             $ticketMailer = new TicketMailer();
@@ -49,7 +44,5 @@ class TicketAgentUpdate extends BaseTicketAction
                 \Log::error($msg);
             }
         }
-
     }
-
 }

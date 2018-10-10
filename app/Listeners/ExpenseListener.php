@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\InvoiceWasDeleted;
 use App\Models\Expense;
+use App\Events\InvoiceWasDeleted;
 use App\Ninja\Repositories\ExpenseRepository;
 
 /**

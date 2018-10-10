@@ -2,7 +2,6 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Subscription;
 use DB;
 
 class SubscriptionRepository extends BaseRepository

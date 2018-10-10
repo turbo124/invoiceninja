@@ -9,5 +9,4 @@ use Eloquent;
  */
 class PasswordReset extends Eloquent
 {
-
 }

@@ -2,11 +2,10 @@
 
 namespace App\Ninja\Datatables;
 
-use App\Models\Invoice;
-use Auth;
-use Illuminate\Support\Facades\Log;
 use URL;
+use Auth;
 use Utils;
+use App\Models\Invoice;
 
 class InvoiceDatatable extends EntityDatatable
 {
@@ -22,28 +21,27 @@ class InvoiceDatatable extends EntityDatatable
             [
                 $entityType == ENTITY_INVOICE ? 'invoice_number' : 'quote_number',
                 function ($model) use ($entityType) {
-
                     $model->entityType = $entityType;
 
-                    if(Auth::user()->can('viewModel', $model)) {
+                    if (Auth::user()->can('viewModel', $model)) {
                         $str = link_to("{$entityType}s/{$model->public_id}/edit", $model->invoice_number, ['class' => Utils::getEntityRowClass($model)])->toHtml();
+
                         return $this->addNote($str, $model->private_notes);
                     }
-                    else
-                        return $model->invoice_number;
+
+                    return $model->invoice_number;
                 },
             ],
             [
                 'client_name',
-                function ($model) use ($entityType){
-
+                function ($model) use ($entityType) {
                     $model->entityType = ENTITY_CLIENT;
 
-                    if(Auth::user()->can('viewModel', $model))
+                    if (Auth::user()->can('viewModel', $model)) {
                         return link_to("clients/{$model->client_public_id}", Utils::getClientDisplayName($model))->toHtml();
-                    else
-                        return Utils::getClientDisplayName($model);
+                    }
 
+                    return Utils::getClientDisplayName($model);
                 },
                 ! $this->hideClient,
             ],
@@ -81,7 +79,8 @@ class InvoiceDatatable extends EntityDatatable
                             $str .= ', ';
                         }
                     }
-                    return $str . Utils::fromSqlDate($model->due_date_sql);
+
+                    return $str.Utils::fromSqlDate($model->due_date_sql);
                 },
             ],
             [
@@ -99,7 +98,7 @@ class InvoiceDatatable extends EntityDatatable
 
         return [
             [
-                trans("texts.clone_invoice"),
+                trans('texts.clone_invoice'),
                 function ($model) {
                     return URL::to("invoices/{$model->public_id}/clone");
                 },
@@ -108,7 +107,7 @@ class InvoiceDatatable extends EntityDatatable
                 },
             ],
             [
-                trans("texts.clone_quote"),
+                trans('texts.clone_quote'),
                 function ($model) {
                     return URL::to("quotes/{$model->public_id}/clone");
                 },
@@ -171,7 +170,9 @@ class InvoiceDatatable extends EntityDatatable
                 function ($model) {
                     return URL::to("invoices/{$model->quote_invoice_id}/edit");
                 },
-                function ($model) use ($entityType) {$model->entityType = ENTITY_INVOICE;
+                function ($model) use ($entityType) {
+                    $model->entityType = ENTITY_INVOICE;
+
                     return $entityType == ENTITY_QUOTE && $model->quote_invoice_id && Auth::user()->can('viewModel', $model);
                 },
             ],
@@ -210,12 +211,12 @@ class InvoiceDatatable extends EntityDatatable
 
         if ($this->entityType == ENTITY_INVOICE || $this->entityType == ENTITY_QUOTE) {
             $actions[] = [
-                'label' => mtrans($this->entityType, 'download_' . $this->entityType),
+                'label' => mtrans($this->entityType, 'download_'.$this->entityType),
                 'url' => 'javascript:submitForm_'.$this->entityType.'("download")',
             ];
             if (auth()->user()->isTrusted()) {
                 $actions[] = [
-                    'label' => mtrans($this->entityType, 'email_' . $this->entityType),
+                    'label' => mtrans($this->entityType, 'email_'.$this->entityType),
                     'url' => 'javascript:submitForm_'.$this->entityType.'("emailInvoice")',
                 ];
             }

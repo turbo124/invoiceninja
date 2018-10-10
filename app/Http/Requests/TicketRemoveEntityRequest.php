@@ -10,5 +10,4 @@ class TicketRemoveEntityRequest extends EntityRequest
     {
         return $this->user()->can('edit', Ticket::class);
     }
-
 }

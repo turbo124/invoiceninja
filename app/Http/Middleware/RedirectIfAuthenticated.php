@@ -2,12 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Client;
 use Closure;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Session;
+use App\Models\Client;
+use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\Guard;
 
 /**
  * Class RedirectIfAuthenticated.

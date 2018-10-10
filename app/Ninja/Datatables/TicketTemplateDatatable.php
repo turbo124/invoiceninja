@@ -2,9 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
-use Utils;
+use Auth;
 
 class TicketTemplateDatatable extends EntityDatatable
 {
@@ -13,7 +12,6 @@ class TicketTemplateDatatable extends EntityDatatable
 
     public function columns()
     {
-
         return [
             [
                 'name',
@@ -25,7 +23,7 @@ class TicketTemplateDatatable extends EntityDatatable
                 'description',
                 function ($model) {
                     return substr($model->description, 0, 30);
-                }
+                },
             ],
         ];
     }

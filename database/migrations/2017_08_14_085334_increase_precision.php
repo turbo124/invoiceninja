@@ -1,14 +1,11 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class IncreasePrecision extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -25,13 +22,10 @@ class IncreasePrecision extends Migration
         Schema::table('clients', function ($table) {
             $table->integer('credit_number_counter')->default(1)->nullable();
         });
-
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

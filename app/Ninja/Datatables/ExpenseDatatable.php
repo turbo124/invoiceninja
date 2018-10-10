@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Datatables;
 
-use App\Models\Expense;
-use Auth;
 use URL;
+use Auth;
 use Utils;
+use App\Models\Expense;
 
 class ExpenseDatatable extends EntityDatatable
 {
@@ -20,14 +20,14 @@ class ExpenseDatatable extends EntityDatatable
                 'vendor_name',
                 function ($model) {
                     if ($model->vendor_public_id) {
-                        if (Auth::user()->can('view', [ENTITY_VENDOR, $model]))
+                        if (Auth::user()->can('view', [ENTITY_VENDOR, $model])) {
                             return link_to("vendors/{$model->vendor_public_id}", $model->vendor_name)->toHtml();
-                        else
-                            return $model->vendor_name;
+                        }
 
-                    } else {
-                        return '';
+                        return $model->vendor_name;
                     }
+
+                    return '';
                 },
                 ! $this->hideClient,
             ],
@@ -35,25 +35,25 @@ class ExpenseDatatable extends EntityDatatable
                 'client_name',
                 function ($model) {
                     if ($model->client_public_id) {
-                        if (Auth::user()->can('view', [ENTITY_CLIENT, $model]))
+                        if (Auth::user()->can('view', [ENTITY_CLIENT, $model])) {
                             return link_to("clients/{$model->client_public_id}", Utils::getClientDisplayName($model))->toHtml();
-                        else
-                            return Utils::getClientDisplayName($model);
+                        }
 
-                    } else {
-                        return '';
+                        return Utils::getClientDisplayName($model);
                     }
+
+                    return '';
                 },
                 ! $this->hideClient,
             ],
             [
                 'expense_date',
                 function ($model) {
-                    if (Auth::user()->can('view', [ENTITY_EXPENSE, $model]))
+                    if (Auth::user()->can('view', [ENTITY_EXPENSE, $model])) {
                         return $this->addNote(link_to("expenses/{$model->public_id}/edit", Utils::fromSqlDate($model->expense_date_sql))->toHtml(), $model->private_notes);
-                    else
-                        return Utils::fromSqlDate($model->expense_date_sql);
+                    }
 
+                    return Utils::fromSqlDate($model->expense_date_sql);
                 },
             ],
             [
@@ -65,7 +65,7 @@ class ExpenseDatatable extends EntityDatatable
                     // show both the amount and the converted amount
                     if ($model->exchange_rate != 1) {
                         $converted = round($amount * $model->exchange_rate, 2);
-                        $str .= ' | ' . Utils::formatMoney($converted, $model->invoice_currency_id);
+                        $str .= ' | '.Utils::formatMoney($converted, $model->invoice_currency_id);
                     }
 
                     return $str;
@@ -75,11 +75,11 @@ class ExpenseDatatable extends EntityDatatable
                 'category',
                 function ($model) {
                     $category = $model->category != null ? substr($model->category, 0, 100) : '';
-                    if (Auth::user()->can('view', [ENTITY_EXPENSE_CATEGORY, $model]))
+                    if (Auth::user()->can('view', [ENTITY_EXPENSE_CATEGORY, $model])) {
                         return $model->category_public_id ? link_to("expense_categories/{$model->category_public_id}/edit", $category)->toHtml() : '';
-                    else
-                        return $category;
+                    }
 
+                    return $category;
                 },
             ],
             [
@@ -110,7 +110,7 @@ class ExpenseDatatable extends EntityDatatable
                 },
             ],
             [
-                trans("texts.clone_expense"),
+                trans('texts.clone_expense'),
                 function ($model) {
                     return URL::to("expenses/{$model->public_id}/clone");
                 },

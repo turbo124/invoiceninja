@@ -2,48 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateProjectRequest;
-use App\Http\Requests\ProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
-use App\Ninja\Repositories\ProjectRepository;
 use App\Services\ProjectService;
-use Auth;
-use Input;
-use Session;
-use View;
+use App\Http\Requests\ProjectRequest;
+use App\Http\Requests\CreateProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use App\Ninja\Repositories\ProjectRepository;
 
 /**
- * Class ProjectApiController
- * @package App\Http\Controllers
+ * Class ProjectApiController.
  */
-
 class ProjectApiController extends BaseAPIController
 {
     /**
      * @var ProjectRepository
      */
-
     protected $projectRepo;
 
     /**
      * @var ProjectService
      */
-
     protected $projectService;
 
     /**
      * @var string
      */
-
     protected $entityType = ENTITY_PROJECT;
 
     /**
      * ProjectApiController constructor.
+     *
      * @param ProjectRepository $projectRepo
-     * @param ProjectService $projectService
+     * @param ProjectService    $projectService
      */
-
     public function __construct(ProjectRepository $projectRepo, ProjectService $projectService)
     {
         parent::__construct();
@@ -69,7 +60,6 @@ class ProjectApiController extends BaseAPIController
      *   )
      * )
      */
-
     public function index()
     {
         $projects = Project::scope()
@@ -78,7 +68,6 @@ class ProjectApiController extends BaseAPIController
 
         return $this->listResponse($projects);
     }
-
 
     /**
      * @SWG\Get(
@@ -103,7 +92,6 @@ class ProjectApiController extends BaseAPIController
      *   )
      * )
      */
-
     public function show(ProjectRequest $request)
     {
         return $this->itemResponse($request->entity());
@@ -131,14 +119,12 @@ class ProjectApiController extends BaseAPIController
      *   )
      * )
      */
-
     public function store(CreateProjectRequest $request)
     {
         $project = $this->projectService->save($request->input());
 
         return $this->itemResponse($project);
     }
-
 
     /**
      * @SWG\Put(
@@ -170,7 +156,6 @@ class ProjectApiController extends BaseAPIController
      *
      * @param mixed $publicId
      */
-
     public function update(UpdateProjectRequest $request, $publicId)
     {
         if ($request->action) {
@@ -183,7 +168,6 @@ class ProjectApiController extends BaseAPIController
 
         return $this->itemResponse($project);
     }
-
 
     /**
      * @SWG\Delete(
@@ -207,17 +191,13 @@ class ProjectApiController extends BaseAPIController
      *     description="an ""unexpected"" error"
      *   )
      * )
-     *
      */
+    public function destroy(UpdateProjectRequest $request)
+    {
+        $project = $request->entity();
 
-     public function destroy(UpdateProjectRequest $request)
-     {
-         $project = $request->entity();
+        $this->projectRepo->delete($project);
 
-         $this->projectRepo->delete($project);
-
-         return $this->itemResponse($project);
-     }
-
-
+        return $this->itemResponse($project);
+    }
 }

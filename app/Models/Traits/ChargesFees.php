@@ -2,12 +2,8 @@
 
 namespace App\Models\Traits;
 
-use App\Models\GatewayType;
-use App\Models\InvoiceItem;
-use App\Models\AccountGatewaySettings;
-
 /**
- * Class ChargesFees
+ * Class ChargesFees.
  */
 trait ChargesFees
 {
@@ -49,7 +45,7 @@ trait ChargesFees
             }
         }
 
-        if($fee_cap != 0) {
+        if ($fee_cap != 0) {
             $fee = min($fee, $fee_cap);
         }
 
@@ -65,6 +61,7 @@ trait ChargesFees
         }
 
         $item = $this->getGatewayFeeItem();
+
         return $item ? $item->amount() : 0;
     }
 

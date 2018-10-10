@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent;
 use Cache;
+use Eloquent;
 
 /**
  * Class ExpenseCategory.
@@ -22,9 +22,9 @@ class LookupModel extends Eloquent
 
     public static function createNew($accountKey, $data)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         $current = config('database.default');
         config(['database.default' => DB_NINJA_LOOKUP]);
@@ -34,7 +34,7 @@ class LookupModel extends Eloquent
         if ($lookupAccount) {
             $data['lookup_account_id'] = $lookupAccount->id;
         } else {
-            abort(500, 'Lookup account not found for ' . $accountKey);
+            abort(500, 'Lookup account not found for '.$accountKey);
         }
 
         static::create($data);
@@ -44,9 +44,9 @@ class LookupModel extends Eloquent
 
     public static function deleteWhere($where)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         $current = config('database.default');
         config(['database.default' => DB_NINJA_LOOKUP]);
@@ -54,14 +54,13 @@ class LookupModel extends Eloquent
         static::where($where)->delete();
 
         config(['database.default' => $current]);
-
     }
 
     public static function setServerByField($field, $value)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         $className = get_called_class();
         $className = str_replace('Lookup', '', $className);
@@ -70,6 +69,7 @@ class LookupModel extends Eloquent
         // check if we've cached this lookup
         if (env('MULTI_DB_CACHE_ENABLED') && $server = Cache::get($key)) {
             static::setDbServer($server);
+
             return;
         }
 
@@ -107,9 +107,9 @@ class LookupModel extends Eloquent
 
     protected static function setDbServer($server)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         config(['database.default' => $server]);
     }

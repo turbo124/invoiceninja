@@ -6,8 +6,6 @@ class AddAffiliatePrice extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -22,15 +20,13 @@ class AddAffiliatePrice extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {
         Schema::table('affiliates', function ($table) {
             $table->dropColumn('price');
         });
-    
+
         Schema::table('licenses', function ($table) {
             $table->dropColumn('product_id');
         });
