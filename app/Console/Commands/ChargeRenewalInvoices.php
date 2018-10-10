@@ -2,13 +2,13 @@
 
 namespace App\Console\Commands;
 
+use Carbon;
 use App\Models\Account;
 use App\Models\Invoice;
-use App\Ninja\Mailers\ContactMailer as Mailer;
-use App\Ninja\Repositories\AccountRepository;
-use App\Services\PaymentService;
 use Illuminate\Console\Command;
-use Carbon;
+use App\Services\PaymentService;
+use App\Ninja\Repositories\AccountRepository;
+use App\Ninja\Mailers\ContactMailer as Mailer;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -73,7 +73,7 @@ class ChargeRenewalInvoices extends Command
                         ->orderBy('id')
                         ->get();
 
-        $this->info($invoices->count() . ' invoices found');
+        $this->info($invoices->count().' invoices found');
 
         foreach ($invoices as $invoice) {
 
@@ -90,7 +90,7 @@ class ChargeRenewalInvoices extends Command
             }
 
             if (Carbon::parse($company->plan_expires)->isFuture()) {
-                $this->info('Skipping invoice ' . $invoice->invoice_number . ' [plan not expired]');
+                $this->info('Skipping invoice '.$invoice->invoice_number.' [plan not expired]');
                 continue;
             }
 

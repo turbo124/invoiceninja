@@ -50,8 +50,8 @@ class PaymentType extends Eloquent
 
         if (! empty($cardTypes[$cardName])) {
             return $cardTypes[$cardName];
-        } else {
-            return PAYMENT_TYPE_CREDIT_CARD_OTHER;
         }
+
+        return PAYMENT_TYPE_CREDIT_CARD_OTHER;
     }
 }

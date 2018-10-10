@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\ClientAuth;
 
-use App\Http\Controllers\Controller;
 use App\Models\Contact;
-use App\Models\Invitation;
-use Config;
-use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
-use Illuminate\Mail\Message;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Password;
 
 class PasswordController extends Controller
@@ -30,10 +26,10 @@ class PasswordController extends Controller
             return $this->getEmail();
         }
 
-        $data = array(
-        	'token' => $token,
-			'clientauth' => true,
-		);
+        $data = [
+            'token' => $token,
+            'clientauth' => true,
+        ];
 
         if (! session('contact_key')) {
             return \Redirect::to('/client/session_expired');

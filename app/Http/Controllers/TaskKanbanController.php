@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use App\Models\TaskStatus;
-use App\Models\Project;
 use App\Models\Client;
+use App\Models\Project;
+use App\Models\TaskStatus;
 
 class TaskKanbanController extends BaseController
 {
@@ -39,9 +39,9 @@ class TaskKanbanController extends BaseController
                 'in_progress',
                 'done',
             ];
-            for ($i=0; $i<count($defaults); $i++) {
+            for ($i = 0; $i < count($defaults); $i++) {
                 $status = TaskStatus::createNew();
-                $status->name = trans('texts.' . $defaults[$i]);
+                $status->name = trans('texts.'.$defaults[$i]);
                 $status->sort_order = $i;
                 $status->save();
                 $statuses[] = $status;
@@ -55,9 +55,9 @@ class TaskKanbanController extends BaseController
                 $task->task_status_sort_order = $i++;
                 $task->save();
             }
-        // otherwise, check that the orders are correct
+            // otherwise, check that the orders are correct
         } else {
-            for ($i=0; $i<$statuses->count(); $i++) {
+            for ($i = 0; $i < $statuses->count(); $i++) {
                 $status = $statuses[$i];
                 if ($status->sort_order != $i) {
                     $status->sort_order = $i;
@@ -163,7 +163,7 @@ class TaskKanbanController extends BaseController
             Task::scope()
                 ->where('task_status_id', '=', $status->id)
                 ->increment('task_status_sort_order', $firstCount, [
-                    'task_status_id' => $firstStatus->id
+                    'task_status_id' => $firstStatus->id,
                 ]);
         }
 
@@ -201,5 +201,4 @@ class TaskKanbanController extends BaseController
 
         return response()->json($task);
     }
-
 }

@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
-use App\Models\Invitation;
 use App\Models\Invoice;
+use App\Models\Invitation;
 use Illuminate\Queue\SerializesModels;
 
 /**

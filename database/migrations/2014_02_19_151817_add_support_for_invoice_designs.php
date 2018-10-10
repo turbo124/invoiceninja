@@ -6,8 +6,6 @@ class AddSupportForInvoiceDesigns extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -35,7 +33,7 @@ class AddSupportForInvoiceDesigns extends Migration
         Schema::table('invoices', function ($table) {
             $table->foreign('invoice_design_id')->references('id')->on('invoice_designs');
         });
-    
+
         Schema::table('accounts', function ($table) {
             $table->foreign('invoice_design_id')->references('id')->on('invoice_designs');
         });
@@ -43,8 +41,6 @@ class AddSupportForInvoiceDesigns extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

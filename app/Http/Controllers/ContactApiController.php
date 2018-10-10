@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Response;
+use App\Models\Contact;
+use App\Services\ContactService;
 use App\Http\Requests\ContactRequest;
 use App\Http\Requests\CreateContactRequest;
 use App\Http\Requests\UpdateContactRequest;
-use App\Models\Contact;
 use App\Ninja\Repositories\ContactRepository;
-use Input;
-use Response;
-use Utils;
-use App\Services\ContactService;
 
 class ContactApiController extends BaseAPIController
 {

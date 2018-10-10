@@ -3,9 +3,7 @@
 namespace App\Ninja\Intents\WebApp;
 
 use App\Models\Invoice;
-use App\Models\EntityModel;
 use App\Ninja\Intents\InvoiceIntent;
-use Exception;
 
 class CreateInvoiceIntent extends InvoiceIntent
 {
@@ -16,7 +14,7 @@ class CreateInvoiceIntent extends InvoiceIntent
 
         //$invoiceItems = $this->requestInvoiceItems();
 
-        $url = '/invoices/create/' . $clientPublicId . '?';
+        $url = '/invoices/create/'.$clientPublicId.'?';
         $url .= $this->requestFieldsAsString(Invoice::$requestFields);
 
         $url = rtrim($url, '?');

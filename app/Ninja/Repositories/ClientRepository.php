@@ -2,14 +2,14 @@
 
 namespace App\Ninja\Repositories;
 
+use DB;
+use Auth;
+use Cache;
+use App\Models\Client;
+use App\Models\Contact;
 use App\Jobs\PurgeClientData;
 use App\Events\ClientWasCreated;
 use App\Events\ClientWasUpdated;
-use App\Models\Client;
-use App\Models\Contact;
-use Auth;
-use Cache;
-use DB;
 
 class ClientRepository extends BaseRepository
 {
@@ -57,11 +57,11 @@ class ClientRepository extends BaseRepository
                         'clients.id_number'
                     );
 
-         if(Auth::user()->account->customFieldsOption('client1_filter')) {
+        if (Auth::user()->account->customFieldsOption('client1_filter')) {
             $query->addSelect('clients.custom_value1');
         }
 
-        if(Auth::user()->account->customFieldsOption('client2_filter')) {
+        if (Auth::user()->account->customFieldsOption('client2_filter')) {
             $query->addSelect('clients.custom_value2');
         }
 
@@ -76,12 +76,12 @@ class ClientRepository extends BaseRepository
                       ->orWhere('contacts.email', 'like', '%'.$filter.'%');
             });
 
-            if(Auth::user()->account->customFieldsOption('client1_filter')) {
-                $query->orWhere('clients.custom_value1', 'like' , '%'.$filter.'%');
+            if (Auth::user()->account->customFieldsOption('client1_filter')) {
+                $query->orWhere('clients.custom_value1', 'like', '%'.$filter.'%');
             }
 
-            if(Auth::user()->account->customFieldsOption('client2_filter')) {
-                $query->orWhere('clients.custom_value2', 'like' , '%'.$filter.'%');
+            if (Auth::user()->account->customFieldsOption('client2_filter')) {
+                $query->orWhere('clients.custom_value2', 'like', '%'.$filter.'%');
             }
         }
 
@@ -110,7 +110,7 @@ class ClientRepository extends BaseRepository
         }
 
         // auto-set the client id number
-        if (Auth::check() && Auth::user()->account->client_number_counter && !$client->id_number && empty($data['id_number'])) {
+        if (Auth::check() && Auth::user()->account->client_number_counter && ! $client->id_number && empty($data['id_number'])) {
             $data['id_number'] = Auth::user()->account->getNextNumber();
         }
 
@@ -173,9 +173,9 @@ class ClientRepository extends BaseRepository
         usort($contacts, function ($left, $right) {
             if (isset($right['is_primary']) && isset($left['is_primary'])) {
                 return $right['is_primary'] - $left['is_primary'];
-            } else {
-                return 0;
             }
+
+            return 0;
         });
 
         foreach ($contacts as $contact) {

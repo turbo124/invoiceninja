@@ -2,11 +2,12 @@
 
 namespace App\Libraries;
 
-class MoneyUtilsInvalidArgumentException extends \Exception {};
+class MoneyUtilsInvalidArgumentException extends \Exception
+{
+}
 
 /**
- * Class MoneyUtils
- * @package App\Libraries
+ * Class MoneyUtils.
  */
 class MoneyUtils
 {
@@ -26,19 +27,20 @@ class MoneyUtils
     protected static $baseCurency;
 
     /**
-     * Loads currencies from cache, make $rates array and $baseCurrency
+     * Loads currencies from cache, make $rates array and $baseCurrency.
+     *
      * @throws \Exception
      */
     protected static function loadCurrencies()
     {
-        if(self::$initialized) return;
+        if (self::$initialized) {
+            return;
+        }
 
         $currencies = cache('currencies');
 
-        foreach ($currencies as $currency)
-        {
-            if(!self::$baseCurency && $currency->exchange_rate === 1.0000)
-            {
+        foreach ($currencies as $currency) {
+            if (! self::$baseCurency && $currency->exchange_rate === 1.0000) {
                 self::$baseCurency = $currency->code;
             }
 
@@ -49,11 +51,12 @@ class MoneyUtils
     }
 
     /**
-     * Currency conversion
+     * Currency conversion.
      *
      * @param  $val  value to convert
      * @param  $from currency to convert from
      * @param  $to   currency to convert to
+     *
      * @throws \Exception
      * @throws MoneyUtilsInvalidArgumentException
      */
@@ -63,32 +66,31 @@ class MoneyUtils
     }
 
     /**
-     * Get exchange rate for `to` currency based on `from` currency
+     * Get exchange rate for `to` currency based on `from` currency.
      *
      * @param $from
      * @param $to
-     * @return float|int|mixed
+     *
      * @throws \Exception
      * @throws MoneyUtilsInvalidArgumentException
+     *
+     * @return float|int|mixed
      */
     public static function getRate($from, $to)
     {
         self::loadCurrencies();
 
-        if(!array_key_exists($from, self::$rates) || !array_key_exists($to, self::$rates))
-        {
+        if (! array_key_exists($from, self::$rates) || ! array_key_exists($to, self::$rates)) {
             throw new MoneyUtilsInvalidArgumentException('Invalid currency code $from or $to');
         }
 
         // if `from` currency is same as `base` currency, return the basic exchange rate for the `to` currency
-        if($from === self::$baseCurency)
-        {
+        if ($from === self::$baseCurency) {
             return self::$rates[$to];
         }
 
         // if `to` currency is same as `base` currency, return the basic inverse of the `from` currency
-        if($to === self::$baseCurency)
-        {
+        if ($to === self::$baseCurency) {
             return 1 / self::$rates[$from];
         }
 

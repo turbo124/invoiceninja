@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-
 use App\Models\Ticket;
 
 class CreateTicketTemplateRequest extends Request
@@ -12,7 +11,6 @@ class CreateTicketTemplateRequest extends Request
      *
      * @return bool
      */
-
     public function authorize()
     {
         return $this->user()->can('create', Ticket::class);
@@ -23,15 +21,12 @@ class CreateTicketTemplateRequest extends Request
      *
      * @return array
      */
-
     public function rules()
     {
-
         $rules = [
             'name' => 'required',
             'description' => 'required',
         ];
-
 
         return $rules;
     }

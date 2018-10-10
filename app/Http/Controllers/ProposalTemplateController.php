@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateProposalTemplateRequest;
-use App\Http\Requests\ProposalTemplateRequest;
-use App\Http\Requests\UpdateProposalTemplateRequest;
-use App\Models\Invoice;
-use App\Models\ProposalTemplate;
-use App\Ninja\Datatables\ProposalTemplateDatatable;
-use App\Ninja\Repositories\ProposalTemplateRepository;
-use App\Services\ProposalTemplateService;
 use Auth;
+use View;
 use Input;
 use Session;
-use View;
+use App\Models\ProposalTemplate;
+use App\Services\ProposalTemplateService;
+use App\Http\Requests\ProposalTemplateRequest;
+use App\Ninja\Datatables\ProposalTemplateDatatable;
+use App\Http\Requests\CreateProposalTemplateRequest;
+use App\Http\Requests\UpdateProposalTemplateRequest;
+use App\Ninja\Repositories\ProposalTemplateRepository;
 
 class ProposalTemplateController extends BaseController
 {
@@ -113,7 +112,7 @@ class ProposalTemplateController extends BaseController
             $url = 'proposals/templates';
         } else {
             $method = 'PUT';
-            $url = 'proposals/templates/' . $template->public_id;
+            $url = 'proposals/templates/'.$template->public_id;
         }
 
         $data = array_merge($this->getViewmodel(), [

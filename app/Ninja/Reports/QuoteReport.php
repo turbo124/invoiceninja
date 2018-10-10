@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Client;
 use Auth;
-use Barracuda\ArchiveStream\Archive;
+use App\Models\Client;
 use App\Models\TaxRate;
+use Barracuda\ArchiveStream\Archive;
 
 class QuoteReport extends AbstractReport
 {
@@ -63,7 +63,7 @@ class QuoteReport extends AbstractReport
                 die(trans('texts.gmp_required'));
             }
 
-            $zip = Archive::instance_by_useragent(date('Y-m-d') . '_' . str_replace(' ', '_', trans('texts.quote_documents')));
+            $zip = Archive::instance_by_useragent(date('Y-m-d').'_'.str_replace(' ', '_', trans('texts.quote_documents')));
             foreach ($clients->get() as $client) {
                 foreach ($client->invoices as $invoice) {
                     foreach ($invoice->documents as $document) {

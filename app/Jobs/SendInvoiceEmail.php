@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
+use App;
+use Auth;
+use Monolog\Logger;
 use App\Models\Invoice;
 use App\Ninja\Mailers\ContactMailer;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Monolog\Logger;
-use Auth;
-use App;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
  * Class SendInvoiceEmail.

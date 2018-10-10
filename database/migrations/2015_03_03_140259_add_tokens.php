@@ -6,8 +6,6 @@ class AddTokens extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -23,7 +21,7 @@ class AddTokens extends Migration
 
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            
+
             $table->unsignedInteger('public_id')->nullable();
             $table->unique(['account_id', 'public_id']);
         });
@@ -35,8 +33,6 @@ class AddTokens extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

@@ -6,8 +6,6 @@ class AddCustomFields extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -30,8 +28,6 @@ class AddCustomFields extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

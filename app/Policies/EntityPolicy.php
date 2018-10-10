@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class EntityPolicy.
@@ -14,19 +13,18 @@ class EntityPolicy
     use HandlesAuthorization;
 
     /**
-     * @param User  $user
+     * @param User $user
      * @param $item - entity name or object
      *
      * @return bool
      */
-
     public function createPermission(User $user, $entityType)
     {
-
-        if (! $this->checkModuleEnabled($user, $entityType))
+        if (! $this->checkModuleEnabled($user, $entityType)) {
             return false;
+        }
 
-            return $user->hasPermission('create_' . $entityType);
+        return $user->hasPermission('create_'.$entityType);
     }
 
     /**
@@ -35,15 +33,15 @@ class EntityPolicy
      *
      * @return bool
      */
-
     public function edit(User $user, $item)
     {
-        if (! $this->checkModuleEnabled($user, $item))
+        if (! $this->checkModuleEnabled($user, $item)) {
             return false;
-
+        }
 
         $entityType = is_string($item) ? $item : $item->getEntityType();
-            return $user->hasPermission('edit_' . $entityType) || $user->owns($item);
+
+        return $user->hasPermission('edit_'.$entityType) || $user->owns($item);
     }
 
     /**
@@ -52,28 +50,29 @@ class EntityPolicy
      *
      * @return bool
      */
-
     public function view(User $user, $item, $entityType = null)
     {
-        if (! $this->checkModuleEnabled($user, $item))
+        if (! $this->checkModuleEnabled($user, $item)) {
             return false;
+        }
 
         $entityType = is_string($item) ? $item : $item->getEntityType();
-            return $user->hasPermission('view_' . $entityType) || $user->owns($item);
+
+        return $user->hasPermission('view_'.$entityType) || $user->owns($item);
     }
 
     public function viewModel(User $user, $model)
     {
-        if($user->hasPermission('view_'.$model->entityType))
+        if ($user->hasPermission('view_'.$model->entityType)) {
             return true;
-        elseif($model->user_id == $user->id)
+        } elseif ($model->user_id == $user->id) {
             return true;
-        elseif(isset($model->agent_id) && ($model->agent_id == $user->id))
+        } elseif (isset($model->agent_id) && ($model->agent_id == $user->id)) {
             return true;
-        else
-            return false;
-    }
+        }
 
+        return false;
+    }
 
     /**
      * @param User $user
@@ -86,7 +85,6 @@ class EntityPolicy
      *
      * @return bool
      */
-
     public function viewByOwner(User $user, $ownerUserId)
     {
         return $user->id == $ownerUserId;
@@ -103,7 +101,6 @@ class EntityPolicy
      *
      * @return bool
      */
-
     public function editByOwner(User $user, $ownerUserId)
     {
         return $user->id == $ownerUserId;
@@ -112,18 +109,18 @@ class EntityPolicy
     /**
      * @param User $user
      * @param $item - entity name or object
+     *
      * @return bool
      */
-
     public function checkModuleEnabled(User $user, $item)
     {
         $entityType = is_string($item) ? $item : $item->getEntityType();
-            return $user->account->isModuleEnabled($entityType);
+
+        return $user->account->isModuleEnabled($entityType);
     }
 
     public function createEntity(User $user, $entityType)
     {
-        return $user->hasPermission('create_' . $entityType);
+        return $user->hasPermission('create_'.$entityType);
     }
-
 }

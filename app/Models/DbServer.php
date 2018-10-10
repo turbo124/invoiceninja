@@ -20,5 +20,4 @@ class DbServer extends Eloquent
     protected $fillable = [
         'name',
     ];
-
 }

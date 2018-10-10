@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Utils;
+use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -23,7 +23,7 @@ class ResetData extends Command
 
     public function fire()
     {
-        $this->info(date('r') . ' Running ResetData...');
+        $this->info(date('r').' Running ResetData...');
 
         if (! Utils::isNinjaDev()) {
             return;
