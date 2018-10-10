@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateDocumentRequest;
-use App\Http\Requests\DocumentRequest;
-use App\Http\Requests\UpdateDocumentRequest;
-use App\Models\Contact;
-use App\Models\Document;
-use App\Ninja\Repositories\DocumentRepository;
+use View;
 use Redirect;
 use Response;
-use View;
+use App\Models\Document;
+use App\Http\Requests\DocumentRequest;
+use App\Http\Requests\CreateDocumentRequest;
+use App\Http\Requests\UpdateDocumentRequest;
+use App\Ninja\Repositories\DocumentRepository;
 
 class DocumentController extends BaseController
 {
@@ -57,7 +56,6 @@ class DocumentController extends BaseController
 
     public function getPreview(DocumentRequest $request)
     {
-
         $document = $request->entity();
 
         if (empty($document->preview)) {
@@ -106,23 +104,22 @@ class DocumentController extends BaseController
                 'error' => $result,
                 'code' => 400,
             ], 400);
-        } else {
-            if ($request->grapesjs) {
-                $response = [
+        }
+        if ($request->grapesjs) {
+            $response = [
                     'data' => [
-                        $result->getProposalUrl()
-                    ]
+                        $result->getProposalUrl(),
+                    ],
                 ];
-            } else {
-                $response = [
+        } else {
+            $response = [
                     'error' => false,
                     'document' => $doc_array,
                     'code' => 200,
                 ];
-            }
-
-            return Response::json($response, 200);
         }
+
+        return Response::json($response, 200);
     }
 
     public function delete(UpdateDocumentRequest $request)

@@ -96,9 +96,9 @@ class VendorContact extends EntityModel
     {
         if ($this->getFullName()) {
             return $this->getFullName();
-        } else {
-            return $this->email;
         }
+
+        return $this->email;
     }
 
     /**
@@ -108,8 +108,8 @@ class VendorContact extends EntityModel
     {
         if ($this->first_name || $this->last_name) {
             return $this->first_name.' '.$this->last_name;
-        } else {
-            return '';
         }
+
+        return '';
     }
 }

@@ -13,7 +13,7 @@ class CreateTaskIntent extends BaseIntent
 
         //$invoiceItems = $this->requestInvoiceItems();
 
-        $url = '/tasks/create/' . $clientPublicId . '?';
+        $url = '/tasks/create/'.$clientPublicId.'?';
         //$url .= $this->requestFieldsAsString(Invoice::$requestFields);
 
         return redirect($url);

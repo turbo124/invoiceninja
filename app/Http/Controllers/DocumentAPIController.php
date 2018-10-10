@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Document;
 use App\Http\Requests\DocumentRequest;
 use App\Http\Requests\CreateDocumentRequest;
 use App\Http\Requests\UpdateDocumentRequest;
-use App\Models\Document;
 use App\Ninja\Repositories\DocumentRepository;
 
 /**
@@ -93,9 +93,9 @@ class DocumentAPIController extends BaseAPIController
 
         if (array_key_exists($document->type, Document::$types)) {
             return DocumentController::getDownloadResponse($document);
-        } else {
-            return $this->errorResponse(['error' => 'Invalid mime type'], 400);
         }
+
+        return $this->errorResponse(['error' => 'Invalid mime type'], 400);
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Gateway;
-use App\Models\GatewayType;
 use Form;
 use HTML;
 use Utils;
+use App\Models\Gateway;
+use App\Models\GatewayType;
 
 class TemplateService
 {
@@ -95,8 +95,8 @@ class TemplateService
             }
             $camelType = Utils::toCamelCase(GatewayType::getAliasFromId($type));
             $snakeCase = Utils::toSnakeCase(GatewayType::getAliasFromId($type));
-            $variables["\${$camelType}Link"] = $invitation->getLink('payment') . "/{$snakeCase}";
-            $variables["\${$camelType}Button"] = Form::emailPaymentButton($invitation->getLink('payment')  . "/{$snakeCase}");
+            $variables["\${$camelType}Link"] = $invitation->getLink('payment')."/{$snakeCase}";
+            $variables["\${$camelType}Button"] = Form::emailPaymentButton($invitation->getLink('payment')."/{$snakeCase}");
         }
 
         $includesPasswordPlaceholder = strpos($template, '$password') !== false;

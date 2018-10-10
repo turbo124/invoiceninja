@@ -5,18 +5,20 @@ namespace App\Models\Traits;
 use Illuminate\Contracts\Database\ModelIdentifier;
 
 /**
- * Class SerialisesDeletedModels
+ * Class SerialisesDeletedModels.
+ *
  * @see https://github.com/laravel/framework/issues/9347#issuecomment-165647596
  */
 trait SerialisesDeletedModels
 {
     /**
      * @param $value
+     *
      * @return mixed
      */
     protected function getRestoredPropertyValue($value)
     {
-        if (!$value instanceof ModelIdentifier) {
+        if (! $value instanceof ModelIdentifier) {
             return $value;
         }
 

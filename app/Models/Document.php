@@ -248,7 +248,7 @@ class Document extends EntityModel
      */
     public function getRawCached()
     {
-        $key = 'image:' . $this->path;
+        $key = 'image:'.$this->path;
 
         if ($image = cache($key)) {
             // do nothing
@@ -309,7 +309,7 @@ class Document extends EntityModel
             return '';
         }
 
-        return url('proposal/image/'. $this->account->account_key . '/' . $this->document_key . '/' . $this->name);
+        return url('proposal/image/'.$this->account->account_key.'/'.$this->document_key.'/'.$this->name);
     }
 
     /**

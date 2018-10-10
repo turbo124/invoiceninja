@@ -40,7 +40,6 @@ class PaymentMethod extends EntityModel
         'currency_id',
     ];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -103,8 +102,6 @@ class PaymentMethod extends EntityModel
 
     /**
      * @param $bank_name
-     *
-     * @return null
      */
     public function getBankNameAttribute($bank_name)
     {
@@ -223,11 +220,10 @@ class PaymentMethod extends EntityModel
             Cache::put('bankData:'.$routingNumber, $data, 5);
 
             return $data;
-        } else {
-            Cache::put('bankData:'.$routingNumber, false, 5);
-
-            return null;
         }
+        Cache::put('bankData:'.$routingNumber, false, 5);
+
+        return null;
     }
 
     /**
@@ -247,9 +243,9 @@ class PaymentMethod extends EntityModel
             return GATEWAY_TYPE_BANK_TRANSFER;
         } elseif ($this->payment_type_id == PAYMENT_TYPE_PAYPAL) {
             return GATEWAY_TYPE_PAYPAL;
-        } else {
-            return GATEWAY_TYPE_TOKEN;
         }
+
+        return GATEWAY_TYPE_TOKEN;
     }
 }
 

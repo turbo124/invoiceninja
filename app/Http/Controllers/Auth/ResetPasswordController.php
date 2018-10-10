@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use Event;
-use Illuminate\Http\Request;
 use App\Events\UserLoggedIn;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 
@@ -34,8 +34,6 @@ class ResetPasswordController extends Controller
 
     /**
      * Create a new controller instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -49,18 +47,19 @@ class ResetPasswordController extends Controller
         if ($user->google_2fa_secret) {
             auth()->logout();
             session(['2fa:user:id' => $user->id]);
-            return redirect('/validate_two_factor/' . $user->account->account_key);
-        } else {
-            Event::fire(new UserLoggedIn());
-            return $this->traitSendResetResponse($response);
+
+            return redirect('/validate_two_factor/'.$user->account->account_key);
         }
+        Event::fire(new UserLoggedIn());
+
+        return $this->traitSendResetResponse($response);
     }
 
     public function showResetForm(Request $request, $token = null)
     {
         return view('auth.passwords.reset')->with([
             'token' => $token,
-            'url' => '/password/reset'
+            'url' => '/password/reset',
         ]);
     }
 }

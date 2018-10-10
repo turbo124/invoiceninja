@@ -2,11 +2,11 @@
 
 namespace App\Ninja\Repositories;
 
+use DB;
+use Utils;
 use App\Models\Product;
 use App\Events\ProductWasCreated;
 use App\Events\ProductWasUpdated;
-use Utils;
-use DB;
 
 class ProductRepository extends BaseRepository
 {
@@ -79,6 +79,7 @@ class ProductRepository extends BaseRepository
         } else {
             event(new ProductWasCreated($product, $data));
         }
+
         return $product;
     }
 

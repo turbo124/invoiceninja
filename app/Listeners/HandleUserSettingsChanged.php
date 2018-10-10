@@ -2,11 +2,11 @@
 
 namespace App\Listeners;
 
-use App\Events\UserSettingsChanged;
-use App\Ninja\Mailers\UserMailer;
-use App\Ninja\Repositories\AccountRepository;
 use Auth;
 use Session;
+use App\Ninja\Mailers\UserMailer;
+use App\Events\UserSettingsChanged;
+use App\Ninja\Repositories\AccountRepository;
 
 /**
  * Class HandleUserSettingsChanged.
@@ -29,8 +29,6 @@ class HandleUserSettingsChanged
      * Handle the event.
      *
      * @param UserSettingsChanged $event
-     *
-     * @return void
      */
     public function handle(UserSettingsChanged $event)
     {

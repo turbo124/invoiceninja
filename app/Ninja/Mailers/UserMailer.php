@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Mailers;
 
-use App\Models\Invitation;
+use App\Models\User;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\User;
+use App\Models\Invitation;
 
 class UserMailer extends Mailer
 {
@@ -81,7 +81,7 @@ class UserMailer extends Mailer
         }
 
         $entityType = $invoice->getEntityType();
-        $view = ($notificationType == 'approved' ? ENTITY_QUOTE : ENTITY_INVOICE) . "_{$notificationType}";
+        $view = ($notificationType == 'approved' ? ENTITY_QUOTE : ENTITY_INVOICE)."_{$notificationType}";
         $account = $user->account;
         $client = $invoice->client;
         $link = $invoice->present()->multiAccountLink;
@@ -108,7 +108,7 @@ class UserMailer extends Mailer
         ]);
 
         if ($notes) {
-            $subject .= ' [' . trans('texts.notes_' . $notes) . ']';
+            $subject .= ' ['.trans('texts.notes_'.$notes).']';
         }
 
         $this->sendTo($user->email, CONTACT_EMAIL, CONTACT_NAME, $subject, $view, $data);
@@ -204,15 +204,15 @@ class UserMailer extends Mailer
             return;
         }
 
-        $subject = sprintf('%s - %s %s', APP_NAME, trans('texts.' . $config->report_type), trans('texts.report'));
+        $subject = sprintf('%s - %s %s', APP_NAME, trans('texts.'.$config->report_type), trans('texts.report'));
         $view = 'user_message';
         $data = [
             'userName' => $user->getDisplayName(),
-            'primaryMessage' => trans('texts.scheduled_report_attached', ['type' => trans('texts.' . $config->report_type)]),
+            'primaryMessage' => trans('texts.scheduled_report_attached', ['type' => trans('texts.'.$config->report_type)]),
             'documents' => [[
-                'name' => $file->filename . '.' . $config->export_format,
+                'name' => $file->filename.'.'.$config->export_format,
                 'data' =>  $file->string($config->export_format),
-            ]]
+            ]],
         ];
 
         $this->sendTo($user->email, CONTACT_EMAIL, CONTACT_NAME, $subject, $view, $data);

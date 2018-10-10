@@ -23,9 +23,9 @@ class ProposalTemplatesSeeder extends Seeder
 
         for ($i = 0; $i < count($designs); $i++) {
             $design = $designs[$i];
-            $baseFileName = storage_path() . '/templates/' . strtolower($design);
-            $htmlFileName = $baseFileName . '.html';
-            $cssFileName = $baseFileName . '.css';
+            $baseFileName = storage_path().'/templates/'.strtolower($design);
+            $htmlFileName = $baseFileName.'.html';
+            $cssFileName = $baseFileName.'.css';
             if (file_exists($htmlFileName) && file_exists($cssFileName)) {
                 $template = ProposalTemplate::whereName($design)->whereNull('account_id')->first();
 

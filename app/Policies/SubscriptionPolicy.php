@@ -5,14 +5,14 @@ namespace App\Policies;
 use App\Models\User;
 
 /**
- * Class SubscriptionPolicy
- * @package App\Policies
+ * Class SubscriptionPolicy.
  */
 class SubscriptionPolicy extends EntityPolicy
 {
     /**
      * @param User $user
      * @param $item
+     *
      * @return bool
      */
     public function edit(User $user, $item)
@@ -22,6 +22,7 @@ class SubscriptionPolicy extends EntityPolicy
 
     /**
      * @param User $user
+     *
      * @return bool
      */
     public function create(User $user)

@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
-
 /**
  * Class ExpenseCategory.
  */
@@ -16,5 +14,4 @@ class LookupAccountToken extends LookupModel
         'lookup_account_id',
         'token',
     ];
-
 }

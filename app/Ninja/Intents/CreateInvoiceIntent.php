@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Intents;
 
-use App\Models\EntityModel;
 use Exception;
+use App\Models\EntityModel;
 
 class CreateInvoiceIntent extends InvoiceIntent
 {

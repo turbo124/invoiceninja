@@ -4,10 +4,10 @@ namespace App\Models;
 
 //use App\Events\ExpenseWasCreated;
 //use App\Events\ExpenseWasUpdated;
-use App\Models\Traits\HasRecurrence;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Laracasts\Presenter\PresentableTrait;
 use Utils;
+use App\Models\Traits\HasRecurrence;
+use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Expense.
@@ -98,9 +98,9 @@ class RecurringExpense extends EntityModel
     {
         if ($this->public_notes) {
             return Utils::truncateString($this->public_notes, 16);
-        } else {
-            return '#' . $this->public_id;
         }
+
+        return '#'.$this->public_id;
     }
 
     /**

@@ -239,20 +239,20 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         'Illuminate\Queue\Events\JobExceptionOccurred' => [
-            'App\Listeners\InvoiceListener@jobFailed'
+            'App\Listeners\InvoiceListener@jobFailed',
         ],
 
         //DNS Add A record to Cloudflare
         'App\Events\SubdomainWasUpdated' => [
-            'App\Listeners\DNSListener@addDNSRecord'
+            'App\Listeners\DNSListener@addDNSRecord',
         ],
 
         //DNS Remove A record from Cloudflare
         'App\Events\SubdomainWasRemoved' => [
-            'App\Listeners\DNSListener@removeDNSRecord'
+            'App\Listeners\DNSListener@removeDNSRecord',
         ],
         'App\Events\TicketUserViewed' => [
-            'App\Listeners\ActivityListener@userViewedTicket'
+            'App\Listeners\ActivityListener@userViewedTicket',
         ],
 
         /*
@@ -267,8 +267,6 @@ class EventServiceProvider extends ServiceProvider
      * Register any other events for your application.
      *
      * @param \Illuminate\Contracts\Events\Dispatcher $events
-     *
-     * @return void
      */
     public function boot()
     {

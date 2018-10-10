@@ -2,12 +2,9 @@
 
 namespace App\Jobs;
 
-use DateInterval;
-use DatePeriod;
 use stdClass;
-use App\Jobs\Job;
-use App\Models\Task;
-use App\Models\Project;
+use DatePeriod;
+use DateInterval;
 
 class GenerateProjectChartData extends Job
 {
@@ -18,8 +15,6 @@ class GenerateProjectChartData extends Job
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -83,7 +78,7 @@ class GenerateProjectChartData extends Job
 
         $dataset = new stdClass();
         $dataset->data = $records;
-        $dataset->label = trans("texts.tasks");
+        $dataset->label = trans('texts.tasks');
         $dataset->lineTension = 0;
         $dataset->borderWidth = 4;
         $dataset->borderColor = "rgba({$color}, 1)";

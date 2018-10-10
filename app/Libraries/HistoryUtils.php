@@ -2,10 +2,10 @@
 
 namespace App\Libraries;
 
-use App\Models\Activity;
-use App\Models\EntityModel;
 use Session;
 use stdClass;
+use App\Models\Activity;
+use App\Models\EntityModel;
 
 class HistoryUtils
 {
@@ -88,7 +88,7 @@ class HistoryUtils
         $accountHistory = isset($history[$entity->account_id]) ? $history[$entity->account_id] : [];
         $remove = [];
 
-        for ($i=0; $i<count($accountHistory); $i++) {
+        for ($i = 0; $i < count($accountHistory); $i++) {
             $item = $accountHistory[$i];
             if ($entity->equalTo($item)) {
                 $remove[] = $i;
@@ -97,7 +97,7 @@ class HistoryUtils
             }
         }
 
-        for ($i=count($remove) - 1; $i>=0; $i--) {
+        for ($i = count($remove) - 1; $i >= 0; $i--) {
             array_splice($history[$entity->account_id], $remove[$i], 1);
         }
 
@@ -205,12 +205,12 @@ class HistoryUtils
             if ($lastClientId === false || $item->client_id != $lastClientId) {
                 $icon = '<i class="fa fa-users" style="width:32px"></i>';
                 if ($item->client_id) {
-                    $link = url('/clients/' . $item->client_id);
+                    $link = url('/clients/'.$item->client_id);
                     $name = e($item->client_name);
 
-                    $buttonLink = url('/invoices/create/' . $item->client_id);
-                    $button = '<a type="button" class="btn btn-primary btn-sm pull-right" href="' . $buttonLink . '">
-                                    <i class="fa fa-plus-circle" style="width:20px" title="' . trans('texts.create_invoice') . '"></i>
+                    $buttonLink = url('/invoices/create/'.$item->client_id);
+                    $button = '<a type="button" class="btn btn-primary btn-sm pull-right" href="'.$buttonLink.'">
+                                    <i class="fa fa-plus-circle" style="width:20px" title="'.trans('texts.create_invoice').'"></i>
                                 </a>';
                 } else {
                     $link = '#';
@@ -227,7 +227,7 @@ class HistoryUtils
                 continue;
             }
 
-            $icon = '<i class="fa fa-' . EntityModel::getIcon($item->entityType . 's') . '" style="width:24px"></i>';
+            $icon = '<i class="fa fa-'.EntityModel::getIcon($item->entityType.'s').'" style="width:24px"></i>';
             $str .= sprintf('<li style="text-align:right; padding-right:18px;"><a href="%s">%s %s</a></li>', $item->url, e($item->name), $icon);
         }
 
