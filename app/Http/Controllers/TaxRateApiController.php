@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TaxRate;
 use App\Http\Requests\TaxRateRequest;
 use App\Http\Requests\CreateTaxRateRequest;
 use App\Http\Requests\UpdateTaxRateRequest;
-use App\Models\TaxRate;
 use App\Ninja\Repositories\TaxRateRepository;
 
 class TaxRateApiController extends BaseAPIController

@@ -2,9 +2,7 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
-use Utils;
 
 class PaymentTermDatatable extends EntityDatatable
 {
@@ -17,7 +15,7 @@ class PaymentTermDatatable extends EntityDatatable
             [
                 'num_days',
                 function ($model) {
-                    return link_to("payment_terms/{$model->public_id}/edit", trans('texts.payment_terms_net') . ' ' . ($model->num_days == -1 ? 0 : $model->num_days))->toHtml();
+                    return link_to("payment_terms/{$model->public_id}/edit", trans('texts.payment_terms_net').' '.($model->num_days == -1 ? 0 : $model->num_days))->toHtml();
                 },
             ],
         ];

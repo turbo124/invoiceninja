@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Excel;
+use App\Models\Task;
 use App\Models\Client;
-use App\Models\Contact;
 use App\Models\Credit;
+use App\Models\Vendor;
+use App\Models\Contact;
 use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
-use App\Models\Task;
-use App\Models\Vendor;
+use League\Fractal\Manager;
+use Illuminate\Http\Request;
 use App\Models\VendorContact;
+use League\Fractal\Resource\Item;
 use App\Ninja\Serializers\ArraySerializer;
 use App\Ninja\Transformers\AccountTransformer;
-use Auth;
-use Excel;
-use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 /**
  * Class ExportController.
@@ -43,20 +43,20 @@ class ExportController extends BaseController
             $fields = array_filter(array_map(function ($key) {
                 if (! in_array($key, ['format', 'include', '_token'])) {
                     return $key;
-                } else {
-                    return null;
                 }
+
+                return null;
             }, array_keys($fields), $fields));
-            $fileName = $date. '-invoiceninja-' . implode('-', $fields);
+            $fileName = $date.'-invoiceninja-'.implode('-', $fields);
         }
 
         if ($format === 'JSON') {
             return $this->returnJSON($request, $fileName);
         } elseif ($format === 'CSV') {
             return $this->returnCSV($request, $fileName);
-        } else {
-            return $this->returnXLS($request, $fileName);
         }
+
+        return $this->returnXLS($request, $fileName);
     }
 
     /**
@@ -164,7 +164,7 @@ class ExportController extends BaseController
 
         $data = [
             'account' => $account,
-            'title' => 'Invoice Ninja v' . NINJA_VERSION . ' - ' . $account->formatDateTime($account->getDateTime()),
+            'title' => 'Invoice Ninja v'.NINJA_VERSION.' - '.$account->formatDateTime($account->getDateTime()),
             'multiUser' => $account->users->count() > 1,
         ];
 

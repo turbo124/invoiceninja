@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\ClientAuth;
 
 use Utils;
+use App\Models\Account;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Contact;
-use App\Models\Account;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
 {
@@ -34,8 +34,6 @@ class LoginController extends Controller
 
     /**
      * Create a new controller instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -116,8 +114,9 @@ class LoginController extends Controller
     /**
      * Send the post-authentication response.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param \Illuminate\Http\Request                   $request
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
      * @return \Illuminate\Http\Response
      */
     private function authenticated(Request $request, Authenticatable $contact)
@@ -130,7 +129,8 @@ class LoginController extends Controller
     /**
      * Get the failed login response instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function sendFailedLoginResponse(Request $request)
@@ -143,11 +143,9 @@ class LoginController extends Controller
     }
 
     /**
-     * Validate the user login request - don't require the email
+     * Validate the user login request - don't require the email.
      *
      * @param \Illuminate\Http\Request $request
-     *
-     * @return void
      */
     protected function validateLogin(Request $request)
     {
@@ -179,7 +177,6 @@ class LoginController extends Controller
 
         self::logout($request);
 
-        return redirect('/client/dashboard/' . $contactKey);
+        return redirect('/client/dashboard/'.$contactKey);
     }
-
 }

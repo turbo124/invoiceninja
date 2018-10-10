@@ -17,8 +17,6 @@ class TranslationComposer
      * Bind data to the view.
      *
      * @param View $view
-     *
-     * @return void
      */
     public function compose(View $view)
     {
@@ -47,7 +45,7 @@ class TranslationComposer
         }));
 
         $view->with('currencies', Cache::get('currencies')->each(function ($currency) {
-            $currency->name = trans('texts.currency_' . Str::slug($currency->name, '_'));
+            $currency->name = trans('texts.currency_'.Str::slug($currency->name, '_'));
         })->sortBy(function ($currency) {
             return $currency->name;
         }));

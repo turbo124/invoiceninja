@@ -2,15 +2,15 @@
 
 namespace App\Listeners;
 
+use Auth;
+use Utils;
+use Carbon;
+use Session;
+use App\Models\Gateway;
 use App\Events\UserLoggedIn;
 use App\Events\UserSignedUp;
 use App\Libraries\HistoryUtils;
-use App\Models\Gateway;
 use App\Ninja\Repositories\AccountRepository;
-use Utils;
-use Auth;
-use Carbon;
-use Session;
 
 /**
  * Class HandleUserLoggedIn.
@@ -36,8 +36,6 @@ class HandleUserLoggedIn
      * Handle the event.
      *
      * @param UserLoggedIn $event
-     *
-     * @return void
      */
     public function handle(UserLoggedIn $event)
     {
@@ -74,7 +72,7 @@ class HandleUserLoggedIn
         if ($accountGateway && ! $accountGateway->getPublishableKey()) {
             Session::flash('warning', trans('texts.missing_publishable_key'));
         } elseif ($account->isLogoTooLarge()) {
-            Session::flash('warning', trans('texts.logo_too_large', ['size' => $account->getLogoSize() . 'KB']));
+            Session::flash('warning', trans('texts.logo_too_large', ['size' => $account->getLogoSize().'KB']));
         }
 
         if (! Utils::isNinja()) {
@@ -90,10 +88,10 @@ class HandleUserLoggedIn
             if (! $appKey || ! $appCipher) {
                 $fp = fopen(base_path().'/.env', 'a');
                 if (! $appKey) {
-                    fwrite($fp, "\nAPP_KEY=" . config('app.key'));
+                    fwrite($fp, "\nAPP_KEY=".config('app.key'));
                 }
                 if (! $appCipher) {
-                    fwrite($fp, "\nAPP_CIPHER=" . config('app.cipher'));
+                    fwrite($fp, "\nAPP_CIPHER=".config('app.cipher'));
                 }
                 fclose($fp);
             }

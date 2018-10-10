@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -46,5 +45,4 @@ class Subscription extends EntityModel
     {
         return $this->belongsTo('App\Models\Account');
     }
-
 }

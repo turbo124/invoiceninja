@@ -2,11 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
-use Postmark\PostmarkClient;
 use stdClass;
-use DateInterval;
 use DatePeriod;
+use DateInterval;
 
 class LoadPostmarkStats extends Job
 {
@@ -22,8 +20,6 @@ class LoadPostmarkStats extends Job
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -39,7 +35,8 @@ class LoadPostmarkStats extends Job
         return $this->response;
     }
 
-    private function loadOverallStats() {
+    private function loadOverallStats()
+    {
         $startDate = date_create($this->startDate);
         $endDate = date_create($this->endDate);
 
@@ -97,7 +94,8 @@ class LoadPostmarkStats extends Job
         $this->response->data = $data;
     }
 
-    private function loadSentStats() {
+    private function loadSentStats()
+    {
         $account = $this->account;
         $data = $this->postmark->getOutboundOverviewStatistics($this->account->account_key, request()->start_date, request()->end_date);
         $percent = $data->sent ? ($data->uniqueopens / $data->sent * 100) : 0;
@@ -109,7 +107,8 @@ class LoadPostmarkStats extends Job
         ];
     }
 
-    private function loadPlatformStats() {
+    private function loadPlatformStats()
+    {
         $data = $this->postmark->getOutboundPlatformStatistics($this->account->account_key, request()->start_date, request()->end_date);
         $account = $this->account;
         $str = '';
@@ -119,13 +118,14 @@ class LoadPostmarkStats extends Job
 
         foreach (['mobile', 'desktop', 'webmail'] as $platform) {
             $percent = $total ? ($data[$platform] / $total * 100) : 0;
-            $str .= sprintf('<tr><td>%s</td><td>%s%%</td></tr>', trans('texts.' . $platform), $account->formatNumber($percent));
+            $str .= sprintf('<tr><td>%s</td><td>%s%%</td></tr>', trans('texts.'.$platform), $account->formatNumber($percent));
         }
 
         $this->response->platforms = $str;
     }
 
-    private function loadEmailClientStats() {
+    private function loadEmailClientStats()
+    {
         $data = $this->postmark->getOutboundEmailClientStatistics($this->account->account_key, request()->start_date, request()->end_date);
         $account = $this->account;
         $str = '';
@@ -153,5 +153,4 @@ class LoadPostmarkStats extends Job
 
         $this->response->emailClients = $str;
     }
-
 }

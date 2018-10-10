@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Ninja\Repositories\PaymentTermRepository;
-use App\Ninja\Datatables\PaymentTermDatatable;
 use URL;
+use App\Ninja\Datatables\PaymentTermDatatable;
+use App\Ninja\Repositories\PaymentTermRepository;
 
 class PaymentTermService extends BaseService
 {

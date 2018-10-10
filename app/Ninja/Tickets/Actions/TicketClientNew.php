@@ -2,23 +2,20 @@
 
 namespace App\Ninja\Tickets\Actions;
 
-use App\Libraries\Utils;
 use App\Models\Ticket;
+use App\Libraries\Utils;
 use App\Ninja\Mailers\TicketMailer;
-use Illuminate\Support\Facades\Log;
 
 /**
- * Class TicketClientNew
- * @package App\Ninja\Tickets\Actions
+ * Class TicketClientNew.
  */
 class TicketClientNew extends BaseTicketAction
 {
     /**
      * Check if a default agent exists
      * Fire notification to agent / slack if configured
-     * Fire notification to client if new_ticket_template exists
+     * Fire notification to client if new_ticket_template exists.
      */
-
     public function fire(Ticket $ticket)
     {
         $account = $ticket->account;
@@ -26,9 +23,7 @@ class TicketClientNew extends BaseTicketAction
 
         $this->setDefaultAgent($ticket, $accountTicketSettings);
 
-        if($accountTicketSettings->alert_ticket_assign_agent_id > 0 && $accountTicketSettings->default_agent_id > 0 && $ticket->agent_id > 0)
-        {
-
+        if ($accountTicketSettings->alert_ticket_assign_agent_id > 0 && $accountTicketSettings->default_agent_id > 0 && $ticket->agent_id > 0) {
             $toEmail = $ticket->agent->email;
 
             $fromEmail = $this->buildFromAddress($accountTicketSettings);
@@ -44,7 +39,7 @@ class TicketClientNew extends BaseTicketAction
                 'body' => parent::buildTicketBodyResponse($ticket, $accountTicketSettings, $accountTicketSettings->alert_ticket_assign_agent_id),
                 'account' => $account,
                 'replyTo' => $ticket->getTicketEmailFormat(),
-                'invitation' => $ticket->invitations->first()
+                'invitation' => $ticket->invitations->first(),
             ];
 
             $ticketMailer = new TicketMailer();
@@ -58,9 +53,5 @@ class TicketClientNew extends BaseTicketAction
         }
 
         $this->newTicketTemplateAction($ticket);
-
     }
-
-
-
 }

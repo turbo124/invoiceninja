@@ -9,7 +9,7 @@ use App\Models\Account;
  */
 class AccountTransformer extends EntityTransformer
 {
-	  /**
+    /**
      * @SWG\Property(property="account_key", type="string", example="123456")
      * @SWG\Property(property="logo", type="string", example="Logo")
      * @SWG\Property(property="name", type="string", example="John Doe")

@@ -6,15 +6,13 @@ class AddCompanyVatNumber extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
         Schema::table('accounts', function ($table) {
             $table->string('vat_number')->nullable();
         });
-        
+
         Schema::table('clients', function ($table) {
             $table->string('vat_number')->nullable();
         });
@@ -22,8 +20,6 @@ class AddCompanyVatNumber extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

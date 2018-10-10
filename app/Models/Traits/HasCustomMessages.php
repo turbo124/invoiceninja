@@ -42,8 +42,8 @@ trait HasCustomMessages
 
         if ($this->account) {
             return $this->account->customMessage($type);
-        } else {
-            return '';
         }
+
+        return '';
     }
 }

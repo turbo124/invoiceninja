@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Ninja\Datatables\RecurringInvoiceDatatable;
 use App\Ninja\Repositories\InvoiceRepository;
+use App\Ninja\Datatables\RecurringInvoiceDatatable;
 
 /**
  * Class RecurringQuoteController.

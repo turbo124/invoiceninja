@@ -2,28 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateOnlinePaymentRequest;
-use App\Models\Account;
+use URL;
+use Auth;
+use View;
+use Input;
+use Utils;
+use Crawler;
+use Session;
+use Exception;
+use Validator;
 use App\Models\Client;
-use App\Models\GatewayType;
-use App\Models\Invitation;
+use App\Models\Account;
 use App\Models\Payment;
-use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\Invitation;
+use App\Models\GatewayType;
+use App\Models\PaymentMethod;
+use App\Services\InvoiceService;
+use App\Services\PaymentService;
 use App\Ninja\Mailers\UserMailer;
 use App\Ninja\Repositories\ClientRepository;
 use App\Ninja\Repositories\InvoiceRepository;
-use App\Services\InvoiceService;
-use App\Services\PaymentService;
-use Auth;
-use Crawler;
-use Exception;
-use Input;
-use Session;
-use URL;
-use Utils;
-use Validator;
-use View;
+use App\Http\Requests\CreateOnlinePaymentRequest;
 
 /**
  * Class OnlinePaymentController.
@@ -76,20 +76,20 @@ class OnlinePaymentController extends BaseController
         }
 
         if (! request()->capture && ! $invitation->invoice->canBePaid()) {
-            return redirect()->to('view/' . $invitation->invitation_key);
+            return redirect()->to('view/'.$invitation->invitation_key);
         }
 
         $invitation = $invitation->load('invoice.client.account.account_gateways.gateway');
         $account = $invitation->account;
 
-        if (! request()->capture && $account->requiresAuthorization($invitation->invoice) && ! session('authorized:' . $invitation->invitation_key)) {
-            return redirect()->to('view/' . $invitation->invitation_key);
+        if (! request()->capture && $account->requiresAuthorization($invitation->invoice) && ! session('authorized:'.$invitation->invitation_key)) {
+            return redirect()->to('view/'.$invitation->invitation_key);
         }
 
         $account->loadLocalizationSettings($invitation->invoice->client);
 
         if (! $gatewayTypeAlias) {
-            $gatewayTypeId = Session::get($invitation->id . 'gateway_type');
+            $gatewayTypeId = Session::get($invitation->id.'gateway_type');
         } elseif ($gatewayTypeAlias != GATEWAY_TYPE_TOKEN) {
             $gatewayTypeId = GatewayType::getIdFromAlias($gatewayTypeAlias);
         } else {
@@ -99,17 +99,16 @@ class OnlinePaymentController extends BaseController
         $paymentDriver = $account->paymentDriver($invitation, $gatewayTypeId);
 
         if (! $paymentDriver) {
-            return redirect()->to('view/' . $invitation->invitation_key);
+            return redirect()->to('view/'.$invitation->invitation_key);
         }
 
         // add a delay check for token links
         if ($gatewayTypeId == GATEWAY_TYPE_TOKEN) {
-            $key = 'payment_token:' . $invitation->invitation_key;
+            $key = 'payment_token:'.$invitation->invitation_key;
             if (cache($key)) {
-                return redirect()->to('view/' . $invitation->invitation_key);
-            } else {
-                cache([$key => true], \Carbon::now()->addSeconds(10));
+                return redirect()->to('view/'.$invitation->invitation_key);
             }
+            cache([$key => true], \Carbon::now()->addSeconds(10));
         }
 
         try {
@@ -131,13 +130,13 @@ class OnlinePaymentController extends BaseController
         if ($gatewayTypeAlias) {
             $gatewayTypeId = GatewayType::getIdFromAlias($gatewayTypeAlias);
         } else {
-            $gatewayTypeId = Session::get($invitation->id . 'gateway_type');
+            $gatewayTypeId = Session::get($invitation->id.'gateway_type');
         }
 
         $paymentDriver = $invitation->account->paymentDriver($invitation, $gatewayTypeId);
 
         if (! $invitation->invoice->canBePaid() && ! request()->capture) {
-            return redirect()->to('view/' . $invitation->invitation_key);
+            return redirect()->to('view/'.$invitation->invitation_key);
         }
 
         try {
@@ -174,7 +173,7 @@ class OnlinePaymentController extends BaseController
                         ->where('invitation_key', '=', $invitationKey)->firstOrFail();
 
         if (! $gatewayTypeAlias) {
-            $gatewayTypeId = Session::get($invitation->id . 'gateway_type');
+            $gatewayTypeId = Session::get($invitation->id.'gateway_type');
         } elseif ($gatewayTypeAlias != GATEWAY_TYPE_TOKEN) {
             $gatewayTypeId = GatewayType::getIdFromAlias($gatewayTypeAlias);
         } else {
@@ -202,18 +201,17 @@ class OnlinePaymentController extends BaseController
     {
         if (request()->wantsJson()) {
             return response()->json(RESULT_SUCCESS);
-        } elseif ($redirectUrl = session('redirect_url:' . $invitation->invitation_key)) {
+        } elseif ($redirectUrl = session('redirect_url:'.$invitation->invitation_key)) {
             $separator = strpos($redirectUrl, '?') === false ? '?' : '&';
 
-            return redirect()->to($redirectUrl . $separator . 'invoice_id=' . $invitation->invoice->public_id);
-        } else {
-            // Allow redirecting to iFrame for offsite payments
-            if ($isOffsite) {
-                return redirect()->to($invitation->getLink());
-            } else {
-                return redirect()->to('view/' . $invitation->invitation_key);
-            }
+            return redirect()->to($redirectUrl.$separator.'invoice_id='.$invitation->invoice->public_id);
         }
+        // Allow redirecting to iFrame for offsite payments
+        if ($isOffsite) {
+            return redirect()->to($invitation->getLink());
+        }
+
+        return redirect()->to('view/'.$invitation->invitation_key);
     }
 
     public function completeSource($invitationKey, $gatewayType)
@@ -225,7 +223,7 @@ class OnlinePaymentController extends BaseController
             ]);
         }
 
-        return redirect()->to('view/' . $invitation->invitation_key);
+        return redirect()->to('view/'.$invitation->invitation_key);
     }
 
     /**
@@ -253,7 +251,7 @@ class OnlinePaymentController extends BaseController
 
         $route = $showPayment ? 'payment/' : 'view/';
 
-        return redirect()->to($route . $paymentDriver->invitation->invitation_key);
+        return redirect()->to($route.$paymentDriver->invitation->invitation_key);
     }
 
     /**
@@ -363,7 +361,7 @@ class OnlinePaymentController extends BaseController
 
             $validator = Validator::make(Input::all(), $rules);
             if ($validator->fails()) {
-                return redirect()->to("{$failureUrl}/?error=" . $validator->errors()->first());
+                return redirect()->to("{$failureUrl}/?error=".$validator->errors()->first());
             }
 
             $data = request()->all();
@@ -417,20 +415,20 @@ class OnlinePaymentController extends BaseController
         $link = $invitation->getLink();
 
         if ($redirectUrl) {
-            session(['redirect_url:' . $invitation->invitation_key => $redirectUrl]);
+            session(['redirect_url:'.$invitation->invitation_key => $redirectUrl]);
         }
 
         if ($gatewayTypeAlias) {
-            $link = $invitation->getLink('payment') . "/{$gatewayTypeAlias}";
+            $link = $invitation->getLink('payment')."/{$gatewayTypeAlias}";
         } else {
             $link = $invitation->getLink();
         }
 
         if (filter_var(Input::get('return_link'), FILTER_VALIDATE_BOOLEAN)) {
             return $link;
-        } else {
-            return redirect()->to($link);
         }
+
+        return redirect()->to($link);
     }
 
     public function showAppleMerchantId()

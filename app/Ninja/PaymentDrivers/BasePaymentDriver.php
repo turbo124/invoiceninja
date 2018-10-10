@@ -2,23 +2,22 @@
 
 namespace App\Ninja\PaymentDrivers;
 
-use App\Models\Account;
-use App\Models\AccountGatewaySettings;
-use App\Models\AccountGatewayToken;
-use App\Models\Country;
-use App\Models\GatewayType;
-use App\Models\License;
-use App\Models\Payment;
-use App\Models\PaymentMethod;
-use Omnipay\Common\Item;
-use CreditCard;
-use DateTime;
-use Exception;
+use URL;
+use Utils;
 use Omnipay;
 use Request;
 use Session;
-use URL;
-use Utils;
+use DateTime;
+use Exception;
+use CreditCard;
+use App\Models\Account;
+use App\Models\License;
+use App\Models\Payment;
+use Omnipay\Common\Item;
+use App\Models\GatewayType;
+use App\Models\PaymentMethod;
+use App\Models\AccountGatewayToken;
+use App\Models\AccountGatewaySettings;
 
 class BasePaymentDriver
 {
@@ -63,9 +62,9 @@ class BasePaymentDriver
     {
         if ($paymentMethod) {
             return $paymentMethod->gatewayType() == $gatewayType;
-        } else {
-            return $this->gatewayType === $gatewayType;
         }
+
+        return $this->gatewayType === $gatewayType;
     }
 
     public function gatewayTypes()
@@ -123,8 +122,8 @@ class BasePaymentDriver
         $this->sourceId = $sourceId;
 
         Session::put('invitation_key', $this->invitation->invitation_key);
-        Session::put($this->invitation->id . 'gateway_type', $this->gatewayType);
-        Session::put($this->invitation->id . 'payment_ref', $this->invoice()->id . '_' . uniqid());
+        Session::put($this->invitation->id.'gateway_type', $this->gatewayType);
+        Session::put($this->invitation->id.'payment_ref', $this->invoice()->id.'_'.uniqid());
 
         $gateway = $this->accountGateway->gateway;
 
@@ -132,7 +131,7 @@ class BasePaymentDriver
             // The customer must have hacked the URL
             Session::flash('error', trans('texts.limits_not_met'));
 
-            return redirect()->to('view/' . $this->invitation->invitation_key);
+            return redirect()->to('view/'.$this->invitation->invitation_key);
         }
 
         if (! $this->isGatewayType(GATEWAY_TYPE_TOKEN)) {
@@ -151,19 +150,18 @@ class BasePaymentDriver
                 Session::reflash();
             } else {
                 $this->completeOnsitePurchase();
-                if ($redirectUrl = session('redirect_url:' . $this->invitation->invitation_key)) {
+                if ($redirectUrl = session('redirect_url:'.$this->invitation->invitation_key)) {
                     $separator = strpos($redirectUrl, '?') === false ? '?' : '&';
 
-                    return redirect()->to($redirectUrl . $separator . 'invoice_id=' . $this->invoice()->public_id);
-                } else {
-                    Session::flash('message', trans('texts.applied_payment'));
+                    return redirect()->to($redirectUrl.$separator.'invoice_id='.$this->invoice()->public_id);
                 }
+                Session::flash('message', trans('texts.applied_payment'));
             }
 
-            return redirect()->to('view/' . $this->invitation->invitation_key);
+            return redirect()->to('view/'.$this->invitation->invitation_key);
         }
 
-        $url = 'payment/' . $this->invitation->invitation_key;
+        $url = 'payment/'.$this->invitation->invitation_key;
         if (request()->capture) {
             $url .= '?capture=true';
         }
@@ -201,9 +199,9 @@ class BasePaymentDriver
 
         if (file_exists($file)) {
             return sprintf('payments.%s/%s', $this->providerName(), $gatewayTypeAlias);
-        } else {
-            return sprintf('payments.%s', $gatewayTypeAlias);
         }
+
+        return sprintf('payments.%s', $gatewayTypeAlias);
     }
 
     // check if a custom partial exists for this provider
@@ -213,9 +211,9 @@ class BasePaymentDriver
 
         if (file_exists($file)) {
             return sprintf('payments.%s.partial', $this->providerName());
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function rules()
@@ -291,7 +289,7 @@ class BasePaymentDriver
                 // The customer must have hacked the URL
                 Session::flash('error', trans('texts.limits_not_met'));
 
-                return redirect()->to('view/' . $this->invitation->invitation_key);
+                return redirect()->to('view/'.$this->invitation->invitation_key);
             }
         } else {
             if ($this->shouldCreateToken()) {
@@ -302,7 +300,7 @@ class BasePaymentDriver
                 // The customer must have hacked the URL
                 Session::flash('error', trans('texts.limits_not_met'));
 
-                return redirect()->to('view/' . $this->invitation->invitation_key);
+                return redirect()->to('view/'.$this->invitation->invitation_key);
             }
         }
 
@@ -448,14 +446,14 @@ class BasePaymentDriver
     {
         $invoice = $this->invoice();
         $gatewayTypeAlias = $this->gatewayType == GATEWAY_TYPE_TOKEN ? $this->gatewayType : GatewayType::getAliasFromId($this->gatewayType);
-        $completeUrl = $this->invitation->getLink('complete', true) . '/' . $gatewayTypeAlias;
+        $completeUrl = $this->invitation->getLink('complete', true).'/'.$gatewayTypeAlias;
 
         $data = [
             'amount' => $invoice->getRequestedAmount(),
             'currency' => $invoice->getCurrencyCode(),
             'returnUrl' => $completeUrl,
             'cancelUrl' => $this->invitation->getLink(),
-            'description' => trans('texts.' . $invoice->getEntityType()) . " {$invoice->invoice_number}",
+            'description' => trans('texts.'.$invoice->getEntityType())." {$invoice->invoice_number}",
             'transactionId' => $invoice->invoice_number,
             'transactionType' => 'Purchase',
             'clientIp' => Request::getClientIp(),
@@ -948,7 +946,7 @@ class BasePaymentDriver
                     $label = trans('texts.use_bank_on_file');
                 }
             } elseif ($paymentMethod->payment_type_id == PAYMENT_TYPE_PAYPAL) {
-                $label = 'PayPal: ' . $paymentMethod->email;
+                $label = 'PayPal: '.$paymentMethod->email;
             } else {
                 $label = trans('texts.payment_type_on_file', ['type' => $paymentMethod->payment_type->name]);
             }

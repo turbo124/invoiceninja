@@ -2,12 +2,12 @@
 
 namespace App\Ninja\Reports;
 
-use Utils;
 use Auth;
+use Utils;
 use Carbon;
-use DateInterval;
-use DatePeriod;
 use stdClass;
+use DatePeriod;
+use DateInterval;
 use App\Models\Client;
 
 class AbstractReport
@@ -31,7 +31,6 @@ class AbstractReport
 
     public function run()
     {
-
     }
 
     public function getColumns()
@@ -63,7 +62,8 @@ class AbstractReport
         $this->totals[$currencyId][$dimension][$field] += $value;
     }
 
-    public function tableHeaderArray() {
+    public function tableHeaderArray()
+    {
         $columns_labeled = [];
 
         foreach ($this->getColumns() as $key => $val) {
@@ -76,7 +76,7 @@ class AbstractReport
             }
 
             if (strpos($field, 'date') !== false) {
-                $class[] = 'group-date-' . (isset($this->options['group']) ? $this->options['group'] : 'monthyear');
+                $class[] = 'group-date-'.(isset($this->options['group']) ? $this->options['group'] : 'monthyear');
             } elseif (in_array($field, ['client', 'vendor', 'product', 'user', 'method', 'category', 'project'])) {
                 $class[] = 'group-letter-100';
             } elseif (in_array($field, ['amount', 'paid', 'balance'])) {
@@ -95,7 +95,7 @@ class AbstractReport
             $columns_labeled[] = [
                 'label' => $label,
                 'class' => $class,
-                'key' => $field
+                'key' => $field,
             ];
         }
 
@@ -123,7 +123,7 @@ class AbstractReport
         $format = str_replace('do', '', $format);
 
         $orignalFormat = $format;
-        $format = preg_replace("/[^mdy]/", '', $format);
+        $format = preg_replace('/[^mdy]/', '', $format);
 
         $lastLetter = false;
         $reportParts = [];
@@ -160,9 +160,9 @@ class AbstractReport
                 return $entity->getDisplayName();
             } elseif ($entity->client) {
                 return $entity->client->getDisplayName();
-            } else {
-                return trans('texts.unset');
             }
+
+            return trans('texts.unset');
         }
     }
 
@@ -201,7 +201,7 @@ class AbstractReport
         $groupBy = $this->chartGroupBy();
         $dateFormat = $groupBy == 'DAY' ? 'z' : ($groupBy == 'MONTH' ? 'm' : '');
 
-        return $date->format('Y' . $dateFormat);
+        return $date->format('Y'.$dateFormat);
     }
 
     public function getLineChartData()
@@ -248,7 +248,7 @@ class AbstractReport
             $record->lineTension = 0;
             $record->borderWidth = 3;
             $record->borderColor = "rgba({$color}, 1)";
-            $record->backgroundColor = "rgba(255,255,255,0)";
+            $record->backgroundColor = 'rgba(255,255,255,0)';
         }
 
         $data = new stdClass();
