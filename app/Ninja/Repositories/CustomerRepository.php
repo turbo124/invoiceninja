@@ -4,7 +4,6 @@ namespace App\Ninja\Repositories;
 
 use App\Models\PaymentMethod;
 use App\Models\AccountGatewayToken;
-use DB;
 
 class CustomerRepository extends BaseRepository
 {

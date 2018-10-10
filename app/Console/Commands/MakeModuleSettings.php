@@ -3,11 +3,11 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Nwidart\Modules\Commands\GeneratorCommand;
 use Nwidart\Modules\Support\Stub;
+use Nwidart\Modules\Commands\GeneratorCommand;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 class MakeModuleSettings extends GeneratorCommand
 {
@@ -32,8 +32,6 @@ class MakeModuleSettings extends GeneratorCommand
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -48,18 +46,19 @@ class MakeModuleSettings extends GeneratorCommand
         return (new Stub('/module-settings-view.stub', [
             'MODULE_NAME' => $module->getName(),
             'LOWER_NAME' => $module->getLowerName(),
-            'SHOW_ROUTES' => $this->option('route') ? true : false
+            'SHOW_ROUTES' => $this->option('route') ? true : false,
         ]))->render();
     }
 
-    public function fire() {
-        $this->info('Creating settings view template for ' . $this->getModuleName());
+    public function fire()
+    {
+        $this->info('Creating settings view template for '.$this->getModuleName());
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
         parent::fire();
 
         // add default routes if option specified
-        $route =  $this->option('route');
+        $route = $this->option('route');
 
         if ($route) {
             file_put_contents(
@@ -74,11 +73,12 @@ class MakeModuleSettings extends GeneratorCommand
         }
     }
 
-    protected function getModuleRoutesFilePath() {
+    protected function getModuleRoutesFilePath()
+    {
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
         $seederPath = $this->laravel['modules']->config('paths.generator.module-settings-routes');
 
-        return $path . $seederPath . '/routes.php';
+        return $path.$seederPath.'/routes.php';
     }
 
     public function getDestinationFilePath()
@@ -86,20 +86,20 @@ class MakeModuleSettings extends GeneratorCommand
         $path = $this->laravel['modules']->getModulePath($this->getModuleName());
         $seederPath = $this->laravel['modules']->config('paths.generator.module-settings-view');
 
-        return $path . $seederPath . '/' . $this->getFileName();
+        return $path.$seederPath.'/'.$this->getFileName();
     }
 
     protected function getArguments()
     {
         return [
-            ['module', InputArgument::REQUIRED, 'The name of the module.']
+            ['module', InputArgument::REQUIRED, 'The name of the module.'],
         ];
     }
 
     protected function getOptions()
     {
         return [
-            ['route', null, InputOption::VALUE_NONE, 'Add default routes.', null]
+            ['route', null, InputOption::VALUE_NONE, 'Add default routes.', null],
         ];
     }
 

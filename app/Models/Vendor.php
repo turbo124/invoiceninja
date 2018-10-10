@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use DB;
+use Utils;
 use App\Events\VendorWasCreated;
 use App\Events\VendorWasDeleted;
 use App\Events\VendorWasUpdated;
-use DB;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
-use Utils;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Vendor.
@@ -311,9 +311,9 @@ class Vendor extends EntityModel
     {
         if ($this->created_at == '0000-00-00 00:00:00') {
             return '---';
-        } else {
-            return $this->created_at->format('m/d/y h:i a');
         }
+
+        return $this->created_at->format('m/d/y h:i a');
     }
 
     /**

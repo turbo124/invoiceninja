@@ -1,12 +1,13 @@
-<?php namespace App\Ninja\OAuth\Providers;
+<?php
+
+namespace App\Ninja\OAuth\Providers;
 
 class Google implements ProviderInterface
 {
-
     public function getTokenResponse($token)
     {
-
         $client = new \Google_Client();
+
         return $client->verifyIdToken($token);
     }
 

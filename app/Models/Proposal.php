@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class ExpenseCategory.
@@ -113,7 +113,7 @@ class Proposal extends EntityModel
     {
         $entityType = $this->getEntityType();
 
-        return trans('texts.proposal') . '_' . $this->invoice->invoice_number . '.' . $extension;
+        return trans('texts.proposal').'_'.$this->invoice->invoice_number.'.'.$extension;
     }
 
     /**
@@ -123,11 +123,10 @@ class Proposal extends EntityModel
     {
         if ($this->invoice->quote_invoice_id) {
             return CUSTOM_MESSAGE_APPROVED_PROPOSAL;
-        } else {
-            return CUSTOM_MESSAGE_UNAPPROVED_PROPOSAL;
         }
-    }
 
+        return CUSTOM_MESSAGE_UNAPPROVED_PROPOSAL;
+    }
 }
 
 Proposal::creating(function ($project) {

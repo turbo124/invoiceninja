@@ -2,17 +2,16 @@
 
 namespace App\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Monolog\Logger;
-use App\Services\ImportService;
-use App\Ninja\Mailers\UserMailer;
-use App\Models\User;
-use Auth;
 use App;
+use Auth;
 use Utils;
 use Exception;
+use App\Models\User;
+use App\Services\ImportService;
+use App\Ninja\Mailers\UserMailer;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
  * Class SendInvoiceEmail.
@@ -44,8 +43,8 @@ class ImportData extends Job implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param mixed   $files
-     * @param mixed   $settings
+     * @param mixed $files
+     * @param mixed $settings
      */
     public function __construct(User $user, $type, $settings)
     {
@@ -91,7 +90,7 @@ class ImportData extends Job implements ShouldQueue
         } catch (Exception $exception) {
             $subject = trans('texts.import_failed');
             $message = $exception->getMessage();
-            Utils::logError($subject . ': ' . $message);
+            Utils::logError($subject.': '.$message);
         }
 
         $userMailer->sendMessage($this->user, $subject, $message);

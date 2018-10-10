@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
-
 /**
  * Class LookupTicketInvitation.
  */
@@ -44,6 +42,4 @@ class LookupTicketInvitation extends LookupModel
 
         config(['database.default' => $current]);
     }
-
-
 }

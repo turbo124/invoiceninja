@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use URL;
+use Auth;
+use View;
+use Input;
+use Utils;
+use Session;
+use Redirect;
+use App\Models\Vendor;
+use App\Models\Account;
+use App\Services\VendorService;
+use App\Http\Requests\VendorRequest;
+use App\Ninja\Datatables\VendorDatatable;
 use App\Http\Requests\CreateVendorRequest;
 use App\Http\Requests\UpdateVendorRequest;
-use App\Http\Requests\VendorRequest;
-use App\Models\Account;
-use App\Models\Vendor;
-use App\Ninja\Datatables\VendorDatatable;
 use App\Ninja\Repositories\VendorRepository;
-use App\Services\VendorService;
-use Auth;
-use Cache;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Utils;
-use View;
 
 class VendorController extends BaseController
 {
@@ -78,7 +77,7 @@ class VendorController extends BaseController
         $vendor = $request->entity();
 
         $actionLinks = [
-            ['label' => trans('texts.new_vendor'), 'url' => URL::to('/vendors/create/' . $vendor->public_id)],
+            ['label' => trans('texts.new_vendor'), 'url' => URL::to('/vendors/create/'.$vendor->public_id)],
         ];
 
         $data = [

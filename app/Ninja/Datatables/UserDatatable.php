@@ -33,12 +33,12 @@ class UserDatatable extends EntityDatatable
                     } elseif ($model->confirmed) {
                         if ($model->is_admin) {
                             return self::getStatusLabel(USER_STATE_ADMIN);
-                        } else {
-                            return self::getStatusLabel(USER_STATE_ACTIVE);
                         }
-                    } else {
-                        return self::getStatusLabel(USER_STATE_PENDING);
+
+                        return self::getStatusLabel(USER_STATE_ACTIVE);
                     }
+
+                    return self::getStatusLabel(USER_STATE_PENDING);
                 },
             ],
         ];

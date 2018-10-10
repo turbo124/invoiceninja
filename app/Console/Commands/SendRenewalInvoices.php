@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Company;
-use App\Ninja\Mailers\ContactMailer as Mailer;
-use App\Ninja\Repositories\AccountRepository;
-use Illuminate\Console\Command;
 use Utils;
+use App\Models\Company;
+use Illuminate\Console\Command;
+use App\Ninja\Repositories\AccountRepository;
+use App\Ninja\Mailers\ContactMailer as Mailer;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -60,7 +60,7 @@ class SendRenewalInvoices extends Command
         $companies = Company::whereRaw("datediff(plan_expires, curdate()) = 10 and (plan = 'pro' or plan = 'enterprise')")
                         ->orderBy('id')
                         ->get();
-        $this->info($companies->count() . ' companies found renewing in 10 days');
+        $this->info($companies->count().' companies found renewing in 10 days');
 
         foreach ($companies as $company) {
             if (! $company->accounts->count()) {

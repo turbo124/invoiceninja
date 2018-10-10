@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent;
 use Str;
+use Eloquent;
 
 /**
  * Class Currency.
@@ -36,6 +36,6 @@ class Currency extends Eloquent
      */
     public function getTranslatedName()
     {
-        return trans('texts.currency_' . Str::slug($this->name, '_'));
+        return trans('texts.currency_'.Str::slug($this->name, '_'));
     }
 }

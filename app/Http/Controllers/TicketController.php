@@ -2,40 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\TicketUserViewed;
-use App\Http\Requests\CreateTicketRequest;
-use App\Http\Requests\TicketAddEntityRequest;
-use App\Http\Requests\TicketInboundRequest;
-use App\Http\Requests\TicketMergeRequest;
-use App\Http\Requests\TicketRemoveEntityRequest;
-use App\Http\Requests\TicketRequest;
-use App\Http\Requests\UpdateTicketRequest;
-use App\Libraries\Utils;
+use App\Models\User;
 use App\Models\Client;
 use App\Models\Ticket;
+use App\Libraries\Utils;
 use App\Models\TicketComment;
 use App\Models\TicketRelation;
-use App\Models\User;
-use App\Ninja\Datatables\TicketDatatable;
-use App\Ninja\Repositories\TicketRepository;
 use App\Services\TicketService;
-use Barryvdh\LaravelIdeHelper\Eloquent;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
+use App\Events\TicketUserViewed;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
+use App\Http\Requests\TicketRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
-use DB;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Requests\TicketMergeRequest;
+use App\Ninja\Datatables\TicketDatatable;
+use App\Http\Requests\CreateTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
+use App\Http\Requests\TicketInboundRequest;
+use App\Ninja\Repositories\TicketRepository;
+use App\Http\Requests\TicketAddEntityRequest;
+use App\Http\Requests\TicketRemoveEntityRequest;
 
 /**
- * Class TicketController
- * @package App\Http\Controllers
+ * Class TicketController.
  */
 class TicketController extends BaseController
 {
-
     /**
      * @var TicketService
      */
@@ -48,14 +44,13 @@ class TicketController extends BaseController
 
     /**
      * TicketController constructor.
+     *
      * @param TicketService $ticketService
      */
     public function __construct(TicketService $ticketService, TicketRepository $ticketRepository)
     {
-
         $this->ticketService = $ticketService;
         $this->ticketRepo = $ticketRepository;
-
     }
 
     /**
@@ -63,83 +58,79 @@ class TicketController extends BaseController
      */
     public function index()
     {
-
         return View::make('list_wrapper', [
             'entityType' => ENTITY_TICKET,
             'datatable' => new TicketDatatable(),
             'title' => trans('texts.tickets'),
         ]);
-
     }
 
     /**
      * @param null $clientPublicId
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function getDatatable($clientPublicId = null)
     {
-
         $search = Input::get('sSearch');
 
         return $this->ticketService->getDatatable($search);
-
     }
 
     /**
      * @param $publicId
+     *
      * @return Redirect
      */
     public function show($publicId)
     {
-
         Session::reflash();
 
         return redirect("tickets/$publicId/edit");
-
     }
 
     /**
      * @param TicketRequest $request
+     *
      * @return View
      */
     public function edit(TicketRequest $request)
     {
-
         $ticket = $request->entity();
 
         $clients = false;
 
         //If we are missing a client from the ticket, load clients for assignment
-        if($ticket->is_internal == TRUE && !$ticket->client_id)
+        if ($ticket->is_internal == true && ! $ticket->client_id) {
             $clients = Client::scope()->with('contacts')->get();
-        else if(!$ticket->client_id)
+        } elseif (! $ticket->client_id) {
             $clients = $this->ticketService->findClientsByContactEmail($ticket->contact_key);
+        }
 
         $data = array_merge(self::getViewModel($ticket, $clients));
 
         event(new TicketUserViewed($ticket));
 
         return View::make('tickets.edit', $data);
-
     }
 
     /**
      * @param UpdateTicketRequest $request
+     *
      * @return View
      */
-
     public function update(UpdateTicketRequest $request)
     {
-
         $data = $request->input();
         $data['document_ids'] = $request->document_ids;
 
-        if($data['closed'] != '0000-00-00 00:00:00')
+        if ($data['closed'] != '0000-00-00 00:00:00') {
             $data['action'] = TICKET_AGENT_CLOSED;
-        elseif(isset($data['description']) && strlen($data['description']) > 0)
+        } elseif (isset($data['description']) && strlen($data['description']) > 0) {
             $data['action'] = TICKET_AGENT_UPDATE;
-        else
+        } else {
             $data['action'] = TICKET_SAVE_ONLY;
+        }
 
         $ticket = $request->entity();
         $ticket = $this->ticketService->save($data, $ticket);
@@ -155,7 +146,6 @@ class TicketController extends BaseController
         $data = array_merge($this->getViewmodel($ticket), $data);
 
         return View::make('tickets.edit', $data);
-
     }
 
     /**
@@ -163,13 +153,13 @@ class TicketController extends BaseController
      */
     public function bulk()
     {
-
         $action = Input::get('action');
 
         $ids = Input::get('public_id') ? Input::get('public_id') : Input::get('ids');
 
-        if ($action == 'purge' && ! auth()->user()->is_admin)
+        if ($action == 'purge' && ! auth()->user()->is_admin) {
             return redirect('dashboard')->withError(trans('texts.not_authorized'));
+        }
 
         $count = $this->ticketService->bulk($ids, $action);
 
@@ -177,21 +167,21 @@ class TicketController extends BaseController
 
         Session::flash('message', $message);
 
-        if ($action == 'purge')
+        if ($action == 'purge') {
             return redirect('dashboard')->withMessage($message);
-        else
-            return $this->returnBulk(ENTITY_TICKET, $action, $ids);
+        }
 
+        return $this->returnBulk(ENTITY_TICKET, $action, $ids);
     }
 
     /**
      * @param TicketRequest $request
-     * @param int $parentTicketId
+     * @param int           $parentTicketId
+     *
      * @return View
      */
     public function create(TicketRequest $request, $parentTicketId = 0)
     {
-
         $parentTicket = Ticket::scope($parentTicketId)->first();
 
         $parentTicketClientExists = false;
@@ -234,6 +224,7 @@ class TicketController extends BaseController
 
     /**
      * @param CreateTicketRequest $request
+     *
      * @return Redirect
      */
     public function store(CreateTicketRequest $request)
@@ -244,7 +235,6 @@ class TicketController extends BaseController
         $ticket = $this->ticketService->save($input, $request->entity());
 
         return redirect("tickets/$ticket->public_id/edit");
-
     }
 
     /**
@@ -252,13 +242,12 @@ class TicketController extends BaseController
      */
     private static function getViewModel($ticket = false, $clients = false)
     {
-
         return [
             'clients' => $clients,
             //'status' => $ticket->status(),
             'comments' => $ticket->comments(),
             'account' => Auth::user()->account,
-            'url' => 'tickets/' . $ticket->public_id,
+            'url' => 'tickets/'.$ticket->public_id,
             'ticket' => $ticket,
             'entity' => $ticket,
             'title' => trans('texts.edit_ticket'),
@@ -267,7 +256,6 @@ class TicketController extends BaseController
             'method' => 'PUT',
             'isAdminUser' => Auth::user()->is_admin || Auth::user()->isTicketMaster() ? true : false,
         ];
-
     }
 
     /**
@@ -275,19 +263,18 @@ class TicketController extends BaseController
      */
     public function inbound(TicketInboundRequest $request) : void
     {
-
         $ticket = $request->entity();
 
-        if(!$ticket)
+        if (! $ticket) {
             Log::error('no ticket found - ? spam or new request?');
-        else
-            Log::error('ticket #'. $ticket->ticket_number .' found');
-
-
+        } else {
+            Log::error('ticket #'.$ticket->ticket_number.' found');
+        }
     }
 
     /**
      * @param $publicId
+     *
      * @return View
      */
     public function merge($publicId)
@@ -309,18 +296,17 @@ class TicketController extends BaseController
 
     /**
      * @param TicketMergeRequest $request
+     *
      * @return Redirect
      */
     public function actionMerge(TicketMergeRequest $request)
     {
-
         $ticket = $request->entity();
         $this->ticketService->mergeTicket($ticket, $request->input());
 
         Session::reflash();
 
         return redirect("tickets/$request->updated_ticket_id/edit");
-
     }
 
     /**
@@ -328,48 +314,43 @@ class TicketController extends BaseController
      */
     public function getTicketRelationCollection(\Illuminate\Http\Request $request)
     {
-
         return $this->ticketService->getRelationCollection($request);
-
     }
 
     /**
      * Add ticket relation entity.
-     * returns a formatted URL
+     * returns a formatted URL.
+     *
      * @return string
      */
     public function addEntity(TicketAddEntityRequest $request)
     {
-
         return $request->addEntity();
-
     }
 
     /**
-     * Remove ticket
+     * Remove ticket.
+     *
      * @return primary ID
      */
     public function removeEntity(TicketRemoveEntityRequest $request)
     {
         TicketRelation::destroy(request()->id);
-            return request()->id;
+
+        return request()->id;
     }
 
     /**
-     * Algolia / Elasticsearch
+     * Algolia / Elasticsearch.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function search()
     {
-        
-        if( config('ninja.scout_driver') != null) {
-
+        if (config('ninja.scout_driver') != null) {
             $result = TicketComment::search(request()->term)->where('agent_id', Auth::user()->id)->get()->pluck('description');
+
             return response()->json($result);
         }
-
     }
-
-
-
 }

@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Repositories;
 
+use DB;
+use Crypt;
 use App\Models\BankAccount;
 use App\Models\BankSubaccount;
-use Crypt;
-use DB;
 
 class BankAccountRepository extends BaseRepository
 {

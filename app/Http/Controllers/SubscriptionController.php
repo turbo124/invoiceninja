@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use URL;
+use Auth;
+use View;
+use Input;
+use Session;
+use Redirect;
+use Validator;
 use App\Models\Subscription;
 use App\Services\SubscriptionService;
-use Auth;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Validator;
-use View;
 
 /**
  * Class SubscriptionController.
@@ -39,7 +39,7 @@ class SubscriptionController extends BaseController
      */
     public function index()
     {
-        return Redirect::to('settings/' . ACCOUNT_API_TOKENS);
+        return Redirect::to('settings/'.ACCOUNT_API_TOKENS);
     }
 
     /**
@@ -62,7 +62,7 @@ class SubscriptionController extends BaseController
         $data = [
             'subscription' => $subscription,
             'method' => 'PUT',
-            'url' => 'subscriptions/' . $publicId,
+            'url' => 'subscriptions/'.$publicId,
             'title' => trans('texts.edit_subscription'),
         ];
 
@@ -114,7 +114,7 @@ class SubscriptionController extends BaseController
 
         Session::flash('message', trans('texts.archived_subscription'));
 
-        return Redirect::to('settings/' . ACCOUNT_API_TOKENS);
+        return Redirect::to('settings/'.ACCOUNT_API_TOKENS);
     }
 
     /**

@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
-use App\Models\User;
-
 /**
  * Class ExpenseCategory.
  */
@@ -40,7 +37,7 @@ class LookupUser extends LookupModel
 
         $lookupUser->email = $user->email;
         $lookupUser->confirmation_code = $user->confirmation_code ?: null;
-        $lookupUser->oauth_user_key = ($user->oauth_provider_id && $user->oauth_user_id) ? ($user->oauth_provider_id . '-' . $user->oauth_user_id) : null;
+        $lookupUser->oauth_user_key = ($user->oauth_provider_id && $user->oauth_user_id) ? ($user->oauth_provider_id.'-'.$user->oauth_user_id) : null;
         $lookupUser->referral_code = $user->referral_code;
         $lookupUser->save();
 
@@ -71,5 +68,4 @@ class LookupUser extends LookupModel
 
         return $isValid;
     }
-
 }

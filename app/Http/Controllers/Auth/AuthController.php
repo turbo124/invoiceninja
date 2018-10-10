@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
-use App\Ninja\Repositories\AccountRepository;
 use App\Services\AuthService;
 use App\Http\Controllers\Controller;
+use App\Ninja\Repositories\AccountRepository;
 
 class AuthController extends Controller
 {
@@ -54,6 +54,6 @@ class AuthController extends Controller
 
         session()->flash('message', trans('texts.updated_settings'));
 
-        return redirect()->to('/settings/' . ACCOUNT_USER_DETAILS);
+        return redirect()->to('/settings/'.ACCOUNT_USER_DETAILS);
     }
 }

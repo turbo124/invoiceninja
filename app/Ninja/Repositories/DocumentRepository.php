@@ -2,14 +2,13 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Contact;
-use App\Models\Document;
-use App\Models\User;
 use DB;
 use Form;
-use Illuminate\Support\Facades\Log;
-use Intervention\Image\ImageManager;
 use Utils;
+use App\Models\User;
+use App\Models\Contact;
+use App\Models\Document;
+use Intervention\Image\ImageManager;
 
 class DocumentRepository extends BaseRepository
 {
@@ -56,11 +55,8 @@ class DocumentRepository extends BaseRepository
         return $query;
     }
 
-
-
     public function inboundUpload($data, $account)
     {
-
         $uploaded = $data['file'];
 
         $extension = pathinfo($data['fileName'], PATHINFO_EXTENSION);
@@ -89,16 +85,15 @@ class DocumentRepository extends BaseRepository
 
         $ticketMaster = false;
 
-        if($contactKey = session('contact_key')) {
+        if ($contactKey = session('contact_key')) {
             $contact = Contact::where('contact_key', '=', $contactKey)->first();
             $account = $contact->account;
             $ticketMaster = $account->account_ticket_settings->ticket_master;
-        }
-        elseif(isset($data['user_id']) && $data['user_id'] > 0){
+        } elseif (isset($data['user_id']) && $data['user_id'] > 0) {
             $ticketMaster = User::find($data['user_id']);
-        }
-        else
+        } else {
             $account = \Auth::user()->account;
+        }
 
         $filename = $account->account_key.'/'.$hash.'.'.$documentType;
 
@@ -234,16 +229,15 @@ class DocumentRepository extends BaseRepository
 
         $ticketMaster = false;
 
-        if($contactKey = session('contact_key')) {
+        if ($contactKey = session('contact_key')) {
             $contact = Contact::where('contact_key', '=', $contactKey)->first();
             $account = $contact->account;
             $ticketMaster = $account->account_ticket_settings->ticket_master;
-        }
-        elseif(isset($data['user_id']) && $data['user_id'] > 0){
+        } elseif (isset($data['user_id']) && $data['user_id'] > 0) {
             $ticketMaster = User::find($data['user_id']);
-        }
-        else
+        } else {
             $account = \Auth::user()->account;
+        }
 
         $filename = $account->account_key.'/'.$hash.'.'.$documentType;
 

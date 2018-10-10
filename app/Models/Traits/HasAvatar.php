@@ -2,7 +2,6 @@
 
 namespace App\Models\Traits;
 
-use Utils;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -41,9 +40,6 @@ trait HasAvatar
         $this->save();
     }
 
-    /**
-     * @return null
-     */
     public function getAvatarRaw()
     {
         if (! $this->hasAvatar()) {
@@ -75,7 +71,7 @@ trait HasAvatar
 
         if ($adapter instanceof \League\Flysystem\Adapter\Local) {
             // Stored locally
-            $avatarUrl = url('/logo/' . $this->avatar);
+            $avatarUrl = url('/logo/'.$this->avatar);
 
             if ($cachebuster) {
                 $avatarUrl .= '?no_cache='.time();
@@ -98,9 +94,9 @@ trait HasAvatar
 
         if ($adapter instanceof \League\Flysystem\Adapter\Local) {
             return $adapter->applyPathPrefix($this->avatar);
-        } else {
-            return Document::getDirectFileUrl($this->avatar, $this->getAvatarDisk());
         }
+
+        return Document::getDirectFileUrl($this->avatar, $this->getAvatarDisk());
     }
 
     /**

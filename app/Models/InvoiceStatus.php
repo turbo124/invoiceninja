@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent;
 use Str;
+use Eloquent;
 
 /**
  * Class InvoiceStatus.
@@ -42,6 +42,6 @@ class InvoiceStatus extends Eloquent
      */
     public function getTranslatedName()
     {
-        return trans('texts.status_' . Str::slug($this->name, '_'));
+        return trans('texts.status_'.Str::slug($this->name, '_'));
     }
 }
