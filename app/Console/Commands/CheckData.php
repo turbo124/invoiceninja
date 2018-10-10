@@ -2,18 +2,18 @@
 
 namespace App\Console\Commands;
 
-use Carbon;
-use App\Libraries\CurlUtils;
 use DB;
 use App;
-use Exception;
-use Illuminate\Console\Command;
 use Mail;
-use Symfony\Component\Console\Input\InputOption;
 use Utils;
+use Carbon;
+use Exception;
 use App\Models\Contact;
 use App\Models\Invoice;
 use App\Models\Invitation;
+use App\Libraries\CurlUtils;
+use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 
 /*
 
@@ -69,7 +69,7 @@ class CheckData extends Command
 
     public function fire()
     {
-        $this->logMessage(date('Y-m-d h:i:s') . ' Running CheckData...');
+        $this->logMessage(date('Y-m-d h:i:s').' Running CheckData...');
 
         if ($database = $this->option('database')) {
             config(['database.default' => $database]);
@@ -97,25 +97,25 @@ class CheckData extends Command
             $this->checkFailedJobs();
         }
 
-        $this->logMessage('Done: ' . strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
+        $this->logMessage('Done: '.strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE));
         $errorEmail = env('ERROR_EMAIL');
 
         if ($errorEmail) {
             Mail::raw($this->log, function ($message) use ($errorEmail, $database) {
                 $message->to($errorEmail)
                         ->from(CONTACT_EMAIL)
-                        ->subject("Check-Data: " . strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE) . " [{$database}]");
+                        ->subject('Check-Data: '.strtoupper($this->isValid ? RESULT_SUCCESS : RESULT_FAILURE)." [{$database}]");
             });
         } elseif (! $this->isValid) {
-            throw new Exception("Check data failed!!\n" . $this->log);
+            throw new Exception("Check data failed!!\n".$this->log);
         }
     }
 
     private function logMessage($str)
     {
-        $str = date('Y-m-d h:i:s') . ' ' . $str;
+        $str = date('Y-m-d h:i:s').' '.$str;
         $this->info($str);
-        $this->log .= $str . "\n";
+        $this->log .= $str."\n";
     }
 
     private function checkTranslations()
@@ -127,7 +127,7 @@ class CheckData extends Command
             foreach (trans('texts') as $text) {
                 if (strpos($text, '=') !== false) {
                     $invalid++;
-                    $this->logMessage($language->locale . ' is invalid: ' . $text);
+                    $this->logMessage($language->locale.' is invalid: '.$text);
                 }
 
                 preg_match('/(.script)/', strtolower($text), $matches);
@@ -149,7 +149,7 @@ class CheckData extends Command
         }
 
         App::setLocale('en');
-        $this->logMessage($invalid . ' invalid text strings');
+        $this->logMessage($invalid.' invalid text strings');
     }
 
     private function checkDraftSentInvoices()
@@ -159,7 +159,7 @@ class CheckData extends Command
                         ->withTrashed()
                         ->get();
 
-        $this->logMessage($invoices->count() . ' draft sent invoices');
+        $this->logMessage($invoices->count().' draft sent invoices');
 
         if ($invoices->count() > 0) {
             $this->isValid = false;
@@ -194,13 +194,13 @@ class CheckData extends Command
         $date = $date->subDays(1)->format('Y-m-d');
 
         $invoices = Invoice::with('invitations')
-            ->where('created_at', '>',  $date)
+            ->where('created_at', '>', $date)
             ->orderBy('id')
             ->get();
 
         foreach ($invoices as $invoice) {
             $link = $invoice->getInvitationLink('view', true, true);
-            $result = CurlUtils::phantom('GET', $link . '?phantomjs=true&phantomjs_balances=true&phantomjs_secret=' . env('PHANTOMJS_SECRET'));
+            $result = CurlUtils::phantom('GET', $link.'?phantomjs=true&phantomjs_balances=true&phantomjs_secret='.env('PHANTOMJS_SECRET'));
             $result = floatval(strip_tags($result));
             $invoice = $invoice->fresh();
 
@@ -227,7 +227,7 @@ class CheckData extends Command
                     ->havingRaw('count(users.id) > 1')
                     ->get(['users.oauth_user_id']);
 
-        $this->logMessage($users->count() . ' users with duplicate oauth ids');
+        $this->logMessage($users->count().' users with duplicate oauth ids');
 
         if ($users->count() > 0) {
             $this->isValid = false;
@@ -236,7 +236,7 @@ class CheckData extends Command
         if ($this->option('fix') == 'true') {
             foreach ($users as $user) {
                 $first = true;
-                $this->logMessage('checking ' . $user->oauth_user_id);
+                $this->logMessage('checking '.$user->oauth_user_id);
                 $matches = DB::table('users')
                             ->where('oauth_user_id', '=', $user->oauth_user_id)
                             ->orderBy('id')
@@ -244,11 +244,11 @@ class CheckData extends Command
 
                 foreach ($matches as $match) {
                     if ($first) {
-                        $this->logMessage('skipping ' . $match->id);
+                        $this->logMessage('skipping '.$match->id);
                         $first = false;
                         continue;
                     }
-                    $this->logMessage('updating ' . $match->id);
+                    $this->logMessage('updating '.$match->id);
 
                     DB::table('users')
                         ->where('id', '=', $match->id)
@@ -274,7 +274,7 @@ class CheckData extends Command
         ];
 
         foreach ($tables as $table) {
-            $count = DB::table('lookup_' . $table)->count();
+            $count = DB::table('lookup_'.$table)->count();
             if ($count > 0) {
                 $this->logMessage("Lookup table {$table} has {$count} records");
                 $this->isValid = false;
@@ -326,12 +326,12 @@ class CheckData extends Command
             }
 
             if (count($ids) > 1) {
-                $this->info('user_account: ' . $userAccount->id);
+                $this->info('user_account: '.$userAccount->id);
                 $countInvalid++;
             }
         }
 
-        $this->logMessage($countInvalid . ' user accounts with multiple companies');
+        $this->logMessage($countInvalid.' user accounts with multiple companies');
 
         if ($countInvalid > 0) {
             $this->isValid = false;
@@ -345,7 +345,7 @@ class CheckData extends Command
                         ->whereNull('contact_key')
                         ->orderBy('id')
                         ->get(['id']);
-        $this->logMessage($contacts->count() . ' contacts without a contact_key');
+        $this->logMessage($contacts->count().' contacts without a contact_key');
 
         if ($contacts->count() > 0) {
             $this->isValid = false;
@@ -364,7 +364,7 @@ class CheckData extends Command
 
         // check for missing contacts
         $clients = DB::table('clients')
-                    ->leftJoin('contacts', function($join) {
+                    ->leftJoin('contacts', function ($join) {
                         $join->on('contacts.client_id', '=', 'clients.id')
                             ->whereNull('contacts.deleted_at');
                     })
@@ -376,7 +376,7 @@ class CheckData extends Command
         }
 
         $clients = $clients->get(['clients.id', 'clients.user_id', 'clients.account_id']);
-        $this->logMessage($clients->count() . ' clients without any contacts');
+        $this->logMessage($clients->count().' clients without any contacts');
 
         if ($clients->count() > 0) {
             $this->isValid = false;
@@ -398,7 +398,7 @@ class CheckData extends Command
 
         // check for more than one primary contact
         $clients = DB::table('clients')
-                    ->leftJoin('contacts', function($join) {
+                    ->leftJoin('contacts', function ($join) {
                         $join->on('contacts.client_id', '=', 'clients.id')
                             ->where('contacts.is_primary', '=', true)
                             ->whereNull('contacts.deleted_at');
@@ -411,7 +411,7 @@ class CheckData extends Command
         }
 
         $clients = $clients->get(['clients.id', DB::raw('count(contacts.id)')]);
-        $this->logMessage($clients->count() . ' clients without a single primary contact');
+        $this->logMessage($clients->count().' clients without a single primary contact');
 
         if ($clients->count() > 0) {
             $this->isValid = false;
@@ -431,7 +431,7 @@ class CheckData extends Command
             $this->isValid = false;
         }
 
-        $this->logMessage($count . ' failed jobs');
+        $this->logMessage($count.' failed jobs');
     }
 
     private function checkBlankInvoiceHistory()
@@ -446,7 +446,7 @@ class CheckData extends Command
             $this->isValid = false;
         }
 
-        $this->logMessage($count . ' activities with blank invoice backup');
+        $this->logMessage($count.' activities with blank invoice backup');
     }
 
     private function checkInvitations()
@@ -460,7 +460,7 @@ class CheckData extends Command
                     ->havingRaw('count(invitations.id) = 0')
                     ->get(['invoices.id', 'invoices.user_id', 'invoices.account_id', 'invoices.client_id']);
 
-        $this->logMessage($invoices->count() . ' invoices without any invitations');
+        $this->logMessage($invoices->count().' invoices without any invitations');
 
         if ($invoices->count() > 0) {
             $this->isValid = false;
@@ -574,7 +574,7 @@ class CheckData extends Command
 
                 if ($records->count()) {
                     $this->isValid = false;
-                    $this->logMessage($records->count() . " {$table} records with incorrect {$entityType} account id");
+                    $this->logMessage($records->count()." {$table} records with incorrect {$entityType} account id");
 
                     if ($this->option('fix') == 'true') {
                         foreach ($records as $record) {
@@ -595,11 +595,11 @@ class CheckData extends Command
     {
         // update client paid_to_date value
         $clients = DB::table('clients')
-                    ->leftJoin('invoices', function($join) {
+                    ->leftJoin('invoices', function ($join) {
                         $join->on('invoices.client_id', '=', 'clients.id')
                             ->where('invoices.is_deleted', '=', 0);
                     })
-                    ->leftJoin('payments', function($join) {
+                    ->leftJoin('payments', function ($join) {
                         $join->on('payments.invoice_id', '=', 'invoices.id')
                             ->where('payments.payment_status_id', '!=', 2)
                             ->where('payments.payment_status_id', '!=', 3)
@@ -609,7 +609,7 @@ class CheckData extends Command
                     ->groupBy('clients.id')
                     ->havingRaw('clients.paid_to_date != sum(coalesce(payments.amount - payments.refunded, 0)) and clients.paid_to_date != 999999999.9999')
                     ->get(['clients.id', 'clients.paid_to_date', DB::raw('sum(coalesce(payments.amount - payments.refunded, 0)) as amount')]);
-        $this->logMessage($clients->count() . ' clients with incorrect paid to date');
+        $this->logMessage($clients->count().' clients with incorrect paid to date');
 
         if ($clients->count() > 0) {
             $this->isValid = false;
@@ -629,7 +629,7 @@ class CheckData extends Command
     private function checkInvoiceBalances()
     {
         $invoices = DB::table('invoices')
-                    ->leftJoin('payments', function($join) {
+                    ->leftJoin('payments', function ($join) {
                         $join->on('payments.invoice_id', '=', 'invoices.id')
                             ->where('payments.payment_status_id', '!=', 2)
                             ->where('payments.payment_status_id', '!=', 3)
@@ -640,7 +640,7 @@ class CheckData extends Command
                     ->havingRaw('(invoices.amount - invoices.balance) != coalesce(sum(payments.amount - payments.refunded), 0)')
                     ->get(['invoices.id', 'invoices.amount', 'invoices.balance', DB::raw('coalesce(sum(payments.amount - payments.refunded), 0)')]);
 
-        $this->logMessage($invoices->count() . ' invoices with incorrect balances');
+        $this->logMessage($invoices->count().' invoices with incorrect balances');
 
         if ($invoices->count() > 0) {
             $this->isValid = false;
@@ -668,7 +668,7 @@ class CheckData extends Command
         $clients = $clients->groupBy('clients.id', 'clients.balance')
                 ->orderBy('accounts.company_id', 'DESC')
                 ->get(['accounts.company_id', 'clients.account_id', 'clients.id', 'clients.balance', 'clients.paid_to_date', DB::raw('sum(invoices.balance) actual_balance')]);
-        $this->logMessage($clients->count() . ' clients with incorrect balance/activities');
+        $this->logMessage($clients->count().' clients with incorrect balance/activities');
 
         if ($clients->count() > 0) {
             $this->isValid = false;
@@ -851,9 +851,9 @@ class CheckData extends Command
         $countMissing = 0;
 
         foreach ($accounts as $account) {
-            $path = public_path('logo/' . $account->logo);
+            $path = public_path('logo/'.$account->logo);
             if (! file_exists($path)) {
-                $this->logMessage('Missing file: ' . $account->logo);
+                $this->logMessage('Missing file: '.$account->logo);
                 $countMissing++;
             }
         }
@@ -862,7 +862,7 @@ class CheckData extends Command
             $this->isValid = false;
         }
 
-        $this->logMessage($countMissing . ' missing logo files');
+        $this->logMessage($countMissing.' missing logo files');
     }
 
     /**

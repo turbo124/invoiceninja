@@ -6,8 +6,6 @@ class AddBankSubaccounts extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -43,8 +41,6 @@ class AddBankSubaccounts extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

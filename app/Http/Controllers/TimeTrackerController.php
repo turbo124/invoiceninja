@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\Models\Task;
-use App\Models\TaskStatus;
 use App\Models\Client;
 use App\Models\Project;
+use App\Models\TaskStatus;
 
 class TimeTrackerController extends Controller
 {

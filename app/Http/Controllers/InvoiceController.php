@@ -2,35 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateInvoiceRequest;
-use App\Http\Requests\InvoiceRequest;
-use App\Http\Requests\UpdateInvoiceRequest;
-use App\Jobs\SendInvoiceEmail;
-use App\Models\Account;
-use App\Models\Activity;
+use DB;
+use URL;
+use Auth;
+use View;
+use Cache;
+use Input;
+use Utils;
+use Session;
+use Redirect;
 use App\Models\Client;
+use App\Models\Account;
 use App\Models\Expense;
 use App\Models\Invoice;
-use App\Models\InvoiceDesign;
 use App\Models\Payment;
 use App\Models\Product;
-use App\Models\TaxRate;
-use App\Ninja\Datatables\InvoiceDatatable;
-use App\Ninja\Repositories\ClientRepository;
-use App\Ninja\Repositories\DocumentRepository;
-use App\Ninja\Repositories\InvoiceRepository;
+use App\Models\Activity;
+use App\Models\InvoiceDesign;
+use App\Jobs\SendInvoiceEmail;
 use App\Services\InvoiceService;
 use App\Services\PaymentService;
+use App\Http\Requests\InvoiceRequest;
 use App\Services\RecurringInvoiceService;
-use Auth;
-use Cache;
-use DB;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Utils;
-use View;
+use App\Ninja\Datatables\InvoiceDatatable;
+use App\Http\Requests\CreateInvoiceRequest;
+use App\Http\Requests\UpdateInvoiceRequest;
+use App\Ninja\Repositories\ClientRepository;
+use App\Ninja\Repositories\InvoiceRepository;
+use App\Ninja\Repositories\DocumentRepository;
 
 class InvoiceController extends BaseController
 {
@@ -146,8 +145,7 @@ class InvoiceController extends BaseController
         ];
 
         $lastSent = null;
-        if($invoice->is_recurring && $invoice->last_sent_date)
-        {
+        if ($invoice->is_recurring && $invoice->last_sent_date) {
             $lastSent = ($invoice->subEntityType() == ENTITY_RECURRING_INVOICE) ? $invoice->recurring_invoices->last() : $invoice->recurring_quotes->last();
         }
 
@@ -284,9 +282,9 @@ class InvoiceController extends BaseController
         $ends = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
         for ($i = 1; $i < 31; $i++) {
             if ($i >= 11 && $i <= 13) {
-                $ordinal = $i. 'th';
+                $ordinal = $i.'th';
             } else {
-                $ordinal = $i . $ends[$i % 10];
+                $ordinal = $i.$ends[$i % 10];
             }
 
             $dayStr = str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -319,11 +317,11 @@ class InvoiceController extends BaseController
         $taxRateOptions = $account->present()->taxRateOptions;
         if ($invoice->exists) {
             foreach ($invoice->getTaxes() as $key => $rate) {
-                $key = '0 ' . $key; // mark it as a standard exclusive rate option
+                $key = '0 '.$key; // mark it as a standard exclusive rate option
                 if (isset($taxRateOptions[$key])) {
                     continue;
                 }
-                $taxRateOptions[$key] = $rate['name'] . ' ' . $rate['rate'] . '%';
+                $taxRateOptions[$key] = $rate['name'].' '.$rate['rate'].'%';
             }
         }
 
@@ -400,7 +398,7 @@ class InvoiceController extends BaseController
 
         if ($action == 'clone_invoice') {
             return url(sprintf('invoices/%s/clone', $invoice->public_id));
-        } else if ($action == 'clone_quote') {
+        } elseif ($action == 'clone_quote') {
             return url(sprintf('quotes/%s/clone', $invoice->public_id));
         } elseif ($action == 'convert') {
             return $this->convertQuote($request, $invoice->public_id);
@@ -455,12 +453,12 @@ class InvoiceController extends BaseController
         if (! $invoice->shouldSendToday()) {
             if ($date = $invoice->getNextSendDate()) {
                 $date = $invoice->account->formatDate($date);
-                $date .= ' ' . DEFAULT_SEND_RECURRING_HOUR . ':00 am ' . $invoice->account->getTimezone();
+                $date .= ' '.DEFAULT_SEND_RECURRING_HOUR.':00 am '.$invoice->account->getTimezone();
 
                 return trans('texts.recurring_too_soon', ['date' => $date]);
-            } else {
-                return trans('texts.no_longer_running');
             }
+
+            return trans('texts.no_longer_running');
         }
 
         // switch from the recurring invoice to the generated invoice
@@ -469,11 +467,11 @@ class InvoiceController extends BaseController
         // in case auto-bill is enabled then a receipt has been sent
         if ($invoice->isPaid()) {
             return true;
-        } else {
-            $userId = Auth::user()->id;
-            $this->dispatch(new SendInvoiceEmail($invoice, $userId));
-            return true;
         }
+        $userId = Auth::user()->id;
+        $this->dispatch(new SendInvoiceEmail($invoice, $userId));
+
+        return true;
     }
 
     /**
@@ -509,7 +507,7 @@ class InvoiceController extends BaseController
             if ($action == 'markSent') {
                 $key = 'marked_sent_invoice';
             } elseif ($action == 'emailInvoice') {
-                $key = 'emailed_' . $entityType;
+                $key = 'emailed_'.$entityType;
             } elseif ($action == 'markPaid') {
                 $key = 'created_payment';
             } elseif ($action == 'download') {
@@ -538,7 +536,7 @@ class InvoiceController extends BaseController
 
         Session::flash('message', trans('texts.converted_to_invoice'));
 
-        return url('invoices/' . $clone->public_id);
+        return url('invoices/'.$clone->public_id);
     }
 
     public function cloneInvoice(InvoiceRequest $request, $publicId)
@@ -594,7 +592,7 @@ class InvoiceController extends BaseController
                 $backup->account = $invoice->account->toArray();
 
                 $versionsJson[$paymentId ? 0 : $activity->id] = $backup;
-                $key = Utils::timestampToDateTimeString(strtotime($activity->created_at)) . ' - ' . $activity->user->getDisplayName();
+                $key = Utils::timestampToDateTimeString(strtotime($activity->created_at)).' - '.$activity->user->getDisplayName();
                 $versionsSelect[$lastId ?: 0] = $key;
                 $lastId = $activity->id;
             } else {
@@ -604,7 +602,7 @@ class InvoiceController extends BaseController
 
         // Show the current version as the last in the history
         if (! $paymentId) {
-            $versionsSelect[$lastId] = Utils::timestampToDateTimeString(strtotime($invoice->created_at)) . ' - ' . $invoice->user->getDisplayName();
+            $versionsSelect[$lastId] = Utils::timestampToDateTimeString(strtotime($invoice->created_at)).' - '.$invoice->user->getDisplayName();
         }
 
         $data = [
@@ -634,7 +632,7 @@ class InvoiceController extends BaseController
 
         if ($invoice->client->shipping_address1) {
             foreach (['address1', 'address2', 'city', 'state', 'postal_code', 'country_id'] as $field) {
-                $invoice->client->$field = $invoice->client->{'shipping_' . $field};
+                $invoice->client->$field = $invoice->client->{'shipping_'.$field};
             }
         }
 

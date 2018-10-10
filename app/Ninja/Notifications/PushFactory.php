@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Notifications;
 
-use Davibennun\LaravelPushNotification\Facades\PushNotification;
 use Illuminate\Support\Facades\Log;
+use Davibennun\LaravelPushNotification\Facades\PushNotification;
 
 /**
  * Class PushFactory.
@@ -27,8 +27,6 @@ class PushFactory
      * @param $message
      * @param $messageArray
      * @param string $device - Type of device the message is being pushed to.
-     *
-     * @return void
      */
     public function customMessage($token, $message, $messageArray, $device)
     {
@@ -46,8 +44,6 @@ class PushFactory
      * @param $token - device token
      * @param $message - user specific message
      * @param mixed $device
-     *
-     * @return void
      */
     public function message($token, $message, $device)
     {

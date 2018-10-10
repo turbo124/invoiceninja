@@ -25,8 +25,7 @@ class SaveTicketSettings extends Request
     public function rules()
     {
         return [
-            'support_email_local_part' =>
-            Rule::unique('account_ticket_settings')->ignore($this->user()->account->account_ticket_settings->id),
+            'support_email_local_part' => Rule::unique('account_ticket_settings')->ignore($this->user()->account->account_ticket_settings->id),
         ];
     }
 
@@ -37,9 +36,8 @@ class SaveTicketSettings extends Request
         //ensure we
         $maxTicketNumber = Ticket::scope()->withTrashed()->max('ticket_number');
 
-        if($input['ticket_number_start'] <= $maxTicketNumber){
-
-            $input['ticket_number_start'] = $maxTicketNumber+1;
+        if ($input['ticket_number_start'] <= $maxTicketNumber) {
+            $input['ticket_number_start'] = $maxTicketNumber + 1;
 
             $this->replace($input);
 

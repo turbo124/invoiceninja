@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use URL;
+use Auth;
+use View;
+use Input;
+use Session;
+use Redirect;
+use Validator;
 use App\Models\AccountToken;
 use App\Services\TokenService;
-use Auth;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Validator;
-use View;
 
 /**
  * Class TokenController.
@@ -39,7 +39,7 @@ class TokenController extends BaseController
      */
     public function index()
     {
-        return Redirect::to('settings/' . ACCOUNT_API_TOKENS);
+        return Redirect::to('settings/'.ACCOUNT_API_TOKENS);
     }
 
     /**
@@ -114,7 +114,7 @@ class TokenController extends BaseController
 
         Session::flash('message', trans('texts.archived_token'));
 
-        return Redirect::to('settings/' . ACCOUNT_API_TOKENS);
+        return Redirect::to('settings/'.ACCOUNT_API_TOKENS);
     }
 
     /**
@@ -159,6 +159,6 @@ class TokenController extends BaseController
             Session::flash('message', $message);
         }
 
-        return Redirect::to('settings/' . ACCOUNT_API_TOKENS);
+        return Redirect::to('settings/'.ACCOUNT_API_TOKENS);
     }
 }

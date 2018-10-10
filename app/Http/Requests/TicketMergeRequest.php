@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-
 class TicketMergeRequest extends EntityRequest
 {
     protected $entityType = ENTITY_TICKET;
-
 
     public function entity()
     {
@@ -19,5 +17,4 @@ class TicketMergeRequest extends EntityRequest
             'updated_ticket_id' => 'required',
         ];
     }
-
 }

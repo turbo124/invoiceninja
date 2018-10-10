@@ -23,8 +23,8 @@ class SubscriptionService extends BaseService
     /**
      * SubscriptionService constructor.
      *
-     * @param SubscriptionRepository  $subscriptionRepo
-     * @param DatatableService $datatableService
+     * @param SubscriptionRepository $subscriptionRepo
+     * @param DatatableService       $datatableService
      */
     public function __construct(SubscriptionRepository $subscriptionRepo, DatatableService $datatableService)
     {

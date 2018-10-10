@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Support\Str;
 use Utils;
+use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class GenericEntityPolicy.
@@ -87,30 +87,29 @@ class GenericEntityPolicy
      *
      * @return bool
      */
-
     public static function edit(User $user, $item)
     {
-        if (! static::checkModuleEnabled($user, $item))
+        if (! static::checkModuleEnabled($user, $item)) {
             return false;
-
+        }
 
         $entityType = is_string($item) ? $item : $item->getEntityType();
-        return $user->hasPermission('edit_' . $entityType) || $user->owns($item);
+
+        return $user->hasPermission('edit_'.$entityType) || $user->owns($item);
     }
 
     /**
      * @param User $user
      * @param $item - entity name or object
+     *
      * @return bool
      */
-
     private static function checkModuleEnabled(User $user, $item)
     {
         $entityType = is_string($item) ? $item : $item->getEntityType();
+
         return $user->account->isModuleEnabled($entityType);
     }
-
-
 
     private static function className($entityType)
     {

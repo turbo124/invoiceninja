@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent;
-
 /**
  * Class ExpenseCategory.
  */
@@ -25,9 +23,9 @@ class LookupAccount extends LookupModel
 
     public static function createAccount($accountKey, $companyId)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         $current = config('database.default');
         config(['database.default' => DB_NINJA_LOOKUP]);
@@ -58,9 +56,9 @@ class LookupAccount extends LookupModel
 
     public static function updateAccount($accountKey, $account)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         $current = config('database.default');
         config(['database.default' => DB_NINJA_LOOKUP]);
@@ -76,9 +74,9 @@ class LookupAccount extends LookupModel
 
     public static function updateSupportLocalPart($accountKey, $support_email_local_part)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return;
-
+        }
 
         $current = config('database.default');
         config(['database.default' => DB_NINJA_LOOKUP]);
@@ -92,12 +90,11 @@ class LookupAccount extends LookupModel
         config(['database.default' => $current]);
     }
 
-
     public static function validateField($field, $value, $account = false)
     {
-        if (! config('ninja.multi_db_enabled'))
+        if (! config('ninja.multi_db_enabled')) {
             return true;
-
+        }
 
         $current = config('database.default');
 
@@ -115,5 +112,4 @@ class LookupAccount extends LookupModel
 
         return $isValid;
     }
-
 }

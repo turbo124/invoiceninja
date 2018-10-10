@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\LookupProposalInvitation;
 use App\Models\Traits\Inviteable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Invitation.
@@ -60,24 +59,21 @@ class TicketInvitation extends EntityModel
     }
 }
 
-TicketInvitation::creating(function ($invitation)
-{
+TicketInvitation::creating(function ($invitation) {
     LookupTicketInvitation::createNew($invitation->account->account_key, [
         'invitation_key' => $invitation->invitation_key,
-        'ticket_hash' => $invitation->ticket_hash
+        'ticket_hash' => $invitation->ticket_hash,
     ]);
 });
 
-TicketInvitation::updating(function ($invitation)
-{
+TicketInvitation::updating(function ($invitation) {
     $dirty = $invitation->getDirty();
     if (array_key_exists('message_id', $dirty)) {
         LookupTicketInvitation::updateInvitation($invitation->account->account_key, $invitation);
     }
 });
 
-TicketInvitation::deleted(function ($invitation)
-{
+TicketInvitation::deleted(function ($invitation) {
     if ($invitation->forceDeleting) {
         LookupTicketInvitation::deleteWhere([
             'invitation_key' => $invitation->invitation_key,

@@ -6,8 +6,6 @@ class AddInvoiceNumberSettings extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -22,7 +20,7 @@ class AddInvoiceNumberSettings extends Migration
         });
 
         // set initial counter value for accounts with invoices
-    $accounts = DB::table('accounts')->pluck('id');
+        $accounts = DB::table('accounts')->pluck('id');
 
         foreach ($accounts as $accountId) {
             $invoiceNumbers = DB::table('invoices')->where('account_id', $accountId)->pluck('invoice_number');
@@ -39,8 +37,6 @@ class AddInvoiceNumberSettings extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {
