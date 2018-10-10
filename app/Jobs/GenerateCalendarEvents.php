@@ -2,19 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
+use App\Models\Task;
+use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\Expense;
-use App\Models\Task;
 use App\Models\Project;
 
 class GenerateCalendarEvents extends Job
 {
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -32,9 +29,10 @@ class GenerateCalendarEvents extends Job
 
         foreach ($data as $type => $source) {
             if (! count($filter) || in_array($type, $filter)) {
-                $source->where(function($query) use ($type) {
+                $source->where(function ($query) use ($type) {
                     $start = date_create(request()->start);
                     $end = date_create(request()->end);
+
                     return $query->dateRange($start, $end);
                 });
 

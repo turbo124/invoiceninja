@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PaymentRequest;
-use App\Http\Requests\CreatePaymentAPIRequest;
-use App\Http\Requests\UpdatePaymentRequest;
-use App\Models\Invoice;
-use App\Models\Payment;
-use App\Ninja\Mailers\ContactMailer;
-use App\Ninja\Repositories\PaymentRepository;
-use App\Services\PaymentService;
 use Input;
 use Response;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Services\PaymentService;
+use App\Ninja\Mailers\ContactMailer;
+use App\Http\Requests\PaymentRequest;
+use App\Http\Requests\UpdatePaymentRequest;
+use App\Ninja\Repositories\PaymentRepository;
+use App\Http\Requests\CreatePaymentAPIRequest;
 
 class PaymentApiController extends BaseAPIController
 {

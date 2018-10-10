@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Presenters;
 
-use Carbon;
 use Utils;
+use Carbon;
 
 class PaymentPresenter extends EntityPresenter
 {
@@ -41,9 +41,9 @@ class PaymentPresenter extends EntityPresenter
     {
         if ($this->payer_id) {
             return 'PayPal';
-        } else {
-            return $this->entity->payment_type ? $this->entity->payment_type->name : trans('texts.manual_entry');
         }
+
+        return $this->entity->payment_type ? $this->entity->payment_type->name : trans('texts.manual_entry');
     }
 
     public function method()
@@ -51,7 +51,7 @@ class PaymentPresenter extends EntityPresenter
         if ($this->entity->account_gateway) {
             return $this->entity->account_gateway->gateway->name;
         } elseif ($this->entity->payment_type) {
-            return trans('texts.payment_type_' . $this->entity->payment_type->name);
+            return trans('texts.payment_type_'.$this->entity->payment_type->name);
         }
     }
 
@@ -61,7 +61,7 @@ class PaymentPresenter extends EntityPresenter
         $payment = $this->entity;
         $invoice = $payment->invoice;
 
-        $data->title = trans('texts.payment') . ' ' . $invoice->invoice_number . ' | ' . $this->completedAmount() . ' | ' . $this->client();
+        $data->title = trans('texts.payment').' '.$invoice->invoice_number.' | '.$this->completedAmount().' | '.$this->client();
         $data->start = $payment->payment_date;
 
         if ($subColors) {

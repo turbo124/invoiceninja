@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateProductRequest;
-use App\Http\Requests\UpdateProductRequest;
-use App\Http\Requests\ProductRequest;
+use URL;
+use Auth;
+use View;
+use Input;
+use Utils;
+use Session;
+use Redirect;
 use App\Models\Product;
 use App\Models\TaxRate;
-use App\Ninja\Datatables\ProductDatatable;
-use App\Ninja\Repositories\ProductRepository;
 use App\Services\ProductService;
-use Auth;
-use Illuminate\Auth\Access\AuthorizationException;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Utils;
-use View;
+use App\Http\Requests\ProductRequest;
+use App\Ninja\Datatables\ProductDatatable;
+use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Ninja\Repositories\ProductRepository;
 
 /**
  * Class ProductController.
@@ -121,7 +120,6 @@ class ProductController extends BaseController
      */
     public function create(ProductRequest $request)
     {
-
         $account = Auth::user()->account;
 
         $data = [
@@ -179,9 +177,9 @@ class ProductController extends BaseController
 
         if ($action == 'clone') {
             return redirect()->to(sprintf('products/%s/clone', $product->public_id));
-        } else {
-            return redirect()->to("products/{$product->public_id}/edit");
         }
+
+        return redirect()->to("products/{$product->public_id}/edit");
     }
 
     /**
@@ -198,10 +196,10 @@ class ProductController extends BaseController
             foreach ($products as $product) {
                 $data[] = $product->product_key;
             }
-            return redirect("invoices/create")->with('selectedProducts', $data);
-        } else {
-            $count = $this->productService->bulk($ids, $action);
+
+            return redirect('invoices/create')->with('selectedProducts', $data);
         }
+        $count = $this->productService->bulk($ids, $action);
 
         $message = Utils::pluralize($action.'d_product', $count);
         Session::flash('message', $message);

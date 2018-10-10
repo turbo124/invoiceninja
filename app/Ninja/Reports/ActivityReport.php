@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Activity;
 use Auth;
+use App\Models\Activity;
 
 class ActivityReport extends AbstractReport
 {
@@ -21,7 +21,7 @@ class ActivityReport extends AbstractReport
     {
         $account = Auth::user()->account;
 
-        $startDate = $this->startDate;;
+        $startDate = $this->startDate;
         $endDate = $this->endDate;
         $subgroup = $this->options['subgroup'];
 
@@ -40,7 +40,7 @@ class ActivityReport extends AbstractReport
             ];
 
             if ($subgroup == 'category') {
-                $dimension = trans('texts.' . $activity->relatedEntityType());
+                $dimension = trans('texts.'.$activity->relatedEntityType());
             } else {
                 $dimension = $this->getDimension($activity);
             }

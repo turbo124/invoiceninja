@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateRecurringExpenseRequest;
-use App\Http\Requests\RecurringExpenseRequest;
-use App\Http\Requests\UpdateRecurringExpenseRequest;
-use App\Models\Client;
-use App\Models\ExpenseCategory;
-use App\Models\TaxRate;
-use App\Models\Vendor;
-use App\Ninja\Datatables\RecurringExpenseDatatable;
-use App\Ninja\Repositories\RecurringExpenseRepository;
-use App\Services\RecurringExpenseService;
 use Auth;
+use View;
 use Input;
 use Session;
-use View;
-use Cache;
+use App\Models\Client;
+use App\Models\Vendor;
+use App\Models\TaxRate;
+use App\Models\ExpenseCategory;
+use App\Services\RecurringExpenseService;
+use App\Http\Requests\RecurringExpenseRequest;
+use App\Ninja\Datatables\RecurringExpenseDatatable;
+use App\Http\Requests\CreateRecurringExpenseRequest;
+use App\Http\Requests\UpdateRecurringExpenseRequest;
+use App\Ninja\Repositories\RecurringExpenseRepository;
 
 class RecurringExpenseController extends BaseController
 {

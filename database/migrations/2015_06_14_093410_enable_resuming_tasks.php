@@ -6,8 +6,6 @@ class EnableResumingTasks extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -27,7 +25,7 @@ class EnableResumingTasks extends Migration
             $data = [
                 'is_running' => true,
                 'duration' => 0,
-                
+
             ];
 
             DB::table('tasks')
@@ -38,8 +36,6 @@ class EnableResumingTasks extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

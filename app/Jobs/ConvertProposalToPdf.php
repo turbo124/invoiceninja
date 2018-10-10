@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Libraries\CurlUtils;
 use Utils;
+use App\Libraries\CurlUtils;
 
 class ConvertProposalToPdf extends Job
 {
@@ -37,11 +37,13 @@ class ConvertProposalToPdf extends Job
             }
         } catch (\Exception $exception) {
             Utils::logError("PhantomJS - Failed to load {$phantomjsLink}: {$exception->getMessage()}");
+
             return false;
         }
 
         if (! $pdf || strlen($pdf) < 200) {
             Utils::logError("PhantomJS - Invalid response {$phantomjsLink}: {$pdf}");
+
             return false;
         }
 

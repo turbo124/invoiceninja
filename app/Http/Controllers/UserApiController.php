@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use App\Models\User;
+use App\Services\UserService;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\Models\User;
 use App\Ninja\Repositories\UserRepository;
 use App\Ninja\Transformers\UserTransformer;
-use App\Services\UserService;
-use Auth;
 
 class UserApiController extends BaseAPIController
 {
@@ -148,9 +148,9 @@ class UserApiController extends BaseAPIController
             $data = $this->createItem($user, $transformer, 'users');
 
             return $this->response($data);
-        } else {
-            return $this->save($request, $user);
         }
+
+        return $this->save($request, $user);
     }
 
     private function save($request, $user = false)
