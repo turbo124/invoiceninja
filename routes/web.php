@@ -11,12 +11,12 @@
 |
 */
 
-Route::get('/', function () { return redirect()->route('login');});
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 Route::get('/login', ['as' => 'login', 'uses' => 'Auth\LoginController@showLoginForm']);
 Route::post('/login', ['as' => 'login', 'uses' => 'Auth\LoginController@login']);
 Route::get('/logout', ['as' => 'logout', 'uses' => 'Auth\LoginController@logout']);
 
-
-
-require_once app_path() . '/Constants.php';
+require_once app_path().'/Constants.php';
