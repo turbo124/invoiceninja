@@ -46,7 +46,6 @@ class CreateUsersTable extends Migration
             $table->softDeletes();
 
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-
         });
 
         Schema::create('user_accounts', function (Blueprint $table) {
@@ -61,11 +60,9 @@ class CreateUsersTable extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-
         });
 
-        Schema::create('account_gateways', function($t)
-        {
+        Schema::create('account_gateways', function ($t) {
             $t->increments('id');
             $t->unsignedInteger('account_id');
             $t->unsignedInteger('user_id');
@@ -79,10 +76,8 @@ class CreateUsersTable extends Migration
             //$t->foreign('gateway_id')->references('id')->on('gateways');
             $t->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $t->unique( array('account_id') );
+            $t->unique(['account_id']);
         });
-
-
     }
 
     /**
@@ -97,6 +92,4 @@ class CreateUsersTable extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('accounts');
     }
-
-
 }
