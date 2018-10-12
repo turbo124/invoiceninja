@@ -2,25 +2,24 @@
 
 namespace App\Ninja\Repositories;
 
+use DB;
+use Auth;
+use Utils;
+use App\Models\Task;
+use App\Models\Client;
+use App\Models\Account;
+use App\Models\Expense;
+use App\Models\Invoice;
+use App\Models\Product;
+use App\Models\Document;
+use App\Models\Invitation;
+use App\Models\InvoiceItem;
+use App\Jobs\SendInvoiceEmail;
+use App\Services\PaymentService;
 use App\Events\QuoteItemsWereCreated;
 use App\Events\QuoteItemsWereUpdated;
 use App\Events\InvoiceItemsWereCreated;
 use App\Events\InvoiceItemsWereUpdated;
-use App\Jobs\SendInvoiceEmail;
-use App\Models\Account;
-use App\Models\Client;
-use App\Models\Document;
-use App\Models\Expense;
-use App\Models\Invitation;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
-use App\Models\Product;
-use App\Models\Task;
-use App\Models\GatewayType;
-use App\Services\PaymentService;
-use Auth;
-use DB;
-use Utils;
 
 class InvoiceRepository extends BaseRepository
 {
@@ -75,9 +74,9 @@ class InvoiceRepository extends BaseRepository
                 'invoices.invoice_date',
                 'invoices.due_date as due_date_sql',
                 'invoices.partial_due_date',
-                DB::raw("CONCAT(invoices.invoice_date, invoices.created_at) as date"),
-                DB::raw("CONCAT(COALESCE(invoices.partial_due_date, invoices.due_date), invoices.created_at) as due_date"),
-                DB::raw("CONCAT(COALESCE(invoices.partial_due_date, invoices.due_date), invoices.created_at) as valid_until"),
+                DB::raw('CONCAT(invoices.invoice_date, invoices.created_at) as date'),
+                DB::raw('CONCAT(COALESCE(invoices.partial_due_date, invoices.due_date), invoices.created_at) as due_date'),
+                DB::raw('CONCAT(COALESCE(invoices.partial_due_date, invoices.due_date), invoices.created_at) as valid_until'),
                 'invoice_statuses.name as status',
                 'invoice_statuses.name as invoice_status_name',
                 'contacts.first_name',
@@ -96,7 +95,7 @@ class InvoiceRepository extends BaseRepository
 
         $this->applyFilters($query, $entityType, ENTITY_INVOICE);
 
-        if ($statuses = session('entity_status_filter:' . $entityType)) {
+        if ($statuses = session('entity_status_filter:'.$entityType)) {
             $statuses = explode(',', $statuses);
             $query->where(function ($query) use ($statuses) {
                 foreach ($statuses as $status) {
@@ -164,9 +163,9 @@ class InvoiceRepository extends BaseRepository
                         'invoices.start_date as start_date_sql',
                         'invoices.end_date as end_date_sql',
                         'invoices.last_sent_date as last_sent_date_sql',
-                        DB::raw("CONCAT(invoices.start_date, invoices.created_at) as start_date"),
-                        DB::raw("CONCAT(invoices.end_date, invoices.created_at) as end_date"),
-                        DB::raw("CONCAT(invoices.last_sent_date, invoices.created_at) as last_sent"),
+                        DB::raw('CONCAT(invoices.start_date, invoices.created_at) as start_date'),
+                        DB::raw('CONCAT(invoices.end_date, invoices.created_at) as end_date'),
+                        DB::raw('CONCAT(invoices.last_sent_date, invoices.created_at) as last_sent'),
                         'contacts.first_name',
                         'contacts.last_name',
                         'contacts.email',
@@ -242,7 +241,8 @@ class InvoiceRepository extends BaseRepository
             ->addColumn('frequency', function ($model) {
                 $frequency = strtolower($model->frequency);
                 $frequency = preg_replace('/\s/', '_', $frequency);
-                return trans('texts.freq_' . $frequency);
+
+                return trans('texts.freq_'.$frequency);
             })
             ->addColumn('start_date', function ($model) {
                 return Utils::fromSqlDate($model->start_date);
@@ -259,10 +259,10 @@ class InvoiceRepository extends BaseRepository
                 } elseif ($model->auto_bill == AUTO_BILL_ALWAYS) {
                     return trans('texts.enabled');
                 } elseif ($model->client_enable_auto_bill) {
-                    return trans('texts.enabled') . ' - <a href="javascript:setAutoBill('.$model->public_id.',false)">'.trans('texts.disable').'</a>';
-                } else {
-                    return trans('texts.disabled') . ' - <a href="javascript:setAutoBill('.$model->public_id.',true)">'.trans('texts.enable').'</a>';
+                    return trans('texts.enabled').' - <a href="javascript:setAutoBill('.$model->public_id.',false)">'.trans('texts.disable').'</a>';
                 }
+
+                return trans('texts.disabled').' - <a href="javascript:setAutoBill('.$model->public_id.',true)">'.trans('texts.enable').'</a>';
             });
 
         return $table->make();
@@ -375,9 +375,9 @@ class InvoiceRepository extends BaseRepository
         $publicId = isset($data['public_id']) ? $data['public_id'] : false;
 
         if (Utils::isNinjaProd() && ! Utils::isReseller()) {
-            $copy = json_decode( json_encode($data), true);
+            $copy = json_decode(json_encode($data), true);
             $copy['data'] = false;
-            $logMessage = date('r') . ' account_id: ' . $account->id . ' ' . json_encode($copy) . "\n\n";
+            $logMessage = date('r').' account_id: '.$account->id.' '.json_encode($copy)."\n\n";
             @file_put_contents(storage_path('logs/invoice-repo.log'), $logMessage, FILE_APPEND);
         }
 
@@ -1246,14 +1246,14 @@ class InvoiceRepository extends BaseRepository
                     ->whereIsPublic(true)
                     ->where('last_sent_date', '<', $lastSentDate);
 
-        for ($i=1; $i<=3; $i++) {
-            if (!$account->{"enable_reminder{$i}"}) {
+        for ($i = 1; $i <= 3; $i++) {
+            if (! $account->{"enable_reminder{$i}"}) {
                 continue;
             }
             $field = $account->{"field_reminder{$i}"} == REMINDER_FIELD_DUE_DATE ? 'due_date' : 'invoice_date';
             $date = date_create();
             if ($account->{"direction_reminder{$i}"} == REMINDER_DIRECTION_AFTER) {
-                $date->sub(date_interval_create_from_date_string($account->{"num_days_reminder{$i}"} . ' days'));
+                $date->sub(date_interval_create_from_date_string($account->{"num_days_reminder{$i}"}.' days'));
             }
             $invoices->where($field, '<', $date);
         }
@@ -1329,11 +1329,11 @@ class InvoiceRepository extends BaseRepository
             if (strpos($feeDescriptionLabel, '$date') !== false) {
                 $feeDescriptionLabel = str_replace('$date', $date, $feeDescriptionLabel);
             } else {
-                $feeDescriptionLabel .= ' • ' . $date;
+                $feeDescriptionLabel .= ' • '.$date;
             }
         } else {
             $feeDescriptionLabel = $fee >= 0 ? trans('texts.online_payment_surcharge') : trans('texts.online_payment_discount');
-            $feeDescriptionLabel .= ' • ' . $date;
+            $feeDescriptionLabel .= ' • '.$date;
         }
 
         $item = [];
@@ -1371,5 +1371,4 @@ class InvoiceRepository extends BaseRepository
 
         return ($invoiceId && isset($map[$invoiceId])) ? $map[$invoiceId] : null;
     }
-
 }

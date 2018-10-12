@@ -2,22 +2,22 @@
 
 namespace App\Console\Commands;
 
-use App\Ninja\Repositories\AccountRepository;
+use Auth;
+use Utils;
+use Faker\Factory;
+use App\Models\Client;
+use App\Models\Project;
+use App\Models\TaxRate;
+use App\Models\ExpenseCategory;
+use Illuminate\Console\Command;
+use App\Ninja\Repositories\TaskRepository;
 use App\Ninja\Repositories\ClientRepository;
+use App\Ninja\Repositories\VendorRepository;
+use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Repositories\ExpenseRepository;
 use App\Ninja\Repositories\InvoiceRepository;
 use App\Ninja\Repositories\PaymentRepository;
-use App\Ninja\Repositories\VendorRepository;
-use App\Ninja\Repositories\TaskRepository;
 use App\Ninja\Repositories\ProjectRepository;
-use App\Models\Client;
-use App\Models\TaxRate;
-use App\Models\Project;
-use App\Models\ExpenseCategory;
-use Auth;
-use Faker\Factory;
-use Illuminate\Console\Command;
-use Utils;
 
 /**
  * Class CreateTestData.
@@ -46,7 +46,7 @@ class CreateTestData extends Command
      * @param PaymentRepository $paymentRepo
      * @param VendorRepository  $vendorRepo
      * @param ExpenseRepository $expenseRepo
-     * @param TaskRepository $taskRepo
+     * @param TaskRepository    $taskRepo
      * @param AccountRepository $accountRepo
      */
     public function __construct(
@@ -80,6 +80,7 @@ class CreateTestData extends Command
     {
         if (Utils::isNinjaProd()) {
             $this->info('Unable to run in production');
+
             return false;
         }
 
@@ -129,7 +130,7 @@ class CreateTestData extends Command
             ];
 
             $client = $this->clientRepo->save($data);
-            $this->info('Client: ' . $client->name);
+            $this->info('Client: '.$client->name);
 
             $this->createInvoices($client);
             $this->createInvoices($client, true);
@@ -147,8 +148,8 @@ class CreateTestData extends Command
                 'is_public' => true,
                 'is_quote' => $isQuote,
                 'client_id' => $client->id,
-                'invoice_date_sql' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
-                'due_date_sql' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
+                'invoice_date_sql' => date_create()->modify(rand(-100, 100).' days')->format('Y-m-d'),
+                'due_date_sql' => date_create()->modify(rand(-100, 100).' days')->format('Y-m-d'),
                 'invoice_items' => [[
                     'product_key' => $this->faker->word,
                     'qty' => $this->faker->randomDigit + 1,
@@ -158,7 +159,7 @@ class CreateTestData extends Command
             ];
 
             $invoice = $this->invoiceRepo->save($data);
-            $this->info('Invoice: ' . $invoice->invoice_number);
+            $this->info('Invoice: '.$invoice->invoice_number);
 
             if (! $isQuote) {
                 $this->createPayment($client, $invoice);
@@ -176,12 +177,12 @@ class CreateTestData extends Command
             'invoice_id' => $invoice->id,
             'client_id' => $client->id,
             'amount' => $this->faker->randomFloat(2, 0, $invoice->amount),
-            'payment_date_sql' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
+            'payment_date_sql' => date_create()->modify(rand(-100, 100).' days')->format('Y-m-d'),
         ];
 
         $payment = $this->paymentRepo->save($data);
 
-        $this->info('Payment: ' . $payment->amount);
+        $this->info('Payment: '.$payment->amount);
     }
 
     private function createTasks($client)
@@ -193,7 +194,7 @@ class CreateTestData extends Command
         $project = $this->projectRepo->save($data);
 
         for ($i = 0; $i < $this->count; $i++) {
-            $startTime = date_create()->modify(rand(-100, 100) . ' days')->format('U');
+            $startTime = date_create()->modify(rand(-100, 100).' days')->format('U');
             $endTime = $startTime + (60 * 60 * 2);
             $timeLog = "[[{$startTime},{$endTime}]]";
             $data = [
@@ -206,8 +207,6 @@ class CreateTestData extends Command
             $this->taskRepo->save(false, $data);
         }
     }
-
-
 
     private function createVendors()
     {
@@ -228,7 +227,7 @@ class CreateTestData extends Command
             ];
 
             $vendor = $this->vendorRepo->save($data);
-            $this->info('Vendor: ' . $vendor->name);
+            $this->info('Vendor: '.$vendor->name);
 
             $this->createExpense($vendor);
         }
@@ -243,12 +242,12 @@ class CreateTestData extends Command
             $data = [
                 'vendor_id' => $vendor->id,
                 'amount' => $this->faker->randomFloat(2, 1, 10),
-                'expense_date' => date_create()->modify(rand(-100, 100) . ' days')->format('Y-m-d'),
+                'expense_date' => date_create()->modify(rand(-100, 100).' days')->format('Y-m-d'),
                 'public_notes' => '',
             ];
 
             $expense = $this->expenseRepo->save($data);
-            $this->info('Expense: ' . $expense->amount);
+            $this->info('Expense: '.$expense->amount);
         }
     }
 

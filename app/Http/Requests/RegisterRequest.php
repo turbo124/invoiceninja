@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Response;
 use App\Libraries\Utils;
 use Illuminate\Http\Request as InputRequest;
-use Response;
 
 class RegisterRequest extends Request
 {

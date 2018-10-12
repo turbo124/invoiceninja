@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Intents;
 
-use App\Models\EntityModel;
-use App\Models\Invoice;
 use Exception;
+use App\Models\Invoice;
+use App\Models\EntityModel;
 
 class UpdateInvoiceIntent extends InvoiceIntent
 {

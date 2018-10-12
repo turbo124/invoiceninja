@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Response;
 use App\Libraries\Utils;
 use Illuminate\Foundation\Http\FormRequest;
-use Response;
 
 // https://laracasts.com/discuss/channels/general-discussion/laravel-5-modify-input-before-validation/replies/34366
 abstract class Request extends FormRequest
@@ -42,10 +42,10 @@ abstract class Request extends FormRequest
         // autoload referenced entities
         foreach ($this->autoload as $entityType) {
             if ($id = $this->input("{$entityType}_public_id") ?: $this->input("{$entityType}_id")) {
-                $class = 'App\\Models\\' . ucwords($entityType);
+                $class = 'App\\Models\\'.ucwords($entityType);
                 $entity = $class::scope($id)->firstOrFail();
                 $input[$entityType] = $entity;
-                $input[$entityType . '_id'] = $entity->id;
+                $input[$entityType.'_id'] = $entity->id;
             }
         }
 

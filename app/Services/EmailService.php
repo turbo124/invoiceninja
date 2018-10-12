@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use Carbon;
 use App\Models\Invitation;
 use App\Ninja\Mailers\UserMailer;
-use Carbon;
 
 /**
  * Class EmailService.

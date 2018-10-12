@@ -32,5 +32,4 @@ class CalendarController extends BaseController
 
         return response()->json($events);
     }
-
 }

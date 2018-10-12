@@ -6,8 +6,6 @@ class AddBankAccounts extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up()
     {
@@ -40,8 +38,6 @@ class AddBankAccounts extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down()
     {

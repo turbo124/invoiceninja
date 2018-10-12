@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Client;
 use Auth;
-use Barracuda\ArchiveStream\Archive;
+use App\Models\Client;
 use App\Models\TaxRate;
+use Barracuda\ArchiveStream\Archive;
 
 class InvoiceReport extends AbstractReport
 {
@@ -68,13 +68,12 @@ class InvoiceReport extends AbstractReport
                                   }, 'invoice_items', 'invoice_status']);
                         }]);
 
-
         if ($this->isExport && $exportFormat == 'zip') {
             if (! extension_loaded('GMP')) {
                 die(trans('texts.gmp_required'));
             }
 
-            $zip = Archive::instance_by_useragent(date('Y-m-d') . '_' . str_replace(' ', '_', trans('texts.invoice_documents')));
+            $zip = Archive::instance_by_useragent(date('Y-m-d').'_'.str_replace(' ', '_', trans('texts.invoice_documents')));
             foreach ($clients->get() as $client) {
                 foreach ($client->invoices as $invoice) {
                     foreach ($invoice->documents as $document) {

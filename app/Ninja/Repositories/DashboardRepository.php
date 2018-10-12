@@ -2,13 +2,13 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Activity;
-use App\Models\Invoice;
-use App\Models\Task;
-use DateInterval;
-use DatePeriod;
 use DB;
 use stdClass;
+use DatePeriod;
+use DateInterval;
+use App\Models\Task;
+use App\Models\Invoice;
+use App\Models\Activity;
 
 class DashboardRepository
 {
@@ -64,10 +64,10 @@ class DashboardRepository
                 $dateFormat = $groupBy == 'DAYOFYEAR' ? 'z' : ($groupBy == 'WEEK' ? 'W' : 'n');
                 if ($groupBy == 'DAYOFYEAR') {
                     // MySQL returns 1-366 for DAYOFYEAR, whereas PHP returns 0-365
-                    $date = $d->format('Y') . ($d->format($dateFormat) + 1);
+                    $date = $d->format('Y').($d->format($dateFormat) + 1);
                 } elseif ($groupBy == 'WEEK' && ($d->format($dateFormat) < 10)) {
                     // PHP zero pads the week
-                    $date = $d->format('Y') . round($d->format($dateFormat));
+                    $date = $d->format('Y').round($d->format($dateFormat));
                 } else {
                     $date = $d->format('Y'.$dateFormat);
                 }
@@ -309,13 +309,13 @@ class DashboardRepository
                     ->where('invoices.deleted_at', '=', null)
                     ->where('invoices.is_public', '=', true)
                     ->where('contacts.is_primary', '=', true)
-                    ->where(DB::raw("coalesce(invoices.partial_due_date, invoices.due_date)"), '<', date('Y-m-d'));
+                    ->where(DB::raw('coalesce(invoices.partial_due_date, invoices.due_date)'), '<', date('Y-m-d'));
 
         if (! $viewAll) {
             $pastDue = $pastDue->where('invoices.user_id', '=', $userId);
         }
 
-        return $pastDue->select([DB::raw("coalesce(invoices.partial_due_date, invoices.due_date) due_date"), 'invoices.balance', 'invoices.public_id', 'invoices.invoice_number', 'clients.name as client_name', 'contacts.email', 'contacts.first_name', 'contacts.last_name', 'clients.currency_id', 'clients.public_id as client_public_id', 'clients.user_id as client_user_id', 'invoice_type_id'])
+        return $pastDue->select([DB::raw('coalesce(invoices.partial_due_date, invoices.due_date) due_date'), 'invoices.balance', 'invoices.public_id', 'invoices.invoice_number', 'clients.name as client_name', 'contacts.email', 'contacts.first_name', 'contacts.last_name', 'clients.currency_id', 'clients.public_id as client_public_id', 'clients.user_id as client_user_id', 'invoice_type_id'])
                     ->orderBy('invoices.due_date', 'asc')
                     ->take(50)
                     ->get();
@@ -336,8 +336,8 @@ class DashboardRepository
                     ->where('invoices.is_deleted', '=', false)
                     ->where('invoices.is_public', '=', true)
                     ->where('contacts.is_primary', '=', true)
-                    ->where(function($query) {
-                        $query->where(DB::raw("coalesce(invoices.partial_due_date, invoices.due_date)"), '>=', date('Y-m-d'))
+                    ->where(function ($query) {
+                        $query->where(DB::raw('coalesce(invoices.partial_due_date, invoices.due_date)'), '>=', date('Y-m-d'))
                             ->orWhereNull('invoices.due_date');
                     })
                     ->orderBy('invoices.due_date', 'asc');
@@ -347,7 +347,7 @@ class DashboardRepository
         }
 
         return $upcoming->take(50)
-                    ->select([DB::raw("coalesce(invoices.partial_due_date, invoices.due_date) due_date"), 'invoices.balance', 'invoices.public_id', 'invoices.invoice_number', 'clients.name as client_name', 'contacts.email', 'contacts.first_name', 'contacts.last_name', 'clients.currency_id', 'clients.public_id as client_public_id', 'clients.user_id as client_user_id', 'invoice_type_id'])
+                    ->select([DB::raw('coalesce(invoices.partial_due_date, invoices.due_date) due_date'), 'invoices.balance', 'invoices.public_id', 'invoices.invoice_number', 'clients.name as client_name', 'contacts.email', 'contacts.first_name', 'contacts.last_name', 'clients.currency_id', 'clients.public_id as client_public_id', 'clients.user_id as client_user_id', 'invoice_type_id'])
                     ->get();
     }
 

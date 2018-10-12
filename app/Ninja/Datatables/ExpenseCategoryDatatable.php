@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
+use Auth;
 
 class ExpenseCategoryDatatable extends EntityDatatable
 {
@@ -16,11 +16,11 @@ class ExpenseCategoryDatatable extends EntityDatatable
             [
                 'name',
                 function ($model) {
-                    if (Auth::user()->can('edit', [ENTITY_EXPENSE_CATEGORY, $model]))
+                    if (Auth::user()->can('edit', [ENTITY_EXPENSE_CATEGORY, $model])) {
                         return link_to("expense_categories/{$model->public_id}/edit", $model->category)->toHtml();
-                    else
-                        return $model->category;
+                    }
 
+                    return $model->category;
                 },
             ],
         ];

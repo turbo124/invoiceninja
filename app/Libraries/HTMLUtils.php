@@ -57,9 +57,9 @@ class HTMLUtils
 
         if ($previous == $current) {
             return url($fallback);
-        } else {
-            return $previous;
         }
+
+        return $previous;
     }
 
     public static function getEnvForAccount($field, $default = '')
@@ -67,7 +67,7 @@ class HTMLUtils
         $key = '';
 
         if ($user = auth()->user()) {
-            $key .= $user->account->id . '_';
+            $key .= $user->account->id.'_';
         }
 
         $key .= $field;

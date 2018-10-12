@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\DbServer;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\DbServer;
 use App\Libraries\CurlUtils;
+use Illuminate\Console\Command;
 
 class CalculatePayouts extends Command
 {
@@ -24,11 +24,8 @@ class CalculatePayouts extends Command
      */
     protected $description = 'Calculate payouts';
 
-
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -61,7 +58,7 @@ class CalculatePayouts extends Command
         $userMap = [];
 
         foreach ($servers as $server) {
-            $this->info('Processing users: ' . $server->name);
+            $this->info('Processing users: '.$server->name);
             config(['database.default' => $server->name]);
 
             $users = User::where('referral_code', '!=', '')
@@ -72,7 +69,7 @@ class CalculatePayouts extends Command
         }
 
         foreach ($servers as $server) {
-            $this->info('Processing companies: ' . $server->name);
+            $this->info('Processing companies: '.$server->name);
             config(['database.default' => $server->name]);
 
             $companies = Company::where('referral_code', '!=', '')
@@ -88,7 +85,7 @@ class CalculatePayouts extends Command
                     $client = $payment->client;
 
                     $this->info("User: $user");
-                    $this->info("Client: " . $client->getDisplayName());
+                    $this->info('Client: '.$client->getDisplayName());
 
                     foreach ($client->payments as $payment) {
                         $amount = $payment->getCompletedAmount();
@@ -101,8 +98,8 @@ class CalculatePayouts extends Command
 
     private function resellerPayouts()
     {
-        $response = CurlUtils::post($this->option('url') . '/reseller_stats', [
-            'password' => $this->option('password')
+        $response = CurlUtils::post($this->option('url').'/reseller_stats', [
+            'password' => $this->option('password'),
         ]);
 
         $this->info('Response:');
@@ -117,5 +114,4 @@ class CalculatePayouts extends Command
             ['password', null, InputOption::VALUE_OPTIONAL, 'Password', null],
         ];
     }
-
 }

@@ -2,24 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Utils;
+use Response;
+use App\Models\User;
+use App\Models\Account;
+use App\Ninja\OAuth\OAuth;
 use App\Events\UserSignedUp;
+use Illuminate\Http\Request;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateAccountRequest;
-use App\Models\Account;
-use App\Models\User;
-use App\Ninja\OAuth\OAuth;
 use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Transformers\AccountTransformer;
 use App\Ninja\Transformers\UserAccountTransformer;
-use App\Services\AuthService;
-use Auth;
-use Cache;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Response;
-use Socialite;
-use Utils;
 
 class AccountApiController extends BaseAPIController
 {
@@ -39,9 +34,9 @@ class AccountApiController extends BaseAPIController
         // Legacy support for Zapier
         if (request()->v2) {
             return $this->response(auth()->user()->email);
-        } else {
-            return Response::make(RESULT_SUCCESS, 200, $headers);
         }
+
+        return Response::make(RESULT_SUCCESS, 200, $headers);
     }
 
     public function register(RegisterRequest $request)
@@ -65,6 +60,7 @@ class AccountApiController extends BaseAPIController
 
         if ($user && $user->failed_logins >= MAX_FAILED_LOGINS) {
             sleep(ERROR_DELAY);
+
             return $this->errorResponse(['message' => 'Invalid credentials'], 401);
         }
 
@@ -82,16 +78,17 @@ class AccountApiController extends BaseAPIController
                 $user->failed_logins = 0;
                 $user->save();
             }
+
             return $this->processLogin($request);
-        } else {
-            error_log('login failed');
-            if ($user) {
-                $user->failed_logins = $user->failed_logins + 1;
-                $user->save();
-            }
-            sleep(ERROR_DELAY);
-            return $this->errorResponse(['message' => 'Invalid credentials'], 401);
         }
+        error_log('login failed');
+        if ($user) {
+            $user->failed_logins = $user->failed_logins + 1;
+            $user->save();
+        }
+        sleep(ERROR_DELAY);
+
+        return $this->errorResponse(['message' => 'Invalid credentials'], 401);
     }
 
     public function refresh(Request $request)
@@ -174,7 +171,7 @@ class AccountApiController extends BaseAPIController
             if ($devices[$x]['email'] == $request->email) {
                 $devices[$x]['token'] = $request->token; //update
                 $devices[$x]['device'] = $request->device;
-                    $account->devices = json_encode($devices);
+                $account->devices = json_encode($devices);
                 $account->save();
                 $devices[$x]['account_key'] = $account->account_key;
 
@@ -202,16 +199,16 @@ class AccountApiController extends BaseAPIController
         return $this->response($newDevice);
     }
 
-    public function removeDeviceToken(Request $request) {
-
+    public function removeDeviceToken(Request $request)
+    {
         $account = Auth::user()->account;
 
         $devices = json_decode($account->devices, true);
 
-        for($x=0; $x<count($devices); $x++)
-        {
-            if($request->token == $devices[$x]['token'])
+        for ($x = 0; $x < count($devices); $x++) {
+            if ($request->token == $devices[$x]['token']) {
                 unset($devices[$x]);
+            }
         }
 
         $account->devices = json_encode(array_values($devices));
@@ -263,17 +260,16 @@ class AccountApiController extends BaseAPIController
 
         if ($user) {
             Auth::login($user);
+
             return $this->processLogin($request);
         }
-        else
-            return $this->errorResponse(['message' => 'Invalid credentials'], 401);
 
+        return $this->errorResponse(['message' => 'Invalid credentials'], 401);
     }
 
-    public function iosSubscriptionStatus() {
+    public function iosSubscriptionStatus()
+    {
 
         //stubbed for iOS callbacks
-
     }
-
 }

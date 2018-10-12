@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Client;
-
 class UpdateInvoiceAPIRequest extends InvoiceRequest
 {
     /**
@@ -35,7 +33,7 @@ class UpdateInvoiceAPIRequest extends InvoiceRequest
 
         $rules = [
             'invoice_items' => 'valid_invoice_items',
-            'invoice_number' => 'unique:invoices,invoice_number,' . $invoiceId . ',id,account_id,' . $this->user()->account_id,
+            'invoice_number' => 'unique:invoices,invoice_number,'.$invoiceId.',id,account_id,'.$this->user()->account_id,
             'discount' => 'positive',
             //'invoice_date' => 'date',
             //'due_date' => 'date',

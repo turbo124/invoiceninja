@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Client;
 use Auth;
 use Utils;
+use App\Models\Client;
 
 class ProductReport extends AbstractReport
 {

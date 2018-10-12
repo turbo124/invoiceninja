@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use DB;
-use Illuminate\Http\Request;
 use Log;
 use Utils;
+use Closure;
+use Illuminate\Http\Request;
 
 /**
  * Class QueryLogging.
@@ -38,7 +38,7 @@ class QueryLogging
                 $count = count($queries);
                 $timeEnd = microtime(true);
                 $time = $timeEnd - $timeStart;
-                Log::info($request->method() . ' - ' . $request->url() . ": $count queries - " . $time);
+                Log::info($request->method().' - '.$request->url().": $count queries - ".$time);
                 //Log::info($queries);
             }
         }

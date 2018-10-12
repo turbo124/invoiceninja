@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use View;
+use Utils;
 use App\Models\Client;
 use App\Models\Expense;
 use App\Ninja\Repositories\DashboardRepository;
-use Auth;
-use Utils;
-use View;
 
 /**
  * Class DashboardController.

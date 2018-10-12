@@ -3,10 +3,9 @@
 namespace App\Jobs\Client;
 
 use Utils;
-use App\Models\InvoiceItem;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\Eloquent;
+use App\Models\InvoiceItem;
 
 class GenerateStatementData
 {
@@ -19,8 +18,6 @@ class GenerateStatementData
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -78,7 +75,7 @@ class GenerateStatementData
         $invoices = $invoices->get();
         $data = collect();
 
-        for ($i=0; $i<$invoices->count(); $i++) {
+        for ($i = 0; $i < $invoices->count(); $i++) {
             $invoice = $invoices[$i];
             $item = new InvoiceItem();
             $item->id = $invoice->id;
@@ -116,7 +113,7 @@ class GenerateStatementData
         $payments = $payments->get();
         $data = collect();
 
-        for ($i=0; $i<$payments->count(); $i++) {
+        for ($i = 0; $i < $payments->count(); $i++) {
             $payment = $payments[$i];
             $item = new InvoiceItem();
             $item->product_key = $payment->invoice->invoice_number;

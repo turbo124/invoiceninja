@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Request;
 use Utils;
+use Request;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BaseController extends Controller
 {
@@ -15,8 +15,6 @@ class BaseController extends Controller
 
     /**
      * Setup the layout used by the controller.
-     *
-     * @return void
      */
     protected function setupLayout()
     {
@@ -37,7 +35,7 @@ class BaseController extends Controller
 
         // when restoring redirect to entity
         if ($action == 'restore' && count($ids) == 1) {
-            return redirect("{$entityTypes}/" . $ids[0]);
+            return redirect("{$entityTypes}/".$ids[0]);
         // when viewing from a datatable list
         } elseif (strpos($referer, '/clients/') || strpos($referer, '/projects/')) {
             return redirect($referer);
@@ -45,27 +43,26 @@ class BaseController extends Controller
             return redirect("{$entityTypes}");
         // when viewing individual entity
         } elseif (count($ids)) {
-            return redirect("{$entityTypes}/" . $ids[0] . '/edit');
-        } else {
-            return redirect("{$entityTypes}");
+            return redirect("{$entityTypes}/".$ids[0].'/edit');
         }
+
+        return redirect("{$entityTypes}");
     }
 
     protected function downloadResponse($filename, $contents, $type = 'application/pdf')
     {
-        header('Content-Type: ' . $type);
-        header('Content-Length: ' . strlen($contents));
+        header('Content-Type: '.$type);
+        header('Content-Length: '.strlen($contents));
 
         if (! request()->debug) {
-            header('Content-disposition: attachment; filename="' . $filename . '"');
+            header('Content-disposition: attachment; filename="'.$filename.'"');
         }
 
         header('Cache-Control: public, must-revalidate, max-age=0');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
         echo $contents;
 
         exit;
     }
-
 }

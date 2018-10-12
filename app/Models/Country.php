@@ -41,6 +41,6 @@ class Country extends Eloquent
      */
     public function getName()
     {
-        return trans('texts.country_' . $this->name);
+        return trans('texts.country_'.$this->name);
     }
 }

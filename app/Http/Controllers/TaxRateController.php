@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use URL;
+use Auth;
+use View;
+use Input;
+use Session;
+use Redirect;
+use App\Models\TaxRate;
+use App\Services\TaxRateService;
 use App\Http\Requests\CreateTaxRateRequest;
 use App\Http\Requests\UpdateTaxRateRequest;
-use App\Models\TaxRate;
 use App\Ninja\Repositories\TaxRateRepository;
-use App\Services\TaxRateService;
-use Auth;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use View;
 
 class TaxRateController extends BaseController
 {
@@ -29,7 +29,7 @@ class TaxRateController extends BaseController
 
     public function index()
     {
-        return Redirect::to('settings/' . ACCOUNT_TAX_RATES);
+        return Redirect::to('settings/'.ACCOUNT_TAX_RATES);
     }
 
     public function getDatatable()
@@ -67,7 +67,7 @@ class TaxRateController extends BaseController
 
         Session::flash('message', trans('texts.created_tax_rate'));
 
-        return Redirect::to('settings/' . ACCOUNT_TAX_RATES);
+        return Redirect::to('settings/'.ACCOUNT_TAX_RATES);
     }
 
     public function update(UpdateTaxRateRequest $request, $publicId)
@@ -76,7 +76,7 @@ class TaxRateController extends BaseController
 
         Session::flash('message', trans('texts.updated_tax_rate'));
 
-        return Redirect::to('settings/' . ACCOUNT_TAX_RATES);
+        return Redirect::to('settings/'.ACCOUNT_TAX_RATES);
     }
 
     public function bulk()
@@ -87,6 +87,6 @@ class TaxRateController extends BaseController
 
         Session::flash('message', trans('texts.archived_tax_rate'));
 
-        return Redirect::to('settings/' . ACCOUNT_TAX_RATES);
+        return Redirect::to('settings/'.ACCOUNT_TAX_RATES);
     }
 }

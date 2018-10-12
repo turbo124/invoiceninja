@@ -46,5 +46,4 @@ class AccountEmailSettings extends Eloquent
         TEMPLATE_REMINDER3,
         TEMPLATE_REMINDER4,
     ];
-
 }

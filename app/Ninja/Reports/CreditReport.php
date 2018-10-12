@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Reports;
 
-use App\Models\Client;
 use Auth;
+use App\Models\Client;
 
 class CreditReport extends AbstractReport
 {

@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
+use Auth;
 use Utils;
 
 class ProjectDatatable extends EntityDatatable
@@ -17,26 +17,25 @@ class ProjectDatatable extends EntityDatatable
             [
                 'project',
                 function ($model) {
-                    if (Auth::user()->can('view', [ENTITY_PROJECT, $model]))
+                    if (Auth::user()->can('view', [ENTITY_PROJECT, $model])) {
                         return $this->addNote(link_to("projects/{$model->public_id}", $model->project)->toHtml(), $model->private_notes);
-                    else
-                        return $model->project;
+                    }
 
-
+                    return $model->project;
                 },
             ],
             [
                 'client_name',
                 function ($model) {
                     if ($model->client_public_id) {
-                        if (Auth::user()->can('view', [ENTITY_CLIENT, $model]))
+                        if (Auth::user()->can('view', [ENTITY_CLIENT, $model])) {
                             return link_to("clients/{$model->client_public_id}", $model->client_name)->toHtml();
-                        else
-                            return Utils::getClientDisplayName($model);
+                        }
 
-                    } else {
-                        return '';
+                        return Utils::getClientDisplayName($model);
                     }
+
+                    return '';
                 },
             ],
             [
@@ -55,7 +54,7 @@ class ProjectDatatable extends EntityDatatable
                 'task_rate',
                 function ($model) {
                     return floatval($model->task_rate) ? Utils::formatMoney($model->task_rate) : '';
-                }
+                },
             ],
         ];
     }

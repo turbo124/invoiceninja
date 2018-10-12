@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Ninja\Datatables\CreditDatatable;
-use App\Ninja\Repositories\CreditRepository;
 use Auth;
 use Utils;
+use App\Ninja\Datatables\CreditDatatable;
+use App\Ninja\Repositories\CreditRepository;
 
 /**
  * Class CreditService.

@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Controllers\Controller;
 use Auth;
 use Closure;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 /**
  * Class PermissionsRequired.
