@@ -2,9 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
-use Utils;
+use Auth;
 
 class ProposalSnippetDatatable extends EntityDatatable
 {
@@ -17,24 +16,23 @@ class ProposalSnippetDatatable extends EntityDatatable
             [
                 'name',
                 function ($model) {
-                    $icon = '<i class="fa fa-' . $model->icon . '"></i>&nbsp;&nbsp;';
+                    $icon = '<i class="fa fa-'.$model->icon.'"></i>&nbsp;&nbsp;';
 
-                    if (Auth::user()->can('view', [ENTITY_PROPOSAL_SNIPPET, $model]))
-                        return $icon . link_to("proposals/snippets/{$model->public_id}/edit", $model->name)->toHtml();
-                    else
-                        return $icon . $model->name;
+                    if (Auth::user()->can('view', [ENTITY_PROPOSAL_SNIPPET, $model])) {
+                        return $icon.link_to("proposals/snippets/{$model->public_id}/edit", $model->name)->toHtml();
+                    }
 
-
+                    return $icon.$model->name;
                 },
             ],
             [
                 'category',
                 function ($model) {
-                    if (Auth::user()->can('view', [ENTITY_PROPOSAL_CATEGORY, $model]))
+                    if (Auth::user()->can('view', [ENTITY_PROPOSAL_CATEGORY, $model])) {
                         return link_to("proposals/categories/{$model->category_public_id}/edit", $model->category ?: ' ')->toHtml();
-                    else
-                        return $model->category;
+                    }
 
+                    return $model->category;
                 },
             ],
             [

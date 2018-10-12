@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Cache;
-use Eloquent;
 use Utils;
+use Eloquent;
 
 /**
  * Class GatewayType.

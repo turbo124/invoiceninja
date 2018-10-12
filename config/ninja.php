@@ -36,7 +36,6 @@ return [
         'selfhost' => env('PRIVACY_POLICY_URL', 'https://www.invoiceninja.com/self-hosting-privacy-data-control/'),
     ],
 
-
     // Google maps
     'google_maps_enabled' => env('GOOGLE_MAPS_ENABLED', true),
     'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY', ''),

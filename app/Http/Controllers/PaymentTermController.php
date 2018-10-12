@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreatePaymentTermRequest;
-use App\Http\Requests\UpdatePaymentTermRequest;
+use URL;
+use Auth;
+use View;
+use Input;
+use Utils;
+use Session;
+use Redirect;
 use App\Models\PaymentTerm;
 use App\Services\PaymentTermService;
-use Auth;
-use Input;
-use Redirect;
-use Session;
-use URL;
-use Utils;
-use View;
+use App\Http\Requests\CreatePaymentTermRequest;
+use App\Http\Requests\UpdatePaymentTermRequest;
 
 class PaymentTermController extends BaseController
 {
@@ -38,7 +38,7 @@ class PaymentTermController extends BaseController
      */
     public function index()
     {
-        return Redirect::to('settings/' . ACCOUNT_PAYMENT_TERMS);
+        return Redirect::to('settings/'.ACCOUNT_PAYMENT_TERMS);
     }
 
     /**
@@ -115,13 +115,13 @@ class PaymentTermController extends BaseController
         }
 
         $paymentTerm->num_days = Utils::parseInt(Input::get('num_days'));
-        $paymentTerm->name = 'Net ' . $paymentTerm->num_days;
+        $paymentTerm->name = 'Net '.$paymentTerm->num_days;
         $paymentTerm->save();
 
         $message = $publicId ? trans('texts.updated_payment_term') : trans('texts.created_payment_term');
         Session::flash('message', $message);
 
-        return Redirect::to('settings/' . ACCOUNT_PAYMENT_TERMS);
+        return Redirect::to('settings/'.ACCOUNT_PAYMENT_TERMS);
     }
 
     /**
@@ -135,6 +135,6 @@ class PaymentTermController extends BaseController
 
         Session::flash('message', trans('texts.archived_payment_term'));
 
-        return Redirect::to('settings/' . ACCOUNT_PAYMENT_TERMS);
+        return Redirect::to('settings/'.ACCOUNT_PAYMENT_TERMS);
     }
 }

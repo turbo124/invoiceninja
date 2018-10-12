@@ -2,10 +2,10 @@
 
 namespace App\Ninja\Intents;
 
-use App\Libraries\Skype\SkypeResponse;
-use App\Models\Client;
-use Exception;
 use stdClass;
+use Exception;
+use App\Models\Client;
+use App\Libraries\Skype\SkypeResponse;
 
 class BaseIntent
 {
@@ -109,12 +109,12 @@ class BaseIntent
 
     protected function loadStates($entityType)
     {
-        $states = array_filter($this->getFields('Filter'), function($state) {
+        $states = array_filter($this->getFields('Filter'), function ($state) {
             return in_array($state, [STATUS_ACTIVE, STATUS_ARCHIVED, STATUS_DELETED]);
         });
 
         if (count($states) || $this->hasField('Filter', 'all')) {
-            session(['entity_state_filter:' . $entityType => join(',', $states)]);
+            session(['entity_state_filter:'.$entityType => join(',', $states)]);
         }
     }
 
@@ -124,9 +124,9 @@ class BaseIntent
 
         if ($value) {
             return $fieldValue && $fieldValue == $value;
-        } else {
-            return $fieldValue ? true : false;
         }
+
+        return $fieldValue ? true : false;
     }
 
     public function process()
@@ -266,7 +266,7 @@ class BaseIntent
 
         foreach ($this->requestFields() as $field => $value) {
             if (in_array($field, $fields)) {
-                $str .= $field . '=' . urlencode($value) . '&';
+                $str .= $field.'='.urlencode($value).'&';
             }
         }
 

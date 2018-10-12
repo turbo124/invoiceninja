@@ -91,21 +91,23 @@ class EntityDatatable
         return $indices;
     }
 
-    public function addNote($str, $note) {
+    public function addNote($str, $note)
+    {
         if (! $note) {
             return $str;
         }
 
-        return $str . '&nbsp; <span class="fa fa-file-o" data-toggle="tooltip" data-placement="bottom" title="' . e($note) . '"></span>';
+        return $str.'&nbsp; <span class="fa fa-file-o" data-toggle="tooltip" data-placement="bottom" title="'.e($note).'"></span>';
     }
 
-    public function showWithTooltip($str, $max = 60) {
+    public function showWithTooltip($str, $max = 60)
+    {
         $str = e($str);
 
         if (strlen($str) > $max) {
-            return '<span data-toggle="tooltip" data-placement="bottom" title="' . mb_substr($str, 0, 500) . '">' . trim(mb_substr($str, 0, $max)) . '...' . '</span>';
-        } else {
-            return $str;
+            return '<span data-toggle="tooltip" data-placement="bottom" title="'.mb_substr($str, 0, 500).'">'.trim(mb_substr($str, 0, $max)).'...'.'</span>';
         }
+
+        return $str;
     }
 }

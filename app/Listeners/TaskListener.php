@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\InvoiceWasDeleted;
 use App\Models\Task;
+use App\Events\InvoiceWasDeleted;
 
 /**
  * Class TaskListener.

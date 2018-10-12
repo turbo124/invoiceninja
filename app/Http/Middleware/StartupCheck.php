@@ -3,20 +3,19 @@
 namespace App\Http\Middleware;
 
 use App;
-use App\Events\UserLoggedIn;
-use App\Libraries\CurlUtils;
-use App\Models\InvoiceDesign;
-use App\Models\Language;
 use Auth;
 use Cache;
-use Closure;
 use Event;
-use Illuminate\Http\Request;
 use Input;
-use Redirect;
-use Schema;
-use Session;
 use Utils;
+use Schema;
+use Closure;
+use Session;
+use Redirect;
+use App\Models\Language;
+use App\Events\UserLoggedIn;
+use App\Libraries\CurlUtils;
+use Illuminate\Http\Request;
 
 /**
  * Class StartupCheck.
@@ -40,7 +39,7 @@ class StartupCheck
         if (isset($_ENV['TRUSTED_PROXIES'])) {
             if (env('TRUSTED_PROXIES') == '*') {
                 $request->setTrustedProxies(['127.0.0.1', $request->server->get('REMOTE_ADDR')]);
-            } else{
+            } else {
                 $request->setTrustedProxies(array_map('trim', explode(',', env('TRUSTED_PROXIES'))));
             }
         }
@@ -63,13 +62,13 @@ class StartupCheck
         if (Utils::isSelfHost()) {
             // Check if config:cache may have been run
             if (! env('APP_URL')) {
-                echo "<p>There appears to be a problem with your configuration, please check your .env file.</p>" .
+                echo '<p>There appears to be a problem with your configuration, please check your .env file.</p>'.
                      "<p>If you've run 'php artisan config:cache' you will need to run 'php artisan config:clear'</p>.";
                 exit;
             }
 
             // Check if a new version was installed
-            $file = storage_path() . '/version.txt';
+            $file = storage_path().'/version.txt';
             $version = @file_get_contents($file);
             if ($version != NINJA_VERSION) {
                 if (version_compare(phpversion(), '7.0.0', '<')) {
@@ -182,7 +181,7 @@ class StartupCheck
                 $licenseKey = Input::get('license_key');
                 $productId = Input::get('product_id');
 
-                $url = (Utils::isNinjaDev() ? SITE_URL : NINJA_APP_URL) . "/claim_license?license_key={$licenseKey}&product_id={$productId}&get_date=true";
+                $url = (Utils::isNinjaDev() ? SITE_URL : NINJA_APP_URL)."/claim_license?license_key={$licenseKey}&product_id={$productId}&get_date=true";
                 $data = trim(CurlUtils::get($url));
 
                 if ($data == RESULT_FAILURE) {

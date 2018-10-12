@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GenerateProjectChartData;
-use App\Http\Requests\CreateProjectRequest;
-use App\Http\Requests\ProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
-use App\Models\Client;
-use App\Models\Project;
-use App\Ninja\Datatables\ProjectDatatable;
-use App\Ninja\Repositories\ProjectRepository;
-use App\Services\ProjectService;
 use Auth;
+use View;
 use Input;
 use Session;
-use View;
+use App\Models\Client;
+use App\Models\Project;
+use App\Services\ProjectService;
+use App\Http\Requests\ProjectRequest;
+use App\Jobs\GenerateProjectChartData;
+use App\Ninja\Datatables\ProjectDatatable;
+use App\Http\Requests\CreateProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use App\Ninja\Repositories\ProjectRepository;
 
 class ProjectController extends BaseController
 {
@@ -90,7 +90,7 @@ class ProjectController extends BaseController
             'account' => auth()->user()->account,
             'project' => $project,
             'method' => 'PUT',
-            'url' => 'projects/' . $project->public_id,
+            'url' => 'projects/'.$project->public_id,
             'title' => trans('texts.edit_project'),
             'clients' => Client::scope()->with('contacts')->orderBy('name')->get(),
             'clientPublicId' => $project->client ? $project->client->public_id : null,
@@ -160,17 +160,17 @@ class ProjectController extends BaseController
                     $lastProjectId = $task->project_id;
                 }
             }
+
             return redirect("invoices/create/{$clientPublicId}")->with('tasks', $data);
-        } else {
-            $count = $this->projectService->bulk($ids, $action);
-
-            if ($count > 0) {
-                $field = $count == 1 ? "{$action}d_project" : "{$action}d_projects";
-                $message = trans("texts.$field", ['count' => $count]);
-                Session::flash('message', $message);
-            }
-
-            return redirect()->to('/projects');
         }
+        $count = $this->projectService->bulk($ids, $action);
+
+        if ($count > 0) {
+            $field = $count == 1 ? "{$action}d_project" : "{$action}d_projects";
+            $message = trans("texts.$field", ['count' => $count]);
+            Session::flash('message', $message);
+        }
+
+        return redirect()->to('/projects');
     }
 }

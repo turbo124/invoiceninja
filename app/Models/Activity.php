@@ -123,7 +123,7 @@ class Activity extends Eloquent
 
         $data = [
             'client' => $client ? link_to($client->getRoute(), $client->getDisplayName()) : null,
-            'user' => $isSystem ? '<i>' . trans('texts.system') . '</i>' : e($user->getDisplayName()),
+            'user' => $isSystem ? '<i>'.trans('texts.system').'</i>' : e($user->getDisplayName()),
             'invoice' => $invoice ? link_to($invoice->getRoute(), $invoice->getDisplayName()) : null,
             'quote' => $invoice ? link_to($invoice->getRoute(), $invoice->getDisplayName()) : null,
             'contact' => $contactId ? link_to($client->getRoute(), $client->getDisplayName()) : e($user->getDisplayName()),

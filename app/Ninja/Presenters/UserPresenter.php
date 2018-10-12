@@ -11,7 +11,7 @@ class UserPresenter extends EntityPresenter
 
     public function fullName()
     {
-        return $this->entity->first_name . ' ' . $this->entity->last_name;
+        return $this->entity->first_name.' '.$this->entity->last_name;
     }
 
     public function statusCode()

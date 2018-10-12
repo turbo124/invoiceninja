@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\QuoteInvitationWasViewed;
 use App\Events\QuoteWasEmailed;
+use App\Events\QuoteInvitationWasViewed;
 
 /**
  * Class QuoteListener.
@@ -28,5 +28,4 @@ class QuoteListener
         $quote->last_sent_date = date('Y-m-d');
         $quote->save();
     }
-
 }

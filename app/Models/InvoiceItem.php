@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class InvoiceItem.
@@ -146,5 +146,4 @@ class InvoiceItem extends EntityModel
 
         return $cost;
     }
-
 }

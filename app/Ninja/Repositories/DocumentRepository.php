@@ -2,11 +2,11 @@
 
 namespace App\Ninja\Repositories;
 
-use App\Models\Document;
 use DB;
 use Form;
-use Intervention\Image\ImageManager;
 use Utils;
+use App\Models\Document;
+use Intervention\Image\ImageManager;
 
 class DocumentRepository extends BaseRepository
 {

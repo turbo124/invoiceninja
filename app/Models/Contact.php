@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Utils;
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\LookupContact;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * Class Contact.
@@ -126,9 +125,9 @@ class Contact extends EntityModel implements AuthenticatableContract, CanResetPa
     {
         if ($this->getFullName()) {
             return $this->getFullName();
-        } else {
-            return $this->email;
         }
+
+        return $this->email;
     }
 
     /**
@@ -141,9 +140,9 @@ class Contact extends EntityModel implements AuthenticatableContract, CanResetPa
 
         if ($name && $email) {
             return sprintf('%s <%s>', $name, $email);
-        } else {
-            return $name ?: $email;
         }
+
+        return $name ?: $email;
     }
 
     /**
@@ -168,9 +167,9 @@ class Contact extends EntityModel implements AuthenticatableContract, CanResetPa
     {
         if ($this->first_name || $this->last_name) {
             return trim($this->first_name.' '.$this->last_name);
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -212,15 +211,13 @@ class Contact extends EntityModel implements AuthenticatableContract, CanResetPa
     }
 }
 
-Contact::creating(function ($contact)
-{
+Contact::creating(function ($contact) {
     LookupContact::createNew($contact->account->account_key, [
         'contact_key' => $contact->contact_key,
     ]);
 });
 
-Contact::deleted(function ($contact)
-{
+Contact::deleted(function ($contact) {
     if ($contact->forceDeleting) {
         LookupContact::deleteWhere([
             'contact_key' => $contact->contact_key,

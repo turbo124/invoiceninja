@@ -2,28 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\InvoiceRequest;
-use App\Http\Requests\QuoteRequest;
-use App\Models\Account;
-use App\Models\Client;
-use App\Models\Country;
-use App\Models\Invitation;
-use App\Models\Invoice;
-use App\Models\InvoiceDesign;
-use App\Models\Product;
-use App\Models\TaxRate;
-use App\Ninja\Datatables\InvoiceDatatable;
-use App\Ninja\Mailers\ContactMailer as Mailer;
-use App\Ninja\Repositories\ClientRepository;
-use App\Ninja\Repositories\InvoiceRepository;
-use App\Services\InvoiceService;
 use Auth;
+use View;
 use Cache;
 use Input;
-use Redirect;
-use Session;
 use Utils;
-use View;
+use Session;
+use Redirect;
+use App\Models\Client;
+use App\Models\Account;
+use App\Models\Country;
+use App\Models\Invoice;
+use App\Models\Product;
+use App\Models\TaxRate;
+use App\Models\Invitation;
+use App\Models\InvoiceDesign;
+use App\Services\InvoiceService;
+use App\Http\Requests\QuoteRequest;
+use App\Ninja\Datatables\InvoiceDatatable;
+use App\Ninja\Repositories\ClientRepository;
+use App\Ninja\Repositories\InvoiceRepository;
+use App\Ninja\Mailers\ContactMailer as Mailer;
 
 class QuoteController extends BaseController
 {
@@ -116,7 +115,7 @@ class QuoteController extends BaseController
     public function bulk()
     {
         $action = Input::get('bulk_action') ?: Input::get('action');
-        ;
+
         $ids = Input::get('bulk_public_id') ?: (Input::get('public_id') ?: Input::get('ids'));
 
         if ($action == 'convert') {
@@ -151,8 +150,8 @@ class QuoteController extends BaseController
         $invoice = $invitation->invoice;
         $account = $invoice->account;
 
-        if ($account->requiresAuthorization($invoice) && ! session('authorized:' . $invitation->invitation_key)) {
-            return redirect()->to('view/' . $invitation->invitation_key);
+        if ($account->requiresAuthorization($invoice) && ! session('authorized:'.$invitation->invitation_key)) {
+            return redirect()->to('view/'.$invitation->invitation_key);
         }
 
         if ($invoice->due_date) {
@@ -164,9 +163,10 @@ class QuoteController extends BaseController
 
         if ($invoiceInvitationKey = $this->invoiceService->approveQuote($invoice, $invitation)) {
             Session::flash('message', trans('texts.quote_is_approved'));
+
             return Redirect::to("view/{$invoiceInvitationKey}");
-        } else {
-            return Redirect::to("view/{$invitationKey}");
         }
+
+        return Redirect::to("view/{$invitationKey}");
     }
 }

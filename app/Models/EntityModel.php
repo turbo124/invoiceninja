@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Str;
 use Auth;
-use Eloquent;
 use Utils;
+use Eloquent;
 use Validator;
 
 /**
@@ -90,9 +90,9 @@ class EntityModel extends Eloquent
 
         if ($lastEntity) {
             return $lastEntity->public_id + 1;
-        } else {
-            return 1;
         }
+
+        return 1;
     }
 
     /**
@@ -110,9 +110,9 @@ class EntityModel extends Eloquent
 
         if (method_exists($className, 'trashed')) {
             return $className::scope($publicId)->withTrashed()->value('id');
-        } else {
-            return $className::scope($publicId)->value('id');
         }
+
+        return $className::scope($publicId)->value('id');
     }
 
     /**
@@ -120,12 +120,12 @@ class EntityModel extends Eloquent
      */
     public function getActivityKey()
     {
-        return '[' . $this->getEntityType().':'.$this->public_id.':'.$this->getDisplayName() . ']';
+        return '['.$this->getEntityType().':'.$this->public_id.':'.$this->getDisplayName().']';
     }
 
     public function entityKey()
     {
-        return $this->public_id . ':' . $this->getEntityType();
+        return $this->public_id.':'.$this->getEntityType();
     }
 
     public function subEntityType()
@@ -162,6 +162,7 @@ class EntityModel extends Eloquent
         // If 'false' is passed as the publicId return nothing rather than everything
         if (func_num_args() > 1 && ! $publicId && ! $accountId) {
             $query->where('id', '=', 0);
+
             return $query;
         }
 
@@ -169,7 +170,7 @@ class EntityModel extends Eloquent
             $accountId = Auth::user()->account_id;
         }
 
-        $query->where($this->getTable() .'.account_id', '=', $accountId);
+        $query->where($this->getTable().'.account_id', '=', $accountId);
 
         if ($publicId) {
             if (is_array($publicId)) {
@@ -179,8 +180,8 @@ class EntityModel extends Eloquent
             }
         }
 
-        if (Auth::check() && method_exists($this, 'getEntityType') && ! Auth::user()->hasPermission('view_' . $this->getEntityType())  && $this->getEntityType() != ENTITY_TAX_RATE && $this->getEntityType() != ENTITY_DOCUMENT) {
-            $query->where(Utils::pluralizeEntityType($this->getEntityType()) . '.user_id', '=', Auth::user()->id);
+        if (Auth::check() && method_exists($this, 'getEntityType') && ! Auth::user()->hasPermission('view_'.$this->getEntityType()) && $this->getEntityType() != ENTITY_TAX_RATE && $this->getEntityType() != ENTITY_DOCUMENT) {
+            $query->where(Utils::pluralizeEntityType($this->getEntityType()).'.user_id', '=', Auth::user()->id);
         }
 
         return $query;
@@ -190,9 +191,9 @@ class EntityModel extends Eloquent
     {
         return $query->withTrashed()
                       ->where(function ($query) use ($id) {
-                            $query->whereNull('deleted_at')
+                          $query->whereNull('deleted_at')
                                   ->orWhere('id', '=', $id);
-                });
+                      });
     }
 
     /**
@@ -238,7 +239,7 @@ class EntityModel extends Eloquent
             $entityType = ENTITY_INVOICE;
         }
 
-        return 'App\\Models\\' . ucwords(Utils::toCamelCase($entityType));
+        return 'App\\Models\\'.ucwords(Utils::toCamelCase($entityType));
     }
 
     /**
@@ -254,7 +255,7 @@ class EntityModel extends Eloquent
             }
         }
 
-        return 'App\\Ninja\\Transformers\\' . ucwords(Utils::toCamelCase($entityType)) . 'Transformer';
+        return 'App\\Ninja\\Transformers\\'.ucwords(Utils::toCamelCase($entityType)).'Transformer';
     }
 
     public function setNullValues()
@@ -277,14 +278,15 @@ class EntityModel extends Eloquent
         $parts = explode('\\', $class);
         $name = $parts[count($parts) - 1];
 
-        return strtolower($name) . '_id';
+        return strtolower($name).'_id';
     }
 
     /**
      * @param $data
      * @param $entityType
      * @param mixed $entity
-     * TODO Remove $entityType parameter
+     *                      TODO Remove $entityType parameter
+     *
      * @return bool|string
      */
     public static function validate($data, $entityType = false, $entity = false)
@@ -317,9 +319,9 @@ class EntityModel extends Eloquent
 
         if ($validator->fails()) {
             return $validator->messages()->first();
-        } else {
-            return true;
         }
+
+        return true;
     }
 
     public static function getIcon($entityType)
@@ -372,9 +374,9 @@ class EntityModel extends Eloquent
     {
         if (in_array($entityType, [ENTITY_PROPOSAL_CATEGORY, ENTITY_PROPOSAL_SNIPPET, ENTITY_PROPOSAL_TEMPLATE])) {
             return str_replace('_', 's/', Utils::pluralizeEntityType($entityType));
-        } else {
-            return Utils::pluralizeEntityType($entityType);
         }
+
+        return Utils::pluralizeEntityType($entityType);
     }
 
     public static function getStates($entityType = false)
@@ -434,6 +436,7 @@ class EntityModel extends Eloquent
                             $this->invitation_key = strtolower(str_random(RANDOM_KEY_LENGTH));
                         }
                     }
+
                     return $this->save($options);
                 }
             }
@@ -451,18 +454,19 @@ class EntityModel extends Eloquent
     }
 
     /**
-      * @param $method
-      * @param $params
-      */
+     * @param $method
+     * @param $params
+     */
     public function __call($method, $params)
     {
         if (count(config('modules.relations'))) {
             $entityType = $this->getEntityType();
 
             if ($entityType) {
-                $config = implode('.', ['modules.relations.' . $entityType, $method]);
+                $config = implode('.', ['modules.relations.'.$entityType, $method]);
                 if (config()->has($config)) {
                     $function = config()->get($config);
+
                     return $function($this);
                 }
             }

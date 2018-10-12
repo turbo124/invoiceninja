@@ -1,10 +1,12 @@
-<?php namespace App\Ninja\OAuth;
+<?php
 
-use App\Models\LookupUser;
+namespace App\Ninja\OAuth;
+
 use App\Models\User;
+use App\Models\LookupUser;
 
-class OAuth {
-
+class OAuth
+{
     const SOCIAL_GOOGLE = 1;
     const SOCIAL_FACEBOOK = 2;
     const SOCIAL_GITHUB = 3;
@@ -19,11 +21,11 @@ class OAuth {
 
     public function getProvider($provider)
     {
-        switch ($provider)
-        {
-            case 'google';
+        switch ($provider) {
+            case 'google':
                 $this->providerInstance = new Providers\Google();
                 $this->providerId = self::SOCIAL_GOOGLE;
+
                 return $this;
 
             default:
@@ -39,19 +41,16 @@ class OAuth {
         $payload = $this->providerInstance->getTokenResponse($token);
         $oauthUserId = $this->providerInstance->harvestSubField($payload);
 
-        LookupUser::setServerByField('oauth_user_key', $this->providerId . '-' . $oauthUserId);
+        LookupUser::setServerByField('oauth_user_key', $this->providerId.'-'.$oauthUserId);
 
-        if($this->providerInstance)
-          $user = User::where('oauth_user_id', $oauthUserId)->where('oauth_provider_id', $this->providerId)->first();
+        if ($this->providerInstance) {
+            $user = User::where('oauth_user_id', $oauthUserId)->where('oauth_provider_id', $this->providerId)->first();
+        }
 
-
-        if ($user)
+        if ($user) {
             return $user;
-        else
-            return false;
+        }
 
+        return false;
     }
-
-
 }
-?>

@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Events\CreditWasCreated;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Credit.

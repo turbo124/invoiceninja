@@ -2,9 +2,9 @@
 
 namespace App\Ninja\Reports;
 
+use Auth;
 use App\Models\Expense;
 use App\Models\Payment;
-use Auth;
 
 class ProfitAndLossReport extends AbstractReport
 {
@@ -74,7 +74,7 @@ class ProfitAndLossReport extends AbstractReport
                 trans('texts.expense'),
                 $client ? ($this->isExport ? $client->getDisplayName() : $client->present()->link) : '',
                 $vendor ? ($this->isExport ? $vendor->name : $vendor->present()->link) : '',
-                '-' . $expense->present()->amount,
+                '-'.$expense->present()->amount,
                 $expense->present()->expense_date,
                 $expense->present()->category,
             ];

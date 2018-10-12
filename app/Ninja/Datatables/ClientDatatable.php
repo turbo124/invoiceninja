@@ -2,8 +2,8 @@
 
 namespace App\Ninja\Datatables;
 
-use Auth;
 use URL;
+use Auth;
 use Utils;
 
 class ClientDatatable extends EntityDatatable
@@ -18,6 +18,7 @@ class ClientDatatable extends EntityDatatable
                 'name',
                 function ($model) {
                     $str = link_to("clients/{$model->public_id}", $model->name ?: '')->toHtml();
+
                     return $this->addNote($str, $model->private_notes);
                 },
             ],
@@ -38,7 +39,7 @@ class ClientDatatable extends EntityDatatable
                 function ($model) {
                     return $model->id_number;
                 },
-                Auth::user()->account->clientNumbersEnabled()
+                Auth::user()->account->clientNumbersEnabled(),
             ],
             [
                 'client_created_at',
@@ -67,10 +68,11 @@ class ClientDatatable extends EntityDatatable
             [
                 trans('texts.edit_client'),
                 function ($model) {
-                    if(Auth::user()->can('edit', [ENTITY_CLIENT, $model]))
+                    if (Auth::user()->can('edit', [ENTITY_CLIENT, $model])) {
                         return URL::to("clients/{$model->public_id}/edit");
-                    elseif(Auth::user()->can('view', [ENTITY_CLIENT, $model]))
+                    } elseif (Auth::user()->can('view', [ENTITY_CLIENT, $model])) {
                         return URL::to("clients/{$model->public_id}");
+                    }
                 },
             ],
             [

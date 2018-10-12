@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Libraries\HistoryUtils;
-use App\Models\EntityModel;
 use Input;
 use Utils;
+use App\Models\EntityModel;
+use App\Libraries\HistoryUtils;
 
 class EntityRequest extends Request
 {
@@ -22,7 +22,7 @@ class EntityRequest extends Request
 
         // The entity id can appear as invoices, invoice_id, public_id or id
         $publicId = false;
-        $field = $this->entityType . '_id';
+        $field = $this->entityType.'_id';
         if (! empty($this->$field)) {
             $publicId = $this->$field;
         }

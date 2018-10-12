@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\Frequency;
-use App\Models\PaymentLibrary;
-use App\Models\PaymentTerm;
 use App\Models\Size;
 use App\Models\Theme;
 use App\Models\Timezone;
+use App\Models\PaymentTerm;
+use App\Models\PaymentLibrary;
 
 class ConstantsSeeder extends Seeder
 {

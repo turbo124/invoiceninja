@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use Auth;
+use Utils;
 use App\Models\Client;
 use App\Models\Vendor;
 use App\Ninja\Datatables\ExpenseDatatable;
 use App\Ninja\Repositories\ExpenseRepository;
-use Auth;
-use Utils;
 
 /**
  * Class ExpenseService.
@@ -114,5 +114,4 @@ class ExpenseService extends BaseService
 
         return $this->datatableService->createDatatable($datatable, $query);
     }
-
 }

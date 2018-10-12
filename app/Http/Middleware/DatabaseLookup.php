@@ -2,16 +2,16 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Request;
+use Auth;
+use Utils;
 use Closure;
+use App\Models\LookupUser;
+use Illuminate\Http\Request;
 use App\Models\LookupAccount;
 use App\Models\LookupContact;
 use App\Models\LookupInvitation;
-use App\Models\LookupProposalInvitation;
 use App\Models\LookupAccountToken;
-use App\Models\LookupUser;
-use Auth;
-use Utils;
+use App\Models\LookupProposalInvitation;
 
 class DatabaseLookup
 {
@@ -27,9 +27,8 @@ class DatabaseLookup
             } elseif (session(SESSION_DB_SERVER)) {
                 if (Auth::viaRemember()) {
                     Auth::logout();
-                } else {
-                    // do nothing
                 }
+                // do nothing
             } elseif (! Auth::check() && $email = $request->email) {
                 LookupUser::setServerByField('email', $email);
             } else {

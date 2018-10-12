@@ -39,15 +39,14 @@ class ProductPresenter extends EntityPresenter
             if (count($actions)) {
                 $actions[] = DropdownButton::DIVIDER;
             }
-            $actions[] = ['url' => 'javascript:submitAction("archive")', 'label' => trans("texts.archive_product")];
+            $actions[] = ['url' => 'javascript:submitAction("archive")', 'label' => trans('texts.archive_product')];
         } else {
-            $actions[] = ['url' => 'javascript:submitAction("restore")', 'label' => trans("texts.restore_product")];
+            $actions[] = ['url' => 'javascript:submitAction("restore")', 'label' => trans('texts.restore_product')];
         }
         if (! $product->is_deleted) {
-            $actions[] = ['url' => 'javascript:onDeleteClick()', 'label' => trans("texts.delete_product")];
+            $actions[] = ['url' => 'javascript:onDeleteClick()', 'label' => trans('texts.delete_product')];
         }
 
         return $actions;
     }
-
 }

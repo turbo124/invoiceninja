@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Events\PaymentCompleted;
+use Event;
 use App\Events\PaymentFailed;
+use App\Events\PaymentCompleted;
+use App\Events\PaymentWasVoided;
 use App\Events\PaymentWasCreated;
 use App\Events\PaymentWasRefunded;
-use App\Events\PaymentWasVoided;
-use Event;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Payment.
@@ -328,8 +328,6 @@ class Payment extends EntityModel
 
     /**
      * @param $bank_name
-     *
-     * @return null
      */
     public function getBankNameAttribute($bank_name)
     {
@@ -357,9 +355,9 @@ class Payment extends EntityModel
             return trans('texts.status_partially_refunded_amount', [
                 'amount' => $amount,
             ]);
-        } else {
-            return trans('texts.status_' . strtolower($statusName));
         }
+
+        return trans('texts.status_'.strtolower($statusName));
     }
 
     public static function calcStatusClass($statusId)
