@@ -641,8 +641,14 @@ class QuoteController extends BaseController
                 return $this->itemResponse($quote);
                 break;
             case 'approve':
-            //make sure it hasn't already been approved!!
-                return $quote->service()->approve()->save();
+                $approved = $quote->service()->approve();
+
+                if(!$approved) {
+                    return response()->json(['message' => 'Unable to approve this quote as it has expired.'], 400);
+                }
+
+                $quote = $approved->save();
+                return response()->json($quote);
                 break;
             case 'convert':
             //convert  quote to an invoice make sure we link the two entities!!!
