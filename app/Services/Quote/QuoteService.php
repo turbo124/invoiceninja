@@ -83,29 +83,29 @@ class QuoteService
         return $this;
     }
 
-    public function approve() :QuoteService
-    {
+    public function approve() :?QuoteService
+     {
 
-        if($this->quote->status_id != Quote::STATUS_SENT)
-            return response()->json(['message' => 'Unable to approve this quote as it has expired.'], 400);
+         if($this->quote->status_id != Quote::STATUS_SENT)
+             return null;
 
-        $this->setStatus(Quote::STATUS_APPROVED)->save();
+         $this->setStatus(Quote::STATUS_APPROVED)->save();
 
-        $invoice = null;
+         $invoice = null;
 
-        if($this->quote->client->getSetting('auto_convert_quote')){
-            $invoice = $this->convertToInvoice();
-            $this->linkInvoiceToQuote($invoice)->save();
-        }
+         if($this->quote->customer->getSetting('auto_convert_quote')){
+             $invoice = $this->convertToInvoice();
+             $this->linkInvoiceToQuote($invoice)->save();
+         }
 
-        if($this->quote->client->getSetting('auto_archive_quote')) {
-            $quote_repo = new QuoteRepository();
+        if ($this->quote->customer->getSetting('auto_archive_quote')) {
+            $quote_repo = new QuoteRepository(new Quote);
             $quote_repo->archive($this->quote);
         }
 
         return $this;
 
-    }
+}
 
     /**
      * Where we convert a quote to an invoice we link the two entities via the invoice_id parameter on the quote table
@@ -119,23 +119,20 @@ class QuoteService
         return $this;
     }
 
-    public function convertToInvoice() :Invoice
-    {
-        Invoice::unguard();
+    public
+function convertToInvoice() :Invoice
+{
+    $invoice = CloneQuoteToInvoiceFactory::create($this->quote, auth()->user()->id,
+        $this->quote->company_id);
+    $invoice->status_id = Invoice::STATUS_SENT;
+    $invoice->due_date = null;
+    $invoice->number = null;
+    $invoice->save();
+    
+    $invoice->service()->markSent()->createInvitations()->save();
 
-            $invoice = new Invoice((array) $this->quote);
-            $invoice->status_id = Invoice::STATUS_SENT;
-            $invoice->due_date = null;
-            $invoice->invitations = null;
-            $invoice->number = null;
-            $invoice->save();
-
-        Invoice::reguard();
-
-        $invoice->service()->markSent()->createInvitations()->save();   
-
-        return $invoice;
-    }
+    return $invoice;
+}
 
     /**
      * Saves the quote
