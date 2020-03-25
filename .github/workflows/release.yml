@@ -1,5 +1,7 @@
 on:
-  release:
+  push:
+    branches:    
+    - 'releases/**'
 
 name: Upload Release Asset
 
