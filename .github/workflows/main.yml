@@ -7,8 +7,8 @@ name: phpunit
 jobs:
   phpunit:
     runs-on: ubuntu-latest
-    container:
-      image: kirschbaumdevelopment/laravel-test-runner:7.3
+   # container:
+   #   image: kirschbaumdevelopment/laravel-test-runner:7.3
 
     services:
       mysql:
