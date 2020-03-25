@@ -46,4 +46,4 @@ jobs:
         php artisan migrate:fresh --seed --force && php artisan db:seed --class=RandomDataSeeder --force
 
     - name: Run Testsuite
-      run: vendor/bin/phpunit tests/
+      run: vendor/bin/phpunit --testdox
