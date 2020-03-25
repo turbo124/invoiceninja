@@ -26,14 +26,15 @@ jobs:
       run: |
         composer install --no-scripts
 
-    - name: Migrate Database
-      run: |
-        php artisan migrate:fresh --seed --force && php artisan db:seed --class=RandomDataSeeder --force
-
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
         php artisan key:generate
+        php artisan optimize
+        
+    - name: Migrate Database
+      run: |
+        php artisan migrate:fresh --seed --force && php artisan db:seed --class=RandomDataSeeder --force
 
     - name: Run Testsuite
       run: vendor/bin/phpunit tests/
