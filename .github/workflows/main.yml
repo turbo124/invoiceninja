@@ -7,8 +7,6 @@ name: phpunit
 jobs:
   phpunit:
     runs-on: ubuntu-latest
-   # container:
-   #   image: kirschbaumdevelopment/laravel-test-runner:7.3
 
     services:
       mysql:
@@ -28,6 +26,7 @@ jobs:
 
     - name: Install composer dependencies
       run: |
+        composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
         composer install
 
     - name: Prepare Laravel Application
