@@ -32,6 +32,11 @@ jobs:
         php artisan key:generate
         php artisan optimize
         
+    - name: Prepare JS/CSS assets
+      run: |
+        npm i
+        npm run production
+          
     - name: Migrate Database
       run: |
         php artisan migrate:fresh --seed --force && php artisan db:seed --class=RandomDataSeeder --force
