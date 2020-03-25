@@ -1,7 +1,11 @@
 on:
-  create:
-    tags:
-      - 'v*'
+  push:
+    branches:
+      - 'refs/tags/*'
+#on:
+#  create:
+#    tags:
+#      - 'v*'
 #on:
 #  push:
     # Sequence of patterns matched against refs/tags
