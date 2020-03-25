@@ -1,6 +1,6 @@
 on:
   release:
-    types: [published]
+    types: [created, published]
 
 name: Upload Release Asset
 
