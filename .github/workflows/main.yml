@@ -1,5 +1,5 @@
 on: push
-name: CI
+name: phpunit
 jobs:
   phpunit:
     runs-on: ubuntu-latest
