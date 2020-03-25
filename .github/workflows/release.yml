@@ -1,7 +1,9 @@
 on:
   push:
     branches:    
-    - 'releases/**'
+      - v2
+    tags:        
+      - v           # Push events to v1.0, v1.1, and v1.9 tags
 
 name: Upload Release Asset
 
