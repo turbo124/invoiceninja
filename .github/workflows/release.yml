@@ -27,6 +27,7 @@ jobs:
           cp .env.example .env
           php artisan key:generate
           php artisan optimize
+          php artisan storage:link
         
       - name: Prepare JS/CSS assets
         run: |
