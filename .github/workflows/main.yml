@@ -1,7 +1,7 @@
 on: 
   push:
     branches:
-      - v2
+      - master
       
 name: phpunit
 jobs:
@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        ref: v2
+        ref: master
         fetch-depth: 1
 
     - name: Install composer dependencies
