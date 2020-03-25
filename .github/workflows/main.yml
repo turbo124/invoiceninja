@@ -26,6 +26,10 @@ jobs:
       run: |
         composer install --no-scripts
 
+    - name: Migrate Database
+      run: |
+        php artisan migrate:fresh --seed && php artisan db:seed --class=RandomDataSeeder
+
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
