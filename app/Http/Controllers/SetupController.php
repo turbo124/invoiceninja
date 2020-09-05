@@ -77,7 +77,7 @@ class SetupController extends Controller
         $_ENV['DB_DATABASE1'] = $request->input('database');
         $_ENV['DB_USERNAME1'] = $request->input('db_username');
         $_ENV['DB_PASSWORD1'] = $request->input('db_password');
-        $_ENV['MAIL_DRIVER'] = $mail_driver;
+        $_ENV['MAIL_MAILER'] = $mail_driver;
         $_ENV['MAIL_PORT'] = $request->input('mail_port');
         $_ENV['MAIL_ENCRYPTION'] = $request->input('encryption');
         $_ENV['MAIL_HOST'] = $request->input('mail_host');
