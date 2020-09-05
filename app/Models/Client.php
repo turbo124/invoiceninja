@@ -54,7 +54,7 @@ class Client extends BaseModel implements HasLocalePreference
     use Filterable;
     use GeneratesCounter;
 
-    protected $presenter = 'App\Models\Presenters\ClientPresenter';
+    protected $presenter = \App\Models\Presenters\ClientPresenter::class;
 
     protected $hidden = [
         'id',

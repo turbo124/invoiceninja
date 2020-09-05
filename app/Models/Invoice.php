@@ -54,7 +54,7 @@ class Invoice extends BaseModel
     use MakesReminders;
     use ActionsInvoice;
 
-    protected $presenter = 'App\Models\Presenters\InvoicePresenter';
+    protected $presenter = \App\Models\Presenters\InvoicePresenter::class;
 
     protected $touches = [];
 

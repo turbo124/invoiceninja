@@ -45,7 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $dates = ['deleted_at'];
 
-    protected $presenter = 'App\Models\Presenters\UserPresenter';
+    protected $presenter = \App\Models\Presenters\UserPresenter::class;
 
     protected $with = []; // ? companies also
 

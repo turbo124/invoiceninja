@@ -40,7 +40,7 @@ class Quote extends BaseModel
     use PresentableTrait;
     use MakesInvoiceValues;
 
-    protected $presenter = 'App\Models\Presenters\QuotePresenter';
+    protected $presenter = \App\Models\Presenters\QuotePresenter::class;
 
     protected $touches = [];
 

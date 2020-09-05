@@ -33,6 +33,6 @@ class ExpenseCategory extends BaseModel
      */
     public function expense()
     {
-        return $this->belongsTo('App\Models\Expense');
+        return $this->belongsTo(\App\Models\Expense::class);
     }
 }

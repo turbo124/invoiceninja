@@ -81,7 +81,7 @@ class Company extends BaseModel
     //    kModulePayments = 8192;
     //    16383
 
-    protected $presenter = 'App\Models\Presenters\CompanyPresenter';
+    protected $presenter = \App\Models\Presenters\CompanyPresenter::class;
 
     protected $fillable = [
         'enabled_item_tax_rates',

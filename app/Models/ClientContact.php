@@ -42,7 +42,7 @@ class ClientContact extends Authenticatable implements HasLocalePreference
     /* Allow microtime timestamps */
     protected $dateFormat = 'Y-m-d H:i:s.u';
 
-    protected $presenter = 'App\Models\Presenters\ClientContactPresenter';
+    protected $presenter = \App\Models\Presenters\ClientContactPresenter::class;
 
     protected $dates = [
         'deleted_at',

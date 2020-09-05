@@ -35,7 +35,7 @@ class SendFailedEmailsTest extends TestCase
         $reminder_template = $this->invoice->calculateTemplate();
 
         $sl = [
-            'entity_name' => 'App\Models\InvoiceInvitation',
+            'entity_name' => \App\Models\InvoiceInvitation::class,
             'invitation_key' => $invitation->key,
             'reminder_template' => $reminder_template,
             'subject' => '',

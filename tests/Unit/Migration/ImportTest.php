@@ -47,7 +47,7 @@ class ImportTest extends TestCase
 
     public function testImportClassExists()
     {
-        $status = class_exists('App\Jobs\Util\Import');
+        $status = class_exists(\App\Jobs\Util\Import::class);
 
         $this->assertTrue($status);
     }

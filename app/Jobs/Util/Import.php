@@ -704,12 +704,12 @@ class Import implements ShouldQueue
 
             if (array_key_exists('invoice_id', $resource) && $resource['invoice_id'] && array_key_exists('invoices', $this->ids)) {
                 $modified['documentable_id'] = $this->transformId('invoices', $resource['invoice_id']);
-                $modified['documentable_type'] = 'App\\Models\\Invoice';
+                $modified['documentable_type'] = \App\Models\Invoice::class;
             }
 
             if (array_key_exists('expense_id', $resource) && $resource['expense_id'] && array_key_exists('expenses', $this->ids)) {
                 $modified['documentable_id'] = $this->transformId('expenses', $resource['expense_id']);
-                $modified['documentable_type'] = 'App\\Models\\Expense';
+                $modified['documentable_type'] = \App\Models\Expense::class;
             }
 
             $modified['user_id'] = $this->processUserId($resource);

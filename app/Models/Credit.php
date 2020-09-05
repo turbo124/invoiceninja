@@ -36,7 +36,7 @@ class Credit extends BaseModel
     use PresentableTrait;
     use MakesInvoiceValues;
 
-    protected $presenter = 'App\Models\Presenters\CreditPresenter';
+    protected $presenter = \App\Models\Presenters\CreditPresenter::class;
 
     protected $fillable = [
         'assigned_user_id',

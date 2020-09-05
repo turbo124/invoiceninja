@@ -56,8 +56,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Relation::morphMap([
-            'invoices' => '\App\Models\Invoice',
-            'proposals' => '\App\Models\Proposal',
+            'invoices' => \App\Models\Invoice::class,
+            'proposals' => \App\Models\Proposal::class,
         ]);
 
         Blade::if('env', function ($environment) {

@@ -24,7 +24,7 @@ class Account extends BaseModel
     /**
      * @var string
      */
-    protected $presenter = 'App\Models\Presenters\AccountPresenter';
+    protected $presenter = \App\Models\Presenters\AccountPresenter::class;
 
     /**
      * @var array

@@ -65,7 +65,7 @@ class BankAccount extends BaseModel
      */
     public function bank_subaccounts()
     {
-        return $this->hasMany('App\Models\BankSubaccount');
+        return $this->hasMany(\App\Models\BankSubaccount::class);
     }
 
     public function getEntityType()
