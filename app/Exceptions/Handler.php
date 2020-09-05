@@ -11,7 +11,6 @@
 
 namespace App\Exceptions;
 
-use Throwable;
 use App\Exceptions\GenericPaymentDriverFailure;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -28,6 +27,7 @@ use Sentry\State\Scope;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
