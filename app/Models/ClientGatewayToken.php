@@ -1,6 +1,6 @@
 <?php
 /**
- * Invoice Ninja (https://invoiceninja.com)
+ * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
@@ -32,9 +32,10 @@ class ClientGatewayToken extends BaseModel
     protected $appends = [
         'hashed_id',
     ];
+
     public function getEntityType()
     {
-        return ClientGatewayToken::class;
+        return self::class;
     }
 
     public function client()

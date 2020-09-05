@@ -1,6 +1,6 @@
 <?php
 /**
- * Invoice Ninja (https://invoiceninja.com)
+ * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
@@ -79,7 +79,6 @@ class AppServiceProvider extends ServiceProvider
         Proposal::observe(ProposalObserver::class);
         Quote::observe(QuoteObserver::class);
         Task::observe(TaskObserver::class);
-
 
         // Queue::before(function (JobProcessing $event) {
         //     // \Log::info('Event Job '.$event->connectionName);

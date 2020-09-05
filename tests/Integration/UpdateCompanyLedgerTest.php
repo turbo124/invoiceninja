@@ -19,7 +19,6 @@ use Tests\MockAccountData;
 use Tests\TestCase;
 
 /** @test*/
-
 class UpdateCompanyLedgerTest extends TestCase
 {
     use MockAccountData;
@@ -44,7 +43,7 @@ class UpdateCompanyLedgerTest extends TestCase
                                 ->orderBy('id', 'DESC')
                                 ->first();
 
-        $payment = $ledger->adjustment * - 1;
+        $payment = $ledger->adjustment * -1;
         $this->assertEquals($invoice->amount, $payment);
     }
 

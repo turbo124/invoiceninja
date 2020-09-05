@@ -10,7 +10,7 @@ return [
     'app_name' => env('APP_NAME'),
     'app_env' => env('APP_ENV', 'selfhosted'),
     'require_https' => env('REQUIRE_HTTPS', true),
-    'app_url' => rtrim(env('APP_URL', ''), '/') . '/',
+    'app_url' => rtrim(env('APP_URL', ''), '/').'/',
     'app_domain' => env('APP_DOMAIN', ''),
     'app_version' => '5.0.13',
     'minimum_client_version' => '5.0.13',
@@ -25,7 +25,7 @@ return [
     'error_email' => env('ERROR_EMAIL', ''),
     'company_id' => 0,
     'hash_salt' => env('HASH_SALT', ''),
-    'currency_converter_api_key' => env('OPENEXCHANGE_APP_ID',''),
+    'currency_converter_api_key' => env('OPENEXCHANGE_APP_ID', ''),
     'enabled_modules' => 32767,
     'phantomjs_key' => env('PHANTOMJS_KEY', false),
     'phantomjs_secret' => env('PHANTOMJS_SECRET', false),
@@ -59,10 +59,10 @@ return [
         'datetime_format_id' => env('DEFAULT_DATETIME_FORMAT_ID', '1'),
         'locale' => env('DEFAULT_LOCALE', 'en'),
         'map_zoom' => env('DEFAULT_MAP_ZOOM', 10),
-        'payment_terms' => env('DEFAULT_PAYMENT_TERMS', ""),
+        'payment_terms' => env('DEFAULT_PAYMENT_TERMS', ''),
         'military_time' => env('MILITARY_TIME', 0),
         'first_day_of_week' => env('FIRST_DATE_OF_WEEK', 0),
-        'first_month_of_year' => env('FIRST_MONTH_OF_YEAR', '2000-01-01')
+        'first_month_of_year' => env('FIRST_MONTH_OF_YEAR', '2000-01-01'),
     ],
 
     'testvars' => [
@@ -71,8 +71,8 @@ return [
         'password' => 'password',
         'stripe' => env('STRIPE_KEYS', ''),
         'paypal' => env('PAYPAL_KEYS', ''),
-        'authorize' => env('AUTHORIZE_KEYS',''),
-        'checkout' => env('CHECKOUT_KEYS',''),
+        'authorize' => env('AUTHORIZE_KEYS', ''),
+        'checkout' => env('CHECKOUT_KEYS', ''),
         'travis' => env('TRAVIS', false),
         'test_email' => env('TEST_EMAIL', 'test@example.com'),
     ],
@@ -117,17 +117,17 @@ return [
         ],
         'enterprise' => [
             'daily_emails' => 200,
-        ]
+        ],
     ],
     'auth' => [
         'google' => [
             'client_id' => env('GOOGLE_CLIENT_ID', ''),
-            'client_secret' => env('GOOGLE_CLIENT_SECRET','')
-        ]
+            'client_secret' => env('GOOGLE_CLIENT_SECRET', ''),
+        ],
     ],
     'system' => [
         'node_path' => env('NODE_PATH', false),
-        'npm_path' => env('NPM_PATH', false)
+        'npm_path' => env('NPM_PATH', false),
     ],
     'designs' => [
         'base_path' => resource_path('views/pdf-designs/'),
