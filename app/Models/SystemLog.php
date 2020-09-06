@@ -67,7 +67,7 @@ class SystemLog extends Model
         'type_id',
     ];
 
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         if (is_numeric($value)) {
             throw new ModelNotFoundException("Record with value {$value} not found");

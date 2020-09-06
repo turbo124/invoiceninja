@@ -346,7 +346,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         return $this
             ->withTrashed()

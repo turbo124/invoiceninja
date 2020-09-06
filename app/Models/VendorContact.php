@@ -132,7 +132,7 @@ class VendorContact extends Authenticatable implements HasLocalePreference
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         return $this
             ->withTrashed()

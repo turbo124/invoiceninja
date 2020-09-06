@@ -351,7 +351,7 @@ class CompanyGateway extends BaseModel
         $fee_component_tax_rate3 = $fees_and_limits->fee_tax_rate3 ? ($combined_fee_component * $fees_and_limits->fee_tax_rate3 / 100) : 0;
     }
 
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         return $this
             ->where('id', $this->decodePrimaryKey($value))->firstOrFail();

@@ -63,7 +63,7 @@ class GroupSetting extends StaticModel
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         return $this
             ->where('id', $this->decodePrimaryKey($value))->firstOrFail();

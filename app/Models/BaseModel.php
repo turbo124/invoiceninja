@@ -163,7 +163,7 @@ class BaseModel extends Model
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         if (is_numeric($value)) {
             throw new ModelNotFoundException("Record with value {$value} not found");

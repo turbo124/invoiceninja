@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('client', 'Auth\ContactLoginController@showLoginForm')->name('client.login'); //catch all
+Route::get('client', 'Auth\ContactLoginController@showLoginForm')->name('client.catchall'); //catch all
 
 Route::get('client/login', 'Auth\ContactLoginController@showLoginForm')->name('client.login')->middleware('locale');
 Route::post('client/login', 'Auth\ContactLoginController@login')->name('client.login.submit');

@@ -203,7 +203,7 @@ class Payment extends BaseModel
         return new PaymentService($this);
     }
 
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, $field = NULL)
     {
         return $this
             ->withTrashed()

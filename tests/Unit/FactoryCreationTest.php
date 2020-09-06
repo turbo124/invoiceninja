@@ -50,7 +50,7 @@ class FactoryCreationTest extends TestCase
 
         $this->assertNotNull($product);
 
-        $this->assertInternalType('int', $product->id);
+        $this->assertIsInt($product->id);
     }
 
     /**
@@ -69,7 +69,7 @@ class FactoryCreationTest extends TestCase
 
         $this->assertNotNull($invoice);
 
-        $this->assertInternalType('int', $invoice->id);
+        $this->assertIsInt($invoice->id);
     }
 
     /**
@@ -88,14 +88,14 @@ class FactoryCreationTest extends TestCase
 
         $this->assertNotNull($invoice);
 
-        $this->assertInternalType('int', $invoice->id);
+        $this->assertIsInt($invoice->id);
 
         $clone = CloneInvoiceFactory::create($invoice, $this->user->id);
         $clone->save();
 
         $this->assertNotNull($clone);
 
-        $this->assertInternalType('int', $clone->id);
+        $this->assertIsInt($clone->id);
     }
 
     /**
@@ -110,7 +110,7 @@ class FactoryCreationTest extends TestCase
 
         $this->assertNotNull($cliz);
 
-        $this->assertInternalType('int', $cliz->id);
+        $this->assertIsInt($cliz->id);
     }
 
     /**
@@ -125,7 +125,7 @@ class FactoryCreationTest extends TestCase
 
         $this->assertNotNull($cliz->contacts);
         $this->assertEquals(0, $cliz->contacts->count());
-        $this->assertInternalType('int', $cliz->id);
+        $this->assertIsInt($cliz->id);
     }
 
     /**
@@ -140,6 +140,6 @@ class FactoryCreationTest extends TestCase
 
         $this->assertNotNull($new_user);
 
-        $this->assertInternalType('int', $new_user->id);
+        $this->assertIsInt($new_user->id);
     }
 }
