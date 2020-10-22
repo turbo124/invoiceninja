@@ -51,7 +51,7 @@ class RelatedUserRule implements Rule
     private function checkUserIsRelated($user_id) : bool
     {
         return User::query()
-                    ->where('id', $this->input['assigned_user_id'])
+                    ->where('id', $user_id)
                     ->where('account_id', auth()->user()->company()->account_id)
                     ->exists();
     }

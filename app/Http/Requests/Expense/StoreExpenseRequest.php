@@ -37,52 +37,22 @@ class StoreExpenseRequest extends Request
 
     public function rules()
     {
-info(print_r($this->all(),1));
+        $rules = [];
 
         $rules['id_number'] = 'unique:expenses,id_number,'.$this->id.',id,company_id,'.$this->company_id;
-
         $rules['contacts.*.email'] = 'nullable|distinct';
-
         $rules['number'] = new UniqueExpenseNumberRule($this->all());
-
         $rules['client_id'] = 'bail|sometimes|exists:clients,id,company_id,'.auth()->user()->company()->id;
-        $rules['vendor_id'] = 'bail|sometimes|exists:vendors,id,company_id,'.auth()->user()->company()->id;
-        $rules['assigned_user_id'] = [
-            'bail' , 
-            'sometimes', 
-            'nullable',
-                new RelatedUserRule($this->all())
-            ];
-            //,id,company_id,'.auth()->user()->company()->id;
 
-        $rules['invoice_id'] = 'bail|nullable|sometimes|exists:invoices,id,company_id,'.auth()->user()->company()->id.',client_id,'.$this['client_id'];
 
-        return $rules;
+        return $this->globalRules($rules);
     }
 
     protected function prepareForValidation()
     {
         $input = $this->all();
 
-        if (array_key_exists('assigned_user_id', $input) && is_string($input['assigned_user_id'])) {
-            $input['assigned_user_id'] = $this->decodePrimaryKey($input['assigned_user_id']);
-        }
-
-        if (array_key_exists('user_id', $input) && is_string($input['user_id'])) {
-            $input['user_id'] = $this->decodePrimaryKey($input['user_id']);
-        }
-
-        if (array_key_exists('vendor_id', $input) && is_string($input['vendor_id'])) {
-            $input['vendor_id'] = $this->decodePrimaryKey($input['vendor_id']);
-        }        
-
-        if (array_key_exists('client_id', $input) && is_string($input['client_id'])) {
-            $input['client_id'] = $this->decodePrimaryKey($input['client_id']);
-        }   
-
-        if (array_key_exists('invoice_id', $input) && is_string($input['invoice_id'])) {
-            $input['invoice_id'] = $this->decodePrimaryKey($input['invoice_id']);
-        }  
+        $input = $this->decodePrimaryKeys($input);
 
         $this->replace($input);
     }
