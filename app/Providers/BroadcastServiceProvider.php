@@ -23,7 +23,9 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Broadcast::routes();
+        // $attributes = ['middleware' => ['api_db', 'token_auth', 'locale'], 'guards' => 'api'];
+        
+        // Broadcast::routes($attributes);
 
         require base_path('routes/channels.php');
     }

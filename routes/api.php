@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['api_secret_check']], function () {
     Route::post('api/v1/signup', 'AccountController@store')->name('signup.submit');
     Route::post('api/v1/oauth_login', 'Auth\LoginController@oauthApiLogin');
+    Route::get('api/v1/broadcast_test/{company_key}', 'BroadcastController@test');
 });
 
 Route::group(['middleware' => ['api_secret_check','email_db']], function () {
@@ -29,6 +30,9 @@ Route::group(['middleware' => ['api_db', 'token_auth', 'locale'], 'prefix' => 'a
     Route::get('health_check', 'PingController@health')->name('health_check');
 
     Route::get('activities', 'ActivityController@index');
+
+    Route::post('broadcasting/auth', 'BroadcastController@authenticate');
+
     Route::get('activities/download_entity/{activity}', 'ActivityController@downloadHistoricalEntity');
 
     Route::post('claim_license', 'LicenseController@index')->name('license.index');
