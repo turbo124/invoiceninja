@@ -17,8 +17,8 @@
         <input type="hidden" name="token" id="token" />
         <input type="hidden" name="store_card" id="store_card" />
         <input type="hidden" name="amount_with_fee" id="amount_with_fee" value="{{ $total['amount_with_fee'] }}" />
-        <input type="txt" id=HPF_Token name=HPF_Token hidden>
-        <input type="txt" id=enc_key name=enc_key hidden>
+        <input type="txt" id="HPF_Token" name="HPF_Token" hidden>
+        <input type="txt" id="enc_key" name="enc_key" hidden>
     </form>
 
     <div class="alert alert-failure mb-4" hidden id="errors"></div>
@@ -39,6 +39,12 @@
                 </label>
             @endforeach
         @endisset
+
+        <label class="mr-4">
+            <input type="radio" data-token="123" name="payment-type"
+                class="form-radio cursor-pointer toggle-payment-with-token" />
+            <span class="ml-1 cursor-pointer">123</span>
+        </label>
 
         <label>
             <input type="radio" id="toggle-payment-with-credit-card" class="form-radio cursor-pointer" name="payment-type"
@@ -156,6 +162,15 @@
                             document.getElementById('HPF_Token').value = response.message.hpf_token;
                             document.getElementById("enc_key").value = response.message.enc_key;
 
+                            let tokenBillingCheckbox = document.querySelector(
+                                'input[name="token-billing-checkbox"]:checked'
+                            );
+
+                            if (tokenBillingCheckbox) {
+                                document.querySelector('input[name="store_card"]').value =
+                                    tokenBillingCheckbox.value;
+                            }
+
                             document.getElementById("server_response").submit();
                         })
                         .catch((error) => {
@@ -167,14 +182,44 @@
                 });
             }
 
+            handlePaymentWithToken(event) {
+                event.target.parentElement.disabled = true;
+                
+                document.getElementById("server_response").submit();
+            }
+
             handle() {
                 this.setupPayTrace().then((instance) => {
                     this.ptInstance = instance;
                     this.updatePayTraceLabels();
 
+                    Array
+                        .from(document.getElementsByClassName('toggle-payment-with-token'))
+                        .forEach((element) => element.addEventListener('click', (element) => {
+                            document.getElementById('paytrace--credit-card-container').classList.add(
+                                'hidden');
+                            document.getElementById('save-card--container').style.display = 'none';
+                            document.querySelector('input[name=token]').value = element.target.dataset
+                                .token;
+                        }));
+
+                    document
+                        .getElementById('toggle-payment-with-credit-card')
+                        .addEventListener('click', (element) => {
+                            document.getElementById('paytrace--credit-card-container').classList.remove('hidden');
+                            document.getElementById('save-card--container').style.display = 'grid';
+                            document.querySelector('input[name=token]').value = "";
+                        });
+
                     document
                         .getElementById('pay-now')
-                        .addEventListener('click', (e) => this.handlePaymentWithCreditCard(e));
+                        .addEventListener('click', (e) => {
+                            if (document.querySelector('input[name=token]').value === '') {
+                                return this.handlePaymentWithCreditCard(e);
+                            }
+
+                            return this.handlePaymentWithToken(e);
+                        });
                 });
             }
         }
