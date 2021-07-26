@@ -747,7 +747,7 @@ class CreateSingleAccount extends Command
             $cg = new CompanyGateway;
             $cg->company_id = $company->id;
             $cg->user_id = $user->id;
-            $cg->gateway_key = 'f7ec488676d310683fb51802d076d713';
+            $cg->gateway_key = 'bbd736b3254b0aabed6ad7fda1298c88';
             $cg->require_cvv = true;
             $cg->require_billing_address = true;
             $cg->require_shipping_address = true;
