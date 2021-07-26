@@ -94,7 +94,7 @@ class CreditCard
             'customer_id' => Str::random(32),
             'hpf_token' => $data['HPF_Token'],
             'enc_key' => $data['enc_key'],
-            'integrator_id' =>  $this->company_gateway->getConfigField('integratorId'),
+            'integrator_id' =>  $this->paytrace->company_gateway->getConfigField('integratorId'),
             'billing_address' => $this->buildBillingAddress(),
         ];
 
@@ -123,7 +123,7 @@ class CreditCard
     private function getCustomerProfile($customer_id)
     {
         $profile = $this->paytrace->gatewayRequest('/v1/customer/export', [
-            'integrator_id' =>  $this->company_gateway->getConfigField('integratorId'),
+            'integrator_id' =>  $this->paytrace->company_gateway->getConfigField('integratorId'),
             'customer_id' => $customer_id,
             // 'include_bin' => true,
         ]);
