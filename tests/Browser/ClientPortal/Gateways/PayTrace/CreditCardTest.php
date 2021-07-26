@@ -37,4 +37,26 @@ class CreditCardTest extends DuskTestCase
                 ->auth();
         });
     }
+
+    public function testPayingWithNewCreditCard()
+    {
+        $this->markTestSkipped('Credit card not supported.');
+
+        $this->browse(function (Browser $browser) {
+            $browser
+                ->visitRoute('client.invoices.index')
+                ->click('@pay-now')
+                ->press('Pay Now')
+                ->clickLink('Credit Card')
+                ->withinFrame('iframe', function (Browser $browser) {
+                    $browser
+                        ->type('CC', '4012000098765439')
+                        ->select('EXP_MM', '12')
+                        ->select('EXP_YY', '30')
+                        ->type('SEC', '999');
+                })
+                ->press('Pay Now')
+                ->waitForText('Details of the payment', 60);
+        });
+    }
 }
