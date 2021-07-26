@@ -39,13 +39,7 @@
                 </label>
             @endforeach
         @endisset
-
-        <label class="mr-4">
-            <input type="radio" data-token="123" name="payment-type"
-                class="form-radio cursor-pointer toggle-payment-with-token" />
-            <span class="ml-1 cursor-pointer">123</span>
-        </label>
-
+        
         <label>
             <input type="radio" id="toggle-payment-with-credit-card" class="form-radio cursor-pointer" name="payment-type"
                 checked />
