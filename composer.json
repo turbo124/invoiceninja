@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=7.3.0",
+        "php": "^8.0",
         "ext-gd": "*",
         "ext-gmp": "*",
         "ext-json": "*",
@@ -40,9 +40,9 @@
         "dercoder/omnipay-paysafecard": "dev-master",
         "digitickets/omnipay-barclays-epdq": "~3.0",
         "digitickets/omnipay-datacash": "~3.0",
-        "digitickets/omnipay-gocardlessv2": "dev-payment-fix",
+        "digitickets/omnipay-gocardlessv2": "dev-php80",
         "digitickets/omnipay-realex": "~5.0",
-        "doctrine/dbal": "2.6.x",
+        "doctrine/dbal": "^2.11.0",
         "dompdf/dompdf": "0.7.0",
         "ezyang/htmlpurifier": "~v4.7",
         "fotografde/omnipay-checkoutcom": "~2.0",
@@ -60,7 +60,7 @@
         "laravel/framework": "^6.20",
         "laravel/helpers": "^1.4",
         "laravel/legacy-encrypter": "^1.0",
-        "laravel/socialite": "~4.4.1",
+        "laravel/socialite": "^5.1.0",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^6.2",
         "league/csv": "^9.1",
@@ -93,20 +93,13 @@
         "stripe/stripe-php": "^7",
         "superbalist/laravel-google-cloud-storage": "^2.2",
         "symfony/css-selector": "~3.1",
-        "therobfonz/laravel-mandrill-driver": "~1.0",
         "turbo124/laravel-push-notification": "dev-master",
-        "vemcogroup/laravel-sparkpost-driver": "~2.0",
         "vink/omnipay-komoju": "~1.0",
         "webpatser/laravel-countries": "dev-master#75992ad",
         "wepay/php-sdk": "^0.2",
         "wildbit/postmark-php": "^2.5"
     },
     "require-dev": {
-        "symfony/dom-crawler": "~3.1",
-        "codeception/c3": "2.*",
-        "codeception/codeception": "2.*",
-        "phpspec/phpspec": "~6.1",
-        "phpunit/phpunit": "~5.7"
     },
     "autoload": {
         "classmap": [
@@ -176,10 +169,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/hillelcoren/omnipay-gocardlessv2"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/turbo124/chumper-datatable"
         },
         {
@@ -209,6 +198,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/turbo124/Laravel-Excel"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/turbo124/omnipay-gocardlessv2"
         }
     ]
 }
