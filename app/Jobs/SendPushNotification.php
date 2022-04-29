@@ -54,6 +54,6 @@ class SendPushNotification extends Job implements ShouldQueue
             $this->invoice->account->loadLocalizationSettings();
         }
 
-        $pushService->sendNotification($this->invoice, $this->type);
+     //   $pushService->sendNotification($this->invoice, $this->type);
     }
 }

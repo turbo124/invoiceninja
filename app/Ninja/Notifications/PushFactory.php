@@ -2,7 +2,6 @@
 
 namespace App\Ninja\Notifications;
 
-use Davibennun\LaravelPushNotification\Facades\PushNotification;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -32,9 +31,9 @@ class PushFactory
      */
     public function customMessage($token, $message, $messageArray, $device)
     {
-        $customMessage = PushNotification::Message($message, $messageArray);
+        // $customMessage = PushNotification::Message($message, $messageArray);
 
-        $this->message($token, $customMessage, $device);
+        // $this->message($token, $customMessage, $device);
     }
 
     /**
@@ -51,13 +50,13 @@ class PushFactory
      */
     public function message($token, $message, $device)
     {
-        try {
-            PushNotification::app($device)
-                ->to($token)
-                ->send($message);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-        }
+        // try {
+        //     PushNotification::app($device)
+        //         ->to($token)
+        //         ->send($message);
+        // } catch (\Exception $e) {
+        //     Log::error($e->getMessage());
+        // }
     }
 
     /**
@@ -76,10 +75,11 @@ class PushFactory
      */
     public function getFeedback($token, $message, $device)
     {
-        $feedback = PushNotification::app($device)
-            ->to($token)
-            ->send($message);
+        return '';
+        // $feedback = PushNotification::app($device)
+        //     ->to($token)
+        //     ->send($message);
 
-        return $feedback->getFeedback();
+        // return $feedback->getFeedback();
     }
 }
