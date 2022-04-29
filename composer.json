@@ -73,7 +73,7 @@
         "meebio/omnipay-secure-trading": "dev-master",
         "mfauveau/omnipay-pacnet": "~2.0",
         "mpdf/mpdf": "^8.0",
-        "nesbot/carbon": "^2.0",
+        "nesbot/carbon": "^2.1",
         "nwidart/laravel-modules": "2.0.*",
         "omnipay/authorizenet": "dev-solution-id as 2.5.0",
         "omnipay/bitpay": "dev-master",

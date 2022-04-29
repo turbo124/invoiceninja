@@ -606,10 +606,10 @@ class InvoiceRepository extends BaseRepository
         }
 
         if (isset($data['custom_value1'])) {
-            $invoice->custom_value1 = round($data['custom_value1'], 2);
+            $invoice->custom_value1 = round((float)$data['custom_value1'], 2);
         }
         if (isset($data['custom_value2'])) {
-            $invoice->custom_value2 = round($data['custom_value2'], 2);
+            $invoice->custom_value2 = round((float)$data['custom_value2'], 2);
         }
 
         if (isset($data['custom_text_value1'])) {

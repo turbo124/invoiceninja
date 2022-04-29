@@ -37,8 +37,10 @@ class EntityTransformer extends TransformerAbstract
 
     protected function getTimestamp($date)
     {
-        if (method_exists($date, 'getTimestamp')) {
-            return $date->getTimestamp();
+        $carbon_date = \Carbon\Carbon::parse($date);
+        
+        if ($carbon_date) {
+            return $carbon_date->timestamp;
         } elseif (is_string($date)) {
             return strtotime($date);
         } else {
