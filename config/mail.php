@@ -44,6 +44,9 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
+        'microsoft_oauth' => [
+            'transport' => 'microsoft_oauth'
+        ],
 
         'ses' => [
             'transport' => 'ses',
