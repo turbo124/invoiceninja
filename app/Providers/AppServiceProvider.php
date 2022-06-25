@@ -12,6 +12,7 @@
 namespace App\Providers;
 
 use App\Http\Middleware\SetDomainNameDb;
+use App\Mail\Transports\MicrosoftGraphTransport;
 use App\Models\Invoice;
 use App\Models\Proposal;
 use App\Utils\Ninja;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
@@ -68,6 +70,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         app()->instance(TruthSource::class, new TruthSource());
+
+        Mail::extend('microsoft_oauth', function (array $config = []) {
+            return new MicrosoftGraphTransport();
+        });
 
         // Model::preventLazyLoading(
         //     !$this->app->isProduction()
