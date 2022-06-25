@@ -67,7 +67,7 @@
         "league/fractal": "^0.17.0",
         "league/omnipay": "^3.1",
         "livewire/livewire": "^2.6",
-        "microsoft/microsoft-graph": "^1.69",
+        "microsoft/microsoft-graph": "^1.70",
         "mollie/mollie-api-php": "^2.36",
         "nelexa/zip": "^4.0",
         "nwidart/laravel-modules": "8.3",
@@ -84,11 +84,11 @@
         "square/square": "13.0.0.20210721",
         "stripe/stripe-php": "^7.50",
         "symfony/http-client": "^6.0",
+        "symfony/postmark-mailer": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2",
         "turbo124/beacon": "^1.2",
         "webpatser/laravel-countries": "dev-master#75992ad",
-        "wepay/php-sdk": "^0.3",
-        "symfony/postmark-mailer": "^6.0"
+        "wepay/php-sdk": "^0.3"
     },
     "require-dev": {
         "php": "^7.4|^8.0",
