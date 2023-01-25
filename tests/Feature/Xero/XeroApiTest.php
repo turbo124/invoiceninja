@@ -178,9 +178,14 @@ class XeroApiTest extends TestCase
             'clientSecret'      => config('services.xero.client_secret'),
         ]);
 
-        $newAccessToken = $provider->getAccessToken('refresh_token', [
-            'refresh_token' => $user->xero_oauth_refresh_token
+        // $newAccessToken = $provider->getAccessToken('refresh_token', [
+        //     'refresh_token' => $user->xero_oauth_refresh_token
+        // ]);
+
+        $newAccessToken = $provider->getAccessToken('refresh_token', [ 
+            'grant_type' => 'refresh_token', 'refresh_token' => $user->xero_oauth_refresh_token
         ]);
+
 
         $this->assertNotNull($newAccessToken);
         $this->assertInstanceOf(AccessToken::class, $newAccessToken);

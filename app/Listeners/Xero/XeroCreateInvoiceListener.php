@@ -14,10 +14,13 @@ namespace App\Listeners\Xero;
 use App\Libraries\MultiDB;
 use App\Models\Invoice as NinjaInvoice;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Carbon;
 use \XeroPHP\Application;
 use \XeroPHP\Models\Accounting\Contact;
 use \XeroPHP\Models\Accounting\Address;
 use \XeroPHP\Models\Accounting\Phone;
+use \XeroPHP\Models\Accounting\Invoice;
+use \XeroPHP\Models\Accounting\LineItem;
 
 class XeroCreateInvoiceListener implements ShouldQueue
 {
@@ -58,8 +61,12 @@ class XeroCreateInvoiceListener implements ShouldQueue
             'clientSecret'      => config('services.xero.client_secret'),
         ]);
 
-        $access_token = $provider->getAccessToken('refresh_token', [
-            'refresh_token' => $user->xero_oauth_refresh_token
+        // $access_token = $provider->getAccessToken('refresh_token', [
+        //     'refresh_token' => $user->xero_oauth_refresh_token
+        // ]);
+
+        $access_token = $provider->getAccessToken('refresh_token', [ 
+            'grant_type' => 'refresh_token', 'refresh_token' => $user->xero_oauth_refresh_token
         ]);
 
         $user->xero_oauth_refresh_token = $access_token->getRefreshToken();
@@ -67,23 +74,36 @@ class XeroCreateInvoiceListener implements ShouldQueue
 
         $this->xero = new Application($access_token, $tenant);
 
-        // $invoice = new Invoice($xero);
-        // $invoice->setType(Invoice::INVOICE_TYPE_ACCREC);
-        // $invoice->setStatus(Invoice::INVOICE_STATUS_AUTHORISED);
-        // $invoice->setContact($contact);
-        // $invoice->setDueDate(now()->toDateTime());
-        // $invoice->setDate(now()->toDateTime());
-        // $invoice->setCurrencyCode('AUD');
+        $invoice = new Invoice($this->xero);
+        $invoice->setType(Invoice::INVOICE_TYPE_ACCREC);
+        $invoice->setStatus(Invoice::INVOICE_STATUS_AUTHORISED);
+        $invoice->setContact($this->findOrCreateContact());
+        $invoice->setDate(Carbon::parse($this->invoice->date)->toDateTime());
+        $invoice->setDueDate(Carbon::parse($this->invoice->due_date)->toDateTime());
+        $invoice->setCurrencyCode($this->invoice->client->currency()->code);
+        $invoice->setInvoiceNumber($this->invoice->number);
 
-        // $lineItem = new LineItem();
-        // $lineItem->setDescription("test")
-        //          ->setQuantity(1)
-        //          ->setAccountCode(200)
-        //          ->setUnitAmount(100)
-        //          ->setTaxType("OUTPUT");
+        foreach($this->invoice->line_items as $item)
+        {
 
-        // $invoice->addLineItem($lineItem);
+            $lineItem = new LineItem();
+            $lineItem->setDescription($item->notes)
+                     ->setQuantity($item->quantity)
+                     ->setAccountCode(200)
+                     ->setUnitAmount($item->cost)
+                     ->setItemCode($item->product_key)
+                     ->setTaxType("OUTPUT");
 
+            $invoice->addLineItem($lineItem);
+   
+        }
+
+        $invoice->save();
+        // $invoice = $this->xero->save($invoice, true);
+
+        $this->invoice->customn_value1 = $invoice->getInvoiceId();
+        $this->invoice->save();
+        
     }
 
     private function findOrCreateContact(): Contact
@@ -176,12 +196,10 @@ class XeroCreateInvoiceListener implements ShouldQueue
                 $phone = new Phone();
                 $phone->setPhoneType('DEFAULT');
                 $phone->setPhoneNumber($this->client->present()->phone());
-
                 $contact->addPhone($phone);
             }
 
-
-
+            $contact = $this->xero->save($contact, true);
         }
 
         return $contact;
