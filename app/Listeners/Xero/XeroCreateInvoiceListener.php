@@ -16,6 +16,8 @@ use App\Models\Invoice as NinjaInvoice;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use \XeroPHP\Application;
 use \XeroPHP\Models\Accounting\Contact;
+use \XeroPHP\Models\Accounting\Address;
+use \XeroPHP\Models\Accounting\Phone;
 
 class XeroCreateInvoiceListener implements ShouldQueue
 {
@@ -91,8 +93,9 @@ class XeroCreateInvoiceListener implements ShouldQueue
         if(strlen($this->invoice->client->id_number) > 5){
             $contact = $this->xero->loadByGUID(Contact::class, $this->invoice->client->id_number);
         }
-        else {
 
+        if(!$contact) 
+        {
             //search by email
             $primary_contact = $this->invoice->client->primary_contact()->first();
 
@@ -104,25 +107,82 @@ class XeroCreateInvoiceListener implements ShouldQueue
             
             if(count($contacts) >= 1)
                 $contact = $contacts[0];
-            else  {
 
-                //final try, search by VAT_NUMBER / ABN Number
-                if(strlen($this->invoice->client->vat_number) > 5){
+        }
 
-                    $contacts = $this->xero->load(Contact::class)
-                        ->where('TaxNumber', $this->invoice->client->vat_number)
-                        ->execute();
+        //final try, search by VAT_NUMBER / ABN Number
+        if(!$contact && strlen($this->invoice->client->vat_number) > 5) 
+        {
 
-                        if(count($contacts) >= 1)
-                            $contact = $contacts[0];
-                }
+            $contacts = $this->xero->load(Contact::class)
+                ->where('TaxNumber', $this->invoice->client->vat_number)
+                ->execute();
 
+                if(count($contacts) >= 1)
+                    $contact = $contacts[0];            
+        
+        }
+
+        if(!$contact && strlen($this->invoice->client->name) > 2) 
+        {
+
+            $contacts = $this->xero->load(Contact::class)
+                ->where('Name', $this->invoice->client->name)
+                ->execute();
+
+                if(count($contacts) >= 1)
+                    $contact = $contacts[0];            
+        
+        }
+
+        //create new contact here
+        if(!$contact)
+        {
+            $address = new Address();
+            $address->setAddressLine1($this->invoice->client->address1)
+                    ->setAddressLine2($this->invoice->client->address2)
+                    ->setCity($this->invoice->client->city)
+                    ->setRegion($this->invoice->client->state)
+                    ->setPostalCode($this->invoice->client->postal_code)
+                    ->setCountry($this->invoice->client->country->name)
+                    ->setAddressType('STREET');
+
+            $contact = new Contact($this->xero);
+            $contact->setName($this->invoice->client->present()->name())
+                    ->setEmailAddress($this->invoice->client->present()->email())
+                    ->setFirstName($this->client->present()->first_name())
+                    ->setLastName($this->client->present()->first_name())
+                    ->setCompanyNumber($this->client->vat_number)
+                    ->setContactStatus('ACTIVE')
+                    ->addAddress($address);
+
+            if(strlen($this->invoice->client->shipping_address1) > 2 || strlen($this->invoice->client->shipping_address2) > 2)
+            {
+
+                $shipping_address = new Address();
+                $shipping_address->setAddressLine1($this->invoice->client->shipping_address1)
+                        ->setAddressLine2($this->invoice->client->shipping_address2)
+                        ->setCity($this->invoice->client->shipping_city)
+                        ->setRegion($this->invoice->client->shipping_state)
+                        ->setPostalCode($this->invoice->client->shipping_postal_code)
+                        ->setCountry($this->invoice->client->shipping_country->name)
+                        ->setAddressType('DELIVERY');
+
+                $contact->addAddress($shipping_address);
+            }
+
+            if(strlen($this->invoice->client->present()->phone() > 1))
+            {
+                $phone = new Phone();
+                $phone->setPhoneType('DEFAULT');
+                $phone->setPhoneNumber($this->client->present()->phone());
+
+                $contact->addPhone($phone);
             }
 
 
 
         }
-
 
         return $contact;
     }
