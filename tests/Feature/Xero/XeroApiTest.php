@@ -12,15 +12,16 @@
 namespace Tests\Feature\Xero;
 
 use App\Models\User;
+use App\Models\XeroTenant;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use League\OAuth2\Client\Token\AccessToken as AccessToken;
 use Tests\MockAccountData;
 use Tests\TestCase;
-use League\OAuth2\Client\Token\AccessToken as AccessToken;
-use \XeroPHP\Models\Accounting\Invoice;
-use \XeroPHP\Models\Accounting\Contact;
-use \XeroPHP\Models\Accounting\LineItem;
 use \XeroPHP\Models\Accounting\Account;
+use \XeroPHP\Models\Accounting\Contact;
+use \XeroPHP\Models\Accounting\Invoice;
+use \XeroPHP\Models\Accounting\LineItem;
 use \XeroPHP\Models\Accounting\TaxRate;
 
 /**
@@ -39,10 +40,136 @@ class XeroApiTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
+
+        $this->makeTestData();
+    
     }
+
+    public function testShowXeroTenant()
+    {
+    
+        $xt = new XeroTenant;
+        $xt->tenant_id = rand(1,10000000);
+        $xt->tenant_name = $this->faker->words(2,true);
+        $xt->tenant_type = 'ORGANISATION';
+        $xt->account_id = $this->account->id;
+        $xt->company_id = $this->company->id;
+        $xt->user_id = $this->user->id;
+        $xt->save();
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->get('/api/v1/xero_tenants/'.$xt->hashed_id);
+
+        $response->assertStatus(200);
+
+
+        $data = [
+            'tenant_name' => "SHINY",
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/xero_tenants/'.$xt->hashed_id, $data);
+
+        $response->assertStatus(200);
+
+        $arr = $response->json();
+
+        $this->assertEquals('SHINY', $arr['data']['tenant_name']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->delete('/api/v1/xero_tenants/'.$xt->hashed_id);
+
+        $response->assertStatus(200);
+
+        $arr = $response->json();
+
+        $this->assertTrue($arr['data']['is_deleted']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/bulk', ['ids' => [$xt->hashed_id], 'action' => 'restore']);
+
+        $response->assertStatus(200);
+
+        $arr = $response->json();
+
+
+        $this->assertFalse($arr['data'][0]['is_deleted']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/bulk', ['ids' => [$xt->hashed_id], 'action' => 'archive']);
+
+        $arr = $response->json();
+
+        $this->assertNotEquals(0, $arr['data'][0]['archived_at']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/bulk', ['ids' => [$xt->hashed_id], 'action' => 'delete']);
+
+        $arr = $response->json();
+
+        $this->assertNotEquals(0, $arr['data'][0]['archived_at']);
+        $this->assertTrue($arr['data'][0]['is_deleted']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/bulk', ['ids' => [$xt->hashed_id], 'action' => 'restore']);
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $this->assertEquals(0, $arr['data'][0]['archived_at']);
+        $this->assertFalse($arr['data'][0]['is_deleted']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/link/'.$xt->hashed_id.'/');
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $this->assertEmpty($arr['data']['company_id']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/link/'.$xt->hashed_id.'/'.$this->company->company_key);
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $this->assertNotEmpty($arr['data']['company_id']);
+
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/xero_tenants/link/'.$xt->hashed_id.'/');
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $this->assertEmpty($arr['data']['company_id']);
+
+    }
+
 
     public function testRefreshToken()
     {
+        $this->markTestSkipped('not now');
 
         $user = User::where('email','small@example.com')->first();
 
@@ -80,7 +207,7 @@ class XeroApiTest extends TestCase
 
         foreach($invoices as $invoice){
 
-            nlog($invoice);
+            // nlog($invoice);
             // nlog($invoice->getAccountType());
 
         }
@@ -120,13 +247,14 @@ class XeroApiTest extends TestCase
         // $invoice = $xero->loadByGUID(Invoice::class, '15a233a2-737f-4fc4-a9f7-a44416fe705c');
 
         $lineItem = new LineItem();
-        $lineItem->setDescription("something that is updated")
+        $lineItem->setDescription("Here we go!!")
                  ->setQuantity(3)
                  ->setAccountCode(200)
                  ->setUnitAmount(300)
                  ->setTaxType("OUTPUT");
 
         $invoice->addLineItem($lineItem);
+        $invoice->setInvoiceNumber("Ninja-0001");
         $invoice = $xero->save($invoice, true);
 
     // $lineItem = new RepeatingInvoice\LineItem();

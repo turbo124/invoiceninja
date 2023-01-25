@@ -96,6 +96,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WebCronController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\XeroTenantController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['throttle:300,1', 'api_secret_check']], function () {
@@ -334,7 +335,9 @@ Route::group(['middleware' => ['throttle:300,1', 'api_db', 'token_auth', 'locale
     Route::resource('webhooks', WebhookController::class);
     Route::post('webhooks/bulk', [WebhookController::class, 'bulk'])->name('webhooks.bulk');
 
-    Route::resource('xero_tenants', XeroController::class)->only(['show', 'update', 'destroy']);
+    Route::resource('xero_tenants', XeroTenantController::class)->only(['show', 'update', 'destroy']);
+    Route::post('xero_tenants/bulk', [XeroTenantController::class, 'bulk'])->name('xero_tenants.bulk');
+    Route::post('xero_tenants/link/{xero_tenant}/{company_key?}', [XeroTenantController::class, 'link'])->name('xero_tenants.link');
 
     /*Subscription and Webhook routes */
     // Route::post('hooks', [SubscriptionController::class, 'subscribe'])->name('hooks.subscribe');

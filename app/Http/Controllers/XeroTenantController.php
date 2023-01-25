@@ -12,10 +12,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Credit\BulkXeroTenantRequest;
+use App\Http\Requests\XeroTenant\BulkXeroTenantRequest;
 use App\Http\Requests\XeroTenant\DestroyXeroTenantRequest;
+use App\Http\Requests\XeroTenant\LinkXeroTenantRequest;
 use App\Http\Requests\XeroTenant\ShowXeroTenantRequest;
 use App\Http\Requests\XeroTenant\UpdateXeroTenantRequest;
+use App\Libraries\MultiDB;
+use App\Models\Company;
 use App\Models\XeroTenant;
 use App\Repositories\BaseRepository;
 use App\Transformers\XeroTenantTransformer;
@@ -278,4 +281,57 @@ class XeroTenantController extends BaseController
 
         return $this->listResponse(XeroTenant::withTrashed()->where('account_id', auth()->user()->account_id)->whereIn('id', $ids));
     }
+
+    /**
+     * Perform bulk actions on the list view.
+     *
+     * @return Response
+     *
+     *
+     * @OA\Post(
+     *      path="/api/v1/xero_tenants/{xero_tenant}/{company?}/link",
+     *      operationId="linkXeroTenant",
+     *      tags={"xero_tenants"},
+     *      summary="Links a XeroTenant to a company",
+     *      description="",
+     *      @OA\Parameter(ref="#/components/parameters/X-Api-Token"),
+     *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *      @OA\Parameter(ref="#/components/parameters/index"),
+     *      @OA\Response(
+     *          response=200,
+     *          description="The XeroTenant User response",
+     *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
+     *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
+     *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *          @OA\JsonContent(ref="#/components/schemas/XeroTenant"),
+     *       ),
+     *       @OA\Response(
+     *          response=422,
+     *          description="Validation error",
+     *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
+     *       ),
+     *       @OA\Response(
+     *           response="default",
+     *           description="Unexpected Error",
+     *           @OA\JsonContent(ref="#/components/schemas/Error"),
+     *       ),
+     *     )
+     */
+    public function link(LinkXeroTenantRequest $request, XeroTenant $xero_tenant, ?string $company_key = null)
+    {
+        $company = false;
+
+        if($company_key){
+            $company = Company::where('company_key', $company_key)->where('account_id', $xero_tenant->account_id)->firstOrFail();
+            $xero_tenant->company_id = $company->id;
+        }
+        else
+            $xero_tenant->company_id = null;
+
+        $xero_tenant->save();
+        
+        return $this->itemResponse($xero_tenant);
+
+    }
+
 }

@@ -56,8 +56,8 @@ Route::get('stripe/completed', [StripeConnectController::class, 'completed'])->n
 
 Route::get('yodlee/onboard/{token}', [YodleeController::class, 'auth'])->name('yodlee.auth');
 Route::get('xero/auth/{token}', [XeroAuthController::class,'onboard'])->name('xero.auth');
-Route::get('xero/completed', [XeroAuthController::class,'completed'])->name('xero.completed');
-
+Route::get('/completed', [XeroAuthController::class,'completed'])->name('xero.completed');
+Route::post('xero/webhook', [XeroAuthController::class,'webhook'])->name('xero.webhook');
 
 Route::get('checkout/3ds_redirect/{company_key}/{company_gateway_id}/{hash}', [Checkout3dsController::class, 'index'])->middleware('domain_db')->name('checkout.3ds_redirect');
 Route::get('mollie/3ds_redirect/{company_key}/{company_gateway_id}/{hash}', [Mollie3dsController::class, 'index'])->middleware('domain_db')->name('mollie.3ds_redirect');

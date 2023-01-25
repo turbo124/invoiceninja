@@ -11,17 +11,26 @@
 
 namespace App\Http\Requests\XeroTenant;
 
-use App\Http\Requests\Request;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateXeroTenantRequest extends Request
+class LinkXeroTenantRequest extends FormRequest
 {
+    use MakesHash;
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize() : bool
+    public function authorize(): bool
     {
-        return auth()->user()->isAdmin();
+        return auth()->user()->isAdmin() && auth()->user()->account_id == $this->xero_tenant->account_id;
     }
+
+    public function rules(): array
+    {
+        return [];
+    }
+
 }

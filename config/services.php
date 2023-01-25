@@ -98,6 +98,7 @@ return [
     'xero' => [    
         'client_id' => env('XERO_CLIENT_ID'),  
         'client_secret' => env('XERO_CLIENT_SECRET'),  
-        'redirect' => env('XERO_REDIRECT_URI') 
+        'redirect' => env('XERO_REDIRECT_URI'),
+        'signing_key' => env('XERO_SIGNING_KEY'),
     ],
 ];

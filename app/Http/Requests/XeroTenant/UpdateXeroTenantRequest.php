@@ -12,9 +12,11 @@
 namespace App\Http\Requests\XeroTenant;
 
 use App\Http\Requests\Request;
+use App\Utils\Traits\ChecksEntityStatus;
 
-class DestroyXeroTenantRequest extends Request
+class UpdateXeroTenantRequest extends Request
 {
+    use ChecksEntityStatus;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -22,6 +24,6 @@ class DestroyXeroTenantRequest extends Request
      */
     public function authorize() : bool
     {
-        return auth()->user()->isAdmin();
+        return auth()->user()->isAdmin() && auth()->user()->account_id == $this->xero_tenant->account_id;
     }
 }

@@ -9,7 +9,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace App\Http\Requests\Xero;
+namespace App\Http\Requests\XeroTenant;
 
 use App\Http\Requests\Request;
 use App\Libraries\MultiDB;

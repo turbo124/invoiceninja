@@ -11,9 +11,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Xero\XeroAuthRequest;
+use App\Http\Requests\XeroTenant\XeroAuthRequest;
 use App\Libraries\MultiDB;
 use App\Models\XeroTenant;
+use Illuminate\Http\Request;
 
 class XeroAuthController extends BaseController
 {
@@ -115,6 +116,25 @@ class XeroAuthController extends BaseController
 
             return redirect('/');
 
+    }
+
+    public function webhook(Request $request)
+    {
+        nlog($request->all());
+
+        // $application->setConfig(['webhook' => ['signing_key' => 'xyz123']]);
+        // $webhook = new Webhook($application, $request->getContent());
+
+        $computedSignatureKey = base64_encode(
+            hash_hmac($request->getContent(), config('services.xero.signing_key'), true)
+        );
+
+        if(!hash_equals($computedSignatureKey, $request->headers->get('x-xero-signature'))){
+
+            return response()->json(null, 401);
+        }
+
+        return response()->json(null, 200);
     }
 
 }

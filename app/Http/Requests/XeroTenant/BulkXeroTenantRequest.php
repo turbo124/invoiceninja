@@ -9,7 +9,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace App\Http\Requests\Credit;
+namespace App\Http\Requests\XeroTenant;
 
 use App\Utils\Traits\MakesHash;
 use Illuminate\Foundation\Http\FormRequest;

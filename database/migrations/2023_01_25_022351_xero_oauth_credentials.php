@@ -33,6 +33,8 @@ return new class extends Migration
             $table->string('tenant_type', 191)->nullable();
 
             $table->timestamps(6);
+            $table->softDeletes('deleted_at', 6);
+
             $table->unique(['account_id', 'tenant_id']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
