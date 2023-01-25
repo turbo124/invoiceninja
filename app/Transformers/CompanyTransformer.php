@@ -198,6 +198,8 @@ class CompanyTransformer extends EntityTransformer
             'convert_expense_currency' => (bool) $company->convert_expense_currency,
             'notify_vendor_when_paid' => (bool) $company->notify_vendor_when_paid,
             'invoice_task_hours' => (bool) $company->invoice_task_hours,
+            'xero_sync_invoices' => (bool) $company->xero_sync_invoices,
+            'xero_sync_contacts' => (bool) $company->xero_sync_contacts
         ];
     }
 

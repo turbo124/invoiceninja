@@ -43,6 +43,13 @@ return new class extends Migration
 
         });
 
+        Schema::table('companies', function (Blueprint $table)
+        {
+            $table->boolean('xero_sync_invoices')->default(false);
+            $table->boolean('xero_sync_contacts')->default(false);
+        });
+
+
     }
 
     /**

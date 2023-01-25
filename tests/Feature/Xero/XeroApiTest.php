@@ -169,7 +169,7 @@ class XeroApiTest extends TestCase
 
     public function testRefreshToken()
     {
-        $this->markTestSkipped('not now');
+        // $this->markTestSkipped('not now');
 
         $user = User::where('email','small@example.com')->first();
 
@@ -177,7 +177,6 @@ class XeroApiTest extends TestCase
             'clientId'          => config('services.xero.client_id'),
             'clientSecret'      => config('services.xero.client_secret'),
         ]);
-
 
         $newAccessToken = $provider->getAccessToken('refresh_token', [
             'refresh_token' => $user->xero_oauth_refresh_token
@@ -200,17 +199,25 @@ class XeroApiTest extends TestCase
         // 
         $contactId = 'c0b4b5a3-3223-4345-b9ad-1266ab7a23fa';
         $contact = $xero->loadByGUID(Contact::class, $contactId);
+        $contact->setEmailAddress('david@invoiceninja.com');
+        $contact->save();
 
-        $invoices = $xero->load(\XeroPHP\Models\Accounting\Invoice::class)->execute();
+        $contacts = $xero->load(Contact::class)
+            ->where('EmailAddress', 'david@invoiceninja.com')
+            ->execute();
+        
+        nlog(count($contacts));
+
+        foreach($contacts as $contact)
+        {
+            nlog($contact->toStringArray());
+        }
+
+
+        // $invoices = $xero->load(\XeroPHP\Models\Accounting\Invoice::class)->execute();
 
         //nlog($invoices);
 
-        foreach($invoices as $invoice){
-
-            // nlog($invoice);
-            // nlog($invoice->getAccountType());
-
-        }
 
         // $invoice = new Invoice($xero);
         // $invoice->setType(Invoice::INVOICE_TYPE_ACCREC);
@@ -232,8 +239,8 @@ class XeroApiTest extends TestCase
         // $invoice = $xero->save($invoice, true);
 
 
-        $invoice = $xero->loadByGUID(Invoice::class, '15a233a2-737f-4fc4-a9f7-a44416fe705c');
-        $invoice->LineItems->removeAll();
+        // $invoice = $xero->loadByGUID(Invoice::class, '15a233a2-737f-4fc4-a9f7-a44416fe705c');
+        // $invoice->LineItems->removeAll();
 //         $items = $invoice->getLineItems();
 
 // nlog($items);
@@ -246,16 +253,16 @@ class XeroApiTest extends TestCase
 
         // $invoice = $xero->loadByGUID(Invoice::class, '15a233a2-737f-4fc4-a9f7-a44416fe705c');
 
-        $lineItem = new LineItem();
-        $lineItem->setDescription("Here we go!!")
-                 ->setQuantity(3)
-                 ->setAccountCode(200)
-                 ->setUnitAmount(300)
-                 ->setTaxType("OUTPUT");
+        // $lineItem = new LineItem();
+        // $lineItem->setDescription("Here we go!!")
+        //          ->setQuantity(3)
+        //          ->setAccountCode(200)
+        //          ->setUnitAmount(300)
+        //          ->setTaxType("OUTPUT");
 
-        $invoice->addLineItem($lineItem);
-        $invoice->setInvoiceNumber("Ninja-0001");
-        $invoice = $xero->save($invoice, true);
+        // $invoice->addLineItem($lineItem);
+        // $invoice->setInvoiceNumber("Ninja-0001");
+        // $invoice = $xero->save($invoice, true);
 
     // $lineItem = new RepeatingInvoice\LineItem();
     // $lineItem->setDescription('Testing repeating invoices')

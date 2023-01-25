@@ -223,6 +223,8 @@ use App\Listeners\User\DeletedUserActivity;
 use App\Listeners\User\RestoredUserActivity;
 use App\Listeners\User\UpdateUserLastLogin;
 use App\Listeners\User\UpdatedUserActivity;
+use App\Listeners\Xero\XeroCreateInvoiceListener;
+use App\Listeners\Xero\XeroUpdateInvoiceListener;
 use App\Models\Account;
 use App\Models\Client;
 use App\Models\ClientContact;
@@ -408,11 +410,12 @@ class EventServiceProvider extends ServiceProvider
         InvoiceWasUpdated::class => [
             UpdateInvoiceActivity::class,
             CreateInvoicePdf::class,
+            XeroUpdateInvoiceListener::class,
         ],
         InvoiceWasCreated::class => [
             CreateInvoiceActivity::class,
             InvoiceCreatedNotification::class,
-            //    CreateInvoicePdf::class,
+            XeroCreateInvoiceListener::class,
         ],
         InvoiceWasPaid::class => [
             InvoicePaidActivity::class,

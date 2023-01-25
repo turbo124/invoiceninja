@@ -131,6 +131,8 @@ class Company extends BaseModel
         'convert_payment_currency',
         'convert_expense_currency',
         'notify_vendor_when_paid',
+        'xero_sync_invoices',
+        'xero_sync_contacts',
     ];
 
     protected $hidden = [
@@ -215,6 +217,11 @@ class Company extends BaseModel
     public function getCompanyIdAttribute()
     {
         return $this->encodePrimaryKey($this->id);
+    }
+
+    public function xero_tenant()
+    {
+        return $this->belongsTo(XeroTenant::class);
     }
 
     public function account()
