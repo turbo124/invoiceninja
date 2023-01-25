@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table)
         {
-            $table->varchar('xero_oauth_user_id',100)->nullable();
+            $table->string('xero_oauth_user_id',100)->nullable();
             $table->text('xero_oauth_access_token')->nullable();
             $table->text('xero_oauth_refresh_token')->nullable();
         });
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->unsignedInteger('user_id');
             $table->boolean('is_deleted')->default(false);
 
-            $table->varchar('tenant_id',191)->nullable();
-            $table->varchar('tenant_name',191)->nullable();
-            $table->varchar('tenant_type', 191)->nullable();
+            $table->string('tenant_id',191)->nullable();
+            $table->string('tenant_name',191)->nullable();
+            $table->string('tenant_type', 191)->nullable();
 
             $table->timestamps(6);
             $table->unique(['account_id', 'tenant_id']);
