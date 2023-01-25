@@ -139,6 +139,11 @@ class Account extends BaseModel
         return $this->hasMany(Company::class);
     }
 
+    public function xero_tenants()
+    {
+        return $this->hasMany(XeroTenant::class);
+    }
+
     public function bank_integrations()
     {
         return $this->hasMany(BankIntegration::class);

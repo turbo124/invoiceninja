@@ -13,6 +13,7 @@ use App\Http\Controllers\SetupController;
 use App\Http\Controllers\StripeConnectController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WePayController;
+use App\Http\Controllers\XeroAuthController;
 use Illuminate\Support\Facades\Route;
 
 //Auth::routes(['password.reset' => false]);
@@ -54,6 +55,7 @@ Route::get('stripe/signup/{token}', [StripeConnectController::class, 'initialize
 Route::get('stripe/completed', [StripeConnectController::class, 'completed'])->name('stripe_connect.return');
 
 Route::get('yodlee/onboard/{token}', [YodleeController::class, 'auth'])->name('yodlee.auth');
+Route::get('xero/auth', [XeroAuthController::class])->name('xero.auth');
 
 Route::get('checkout/3ds_redirect/{company_key}/{company_gateway_id}/{hash}', [Checkout3dsController::class, 'index'])->middleware('domain_db')->name('checkout.3ds_redirect');
 Route::get('mollie/3ds_redirect/{company_key}/{company_gateway_id}/{hash}', [Mollie3dsController::class, 'index'])->middleware('domain_db')->name('mollie.3ds_redirect');

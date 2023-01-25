@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fee0057b8444e2a245cea87dab6c1b3a",
+    "content-hash": "454a2e7debff7813064cfe867edd2f77",
     "packages": [
         {
             "name": "afosto/yaac",
@@ -680,6 +680,107 @@
                 }
             ],
             "time": "2022-08-10T22:54:19+00:00"
+        },
+        {
+            "name": "calcinai/oauth2-xero",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/calcinai/oauth2-xero.git",
+                "reference": "4354c2dd4956b6fbe9fc7dd4f51ff4bb7807b7ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/calcinai/oauth2-xero/zipball/4354c2dd4956b6fbe9fc7dd4f51ff4bb7807b7ef",
+                "reference": "4354c2dd4956b6fbe9fc7dd4f51ff4bb7807b7ef",
+                "shasum": ""
+            },
+            "require": {
+                "firebase/php-jwt": "^5.0|^6.0",
+                "league/oauth2-client": "1.*|2.*",
+                "php": ">=7.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Calcinai\\OAuth2\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Calcinai",
+                    "email": "michael@calcin.ai"
+                }
+            ],
+            "description": "Xero OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
+            "keywords": [
+                "Authentication",
+                "SSO",
+                "authorization",
+                "identity",
+                "idp",
+                "oauth",
+                "oauth2",
+                "single sign on",
+                "xero",
+                "xero api"
+            ],
+            "support": {
+                "issues": "https://github.com/calcinai/oauth2-xero/issues",
+                "source": "https://github.com/calcinai/oauth2-xero/tree/v1.3.0"
+            },
+            "time": "2022-10-10T20:42:17+00:00"
+        },
+        {
+            "name": "calcinai/xero-php",
+            "version": "v2.5.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/calcinai/xero-php.git",
+                "reference": "b13209829b047830cf1ecdfc4d47eb861c946eb9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/calcinai/xero-php/zipball/b13209829b047830cf1ecdfc4d47eb861c946eb9",
+                "reference": "b13209829b047830cf1ecdfc4d47eb861c946eb9",
+                "shasum": ""
+            },
+            "require": {
+                "calcinai/oauth2-xero": "^1.0",
+                "ext-json": "*",
+                "ext-simplexml": "*",
+                "guzzlehttp/guzzle": "^6.5|^7.0",
+                "guzzlehttp/psr7": "^1.5|^1.6|^2.1.1",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5"
+            },
+            "suggest": {
+                "ext-fileinfo": "*",
+                "ext-mbstring": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "XeroPHP\\": "src/XeroPHP/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A client implementation of the Xero API, with a cleaner OAuth interface and ORM-like abstraction.",
+            "homepage": "https://github.com/calcinai/xero-php",
+            "support": {
+                "issues": "https://github.com/calcinai/xero-php/issues",
+                "source": "https://github.com/calcinai/xero-php/tree/v2.5.4"
+            },
+            "time": "2022-09-30T19:45:05+00:00"
         },
         {
             "name": "checkout/checkout-sdk-php",
@@ -4767,6 +4868,76 @@
                 "source": "https://github.com/thephpleague/oauth1-client/tree/v1.10.1"
             },
             "time": "2022-04-15T14:02:14+00:00"
+        },
+        {
+            "name": "league/oauth2-client",
+            "version": "2.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/oauth2-client.git",
+                "reference": "2334c249907190c132364f5dae0287ab8666aa19"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/oauth2-client/zipball/2334c249907190c132364f5dae0287ab8666aa19",
+                "reference": "2334c249907190c132364f5dae0287ab8666aa19",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0 || ^7.0",
+                "paragonie/random_compat": "^1 || ^2 || ^9.99",
+                "php": "^5.6 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.3.5",
+                "php-parallel-lint/php-parallel-lint": "^1.3.1",
+                "phpunit/phpunit": "^5.7 || ^6.0 || ^9.5",
+                "squizlabs/php_codesniffer": "^2.3 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-2.x": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\OAuth2\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alex Bilbie",
+                    "email": "hello@alexbilbie.com",
+                    "homepage": "http://www.alexbilbie.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Woody Gilk",
+                    "homepage": "https://github.com/shadowhand",
+                    "role": "Contributor"
+                }
+            ],
+            "description": "OAuth 2.0 Client Library",
+            "keywords": [
+                "Authentication",
+                "SSO",
+                "authorization",
+                "identity",
+                "idp",
+                "oauth",
+                "oauth2",
+                "single sign on"
+            ],
+            "support": {
+                "issues": "https://github.com/thephpleague/oauth2-client/issues",
+                "source": "https://github.com/thephpleague/oauth2-client/tree/2.6.1"
+            },
+            "time": "2021-12-22T16:42:49+00:00"
         },
         {
             "name": "league/omnipay",

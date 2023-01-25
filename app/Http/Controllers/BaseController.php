@@ -157,6 +157,7 @@ class BaseController extends Controller
             $include = implode(',', $this->forced_includes);
         }
 
+        //todo  - enable this
         // $include = $this->filterIncludes($include);
 
         $this->manager->parseIncludes($include);

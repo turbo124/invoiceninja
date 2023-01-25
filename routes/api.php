@@ -334,6 +334,8 @@ Route::group(['middleware' => ['throttle:300,1', 'api_db', 'token_auth', 'locale
     Route::resource('webhooks', WebhookController::class);
     Route::post('webhooks/bulk', [WebhookController::class, 'bulk'])->name('webhooks.bulk');
 
+    Route::resource('xero_tenants', XeroController::class)->only(['show', 'update', 'destroy']);
+
     /*Subscription and Webhook routes */
     // Route::post('hooks', [SubscriptionController::class, 'subscribe'])->name('hooks.subscribe');
     // Route::delete('hooks/{subscription_id}', [SubscriptionController::class, 'unsubscribe'])->name('hooks.unsubscribe');
@@ -347,7 +349,7 @@ Route::group(['middleware' => ['throttle:300,1', 'api_db', 'token_auth', 'locale
     Route::resource('subscriptions', SubscriptionController::class);
     Route::post('subscriptions/bulk', [SubscriptionController::class, 'bulk'])->name('subscriptions.bulk');
     Route::get('statics', StaticController::class);
-    // Route::post('apple_pay/upload_file','ApplyPayController::class, 'upload');
+
 
 });
 
