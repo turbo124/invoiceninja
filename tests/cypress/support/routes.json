@@ -218,6 +218,15 @@
       "POST"
     ]
   },
+  "livewire.message-localized": {
+    "name": "livewire.message-localized",
+    "domain": null,
+    "action": "Livewire\\Controllers\\HttpConnectionHandler",
+    "uri": "{locale}/livewire/message/{name}",
+    "method": [
+      "POST"
+    ]
+  },
   "livewire.upload-file": {
     "name": "livewire.upload-file",
     "domain": null,
@@ -237,8 +246,8 @@
       "HEAD"
     ]
   },
-  "generated::LbMEKyHuoZZlPwNZ": {
-    "name": "generated::LbMEKyHuoZZlPwNZ",
+  "generated::f3sIximd2ECRWPZo": {
+    "name": "generated::f3sIximd2ECRWPZo",
     "domain": null,
     "action": "Livewire\\Controllers\\LivewireJavaScriptAssets@source",
     "uri": "livewire/livewire.js",
@@ -247,8 +256,8 @@
       "HEAD"
     ]
   },
-  "generated::BERbHZk3mZlQ2zNh": {
-    "name": "generated::BERbHZk3mZlQ2zNh",
+  "generated::9PB7CaJdFn6uK20y": {
+    "name": "generated::9PB7CaJdFn6uK20y",
     "domain": null,
     "action": "Livewire\\Controllers\\LivewireJavaScriptAssets@maps",
     "uri": "livewire/livewire.js.map",
@@ -294,8 +303,8 @@
       "POST"
     ]
   },
-  "generated::LcI9cAVRDG3eHEK0": {
-    "name": "generated::LcI9cAVRDG3eHEK0",
+  "generated::NdZ4dZaxypoe7Llp": {
+    "name": "generated::NdZ4dZaxypoe7Llp",
     "domain": null,
     "action": "App\\Http\\Controllers\\Auth\\LoginController@oauthApiLogin",
     "uri": "api/v1/oauth_login",
@@ -312,8 +321,8 @@
       "POST"
     ]
   },
-  "generated::A629fcGvwTfLOJod": {
-    "name": "generated::A629fcGvwTfLOJod",
+  "generated::kBlVvxdp7IsuNowO": {
+    "name": "generated::kBlVvxdp7IsuNowO",
     "domain": null,
     "action": "App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail",
     "uri": "api/v1/reset_password",
@@ -636,8 +645,8 @@
       "HEAD"
     ]
   },
-  "api.generated::DET5P1AwuqN66R4r": {
-    "name": "api.generated::DET5P1AwuqN66R4r",
+  "api.generated::zbmg8TSCNmu9WVS6": {
+    "name": "api.generated::zbmg8TSCNmu9WVS6",
     "domain": null,
     "action": "App\\Http\\Controllers\\ActivityController@downloadHistoricalEntity",
     "uri": "api/v1/activities/download_entity/{activity}",
@@ -854,8 +863,8 @@
       "DELETE"
     ]
   },
-  "api.generated::ZWFw3c3zfOBw9pgT": {
-    "name": "api.generated::ZWFw3c3zfOBw9pgT",
+  "api.generated::Bx8euCP8c5M64Bw6": {
+    "name": "api.generated::Bx8euCP8c5M64Bw6",
     "domain": null,
     "action": "App\\Http\\Controllers\\ConnectedAccountController@index",
     "uri": "api/v1/connected_account",
@@ -863,8 +872,8 @@
       "POST"
     ]
   },
-  "api.generated::Clo98Mgw3bI1A6qC": {
-    "name": "api.generated::Clo98Mgw3bI1A6qC",
+  "api.generated::C8zVUYESEP9kzZe2": {
+    "name": "api.generated::C8zVUYESEP9kzZe2",
     "domain": null,
     "action": "App\\Http\\Controllers\\ConnectedAccountController@handleGmailOauth",
     "uri": "api/v1/connected_account/gmail",
@@ -881,8 +890,8 @@
       "POST"
     ]
   },
-  "api.generated::RppLbiTzkE6rL0xM": {
-    "name": "api.generated::RppLbiTzkE6rL0xM",
+  "api.generated::2yT2CyxYok8Up1r9": {
+    "name": "api.generated::2yT2CyxYok8Up1r9",
     "domain": null,
     "action": "App\\Http\\Controllers\\MigrationController@purgeCompany",
     "uri": "api/v1/companies/purge/{company}",
@@ -890,8 +899,8 @@
       "POST"
     ]
   },
-  "api.generated::iog9yqNE2JOx4unn": {
-    "name": "api.generated::iog9yqNE2JOx4unn",
+  "api.generated::hjP6gj0XWsyEgK2t": {
+    "name": "api.generated::hjP6gj0XWsyEgK2t",
     "domain": null,
     "action": "App\\Http\\Controllers\\MigrationController@purgeCompanySaveSettings",
     "uri": "api/v1/companies/purge_save_settings/{company}",
@@ -967,8 +976,8 @@
       "DELETE"
     ]
   },
-  "api.generated::pVqy59LIgOLTTR8J": {
-    "name": "api.generated::pVqy59LIgOLTTR8J",
+  "api.generated::KMuGdXLZWmlnEfOk": {
+    "name": "api.generated::KMuGdXLZWmlnEfOk",
     "domain": null,
     "action": "App\\Http\\Controllers\\CompanyController@upload",
     "uri": "api/v1/companies/{company}/upload",
@@ -976,8 +985,8 @@
       "PUT"
     ]
   },
-  "api.generated::y64S7PFntB5Tvyko": {
-    "name": "api.generated::y64S7PFntB5Tvyko",
+  "api.generated::BupxNHhgSUCQO1ct": {
+    "name": "api.generated::BupxNHhgSUCQO1ct",
     "domain": null,
     "action": "App\\Http\\Controllers\\CompanyController@default",
     "uri": "api/v1/companies/{company}/default",
@@ -1072,8 +1081,8 @@
       "POST"
     ]
   },
-  "api.generated::fMHDK9ykCMeiM5VI": {
-    "name": "api.generated::fMHDK9ykCMeiM5VI",
+  "api.generated::49opklkKcBmBx8EB": {
+    "name": "api.generated::49opklkKcBmBx8EB",
     "domain": null,
     "action": "App\\Http\\Controllers\\CompanyUserController@update",
     "uri": "api/v1/company_users/{user}",
@@ -1437,8 +1446,8 @@
       "DELETE"
     ]
   },
-  "api.generated::aC0Zr3SWvGhFFuiw": {
-    "name": "api.generated::aC0Zr3SWvGhFFuiw",
+  "api.generated::nfRPErJSdOr9qAnu": {
+    "name": "api.generated::nfRPErJSdOr9qAnu",
     "domain": null,
     "action": "App\\Http\\Controllers\\ExpenseController@upload",
     "uri": "api/v1/expenses/{expense}/upload",
@@ -1609,8 +1618,8 @@
       "DELETE"
     ]
   },
-  "api.generated::2D4kIXL1pT31Trk0": {
-    "name": "api.generated::2D4kIXL1pT31Trk0",
+  "api.generated::rg391dDslxvXjO2X": {
+    "name": "api.generated::rg391dDslxvXjO2X",
     "domain": null,
     "action": "App\\Http\\Controllers\\GroupSettingController@bulk",
     "uri": "api/v1/group_settings/bulk",
@@ -1797,8 +1806,8 @@
       "POST"
     ]
   },
-  "api.generated::hj0Y7xZpadV934D6": {
-    "name": "api.generated::hj0Y7xZpadV934D6",
+  "api.generated::W0C5TUfMTO9Qr10f": {
+    "name": "api.generated::W0C5TUfMTO9Qr10f",
     "domain": null,
     "action": "App\\Http\\Controllers\\MigrationController@purgeCompany",
     "uri": "api/v1/migration/purge/{company}",
@@ -1806,8 +1815,8 @@
       "POST"
     ]
   },
-  "api.generated::QxQAIRXiLaLW0u9W": {
-    "name": "api.generated::QxQAIRXiLaLW0u9W",
+  "api.generated::b689fegV0Td0yjra": {
+    "name": "api.generated::b689fegV0Td0yjra",
     "domain": null,
     "action": "App\\Http\\Controllers\\MigrationController@purgeCompanySaveSettings",
     "uri": "api/v1/migration/purge_save_settings/{company}",
@@ -1815,8 +1824,8 @@
       "POST"
     ]
   },
-  "api.generated::SAVbILd5Ud3QciAg": {
-    "name": "api.generated::SAVbILd5Ud3QciAg",
+  "api.generated::lFQ3XZrk8fYULsda": {
+    "name": "api.generated::lFQ3XZrk8fYULsda",
     "domain": null,
     "action": "App\\Http\\Controllers\\MigrationController@startMigration",
     "uri": "api/v1/migration/start",
@@ -1824,8 +1833,8 @@
       "POST"
     ]
   },
-  "api.generated::3yv1OUwsjZrmnvtv": {
-    "name": "api.generated::3yv1OUwsjZrmnvtv",
+  "api.generated::qb50wDRUrtgkGAGg": {
+    "name": "api.generated::qb50wDRUrtgkGAGg",
     "domain": null,
     "action": "App\\Http\\Controllers\\OneTimeTokenController@create",
     "uri": "api/v1/one_time_token",
@@ -1919,8 +1928,8 @@
       "POST"
     ]
   },
-  "api.generated::oH5pZVIeYNlaYagI": {
-    "name": "api.generated::oH5pZVIeYNlaYagI",
+  "api.generated::ZwCyMgi0soOJsgYa": {
+    "name": "api.generated::ZwCyMgi0soOJsgYa",
     "domain": null,
     "action": "App\\Http\\Controllers\\PaymentController@upload",
     "uri": "api/v1/payments/{payment}/upload",
@@ -2127,8 +2136,8 @@
       "POST"
     ]
   },
-  "api.generated::DH2U07gfXC2fJF8A": {
-    "name": "api.generated::DH2U07gfXC2fJF8A",
+  "api.generated::2JJzL0YtVMq5kVbY": {
+    "name": "api.generated::2JJzL0YtVMq5kVbY",
     "domain": null,
     "action": "App\\Http\\Controllers\\ProductController@upload",
     "uri": "api/v1/products/{product}/upload",
@@ -2299,8 +2308,8 @@
       "POST"
     ]
   },
-  "api.generated::FRRe3e5ToXKR8TzQ": {
-    "name": "api.generated::FRRe3e5ToXKR8TzQ",
+  "api.generated::Dp4BQH3gf2TVW4TG": {
+    "name": "api.generated::Dp4BQH3gf2TVW4TG",
     "domain": null,
     "action": "App\\Http\\Controllers\\PurchaseOrderController@upload",
     "uri": "api/v1/purchase_orders/{purchase_order}/upload",
@@ -2415,8 +2424,8 @@
       "POST"
     ]
   },
-  "api.generated::xykBtsm9tNrrpVZS": {
-    "name": "api.generated::xykBtsm9tNrrpVZS",
+  "api.generated::2vVcLu6xi2SOGbZz": {
+    "name": "api.generated::2vVcLu6xi2SOGbZz",
     "domain": null,
     "action": "App\\Http\\Controllers\\QuoteController@upload",
     "uri": "api/v1/quotes/{quote}/upload",
@@ -2511,8 +2520,8 @@
       "POST"
     ]
   },
-  "api.generated::QtWBtE5coePWEkRQ": {
-    "name": "api.generated::QtWBtE5coePWEkRQ",
+  "api.generated::ECXayTJHSxOCAH13": {
+    "name": "api.generated::ECXayTJHSxOCAH13",
     "domain": null,
     "action": "App\\Http\\Controllers\\RecurringExpenseController@upload",
     "uri": "api/v1/recurring_expenses/{recurring_expense}/upload",
@@ -2597,8 +2606,8 @@
       "POST"
     ]
   },
-  "api.generated::fihLgQbJMRiLlCcf": {
-    "name": "api.generated::fihLgQbJMRiLlCcf",
+  "api.generated::2j16PnZqcVGPcrD1": {
+    "name": "api.generated::2j16PnZqcVGPcrD1",
     "domain": null,
     "action": "App\\Http\\Controllers\\RecurringInvoiceController@upload",
     "uri": "api/v1/recurring_invoices/{recurring_invoice}/upload",
@@ -2683,8 +2692,8 @@
       "POST"
     ]
   },
-  "api.generated::9kp3yEZvFH07hggq": {
-    "name": "api.generated::9kp3yEZvFH07hggq",
+  "api.generated::YdnBTqoaEi71d5jg": {
+    "name": "api.generated::YdnBTqoaEi71d5jg",
     "domain": null,
     "action": "App\\Http\\Controllers\\RecurringQuoteController@upload",
     "uri": "api/v1/recurring_quotes/{recurring_quote}/upload",
@@ -2692,8 +2701,8 @@
       "PUT"
     ]
   },
-  "api.generated::UXJcFXLyFP0eDcPq": {
-    "name": "api.generated::UXJcFXLyFP0eDcPq",
+  "api.generated::o7murA1wcBY2caPY": {
+    "name": "api.generated::o7murA1wcBY2caPY",
     "domain": null,
     "action": "App\\Http\\Controllers\\Auth\\LoginController@refresh",
     "uri": "api/v1/refresh",
@@ -2701,8 +2710,8 @@
       "POST"
     ]
   },
-  "api.generated::1EgHwNPczRIKU64a": {
-    "name": "api.generated::1EgHwNPczRIKU64a",
+  "api.generated::HCC6EtM5ym1v8Js7": {
+    "name": "api.generated::HCC6EtM5ym1v8Js7",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\ClientReportController",
     "uri": "api/v1/reports/clients",
@@ -2710,8 +2719,8 @@
       "POST"
     ]
   },
-  "api.generated::xr1Ozz0vPlXdgn5v": {
-    "name": "api.generated::xr1Ozz0vPlXdgn5v",
+  "api.generated::YqWzWdzntKjt3b4n": {
+    "name": "api.generated::YqWzWdzntKjt3b4n",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\ClientContactReportController",
     "uri": "api/v1/reports/contacts",
@@ -2719,8 +2728,8 @@
       "POST"
     ]
   },
-  "api.generated::Vj78TPJKvfZ1Kjbs": {
-    "name": "api.generated::Vj78TPJKvfZ1Kjbs",
+  "api.generated::mhT70m9ceWVwkVOP": {
+    "name": "api.generated::mhT70m9ceWVwkVOP",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\CreditReportController",
     "uri": "api/v1/reports/credits",
@@ -2728,8 +2737,8 @@
       "POST"
     ]
   },
-  "api.generated::Ukm6MdxG36lz85m8": {
-    "name": "api.generated::Ukm6MdxG36lz85m8",
+  "api.generated::47IFNQpp42hwArtb": {
+    "name": "api.generated::47IFNQpp42hwArtb",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\DocumentReportController",
     "uri": "api/v1/reports/documents",
@@ -2737,8 +2746,8 @@
       "POST"
     ]
   },
-  "api.generated::xeGsy4HGVfWmLXzS": {
-    "name": "api.generated::xeGsy4HGVfWmLXzS",
+  "api.generated::Q3iOwuXtLaCK1y4G": {
+    "name": "api.generated::Q3iOwuXtLaCK1y4G",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\ExpenseReportController",
     "uri": "api/v1/reports/expenses",
@@ -2746,8 +2755,8 @@
       "POST"
     ]
   },
-  "api.generated::UZ4kCKLyMUGpotjr": {
-    "name": "api.generated::UZ4kCKLyMUGpotjr",
+  "api.generated::AJA04lD1BPZ818QZ": {
+    "name": "api.generated::AJA04lD1BPZ818QZ",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\InvoiceReportController",
     "uri": "api/v1/reports/invoices",
@@ -2755,8 +2764,8 @@
       "POST"
     ]
   },
-  "api.generated::FNb6VjLMKGzfUbFf": {
-    "name": "api.generated::FNb6VjLMKGzfUbFf",
+  "api.generated::y6uBYkwVDFevZgI6": {
+    "name": "api.generated::y6uBYkwVDFevZgI6",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\InvoiceItemReportController",
     "uri": "api/v1/reports/invoice_items",
@@ -2764,8 +2773,8 @@
       "POST"
     ]
   },
-  "api.generated::I0HDnHslCugFPzIq": {
-    "name": "api.generated::I0HDnHslCugFPzIq",
+  "api.generated::7OIKcStd9nq6y6S0": {
+    "name": "api.generated::7OIKcStd9nq6y6S0",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\QuoteReportController",
     "uri": "api/v1/reports/quotes",
@@ -2773,8 +2782,8 @@
       "POST"
     ]
   },
-  "api.generated::VzDpeYGVm0JQHzEl": {
-    "name": "api.generated::VzDpeYGVm0JQHzEl",
+  "api.generated::nwfbXeHJ85uvxjsW": {
+    "name": "api.generated::nwfbXeHJ85uvxjsW",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\QuoteItemReportController",
     "uri": "api/v1/reports/quote_items",
@@ -2782,8 +2791,8 @@
       "POST"
     ]
   },
-  "api.generated::CxnnFo9Af4EdAZxF": {
-    "name": "api.generated::CxnnFo9Af4EdAZxF",
+  "api.generated::4JicWfkjKmC2zXkj": {
+    "name": "api.generated::4JicWfkjKmC2zXkj",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\RecurringInvoiceReportController",
     "uri": "api/v1/reports/recurring_invoices",
@@ -2791,8 +2800,8 @@
       "POST"
     ]
   },
-  "api.generated::tDchnoCNqygMLdD4": {
-    "name": "api.generated::tDchnoCNqygMLdD4",
+  "api.generated::4wkA2zGbOmA3qis5": {
+    "name": "api.generated::4wkA2zGbOmA3qis5",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\PaymentReportController",
     "uri": "api/v1/reports/payments",
@@ -2800,8 +2809,8 @@
       "POST"
     ]
   },
-  "api.generated::V6NKGZ40HiwSNIME": {
-    "name": "api.generated::V6NKGZ40HiwSNIME",
+  "api.generated::xVrvZ9ewTkgKmaoS": {
+    "name": "api.generated::xVrvZ9ewTkgKmaoS",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\ProductReportController",
     "uri": "api/v1/reports/products",
@@ -2809,8 +2818,8 @@
       "POST"
     ]
   },
-  "api.generated::ysxp85Ae9kPbBlvB": {
-    "name": "api.generated::ysxp85Ae9kPbBlvB",
+  "api.generated::RaxI7psKG0bitaCL": {
+    "name": "api.generated::RaxI7psKG0bitaCL",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\ProductSalesReportController",
     "uri": "api/v1/reports/product_sales",
@@ -2818,8 +2827,8 @@
       "POST"
     ]
   },
-  "api.generated::v09ahXVLGLjqMc7I": {
-    "name": "api.generated::v09ahXVLGLjqMc7I",
+  "api.generated::3KDEnCBTc1srOvIH": {
+    "name": "api.generated::3KDEnCBTc1srOvIH",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\TaskReportController",
     "uri": "api/v1/reports/tasks",
@@ -2827,8 +2836,8 @@
       "POST"
     ]
   },
-  "api.generated::zxNa0Fjha2JiMSO9": {
-    "name": "api.generated::zxNa0Fjha2JiMSO9",
+  "api.generated::9xlnTEHrN0Zlra31": {
+    "name": "api.generated::9xlnTEHrN0Zlra31",
     "domain": null,
     "action": "App\\Http\\Controllers\\Reports\\ProfitAndLossController",
     "uri": "api/v1/reports/profitloss",
@@ -2913,8 +2922,8 @@
       "POST"
     ]
   },
-  "api.generated::CqQYJuTjXxqI0N0y": {
-    "name": "api.generated::CqQYJuTjXxqI0N0y",
+  "api.generated::CEG5gZTMbIAmDvAl": {
+    "name": "api.generated::CEG5gZTMbIAmDvAl",
     "domain": null,
     "action": "App\\Http\\Controllers\\SchedulerController@index",
     "uri": "api/v1/scheduler",
@@ -2923,8 +2932,8 @@
       "HEAD"
     ]
   },
-  "api.generated::tAKhoC6yZ3ChYtiK": {
-    "name": "api.generated::tAKhoC6yZ3ChYtiK",
+  "api.generated::taZH3mpGk9SoDmoU": {
+    "name": "api.generated::taZH3mpGk9SoDmoU",
     "domain": null,
     "action": "App\\Http\\Controllers\\Support\\Messages\\SendingController",
     "uri": "api/v1/support/messages/send",
@@ -2932,8 +2941,8 @@
       "POST"
     ]
   },
-  "api.generated::Njqn78yYjJGvmX0y": {
-    "name": "api.generated::Njqn78yYjJGvmX0y",
+  "api.generated::Br6u4wwt1RueMplw": {
+    "name": "api.generated::Br6u4wwt1RueMplw",
     "domain": null,
     "action": "App\\Http\\Controllers\\SelfUpdateController@update",
     "uri": "api/v1/self-update",
@@ -2941,8 +2950,8 @@
       "POST"
     ]
   },
-  "api.generated::cXnwkp2th6W3f332": {
-    "name": "api.generated::cXnwkp2th6W3f332",
+  "api.generated::RAbectcGOeAlPanj": {
+    "name": "api.generated::RAbectcGOeAlPanj",
     "domain": null,
     "action": "App\\Http\\Controllers\\SelfUpdateController@checkVersion",
     "uri": "api/v1/self-update/check_version",
@@ -3095,8 +3104,8 @@
       "POST"
     ]
   },
-  "api.generated::CzIPyK9bctiZ2kre": {
-    "name": "api.generated::CzIPyK9bctiZ2kre",
+  "api.generated::AqvDN7npPWhCxZqw": {
+    "name": "api.generated::AqvDN7npPWhCxZqw",
     "domain": null,
     "action": "App\\Http\\Controllers\\TaskController@upload",
     "uri": "api/v1/tasks/{task}/upload",
@@ -3104,8 +3113,8 @@
       "PUT"
     ]
   },
-  "api.generated::WsD7DZAXcVCRebnD": {
-    "name": "api.generated::WsD7DZAXcVCRebnD",
+  "api.generated::BDsXoSD6saDMyrZa": {
+    "name": "api.generated::BDsXoSD6saDMyrZa",
     "domain": null,
     "action": "App\\Http\\Controllers\\TaskController@sort",
     "uri": "api/v1/tasks/sort",
@@ -3353,8 +3362,8 @@
       "POST"
     ]
   },
-  "api.generated::5F8psNW4tgBliQKp": {
-    "name": "api.generated::5F8psNW4tgBliQKp",
+  "api.generated::uEBS9L5BKXDbvpQw": {
+    "name": "api.generated::uEBS9L5BKXDbvpQw",
     "domain": null,
     "action": "App\\Http\\Controllers\\TwoFactorController@setupTwoFactor",
     "uri": "api/v1/settings/enable_two_factor",
@@ -3363,8 +3372,8 @@
       "HEAD"
     ]
   },
-  "api.generated::numU1oTJ77ywzjz7": {
-    "name": "api.generated::numU1oTJ77ywzjz7",
+  "api.generated::H580tyTCwGCzxUri": {
+    "name": "api.generated::H580tyTCwGCzxUri",
     "domain": null,
     "action": "App\\Http\\Controllers\\TwoFactorController@enableTwoFactor",
     "uri": "api/v1/settings/enable_two_factor",
@@ -3372,8 +3381,8 @@
       "POST"
     ]
   },
-  "api.generated::JTyFrmsuyZcL5mFg": {
-    "name": "api.generated::JTyFrmsuyZcL5mFg",
+  "api.generated::MlT0fiZW42jtF1O3": {
+    "name": "api.generated::MlT0fiZW42jtF1O3",
     "domain": null,
     "action": "App\\Http\\Controllers\\TwoFactorController@disableTwoFactor",
     "uri": "api/v1/settings/disable_two_factor",
@@ -3476,8 +3485,8 @@
       "POST"
     ]
   },
-  "api.generated::mhRrJyNsS8qflOvt": {
-    "name": "api.generated::mhRrJyNsS8qflOvt",
+  "api.generated::hoxFNiH72VGtqFG3": {
+    "name": "api.generated::hoxFNiH72VGtqFG3",
     "domain": null,
     "action": "App\\Http\\Controllers\\VendorController@upload",
     "uri": "api/v1/vendors/{vendor}/upload",
@@ -3485,8 +3494,8 @@
       "PUT"
     ]
   },
-  "api.generated::iHeTlsHSBvc8QUl2": {
-    "name": "api.generated::iHeTlsHSBvc8QUl2",
+  "api.generated::kATgors3hlGQsbDf": {
+    "name": "api.generated::kATgors3hlGQsbDf",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@index",
     "uri": "api/v1/users",
@@ -3495,8 +3504,8 @@
       "HEAD"
     ]
   },
-  "api.generated::r5IFdxDgANfm8Pfv": {
-    "name": "api.generated::r5IFdxDgANfm8Pfv",
+  "api.generated::JoR0nhji7dbJGT5x": {
+    "name": "api.generated::JoR0nhji7dbJGT5x",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@create",
     "uri": "api/v1/users/create",
@@ -3505,8 +3514,8 @@
       "HEAD"
     ]
   },
-  "api.generated::OoPzNCnPak5mBRiN": {
-    "name": "api.generated::OoPzNCnPak5mBRiN",
+  "api.generated::5tlI92rqtTHXSexC": {
+    "name": "api.generated::5tlI92rqtTHXSexC",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@show",
     "uri": "api/v1/users/{user}",
@@ -3515,8 +3524,8 @@
       "HEAD"
     ]
   },
-  "api.generated::K8njQsVfRFu2fD8q": {
-    "name": "api.generated::K8njQsVfRFu2fD8q",
+  "api.generated::DGD5X99uRJEnk084": {
+    "name": "api.generated::DGD5X99uRJEnk084",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@update",
     "uri": "api/v1/users/{user}",
@@ -3524,8 +3533,8 @@
       "PUT"
     ]
   },
-  "api.generated::IWF3MIMmtwiOAqIX": {
-    "name": "api.generated::IWF3MIMmtwiOAqIX",
+  "api.generated::4iLyRoxHpb5fjt5r": {
+    "name": "api.generated::4iLyRoxHpb5fjt5r",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@store",
     "uri": "api/v1/users",
@@ -3533,8 +3542,8 @@
       "POST"
     ]
   },
-  "api.generated::w3TusGgioIOwpEwp": {
-    "name": "api.generated::w3TusGgioIOwpEwp",
+  "api.generated::CIXZw2YgkpTLub6h": {
+    "name": "api.generated::CIXZw2YgkpTLub6h",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@detach",
     "uri": "api/v1/users/{user}/detach_from_company",
@@ -3551,8 +3560,8 @@
       "POST"
     ]
   },
-  "api.generated::wx7oIo2t2NqApI4Y": {
-    "name": "api.generated::wx7oIo2t2NqApI4Y",
+  "api.generated::2KO4I37jD7Aj3ASt": {
+    "name": "api.generated::2KO4I37jD7Aj3ASt",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@invite",
     "uri": "api/v1/users/{user}/invite",
@@ -3560,8 +3569,8 @@
       "POST"
     ]
   },
-  "api.generated::EJ4RQTlsSfcxpakf": {
-    "name": "api.generated::EJ4RQTlsSfcxpakf",
+  "api.generated::stSdcbEyJB1wFQRH": {
+    "name": "api.generated::stSdcbEyJB1wFQRH",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@reconfirm",
     "uri": "api/v1/user/{user}/reconfirm",
@@ -3759,8 +3768,8 @@
       "POST"
     ]
   },
-  "api.generated::OgFxwnB4UDDUHOVA": {
-    "name": "api.generated::OgFxwnB4UDDUHOVA",
+  "api.generated::iObAQBlTF82Ul1vS": {
+    "name": "api.generated::iObAQBlTF82Ul1vS",
     "domain": null,
     "action": "App\\Http\\Controllers\\StaticController",
     "uri": "api/v1/statics",
@@ -3809,8 +3818,8 @@
       "HEAD"
     ]
   },
-  "generated::4jDCwtq9RZID899C": {
-    "name": "generated::4jDCwtq9RZID899C",
+  "generated::WTjxaFbxKXHAM5CI": {
+    "name": "generated::WTjxaFbxKXHAM5CI",
     "domain": null,
     "action": "App\\Http\\Controllers\\PostMarkController@webhook",
     "uri": "api/v1/postmark_webhook",
@@ -3818,8 +3827,8 @@
       "POST"
     ]
   },
-  "generated::xbH64tE1hcfrv4hm": {
-    "name": "generated::xbH64tE1hcfrv4hm",
+  "generated::mIgEkEl7uoTEK0WQ": {
+    "name": "generated::mIgEkEl7uoTEK0WQ",
     "domain": null,
     "action": "App\\Http\\Controllers\\OneTimeTokenController@router",
     "uri": "token_hash_router",
@@ -3828,8 +3837,8 @@
       "HEAD"
     ]
   },
-  "generated::F0e3meo4BBqwwQPm": {
-    "name": "generated::F0e3meo4BBqwwQPm",
+  "generated::NLdYWarsA71AcNM4": {
+    "name": "generated::NLdYWarsA71AcNM4",
     "domain": null,
     "action": "App\\Http\\Controllers\\WebCronController@index",
     "uri": "webcron",
@@ -3838,8 +3847,8 @@
       "HEAD"
     ]
   },
-  "generated::Az7dUZcLqUN37UFH": {
-    "name": "generated::Az7dUZcLqUN37UFH",
+  "generated::m3vEcSBlzwCUFaWP": {
+    "name": "generated::m3vEcSBlzwCUFaWP",
     "domain": null,
     "action": "App\\Http\\Controllers\\HostedMigrationController@getAccount",
     "uri": "api/v1/get_migration_account",
@@ -3847,8 +3856,8 @@
       "POST"
     ]
   },
-  "generated::kBFjYNVLCyYWz2Dk": {
-    "name": "generated::kBFjYNVLCyYWz2Dk",
+  "generated::rW6kh4RWUXWLXbgB": {
+    "name": "generated::rW6kh4RWUXWLXbgB",
     "domain": null,
     "action": "App\\Http\\Controllers\\HostedMigrationController@confirmForwarding",
     "uri": "api/v1/confirm_forwarding",
@@ -3856,8 +3865,8 @@
       "POST"
     ]
   },
-  "generated::xXywAAINKFcV2Uan": {
-    "name": "generated::xXywAAINKFcV2Uan",
+  "generated::hDrynM0BxTUPcQ6l": {
+    "name": "generated::hDrynM0BxTUPcQ6l",
     "domain": null,
     "action": "App\\Http\\Controllers\\InAppPurchase\\AppleController@process_webhook",
     "uri": "api/v1/process_webhook",
@@ -3865,8 +3874,8 @@
       "POST"
     ]
   },
-  "generated::S4N7QDie9lTj9Qs7": {
-    "name": "generated::S4N7QDie9lTj9Qs7",
+  "generated::wr6CwEif96itJtkG": {
+    "name": "generated::wr6CwEif96itJtkG",
     "domain": null,
     "action": "App\\Http\\Controllers\\InAppPurchase\\AppleController@confirm_purchase",
     "uri": "api/v1/confirm_purchase",
@@ -3874,8 +3883,8 @@
       "POST"
     ]
   },
-  "generated::4lAmmJb85Vq2JS1H": {
-    "name": "generated::4lAmmJb85Vq2JS1H",
+  "generated::gQkkJnMUETgFjnS2": {
+    "name": "generated::gQkkJnMUETgFjnS2",
     "domain": null,
     "action": "App\\Http\\Controllers\\Bank\\YodleeController@refreshWebhook",
     "uri": "api/v1/yodlee/refresh",
@@ -3883,8 +3892,8 @@
       "POST"
     ]
   },
-  "generated::A0JmbHLalcwDt14e": {
-    "name": "generated::A0JmbHLalcwDt14e",
+  "generated::eF7vpbPhpHVtLdUf": {
+    "name": "generated::eF7vpbPhpHVtLdUf",
     "domain": null,
     "action": "App\\Http\\Controllers\\Bank\\YodleeController@dataUpdatesWebhook",
     "uri": "api/v1/yodlee/data_updates",
@@ -3892,8 +3901,8 @@
       "POST"
     ]
   },
-  "generated::HC8m9NQ4L0D938Ed": {
-    "name": "generated::HC8m9NQ4L0D938Ed",
+  "generated::Cht41Y7rdxJtngdS": {
+    "name": "generated::Cht41Y7rdxJtngdS",
     "domain": null,
     "action": "App\\Http\\Controllers\\Bank\\YodleeController@refreshUpdatesWebhook",
     "uri": "api/v1/yodlee/refresh_updates",
@@ -3901,8 +3910,8 @@
       "POST"
     ]
   },
-  "generated::nqtdv0BmmfGpdKuF": {
-    "name": "generated::nqtdv0BmmfGpdKuF",
+  "generated::FLLTvPqP9buAqNKT": {
+    "name": "generated::FLLTvPqP9buAqNKT",
     "domain": null,
     "action": "App\\Http\\Controllers\\Bank\\YodleeController@balanceWebhook",
     "uri": "api/v1/yodlee/balance",
@@ -3910,8 +3919,8 @@
       "POST"
     ]
   },
-  "generated::spyxazsXktbv5nOs": {
-    "name": "generated::spyxazsXktbv5nOs",
+  "generated::HRVOYFQSUJCaiOq3": {
+    "name": "generated::HRVOYFQSUJCaiOq3",
     "domain": null,
     "action": "App\\Http\\Controllers\\BaseController@notFoundClient",
     "uri": "{fallbackPlaceholder}",
@@ -3920,8 +3929,8 @@
       "HEAD"
     ]
   },
-  "generated::bF8WcnpfZpbhbbkA": {
-    "name": "generated::bF8WcnpfZpbhbbkA",
+  "generated::RSBnetuUcWtZzYIC": {
+    "name": "generated::RSBnetuUcWtZzYIC",
     "domain": null,
     "action": "App\\Http\\Controllers\\BaseController@flutterRoute",
     "uri": "/",
@@ -3930,8 +3939,8 @@
       "HEAD"
     ]
   },
-  "generated::ecOcADO3tabQyhRB": {
-    "name": "generated::ecOcADO3tabQyhRB",
+  "generated::hJedyNCvgnbqLLAi": {
+    "name": "generated::hJedyNCvgnbqLLAi",
     "domain": null,
     "action": "App\\Http\\Controllers\\SetupController@index",
     "uri": "setup",
@@ -3940,8 +3949,8 @@
       "HEAD"
     ]
   },
-  "generated::mZDWFOC7mo1MwpSl": {
-    "name": "generated::mZDWFOC7mo1MwpSl",
+  "generated::V0BWt71QhZBwfeZI": {
+    "name": "generated::V0BWt71QhZBwfeZI",
     "domain": null,
     "action": "App\\Http\\Controllers\\SetupController@doSetup",
     "uri": "setup",
@@ -3949,8 +3958,8 @@
       "POST"
     ]
   },
-  "generated::PF514EHyl9u4u4OL": {
-    "name": "generated::PF514EHyl9u4u4OL",
+  "generated::UmSo0pBzMsMOdwJ6": {
+    "name": "generated::UmSo0pBzMsMOdwJ6",
     "domain": null,
     "action": "App\\Http\\Controllers\\SetupController@update",
     "uri": "update",
@@ -3959,8 +3968,8 @@
       "HEAD"
     ]
   },
-  "generated::xcW1bwOAqv0kUUpg": {
-    "name": "generated::xcW1bwOAqv0kUUpg",
+  "generated::CV778E3OckPtRanC": {
+    "name": "generated::CV778E3OckPtRanC",
     "domain": null,
     "action": "App\\Http\\Controllers\\SetupController@checkDB",
     "uri": "setup/check_db",
@@ -3968,8 +3977,8 @@
       "POST"
     ]
   },
-  "generated::BNHKMmzHx6FTpNuJ": {
-    "name": "generated::BNHKMmzHx6FTpNuJ",
+  "generated::ENEMtGlQLn4JrCoK": {
+    "name": "generated::ENEMtGlQLn4JrCoK",
     "domain": null,
     "action": "App\\Http\\Controllers\\SetupController@checkMail",
     "uri": "setup/check_mail",
@@ -3977,8 +3986,8 @@
       "POST"
     ]
   },
-  "generated::Z4f4gHVQuvTS2PvL": {
-    "name": "generated::Z4f4gHVQuvTS2PvL",
+  "generated::Enq9ij0T6uEk5V0d": {
+    "name": "generated::Enq9ij0T6uEk5V0d",
     "domain": null,
     "action": "App\\Http\\Controllers\\SetupController@checkPdf",
     "uri": "setup/check_pdf",
@@ -4044,8 +4053,8 @@
       "HEAD"
     ]
   },
-  "generated::nWWw54Bz32uDU73y": {
-    "name": "generated::nWWw54Bz32uDU73y",
+  "generated::U3p0yhBmwGjIiHVQ": {
+    "name": "generated::U3p0yhBmwGjIiHVQ",
     "domain": null,
     "action": "App\\Http\\Controllers\\Auth\\LoginController@redirectToProvider",
     "uri": "auth/{provider}",
@@ -4054,8 +4063,8 @@
       "HEAD"
     ]
   },
-  "generated::VPYo2z9LjzmGyrAr": {
-    "name": "generated::VPYo2z9LjzmGyrAr",
+  "generated::xHyAiJeinu1YTwi1": {
+    "name": "generated::xHyAiJeinu1YTwi1",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@confirm",
     "uri": "user/confirm/{confirmation_code}",
@@ -4064,8 +4073,8 @@
       "HEAD"
     ]
   },
-  "generated::DZ1E4NWn9DeAKTmq": {
-    "name": "generated::DZ1E4NWn9DeAKTmq",
+  "generated::ItIiI2hxHWWppRir": {
+    "name": "generated::ItIiI2hxHWWppRir",
     "domain": null,
     "action": "App\\Http\\Controllers\\UserController@confirmWithPassword",
     "uri": "user/confirm/{confirmation_code}",
@@ -4133,8 +4142,8 @@
       "HEAD"
     ]
   },
-  "generated::5kIlSr2tGj8fe8Xv": {
-    "name": "generated::5kIlSr2tGj8fe8Xv",
+  "generated::JbyQcSqKX4G3xZGn": {
+    "name": "generated::JbyQcSqKX4G3xZGn",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\ApplePayDomainController@showAppleMerchantId",
     "uri": ".well-known/apple-developer-merchantid-domain-association",
@@ -4143,8 +4152,8 @@
       "HEAD"
     ]
   },
-  "generated::PNW7F8OYShGQRz3Q": {
-    "name": "generated::PNW7F8OYShGQRz3Q",
+  "generated::WWPcvjQiUL9HwcIm": {
+    "name": "generated::WWPcvjQiUL9HwcIm",
     "domain": null,
     "action": "App\\Http\\Controllers\\Contact\\LoginController@apiLogin",
     "uri": "api/v1/contact/login",
@@ -4192,8 +4201,8 @@
       "HEAD"
     ]
   },
-  "vendor.generated::NwLUmJ8Z7uDQAYi4": {
-    "name": "vendor.generated::NwLUmJ8Z7uDQAYi4",
+  "vendor.generated::u5tw4d3POrgqvAaO": {
+    "name": "vendor.generated::u5tw4d3POrgqvAaO",
     "domain": null,
     "action": "App\\Http\\Controllers\\VendorPortal\\InvitationController@download",
     "uri": "vendor/purchase_order/{invitation_key}/download",
@@ -4367,8 +4376,8 @@
       "HEAD"
     ]
   },
-  "generated::1treHbNadtYbt8l5": {
-    "name": "generated::1treHbNadtYbt8l5",
+  "generated::8FDB9ysUyYQKiovU": {
+    "name": "generated::8FDB9ysUyYQKiovU",
     "domain": null,
     "action": "App\\Http\\Controllers\\Auth\\ContactRegisterController@register",
     "uri": "client/register/{company_key?}",
@@ -4434,8 +4443,8 @@
       "HEAD"
     ]
   },
-  "generated::YaZCrI8ELO78h3ik": {
-    "name": "generated::YaZCrI8ELO78h3ik",
+  "generated::HVoER8YfmhHqgJp6": {
+    "name": "generated::HVoER8YfmhHqgJp6",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\EntityViewController@handlePassword",
     "uri": "view/{entity_type}/{invitation_key}/password",
@@ -4502,8 +4511,8 @@
       "HEAD"
     ]
   },
-  "generated::8AGcFJVqXoCVp8vF": {
-    "name": "generated::8AGcFJVqXoCVp8vF",
+  "generated::0SWjaO7Vnb8rdj7e": {
+    "name": "generated::0SWjaO7Vnb8rdj7e",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\InvitationController@paymentRouter",
     "uri": "client/payment/{contact_key}/{payment_id}",
@@ -5048,8 +5057,8 @@
       "HEAD"
     ]
   },
-  "client.generated::H8hCyNDzwMF60PJs": {
-    "name": "client.generated::H8hCyNDzwMF60PJs",
+  "client.generated::2YYZ7UW6tnJzcZWR": {
+    "name": "client.generated::2YYZ7UW6tnJzcZWR",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\InvitationController@recurringRouter",
     "uri": "client/recurring_invoice/{invitation_key}",
@@ -5058,8 +5067,8 @@
       "HEAD"
     ]
   },
-  "client.generated::uZMvsHShteWNNF2k": {
-    "name": "client.generated::uZMvsHShteWNNF2k",
+  "client.generated::QAlm7THOQGdT9ENG": {
+    "name": "client.generated::QAlm7THOQGdT9ENG",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\InvitationController@invoiceRouter",
     "uri": "client/invoice/{invitation_key}",
@@ -5068,8 +5077,8 @@
       "HEAD"
     ]
   },
-  "client.generated::CS1U71QvDjdE9QU2": {
-    "name": "client.generated::CS1U71QvDjdE9QU2",
+  "client.generated::Y4CsqcpbZENychYU": {
+    "name": "client.generated::Y4CsqcpbZENychYU",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\InvitationController@quoteRouter",
     "uri": "client/quote/{invitation_key}",
@@ -5078,8 +5087,8 @@
       "HEAD"
     ]
   },
-  "client.generated::mEmCvZlhZjOtKBro": {
-    "name": "client.generated::mEmCvZlhZjOtKBro",
+  "client.generated::5ewhX6rvXPKl7iPA": {
+    "name": "client.generated::5ewhX6rvXPKl7iPA",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\InvitationController@creditRouter",
     "uri": "client/credit/{invitation_key}",
@@ -5128,8 +5137,8 @@
       "HEAD"
     ]
   },
-  "client.generated::dFh8YyI3NF90jeA7": {
-    "name": "client.generated::dFh8YyI3NF90jeA7",
+  "client.generated::AxY7KFvsyZBvp3S9": {
+    "name": "client.generated::AxY7KFvsyZBvp3S9",
     "domain": null,
     "action": "App\\Http\\Controllers\\ClientPortal\\InvitationController@routerForDownload",
     "uri": "client/{entity}/{invitation_key}/download",
@@ -5168,8 +5177,8 @@
       "HEAD"
     ]
   },
-  "generated::DX2GaT7Q2aij92cd": {
-    "name": "generated::DX2GaT7Q2aij92cd",
+  "generated::mEfAF7QUQ9rZtcPf": {
+    "name": "generated::mEfAF7QUQ9rZtcPf",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\ProductController@index",
     "uri": "api/v1/shop/products",
@@ -5178,8 +5187,8 @@
       "HEAD"
     ]
   },
-  "generated::iJde93wQL6YxqVFK": {
-    "name": "generated::iJde93wQL6YxqVFK",
+  "generated::DYqiaFmnV3JPWRu0": {
+    "name": "generated::DYqiaFmnV3JPWRu0",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\ClientController@store",
     "uri": "api/v1/shop/clients",
@@ -5187,8 +5196,8 @@
       "POST"
     ]
   },
-  "generated::na3kmJrHWqOlbohO": {
-    "name": "generated::na3kmJrHWqOlbohO",
+  "generated::aJ0N8aRUSn3AgZnw": {
+    "name": "generated::aJ0N8aRUSn3AgZnw",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\InvoiceController@store",
     "uri": "api/v1/shop/invoices",
@@ -5196,8 +5205,8 @@
       "POST"
     ]
   },
-  "generated::7P1ePmtaqydcKOBA": {
-    "name": "generated::7P1ePmtaqydcKOBA",
+  "generated::g3pRQcxekTZPZrVY": {
+    "name": "generated::g3pRQcxekTZPZrVY",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\ClientController@show",
     "uri": "api/v1/shop/client/{contact_key}",
@@ -5206,8 +5215,8 @@
       "HEAD"
     ]
   },
-  "generated::lAwZhvjZalRR5aZf": {
-    "name": "generated::lAwZhvjZalRR5aZf",
+  "generated::IWTGtVrwwFbHRLsZ": {
+    "name": "generated::IWTGtVrwwFbHRLsZ",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\InvoiceController@show",
     "uri": "api/v1/shop/invoice/{invitation_key}",
@@ -5216,8 +5225,8 @@
       "HEAD"
     ]
   },
-  "generated::WE9qPq1BvsH3USKi": {
-    "name": "generated::WE9qPq1BvsH3USKi",
+  "generated::lrG71taYCkOEqHWD": {
+    "name": "generated::lrG71taYCkOEqHWD",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\ProductController@show",
     "uri": "api/v1/shop/product/{product_key}",
@@ -5226,8 +5235,8 @@
       "HEAD"
     ]
   },
-  "generated::90IHZXAOxuwPCLe4": {
-    "name": "generated::90IHZXAOxuwPCLe4",
+  "generated::NGdJyuqHVtepLxpL": {
+    "name": "generated::NGdJyuqHVtepLxpL",
     "domain": null,
     "action": "App\\Http\\Controllers\\Shop\\ProfileController@show",
     "uri": "api/v1/shop/profile",
@@ -5263,6 +5272,15 @@
       "POST"
     ]
   },
+  "generated::9CE1CZ5Uvxx43YHV": {
+    "name": "generated::9CE1CZ5Uvxx43YHV",
+    "domain": null,
+    "action": "Modules\\Admin\\Http\\Controllers\\LicenseController@check",
+    "uri": "api/check",
+    "method": [
+      "POST"
+    ]
+  },
   "admin.login": {
     "name": "admin.login",
     "domain": null,
@@ -5273,8 +5291,8 @@
       "HEAD"
     ]
   },
-  "generated::NwYLFBGVXwLgzKI9": {
-    "name": "generated::NwYLFBGVXwLgzKI9",
+  "generated::wiGRflXsPw5RSGlQ": {
+    "name": "generated::wiGRflXsPw5RSGlQ",
     "domain": null,
     "action": "Modules\\Admin\\Http\\Controllers\\LoginController@login",
     "uri": "admin/login",
@@ -5615,8 +5633,8 @@
       "HEAD"
     ]
   },
-  "generated::XoLRi9FKg3P30e96": {
-    "name": "generated::XoLRi9FKg3P30e96",
+  "generated::EJ0XzKrjLpJ0htQa": {
+    "name": "generated::EJ0XzKrjLpJ0htQa",
     "domain": null,
     "action": "Modules\\Admin\\Http\\Controllers\\OnboardingController@unsubscribe",
     "uri": "onboarding/unsubscribe/{account_key}",
@@ -5625,8 +5643,8 @@
       "HEAD"
     ]
   },
-  "generated::vGh9ZOZ5qs8bCl4v": {
-    "name": "generated::vGh9ZOZ5qs8bCl4v",
+  "generated::4bDNpu9haEYGAV0l": {
+    "name": "generated::4bDNpu9haEYGAV0l",
     "domain": null,
     "action": "Modules\\Admin\\Http\\Controllers\\CertificateController@index",
     "uri": ".well-known/acme-challenge/{challenge_token}",

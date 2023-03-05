@@ -11,37 +11,41 @@
 
 namespace Database\Seeders;
 
-use App\DataMapper\ClientSettings;
-use App\DataMapper\CompanySettings;
-use App\Events\Payment\PaymentWasCreated;
-use App\Helpers\Invoice\InvoiceSum;
-use App\Helpers\Invoice\InvoiceSumInclusive;
-use App\Models\Account;
+use App\Models\User;
+use App\Utils\Ninja;
+use App\Models\Quote;
 use App\Models\Client;
-use App\Models\ClientContact;
-use App\Models\Company;
-use App\Models\CompanyGateway;
-use App\Models\CompanyToken;
 use App\Models\Credit;
-use App\Models\GroupSetting;
+use App\Models\Vendor;
+use App\Models\Account;
+use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Product;
 use App\Models\PaymentHash;
 use App\Models\PaymentType;
-use App\Models\Product;
-use App\Models\Quote;
-use App\Models\RecurringInvoice;
-use App\Models\User;
-use App\Repositories\CreditRepository;
-use App\Repositories\InvoiceRepository;
-use App\Repositories\QuoteRepository;
-use App\Utils\Ninja;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use App\Models\CompanyToken;
+use App\Models\GroupSetting;
+use App\Models\ClientContact;
+use App\Models\PurchaseOrder;
+use App\Models\VendorContact;
+use App\Models\CompanyGateway;
+use Illuminate\Database\Seeder;
+use App\Models\RecurringInvoice;
+use App\DataMapper\ClientSettings;
+use App\DataMapper\CompanySettings;
+use App\Helpers\Invoice\InvoiceSum;
+use Illuminate\Support\Facades\Hash;
+use App\Repositories\QuoteRepository;
+use Illuminate\Support\Facades\Cache;
+use App\Repositories\CreditRepository;
+use Illuminate\Support\Facades\Schema;
+use App\Repositories\InvoiceRepository;
+use Illuminate\Database\Eloquent\Model;
+use App\Events\Payment\PaymentWasCreated;
+use App\Helpers\Invoice\InvoiceSumInclusive;
+use App\Repositories\PurchaseOrderRepository;
 
 class RandomDataSeeder extends Seeder
 {
@@ -195,6 +199,27 @@ class RandomDataSeeder extends Seeder
                     'password' => Hash::make('password'),
                 ]);
 
+
+        $vendor = Vendor::factory()->create([
+                'user_id' => $user->id,
+                'company_id' => $company->id,
+                'name' => 'cypress'
+            ]);
+
+        $vendor->number = $vendor->getNextVendorNumber($vendor);
+        $vendor->save();
+        
+        VendorContact::factory()->create([
+                    'user_id' => $user->id,
+                    'vendor_id' => $vendor->id,
+                    'company_id' => $company->id,
+                    'is_primary' => 1,
+                    'email' => 'vendor@example.com',
+                    'password' => Hash::make('password'),
+                ]);
+
+
+
         /* Product Factory */
         Product::factory()->count(2)->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
@@ -249,7 +274,7 @@ class RandomDataSeeder extends Seeder
         });
 
         /*Credits*/
-        Credit::factory()->count(2)->create(['user_id' => $user->id, 'company_id' => $company->id, 'client_id' => $client->id]);
+        Credit::factory()->count(2)->create(['user_id' => $user->id, 'company_id' => $company->id, 'client_id' => $client->id, 'due_date' => now()->addMonth()]);
 
         $credits = Credit::cursor();
         $credit_repo = new CreditRepository();
@@ -296,6 +321,33 @@ class RandomDataSeeder extends Seeder
             $quote->service()->createInvitations()->markSent()->save();
             //$invoice->markSent()->save();
         });
+
+        PurchaseOrder::factory()->create(['user_id' => $user->id, 'company_id' => $company->id, 'vendor_id' => $vendor->id]);
+
+        $purchase_orders = PurchaseOrder::cursor();
+        $purchase_order_repo = new PurchaseOrderRepository();
+
+        $purchase_orders->each(function ($quote) use ($purchase_order_repo, $user, $company, $vendor) {
+            $purchase_order_calc = null;
+
+            if ($quote->uses_inclusive_taxes) {
+                $purchase_order_calc = new InvoiceSumInclusive($quote);
+            } else {
+                $purchase_order_calc = new InvoiceSum($quote);
+            }
+
+            $purchase_order = $purchase_order_calc->build()->getQuote();
+
+            $purchase_order->save();
+
+            //event(new CreateQuoteInvitation($quote));
+            $purchase_order->service()->createInvitations()->markSent()->save();
+            $invite = $purchase_order->invitations->first();
+            $invite->key = "123456";
+            $invite->save();
+            
+        });
+
 
         GroupSetting::create([
             'company_id' => $company->id,

@@ -278,4 +278,21 @@ class PurchaseOrder extends BaseModel
     {
         return ctrans('texts.purchase_order');
     }
+
+    public function base64Pdf($invitation = null): mixed
+    {
+        if (! $invitation) {
+            if ($this->invitations()->exists()) {
+                $invitation = $this->invitations()->first();
+            } else {
+                $this->service()->createInvitations();
+                $invitation = $this->invitations()->first();
+            }
+        }
+
+        $pdf = (new CreatePurchaseOrderPdf($invitation))->rawPdf();
+
+        return base64_encode($pdf);
+
+    }
 }

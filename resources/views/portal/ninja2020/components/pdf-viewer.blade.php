@@ -78,16 +78,16 @@
 
 @if($mobile)
 
-
-@push('head')
-    <meta name="pdf-url" content="data:application/pdf;base64,{!! $entity->base64Pdf($invitation) !!}">
-    <script src="{{ asset('js/vendor/pdf.js/pdf.min.js') }}"></script>
-@endpush
+    @push('head')
+        <meta name="pdf-url" content="data:application/pdf;base64,{!! $entity->base64Pdf($invitation) !!}">
+        <script src="{{ asset('js/vendor/pdf.js/pdf.min.js') }}"></script>
+    @endpush
 
     <div class="w-full h-full overflow-auto mt-4">
         <canvas id="pdf-placeholder" class="shadow rounded-lg bg-white"></canvas>
     </div>
-
+@elseif(isset($url) && $url)
+    <iframe id="pdf-iframe" src="{{ $url }}?cache_buster={{time()}}" class="h-screen w-full border-0 mt-4"></iframe>
 @else
     @livewire('pdf-slot', ['entity' => $entity, 'invitation' => $invitation, 'db' => $invitation->company->db])
 @endif
