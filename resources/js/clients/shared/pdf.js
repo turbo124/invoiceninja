@@ -115,6 +115,7 @@ class PDF {
 
     async handle() {
         let pdf = await pdfjsLib.getDocument(this.url).promise;
+        console.log(this.url)
 
         let page = await pdf.getPage(this.currentPage);
 

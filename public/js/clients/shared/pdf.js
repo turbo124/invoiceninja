@@ -137,18 +137,19 @@ var PDF = /*#__PURE__*/function () {
 
               case 2:
                 pdf = _context.sent;
-                _context.next = 5;
+                console.log(this.url);
+                _context.next = 6;
                 return pdf.getPage(this.currentPage);
 
-              case 5:
+              case 6:
                 page = _context.sent;
                 this.maxPages = pdf.numPages;
-                _context.next = 9;
+                _context.next = 10;
                 return page.getViewport({
                   scale: this.currentScale
                 });
 
-              case 9:
+              case 10:
                 viewport = _context.sent;
                 this.canvas.height = viewport.height;
                 this.canvas.width = viewport.width;
@@ -158,7 +159,7 @@ var PDF = /*#__PURE__*/function () {
                 });
                 this.setPagesInViewport();
 
-              case 14:
+              case 15:
               case "end":
                 return _context.stop();
             }

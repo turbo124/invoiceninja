@@ -11,16 +11,17 @@
 
 namespace App\Models;
 
-use App\DataMapper\ClientSettings;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use App\Utils\Traits\MakesHash;
+use App\Jobs\Entity\CreateRawPdf;
 use App\Jobs\Util\WebhookHandler;
 use App\Models\Traits\Excludable;
-use App\Utils\Traits\MakesHash;
+use App\DataMapper\ClientSettings;
+use Illuminate\Database\Eloquent\Model;
 use App\Utils\Traits\UserSessionAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 /**
  * Class BaseModel
@@ -223,5 +224,27 @@ class BaseModel extends Model
         if ($subscriptions) {
             WebhookHandler::dispatch($event_id, $this, $this->company, $additional_data);
         }
+    }
+    
+    /**
+     * base64Pdf
+     *
+     * @param  mixed $invitation
+     * @return void
+     */
+    public function base64Pdf($invitation = null): mixed
+    {
+        if (! $invitation) {
+            if ($this->invitations()->exists()) {
+                $invitation = $this->invitations()->first();
+            } else {
+                $this->service()->createInvitations();
+                $invitation = $this->invitations()->first();
+            }
+        }
+
+        $file = (new CreateRawPdf($invitation, $invitation->company->db))->handle();
+
+        return base64_encode($file);
     }
 }
