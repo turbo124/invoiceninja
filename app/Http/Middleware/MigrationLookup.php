@@ -21,6 +21,8 @@ class MigrationLookup
 
     private string $silo = 'V4 is now disabled for your account. Please migrate. <a class="btn btn-primary btn-sm" href="/migration/start">Migrate Now</a> Upgrade to v5 and take advantage of our <a class="btn btn-danger btn-sm" href="https://invoicing.co/campaign/black_friday_2022">Black friday promo</a>';
 
+    private string $sunset_for_all = 'Invoice Ninja v4 has now been sunset, please <a class="btn btn-primary btn-sm" href="/migration/start">Migrate Now</a> . If you would like additional support for your migration, please send an email to contact@invoiceninja.com';
+
     public function handle(Request $request, Closure $next, $guard = 'user')
     {
         if (! env('MULTI_DB_ENABLED')) {
@@ -30,7 +32,7 @@ class MigrationLookup
         //need to wrap an additional block over this to funnel users in a particular range
         if(auth()->user()->id >= config('ninja.migration_user_start') && 
            auth()->user()->id <= config('ninja.migration_user_end') && 
-           (!auth()->user()->account->company->plan_expires || Carbon::parse(auth()->user()->account->company->plan_expires)->lt(now())))
+           (!auth()->user()->account->company->plan_expires || Carbon::parse(auth()->user()->account->company->plan_expires)->lt(now()))) //free users
         {
                 if ($guard == 'user') {
                     
@@ -45,9 +47,11 @@ class MigrationLookup
                 return redirect('/settings/account_management')->with('warning',$this->silo);
         }
         elseif(!auth()->user()->account->company->plan_expires || Carbon::parse(auth()->user()->account->company->plan_expires)->lt(now())){
-            session()->flash('warning',$this->migration_notification);
+            session()->flash('warning',$this->migration_notification); //free users
         }
-
+        else {
+            session()->flash('warning',$this->sunset_for_all); //everyone else
+        }
         return $next($request);
     }
 }
