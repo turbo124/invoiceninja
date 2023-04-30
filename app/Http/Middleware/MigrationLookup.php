@@ -49,9 +49,10 @@ class MigrationLookup
         elseif(!auth()->user()->account->company->plan_expires || Carbon::parse(auth()->user()->account->company->plan_expires)->lt(now())){
             session()->flash('warning',$this->migration_notification); //free users
         }
-        else {
+        elseif(auth()->user()->id <= 135945) {
             session()->flash('warning',$this->sunset_for_all); //everyone else
         }
+
         return $next($request);
     }
 }
