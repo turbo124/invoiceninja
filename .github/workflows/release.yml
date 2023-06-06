@@ -54,7 +54,7 @@ jobs:
       - name: Prepare JS/CSS assets
         run: |
           npm i
-          npm run production
+          npm run build
 
       - name: Cleanup Builds
         run: |
