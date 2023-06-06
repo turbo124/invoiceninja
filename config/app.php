@@ -56,7 +56,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'mix_url' => env('MIX_ASSET_URL', env('APP_URL', null)),
+    'mix_url' => env('VITE_ASSET_URL', env('APP_URL', null)),
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
