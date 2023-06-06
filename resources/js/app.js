@@ -4,7 +4,8 @@
  * Promise based HTTP client for the browser and node.js
  * https://github.com/axios/axios
  */
-window.axios = require('axios');
+import axios from 'axios';
+window.axios = axios;
 
 /**
  * card-validator
@@ -12,7 +13,8 @@ window.axios = require('axios');
  * Validate credit cards as users type.
  * https://github.com/braintree/card-validator
  */
-window.valid = require('card-validator');
+import valid from 'card-validator';
+window.valid = valid;
 
 
 /**
