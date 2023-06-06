@@ -59,7 +59,7 @@
         "invoiceninja/inspector": "^1.0",
         "josemmo/facturae-php": "^1.7",
         "laracasts/presenter": "^0.2.1",
-        "laravel/framework": "^9.3",
+        "laravel/framework": "^9.19",
         "laravel/slack-notification-channel": "^2.2",
         "laravel/socialite": "^5",
         "laravel/tinker": "^2.7",
@@ -140,8 +140,7 @@
         }
     },
     "scripts": {
-        "post-install-cmd": [
-        ],
+        "post-install-cmd": [],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
