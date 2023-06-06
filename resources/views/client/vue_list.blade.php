@@ -23,7 +23,7 @@
 
     </main>
 
-    <script defer src=" {{ mix('/js/client_list.min.js') }}"></script>
+    @vite('resources/js/client_list.min.js')
 
 @endsection
 

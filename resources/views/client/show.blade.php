@@ -15,6 +15,6 @@
 
 </main>
 
-<script defer src=" {{ mix('/js/client_show.min.js') }}"></script>
+@vite('resources/js/client_show.min.js')
 
 @endsection

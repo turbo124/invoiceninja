@@ -53,5 +53,5 @@
     var hashed_id = '';
 </script>
 
-<script defer src=" {{ mix('/js/client_create.min.js') }}"></script>
+@vite('resources/js/client_create.min.js')
 @endsection

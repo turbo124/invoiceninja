@@ -16,4 +16,4 @@
 <script>
 </script>
 
-<script defer src=" {{ mix('/js/localization.min.js') }}"></script>
+@vite('resources/js/localization.min.js')

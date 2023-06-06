@@ -68,6 +68,6 @@
 
 </main>
 
-<script src=" {{ mix('/js/client_edit.min.js') }}"></script>
+@vite('resources/js/client_edit.min.js')
 
 @endsection
