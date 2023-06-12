@@ -680,7 +680,7 @@ trait GenerateMigrationResources
                 'deleted_at' => $invoice->deleted_at ? Carbon::parse($invoice->deleted_at)->toDateString() : null,
                 'invitations' => $this->getResourceInvitations($invoice->invitations, 'invoice_id'),
                 'auto_bill_enabled' => $invoice->auto_bill,
-                'recurring_id' => $invoice->recurring_invoice_id,
+                'recurring_id' => $invoice->amount >=0 ? $invoice->recurring_invoice_id : null,
             ];
         }
 
@@ -763,7 +763,7 @@ trait GenerateMigrationResources
         $invoices = [];
 
         $export_invoices = Invoice::where('account_id', $this->account->id)
-            ->where('amount', '>=', 0)
+            // ->where('amount', '>=', 0)
             ->where('is_recurring', true)
             ->withTrashed()
             ->get();       
@@ -1136,10 +1136,10 @@ trait GenerateMigrationResources
                 'message_id' => $invitation->message_id,
                 'email_error' => $invitation->email_error ?: '',
                 'signature_base64' => $invitation->signature_base64,
-                'signature_date' => $invitation->signature_date,
-                'sent_date' => $invitation->sent_date,
-                'viewed_date' => $invitation->viewed_date,
-                'opened_date' => $invitation->opened_date,
+                'signature_date' => $invitation->signature_date ? Carbon::parse($invitation->signature_date)->toDateString() : null,
+                'sent_date' => $invitation->sent_date ? Carbon::parse($invitation->sent_date)->toDateString() : null,
+                'viewed_date' => $invitation->viewed_date ? Carbon::parse($invitation->viewed_date)->toDateString() : null,
+                'opened_date' => $invitation->opened_date ? Carbon::parse($invitation->opened_date)->toDateString() : null,
                 'created_at' => $invitation->created_at ? Carbon::parse($invitation->created_at)->toDateString() : null,
                 'updated_at' => $invitation->updated_at ? Carbon::parse($invitation->updated_at)->toDateString() : null,
                 'deleted_at' => $invitation->deleted_at ? Carbon::parse($invitation->deleted_at)->toDateString() : null,

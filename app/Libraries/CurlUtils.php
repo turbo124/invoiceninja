@@ -51,7 +51,7 @@ class CurlUtils
 
         $client = Client::getInstance();
         $client->isLazy();
-        //$client->getEngine()->addOption("--ignore-ssl-errors=true");
+        $client->getEngine()->addOption("--ignore-ssl-errors=true");
         $client->getEngine()->setPath($path);
 
         $request = $client->getMessageFactory()->createRequest($url, $method);

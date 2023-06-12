@@ -2,26 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Utils;
+use Carbon;
+use Response;
+use App\Models\User;
+use App\Models\Client;
+use App\Models\Account;
+use App\Ninja\OAuth\OAuth;
 use App\Events\UserSignedUp;
+use Illuminate\Http\Request;
+use GuzzleHttp\RequestOptions;
+use App\Models\AccountGatewayToken;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateAccountRequest;
-use App\Models\Company;
-use App\Models\Account;
-use App\Models\User;
-use App\Ninja\OAuth\OAuth;
 use App\Ninja\Repositories\AccountRepository;
 use App\Ninja\Transformers\AccountTransformer;
 use App\Ninja\Transformers\UserAccountTransformer;
-use App\Services\AuthService;
-use Auth;
-use Cache;
-use Carbon;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Response;
-use Socialite;
-use Utils;
 
 class AccountApiController extends BaseAPIController
 {
@@ -32,6 +29,98 @@ class AccountApiController extends BaseAPIController
         parent::__construct();
 
         $this->accountRepo = $accountRepo;
+    }
+
+    public function forwarding(Request $request)
+    {
+
+        if($request->header('X-API-HOSTED-SECRET') != config('ninja.ninja_hosted_secret'))
+            return response()->json(['message' => 'invalid secret'], 401);
+
+        $url = 'https://invoicing.co/api/v1/confirm_forwarding';
+
+        $headers = [
+            'X-API-HOSTED-SECRET' => config('ninja.ninja_hosted_secret'),
+            'X-Requested-With' => 'XMLHttpRequest',
+            'Content-Type' => 'application/json',
+        ];
+
+        $account = Account::where('account_key', $request->account_key)->first();
+        $gateway_reference = '';
+
+        $ninja_client = Client::where('public_id', $account->id)->first();
+
+        if($ninja_client){
+            $agt = AccountGatewayToken::where('client_id', $ninja_client->id)->first();
+
+            if($agt)
+            $gateway_reference = $agt->token;
+        }
+
+        $body = [
+            'account_key' => $account->account_key,
+            'email' => $account->getPrimaryUser()->email,
+            'plan' => $account->company->plan,
+            'plan_term' =>$account->company->plan_term,
+            'plan_started' =>$account->company->plan_started,
+            'plan_paid' =>$account->company->plan_paid,
+            'plan_expires' =>$account->company->plan_expires,
+            'trial_started' =>$account->company->trial_started,
+            'trial_plan' =>$account->company->trial_plan,
+            'plan_price' =>$account->company->plan_price,
+            'num_users' =>$account->company->num_users,
+            'gateway_reference' => $gateway_reference,
+        ];
+
+        $client =  new \GuzzleHttp\Client([
+            'headers' =>  $headers,
+        ]);
+
+        $response = $client->post($url,[
+            RequestOptions::JSON => $body, 
+            RequestOptions::ALLOW_REDIRECTS => false
+        ]);
+
+        if($response->getStatusCode() == 401){
+            info("autoForwardUrl");
+            info($response->getBody());
+
+        } elseif ($response->getStatusCode() == 200) {
+
+            $message_body = json_decode($response->getBody(), true);
+
+            $forwarding_url = $message_body['forward_url'];
+
+                $account_settings = $account->account_email_settings;
+
+                if(strlen($forwarding_url) == 0) {
+                    $account_settings->is_disabled = false;
+                }
+                else {
+                    $account_settings->is_disabled = true;
+                }
+
+                $account_settings->forward_url_for_v5 = rtrim($forwarding_url,'/');
+                $account_settings->save();
+
+            $billing_transferred = $message_body['billing_transferred'];
+
+            if($billing_transferred == 'true'){
+
+                $company = $account->company;
+                $company->plan = null;
+                $company->plan_expires = null;
+                $company->save();
+            }
+
+
+        } else {
+            info("failed to autoforward");
+            info(json_decode($response->getBody()->getContents()));
+        }
+
+        return response()->json(['message' => 'finished'], 200);
+
     }
 
     public function ping(Request $request)
