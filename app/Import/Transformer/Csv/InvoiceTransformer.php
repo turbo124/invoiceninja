@@ -223,6 +223,7 @@ class InvoiceTransformer extends BaseTransformer
                     'item.custom_value4'
                 ),
                 'type_id' => $this->getInvoiceTypeId($record, 'item.type_id'),
+                'tax_id' => isset($record['item.tax_id']) ? $this->getString($record, 'item.tax_id') : '', 
             ];
         }
 
