@@ -329,6 +329,35 @@ trait GenerateMigrationResources
         return $transformed;
     }
 
+    protected function getActivities()
+    {
+
+        info("get activities => ". $this->account->activities()->count());
+        
+        return \App\Models\Activity::where('account_id', $this->account->id)
+                                    ->orderBy('id','asc')
+                                    ->cursor()->each(function ($activity){
+
+                return [
+                    'activity_type_id' =>  $activity->activity_type_id,
+                    'client_id' => $activity->client ? (int) $activity->client->id : null,
+                    'user_id' => (int) $activity->user->id,
+                    'invoice_id' => $activity->invoice ? (int) $activity->invoice->id : null,
+                    'payment_id' => $activity->payment ? (int) $activity->payment->id : null,
+                    'credit_id' => $activity->credit ? (int) $activity->credit->id : null,
+                    'created_at' => $activity->created_at,
+                    'expense_id' => $activity->expense_id ? (int) $activity->expense->id : null,
+                    'is_system' => $activity->is_system ? (bool) $activity->is_system : null,
+                    'client_contact_id' => $activity->contact_id ? (int) $activity->contact->id : null,
+                    'task_id' => $activity->task_id ? (int) $activity->task->id : null,
+                    'notes' => $activity->notes ?: '',
+                    'adjustment' => (float) $activity->adjustment,
+                    'balance' => (float) $activity->balance,
+                ];
+
+        })->toArray();
+    }
+
     protected function getClients()
     {
 

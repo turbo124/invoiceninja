@@ -133,6 +133,7 @@ class ExportMigrations extends Command
             'tasks' => $this->getTasks(),
             'documents' => $this->getDocuments(),
             'ninja_tokens' => $this->getNinjaToken(),
+            'activities' => $this->getActivities(),
         ];
 
         Storage::makeDirectory('migrations');
