@@ -110,7 +110,7 @@ class SendReminders extends Command
         /** @var Invoice $invoice */
         foreach ($delayedAutoBillInvoices as $invoice) {
             //21-03-2023 adjustment here
-            if ($invoice->isPaid() || !$invoice->account || $invoice->account->is_deleted) {
+            if ($invoice->isPaid() || !$invoice->account || $invoice->account->is_deleted || $invoice->account->account_email_settings->is_disabled) {
             // if ($invoice->isPaid() || $invoice->account->is_deleted) {
                 continue;
             }
