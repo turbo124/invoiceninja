@@ -268,33 +268,37 @@ class Invoice extends BaseModel implements TypesenseDocument
             "enable_nested_fields" => true,
             'fields' => [
                 [
-                    'name' => 'id',
-                    'type' => 'string',
+                    'name' => '.*',
+                    'type' => 'auto'
                 ],
-                [
-                    'name' => 'hashed_id',
-                    'type' => 'string',
-                ],
-                [
-                    'name' => 'number',
-                    'type' => 'string',
-                ],
+                // [
+                //     'name' => 'id',
+                //     'type' => 'string',
+                // ],
+                // [
+                //     'name' => 'hashed_id',
+                //     'type' => 'string',
+                // ],
+                // [
+                //     'name' => 'number',
+                //     'type' => 'string',
+                // ],
                 [
                     'name' => 'created_at',
                     'type' => 'int64',
                 ],
-                [
-                    'name' => 'company_id',
-                    'type' => 'int64',
-                ],
-                [
-                    'name' => 'user_id',
-                    'type' => 'int64',
-                ],
-                [
-                    'name' => 'line_items',
-                    'type' => 'object[]',
-                ]
+                // [
+                //     'name' => 'company_id',
+                //     'type' => 'int64',
+                // ],
+                // [
+                //     'name' => 'user_id',
+                //     'type' => 'int64',
+                // ],
+                // [
+                //     'name' => 'line_items',
+                //     'type' => 'object[]',
+                // ]
             ],
             'default_sorting_field' => 'created_at',
         ];
@@ -307,7 +311,7 @@ class Invoice extends BaseModel implements TypesenseDocument
      */
     public function typesenseQueryBy(): array {
         return [
-            'id','number','hashed_id'
+            'line_items','number','hashed_id'
         ];
     }    
 
