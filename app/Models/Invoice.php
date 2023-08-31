@@ -12,6 +12,7 @@
 namespace App\Models;
 
 use App\Utils\Ninja;
+use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
 use App\Utils\Traits\MakesDates;
 use App\Jobs\Entity\CreateRawPdf;
@@ -32,6 +33,7 @@ use App\Utils\Traits\Invoice\ActionsInvoice;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Events\Invoice\InvoiceReminderWasEmailed;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 
 /**
  * App\Models\Invoice
@@ -137,7 +139,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property object|null $tax_data
  * @mixin \Eloquent
  */
-class Invoice extends BaseModel
+class Invoice extends BaseModel implements TypesenseDocument
 {
     use SoftDeletes;
     use Filterable;
@@ -147,6 +149,7 @@ class Invoice extends BaseModel
     use MakesInvoiceValues;
     use MakesReminders;
     use ActionsInvoice;
+    use Searchable;
 
     protected $presenter = EntityPresenter::class;
 
@@ -232,6 +235,65 @@ class Invoice extends BaseModel
     const STATUS_OVERDUE = -1; //status < 4 || < 3 && !is_deleted && !trashed() && due_date < now()
 
     const STATUS_UNPAID = -2; //status < 4 || < 3 && !is_deleted && !trashed()
+
+
+     /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return array_merge(
+            $this->toArray(), 
+            [
+                // Cast id to string and turn created_at into an int32 timestamp
+                // in order to maintain compatibility with the Typesense index definition below
+                'id' => (string) $this->id,
+            ]
+        );
+    }
+
+     /**
+     * The Typesense schema to be created.
+     *
+     * @return array
+     */
+    public function getCollectionSchema(): array {
+        return [
+            'name' => $this->searchableAs(),
+            'fields' => [
+                [
+                    'name' => 'id',
+                    'type' => 'string',
+                ],
+                [
+                    'name' => 'number',
+                    'type' => 'string',
+                ],
+                [
+                    'name' => 'created_at',
+                    'type' => 'int64',
+                ],
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
+
+     /**
+     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
+     *
+     * @return array
+     */
+    public function typesenseQueryBy(): array {
+        return [
+            'number','hashed_id','created_at'
+        ];
+    }    
+
+
+
+
 
     public function getEntityType()
     {

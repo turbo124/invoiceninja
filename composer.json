@@ -60,6 +60,7 @@
         "josemmo/facturae-php": "^1.7",
         "laracasts/presenter": "^0.2.1",
         "laravel/framework": "^9.3",
+        "laravel/scout": "^10.2",
         "laravel/slack-notification-channel": "^2.2",
         "laravel/socialite": "^5",
         "laravel/tinker": "^2.7",
@@ -95,6 +96,7 @@
         "turbo124/beacon": "^1.4",
         "turbo124/predis": "1.1.11",
         "twilio/sdk": "^6.40",
+        "typesense/laravel-scout-typesense-driver": "^5.2",
         "webpatser/laravel-countries": "dev-master#75992ad",
         "wepay/php-sdk": "^0.3",
         "wildbit/postmark-php": "^4.0"
