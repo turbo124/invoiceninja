@@ -250,6 +250,9 @@ class Invoice extends BaseModel implements TypesenseDocument
                 // Cast id to string and turn created_at into an int32 timestamp
                 // in order to maintain compatibility with the Typesense index definition below
                 'id' => (string) $this->id,
+                'hashed_id' => $this->hashed_id,
+                'company_id' => $this->company_id,
+                'user_id' => $this->user_id,
             ]
         );
     }
@@ -262,9 +265,14 @@ class Invoice extends BaseModel implements TypesenseDocument
     public function getCollectionSchema(): array {
         return [
             'name' => $this->searchableAs(),
+            "enable_nested_fields" => true,
             'fields' => [
                 [
                     'name' => 'id',
+                    'type' => 'string',
+                ],
+                [
+                    'name' => 'hashed_id',
                     'type' => 'string',
                 ],
                 [
@@ -275,6 +283,18 @@ class Invoice extends BaseModel implements TypesenseDocument
                     'name' => 'created_at',
                     'type' => 'int64',
                 ],
+                [
+                    'name' => 'company_id',
+                    'type' => 'int64',
+                ],
+                [
+                    'name' => 'user_id',
+                    'type' => 'int64',
+                ],
+                [
+                    'name' => 'line_items',
+                    'type' => 'object[]',
+                ]
             ],
             'default_sorting_field' => 'created_at',
         ];
@@ -287,13 +307,9 @@ class Invoice extends BaseModel implements TypesenseDocument
      */
     public function typesenseQueryBy(): array {
         return [
-            'number','hashed_id','created_at'
+            'id','number','hashed_id'
         ];
     }    
-
-
-
-
 
     public function getEntityType()
     {
