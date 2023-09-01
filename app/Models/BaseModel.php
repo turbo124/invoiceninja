@@ -11,19 +11,17 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
-use Laravel\Scout\Searchable;
-use Illuminate\Support\Carbon;
-use App\Utils\Traits\MakesHash;
 use App\Jobs\Entity\CreateRawPdf;
 use App\Jobs\Util\WebhookHandler;
-use App\Models\Traits\Excludable;
-use Illuminate\Database\Eloquent\Model;
 use App\Jobs\Vendor\CreatePurchaseOrderPdf;
+use App\Models\Traits\Excludable;
+use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\UserSessionAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * Class BaseModel
@@ -39,7 +37,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundExceptio
  * @property int $assigned_user_id
  * @method BaseModel service()
  * @property \App\Models\Company $company
- * @method static BaseModel find($value) 
+ * @method static BaseModel find($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel<static> company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|Illuminate\Database\Eloquent\Relations\BelongsTo|\Awobaz\Compoships\Database\Eloquent\Relations\BelongsTo|\App\Models\Company company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|Illuminate\Database\Eloquent\Relations\HasMany|BaseModel orderBy()
@@ -70,17 +68,16 @@ use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundExceptio
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|\Illuminate\Database\Query\Builder withoutTrashed()
  * @mixin \Eloquent
  * @mixin \Illuminate\Database\Eloquent\Builder
- * 
+ *
  * @property \Illuminate\Support\Collection $tax_map
  * @property array $total_tax_map
  */
-class BaseModel extends Model implements TypesenseDocument
+class BaseModel extends Model
 {
     use MakesHash;
     use UserSessionAttributes;
     use HasFactory;
     use Excludable;
-    use Searchable;
 
     protected $appends = [
         'hashed_id',
@@ -94,59 +91,6 @@ class BaseModel extends Model implements TypesenseDocument
 
     protected $dateFormat = 'Y-m-d H:i:s.u';
 
-     /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray()
-    {
-        return array_merge(
-            $this->toArray(), 
-            [
-                // Cast id to string and turn created_at into an int32 timestamp
-                // in order to maintain compatibility with the Typesense index definition below
-                'id' => (string) $this->id,
-                'hashed_id' => $this->hashed_id,
-                'company_id' => $this->company_id,
-                'user_id' => $this->user_id,
-            ]
-        );
-    }
-
-     /**
-     * The Typesense schema to be created.
-     *
-     * @return array
-     */
-    public function getCollectionSchema(): array {
-        return [
-            'name' => $this->searchableAs(),
-            "enable_nested_fields" => true,
-            'fields' => [
-                [
-                    'name' => '.*',
-                    'type' => 'auto'
-                ],
-                [
-                    'name' => 'created_at',
-                    'type' => 'int64',
-                ],
-            ],
-            'default_sorting_field' => 'created_at',
-        ];
-    }
-
-     /**
-     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
-     *
-     * @return array
-     */
-    public function typesenseQueryBy(): array {
-        return [
-            'line_items','number','hashed_id'
-        ];
-    }  
 
     public function getHashedIdAttribute()
     {
@@ -294,10 +238,10 @@ class BaseModel extends Model implements TypesenseDocument
         return $this->numberFormatter().'.'.$extension;
     }
 
-     /**
-     * @param string $extension
-     * @return string
-     */
+    /**
+    * @param string $extension
+    * @return string
+    */
     public function getEFileName($extension = 'pdf')
     {
         return ctrans("texts.e_invoice"). "_" . $this->numberFormatter().'.'.$extension;
@@ -360,8 +304,9 @@ class BaseModel extends Model implements TypesenseDocument
             throw new \Exception('Hard fail, could not create an invitation.');
         }
 
-        if($this instanceof \App\Models\PurchaseOrder) 
+        if($this instanceof \App\Models\PurchaseOrder) {
             return "data:application/pdf;base64,".base64_encode((new CreatePurchaseOrderPdf($invitation, $invitation->company->db))->rawPdf());
+        }
         
         return "data:application/pdf;base64,".base64_encode((new CreateRawPdf($invitation, $invitation->company->db))->handle());
 

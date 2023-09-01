@@ -236,7 +236,7 @@ class Invoice extends BaseModel implements TypesenseDocument
 
     const STATUS_UNPAID = -2; //status < 4 || < 3 && !is_deleted && !trashed()
 
-
+     
      /**
      * Get the indexable data array for the model.
      *
@@ -275,6 +275,11 @@ class Invoice extends BaseModel implements TypesenseDocument
                     'name' => 'created_at',
                     'type' => 'int64',
                 ],
+                [
+                    'name' => 'hashed_id',
+                    'type' => 'string',
+                    'facet' => true,
+                ],
             ],
             'default_sorting_field' => 'created_at',
         ];
@@ -289,7 +294,7 @@ class Invoice extends BaseModel implements TypesenseDocument
         return [
             'line_items','number','hashed_id'
         ];
-    }    
+    }  
 
     public function getEntityType()
     {

@@ -11,18 +11,20 @@
 
 namespace App\Models;
 
-use App\Events\Payment\PaymentWasRefunded;
-use App\Events\Payment\PaymentWasVoided;
-use App\Services\Ledger\LedgerService;
-use App\Services\Payment\PaymentService;
 use App\Utils\Ninja; 
 use App\Utils\Number;
+use Laravel\Scout\Searchable;
+use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\Inviteable;
 use App\Utils\Traits\MakesDates;
-use App\Utils\Traits\MakesHash;
+use App\Services\Ledger\LedgerService;
+use App\Events\Payment\PaymentWasVoided;
+use App\Services\Payment\PaymentService;
 use App\Utils\Traits\Payment\Refundable;
-use Awobaz\Compoships\Database\Eloquent\Relations\BelongsTo;
+use App\Events\Payment\PaymentWasRefunded;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Awobaz\Compoships\Database\Eloquent\Relations\BelongsTo;
+use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 
 /**
  * App\Models\Payment
@@ -92,7 +94,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\Payment>|\Illuminate\Support\Collection $paymentables
  * @mixin \Eloquent
  */
-class Payment extends BaseModel
+class Payment extends BaseModel implements TypesenseDocument
 {
     use MakesHash;
     use Filterable;
@@ -100,7 +102,8 @@ class Payment extends BaseModel
     use SoftDeletes;
     use Refundable;
     use Inviteable;
-
+    use Searchable;
+    
     const STATUS_PENDING = 1;
 
     const STATUS_CANCELLED = 2;
@@ -174,6 +177,65 @@ class Payment extends BaseModel
     ];
 
     protected $touches = [];
+
+     /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return array_merge(
+            $this->toArray(), 
+            [
+                // Cast id to string and turn created_at into an int32 timestamp
+                // in order to maintain compatibility with the Typesense index definition below
+                'id' => (string) $this->id,
+                'hashed_id' => $this->hashed_id,
+                'company_id' => $this->company_id,
+                'user_id' => $this->user_id,
+            ]
+        );
+    }
+
+     /**
+     * The Typesense schema to be created.
+     *
+     * @return array
+     */
+    public function getCollectionSchema(): array {
+        return [
+            'name' => $this->searchableAs(),
+            "enable_nested_fields" => true,
+            'fields' => [
+                [
+                    'name' => '.*',
+                    'type' => 'auto'
+                ],
+                [
+                    'name' => 'created_at',
+                    'type' => 'int64',
+                ],
+                [
+                    'name' => 'hashed_id',
+                    'type' => 'string',
+                    'facet' => true,
+                ],
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
+
+     /**
+     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
+     *
+     * @return array
+     */
+    public function typesenseQueryBy(): array {
+        return [
+            'amount','refunded','applied','transaction_reference','number','hashed_id'
+        ];
+    }  
 
     public function getEntityType()
     {

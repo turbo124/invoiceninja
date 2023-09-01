@@ -12,6 +12,7 @@
 namespace App\Models;
 
 use App\Models\GatewayType;
+use Laravel\Scout\Searchable;
 use App\Utils\Traits\AppSetup;
 use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\MakesDates;
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 
 /**
  * App\Models\Client
@@ -114,7 +116,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
  * @property int $has_valid_vat_number
  * @mixin \Eloquent
  */
-class Client extends BaseModel implements HasLocalePreference
+class Client extends BaseModel implements HasLocalePreference, TypesenseDocument
 {
     use PresentableTrait;
     use MakesHash;
@@ -125,6 +127,7 @@ class Client extends BaseModel implements HasLocalePreference
     use AppSetup;
     use ClientGroupSettingsSaver;
     use Excludable;
+    use Searchable;
 
     protected $presenter = ClientPresenter::class;
 
@@ -237,6 +240,21 @@ class Client extends BaseModel implements HasLocalePreference
                     'type' => 'auto',
                     'optional' =>true
                 ],
+                // [
+                //     'name' => 'name',
+                //     'type' => 'string',
+                //     'facet' => true,
+                // ],
+                [
+                    'name' => 'number',
+                    'type' => 'string*',
+                    'facet' => true,
+                ],
+                [
+                    'name' => 'hashed_id',
+                    'type' => 'string',
+                    'facet' => true,
+                ],
                 [
                     'name' => 'created_at',
                     'type' => 'int64',
@@ -246,10 +264,36 @@ class Client extends BaseModel implements HasLocalePreference
                     'type' => 'auto',
                     'index' => false,
                     'optional' => true,
-                ],           
+                ],     
             ],
             'default_sorting_field' => 'created_at',
         ];
+    }
+
+     /**
+     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
+     *
+     * @return array
+     */
+    public function typesenseQueryBy(): array {
+        return [
+            'name','number','hashed_id','contacts.email'
+        ];
+    }  
+
+    public function toSearchableArray()
+    {
+        return array_merge(
+            $this->toArray(), 
+            [
+                // Cast id to string and turn created_at into an int32 timestamp
+                // in order to maintain compatibility with the Typesense index definition below
+                'id' => (string) $this->id,
+                'hashed_id' => $this->hashed_id,
+                'company_id' => $this->company_id,
+                'user_id' => $this->user_id,
+            ]
+        );
     }
 
     public function getEntityType()

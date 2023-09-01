@@ -11,20 +11,22 @@
 
 namespace App\Models;
 
-use App\Helpers\Invoice\InvoiceSum;
-use App\Helpers\Invoice\InvoiceSumInclusive;
-use App\Jobs\Entity\CreateEntityPdf;
-use App\Models\Presenters\QuotePresenter;
-use App\Services\Quote\QuoteService;
 use App\Utils\Ninja;
-use App\Utils\Traits\MakesDates;
-use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\MakesInvoiceValues;
-use App\Utils\Traits\MakesReminders;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
+use App\Utils\Traits\MakesHash;
+use App\Utils\Traits\MakesDates;
+use App\Helpers\Invoice\InvoiceSum;
+use App\Jobs\Entity\CreateEntityPdf;
+use App\Services\Quote\QuoteService;
+use App\Utils\Traits\MakesReminders;
 use Illuminate\Support\Facades\Storage;
+use App\Utils\Traits\MakesInvoiceValues;
+use App\Models\Presenters\QuotePresenter;
 use Laracasts\Presenter\PresentableTrait;
+use App\Helpers\Invoice\InvoiceSumInclusive;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 
 /**
  * App\Models\Quote
@@ -113,7 +115,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @mixin \Eloquent
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class Quote extends BaseModel
+class Quote extends BaseModel implements TypesenseDocument
 {
     use MakesHash;
     use MakesDates;
@@ -122,6 +124,7 @@ class Quote extends BaseModel
     use MakesReminders;
     use PresentableTrait;
     use MakesInvoiceValues;
+    use Searchable;
 
     protected $presenter = QuotePresenter::class;
 
@@ -187,6 +190,66 @@ class Quote extends BaseModel
     const STATUS_CONVERTED = 4;
 
     const STATUS_EXPIRED = -1;
+
+    
+     /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return array_merge(
+            $this->toArray(), 
+            [
+                // Cast id to string and turn created_at into an int32 timestamp
+                // in order to maintain compatibility with the Typesense index definition below
+                'id' => (string) $this->id,
+                'hashed_id' => $this->hashed_id,
+                'company_id' => $this->company_id,
+                'user_id' => $this->user_id,
+            ]
+        );
+    }
+
+     /**
+     * The Typesense schema to be created.
+     *
+     * @return array
+     */
+    public function getCollectionSchema(): array {
+        return [
+            'name' => $this->searchableAs(),
+            "enable_nested_fields" => true,
+            'fields' => [
+                [
+                    'name' => '.*',
+                    'type' => 'auto'
+                ],
+                [
+                    'name' => 'created_at',
+                    'type' => 'int64',
+                ],
+                [
+                    'name' => 'hashed_id',
+                    'type' => 'string',
+                    'facet' => true,
+                ],
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
+
+     /**
+     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
+     *
+     * @return array
+     */
+    public function typesenseQueryBy(): array {
+        return [
+            'line_items','number','hashed_id'
+        ];
+    }  
 
     public function getEntityType()
     {

@@ -11,49 +11,114 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Search\GenericSearchRequest;
-use App\Models\Invoice;
 
 class SearchController extends Controller
 {
+    private function queryKeys(string $collection): string
+    {
+        $query_by = '';
+
+        return match($collection){
+            'invoice' => $query_by = 'line_items,number,hashed_id',
+            'client' => $query_by = 'name',
+            'quote' => $query_by = 'line_items,number,hashed_id',
+            'credit' => $query_by = 'line_items,number,hashed_id',
+            'payment' => $query_by = 'number,transaction_reference',
+        };
+
+        return $query_by;
+    }
+
     public function __invoke(GenericSearchRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
-
-        // $searchRequests = [
-        //     [
-        //     'collection' => 'invoices',
-        //     'q' => $request->input('search')
-        //     ],
-        //     [
-        //     'collection' => 'clients',
-        //     'q' => $request->input('search')
-        //     ]
-        // ];
 
         $searchRequests = collect(['invoice','client','quote','credit','payment'])->map(function ($collection) use ($request, $user) {
             
             if($user->hasPermission('view_all') || $user->hasPermission('view_' . $collection)) {
                 return [
                     'collection' => $collection.'s',
-                    'q' => $request->input('search')
+                    'q' => $request->input('search'),
+                    'group_by'    => 'hashed_id',
+                    'group_limit' => '1',
+                    'per_page' => 100,
+                    'company_id' => $user->company()->id,
+                    // 'query_by' => $this->queryKeys($collection),
                 ];
             }
             else {
                 return [
                     'collection' => $collection,
                     'q' => $request->input('search'),
-                    'user_id' => $user->id
+                    'group_by'    => 'hashed_id',
+                    'group_limit' => '1',
+                    'user_id' => $user->id,
+                    'per_page' => 100,
+                    'company_id' => $user->company()->id,
+                    // 'query_by' => $this->queryKeys($collection),
                 ];
             }
 
         })->toArray();
 
         $query = Invoice::search('')->searchMulti($searchRequests)->paginateRaw();
+
+
+        // nlog($query->count());
+        // nlog($query->items());
+        // nlog($query->perPage());
     
-        nlog($query);
+        $results = $query->items();
+
+        $invoices = $results['results'][0];
+        $clients = $results['results'][1];
+        $quotes = $results['results'][2];
+        $credits = $results['results'][3];
+        $payments = $results['results'][4];
+
+        nlog($invoices['request_params']['collection_name']);
+        nlog($invoices['request_params']['per_page']);
+        nlog($invoices['request_params']['q']);
+
+        if(isset($clients['request_params']['collection_name'])) {
+            nlog($clients['request_params']['collection_name']);
+            nlog($clients['request_params']['per_page']);
+            nlog($clients['request_params']['q']);
+        }
+        else {
+            nlog($clients);
+        }
+
+        if(isset($quotes['request_params']['collection_name'])) {
+            nlog($quotes['request_params']['collection_name']);
+            nlog($quotes['request_params']['per_page']);
+            nlog($quotes['request_params']['q']);
+        }
+        else {
+            nlog($quotes);
+        }
+        if(isset($credits['request_params']['collection_name'])) {
+        
+            nlog($credits['request_params']['collection_name']);
+            nlog($credits['request_params']['per_page']);
+            nlog($credits['request_params']['q']);
+        }
+        else {
+            nlog($credits);
+        }
+        if(isset($payments['request_params']['collection_name'])) {
+
+                nlog($payments['request_params']['collection_name']);
+                nlog($payments['request_params']['per_page']);
+                nlog($payments['request_params']['q']);
+        }
+        else {
+            nlog($payments);
+        }
 
         return response()->json($query, 200);
     }

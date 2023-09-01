@@ -11,22 +11,24 @@
 
 namespace App\Models;
 
-use App\Jobs\Mail\NinjaMailer;
-use App\Jobs\Mail\NinjaMailerJob;
-use App\Jobs\Mail\NinjaMailerObject;
-use App\Mail\ClientContact\ClientContactResetPasswordObject;
-use App\Models\Presenters\ClientContactPresenter;
 use App\Utils\Ninja;
+use Laravel\Scout\Searchable;
+use App\Jobs\Mail\NinjaMailer;
 use App\Utils\Traits\AppSetup;
 use App\Utils\Traits\MakesHash;
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use App\Jobs\Mail\NinjaMailerJob;
+use App\Jobs\Mail\NinjaMailerObject;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Laracasts\Presenter\PresentableTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Presenters\ClientContactPresenter;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use App\Mail\ClientContact\ClientContactResetPasswordObject;
+use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 
 /**
  * Class ClientContact
@@ -90,7 +92,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\InvoiceInvitation> $invoice_invitations
  * @mixin \Eloquent
  */
-class ClientContact extends Authenticatable implements HasLocalePreference
+class ClientContact extends Authenticatable implements HasLocalePreference, TypesenseDocument
 {
     use Notifiable;
     use MakesHash;
@@ -98,7 +100,8 @@ class ClientContact extends Authenticatable implements HasLocalePreference
     use SoftDeletes;
     use HasFactory;
     use AppSetup;
-    
+    use Searchable;
+
     /* Used to authenticate a contact */
     protected $guard = 'contact';
 
@@ -163,6 +166,62 @@ class ClientContact extends Authenticatable implements HasLocalePreference
         'custom_value4',
         'email',
     ];
+
+
+    /**
+     * The Typesense schema to be created.
+     *
+     * @return array
+     */
+    public function getCollectionSchema(): array {
+        return [
+            'name' => $this->searchableAs(),
+            "enable_nested_fields" => true,
+            'fields' => [
+                [
+                    'name' => '.*',
+                    'type' => 'auto',
+                    'optional' =>true
+                ],
+                [
+                    'name' => 'hashed_id',
+                    'type' => 'string',
+                    'facet' => true,
+                ],
+                [
+                    'name' => 'created_at',
+                    'type' => 'int64',
+                ],  
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
+
+     /**
+     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
+     *
+     * @return array
+     */
+    public function typesenseQueryBy(): array {
+        return [
+            'first_name','last_name','hashed_id','email','phone'
+        ];
+    }  
+
+    public function toSearchableArray()
+    {
+        return array_merge(
+            $this->toArray(), 
+            [
+                // Cast id to string and turn created_at into an int32 timestamp
+                // in order to maintain compatibility with the Typesense index definition below
+                'id' => (string) $this->id,
+                'hashed_id' => $this->hashed_id,
+                'company_id' => $this->company_id,
+                'user_id' => $this->user_id,
+            ]
+        );
+    }
 
     /*
     V2 type of scope
