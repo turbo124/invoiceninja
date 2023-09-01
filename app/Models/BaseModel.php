@@ -12,6 +12,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
 use App\Utils\Traits\MakesHash;
 use App\Jobs\Entity\CreateRawPdf;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Jobs\Vendor\CreatePurchaseOrderPdf;
 use App\Utils\Traits\UserSessionAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Typesense\LaravelTypesense\Interfaces\TypesenseDocument;
 use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
 
 /**
@@ -72,12 +74,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundExceptio
  * @property \Illuminate\Support\Collection $tax_map
  * @property array $total_tax_map
  */
-class BaseModel extends Model
+class BaseModel extends Model implements TypesenseDocument
 {
     use MakesHash;
     use UserSessionAttributes;
     use HasFactory;
     use Excludable;
+    use Searchable;
 
     protected $appends = [
         'hashed_id',
@@ -90,6 +93,60 @@ class BaseModel extends Model
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s.u';
+
+     /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return array_merge(
+            $this->toArray(), 
+            [
+                // Cast id to string and turn created_at into an int32 timestamp
+                // in order to maintain compatibility with the Typesense index definition below
+                'id' => (string) $this->id,
+                'hashed_id' => $this->hashed_id,
+                'company_id' => $this->company_id,
+                'user_id' => $this->user_id,
+            ]
+        );
+    }
+
+     /**
+     * The Typesense schema to be created.
+     *
+     * @return array
+     */
+    public function getCollectionSchema(): array {
+        return [
+            'name' => $this->searchableAs(),
+            "enable_nested_fields" => true,
+            'fields' => [
+                [
+                    'name' => '.*',
+                    'type' => 'auto'
+                ],
+                [
+                    'name' => 'created_at',
+                    'type' => 'int64',
+                ],
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
+
+     /**
+     * The fields to be queried against. See https://typesense.org/docs/0.24.0/api/search.html.
+     *
+     * @return array
+     */
+    public function typesenseQueryBy(): array {
+        return [
+            'line_items','number','hashed_id'
+        ];
+    }  
 
     public function getHashedIdAttribute()
     {

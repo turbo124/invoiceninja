@@ -221,12 +221,36 @@ class Client extends BaseModel implements HasLocalePreference
         'routing_id',
     ];
 
-    // public function scopeExclude($query)
-    // {
-    //     $query->makeHidden(['balance','paid_to_date']);
 
-    //     return $query;
-    // }
+    /**
+     * The Typesense schema to be created.
+     *
+     * @return array
+     */
+    public function getCollectionSchema(): array {
+        return [
+            'name' => $this->searchableAs(),
+            "enable_nested_fields" => true,
+            'fields' => [
+                [
+                    'name' => '.*',
+                    'type' => 'auto',
+                    'optional' =>true
+                ],
+                [
+                    'name' => 'created_at',
+                    'type' => 'int64',
+                ],
+                [
+                    'name' => 'contacts.*',
+                    'type' => 'auto',
+                    'index' => false,
+                    'optional' => true,
+                ],           
+            ],
+            'default_sorting_field' => 'created_at',
+        ];
+    }
 
     public function getEntityType()
     {

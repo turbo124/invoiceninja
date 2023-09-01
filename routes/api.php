@@ -26,6 +26,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FilterController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StaticController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TwilioController;
@@ -345,6 +346,8 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
 
     Route::resource('tokens', TokenController::class); // name = (tokens. index / create / show / update / destroy / edit
     Route::post('tokens/bulk', [TokenController::class, 'bulk'])->name('tokens.bulk');
+
+    Route::post('search', SearchController::class);
 
     Route::get('settings/enable_two_factor', [TwoFactorController::class, 'setupTwoFactor']);
     Route::post('settings/enable_two_factor', [TwoFactorController::class, 'enableTwoFactor']);

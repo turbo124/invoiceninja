@@ -271,34 +271,10 @@ class Invoice extends BaseModel implements TypesenseDocument
                     'name' => '.*',
                     'type' => 'auto'
                 ],
-                // [
-                //     'name' => 'id',
-                //     'type' => 'string',
-                // ],
-                // [
-                //     'name' => 'hashed_id',
-                //     'type' => 'string',
-                // ],
-                // [
-                //     'name' => 'number',
-                //     'type' => 'string',
-                // ],
                 [
                     'name' => 'created_at',
                     'type' => 'int64',
                 ],
-                // [
-                //     'name' => 'company_id',
-                //     'type' => 'int64',
-                // ],
-                // [
-                //     'name' => 'user_id',
-                //     'type' => 'int64',
-                // ],
-                // [
-                //     'name' => 'line_items',
-                //     'type' => 'object[]',
-                // ]
             ],
             'default_sorting_field' => 'created_at',
         ];
