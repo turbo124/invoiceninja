@@ -12,6 +12,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\ClientContact;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Search\GenericSearchRequest;
 
@@ -24,6 +25,7 @@ class SearchController extends Controller
         return match($collection){
             'invoice' => $query_by = 'line_items,number,hashed_id',
             'client' => $query_by = 'name',
+            'client_contacts' => $query_by = 'first_name',
             'quote' => $query_by = 'line_items,number,hashed_id',
             'credit' => $query_by = 'line_items,number,hashed_id',
             'payment' => $query_by = 'number,transaction_reference',
@@ -37,7 +39,7 @@ class SearchController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $searchRequests = collect(['invoice','client','quote','credit','payment'])->map(function ($collection) use ($request, $user) {
+        $searchRequests = collect(['invoice','client','quote','credit','payment','client_contacts'])->map(function ($collection) use ($request, $user) {
             
             if($user->hasPermission('view_all') || $user->hasPermission('view_' . $collection)) {
                 return [
@@ -47,7 +49,7 @@ class SearchController extends Controller
                     'group_limit' => '1',
                     'per_page' => 100,
                     'company_id' => $user->company()->id,
-                    // 'query_by' => $this->queryKeys($collection),
+                    'query_by' => $this->queryKeys($collection),
                 ];
             }
             else {
@@ -59,13 +61,13 @@ class SearchController extends Controller
                     'user_id' => $user->id,
                     'per_page' => 100,
                     'company_id' => $user->company()->id,
-                    // 'query_by' => $this->queryKeys($collection),
+                    'query_by' => $this->queryKeys($collection),
                 ];
             }
 
         })->toArray();
 
-        $query = Invoice::search('')->searchMulti($searchRequests)->paginateRaw();
+        $query = ClientContact::search('')->searchMulti($searchRequests)->paginateRaw();
 
 
         // nlog($query->count());
@@ -79,18 +81,36 @@ class SearchController extends Controller
         $quotes = $results['results'][2];
         $credits = $results['results'][3];
         $payments = $results['results'][4];
+        $client_contacts = $results['results'][5];
 
-        nlog($invoices['request_params']['collection_name']);
-        nlog($invoices['request_params']['per_page']);
-        nlog($invoices['request_params']['q']);
+        if(isset($invoices['request_params']['collection_name'])) {
 
+            nlog($invoices['request_params']['collection_name']);
+            nlog($invoices['request_params']['per_page']);
+            nlog($invoices['request_params']['q']);
+            nlog("invoices");
+        }
+        else {
+            nlog($invoices);
+        }
+        
         if(isset($clients['request_params']['collection_name'])) {
             nlog($clients['request_params']['collection_name']);
             nlog($clients['request_params']['per_page']);
             nlog($clients['request_params']['q']);
         }
         else {
+            nlog("clients");
             nlog($clients);
+        }
+
+        if(isset($client_contacts['request_params']['collection_name'])) {
+            nlog($client_contacts['request_params']['collection_name']);
+            nlog($client_contacts['request_params']['per_page']);
+            nlog($client_contacts['request_params']['q']);
+        } else {
+            nlog("client_contacts");
+            nlog($client_contacts);
         }
 
         if(isset($quotes['request_params']['collection_name'])) {
@@ -99,6 +119,7 @@ class SearchController extends Controller
             nlog($quotes['request_params']['q']);
         }
         else {
+            nlog("quotes");
             nlog($quotes);
         }
         if(isset($credits['request_params']['collection_name'])) {
@@ -108,6 +129,7 @@ class SearchController extends Controller
             nlog($credits['request_params']['q']);
         }
         else {
+            nlog("credits");
             nlog($credits);
         }
         if(isset($payments['request_params']['collection_name'])) {
@@ -117,6 +139,7 @@ class SearchController extends Controller
                 nlog($payments['request_params']['q']);
         }
         else {
+            nlog("payments");
             nlog($payments);
         }
 

@@ -277,7 +277,7 @@ class Client extends BaseModel implements HasLocalePreference, TypesenseDocument
      */
     public function typesenseQueryBy(): array {
         return [
-            'name','number','hashed_id','contacts.email'
+            'name','number','hashed_id'
         ];
     }  
 
