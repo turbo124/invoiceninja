@@ -64,7 +64,7 @@ class PaymentController extends Controller
         $data = false;
         $gateway = false;
 
-        if ($payment->gateway_type_id == GatewayType::DIRECT_DEBIT && $payment->type_id == PaymentType::DIRECT_DEBIT) {
+        if ($payment->gateway_type_id == GatewayType::DIRECT_DEBIT && $payment->type_id == PaymentType::STRIPE_BANK_TRANSFER) {
             if (method_exists($payment->company_gateway->driver($payment->client), 'getPaymentIntent')) {
                 $stripe = $payment->company_gateway->driver($payment->client);
                 $payment_intent = $stripe->getPaymentIntent($payment->transaction_reference);
@@ -76,6 +76,7 @@ class PaymentController extends Controller
                     'EUR' => $data = $bt->formatDataforEur($payment_intent),
                     'JPY' => $data = $bt->formatDataforJp($payment_intent),
                     'GBP' => $data = $bt->formatDataforUk($payment_intent),
+                    'USD' => $data = $bt->formatDataforUs($payment_intent),
                 };
 
                 $gateway = $stripe;

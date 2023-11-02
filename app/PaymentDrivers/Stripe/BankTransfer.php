@@ -61,7 +61,6 @@ class BankTransfer
             ],
         ], $this->stripe->stripe_connect_auth);
 
-
         $this->stripe->payment_hash->data = array_merge((array) $this->stripe->payment_hash->data, ['stripe_amount' => $this->stripe->convertToStripeAmount($data['total']['amount_with_fee'], $this->stripe->client->currency()->precision, $this->stripe->client->currency())]);
         $this->stripe->payment_hash->save();
 
@@ -236,6 +235,103 @@ class BankTransfer
     }
 
     
+    /**
+     *
+     * @param PaymentIntent $pi
+     * 
+     *     "next_action": {
+      "display_bank_transfer_instructions": {
+        "amount_remaining": 768120,
+        "currency": "usd",
+        "financial_addresses": [
+          {
+            "aba": {
+              "account_number": "11119989247627823",
+              "bank_name": "US Test Bank",
+              "routing_number": "999999999"
+            },
+            "supported_networks": [
+              "ach",
+              "domestic_wire_us"
+            ],
+            "type": "aba"
+          },
+          {
+            "supported_networks": [
+              "swift"
+            ],
+            "swift": {
+              "account_number": "11119989247627823",
+              "bank_name": "US Test Bank",
+              "swift_code": "TESTUS99"
+            },
+            "type": "swift"
+          }
+        ],
+        "hosted_instructions_url": "https://payments.stripe.com/bank_transfers/instructions/test_YWNjdF8xNXNBMG9GQ2Z4cEZQcHR0LF9Pdm1oQUR4bzhBekNPQklRVHdOQm5jYmxQVXl3NGNZ0100ZFnHtx7m",
+        "reference": "RGXM8JSBSBBF",
+        "type": "us_bank_transfer"
+      },
+      "type": "display_bank_transfer_instructions"
+     * 
+     * 
+     * 
+     * 
+     * @return array
+     */
+    public function formatDataforUs(PaymentIntent $pi): array
+    {
+
+        $data = [];
+        
+        foreach($pi->next_action->display_bank_transfer_instructions->financial_addresses as $key => $address) {
+            nlog($address);
+
+            if($address->type == 'aba') {
+
+                $aba = $address->aba;
+                $account_number = $aba->account_number;
+                $bank_name = $aba->bank_name;
+                $routing_number = $aba->routing_number;
+                                            
+                $data['aba_details'] =  [
+                    'amount' => Number::formatMoney($this->stripe->convertFromStripeAmount($pi->next_action->display_bank_transfer_instructions->amount_remaining, $this->stripe->client->currency()->precision, $this->stripe->client->currency()), $this->stripe->client),
+                    'account_number' => $account_number,
+                    'bank_name' => $bank_name,
+                    'routing_number' => $routing_number,
+                    'reference' => $pi->next_action->display_bank_transfer_instructions->reference,
+                    'description' => $pi->description,
+                    'gateway'   => $this->stripe->company_gateway,
+                    'currency' => $pi->next_action->display_bank_transfer_instructions->currency,
+                ];
+
+            }
+
+            if($address->type == 'swift') {
+
+                $swift = $address->swift;
+                $account_number = $swift->account_number;
+                $bank_name = $swift->bank_name;
+                $swift_code = $swift->swift_code;
+
+                $data['swift_details'] =  [
+                    'amount' => Number::formatMoney($this->stripe->convertFromStripeAmount($pi->next_action->display_bank_transfer_instructions->amount_remaining, $this->stripe->client->currency()->precision, $this->stripe->client->currency()), $this->stripe->client),
+                    'account_number' => $account_number,
+                    'bank_name' => $bank_name,
+                    'swift_code' => $swift_code,
+                    'reference' => $pi->next_action->display_bank_transfer_instructions->reference,
+                    'description' => $pi->description,
+                    'gateway'   => $this->stripe->company_gateway,
+                    'currency' => $pi->next_action->display_bank_transfer_instructions->currency,
+                ];
+
+            }
+        }
+
+        return $data;
+
+    }
+
     /**
      * processSuccesfulRedirect
      *
