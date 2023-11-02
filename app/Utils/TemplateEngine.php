@@ -79,8 +79,6 @@ class TemplateEngine
 
         $this->template = $template;
 
-        // $this->entity_obj = null;
-
         $this->settings_entity = null;
     }
 

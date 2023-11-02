@@ -85,6 +85,7 @@ class BankTransfer
             'EUR' => ['type' => 'eu_bank_transfer', 'eu_bank_transfer' => ['country' => $this->stripe->client->country->iso_3166_2]],
             'JPY' => ['type' => 'jp_bank_transfer'],
             'MXN' => ['type' =>'mx_bank_transfer'],
+            'USD' => ['type' =>'us_bank_transfer'],
         };
     }
     
@@ -133,6 +134,8 @@ class BankTransfer
                     'gbp' => $data['bank_details'] = $this->formatDataforUk($pi),
                     'eur' => $data['bank_details'] = $this->formatDataforEur($pi),
                     'jpy' => $data['bank_details'] = $this->formatDataforJp($pi),
+                    'usd' => $data['bank_details'] = $this->formatDataforUs($pi),
+
                 };
                 
                 $payment = $this->processSuccesfulRedirect($pi);

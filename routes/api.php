@@ -397,7 +397,6 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::resource('subscriptions', SubscriptionController::class);
     Route::post('subscriptions/bulk', [SubscriptionController::class, 'bulk'])->name('subscriptions.bulk');
     Route::get('statics', StaticController::class);
-    // Route::post('apple_pay/upload_file','ApplyPayController::class, 'upload');
 
     Route::post('api/v1/yodlee/status/{account_number}', [YodleeController::class, 'accountStatus']);
 });
