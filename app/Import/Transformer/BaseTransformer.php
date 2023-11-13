@@ -11,27 +11,28 @@
 
 namespace App\Import\Transformer;
 
-use App\Factory\ClientFactory;
-use App\Factory\ExpenseCategoryFactory;
-use App\Factory\ProjectFactory;
-use App\Factory\VendorFactory;
+use App\Models\Quote;
+use App\Utils\Number;
 use App\Models\Client;
-use App\Models\ClientContact;
+use App\Models\Vendor;
 use App\Models\Country;
 use App\Models\Expense;
-use App\Models\ExpenseCategory;
 use App\Models\Invoice;
-use App\Models\PaymentType;
 use App\Models\Product;
 use App\Models\Project;
-use App\Models\Quote;
-use App\Models\RecurringInvoice;
 use App\Models\TaxRate;
-use App\Models\Vendor;
-use App\Repositories\ClientRepository;
-use App\Utils\Number;
+use App\Models\TaskStatus;
+use App\Models\PaymentType;
+use App\Models\ClientContact;
+use App\Factory\ClientFactory;
+use App\Factory\VendorFactory;
 use Illuminate\Support\Carbon;
+use App\Factory\ProjectFactory;
+use App\Models\ExpenseCategory;
+use App\Models\RecurringInvoice;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\ClientRepository;
+use App\Factory\ExpenseCategoryFactory;
 
 /**
  * Class BaseTransformer.
@@ -623,6 +624,30 @@ class BaseTransformer
         return $vendor->id;
     }
 
+    public function getTaskStatusId(array $task_data)
+    {
+        if(isset($task_data['task.status']))
+            return $this->company->task_statuses()->whereNull('deleted_at')->orderBy('id','asc')->first()->id ?? null;
+
+        $ts = TaskStatus::query()->where('company_id', $this->company->id)
+                    ->where('is_deleted', false)
+                    ->whereRaw("LOWER(REPLACE(`name`, ' ' ,''))  = ?", [
+                        strtolower(str_replace(' ', '', $task_data['task.status'])),
+                    ])
+                    ->first();
+
+        if($ts) {
+            return $ts->id;
+        }
+
+        $ts = \App\Factory\TaskStatusFactory::create($this->company->id, $this->company->owner()->id);
+        $ts->name = $task_data['task.status'];
+        $ts->save();
+
+        return $ts ? $ts->id : null;
+    
+    }
+
     /**
      * @param $name
      *
@@ -688,6 +713,9 @@ class BaseTransformer
 
     private function createProject($name, $clientId)
     {
+        if(!$clientId)
+            return null;
+
         $project = ProjectFactory::create($this->company->id, $this->company->owner()->id);
         $project->name = $name;
 
