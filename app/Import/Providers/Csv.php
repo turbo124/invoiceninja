@@ -11,44 +11,48 @@
 
 namespace App\Import\Providers;
 
-use App\Factory\BankTransactionFactory;
+use App\Factory\TaskFactory;
+use App\Factory\QuoteFactory;
 use App\Factory\ClientFactory;
+use App\Factory\VendorFactory;
 use App\Factory\ExpenseFactory;
 use App\Factory\InvoiceFactory;
 use App\Factory\PaymentFactory;
 use App\Factory\ProductFactory;
-use App\Factory\QuoteFactory;
-use App\Factory\RecurringInvoiceFactory;
-use App\Factory\VendorFactory;
-use App\Http\Requests\BankTransaction\StoreBankTransactionRequest;
-use App\Http\Requests\Client\StoreClientRequest;
-use App\Http\Requests\Expense\StoreExpenseRequest;
-use App\Http\Requests\Invoice\StoreInvoiceRequest;
-use App\Http\Requests\Payment\StorePaymentRequest;
-use App\Http\Requests\Product\StoreProductRequest;
-use App\Http\Requests\Quote\StoreQuoteRequest;
-use App\Http\Requests\RecurringInvoice\StoreRecurringInvoiceRequest;
-use App\Http\Requests\Vendor\StoreVendorRequest;
-use App\Import\Transformer\Bank\BankTransformer;
-use App\Import\Transformer\Csv\ClientTransformer;
-use App\Import\Transformer\Csv\ExpenseTransformer;
-use App\Import\Transformer\Csv\InvoiceTransformer;
-use App\Import\Transformer\Csv\PaymentTransformer;
-use App\Import\Transformer\Csv\ProductTransformer;
-use App\Import\Transformer\Csv\QuoteTransformer;
-use App\Import\Transformer\Csv\RecurringInvoiceTransformer;
-use App\Import\Transformer\Csv\VendorTransformer;
-use App\Repositories\BankTransactionRepository;
+use App\Utils\Traits\MakesHash;
+use App\Repositories\TaskRepository;
+use App\Repositories\QuoteRepository;
 use App\Repositories\ClientRepository;
+use App\Repositories\VendorRepository;
+use App\Factory\BankTransactionFactory;
 use App\Repositories\ExpenseRepository;
 use App\Repositories\InvoiceRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\ProductRepository;
-use App\Repositories\QuoteRepository;
-use App\Repositories\RecurringInvoiceRepository;
-use App\Repositories\VendorRepository;
+use App\Factory\RecurringInvoiceFactory;
 use App\Services\Bank\BankMatchingService;
-use App\Utils\Traits\MakesHash;
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Quote\StoreQuoteRequest;
+use App\Import\Transformer\Csv\TaskTransformer;
+use App\Repositories\BankTransactionRepository;
+use App\Http\Requests\Client\StoreClientRequest;
+use App\Http\Requests\Vendor\StoreVendorRequest;
+use App\Import\Transformer\Bank\BankTransformer;
+use App\Import\Transformer\Csv\QuoteTransformer;
+use App\Repositories\RecurringInvoiceRepository;
+use App\Import\Transformer\Csv\ClientTransformer;
+use App\Import\Transformer\Csv\VendorTransformer;
+use App\Http\Requests\Expense\StoreExpenseRequest;
+use App\Http\Requests\Invoice\StoreInvoiceRequest;
+use App\Http\Requests\Payment\StorePaymentRequest;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Import\Transformer\Csv\ExpenseTransformer;
+use App\Import\Transformer\Csv\InvoiceTransformer;
+use App\Import\Transformer\Csv\PaymentTransformer;
+use App\Import\Transformer\Csv\ProductTransformer;
+use App\Import\Transformer\Csv\RecurringInvoiceTransformer;
+use App\Http\Requests\BankTransaction\StoreBankTransactionRequest;
+use App\Http\Requests\RecurringInvoice\StoreRecurringInvoiceRequest;
 
 class Csv extends BaseImport implements ImportInterface
 {
@@ -69,6 +73,7 @@ class Csv extends BaseImport implements ImportInterface
                 'quote',
                 'bank_transaction',
                 'recurring_invoice',
+                'tasks',
             ])
         ) {
             $this->{$entity}();
@@ -348,6 +353,31 @@ class Csv extends BaseImport implements ImportInterface
 
     public function task()
     {
+        $entity_type = 'task';
+
+        $data = $this->getCsvData($entity_type);
+
+        if (is_array($data)) {
+            $data = $this->preTransformCsv($data, $entity_type);
+        }
+
+        if (empty($data)) {
+            $this->entity_count['invoices'] = 0;
+            return;
+        }
+
+        $this->request_name = StoreTaskRequest::class;
+        $this->repository_name = TaskRepository::class;
+        $this->factory_name = TaskFactory::class;
+
+        $this->repository = app()->make($this->repository_name);
+        // $this->repository->import_mode = true;
+
+        $this->transformer = new TaskTransformer($this->company);
+
+        $task_count = $this->ingestTasks($data, 'task.number');
+
+        $this->entity_count['tasks'] = $task_count;
     }
 
     public function transform(array $data)

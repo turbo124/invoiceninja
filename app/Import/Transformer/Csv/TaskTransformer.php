@@ -58,6 +58,8 @@ class TaskTransformer extends BaseTransformer
 
                             })->toJson();
 
+        nlog($time_log);
+
         $transformed['time_log'] = $time_log;
 
         return $transformed;
@@ -65,9 +67,11 @@ class TaskTransformer extends BaseTransformer
 
     private function parseLog($item): array
     {
+        $start_date = false;
+        $end_date = false;
+
         $notes = $item['task.notes'] ?? '';
         $is_billable = $item['task.is_billable'] ?? false;
-        // echo strtotime('01:00:00') - strtotime('TODAY'); // 3600
 
         if(isset($item['start_date']) &&
         isset($item['end_date'])){
@@ -80,6 +84,9 @@ class TaskTransformer extends BaseTransformer
             $start_date = $this->stubbed_timestamp;
             $end_date = $this->stubbed_timestamp + $duration;
             $this->stubbed_timestamp++;
+        }
+        else {
+            return [];
         }
 
         return [$start_date, $end_date, $notes, $is_billable];
