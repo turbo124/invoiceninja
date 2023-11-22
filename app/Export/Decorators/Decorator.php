@@ -27,25 +27,12 @@ use App\Models\RecurringInvoice;
 
 class Decorator {
 
-    public function __invoke(mixed $entity, string $key)
+    public function __construct()
     {
-        return match($entity){
-            ($entity instanceof Client) => $value = (new ClientDecorator($entity, $key))->transform(),
-            ($entity instanceof Payment) => $value = (new PaymentDecorator($entity, $key))->transform(),
-            ($entity instanceof Invoice) => $value = (new InvoiceDecorator($entity, $key))->transform(),
-            ($entity instanceof RecurringInvoice) => $value = (new RecurringInvoiceDecorator($entity, $key))->transform(),
-            ($entity instanceof Credit) => $value = (new CreditDecorator($entity, $key))->transform(),
-            ($entity instanceof Quote) => $value = (new QuoteDecorator($entity, $key))->transform(),
-            ($entity instanceof Task) => $value = (new TaskDecorator($entity, $key))->transform(),
-            ($entity instanceof Expense) => $value = (new ExpenseDecorator($entity, $key))->transform(),
-            ($entity instanceof Project) => $value = (new ProjectDecorator($entity, $key))->transform(),
-            ($entity instanceof Product) => $value = (new ProductDecorator($entity, $key))->transform(),
-            ($entity instanceof Vendor) => $value = (new VendorDecorator($entity, $key))->transform(),
-            ($entity instanceof PurchaseOrder) => $value = (new PurchaseOrderDecorator($entity, $key))->transform(),
-            default => $value = '',
-        };
-
-        return $value;
     }
 
+    public function payment(mixed $entity, string $key): DecoratorInterface
+    {
+        return  new PaymentDecorator($entity, $key);
+    }
 }

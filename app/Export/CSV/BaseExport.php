@@ -11,27 +11,28 @@
 
 namespace App\Export\CSV;
 
+use App\Models\Task;
+use App\Models\Quote;
 use App\Models\Client;
-use App\Models\ClientContact;
-use App\Models\Company;
 use App\Models\Credit;
-use App\Models\Document;
+use App\Models\Vendor;
+use App\Utils\Helpers;
+use App\Models\Company;
 use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
-use App\Models\PurchaseOrder;
-use App\Models\Quote;
-use App\Models\RecurringInvoice;
-use App\Models\Task;
-use App\Models\Vendor;
-use App\Transformers\PaymentTransformer;
-use App\Transformers\TaskTransformer;
-use App\Utils\Helpers;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
+use App\Models\Document;
 use League\Fractal\Manager;
+use App\Models\ClientContact;
+use App\Models\PurchaseOrder;
+use Illuminate\Support\Carbon;
+use App\Utils\Traits\MakesHash;
+use App\Models\RecurringInvoice;
+use App\Export\Decorators\Decorator;
+use App\Transformers\TaskTransformer;
+use App\Transformers\PaymentTransformer;
+use Illuminate\Database\Eloquent\Builder;
 use League\Fractal\Serializer\ArraySerializer;
 
 class BaseExport
@@ -39,6 +40,8 @@ class BaseExport
     use MakesHash;
     
     public Company $company;
+    
+    public Decorator $decorator;
     
     public array $input;
 
@@ -477,7 +480,7 @@ class BaseExport
             'recurring_invoice' => $value = $this->resolveInvoiceKey($parts[1], $entity, $transformer),
             'quote' => $value = $this->resolveQuoteKey($parts[1], $entity, $transformer),
             'purchase_order' => $value = $this->resolvePurchaseOrderKey($parts[1], $entity, $transformer),
-            'payment' => $value = $this->resolvePaymentKey($parts[1], $entity, $transformer),
+            'payment' => $value = $this->decorator->payment($entity, $key)->transform(), //$this->resolvePaymentKey($parts[1], $entity, $transformer),
             'task' => $value = $this->resolveTaskKey($parts[1], $entity, $transformer),
             default => $value = '',
         };
@@ -754,13 +757,13 @@ class BaseExport
 
         if($entity instanceof Payment) {
 
-            $transformed_payment = $transformer->transform($entity);
+            // $transformed_payment = $transformer->transform($entity);
 
-            if(array_key_exists($column, $transformed_payment)) {
-                return $transformed_payment[$column];
-            } elseif (array_key_exists(str_replace("payment.", "", $column), $transformed_payment)) {
-                return $transformed_payment[$column];
-            } 
+            // if(array_key_exists($column, $transformed_payment)) {
+            //     return $transformed_payment[$column];
+            // } elseif (array_key_exists(str_replace("payment.", "", $column), $transformed_payment)) {
+            //     return $transformed_payment[$column];
+            // } 
 
             // nlog("export: Could not resolve payment key: {$column}");
 

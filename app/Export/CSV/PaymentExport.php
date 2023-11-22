@@ -11,6 +11,7 @@
 
 namespace App\Export\CSV;
 
+use App\Export\Decorators\Decorator;
 use App\Libraries\MultiDB;
 use App\Models\Company;
 use App\Models\Payment;
@@ -33,6 +34,7 @@ class PaymentExport extends BaseExport
         $this->company = $company;
         $this->input = $input;
         $this->entity_transformer = new PaymentTransformer();
+        $this->decorator = new Decorator();
     }
 
     private function init(): Builder
