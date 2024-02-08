@@ -13,10 +13,12 @@ namespace App\Services\Subscription;
 
 use App\Models\Credit;
 use App\Models\Invoice;
+use App\Models\PaymentType;
 use App\Models\Subscription;
 use App\Factory\CreditFactory;
 use App\DataMapper\InvoiceItem;
 use App\Factory\InvoiceFactory;
+use App\Factory\PaymentFactory;
 use App\Models\RecurringInvoice;
 use App\Services\AbstractService;
 use App\Repositories\CreditRepository;
@@ -46,16 +48,24 @@ class ChangePlanInvoice extends AbstractService
 
         $invoice = $this->generateInvoice($refund);
 
-        if($refund >= $new_charge){
-            $invoice = $invoice->markPaid()->save();
-
-            //generate new recurring invoice at this point as we know the user has succeeded with their upgrade.
+        if($refund > $new_charge){
+            $credit = $this->generateCredit($refund - $new_charge);
         }
         
-        if($refund > $new_charge)
-            return $this->generateCredit($refund - $new_charge);
+        // if($refund >= $new_charge){
+            
+            // $payment = PaymentFactory::create($invoice->company_id, $invoice->user_id, $invoice->client_id);
+            // $payment->type_id = PaymentType::CREDIT;
+            // $payment->client_id = $invoice->client_id;
+            // $payment->is_manual = true;
+            // $payment->amount = $new_charge;
+            // $payment->saveQuietly();
 
-        return $invoice;
+            // $payment->service()->applyNumber()->applyCreditsToInvoice($invoice);
+
+        // }
+
+        return $invoice->fresh();
     }
 
     private function generateCredit(float $credit_balance): Credit
@@ -77,6 +87,7 @@ class ChangePlanInvoice extends AbstractService
 
         $invoice_items = [];
         $invoice_items[] = $invoice_item;
+        $credit->line_items = $invoice_items;
 
         $data = [
             'client_id' => $this->recurring_invoice->client_id,
@@ -103,11 +114,11 @@ class ChangePlanInvoice extends AbstractService
         $invoice_item->product_key = ctrans('texts.refund');
         $invoice_item->notes = ctrans('texts.refund'). " #{$this->status->refundable_invoice->number}";
         $invoice_item->quantity = 1;
-        $invoice_item->cost = $refund;
+        $invoice_item->cost = $refund*-1;
 
         $invoice_items = [];
-        $invoice_items[] = $subscription_repo->generateLineItems($this->target);
-        $invoice_items[] = $invoice_item;
+        $invoice_items = array_merge($subscription_repo->generateLineItems($this->target), [$invoice_item]);
+        
         $invoice->line_items = $invoice_items;
         $invoice->is_proforma = true;
 

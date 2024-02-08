@@ -164,7 +164,8 @@ class BillingPortalPurchasev2 extends Component
     public $payment_confirmed = false;
     public $is_eligible = true;
     public $not_eligible_message = '';
-
+    public $price = 0;
+    
     public function mount()
     {
         MultiDB::setDb($this->db);
@@ -512,7 +513,7 @@ class BillingPortalPurchasev2 extends Component
      */
     public function handleBeforePaymentEvents(): self
     {
-        $eligibility_check = $this->subscription->service()->isEligible($this->contact);
+        $eligibility_check = $this->subscription->link_service()->isEligible($this->contact);
 
         if (is_array($eligibility_check) && $eligibility_check['message'] != 'Success') {
             $this->is_eligible = false;
@@ -533,7 +534,7 @@ class BillingPortalPurchasev2 extends Component
         ];
 
         $this->invoice = $this->subscription
-            ->service()
+            ->link_service()
             ->createInvoiceV2($this->bundle, $this->contact->client_id, $this->valid_coupon)
             ->service()
             ->markSent()
@@ -565,7 +566,7 @@ class BillingPortalPurchasev2 extends Component
      */
     public function handleTrial()
     {
-        return $this->subscription->service()->startTrial([
+        return $this->subscription->link_service()->startTrial([
             'email' => $this->email ?? $this->contact->email,
             'quantity' => $this->quantity,
             'contact_id' => $this->contact->hashed_id,
@@ -582,7 +583,7 @@ class BillingPortalPurchasev2 extends Component
      */
     public function handlePaymentNotRequired()
     {
-        $eligibility_check = $this->subscription->service()->isEligible($this->contact);
+        $eligibility_check = $this->subscription->link_service()->isEligible($this->contact);
 
         if (is_array($eligibility_check) && $eligibility_check['message'] != 'Success') {
             $this->is_eligible = false;
@@ -591,7 +592,7 @@ class BillingPortalPurchasev2 extends Component
         }
 
         $invoice = $this->subscription
-            ->service()
+            ->link_service()
             ->createInvoiceV2($this->bundle, $this->contact->client_id, $this->valid_coupon)
             ->service()
             ->fillDefaults()
@@ -605,7 +606,7 @@ class BillingPortalPurchasev2 extends Component
                 ->save();
 
         return $this->subscription
-                    ->service()
+                    ->link_service()
                     ->handleNoPaymentFlow($invoice, $this->bundle, $this->contact);
     }
 

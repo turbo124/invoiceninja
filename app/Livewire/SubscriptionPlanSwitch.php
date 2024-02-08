@@ -56,6 +56,12 @@ class SubscriptionPlanSwitch extends Component
      */
     public $total;
 
+    public ?string $contact_first_name;
+
+    public ?string $contact_last_name;
+
+    public ?string $contact_email;
+
     public $hide_button = false;
     /**
      * @var array
@@ -83,6 +89,13 @@ class SubscriptionPlanSwitch extends Component
 
         $this->methods = $this->contact->client->service()->getPaymentMethods($this->amount);
 
+        $this->contact_first_name = $this->contact->first_name;
+        $this->contact_last_name = $this->contact->last_name;
+        $this->contact_email = $this->contact->email;
+
+        $this->state['check_rff'] = false;
+
+
         $this->hash = Str::uuid()->toString();
     }
 
@@ -90,15 +103,17 @@ class SubscriptionPlanSwitch extends Component
     {
         $this->state['show_loading_bar'] = true;
 
-        $payment_required = $this->target->service()->changePlanPaymentCheck([
-            'recurring_invoice' => $this->recurring_invoice,
-            'subscription' => $this->subscription,
-            'target' => $this->target,
-            'hash' => $this->hash,
-        ]);
+        // $payment_required = $this->target->service()->changePlanPaymentCheck([
+        //     'recurring_invoice' => $this->recurring_invoice,
+        //     'subscription' => $this->subscription,
+        //     'target' => $this->target,
+        //     'hash' => $this->hash,
+        // ]);
 
-        if ($payment_required) {
-            $this->state['invoice'] = $this->target->service()->createChangePlanInvoice([
+        $payment_amount = $this->target->link_service()->calculateUpgradePriceV2($this->recurring_invoice, $this->target);
+
+        if ($payment_amount > 0) {
+            $this->state['invoice'] = $this->target->link_service()->createChangePlanInvoice([
                 'recurring_invoice' => $this->recurring_invoice,
                 'subscription' => $this->subscription,
                 'target' => $this->target,
@@ -144,13 +159,19 @@ class SubscriptionPlanSwitch extends Component
     {
         $this->hide_button = true;
 
-        $response =  $this->target->service()->createChangePlanCreditV2([
-            'recurring_invoice' => $this->recurring_invoice,
-            'subscription' => $this->subscription,
-            'target' => $this->target,
-            'hash' => $this->hash,
+        $response = $this->target->link_service()->handleNoPaymentRequired([
+            'email' => $this->contact->email,
+            'quantity' => 1,
+            'contact_id' => $this->contact->id,
+            'client_id' => $this->contact->client_id,
+            'coupon' => '',
+            // $response =  $this->target->service()->createChangePlanCreditV2([
+            // 'recurring_invoice' => $this->recurring_invoice,
+            // 'subscription' => $this->subscription,
+            // 'target' => $this->target,
+            // 'hash' => $this->hash,
         ]);
-
+        
         $this->hide_button = true;
 
         $this->dispatch('redirectRoute', ['route' => $response]);

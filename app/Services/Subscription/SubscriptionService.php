@@ -979,7 +979,6 @@ class SubscriptionService
     public function createInvoiceV2($bundle, $client_id, $valid_coupon = false)
     {
         $invoice_repo = new InvoiceRepository();
-        $subscription_repo = new SubscriptionRepository();
 
         $invoice = InvoiceFactory::create($this->subscription->company_id, $this->subscription->user_id);
         $invoice->subscription_id = $this->subscription->id;

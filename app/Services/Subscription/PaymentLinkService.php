@@ -19,14 +19,18 @@ use App\Models\PaymentHash;
 use App\Models\Subscription;
 use App\Models\ClientContact;
 use GuzzleHttp\RequestOptions;
+use App\DataMapper\InvoiceItem;
+use App\Factory\InvoiceFactory;
 use App\Jobs\Util\SystemLogger;
 use App\Utils\Traits\MakesHash;
 use App\Models\RecurringInvoice;
+use App\Repositories\InvoiceRepository;
 use GuzzleHttp\Exception\ClientException;
 use App\Services\Subscription\UpgradePrice;
 use App\Services\Subscription\ZeroCostProduct;
 use App\Repositories\RecurringInvoiceRepository;
 use App\Services\Subscription\ChangePlanInvoice;
+use App\Services\Subscription\InvoiceToRecurring;
 
 class PaymentLinkService
 {
@@ -229,7 +233,7 @@ class PaymentLinkService
      * 
      * @param  RecurringInvoice $recurring_invoice - The Current Recurring Invoice for the subscription.
      * @param  Subscription $target - The new target subscription to move to
-     * @return float - the upgrade price
+      * @return float - the upgrade price
      */
     public function calculateUpgradePriceV2(RecurringInvoice $recurring_invoice, Subscription $target): ?float
     {
@@ -257,6 +261,7 @@ class PaymentLinkService
     * 'email' => $this->email ?? $this->contact->email,
     * 'quantity' => $this->quantity,
     * 'contact_id' => $this->contact->id,
+    * 'coupon' => ?string
     *
     * @param array $data
     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
@@ -276,10 +281,9 @@ class PaymentLinkService
 
     /**
      * @param Invoice $invoice
-     * @return true
-     * @throws BindingResolutionException
+     * @return bool
      */
-    public function planPaid(Invoice $invoice)
+    public function planPaid(Invoice $invoice): bool
     {
         $recurring_invoice_hashed_id = $invoice->recurring_invoice()->exists() ? $invoice->recurring_invoice->hashed_id : null;
 
@@ -298,6 +302,90 @@ class PaymentLinkService
         nlog($response);
 
         return true;
+    }
+    
+    /**
+     * createInvoiceV2
+     *
+     * @param  \Illuminate\Support\Collection $bundle
+     * @param  int $client_id
+     * @param  boolean $valid_coupon
+     * @return Invoice
+     */
+    public function createInvoiceV2($bundle, $client_id, $valid_coupon = false): Invoice
+    {
+        $invoice_repo = new InvoiceRepository();
+
+        $invoice = InvoiceFactory::create($this->subscription->company_id, $this->subscription->user_id);
+        $invoice->subscription_id = $this->subscription->id;
+        $invoice->client_id = $client_id;
+        $invoice->is_proforma = true;
+        $invoice->number = "####" . ctrans('texts.subscription') . "_" . now()->format('Y-m-d') . "_" . rand(0, 100000);
+        $line_items = $bundle->map(function ($item) {
+            $line_item = new InvoiceItem();
+            $line_item->product_key = $item['product_key'];
+            $line_item->quantity = (float)$item['qty'];
+            $line_item->cost = (float)$item['unit_cost'];
+            $line_item->notes = $item['description'];
+
+            return $line_item;
+        })->toArray();
+
+        $invoice->line_items = $line_items;
+
+        if ($valid_coupon) {
+            $invoice->discount = $this->subscription->promo_discount;
+            $invoice->is_amount_discount = $this->subscription->is_amount_discount;
+        }
+
+        return $invoice_repo->save([], $invoice);
+    }
+
+
+    /**
+     * Handle case where no payment is required
+     * @param  Invoice       $invoice The Invoice
+     * @param  array         $bundle  The bundle array
+     * @param  ClientContact $contact The Client Contact
+     *
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    public function handleNoPaymentFlow(Invoice $invoice, array $bundle, ClientContact $contact)
+    {
+        if (strlen($this->subscription->recurring_product_ids) >= 1) {
+
+            $bundle =collect($bundle)->map(function ($bund) {
+                return (object) $bund;
+            })->toArray();
+
+            $recurring_invoice = (new InvoiceToRecurring($contact->client_id, $this->subscription, $bundle))->run();
+
+            /* Start the recurring service */
+            $recurring_invoice->service()
+                              ->start()
+                              ->save();
+
+            $invoice->recurring_id = $recurring_invoice->id;
+            $invoice->save();
+
+            $context = [
+                'context' => 'recurring_purchase',
+                'recurring_invoice' => $recurring_invoice->hashed_id,
+                'invoice' => $invoice->hashed_id,
+                'client' => $recurring_invoice->client->hashed_id,
+                'subscription' => $this->subscription->hashed_id,
+                'contact' => $contact->hashed_id,
+                'redirect_url' => "/client/recurring_invoices/{$recurring_invoice->hashed_id}",
+            ];
+
+            $this->triggerWebhook($context);
+
+            return $this->handleRedirect($context['redirect_url']);
+        }
+
+        $redirect_url = "/client/invoices/{$invoice->hashed_id}";
+
+        return $this->handleRedirect($redirect_url);
     }
 
 
