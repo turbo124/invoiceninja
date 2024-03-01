@@ -67,7 +67,7 @@ class Piste
         return null;
     }
 
-    public function execute(string $uri, array $data = [])
+    public function execute(string $uri, string $method = 'post', array $data = [])
     {
         $access_token = $this->getOauthAccessToken();
 
@@ -76,19 +76,21 @@ class Piste
         nlog($this->password);
         nlog(base64_encode($this->username . ':' . $this->password));
 
-        $r = Http::withToken($access_token)
-                    ->withHeaders([
+        $r = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $access_token,
                         'cpro-account' => base64_encode($this->username . ':' . $this->password),
                         'Content-Type' => 'application/json;charset=utf-8',
                         'Accept' => 'application/json;charset=utf-8'
                     ])
-                    ->post($this->apiUrl() . '/cpro/factures/'. $uri, $data);
+                    // ->$method($this->apiUrl() . '/cpro/factures/'. $uri, $data);
+                    ->$method($this->apiUrl() . $uri, $data);
 
-        nlog($r);
+        // nlog($r);
+        nlog($this->apiUrl() . $uri);
         nlog($r->json());
         nlog($r->successful());
-        nlog($r->body());
-        nlog($r->collect());
+        // nlog($r->body());
+        // nlog($r->collect());
         return $r;
     }
 
