@@ -113,5 +113,7 @@ return [
     'chorus' => [
         'client_id' => env('CHORUS_CLIENT_ID', false),
         'secret' => env('CHORUS_SECRET', false),
+        'tech_username' => env('CHORUS_TECH_USERNAME', false),
+        'tech_password' => env('CHORUS_TECH_PASSWORD', false),
     ]
 ];
