@@ -42,7 +42,8 @@ class Piste
             'grant_type' => 'client_credentials',
             'client_id' => config('services.chorus.client_id'),
             'client_secret' => config('services.chorus.secret'),
-            'scope' => 'openid profile'
+            'scope' => 'openid profile',
+            // 'scope' => 'openid profile searchInvoiceAProcessByValidator processInvoiceAValidate telechargerGroupeFacture deposerPdfFacture searchRequestPayment searchInvoiceRecipient completerFacture consulterFactureParRecipiendaire searchInvoiceByValidator ProcessAReceivedInvoice consulterFactureParValideur consultInvoiceBySupplier searchInvoiceBySupplier recyclerFacture submitInvoice searchInvoiceProcessByRecipient searchInvoiceProcessBySupplier ProcessRejectedInvoices consulterHistoriqueFacture correctValidatorInvoice deposerFluxFacture recupererStatutsFactureVisiblesParValideur'
         ];
     }
 
@@ -77,13 +78,14 @@ class Piste
         nlog(base64_encode($this->username . ':' . $this->password));
 
         $r = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $access_token,
-                        'cpro-account' => base64_encode($this->username . ':' . $this->password),
-                        'Content-Type' => 'application/json;charset=utf-8',
-                        'Accept' => 'application/json;charset=utf-8'
-                    ])
-                    // ->$method($this->apiUrl() . '/cpro/factures/'. $uri, $data);
-                    ->$method($this->apiUrl() . $uri, $data);
+            'Authorization' => 'Bearer ' . $access_token,
+            'cpro-account' => base64_encode(config('services.chorus.tech_username') . ':' . config('services.chorus.tech_password')),
+            // 'cpro-account' => base64_encode($this->username . ':' . $this->password),
+            'Content-Type' => 'application/json;charset=utf-8',
+            'Accept' => 'application/json;charset=utf-8'
+        ])
+        // ->$method($this->apiUrl() . '/cpro/factures/'. $uri, $data);
+        ->$method($this->apiUrl() . $uri, $data);
 
         // nlog($r);
         nlog($this->apiUrl() . $uri);
