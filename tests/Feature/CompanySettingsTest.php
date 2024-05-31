@@ -32,7 +32,7 @@ class CompanySettingsTest extends TestCase
     use MockAccountData;
     // use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
