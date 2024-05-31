@@ -121,17 +121,17 @@ use App\Http\Controllers\WebhookController;
 use App\PaymentDrivers\PayPalPPCPPaymentDriver;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => ['throttle:api', 'api_secret_check']], function () {
+Route::middleware('throttle:api', 'api_secret_check')->group(function () {
     Route::post('api/v1/signup', [AccountController::class, 'store'])->name('signup.submit');
     Route::post('api/v1/oauth_login', [LoginController::class, 'oauthApiLogin']);
 });
 
-Route::group(['middleware' => ['throttle:login', 'api_secret_check', 'email_db']], function () {
+Route::middleware('throttle:login', 'api_secret_check', 'email_db')->group(function () {
     Route::post('api/v1/login', [LoginController::class, 'apiLogin'])->name('login.submit');
     Route::post('api/v1/reset_password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 });
 
-Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale'], 'prefix' => 'api/v1', 'as' => 'api.'], function () {
+Route::middleware('throttle:api', 'api_db', 'token_auth', 'locale')->prefix('api/v1')->name('api.')->group(function () {
 
     Route::post('password_timeout', PasswordTimeoutController::class)->name('password_timeout');
     Route::put('accounts/{account}', [AccountController::class, 'update'])->name('account.update');

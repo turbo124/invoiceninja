@@ -45,7 +45,7 @@ Route::get('client/payment/{contact_key}/{payment_id}', [App\Http\Controllers\Cl
 Route::get('client/ninja/{contact_key}/{company_key}', [App\Http\Controllers\ClientPortal\NinjaPlanController::class, 'index'])->name('client.ninja_contact_login')->middleware(['domain_db']);
 Route::post('client/ninja/trial_confirmation', [App\Http\Controllers\ClientPortal\NinjaPlanController::class, 'trial_confirmation'])->name('client.trial.response')->middleware(['domain_db']);
 
-Route::group(['middleware' => ['auth:contact', 'locale', 'domain_db', 'check_client_existence'], 'prefix' => 'client', 'as' => 'client.'], function () {
+Route::middleware('auth:contact', 'locale', 'domain_db', 'check_client_existence')->prefix('client')->name('client.')->group(function () {
     Route::get('dashboard', [App\Http\Controllers\ClientPortal\DashboardController::class, 'index'])->name('dashboard'); // name = (dashboard. index / create / show / update / destroy / edit
 
     Route::get('plan', [App\Http\Controllers\ClientPortal\NinjaPlanController::class, 'plan'])->name('plan'); // name = (dashboard. index / create / show / update / destroy / edit
@@ -122,7 +122,7 @@ Route::get('client/subscriptions/{subscription}/purchase', [App\Http\Controllers
 Route::get('client/subscriptions/{subscription}/purchase/v2', [App\Http\Controllers\ClientPortal\SubscriptionPurchaseController::class, 'upgrade'])->name('client.subscription.upgrade')->middleware('domain_db');
 Route::get('client/subscriptions/{subscription}/purchase/v3', [App\Http\Controllers\ClientPortal\SubscriptionPurchaseController::class, 'v3'])->name('client.subscription.v3')->middleware('domain_db');
 
-Route::group(['middleware' => ['invite_db'], 'prefix' => 'client', 'as' => 'client.'], function () {
+Route::middleware('invite_db')->prefix('client')->name('client.')->group(function () {
     /*Invitation catches*/
     Route::get('recurring_invoice/{invitation_key}', [App\Http\Controllers\ClientPortal\InvitationController::class, 'recurringRouter']);
     Route::get('invoice/{invitation_key}', [App\Http\Controllers\ClientPortal\InvitationController::class, 'invoiceRouter']);
