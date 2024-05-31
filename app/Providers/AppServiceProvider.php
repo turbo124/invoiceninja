@@ -22,6 +22,7 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
@@ -144,6 +145,8 @@ class AppServiceProvider extends ServiceProvider
             return $this;
         });
 
+
+        $this->bootAuth();
     }
 
     public function register(): void
@@ -151,5 +154,15 @@ class AppServiceProvider extends ServiceProvider
         if (Ninja::isHosted()) {
             $this->app->register(\App\Providers\BroadcastServiceProvider::class);
         }
+    }
+
+    public function bootAuth()
+    {
+
+        Gate::define('view-list', function ($user, $entity) {
+            $entity = strtolower(class_basename($entity));
+
+            return $user->hasPermission('view_'.$entity) || $user->isAdmin();
+        });
     }
 }
