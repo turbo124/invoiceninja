@@ -32,7 +32,6 @@ class VendorUpdatedActivity implements ShouldQueue
      * Handle the event.
      *
      * @param  object  $event
-     * @return void
      */
     public function handle($event): void
     {

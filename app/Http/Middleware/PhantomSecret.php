@@ -10,16 +10,15 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class PhantomSecret
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

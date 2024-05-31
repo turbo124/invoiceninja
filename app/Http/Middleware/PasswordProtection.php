@@ -10,7 +10,6 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\Libraries\MultiDB;
 use App\Libraries\OAuth\Providers\Google;
 use Closure;
@@ -20,13 +19,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response;
 
 class PasswordProtection
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

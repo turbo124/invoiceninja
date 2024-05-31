@@ -10,12 +10,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\Subscription\PaymentLinkService;
 use App\Services\Subscription\SubscriptionCalculator;
 use App\Services\Subscription\SubscriptionService;
 use App\Services\Subscription\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**

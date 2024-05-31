@@ -16,8 +16,6 @@ class ProposalObserver
 {
     /**
      * Handle the proposal "created" event.
-     *
-     * @return void
      */
     public function created(Proposal $proposal): void
     {
@@ -26,8 +24,6 @@ class ProposalObserver
 
     /**
      * Handle the proposal "updated" event.
-     *
-     * @return void
      */
     public function updated(Proposal $proposal): void
     {
@@ -36,8 +32,6 @@ class ProposalObserver
 
     /**
      * Handle the proposal "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Proposal $proposal): void
     {
@@ -46,8 +40,6 @@ class ProposalObserver
 
     /**
      * Handle the proposal "restored" event.
-     *
-     * @return void
      */
     public function restored(Proposal $proposal): void
     {
@@ -56,8 +48,6 @@ class ProposalObserver
 
     /**
      * Handle the proposal "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Proposal $proposal): void
     {

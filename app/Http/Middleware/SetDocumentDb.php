@@ -10,18 +10,17 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\Libraries\MultiDB;
 use Closure;
 use Illuminate\Http\Request;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response;
 
 class SetDocumentDb
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

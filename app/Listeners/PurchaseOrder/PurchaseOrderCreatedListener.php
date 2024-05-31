@@ -32,8 +32,6 @@ class PurchaseOrderCreatedListener implements ShouldQueue
 
     /**
      * Handle the event.
-     *
-     * @return void
      */
     public function handle(PurchaseOrderWasCreated $event): void
     {

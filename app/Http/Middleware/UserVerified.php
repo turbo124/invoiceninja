@@ -10,11 +10,11 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Utils\Ninja;
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class UserVerified.
@@ -30,7 +30,6 @@ class UserVerified
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

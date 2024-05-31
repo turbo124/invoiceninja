@@ -10,7 +10,6 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\Http\ViewComposers\PortalComposer;
 use App\Libraries\MultiDB;
 use App\Models\Client;
@@ -20,6 +19,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class ContactKeyLogin
 {
@@ -30,7 +30,6 @@ class ContactKeyLogin
      * OR
      * If the contact_key is provided in the route
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

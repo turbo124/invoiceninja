@@ -20,8 +20,6 @@ class ProjectObserver
 
     /**
      * Handle the product "created" event.
-     *
-     * @return void
      */
     public function created(Project $project): void
     {
@@ -36,8 +34,6 @@ class ProjectObserver
 
     /**
      * Handle the product "updated" event.
-     *
-     * @return void
      */
     public function updated(Project $project): void
     {
@@ -62,8 +58,6 @@ class ProjectObserver
 
     /**
      * Handle the product "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Project $project): void
     {
@@ -82,8 +76,6 @@ class ProjectObserver
 
     /**
      * Handle the product "restored" event.
-     *
-     * @return void
      */
     public function restored(Project $project): void
     {
@@ -92,8 +84,6 @@ class ProjectObserver
 
     /**
      * Handle the product "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Project $project): void
     {

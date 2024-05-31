@@ -16,8 +16,6 @@ class CompanyTokenObserver
 {
     /**
      * Handle the company token "created" event.
-     *
-     * @return void
      */
     public function created(CompanyToken $companyToken): void
     {
@@ -26,8 +24,6 @@ class CompanyTokenObserver
 
     /**
      * Handle the company token "updated" event.
-     *
-     * @return void
      */
     public function updated(CompanyToken $companyToken): void
     {
@@ -36,8 +32,6 @@ class CompanyTokenObserver
 
     /**
      * Handle the company token "deleted" event.
-     *
-     * @return void
      */
     public function deleted(CompanyToken $companyToken): void
     {
@@ -46,8 +40,6 @@ class CompanyTokenObserver
 
     /**
      * Handle the company token "restored" event.
-     *
-     * @return void
      */
     public function restored(CompanyToken $companyToken): void
     {
@@ -56,8 +48,6 @@ class CompanyTokenObserver
 
     /**
      * Handle the company token "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(CompanyToken $companyToken): void
     {

@@ -20,8 +20,6 @@ class PaymentObserver
 
     /**
      * Handle the payment "created" event.
-     *
-     * @return void
      */
     public function created(Payment $payment): void
     {
@@ -36,8 +34,6 @@ class PaymentObserver
 
     /**
      * Handle the payment "updated" event.
-     *
-     * @return void
      */
     public function updated(Payment $payment): void
     {
@@ -62,8 +58,6 @@ class PaymentObserver
 
     /**
      * Handle the payment "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Payment $payment): void
     {
@@ -82,8 +76,6 @@ class PaymentObserver
 
     /**
      * Handle the payment "restored" event.
-     *
-     * @return void
      */
     public function restored(Payment $payment): void
     {
@@ -92,8 +84,6 @@ class PaymentObserver
 
     /**
      * Handle the payment "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Payment $payment): void
     {

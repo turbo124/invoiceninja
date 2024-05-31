@@ -12,15 +12,12 @@ namespace Database\Factories;
 
 use App\Factory\InvoiceItemFactory;
 use App\Models\Invoice;
-use App\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PurchaseOrderFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

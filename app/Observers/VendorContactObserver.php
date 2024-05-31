@@ -17,8 +17,6 @@ class VendorContactObserver
 {
     /**
      * Handle the vendor contact "created" event.
-     *
-     * @return void
      */
     public function created(VendorContact $vendorContact): void
     {
@@ -27,8 +25,6 @@ class VendorContactObserver
 
     /**
      * Handle the vendor contact "updated" event.
-     *
-     * @return void
      */
     public function updated(VendorContact $vendorContact): void
     {
@@ -37,8 +33,6 @@ class VendorContactObserver
 
     /**
      * Handle the vendor contact "deleted" event.
-     *
-     * @return void
      */
     public function deleted(VendorContact $vendorContact): void
     {
@@ -55,8 +49,6 @@ class VendorContactObserver
 
     /**
      * Handle the vendor contact "restored" event.
-     *
-     * @return void
      */
     public function restored(VendorContact $vendorContact): void
     {
@@ -64,8 +56,6 @@ class VendorContactObserver
 
     /**
      * Handle the vendor contact "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(VendorContact $vendorContact): void
     {

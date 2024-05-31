@@ -46,8 +46,6 @@ class LoginTest extends TestCase
 
     /**
      * A valid user can be logged in.
-     *
-     * @return void
      */
     // public function testLoginAValidUser()
     // {
@@ -78,8 +76,6 @@ class LoginTest extends TestCase
 
     /**
      * An invalid user cannot be logged in.
-     *
-     * @return void
      */
     // public function testDoesNotLoginAnInvalidUser()
     // {

@@ -20,8 +20,6 @@ class PurchaseOrderObserver
 
     /**
      * Handle the client "created" event.
-     *
-     * @return void
      */
     public function created(PurchaseOrder $purchase_order): void
     {
@@ -36,8 +34,6 @@ class PurchaseOrderObserver
 
     /**
      * Handle the client "updated" event.
-     *
-     * @return void
      */
     public function updated(PurchaseOrder $purchase_order): void
     {
@@ -62,8 +58,6 @@ class PurchaseOrderObserver
 
     /**
      * Handle the client "deleted" event.
-     *
-     * @return void
      */
     public function deleted(PurchaseOrder $purchase_order): void
     {
@@ -82,8 +76,6 @@ class PurchaseOrderObserver
 
     /**
      * Handle the client "restored" event.
-     *
-     * @return void
      */
     public function restored(PurchaseOrder $purchase_order): void
     {
@@ -92,8 +84,6 @@ class PurchaseOrderObserver
 
     /**
      * Handle the client "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(PurchaseOrder $purchase_order): void
     {

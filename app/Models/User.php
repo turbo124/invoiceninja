@@ -10,8 +10,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Jobs\Mail\NinjaMailer;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
@@ -25,6 +23,8 @@ use App\Utils\TruthSource;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -206,8 +206,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns a account.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function account(): BelongsTo
     {
@@ -216,8 +214,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns all company tokens.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function tokens(): HasMany
     {

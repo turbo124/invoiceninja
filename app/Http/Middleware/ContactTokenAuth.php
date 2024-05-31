@@ -10,20 +10,19 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\Events\Contact\ContactLoggedIn;
 use App\Models\ClientContact;
 use App\Utils\Ninja;
 use Closure;
 use Illuminate\Http\Request;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response;
 
 class ContactTokenAuth
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

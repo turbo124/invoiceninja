@@ -9,8 +9,6 @@ class CompanyGatewayObserver
 {
     /**
      * Handle the company gateway "created" event.
-     *
-     * @return void
      */
     public function created(CompanyGateway $company_gateway): void
     {
@@ -23,8 +21,6 @@ class CompanyGatewayObserver
 
     /**
      * Handle the company gateway "updated" event.
-     *
-     * @return void
      */
     public function updated(CompanyGateway $company_gateway): void
     {
@@ -33,8 +29,6 @@ class CompanyGatewayObserver
 
     /**
      * Handle the company gateway "deleted" event.
-     *
-     * @return void
      */
     public function deleted(CompanyGateway $company_gateway): void
     {
@@ -44,8 +38,6 @@ class CompanyGatewayObserver
 
     /**
      * Handle the company gateway "restored" event.
-     *
-     * @return void
      */
     public function restored(CompanyGateway $company_gateway): void
     {
@@ -58,8 +50,6 @@ class CompanyGatewayObserver
 
     /**
      * Handle the company gateway "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(CompanyGateway $company_gateway): void
     {

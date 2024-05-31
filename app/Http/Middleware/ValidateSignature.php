@@ -10,9 +10,9 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 
 class ValidateSignature
@@ -29,9 +29,7 @@ class ValidateSignature
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $relative
-     * @return \Illuminate\Http\Response
      *
      * @throws \Illuminate\Routing\Exceptions\InvalidSignatureException
      */

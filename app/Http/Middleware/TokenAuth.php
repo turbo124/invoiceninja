@@ -10,7 +10,6 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\Models\CompanyToken;
 use App\Models\User;
 use App\Utils\Ninja;
@@ -18,13 +17,13 @@ use App\Utils\TruthSource;
 use Closure;
 use Illuminate\Http\Request;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response;
 
 class TokenAuth
 {
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @return mixed
      */
     public function handle(Request $request, Closure $next): Response

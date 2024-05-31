@@ -10,8 +10,8 @@
 
 namespace App\Notifications\Ninja;
 
-use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Company;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
 
@@ -30,7 +30,6 @@ class EmailSpamNotification extends Notification
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
     public function via($notifiable): array
     {
@@ -50,7 +49,6 @@ class EmailSpamNotification extends Notification
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
     public function toArray($notifiable): array
     {

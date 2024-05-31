@@ -20,8 +20,6 @@ class ProductObserver
 
     /**
      * Handle the product "created" event.
-     *
-     * @return void
      */
     public function created(Product $product): void
     {
@@ -36,8 +34,6 @@ class ProductObserver
 
     /**
      * Handle the product "updated" event.
-     *
-     * @return void
      */
     public function updated(Product $product): void
     {
@@ -62,8 +58,6 @@ class ProductObserver
 
     /**
      * Handle the product "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Product $product): void
     {
@@ -82,8 +76,6 @@ class ProductObserver
 
     /**
      * Handle the product "restored" event.
-     *
-     * @return void
      */
     public function restored(Product $product): void
     {
@@ -92,8 +84,6 @@ class ProductObserver
 
     /**
      * Handle the product "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Product $product): void
     {

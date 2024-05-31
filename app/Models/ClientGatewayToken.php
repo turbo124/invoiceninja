@@ -10,8 +10,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Utils\Traits\MakesDates;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -92,8 +92,6 @@ class ClientGatewayToken extends BaseModel
 
     /**
      * Company
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function company(): BelongsTo
     {

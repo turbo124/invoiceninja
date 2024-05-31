@@ -10,9 +10,9 @@
 
 namespace App\Models;
 
+use Awobaz\Compoships\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Awobaz\Compoships\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -147,41 +147,26 @@ class CompanyUser extends Pivot
         return $this->hasOne(Company::class)->withPivot('permissions', 'settings', 'react_settings', 'is_admin', 'is_owner', 'is_locked', 'slack_webhook_url', 'migrating');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function users(): HasMany
     {
         return $this->hasMany(User::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function token(): HasMany
     {
         return $this->hasMany(CompanyToken::class, 'user_id', 'user_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function tokens(): HasMany
     {
         return $this->hasMany(CompanyToken::class, 'user_id', 'user_id');

@@ -20,8 +20,6 @@ class ExpenseObserver
 
     /**
      * Handle the expense "created" event.
-     *
-     * @return void
      */
     public function created(Expense $expense): void
     {
@@ -36,8 +34,6 @@ class ExpenseObserver
 
     /**
      * Handle the expense "updated" event.
-     *
-     * @return void
      */
     public function updated(Expense $expense): void
     {
@@ -62,8 +58,6 @@ class ExpenseObserver
 
     /**
      * Handle the expense "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Expense $expense): void
     {
@@ -82,8 +76,6 @@ class ExpenseObserver
 
     /**
      * Handle the expense "restored" event.
-     *
-     * @return void
      */
     public function restored(Expense $expense): void
     {
@@ -92,8 +84,6 @@ class ExpenseObserver
 
     /**
      * Handle the expense "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Expense $expense): void
     {

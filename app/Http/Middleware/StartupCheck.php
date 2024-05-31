@@ -10,12 +10,12 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\DataMapper\EmailTemplateDefaults;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class StartupCheck.

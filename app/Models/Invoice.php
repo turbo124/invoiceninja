@@ -10,8 +10,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Events\Invoice\InvoiceReminderWasEmailed;
 use App\Events\Invoice\InvoiceWasEmailed;
 use App\Helpers\Invoice\InvoiceSum;
@@ -25,6 +23,8 @@ use App\Utils\Traits\MakesDates;
 use App\Utils\Traits\MakesInvoiceValues;
 use App\Utils\Traits\MakesReminders;
 use App\Utils\Traits\NumberFormatter;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Laracasts\Presenter\PresentableTrait;

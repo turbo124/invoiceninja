@@ -18,8 +18,6 @@ class UserObserver
 {
     /**
      * Handle the app models user "created" event.
-     *
-     * @return void
      */
     public function created(User $user): void
     {
@@ -30,8 +28,6 @@ class UserObserver
 
     /**
      * Handle the app models user "updated" event.
-     *
-     * @return void
      */
     public function updated(User $user): void
     {
@@ -45,8 +41,6 @@ class UserObserver
 
     /**
      * Handle the app models user "deleted" event.
-     *
-     * @return void
      */
     public function deleted(User $user): void
     {
@@ -55,8 +49,6 @@ class UserObserver
 
     /**
      * Handle the app models user "restored" event.
-     *
-     * @return void
      */
     public function restored(User $user): void
     {
@@ -65,8 +57,6 @@ class UserObserver
 
     /**
      * Handle the app models user "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(User $user): void
     {

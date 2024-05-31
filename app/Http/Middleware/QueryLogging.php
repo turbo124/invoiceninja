@@ -10,12 +10,12 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use App\DataMapper\Analytics\DbQuery;
 use App\Utils\Ninja;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 use Turbo124\Beacon\Facades\LightLogs;
 
 /**

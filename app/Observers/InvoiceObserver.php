@@ -20,8 +20,6 @@ class InvoiceObserver
 
     /**
      * Handle the client "created" event.
-     *
-     * @return void
      */
     public function created(Invoice $invoice): void
     {
@@ -36,8 +34,6 @@ class InvoiceObserver
 
     /**
      * Handle the client "updated" event.
-     *
-     * @return void
      */
     public function updated(Invoice $invoice): void
     {
@@ -62,8 +58,6 @@ class InvoiceObserver
 
     /**
      * Handle the client "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Invoice $invoice): void
     {
@@ -82,8 +76,6 @@ class InvoiceObserver
 
     /**
      * Handle the client "restored" event.
-     *
-     * @return void
      */
     public function restored(Invoice $invoice): void
     {
@@ -92,8 +84,6 @@ class InvoiceObserver
 
     /**
      * Handle the client "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Invoice $invoice): void
     {

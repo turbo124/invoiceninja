@@ -10,8 +10,8 @@
 
 namespace App\Notifications\Admin;
 
-use Illuminate\Notifications\Messages\MailMessage;
 use App\Utils\Number;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
 
@@ -56,7 +56,6 @@ class EntityViewedNotification extends Notification
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
     public function via($notifiable): array
     {
@@ -76,7 +75,6 @@ class EntityViewedNotification extends Notification
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
     public function toArray($notifiable): array
     {

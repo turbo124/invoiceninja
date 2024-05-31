@@ -134,9 +134,6 @@ class RecurringInvoiceInvitation extends BaseModel
         return $this->belongsTo(User::class)->withTrashed();
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);

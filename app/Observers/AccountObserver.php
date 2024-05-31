@@ -16,8 +16,6 @@ class AccountObserver
 {
     /**
      * Handle the account "created" event.
-     *
-     * @return void
      */
     public function created(Account $account): void
     {
@@ -26,8 +24,6 @@ class AccountObserver
 
     /**
      * Handle the account "updated" event.
-     *
-     * @return void
      */
     public function updated(Account $account): void
     {
@@ -36,8 +32,6 @@ class AccountObserver
 
     /**
      * Handle the account "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Account $account): void
     {
@@ -46,8 +40,6 @@ class AccountObserver
 
     /**
      * Handle the account "restored" event.
-     *
-     * @return void
      */
     public function restored(Account $account): void
     {
@@ -56,8 +48,6 @@ class AccountObserver
 
     /**
      * Handle the account "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Account $account): void
     {

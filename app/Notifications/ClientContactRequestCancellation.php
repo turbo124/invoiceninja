@@ -10,10 +10,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Notifications\Messages\MailMessage;
 use Closure;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\InteractsWithQueue;
@@ -51,7 +51,6 @@ class ClientContactRequestCancellation extends Notification
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
     public function via($notifiable): array
     {
@@ -71,7 +70,6 @@ class ClientContactRequestCancellation extends Notification
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
     public function toArray($notifiable): array
     {

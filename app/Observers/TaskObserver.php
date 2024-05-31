@@ -20,8 +20,6 @@ class TaskObserver
 
     /**
      * Handle the task "created" event.
-     *
-     * @return void
      */
     public function created(Task $task): void
     {
@@ -36,8 +34,6 @@ class TaskObserver
 
     /**
      * Handle the task "updated" event.
-     *
-     * @return void
      */
     public function updated(Task $task): void
     {
@@ -62,8 +58,6 @@ class TaskObserver
 
     /**
      * Handle the task "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Task $task): void
     {
@@ -82,8 +76,6 @@ class TaskObserver
 
     /**
      * Handle the task "restored" event.
-     *
-     * @return void
      */
     public function restored(Task $task): void
     {
@@ -92,8 +84,6 @@ class TaskObserver
 
     /**
      * Handle the task "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Task $task): void
     {

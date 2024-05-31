@@ -71,17 +71,11 @@ class BankAccount extends BaseModel
         $this->username = Crypt::encrypt($value);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function bank_subaccounts(): HasMany
     {
         return $this->hasMany(BankSubaccount::class);

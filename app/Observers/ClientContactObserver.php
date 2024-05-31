@@ -20,8 +20,6 @@ class ClientContactObserver
 {
     /**
      * Handle the client contact "created" event.
-     *
-     * @return void
      */
     public function created(ClientContact $clientContact): void
     {
@@ -30,8 +28,6 @@ class ClientContactObserver
 
     /**
      * Handle the client contact "updated" event.
-     *
-     * @return void
      */
     public function updated(ClientContact $clientContact): void
     {
@@ -40,8 +36,6 @@ class ClientContactObserver
 
     /**
      * Handle the client contact "deleted" event.
-     *
-     * @return void
      */
     public function deleted(ClientContact $clientContact): void
     {
@@ -81,8 +75,6 @@ class ClientContactObserver
 
     /**
      * Handle the client contact "restored" event.
-     *
-     * @return void
      */
     public function restored(ClientContact $clientContact): void
     {
@@ -90,8 +82,6 @@ class ClientContactObserver
 
     /**
      * Handle the client contact "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(ClientContact $clientContact): void
     {

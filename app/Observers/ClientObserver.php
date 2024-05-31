@@ -52,8 +52,6 @@ class ClientObserver
 
     /**
      * Handle the client "created" event.
-     *
-     * @return void
      */
     public function created(Client $client): void
     {
@@ -78,8 +76,6 @@ class ClientObserver
 
     /**
      * Handle the client "updated" event.
-     *
-     * @return void
      */
     public function updated(Client $client): void
     {
@@ -115,8 +111,6 @@ class ClientObserver
 
     /**
      * Handle the client "archived" event.
-     *
-     * @return void
      */
     public function deleted(Client $client): void
     {

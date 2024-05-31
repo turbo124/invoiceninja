@@ -35,7 +35,6 @@ use Illuminate\Support\Facades\Schedule;
 |
 */
 
-
 /* Check for the latest version of Invoice Ninja */
 Schedule::job(new VersionCheck())->daily();
 

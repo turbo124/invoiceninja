@@ -20,8 +20,6 @@ class QuoteObserver
 
     /**
      * Handle the quote "created" event.
-     *
-     * @return void
      */
     public function created(Quote $quote): void
     {
@@ -36,8 +34,6 @@ class QuoteObserver
 
     /**
      * Handle the quote "updated" event.
-     *
-     * @return void
      */
     public function updated(Quote $quote): void
     {
@@ -62,8 +58,6 @@ class QuoteObserver
 
     /**
      * Handle the quote "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Quote $quote): void
     {
@@ -82,8 +76,6 @@ class QuoteObserver
 
     /**
      * Handle the quote "restored" event.
-     *
-     * @return void
      */
     public function restored(Quote $quote): void
     {
@@ -92,8 +84,6 @@ class QuoteObserver
 
     /**
      * Handle the quote "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Quote $quote): void
     {

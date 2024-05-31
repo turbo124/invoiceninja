@@ -38,9 +38,6 @@ class BulkInvoiceJob implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     *
-     * @return void
      */
     public function handle(): void
     {   //only the reminder should mark the reminder sent field

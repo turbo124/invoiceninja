@@ -18,8 +18,6 @@ class CompanyObserver
 {
     /**
      * Handle the company "created" event.
-     *
-     * @return void
      */
     public function created(Company $company): void
     {
@@ -28,8 +26,6 @@ class CompanyObserver
 
     /**
      * Handle the company "updated" event.
-     *
-     * @return void
      */
     public function updated(Company $company): void
     {
@@ -41,8 +37,6 @@ class CompanyObserver
 
     /**
      * Handle the company "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Company $company): void
     {
@@ -51,8 +45,6 @@ class CompanyObserver
 
     /**
      * Handle the company "restored" event.
-     *
-     * @return void
      */
     public function restored(Company $company): void
     {
@@ -61,8 +53,6 @@ class CompanyObserver
 
     /**
      * Handle the company "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Company $company): void
     {

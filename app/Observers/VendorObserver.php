@@ -20,8 +20,6 @@ class VendorObserver
 
     /**
      * Handle the vendor "created" event.
-     *
-     * @return void
      */
     public function created(Vendor $vendor): void
     {
@@ -36,8 +34,6 @@ class VendorObserver
 
     /**
      * Handle the vendor "updated" event.
-     *
-     * @return void
      */
     public function updated(Vendor $vendor): void
     {
@@ -62,8 +58,6 @@ class VendorObserver
 
     /**
      * Handle the vendor "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Vendor $vendor): void
     {
@@ -82,8 +76,6 @@ class VendorObserver
 
     /**
      * Handle the vendor "restored" event.
-     *
-     * @return void
      */
     public function restored(Vendor $vendor): void
     {
@@ -92,8 +84,6 @@ class VendorObserver
 
     /**
      * Handle the vendor "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Vendor $vendor): void
     {

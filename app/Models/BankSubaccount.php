@@ -35,9 +35,6 @@ class BankSubaccount extends BaseModel
 {
     use SoftDeletes;
 
-    /**
-     * @return BelongsTo
-     */
     public function bank_account(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class);

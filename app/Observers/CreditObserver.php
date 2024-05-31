@@ -21,8 +21,6 @@ class CreditObserver
 
     /**
      * Handle the client "created" event.
-     *
-     * @return void
      */
     public function created(Credit $credit): void
     {
@@ -37,8 +35,6 @@ class CreditObserver
 
     /**
      * Handle the client "updated" event.
-     *
-     * @return void
      */
     public function updated(Credit $credit): void
     {
@@ -63,8 +59,6 @@ class CreditObserver
 
     /**
      * Handle the client "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Credit $credit): void
     {
@@ -83,8 +77,6 @@ class CreditObserver
 
     /**
      * Handle the client "restored" event.
-     *
-     * @return void
      */
     public function restored(Credit $credit): void
     {
@@ -93,8 +85,6 @@ class CreditObserver
 
     /**
      * Handle the client "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Credit $credit): void
     {

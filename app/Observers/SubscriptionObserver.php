@@ -16,8 +16,6 @@ class SubscriptionObserver
 {
     /**
      * Handle the subscription "created" event.
-     *
-     * @return void
      */
     public function created(Subscription $subscription): void
     {
@@ -26,8 +24,6 @@ class SubscriptionObserver
 
     /**
      * Handle the subscription "updated" event.
-     *
-     * @return void
      */
     public function updated(Subscription $subscription): void
     {
@@ -36,8 +32,6 @@ class SubscriptionObserver
 
     /**
      * Handle the subscription "deleted" event.
-     *
-     * @return void
      */
     public function deleted(Subscription $subscription): void
     {
@@ -46,8 +40,6 @@ class SubscriptionObserver
 
     /**
      * Handle the subscription "restored" event.
-     *
-     * @return void
      */
     public function restored(Subscription $subscription): void
     {
@@ -56,8 +48,6 @@ class SubscriptionObserver
 
     /**
      * Handle the subscription "force deleted" event.
-     *
-     * @return void
      */
     public function forceDeleted(Subscription $subscription): void
     {

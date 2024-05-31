@@ -10,9 +10,9 @@
 
 namespace App\Models;
 
+use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use League\CommonMark\CommonMarkConverter;
 

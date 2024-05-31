@@ -10,7 +10,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Casts\EncryptedCast;
 use App\DataMapper\CompanySettings;
 use App\Models\Presenters\CompanyPresenter;
@@ -22,6 +21,7 @@ use App\Utils\Traits\CompanySettingsSaver;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
@@ -549,9 +549,6 @@ class Company extends BaseModel
         return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);
     }
 
-    /**
-     * @return HasMany
-     */
     public function contacts(): HasMany
     {
         return $this->hasMany(ClientContact::class);
@@ -562,65 +559,41 @@ class Company extends BaseModel
         return $this->hasMany(GroupSetting::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function recurring_invoices(): HasMany
     {
         return $this->hasMany(RecurringInvoice::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function recurring_expenses(): HasMany
     {
         return $this->hasMany(RecurringExpense::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function quotes(): HasMany
     {
         return $this->hasMany(Quote::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function credits(): HasMany
     {
         return $this->hasMany(Credit::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function company_gateways(): HasMany
     {
         return $this->hasMany(CompanyGateway::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function tax_rates(): HasMany
     {
         return $this->hasMany(TaxRate::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class)->withTrashed();
@@ -749,17 +722,11 @@ class Company extends BaseModel
         })->first();
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function industry(): BelongsTo
     {
         return $this->belongsTo(Industry::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function payment_type(): BelongsTo
     {
         return $this->belongsTo(PaymentType::class);

@@ -68,9 +68,6 @@ class ExpenseCategory extends BaseModel
         return self::class;
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function expense(): BelongsTo
     {
         return $this->belongsTo(Expense::class);

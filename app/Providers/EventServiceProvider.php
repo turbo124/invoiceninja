@@ -650,8 +650,6 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * Register any events for your application.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -681,8 +679,6 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * Determine if events and listeners should be automatically discovered.
-     *
-     * @return bool
      */
     public function shouldDiscoverEvents(): bool
     {
