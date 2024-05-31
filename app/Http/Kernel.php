@@ -133,6 +133,7 @@ class Kernel extends HttpKernel
         'can' => Authorize::class,
         'cors' => Cors::class,
         'guest' => RedirectIfAuthenticated::class,
+        'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'verified' => EnsureEmailIsVerified::class,
         'query_logging' => QueryLogging::class,
