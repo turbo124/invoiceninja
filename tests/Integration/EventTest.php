@@ -116,7 +116,7 @@ class EventTest extends TestCase
         Event::fake();
 
         $data = [
-            'public_notes' => $this->faker->firstName,
+            'public_notes' => $this->faker->firstName(),
         ];
 
         $response = $this->withHeaders([
@@ -128,7 +128,7 @@ class EventTest extends TestCase
         $arr = $response->json();
 
         $data = [
-            'public_notes' => $this->faker->firstName,
+            'public_notes' => $this->faker->firstName(),
         ];
 
         $response = $this->withHeaders([
@@ -172,7 +172,7 @@ class EventTest extends TestCase
         Event::fake();
 
         $data = [
-            'name' => $this->faker->firstName,
+            'name' => $this->faker->firstName(),
         ];
 
         $response = $this->withHeaders([
@@ -184,7 +184,7 @@ class EventTest extends TestCase
         $arr = $response->json();
 
         $data = [
-            'name' => $this->faker->firstName,
+            'name' => $this->faker->firstName(),
             'id_number' => 'Coolio',
         ];
 
@@ -611,7 +611,7 @@ class EventTest extends TestCase
         Event::fake();
 
         $data = [
-            'name' => $this->faker->firstName,
+            'name' => $this->faker->firstName(),
         ];
 
         $response = $this->withHeaders([
@@ -623,7 +623,7 @@ class EventTest extends TestCase
         $arr = $response->json();
 
         $data = [
-            'name' => $this->faker->firstName,
+            'name' => $this->faker->firstName(),
             'id_number' => 'Coolio',
         ];
 
@@ -749,7 +749,7 @@ class EventTest extends TestCase
         Event::fake();
 
         $data = [
-            'name' => $this->faker->firstName,
+            'name' => $this->faker->firstName(),
             'steps' => 'cart,auth.login-or-register',
         ];
 
@@ -762,7 +762,7 @@ class EventTest extends TestCase
         $arr = $response->json();
 
         $data = [
-            'name' => $this->faker->firstName,
+            'name' => $this->faker->firstName(),
             'steps' => 'cart,auth.login-or-register',
         ];
 

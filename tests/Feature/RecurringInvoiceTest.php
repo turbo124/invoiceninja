@@ -796,7 +796,7 @@ class RecurringInvoiceTest extends TestCase
             'user_id' => $this->user->id,
             'cost' => 10,
             'price' => 10,
-            'product_key' => $this->faker->word,
+            'product_key' => $this->faker->word(),
         ]);
 
         $p2 = Product::factory()->create([
@@ -804,7 +804,7 @@ class RecurringInvoiceTest extends TestCase
             'user_id' => $this->user->id,
             'cost' => 20,
             'price' => 20,
-            'product_key' => $this->faker->word,
+            'product_key' => $this->faker->word(),
         ]);
 
         $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
@@ -871,7 +871,7 @@ class RecurringInvoiceTest extends TestCase
             'user_id' => $this->user->id,
             'cost' => 10,
             'price' => 10,
-            'product_key' => $this->faker->word,
+            'product_key' => $this->faker->word(),
         ]);
 
         $p2 = Product::factory()->create([
@@ -879,7 +879,7 @@ class RecurringInvoiceTest extends TestCase
             'user_id' => $this->user->id,
             'cost' => 20,
             'price' => 20,
-            'product_key' => $this->faker->word,
+            'product_key' => $this->faker->word(),
         ]);
 
         $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);

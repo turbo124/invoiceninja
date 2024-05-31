@@ -536,7 +536,7 @@ class CreateSingleAccount extends Command
             'user_id' => $client->user->id,
             'company_id' => $client->company->id,
             'time_log' => $time_log,
-            'description' => $this->faker->paragraph,
+            'description' => $this->faker->paragraph(),
             'status_id' => $status->id ?? null,
             'number' => rand(10000, 100000000),
             'rate' => rand(1, 150),
@@ -557,7 +557,7 @@ class CreateSingleAccount extends Command
             $time_log[] = [
                 Carbon::now()->addSeconds($min)->timestamp,
                 Carbon::now()->addSeconds($min += $rando)->timestamp,
-                $this->faker->sentence,
+                $this->faker->sentence(),
                 rand(0, 1) === 0 ? false : true,
             ];
 
@@ -613,7 +613,7 @@ class CreateSingleAccount extends Command
             $invoice->tax_rate3 = 5;
         }
 
-        $invoice->custom_value1 = $faker->date;
+        $invoice->custom_value1 = $faker->date();
         $invoice->custom_value2 = rand(0, 1) ? 'yes' : 'no';
 
         $invoice->save();
@@ -1109,7 +1109,7 @@ class CreateSingleAccount extends Command
             $invoice->tax_rate3 = 5;
         }
 
-        $invoice->custom_value1 = $faker->date;
+        $invoice->custom_value1 = $faker->date();
         $invoice->custom_value2 = rand(0, 1) ? 'yes' : 'no';
 
         $invoice->status_id = RecurringInvoice::STATUS_ACTIVE;
