@@ -634,9 +634,9 @@ class PdfBuilder
             $helpers = new Helpers();
             $_table_type = ltrim($table_type, '$'); // From $product -> product.
 
-            $data[$key][$table_type.'.product_key'] = is_null(optional($item)->product_key) ? $item->item : $item->product_key;
-            $data[$key][$table_type.'.item'] = is_null(optional($item)->item) ? $item->product_key : $item->item;
-            $data[$key][$table_type.'.service'] = is_null(optional($item)->service) ? $item->product_key : $item->service;
+            $data[$key][$table_type.'.product_key'] = is_null($item?->product_key) ? $item->item : $item->product_key;
+            $data[$key][$table_type.'.item'] = is_null($item?->item) ? $item->product_key : $item->item;
+            $data[$key][$table_type.'.service'] = is_null($item?->service) ? $item->product_key : $item->service;
 
             $currentDateTime = null;
             if (isset($this->service->config->entity->next_send_date)) {
@@ -1316,7 +1316,7 @@ class PdfBuilder
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
             ]],
-            ['element' => 'p', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
+            ['element' => 'p', 'content' => $this->service->config->client->shipping_country?->name, 'show_empty' => false],
         ];
 
         if (! is_null($this->service->config->contact)) {
@@ -1364,7 +1364,7 @@ class PdfBuilder
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'shipping_address-client.shipping_state']],
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'shipping_address-client.shipping_postal_code']],
             ]],
-            ['element' => 'p', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
+            ['element' => 'p', 'content' => $this->service->config->client->shipping_country?->name, 'show_empty' => false],
         ];
 
         return $elements;

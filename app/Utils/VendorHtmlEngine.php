@@ -411,8 +411,8 @@ class VendorHtmlEngine
         $data['$autoBill'] = ['value' => ctrans('texts.auto_bill_notification_placeholder'), 'label' => ''];
         $data['$auto_bill'] = &$data['$autoBill'];
 
-        $data['$dir'] = ['value' => in_array(optional($this->company->language())->locale, ['ar', 'he']) ? 'rtl' : 'ltr', 'label' => ''];
-        $data['$dir_text_align'] = ['value' => in_array(optional($this->company->language())->locale, ['ar', 'he']) ? 'right' : 'left', 'label' => ''];
+        $data['$dir'] = ['value' => in_array($this->company->language()?->locale, ['ar', 'he']) ? 'rtl' : 'ltr', 'label' => ''];
+        $data['$dir_text_align'] = ['value' => in_array($this->company->language()?->locale, ['ar', 'he']) ? 'right' : 'left', 'label' => ''];
 
         $data['$payment.date'] = ['value' => '&nbsp;', 'label' => ctrans('texts.payment_date')];
         $data['$method'] = ['value' => '&nbsp;', 'label' => ctrans('texts.method')];
@@ -478,7 +478,7 @@ class VendorHtmlEngine
 
             $data['$client.currency'] = ['value' => $this->entity->client->currency()->code, 'label' => ''];
 
-            $data['$client.lang_2'] = ['value' => optional($this->entity->client->language())->locale, 'label' => ''];
+            $data['$client.lang_2'] = ['value' => $this->entity->client->language()?->locale, 'label' => ''];
 
             $data['$client.balance'] = ['value' => Number::formatMoney($this->entity->client->balance, $this->entity->client), 'label' => ctrans('texts.account_balance')];
             $data['$client_balance'] = ['value' => Number::formatMoney($this->entity->client->balance, $this->entity->client), 'label' => ctrans('texts.account_balance')];

@@ -1211,7 +1211,7 @@ class TemplateService
                 ['element' => 'span', 'content' => "{$this->client->shipping_state} ", 'properties' => ['ref' => 'shipping_address-client.shipping_state']],
                 ['element' => 'span', 'content' => "{$this->client->shipping_postal_code} ", 'properties' => ['ref' => 'shipping_address-client.shipping_postal_code']],
             ]],
-            ['element' => 'p', 'content' => optional($this->client->shipping_country)->name, 'show_empty' => false],
+            ['element' => 'p', 'content' => $this->client->shipping_country?->name, 'show_empty' => false],
         ];
 
         $shipping_address =

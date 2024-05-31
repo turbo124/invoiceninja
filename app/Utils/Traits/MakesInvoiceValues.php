@@ -284,9 +284,9 @@ trait MakesInvoiceValues
             $helpers = new Helpers();
             $_table_type = ltrim($table_type, '$'); // From $product -> product.
 
-            $data[$key][$table_type.'.product_key'] = is_null(optional($item)->product_key) ? $item->item : $item->product_key;
-            $data[$key][$table_type.'.item'] = is_null(optional($item)->item) ? $item->product_key : $item->item;
-            $data[$key][$table_type.'.service'] = is_null(optional($item)->service) ? $item->product_key : $item->service;
+            $data[$key][$table_type.'.product_key'] = is_null($item?->product_key) ? $item->item : $item->product_key;
+            $data[$key][$table_type.'.item'] = is_null($item?->item) ? $item->product_key : $item->item;
+            $data[$key][$table_type.'.service'] = is_null($item?->service) ? $item->product_key : $item->service;
 
             $currentDateTime = null;
             if (isset($this->entity->next_send_date)) {
