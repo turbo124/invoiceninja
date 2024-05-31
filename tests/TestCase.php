@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     use AppSetup;
-    use CreatesApplication;
 
     protected function setUp(): void
     {
