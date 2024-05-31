@@ -6,18 +6,6 @@ return [
         'tracking_id' => env('TRACKING_ID'),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Third Party Services
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Brevo, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
-    */
-
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN', ''),
         'secret' => env('MAILGUN_SECRET', ''),
@@ -32,10 +20,6 @@ return [
 
     'brevo' => [
         'key' => env('BREVO_SECRET', ''),
-    ],
-
-    'postmark' => [
-        'token' => env('POSTMARK_SECRET', ''),
     ],
 
     'postmark-outlook' => [
@@ -57,11 +41,6 @@ return [
         'redirect' => env('APPLE_REDIRECT_URI'),
     ],
 
-    'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('SES_REGION', 'us-east-1'),
-    ],
     'sparkpost' => [
         'secret' => env('SPARKPOST_SECRET'),
     ],
@@ -117,8 +96,10 @@ return [
             'key' => env('ZIP_TAX_KEY', false),
         ],
     ],
+
     'chorus' => [
         'client_id' => env('CHORUS_CLIENT_ID', false),
         'secret' => env('CHORUS_SECRET', false),
     ],
+
 ];
