@@ -35,9 +35,12 @@ class PaymentHash extends Model
 {
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'data' => 'object',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'object',
+        ];
+    }
 
     /**
      * @class \App\Models\PaymentHash $this

@@ -228,15 +228,6 @@ class RecurringInvoice extends BaseModel
         'uses_inclusive_taxes',
     ];
 
-    protected $casts = [
-        'settings' => 'object',
-        'line_items' => 'object',
-        'backup' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected $appends = [
         'hashed_id',
         'status',
@@ -247,6 +238,18 @@ class RecurringInvoice extends BaseModel
     ];
 
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'object',
+            'line_items' => 'object',
+            'backup' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

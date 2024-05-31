@@ -120,16 +120,6 @@ class Vendor extends BaseModel
         'classification',
     ];
 
-    protected $casts = [
-        'country_id' => 'string',
-        'currency_id' => 'string',
-        'is_deleted' => 'boolean',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'last_login' => 'timestamp',
-    ];
-
     protected $touches = [];
 
     protected $with = [
@@ -137,6 +127,19 @@ class Vendor extends BaseModel
     ];
 
     protected $presenter = VendorPresenter::class;
+
+    protected function casts(): array
+    {
+        return [
+            'country_id' => 'string',
+            'currency_id' => 'string',
+            'is_deleted' => 'boolean',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'last_login' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

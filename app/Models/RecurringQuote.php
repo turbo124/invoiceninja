@@ -221,21 +221,24 @@ class RecurringQuote extends BaseModel
         'exchange_rate',
     ];
 
-    protected $casts = [
-        'settings' => 'object',
-        'line_items' => 'object',
-        'backup' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected $appends = [
         'hashed_id',
         'status',
     ];
 
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'object',
+            'line_items' => 'object',
+            'backup' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

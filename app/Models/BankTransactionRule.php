@@ -82,13 +82,6 @@ class BankTransactionRule extends BaseModel
         'category_id',
     ];
 
-    protected $casts = [
-        'rules' => 'array',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected array $search_keys = [
         'description' => 'string',
         'amount' => 'number',
@@ -112,6 +105,16 @@ class BankTransactionRule extends BaseModel
     ];
 
     private array $search_results = [];
+
+    protected function casts(): array
+    {
+        return [
+            'rules' => 'array',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

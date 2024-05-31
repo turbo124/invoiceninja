@@ -104,13 +104,6 @@ class VendorContact extends Authenticatable implements HasLocalePreference
 
     protected $with = [];
 
-    protected $casts = [
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'last_login' => 'timestamp',
-    ];
-
     protected $fillable = [
         'first_name',
         'last_name',
@@ -124,6 +117,16 @@ class VendorContact extends Authenticatable implements HasLocalePreference
         'vendor_id',
         'send_email',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'last_login' => 'timestamp',
+        ];
+    }
 
     public function avatar()
     {

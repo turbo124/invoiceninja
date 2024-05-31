@@ -65,13 +65,6 @@ class GroupSetting extends StaticModel
     use MakesHash;
     use SoftDeletes;
 
-    protected $casts = [
-        'settings' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected $fillable = [
         'name',
         'settings',
@@ -87,6 +80,16 @@ class GroupSetting extends StaticModel
     }
 
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function company()
     {

@@ -163,22 +163,25 @@ class Payment extends BaseModel
         'idempotency_key',
     ];
 
-    protected $casts = [
-        'exchange_rate' => 'float',
-        'settings' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'is_deleted' => 'bool',
-        'meta' => 'object',
-        'refund_meta' => 'array',
-    ];
-
     protected $with = [
         'paymentables',
     ];
 
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'exchange_rate' => 'float',
+            'settings' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'is_deleted' => 'bool',
+            'meta' => 'object',
+            'refund_meta' => 'array',
+        ];
+    }
 
     public function getEntityType()
     {

@@ -378,24 +378,27 @@ class Company extends BaseModel
         'smtp_password',
     ];
 
-    protected $casts = [
-        'is_proforma' => 'bool',
-        'country_id' => 'string',
-        'custom_fields' => 'object',
-        'settings' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'client_registration_fields' => 'array',
-        'tax_data' => 'object',
-        'origin_tax_data' => 'object',
-        'e_invoice_certificate_passphrase' => EncryptedCast::class,
-        'smtp_username' => 'encrypted',
-        'smtp_password' => 'encrypted',
-        'e_invoice' => 'object',
-    ];
-
     protected $with = [];
+
+    protected function casts(): array
+    {
+        return [
+            'is_proforma' => 'bool',
+            'country_id' => 'string',
+            'custom_fields' => 'object',
+            'settings' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'client_registration_fields' => 'array',
+            'tax_data' => 'object',
+            'origin_tax_data' => 'object',
+            'e_invoice_certificate_passphrase' => EncryptedCast::class,
+            'smtp_username' => 'encrypted',
+            'smtp_password' => 'encrypted',
+            'e_invoice' => 'object',
+        ];
+    }
 
     // public static $modules = [
     //     self::ENTITY_RECURRING_INVOICE => 1,

@@ -46,13 +46,6 @@ class ClientGatewayToken extends BaseModel
     use MakesDates;
     use SoftDeletes;
 
-    protected $casts = [
-        'meta' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected $appends = [
         'hashed_id',
     ];
@@ -65,6 +58,16 @@ class ClientGatewayToken extends BaseModel
         'meta',
         'client_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'meta' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

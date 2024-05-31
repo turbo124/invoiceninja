@@ -127,18 +127,21 @@ class Task extends BaseModel
         'meta',
     ];
 
-    protected $casts = [
-        'meta' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected $with = [
         // 'project',
     ];
 
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'meta' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

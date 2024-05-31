@@ -89,20 +89,6 @@ class CompanyUser extends Pivot
 
     protected $dateFormat = 'Y-m-d H:i:s.u';
 
-    /**
-     * The attributes that should be cast to native types.
-     */
-    protected $casts = [
-        'permissions_updated_at' => 'timestamp',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'settings' => 'object',
-        'notifications' => 'object',
-        'permissions' => 'string',
-        'react_settings' => 'object',
-    ];
-
     protected $fillable = [
         'account_id',
         'permissions',
@@ -119,6 +105,25 @@ class CompanyUser extends Pivot
     protected $touches = ['user'];
 
     protected $with = ['user', 'account'];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'permissions_updated_at' => 'timestamp',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'settings' => 'object',
+            'notifications' => 'object',
+            'permissions' => 'string',
+            'react_settings' => 'object',
+        ];
+    }
 
     public function getEntityType()
     {

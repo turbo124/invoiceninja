@@ -57,13 +57,6 @@ class SystemLog extends Model
     use MakesHash;
     use SoftDeletes;
 
-    protected $casts = [
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'log' => 'array',
-    ];
-
     protected $dateFormat = 'Y-m-d H:i:s.u';
 
     /* Category IDs */
@@ -182,6 +175,16 @@ class SystemLog extends Model
         'event_id',
         'type_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'log' => 'array',
+        ];
+    }
 
     public function resolveRouteBinding($value, $field = null)
     {

@@ -131,15 +131,18 @@ class Account extends BaseModel
         'inapp_transaction_id',
     ];
 
-    protected $casts = [
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'onboarding' => 'object',
-        'set_react_as_default_ap' => 'bool',
-        'promo_expires' => 'date',
-        'discount_expires' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'onboarding' => 'object',
+            'set_react_as_default_ap' => 'bool',
+            'promo_expires' => 'date',
+            'discount_expires' => 'date',
+        ];
+    }
 
     public const PLAN_FREE = 'free';
 

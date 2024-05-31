@@ -194,14 +194,17 @@ class RecurringExpense extends BaseModel
         'next_send_date_client',
     ];
 
-    protected $casts = [
-        'is_deleted' => 'boolean',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
-
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'is_deleted' => 'boolean',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function getEntityType()
     {

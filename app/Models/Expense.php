@@ -139,15 +139,18 @@ class Expense extends BaseModel
         'purchase_order_id',
     ];
 
-    protected $casts = [
-        'is_deleted' => 'boolean',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'e_invoice' => 'object',
-    ];
-
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'is_deleted' => 'boolean',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'e_invoice' => 'object',
+        ];
+    }
 
     public function getEntityType()
     {

@@ -46,12 +46,15 @@ class Currency extends StaticModel
 
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'exchange_rate' => 'float',
-        'swap_currency_symbol' => 'boolean',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'precision' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'exchange_rate' => 'float',
+            'swap_currency_symbol' => 'boolean',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'precision' => 'integer',
+        ];
+    }
 }

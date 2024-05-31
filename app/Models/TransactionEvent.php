@@ -78,12 +78,6 @@ class TransactionEvent extends StaticModel
 
     public $guarded = ['id'];
 
-    public $casts = [
-        'metadata' => 'array',
-        'payment_request' => 'array',
-        'paymentables' => 'array',
-    ];
-
     public const INVOICE_MARK_PAID = 1;
 
     public const INVOICE_UPDATED = 2;
@@ -111,4 +105,13 @@ class TransactionEvent extends StaticModel
     public const PAYMENT_DELETED = 105;
 
     public const CLIENT_STATUS = 200;
+
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+            'payment_request' => 'array',
+            'paymentables' => 'array',
+        ];
+    }
 }

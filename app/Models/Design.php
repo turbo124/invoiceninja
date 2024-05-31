@@ -60,13 +60,6 @@ class Design extends BaseModel
     use Filterable;
     use SoftDeletes;
 
-    protected $casts = [
-        'design' => 'object',
-        'deleted_at' => 'timestamp',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-    ];
-
     protected $fillable = [
         'name',
         'design',
@@ -74,6 +67,16 @@ class Design extends BaseModel
         'is_template',
         'entities',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'design' => 'object',
+            'deleted_at' => 'timestamp',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+        ];
+    }
 
     public function company()
     {

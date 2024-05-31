@@ -52,12 +52,15 @@ class Paymentable extends Pivot
 
     protected $table = 'paymentables';
 
-    protected $casts = [
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'settings' => 'object',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'settings' => 'object',
+        ];
+    }
 
     public function paymentable()
     {

@@ -164,20 +164,22 @@ class Quote extends BaseModel
         'vendor_id',
     ];
 
-    protected $casts = [
-        // 'date' => 'date:Y-m-d',
-        'tax_data' => 'object',
-        'due_date' => 'date:Y-m-d',
-        'partial_due_date' => 'date:Y-m-d',
-        'line_items' => 'object',
-        'backup' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'is_deleted' => 'boolean',
-        'is_amount_discount' => 'bool',
-        'e_invoice' => 'object',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'tax_data' => 'object',
+            'due_date' => 'date:Y-m-d',
+            'partial_due_date' => 'date:Y-m-d',
+            'line_items' => 'object',
+            'backup' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'is_deleted' => 'boolean',
+            'is_amount_discount' => 'bool',
+            'e_invoice' => 'object',
+        ];
+    }
 
     public const STATUS_DRAFT = 1;
 

@@ -66,20 +66,23 @@ class Scheduler extends BaseModel
         'remaining_cycles',
     ];
 
-    protected $casts = [
-        'next_run' => 'datetime',
-        'next_run_client' => 'datetime',
-        'created_at' => 'timestamp',
-        'updated_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'is_paused' => 'boolean',
-        'is_deleted' => 'boolean',
-        'parameters' => 'array',
-    ];
-
     protected $appends = [
         'hashed_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'next_run' => 'datetime',
+            'next_run_client' => 'datetime',
+            'created_at' => 'timestamp',
+            'updated_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'is_paused' => 'boolean',
+            'is_deleted' => 'boolean',
+            'parameters' => 'array',
+        ];
+    }
 
     /**
      * Service entry points.

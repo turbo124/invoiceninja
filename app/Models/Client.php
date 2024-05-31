@@ -178,17 +178,6 @@ class Client extends BaseModel implements HasLocalePreference
         'contacts.company',
     ];
 
-    protected $casts = [
-        'is_deleted' => 'boolean',
-        'country_id' => 'string',
-        'settings' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'last_login' => 'timestamp',
-        'tax_data' => 'object',
-    ];
-
     protected $touches = [];
 
     /**
@@ -232,6 +221,20 @@ class Client extends BaseModel implements HasLocalePreference
         'custom_value3',
         'custom_value4',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_deleted' => 'boolean',
+            'country_id' => 'string',
+            'settings' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'last_login' => 'timestamp',
+            'tax_data' => 'object',
+        ];
+    }
 
     public function getEntityType()
     {

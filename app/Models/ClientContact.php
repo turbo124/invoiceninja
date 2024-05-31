@@ -118,13 +118,6 @@ class ClientContact extends Authenticatable implements HasLocalePreference
 
     protected $with = [];
 
-    protected $casts = [
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'last_login' => 'timestamp',
-    ];
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -166,6 +159,16 @@ class ClientContact extends Authenticatable implements HasLocalePreference
         'custom_value4',
         'email',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'last_login' => 'timestamp',
+        ];
+    }
 
     /*
     V2 type of scope

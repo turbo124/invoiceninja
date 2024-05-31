@@ -184,15 +184,18 @@ class PurchaseOrder extends BaseModel
         'currency_id',
     ];
 
-    protected $casts = [
-        'line_items' => 'object',
-        'backup' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'is_amount_discount' => 'bool',
-        'e_invoice' => 'object',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'line_items' => 'object',
+            'backup' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'is_amount_discount' => 'bool',
+            'e_invoice' => 'object',
+        ];
+    }
 
     public const STATUS_DRAFT = 1;
 

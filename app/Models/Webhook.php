@@ -250,12 +250,15 @@ class Webhook extends BaseModel
         'headers',
     ];
 
-    protected $casts = [
-        'headers' => 'array',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'headers' => 'array',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+        ];
+    }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

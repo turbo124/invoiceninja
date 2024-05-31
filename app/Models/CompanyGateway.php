@@ -76,14 +76,6 @@ class CompanyGateway extends BaseModel
 
     public const GATEWAY_CREDIT = 10000000;
 
-    protected $casts = [
-        'fees_and_limits' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'always_show_required_fields' => 'bool',
-    ];
-
     protected $with = [
         'gateway',
     ];
@@ -162,6 +154,17 @@ class CompanyGateway extends BaseModel
     ];
 
     protected $touches = [];
+
+    protected function casts(): array
+    {
+        return [
+            'fees_and_limits' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'always_show_required_fields' => 'bool',
+        ];
+    }
 
     public function getEntityType()
     {

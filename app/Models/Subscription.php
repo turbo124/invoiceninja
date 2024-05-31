@@ -120,19 +120,22 @@ class Subscription extends BaseModel
         'steps',
     ];
 
-    protected $casts = [
-        'is_deleted' => 'boolean',
-        'webhook_configuration' => 'array',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'trial_enabled' => 'boolean',
-        'allow_plan_changes' => 'boolean',
-    ];
-
     protected $with = [
         'company',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_deleted' => 'boolean',
+            'webhook_configuration' => 'array',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'trial_enabled' => 'boolean',
+            'allow_plan_changes' => 'boolean',
+        ];
+    }
 
     public function service(): SubscriptionService
     {

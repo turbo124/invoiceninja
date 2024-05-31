@@ -198,29 +198,32 @@ class Invoice extends BaseModel
         'vendor_id',
     ];
 
-    protected $casts = [
-        'line_items' => 'object',
-        'backup' => 'object',
-        'updated_at' => 'timestamp',
-        'created_at' => 'timestamp',
-        'deleted_at' => 'timestamp',
-        'is_deleted' => 'bool',
-        'is_amount_discount' => 'bool',
-        'tax_data' => 'object',
-        'partial_due_date' => 'date:Y-m-d',
-        'custom_surcharge_tax1' => 'bool',
-        'custom_surcharge_tax2' => 'bool',
-        'custom_surcharge_tax3' => 'bool',
-        'custom_surcharge_tax4' => 'bool',
-        'e_invoice' => 'object',
-    ];
-
     protected $with = [];
 
     protected $appends = [
         'hashed_id',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'line_items' => 'object',
+            'backup' => 'object',
+            'updated_at' => 'timestamp',
+            'created_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
+            'is_deleted' => 'bool',
+            'is_amount_discount' => 'bool',
+            'tax_data' => 'object',
+            'partial_due_date' => 'date:Y-m-d',
+            'custom_surcharge_tax1' => 'bool',
+            'custom_surcharge_tax2' => 'bool',
+            'custom_surcharge_tax3' => 'bool',
+            'custom_surcharge_tax4' => 'bool',
+            'e_invoice' => 'object',
+        ];
+    }
 
     public const STATUS_DRAFT = 1;
 
