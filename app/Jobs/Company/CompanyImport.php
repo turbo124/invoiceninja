@@ -1462,7 +1462,7 @@ class CompanyImport implements ShouldQueue
                 unset($obj_array[$un]);
             }
 
-            if ($class == 'App\Models\CompanyGateway') {
+            if ($class == \App\Models\CompanyGateway::class) {
 
                 if (Ninja::isHosted() && $obj_array['gateway_key'] == 'd14dd26a37cecc30fdd65700bfb55b23') {
                     $obj_array['gateway_key'] = 'd14dd26a47cecc30fdd65700bfb67b34';
@@ -1483,7 +1483,7 @@ class CompanyImport implements ShouldQueue
 
             $activity_invitation_key = false;
 
-            if ($class == 'App\Models\Activity') {
+            if ($class == \App\Models\Activity::class) {
                 if (isset($obj->invitation_id)) {
                     if (isset($obj->invoice_id)) {
                         $activity_invitation_key = 'invoice_invitations';
@@ -1500,7 +1500,7 @@ class CompanyImport implements ShouldQueue
             /* Transform old keys to new keys */
             foreach ($transforms as $transform) {
                 foreach ($transform as $key => $value) {
-                    if ($class == 'App\Models\Activity' && $activity_invitation_key && $key == 'invitations') {
+                    if ($class == \App\Models\Activity::class && $activity_invitation_key && $key == 'invitations') {
                         $key = $activity_invitation_key;
                     }
 
@@ -1508,7 +1508,7 @@ class CompanyImport implements ShouldQueue
                 }
             }
 
-            if ($class == 'App\Models\CompanyGateway') {
+            if ($class == \App\Models\CompanyGateway::class) {
                 $obj_array['config'] = encrypt($obj_array['config']);
             }
 
@@ -1518,7 +1518,7 @@ class CompanyImport implements ShouldQueue
              * @property string $entity
              * @property string $entity_id
              */
-            if ($class == 'App\Models\Scheduler') {
+            if ($class == \App\Models\Scheduler::class) {
 
                 /** @var \stdClass $parameters */
                 $parameters = $obj_array['parameters'];
@@ -1581,7 +1581,7 @@ class CompanyImport implements ShouldQueue
             }
 
             /* New to convert product ids from old hashes to new hashes*/
-            if ($class == 'App\Models\Subscription') {
+            if ($class == \App\Models\Subscription::class) {
                 $obj_array['product_ids'] = $this->recordProductIds($obj_array['product_ids']);
                 $obj_array['recurring_product_ids'] = $this->recordProductIds($obj_array['recurring_product_ids']);
                 $obj_array['webhook_configuration'] = \json_encode($obj_array['webhook_configuration']);
@@ -1630,7 +1630,7 @@ class CompanyImport implements ShouldQueue
             }
 
             /* New to convert product ids from old hashes to new hashes*/
-            if ($class == 'App\Models\Subscription') {
+            if ($class == \App\Models\Subscription::class) {
                 if (array_key_exists('company', $obj_array)) {
                     unset($obj_array['company']);
                 }
@@ -1643,92 +1643,92 @@ class CompanyImport implements ShouldQueue
             $obj_array = $this->filterVersionProps($class, $obj_array);
 
             /* Expenses that don't have a number will not be inserted - so need to override here*/
-            if ($class == 'App\Models\Expense' && is_null($obj->{$match_key})) {
+            if ($class == \App\Models\Expense::class && is_null($obj->{$match_key})) {
                 $new_obj = new Expense();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextExpenseNumber($new_obj);
-            } elseif ($class == 'App\Models\Invoice' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Invoice::class && is_null($obj->{$match_key})) {
                 $new_obj = new Invoice();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->design_id = 2;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextInvoiceNumber($client = Client::withTrashed()->find($obj_array['client_id']), $new_obj);
-            } elseif ($class == 'App\Models\PurchaseOrder' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\PurchaseOrder::class && is_null($obj->{$match_key})) {
                 $new_obj = new PurchaseOrder();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->design_id = 2;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextPurchaseOrderNumber($new_obj);
-            } elseif ($class == 'App\Models\Payment' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Payment::class && is_null($obj->{$match_key})) {
                 $new_obj = new Payment();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextPaymentNumber($client = Client::withTrashed()->find($obj_array['client_id']), $new_obj);
-            } elseif ($class == 'App\Models\Quote' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Quote::class && is_null($obj->{$match_key})) {
                 $new_obj = new Quote();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->design_id = 2;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextQuoteNumber($client = Client::withTrashed()->find($obj_array['client_id']), $new_obj);
-            } elseif ($class == 'App\Models\Credit' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Credit::class && is_null($obj->{$match_key})) {
                 $new_obj = new Credit();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->design_id = 2;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextCreditNumber($client = Client::withTrashed()->find($obj_array['client_id']), $new_obj);
-            } elseif ($class == 'App\Models\ClientContact') {
+            } elseif ($class == \App\Models\ClientContact::class) {
                 $new_obj = new ClientContact();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
-            } elseif ($class == 'App\Models\VendorContact') {
+            } elseif ($class == \App\Models\VendorContact::class) {
                 $new_obj = new VendorContact();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
-            } elseif ($class == 'App\Models\RecurringExpense' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\RecurringExpense::class && is_null($obj->{$match_key})) {
                 $new_obj = new RecurringExpense();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextRecurringExpenseNumber($new_obj);
-            } elseif ($class == 'App\Models\Project' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Project::class && is_null($obj->{$match_key})) {
                 $new_obj = new Project();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextProjectNumber($new_obj);
-            } elseif ($class == 'App\Models\Task' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Task::class && is_null($obj->{$match_key})) {
                 $new_obj = new Task();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextTaskNumber($new_obj);
-            } elseif ($class == 'App\Models\Vendor' && is_null($obj->{$match_key})) {
+            } elseif ($class == \App\Models\Vendor::class && is_null($obj->{$match_key})) {
                 $new_obj = new Vendor();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
                 $new_obj->number = $this->getNextVendorNumber($new_obj);
-            } elseif ($class == 'App\Models\CompanyLedger') {
+            } elseif ($class == \App\Models\CompanyLedger::class) {
                 $new_obj = $class::firstOrNew(
                     [$match_key => $obj->{$match_key}, 'company_id' => $this->company->id],
                     $obj_array,
                 );
-            } elseif ($class == 'App\Models\BankIntegration') {
+            } elseif ($class == \App\Models\BankIntegration::class) {
                 $new_obj = new BankIntegration();
                 $new_obj->company_id = $this->company->id;
                 $new_obj->account_id = $this->account->id;
                 $new_obj->fill($obj_array);
                 $new_obj->save(['timestamps' => false]);
-            } elseif ($class == 'App\Models\BankTransaction') {
+            } elseif ($class == \App\Models\BankTransaction::class) {
                 $new_obj = new BankTransaction();
                 $new_obj->company_id = $this->company->id;
 

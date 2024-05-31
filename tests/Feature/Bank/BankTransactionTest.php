@@ -125,7 +125,7 @@ class BankTransactionTest extends TestCase
 
         $this->assertEquals("{$this->expense->hashed_id},{$e->hashed_id},{$e2->hashed_id}", $bt->fresh()->expense_id);
 
-        $expense_repo = app('App\Repositories\ExpenseRepository');
+        $expense_repo = app(\App\Repositories\ExpenseRepository::class);
 
         $expense_repo->delete($e2);
 

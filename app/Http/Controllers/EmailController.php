@@ -158,14 +158,14 @@ class EmailController extends BaseController
 
         match ($entity) {
             'invoice' => $class = Invoice::class,
-            'App\Models\Invoice' => $class = Invoice::class,
+            \App\Models\Invoice::class => $class = Invoice::class,
             'credit' => $class = Credit::class,
-            'App\Models\Credit' => $class = Credit::class,
+            \App\Models\Credit::class => $class = Credit::class,
             'quote' => $class = Quote::class,
-            'App\Models\Quote' => $class = Quote::class,
+            \App\Models\Quote::class => $class = Quote::class,
             'purchase_order' => $class = PurchaseOrder::class,
             'purchaseOrder' => $class = PurchaseOrder::class,
-            'App\Models\PurchaseOrder' => $class = PurchaseOrder::class,
+            \App\Models\PurchaseOrder::class => $class = PurchaseOrder::class,
             default => $class = Invoice::class,
         };
 

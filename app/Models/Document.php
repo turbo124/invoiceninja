@@ -215,17 +215,17 @@ class Document extends BaseModel
         $link = '';
 
         match ($this->documentable_type) {
-            'App\Models\Vendor' => $link = "/vendors/{$entity_id}",
-            'App\Models\Project' => $link = "/projects/{$entity_id}",
+            \App\Models\Vendor::class => $link = "/vendors/{$entity_id}",
+            \App\Models\Project::class => $link = "/projects/{$entity_id}",
             'invoices' => $link = "/invoices/{$entity_id}/edit",
-            'App\Models\Quote' => $link = "/quotes/{$entity_id}/edit",
-            'App\Models\Credit' => $link = "/credits/{$entity_id}/edit",
-            'App\Models\Expense' => $link = "/expenses/{$entity_id}/edit",
-            'App\Models\Payment' => $link = "/payments/{$entity_id}/edit",
-            'App\Models\Task' => $link = "/tasks/{$entity_id}/edit",
-            'App\Models\Client' => $link = "/clients/{$entity_id}",
-            'App\Models\RecurringExpense' => $link = "/recurring_expenses/{$entity_id}/edit",
-            'App\Models\RecurringInvoice' => $link = "/recurring_invoices/{$entity_id}/edit",
+            \App\Models\Quote::class => $link = "/quotes/{$entity_id}/edit",
+            \App\Models\Credit::class => $link = "/credits/{$entity_id}/edit",
+            \App\Models\Expense::class => $link = "/expenses/{$entity_id}/edit",
+            \App\Models\Payment::class => $link = "/payments/{$entity_id}/edit",
+            \App\Models\Task::class => $link = "/tasks/{$entity_id}/edit",
+            \App\Models\Client::class => $link = "/clients/{$entity_id}",
+            \App\Models\RecurringExpense::class => $link = "/recurring_expenses/{$entity_id}/edit",
+            \App\Models\RecurringInvoice::class => $link = "/recurring_invoices/{$entity_id}/edit",
             default => $link = '',
         };
 

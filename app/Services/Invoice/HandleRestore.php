@@ -96,7 +96,7 @@ class HandleRestore extends AbstractService
 
             //14/07/2023 - do not include credits in the payment amount
             $this->adjustment_amount -= $payment->paymentables
-                ->where('paymentable_type', '=', 'App\Models\Credit')
+                ->where('paymentable_type', '=', \App\Models\Credit::class)
                 ->sum('amount');
 
             nlog("Adjustment amount: {$this->adjustment_amount}");
@@ -131,7 +131,7 @@ class HandleRestore extends AbstractService
                 ->sum('refunded');
 
             $payment_adjustment -= $payment->paymentables
-                ->where('paymentable_type', '=', 'App\Models\Credit')
+                ->where('paymentable_type', '=', \App\Models\Credit::class)
                 ->sum('amount');
 
             $payment->amount += $payment_adjustment;

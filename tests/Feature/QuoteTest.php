@@ -258,14 +258,14 @@ class QuoteTest extends TestCase
     {
         $project = $this->quote->service()->convertToProject();
 
-        $this->assertInstanceOf('\App\Models\Project', $project);
+        $this->assertInstanceOf(\App\Models\Project::class, $project);
     }
 
     public function testQuoteConversion()
     {
         $invoice = $this->quote->service()->convertToInvoice();
 
-        $this->assertInstanceOf('\App\Models\Invoice', $invoice);
+        $this->assertInstanceOf(\App\Models\Invoice::class, $invoice);
 
         $this->expectException(QuoteConversion::class);
 

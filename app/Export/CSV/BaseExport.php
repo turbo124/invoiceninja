@@ -733,11 +733,11 @@ class BaseExport
             $manager->setSerializer(new ArraySerializer());
             $transformed_invoices = $manager->createData($transformed_invoices)->toArray();
 
-            if (! isset($transformed_invoices['App\\Models\\Invoice'])) {
+            if (! isset($transformed_invoices[\App\Models\Invoice::class])) {
                 return '';
             }
 
-            $transformed_invoices = $transformed_invoices['App\\Models\\Invoice'];
+            $transformed_invoices = $transformed_invoices[\App\Models\Invoice::class];
 
             if (count($transformed_invoices) == 1 && array_key_exists($column, $transformed_invoices[0])) {
                 return $transformed_invoices[0][$column];

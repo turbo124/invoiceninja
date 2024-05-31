@@ -69,7 +69,7 @@ class ExpenseApiTest extends TestCase
 
         $this->assertNotNull($e->transaction_id);
 
-        $expense_repo = app('App\Repositories\ExpenseRepository');
+        $expense_repo = app(\App\Repositories\ExpenseRepository::class);
         $e = $expense_repo->delete($e);
 
         $this->assertNull($e->transaction_id);

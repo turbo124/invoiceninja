@@ -91,7 +91,7 @@ class MarkInvoiceDeleted extends AbstractService
 
             //14-07-2023 - Do not include credits in the payment adjustment.
             $payment_adjustment -= $payment->paymentables
-                ->where('paymentable_type', '=', 'App\Models\Credit')
+                ->where('paymentable_type', '=', \App\Models\Credit::class)
                 ->sum('amount');
 
             $payment->amount -= $payment_adjustment;

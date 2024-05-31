@@ -870,7 +870,7 @@ class ClientApiTest extends TestCase
             'paid_to_date' => '0',
             'credit_balance' => 0,
             'settings' => [
-                'entity' => 'App\\Models\\Client',
+                'entity' => \App\Models\Client::class,
                 'currency_id' => '3',
             ],
             'client_hash' => 'xx',
@@ -909,7 +909,7 @@ class ClientApiTest extends TestCase
     public function testClientSettingsSave()
     {
         $std = new \stdClass;
-        $std->entity = 'App\\Models\\Client';
+        $std->entity = \App\Models\Client::class;
         $std->currency_id = 3;
 
         $this->settings = $this->client->settings;
@@ -922,7 +922,7 @@ class ClientApiTest extends TestCase
     public function testClientSettingsSave2()
     {
         $std = new \stdClass;
-        $std->entity = 'App\\Models\\Client';
+        $std->entity = \App\Models\Client::class;
         $std->industry_id = '';
         $std->size_id = '';
         $std->currency_id = 3;
@@ -966,7 +966,7 @@ class ClientApiTest extends TestCase
             'paid_to_date' => '0',
             'credit_balance' => 0,
             'settings' => (object) [
-                'entity' => 'App\\Models\\Client',
+                'entity' => \App\Models\Client::class,
                 'currency_id' => '3',
             ],
             'client_hash' => 'xx',
@@ -1035,7 +1035,7 @@ class ClientApiTest extends TestCase
             'paid_to_date' => '0',
             'credit_balance' => 0,
             'settings' => (object) [
-                'entity' => 'App\\Models\\Client',
+                'entity' => \App\Models\Client::class,
                 'currency_id' => '3',
             ],
             'client_hash' => 'xx',
