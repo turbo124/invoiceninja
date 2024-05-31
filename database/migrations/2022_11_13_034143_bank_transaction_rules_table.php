@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -16,13 +17,13 @@ return new class extends Migration {
             $table->id();
             $table->unsignedInteger('company_id');
             $table->unsignedInteger('user_id');
-        
+
             $table->string('name'); //name of rule
             $table->mediumText('rules')->nullable(); //array of rule objects
             $table->boolean('auto_convert')->default(false); //auto convert to match
             $table->boolean('matches_on_all')->default(false); //match on all rules or just one
             $table->string('applies_to')->default('CREDIT'); //CREDIT/DEBIT
-        
+
             $table->unsignedInteger('client_id')->nullable();
             $table->unsignedInteger('vendor_id')->nullable();
             $table->unsignedInteger('category_id')->nullable();

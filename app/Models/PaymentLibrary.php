@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,6 +19,7 @@ namespace App\Models;
  * @property string|null $name
  * @property bool $visible
  * @property-read mixed $hashed_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentLibrary newModelQuery()
@@ -31,6 +31,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentLibrary whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentLibrary whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentLibrary whereVisible($value)
+ *
  * @mixin \Eloquent
  */
 class PaymentLibrary extends BaseModel

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,12 +17,13 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Helpers\Invoice\InvoiceSum
  */
 class InvoiceStatusTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
     public $invoice;
 
@@ -31,7 +31,7 @@ class InvoiceStatusTest extends TestCase
 
     public $settings;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 

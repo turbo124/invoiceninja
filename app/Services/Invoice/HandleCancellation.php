@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -76,7 +75,6 @@ class HandleCancellation extends AbstractService
 
         $this->invoice->client->service()->calculateBalance();
 
-
         /* Pop the cancellation out of the backup*/
         $backup = $this->invoice->backup;
         unset($backup->cancellation);
@@ -90,7 +88,7 @@ class HandleCancellation extends AbstractService
     /**
      * Backup the cancellation in case we ever need to reverse it.
      *
-     * @param  float $adjustment  The amount the balance has been reduced by to cancel the invoice
+     * @param  float  $adjustment  The amount the balance has been reduced by to cancel the invoice
      * @return void
      */
     private function backupCancellation($adjustment)

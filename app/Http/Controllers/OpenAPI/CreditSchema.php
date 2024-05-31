@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Credit",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The credit hashed id"),
  *       @OA\Property(property="user_id", type="string", example="", description="The user hashed id"),
  *       @OA\Property(property="assigned_user_id", type="string", example="", description="The assigned user hashed id"),

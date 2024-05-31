@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,9 +33,9 @@ class ZipDocuments implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use MakesDates;
     use Queueable;
     use SerializesModels;
-    use MakesDates;
 
     public $document_ids;
 
@@ -49,9 +48,8 @@ class ZipDocuments implements ShouldQueue
     public $tries = 1;
 
     /**
-     * @param array $document_ids
-     * @param Company $company
-     * @param User $user
+     * @param  array  $document_ids
+     *
      * @deprecated confirm to be deleted
      * Create a new job instance.
      */

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,7 +34,6 @@ class ClientRepository extends BaseRepository
 
     /**
      * ClientController constructor.
-     * @param ClientContactRepository $contact_repo
      */
     public function __construct(ClientContactRepository $contact_repo)
     {
@@ -45,10 +43,9 @@ class ClientRepository extends BaseRepository
     /**
      * Saves the client and its contacts.
      *
-     * @param array $data The data
-     * @param Client $client The client
-     *
-     * @return     Client|Client|null  Client Object
+     * @param  array  $data  The data
+     * @param  Client  $client  The client
+     * @return Client|Client|null Client Object
      *
      * @throws \Laracasts\Presenter\Exceptions\PresenterException
      */
@@ -71,7 +68,7 @@ class ClientRepository extends BaseRepository
         }
 
         if (! $client->country_id || $client->country_id == 0) {
-            /** @var \App\Models\Company $company **/
+            /** @var \App\Models\Company $company * */
             $company = Company::find($client->company_id);
             $client->country_id = $company->settings->country_id;
         }
@@ -113,8 +110,7 @@ class ClientRepository extends BaseRepository
     /**
      * Store clients in bulk.
      *
-     * @param array $client
-     * @return Client|null
+     * @param  array  $client
      */
     public function create($client): ?Client
     {
@@ -126,25 +122,24 @@ class ClientRepository extends BaseRepository
             ClientFactory::create($user->company()->id, $user->id)
         );
     }
-    
+
     /**
      * Bulk assign clients to a group.
      *
-     * @param  mixed $clients
-     * @param  mixed $group_settings_id
-     * @return void
+     * @param  mixed  $clients
+     * @param  mixed  $group_settings_id
      */
     public function assignGroup($clients, $group_settings_id): void
     {
         Client::query()
-              ->company()
-              ->whereIn('id', $clients->pluck('id'))
-              ->update(['group_settings_id' => $group_settings_id]);
+            ->company()
+            ->whereIn('id', $clients->pluck('id'))
+            ->update(['group_settings_id' => $group_settings_id]);
     }
 
     public function purge($client)
     {
-        
+
         nlog("Purging client id => {$client->id}");
 
         $client->contacts()->forceDelete();

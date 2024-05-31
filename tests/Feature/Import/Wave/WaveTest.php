@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,13 +26,14 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Import\Providers\Wave
  */
 class WaveTest extends TestCase
 {
+    use DatabaseTransactions;
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
 
     protected function setUp(): void
     {

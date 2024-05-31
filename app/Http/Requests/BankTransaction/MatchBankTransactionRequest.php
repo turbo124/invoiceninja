@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,6 @@ class MatchBankTransactionRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -73,7 +70,7 @@ class MatchBankTransactionRequest extends Request
                 $p = Payment::withTrashed()->where('company_id', $user->company()->id)->where('id', $inputs['transactions'][$key]['payment_id'])->first();
 
                 /*Ensure we don't relink an existing payment*/
-                if (!$p || is_numeric($p->transaction_id)) {
+                if (! $p || is_numeric($p->transaction_id)) {
                     unset($inputs['transactions'][$key]);
                 }
             }

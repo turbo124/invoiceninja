@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -137,7 +136,7 @@ class CSVIngest implements ShouldQueue
             case 'freshbooks':
                 return new Freshbooks($this->request, $this->company);
             default:
-                nlog("could not return provider");
+                nlog('could not return provider');
                 break;
         }
     }

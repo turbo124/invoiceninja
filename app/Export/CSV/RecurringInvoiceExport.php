@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -54,14 +53,14 @@ class RecurringInvoiceExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_client_fields, $this->input['report_keys']));
 
         $query = RecurringInvoice::query()
-                        ->withTrashed()
-                        ->with('client')
-                        ->whereHas('client', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->where('company_id', $this->company->id);
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->with('client')
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
@@ -69,7 +68,7 @@ class RecurringInvoiceExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
@@ -82,7 +81,7 @@ class RecurringInvoiceExport extends BaseExport
     public function run()
     {
 
-        $query  = $this->init();
+        $query = $this->init();
 
         //load the CSV document from a string
         $this->csv = Writer::createFromString();
@@ -99,7 +98,6 @@ class RecurringInvoiceExport extends BaseExport
         return $this->csv->toString();
     }
 
-
     public function returnJson()
     {
         $query = $this->init();
@@ -111,14 +109,14 @@ class RecurringInvoiceExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
-
 
     private function buildRow(RecurringInvoice $invoice): array
     {
@@ -132,7 +130,7 @@ class RecurringInvoiceExport extends BaseExport
 
             if (is_array($parts) && $parts[0] == 'recurring_invoice' && array_key_exists($parts[1], $transformed_invoice)) {
                 $entity[$key] = $transformed_invoice[$parts[1]];
-            } elseif($parts[0] == 'item') {
+            } elseif ($parts[0] == 'item') {
                 $entity[$key] = '';
             } else {
                 // nlog($key);
@@ -188,7 +186,6 @@ class RecurringInvoiceExport extends BaseExport
         if (in_array('recurring_invoice.user_id', $this->input['report_keys'])) {
             $entity['recurring_invoice.user_id'] = $invoice->user ? $invoice->user->present()->name() : '';
         }
-
 
         return $entity;
     }

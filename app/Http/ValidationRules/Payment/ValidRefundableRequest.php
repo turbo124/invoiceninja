@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,8 +23,8 @@ class ValidRefundableRequest implements Rule
     use MakesHash;
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     private $error_msg;
@@ -72,7 +71,7 @@ class ValidRefundableRequest implements Rule
 
     private function checkInvoiceIsPaymentable($invoice, $payment)
     {
-        /**@var \App\Models\Invoice $invoice **/
+        /** @var \App\Models\Invoice $invoice * */
         $invoice = Invoice::query()->where('id', $invoice['invoice_id'])->where('company_id', $payment->company_id)->withTrashed()->first();
 
         if (! $invoice) {
@@ -100,7 +99,7 @@ class ValidRefundableRequest implements Rule
     {
         $record_found = false;
 
-        foreach($paymentables as $paymentable) {
+        foreach ($paymentables as $paymentable) {
             foreach ($request_invoices as $request_invoice) {
 
                 if ($request_invoice['invoice_id'] == $paymentable->pivot->paymentable_id) {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,6 @@ use App\Import\Transformer\BaseTransformer;
 class ExpenseTransformer extends BaseTransformer
 {
     /**
-     * @param $line_items_data
-     *
      * @return bool|array
      */
     public function transform($line_items_data)
@@ -39,16 +36,16 @@ class ExpenseTransformer extends BaseTransformer
         $tax_rate = round(($total_tax / $amount) * 100, 3);
 
         $transformed = [
-            'company_id'  => $this->company->id,
-            'vendor_id'   => $this->getVendorIdOrCreate($this->getString($data, 'Vendor')),
-            'number' 	  => $this->getString($data, 'Bill Number'),
+            'company_id' => $this->company->id,
+            'vendor_id' => $this->getVendorIdOrCreate($this->getString($data, 'Vendor')),
+            'number' => $this->getString($data, 'Bill Number'),
             'public_notes' => $this->getString($data, 'Notes / Memo'),
-            'date'        => $this->parseDate($data['Transaction Date Added']) ?: now()->format('Y-m-d'), //27-01-2022
+            'date' => $this->parseDate($data['Transaction Date Added']) ?: now()->format('Y-m-d'), //27-01-2022
             'currency_id' => $this->company->settings->currency_id,
             'category_id' => $this->getOrCreateExpenseCategry($data['Account Name']),
-            'amount'	  => $amount,
-            'tax_name1'   => $data['Sales Tax Name'],
-            'tax_rate1'	  => $tax_rate,
+            'amount' => $amount,
+            'tax_name1' => $data['Sales Tax Name'],
+            'tax_rate1' => $tax_rate,
         ];
 
         return $transformed;

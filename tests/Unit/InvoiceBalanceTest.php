@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -14,12 +13,12 @@ namespace Tests\Unit;
 use App\DataMapper\InvoiceItem;
 use App\Models\Invoice;
 use App\Models\PurchaseOrder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\MockAccountData;
 use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Helpers\Invoice\InvoiceSum
  */
 class InvoiceBalanceTest extends TestCase
@@ -35,12 +34,12 @@ class InvoiceBalanceTest extends TestCase
 
     public function testInvoiceBalances()
     {
-        
+
         $item = new InvoiceItem();
         $item->quantity = 1;
         $item->cost = 100;
         $item->type_id = '1';
-        
+
         $i = Invoice::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -57,7 +56,6 @@ class InvoiceBalanceTest extends TestCase
             'paid_to_date' => 0,
         ]);
 
-
         $this->assertEquals(1, $i->status_id);
 
         $i = $i->calc()->getInvoice()->service()->markSent()->save();
@@ -67,7 +65,6 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(2, $i->status_id);
         $this->assertEquals(0, $i->paid_to_date);
 
-        
         $item = new InvoiceItem();
         $item->quantity = 1;
         $item->cost = 30.37;
@@ -85,7 +82,7 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(0, $i->paid_to_date);
 
         $i = $i->service()->applyPaymentAmount(10.37, 'paid')->save();
-        
+
         // nlog($i->withoutRelations()->toArray());
 
         $this->assertEquals(30.37, $i->amount);
@@ -103,22 +100,20 @@ class InvoiceBalanceTest extends TestCase
         $i = $i->calc()->getInvoice();
 
         $this->assertEquals(15, $i->amount);
-        $this->assertEquals(15-10.37, $i->balance);
+        $this->assertEquals(15 - 10.37, $i->balance);
         $this->assertEquals(3, $i->status_id);
         $this->assertEquals(10.37, $i->paid_to_date);
 
-
     }
-
 
     public function testInvoiceBalancesWithNegatives()
     {
-        
+
         $item = new InvoiceItem();
         $item->quantity = 1;
         $item->cost = -100;
         $item->type_id = '1';
-        
+
         $i = Invoice::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -135,7 +130,6 @@ class InvoiceBalanceTest extends TestCase
             'paid_to_date' => 0,
         ]);
 
-
         $this->assertEquals(1, $i->status_id);
 
         $i = $i->calc()->getInvoice()->service()->markSent()->save();
@@ -145,7 +139,6 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(2, $i->status_id);
         $this->assertEquals(0, $i->paid_to_date);
 
-        
         $item = new InvoiceItem();
         $item->quantity = 1;
         $item->cost = -30.37;
@@ -166,17 +159,14 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(-30.37, $i->paid_to_date);
     }
 
-
-
-
     public function testPurchaseOrderBalances()
     {
-        
+
         $item = new InvoiceItem();
         $item->quantity = 1;
         $item->cost = 100;
         $item->type_id = '1';
-        
+
         $i = PurchaseOrder::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -203,7 +193,6 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(2, $i->status_id);
         $this->assertEquals(0, $i->paid_to_date);
 
-        
         $item = new InvoiceItem();
         $item->quantity = 1;
         $item->cost = 30.37;
@@ -221,7 +210,7 @@ class InvoiceBalanceTest extends TestCase
 
         $item = new InvoiceItem();
         $item->quantity = 1;
-        $item->cost =10.37;
+        $item->cost = 10.37;
         $item->type_id = '1';
 
         $i->line_items = [$item];
@@ -234,8 +223,5 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(2, $i->status_id);
         $this->assertEquals(0, $i->paid_to_date);
 
-
-
     }
-
 }

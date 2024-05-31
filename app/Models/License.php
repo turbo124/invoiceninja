@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $product_id
  * @property int|null $recurring_invoice_id
  * @property-read \App\Models\RecurringInvoice $recurring_invoice
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|License newModelQuery()
@@ -49,6 +49,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|License whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|License withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|License withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class License extends StaticModel

@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="CompanyGateway",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed id of the company gateway"),
  *       @OA\Property(property="company_id", type="string", example="2", description="The company hashed id"),
  *       @OA\Property(property="gateway_key", type="string", example="2", description="The gateway key (hash)"),
@@ -15,6 +16,7 @@
  *       	property="fees_and_limits",
  *        	type="array",
  *        	description="A mapped collection of the fees and limits for the configured gateway",
+ *
  *        	@OA\Items(
  *           	ref="#/components/schemas/FeesAndLimits",
  *          ),

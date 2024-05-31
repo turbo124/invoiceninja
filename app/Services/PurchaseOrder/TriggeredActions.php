@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,18 +35,18 @@ class TriggeredActions extends AbstractService
     {
         if ($this->request->has('send_email') && $this->request->input('send_email') == 'true') {
             $this->purchase_order
-                 ->service()
-                 ->markSent()
-                 ->save();
+                ->service()
+                ->markSent()
+                ->save();
 
             $this->sendEmail();
         }
 
         if ($this->request->has('mark_sent') && $this->request->input('mark_sent') == 'true') {
             $this->purchase_order = $this->purchase_order
-                                         ->service()
-                                         ->markSent()
-                                         ->save();
+                ->service()
+                ->markSent()
+                ->save();
         }
 
         if ($this->request->has('save_default_footer') && $this->request->input('save_default_footer') == 'true') {

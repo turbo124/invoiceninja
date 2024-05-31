@@ -5,8 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
-
 * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,6 +38,7 @@ class InventoryNotificationObject
         $mail_obj->markdown = 'email.admin.generic';
         $mail_obj->tag = $this->product->company->company_key;
         $mail_obj->text_view = 'email.template.text';
+
         return $mail_obj;
     }
 
@@ -62,8 +61,8 @@ class InventoryNotificationObject
         $content = ctrans(
             'texts.inventory_notification_body',
             ['amount' => $this->getAmount(),
-                    'product' => $this->product->product_key.': '.$this->product->notes,
-                ]
+                'product' => $this->product->product_key.': '.$this->product->notes,
+            ]
         );
 
         $data = [

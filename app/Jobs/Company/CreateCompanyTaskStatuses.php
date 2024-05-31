@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,8 @@ use Illuminate\Support\Facades\App;
 
 class CreateCompanyTaskStatuses
 {
-    use MakesHash;
     use Dispatchable;
+    use MakesHash;
 
     protected $company;
 
@@ -28,9 +27,6 @@ class CreateCompanyTaskStatuses
 
     /**
      * Create a new job instance.
-     *
-     * @param $company
-     * @param $user
      */
     public function __construct($company, $user)
     {

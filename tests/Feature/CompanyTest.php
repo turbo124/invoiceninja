@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,17 +26,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\CompanyController
  */
 class CompanyTest extends TestCase
 {
+    use DatabaseTransactions;
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,7 +54,7 @@ class CompanyTest extends TestCase
     {
         $x = '**********';
 
-        $new_string = str_replace("*", "", $x);
+        $new_string = str_replace('*', '', $x);
 
         $this->assertEquals(0, strlen($new_string));
     }
@@ -87,7 +87,7 @@ class CompanyTest extends TestCase
     public function testUpdateCompanyPropertyInvoiceTaskHours()
     {
         $company_update = [
-            'invoice_task_hours' => true
+            'invoice_task_hours' => true,
         ];
 
         $response = $this->withHeaders([
@@ -101,9 +101,8 @@ class CompanyTest extends TestCase
 
         $this->assertTrue($arr['data']['invoice_task_hours']);
 
-
         $company_update = [
-            'invoice_task_hours' => false
+            'invoice_task_hours' => false,
         ];
 
         $response = $this->withHeaders([
@@ -111,7 +110,6 @@ class CompanyTest extends TestCase
             'X-API-TOKEN' => $this->token,
         ])->putJson('/api/v1/companies/'.$this->encodePrimaryKey($this->company->id), $company_update)
             ->assertStatus(200);
-
 
         $arr = $response->json();
 
@@ -142,7 +140,7 @@ class CompanyTest extends TestCase
                 'logo' => UploadedFile::fake()->image('avatar.jpg'),
             ]
         )
-        ->assertStatus(200)->decodeResponseJson();
+            ->assertStatus(200)->decodeResponseJson();
 
         $company = Company::find($this->decodePrimaryKey($response['data'][0]['company']['id']));
 
@@ -156,7 +154,7 @@ class CompanyTest extends TestCase
                 'company_logo' => UploadedFile::fake()->create('avatar.pdf', 100),
             ]
         )
-        ->assertStatus(302);
+            ->assertStatus(302);
 
         //  Log::error($company);
 
@@ -186,19 +184,19 @@ class CompanyTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->putJson('/api/v1/companies/'.$this->encodePrimaryKey($company->id), $company->toArray())
-        ->assertStatus(200)->decodeResponseJson();
+            ->assertStatus(200)->decodeResponseJson();
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/companies/'.$this->encodePrimaryKey($company->id))
-        ->assertStatus(200)->decodeResponseJson();
+            ->assertStatus(200)->decodeResponseJson();
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
             'X-API-PASSWORD' => 'ALongAndBriliantPassword',
         ])->delete('/api/v1/companies/'.$this->encodePrimaryKey($company->id))
-        ->assertStatus(200);
+            ->assertStatus(200);
     }
 }

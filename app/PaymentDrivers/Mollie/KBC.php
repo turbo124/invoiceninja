@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,9 +37,6 @@ class KBC implements MethodInterface
 
     /**
      * Show the authorization page for KBC.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function authorizeView(array $data): View
     {
@@ -49,9 +45,6 @@ class KBC implements MethodInterface
 
     /**
      * Handle the authorization for KBC.
-     *
-     * @param Request $request
-     * @return RedirectResponse
      */
     public function authorizeResponse(Request $request): RedirectResponse
     {
@@ -61,7 +54,6 @@ class KBC implements MethodInterface
     /**
      * Show the payment page for KBC.
      *
-     * @param array $data
      * @return Redirector|RedirectResponse
      */
     public function paymentView(array $data)
@@ -97,7 +89,7 @@ class KBC implements MethodInterface
             return redirect(
                 $payment->getCheckoutUrl()
             );
-        } catch (\Mollie\Api\Exceptions\ApiException | \Exception $exception) {
+        } catch (\Mollie\Api\Exceptions\ApiException|\Exception $exception) {
             return $this->processUnsuccessfulPayment($exception);
         }
     }
@@ -105,9 +97,9 @@ class KBC implements MethodInterface
     /**
      * Handle unsuccessful payment.
      *
-     * @param Exception $exception
+     * @param  Exception  $exception
+     *
      * @throws PaymentFailed
-     * @return void
      */
     public function processUnsuccessfulPayment(\Exception $exception): void
     {
@@ -128,7 +120,6 @@ class KBC implements MethodInterface
     /**
      * Handle the payments for the KBC.
      *
-     * @param PaymentResponseRequest $request
      * @return mixed
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -157,7 +148,7 @@ class KBC implements MethodInterface
             return $this->processUnsuccessfulPayment(
                 new PaymentFailed(ctrans('texts.status_voided'))
             );
-        } catch (\Mollie\Api\Exceptions\ApiException | \Exception $exception) {
+        } catch (\Mollie\Api\Exceptions\ApiException|\Exception $exception) {
             return $this->processUnsuccessfulPayment($exception);
         }
     }
@@ -165,8 +156,7 @@ class KBC implements MethodInterface
     /**
      * Handle the successful payment for KBC.
      *
-     * @param ResourcesPayment $payment
-     * @return RedirectResponse
+     * @param  ResourcesPayment  $payment
      */
     public function processSuccessfulPayment(\Mollie\Api\Resources\Payment $payment): RedirectResponse
     {

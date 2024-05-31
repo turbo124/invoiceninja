@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,8 +22,6 @@ class RecurringInvoiceFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -33,22 +30,22 @@ class RecurringInvoiceFilters extends QueryFilters
             return $this->builder;
         }
 
-        return  $this->builder->where(function ($query) use ($filter) {
+        return $this->builder->where(function ($query) use ($filter) {
             $query->where('date', 'like', '%'.$filter.'%')
-                  ->orWhere('amount', 'like', '%'.$filter.'%')
-                  ->orWhere('number', 'like', '%'.$filter.'%')
-                  ->orWhere('custom_value1', 'like', '%'.$filter.'%')
-                  ->orWhere('custom_value2', 'like', '%'.$filter.'%')
-                  ->orWhere('custom_value3', 'like', '%'.$filter.'%')
-                  ->orWhere('custom_value4', 'like', '%'.$filter.'%')
-                  ->orWhereHas('client', function ($q) use ($filter) {
-                      $q->where('name', 'like', '%'.$filter.'%');
-                  })
-                  ->orWhereHas('client.contacts', function ($q) use ($filter) {
-                      $q->where('first_name', 'like', '%'.$filter.'%')
+                ->orWhere('amount', 'like', '%'.$filter.'%')
+                ->orWhere('number', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value1', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value2', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value3', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value4', 'like', '%'.$filter.'%')
+                ->orWhereHas('client', function ($q) use ($filter) {
+                    $q->where('name', 'like', '%'.$filter.'%');
+                })
+                ->orWhereHas('client.contacts', function ($q) use ($filter) {
+                    $q->where('first_name', 'like', '%'.$filter.'%')
                         ->orWhere('last_name', 'like', '%'.$filter.'%')
                         ->orWhere('email', 'like', '%'.$filter.'%');
-                  });
+                });
         });
     }
 
@@ -61,8 +58,7 @@ class RecurringInvoiceFilters extends QueryFilters
      * - paused
      * - completed
      *
-     * @param string $value The invoice status as seen by the client
-     * @return Builder
+     * @param  string  $value  The invoice status as seen by the client
      */
     public function client_status(string $value = ''): Builder
     {
@@ -81,7 +77,6 @@ class RecurringInvoiceFilters extends QueryFilters
         if (in_array('active', $status_parameters)) {
             $recurring_filters[] = RecurringInvoice::STATUS_ACTIVE;
         }
-
 
         if (in_array('paused', $status_parameters)) {
             $recurring_filters[] = RecurringInvoice::STATUS_PAUSED;
@@ -110,15 +105,14 @@ class RecurringInvoiceFilters extends QueryFilters
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
 
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
@@ -126,14 +120,14 @@ class RecurringInvoiceFilters extends QueryFilters
 
         if ($sort_col[0] == 'client_id') {
             return $this->builder->orderBy(\App\Models\Client::select('name')
-                    ->whereColumn('clients.id', 'recurring_invoices.client_id'), $dir);
+                ->whereColumn('clients.id', 'recurring_invoices.client_id'), $dir);
         }
 
-        if($sort_col[0] == 'number') {
-            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
+        if ($sort_col[0] == 'number') {
+            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 ".$dir);
         }
 
-        if($sort_col[0] == 'next_send_datetime'){
+        if ($sort_col[0] == 'next_send_datetime') {
             $sort_col[0] = 'next_send_date';
         }
 
@@ -142,8 +136,6 @@ class RecurringInvoiceFilters extends QueryFilters
 
     /**
      * Filters the query by the users company ID.
-     *
-     * @return Builder
      */
     public function entityFilter(): Builder
     {
@@ -153,8 +145,7 @@ class RecurringInvoiceFilters extends QueryFilters
     /**
      * Filter based on line_items product_key
      *
-     * @param string $value Product keys
-     * @return Builder
+     * @param  string  $value  Product keys
      */
     public function product_key(string $value = ''): Builder
     {
@@ -177,31 +168,28 @@ class RecurringInvoiceFilters extends QueryFilters
 
     /**
      * next send date between.
-     *
-     * @param string $range
-     * @return Builder
      */
     public function next_send_between(string $range = ''): Builder
     {
         $parts = explode('|', $range);
 
-        if (!isset($parts[0]) || !isset($parts[1])) {
+        if (! isset($parts[0]) || ! isset($parts[1])) {
             return $this->builder;
         }
 
         if (is_numeric($parts[0])) {
-            $startDate = Carbon::createFromTimestamp((int)$parts[0]);
+            $startDate = Carbon::createFromTimestamp((int) $parts[0]);
         } else {
             $startDate = Carbon::parse($parts[0]);
         }
 
         if (is_numeric($parts[1])) {
-            $endDate = Carbon::createFromTimestamp((int)$parts[1]);
+            $endDate = Carbon::createFromTimestamp((int) $parts[1]);
         } else {
             $endDate = Carbon::parse($parts[1]);
         }
 
-        if (!$startDate || !$endDate) {
+        if (! $startDate || ! $endDate) {
             return $this->builder;
         }
 
@@ -213,9 +201,6 @@ class RecurringInvoiceFilters extends QueryFilters
 
     /**
      * Filter by frequency id.
-     *
-     * @param string $value
-     * @return Builder
      */
     public function frequency_id(string $value = ''): Builder
     {

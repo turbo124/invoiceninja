@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -57,7 +56,7 @@ class CreditCard
             'customer_id' => Str::random(32),
             'hpf_token' => $data['HPF_Token'],
             'enc_key' => $data['enc_key'],
-            'integrator_id' =>  $this->paytrace->company_gateway->getConfigField('integratorId'),
+            'integrator_id' => $this->paytrace->company_gateway->getConfigField('integratorId'),
             'billing_address' => $this->buildBillingAddress(),
             'email' => $this->paytrace->client->present()->email(),
             'phone' => $this->paytrace->client->present()->phone(),
@@ -85,7 +84,7 @@ class CreditCard
             return $this->paytrace->processUnsuccessfulTransaction($data);
         }
 
-        nlog("paytrace response createCustomer");
+        nlog('paytrace response createCustomer');
         nlog($response);
 
         $cgt = [];
@@ -111,7 +110,7 @@ class CreditCard
     private function getCustomerProfile($customer_id)
     {
         $profile = $this->paytrace->gatewayRequest('/v1/customer/export', [
-            'integrator_id' =>  $this->paytrace->company_gateway->getConfigField('integratorId'),
+            'integrator_id' => $this->paytrace->company_gateway->getConfigField('integratorId'),
             'customer_id' => $customer_id,
         ]);
 
@@ -126,7 +125,7 @@ class CreditCard
             'city' => $this->paytrace->client->city,
             'state' => $this->paytrace->client->state,
             'zip' => $this->paytrace->client->postal_code,
-            'country' => $this->paytrace->client->country->iso_3166_2
+            'country' => $this->paytrace->client->country->iso_3166_2,
         ];
 
         return $data;
@@ -160,7 +159,7 @@ class CreditCard
         $data = [
             'hpf_token' => $response_array['HPF_Token'],
             'enc_key' => $response_array['enc_key'],
-            'integrator_id' =>  $this->paytrace->company_gateway->getConfigField('integratorId'),
+            'integrator_id' => $this->paytrace->company_gateway->getConfigField('integratorId'),
             'billing_address' => $this->buildBillingAddress(),
             'amount' => $request->input('amount_with_fee'),
             'invoice_id' => $this->harvestInvoiceId(),
@@ -179,7 +178,7 @@ class CreditCard
     {
         $data = [
             'customer_id' => $token,
-            'integrator_id' =>  $this->paytrace->company_gateway->getConfigField('integratorId'),
+            'integrator_id' => $this->paytrace->company_gateway->getConfigField('integratorId'),
             'amount' => $request->input('amount_with_fee'),
             'invoice_id' => $this->harvestInvoiceId(),
         ];

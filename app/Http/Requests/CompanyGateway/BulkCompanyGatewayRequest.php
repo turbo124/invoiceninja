@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,6 @@ class BulkCompanyGatewayRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -39,8 +36,8 @@ class BulkCompanyGatewayRequest extends Request
         $user = auth()->user();
 
         return [
-            'ids' => ['required','bail','array',Rule::exists('company_gateways', 'id')->where('company_id', $user->company()->id)],
-            'action' => 'required|bail|in:archive,restore,delete'
+            'ids' => ['required', 'bail', 'array', Rule::exists('company_gateways', 'id')->where('company_id', $user->company()->id)],
+            'action' => 'required|bail|in:archive,restore,delete',
         ];
     }
 

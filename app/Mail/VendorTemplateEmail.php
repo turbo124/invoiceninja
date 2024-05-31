@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,8 +44,6 @@ class VendorTemplateEmail extends Mailable
     /**
      * Supports inline attachments for large
      * attachments in custom designs
-     *
-     * @return string
      */
     private function buildLinksForCustomDesign(): string
     {
@@ -74,8 +71,8 @@ class VendorTemplateEmail extends Mailable
         if (in_array($this->build_email->getTemplate(), ['light', 'dark'])) {
             $template_name = 'email.template.client';
         }
-        
-        if($this->build_email->getTemplate() == 'premium') {
+
+        if ($this->build_email->getTemplate() == 'premium') {
             $template_name = 'email.template.client_premium';
         }
 
@@ -110,7 +107,7 @@ class VendorTemplateEmail extends Mailable
 
             if (Ninja::isHosted()) {
 
-                if($this->company->account->isPaid()) {
+                if ($this->company->account->isPaid()) {
                     $bccs = explode(',', str_replace(' ', '', $settings->bcc_email));
                     $this->bcc(array_slice($bccs, 0, 5));
                 }
@@ -141,7 +138,6 @@ class VendorTemplateEmail extends Mailable
                 'logo' => $this->company->present()->logo($settings),
                 'links' => $this->build_email->getAttachmentLinks(),
             ]);
-
 
         foreach ($this->build_email->getAttachments() as $file) {
             if (array_key_exists('file', $file)) {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,10 +39,10 @@ class CreateInvitations extends AbstractService
 
         $contacts->each(function ($contact) {
             $invitation = InvoiceInvitation::query()->where('company_id', $this->invoice->company_id)
-                                        ->where('client_contact_id', $contact->id)
-                                        ->where('invoice_id', $this->invoice->id)
-                                        ->withTrashed()
-                                        ->first();
+                ->where('client_contact_id', $contact->id)
+                ->where('invoice_id', $this->invoice->id)
+                ->withTrashed()
+                ->first();
 
             if (! $invitation && $contact->send_email) {
                 $ii = InvoiceInvitationFactory::create($this->invoice->company_id, $this->invoice->user_id);
@@ -63,10 +62,10 @@ class CreateInvitations extends AbstractService
                 $contact = $contacts->first();
 
                 $invitation = InvoiceInvitation::query()->where('company_id', $this->invoice->company_id)
-                                        ->where('client_contact_id', $contact->id)
-                                        ->where('invoice_id', $this->invoice->id)
-                                        ->withTrashed()
-                                        ->first();
+                    ->where('client_contact_id', $contact->id)
+                    ->where('invoice_id', $this->invoice->id)
+                    ->withTrashed()
+                    ->first();
 
                 if ($invitation) {
                     $invitation->restore();

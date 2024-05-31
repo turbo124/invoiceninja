@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,13 +24,12 @@ class UploadController extends Controller
     /**
      * Main logic behind uploading the files.
      *
-     * @param StoreUploadRequest $request
      * @return Response|ResponseFactory
      */
     public function __invoke(StoreUploadRequest $request)
     {
 
-        /** @var \App\Models\ClientContact $client_contact **/
+        /** @var \App\Models\ClientContact $client_contact * */
         $client_contact = auth()->user();
 
         $this->saveDocuments($request->getFile(), $client_contact->client, $request->input('is_public', true));

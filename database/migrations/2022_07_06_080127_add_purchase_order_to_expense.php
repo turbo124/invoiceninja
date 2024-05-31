@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 use App\Models\Language;
@@ -18,6 +17,7 @@ use Illuminate\Support\Facades\Schema;
 class AddPurchaseOrderToExpense extends Migration
 {
     use AppSetup;
+
     /**
      * Run the migrations.
      *
@@ -33,7 +33,7 @@ class AddPurchaseOrderToExpense extends Migration
 
         $language = Language::find(36);
 
-        if (!$language) {
+        if (! $language) {
             Language::unguard();
             Language::create(['id' => 36, 'name' => 'Bulgarian', 'locale' => 'bg']);
 

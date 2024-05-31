@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -98,6 +97,7 @@ class AccountSummary extends Data
     public ?string $nickname = '';
 
     public ?float $current_balance = 0;
+
     public ?string $account_currency = '';
 
     public static function prepareForPipeline(Collection $properties): Collection

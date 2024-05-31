@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -58,23 +57,23 @@ class ZipPurchaseOrders implements ShouldQueue
         $file_name = now()->addSeconds($this->company->timezone_offset())->format('Y-m-d-h-m-s').'_'.str_replace(' ', '_', trans('texts.purchase_orders')).'.zip';
 
         $invitations = PurchaseOrderInvitation::query()
-                                            ->with('purchase_order')
-                                            ->whereIn('purchase_order_id', $this->purchase_order_ids)
-                                            ->get();
+            ->with('purchase_order')
+            ->whereIn('purchase_order_id', $this->purchase_order_ids)
+            ->get();
         $invitation = $invitations->first();
         $path = $invitation->contact->vendor->purchase_order_filepath($invitation);
 
         try {
             foreach ($invitations as $invitation) {
 
-                if ($invitation->purchase_order->vendor->getSetting("enable_e_invoice")) {
+                if ($invitation->purchase_order->vendor->getSetting('enable_e_invoice')) {
                     $xml = $invitation->purchase_order->service()->getEInvoice();
-                    $zipFile->addFromString($invitation->purchase_order->getFileName("xml"), $xml);
+                    $zipFile->addFromString($invitation->purchase_order->getFileName('xml'), $xml);
                 }
 
                 $file = (new CreateRawPdf($invitation))->handle();
 
-                $zipFile->addFromString($invitation->purchase_order->numberFormatter().".pdf", $file);
+                $zipFile->addFromString($invitation->purchase_order->numberFormatter().'.pdf', $file);
             }
 
             Storage::put($path.$file_name, $zipFile->outputAsString());

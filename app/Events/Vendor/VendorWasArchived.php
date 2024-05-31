@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,10 +33,6 @@ class VendorWasArchived
 
     /**
      * Create a new event instance.
-     *
-     * @param Vendor $vendor
-     * @param Company $company
-     * @param array $event_vars
      */
     public function __construct(Vendor $vendor, Company $company, array $event_vars)
     {

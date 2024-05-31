@@ -5,7 +5,8 @@ use App\Utils\Ninja;
 use App\Utils\Traits\ClientGroupSettingsSaver;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     use ClientGroupSettingsSaver;
 
     /**

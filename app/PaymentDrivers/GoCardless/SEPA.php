@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,7 +44,6 @@ class SEPA implements MethodInterface
     /**
      * Handle authorization for SEPA.
      *
-     * @param array $data
      * @return Redirector|RedirectResponse|void
      */
     public function authorizeView(array $data)
@@ -82,9 +80,6 @@ class SEPA implements MethodInterface
 
     /**
      * Handle unsuccessful authorization for SEPA.
-     *
-     * @param Exception $exception
-     * @return void
      */
     public function processUnsuccessfulAuthorization(Exception $exception): void
     {
@@ -105,7 +100,6 @@ class SEPA implements MethodInterface
     /**
      * Handle authorization response for SEPA.
      *
-     * @param Request $request
      * @return RedirectResponse|void
      */
     public function authorizeResponse(Request $request)
@@ -139,9 +133,6 @@ class SEPA implements MethodInterface
 
     /**
      * Payment view for SEPA.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function paymentView(array $data): View
     {
@@ -155,7 +146,6 @@ class SEPA implements MethodInterface
     /**
      * Handle the payment page for SEPA.
      *
-     * @param PaymentResponseRequest $request
      * @return RedirectResponse|App\PaymentDrivers\GoCardless\never|void
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -163,8 +153,8 @@ class SEPA implements MethodInterface
         $this->go_cardless->ensureMandateIsReady($request->source);
 
         $invoice = Invoice::query()->whereIn('id', $this->transformKeys(array_column($this->go_cardless->payment_hash->invoices(), 'invoice_id')))
-                          ->withTrashed()
-                          ->first();
+            ->withTrashed()
+            ->first();
 
         if ($invoice) {
             $description = "Invoice {$invoice->number} for {$request->amount} for client {$this->go_cardless->client->present()->name()}";
@@ -202,8 +192,7 @@ class SEPA implements MethodInterface
     /**
      * Handle pending payments for Direct Debit.
      *
-     * @param ResourcesPayment $payment
-     * @param array $data
+     * @param  ResourcesPayment  $payment
      * @return RedirectResponse
      */
     public function processPendingPayment(\GoCardlessPro\Resources\Payment $payment, array $data = [])
@@ -232,7 +221,7 @@ class SEPA implements MethodInterface
     /**
      * Process unsuccessful payments for Direct Debit.
      *
-     * @param ResourcesPayment $payment
+     * @param  ResourcesPayment  $payment
      * @return never
      */
     public function processUnsuccessfulPayment(\GoCardlessPro\Resources\Payment $payment)

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,13 +37,10 @@ class UpdateLedger implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     *
-     * @return void
      */
     public function handle(): void
     {
-        nlog("Updating company ledger for client ". $this->company_ledger_id);
+        nlog('Updating company ledger for client '.$this->company_ledger_id);
 
         MultiDB::setDb($this->db);
 
@@ -54,7 +50,7 @@ class UpdateLedger implements ShouldQueue
 
         nlog($cl->company_ledgerable->company_ledger()->count());
 
-        if(!$cl) {
+        if (! $cl) {
             return;
         }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,8 +22,6 @@ class StoreTaskRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -56,24 +53,25 @@ class StoreTaskRequest extends Request
 
         $rules['hash'] = 'bail|sometimes|string|nullable';
 
-        $rules['time_log'] = ['bail',function ($attribute, $values, $fail) {
+        $rules['time_log'] = ['bail', function ($attribute, $values, $fail) {
 
-            if(is_string($values)) {
+            if (is_string($values)) {
                 $values = json_decode($values, true);
             }
 
-            if(!is_array($values)) {
+            if (! is_array($values)) {
                 $fail('The '.$attribute.' must be a valid array.');
+
                 return;
             }
 
             foreach ($values as $k) {
-                if (!is_int($k[0]) || !is_int($k[1])) {
+                if (! is_int($k[0]) || ! is_int($k[1])) {
                     return $fail('The '.$attribute.' - '.print_r($k, 1).' is invalid. Unix timestamps only.');
                 }
             }
 
-            if (!$this->checkTimeLog($values)) {
+            if (! $this->checkTimeLog($values)) {
                 return $fail('Please correct overlapping values');
             }
         }];
@@ -82,7 +80,7 @@ class StoreTaskRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -107,7 +105,7 @@ class StoreTaskRequest extends Request
         /* Ensure the project is related */
         if (array_key_exists('project_id', $input) && isset($input['project_id'])) {
             $project = Project::withTrashed()->where('id', $input['project_id'])->company()->first();
-            ;
+
             if ($project) {
                 $input['client_id'] = $project->client_id;
             } else {
@@ -123,7 +121,7 @@ class StoreTaskRequest extends Request
             }
         }
 
-        if(!isset($input['time_log']) || empty($input['time_log']) || $input['time_log'] == '{}') {
+        if (! isset($input['time_log']) || empty($input['time_log']) || $input['time_log'] == '{}') {
             $input['time_log'] = json_encode([]);
         }
 

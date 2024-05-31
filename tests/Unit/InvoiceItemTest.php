@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,27 +20,27 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Helpers\Invoice\InvoiceItemSum
  */
 class InvoiceItemTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
     }
 
-
     public function testEdgeCasewithDiscountsPercentageAndTaxCalculations()
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =false;
+        $invoice->is_amount_discount = false;
         $invoice->discount = 0;
         $invoice->tax_rate1 = 0;
         $invoice->tax_rate2 = 0;
@@ -51,7 +50,7 @@ class InvoiceItemTest extends TestCase
         $invoice->tax_name3 = '';
 
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = 1;
         $line_item->cost = 100;
@@ -71,17 +70,16 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(22, $invoice->total_taxes);
     }
 
-
     public function testDiscountsWithInclusiveTaxes()
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = true;
-        $invoice->is_amount_discount =true;
+        $invoice->is_amount_discount = true;
         $invoice->discount = 10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = 1;
         $line_item->cost = 100;
@@ -100,17 +98,16 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(8.18, $invoice->total_taxes);
     }
 
-
     public function testDiscountsWithInclusiveTaxesNegativeInvoice()
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = true;
-        $invoice->is_amount_discount =true;
+        $invoice->is_amount_discount = true;
         $invoice->discount = -10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = -1;
         $line_item->cost = 100;
@@ -134,11 +131,11 @@ class InvoiceItemTest extends TestCase
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =true;
+        $invoice->is_amount_discount = true;
         $invoice->discount = 10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = 1;
         $line_item->cost = 100;
@@ -157,17 +154,16 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(9, $invoice->total_taxes);
     }
 
-
     public function testDicountsWithTaxesNegativeInvoice()
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =true;
+        $invoice->is_amount_discount = true;
         $invoice->discount = -10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = -1;
         $line_item->cost = 100;
@@ -191,11 +187,11 @@ class InvoiceItemTest extends TestCase
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =false;
+        $invoice->is_amount_discount = false;
         $invoice->discount = 10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = 1;
         $line_item->cost = 100;
@@ -219,11 +215,11 @@ class InvoiceItemTest extends TestCase
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = true;
-        $invoice->is_amount_discount =false;
+        $invoice->is_amount_discount = false;
         $invoice->discount = 10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = 1;
         $line_item->cost = 100;
@@ -249,11 +245,11 @@ class InvoiceItemTest extends TestCase
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =false;
+        $invoice->is_amount_discount = false;
         $invoice->discount = -10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = -1;
         $line_item->cost = 100;
@@ -274,17 +270,16 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(-12.1, $invoice->total_taxes);
     }
 
-
     public function testDicountsWithTaxesNegativeInvoicePercentage()
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =false;
+        $invoice->is_amount_discount = false;
         $invoice->discount = -10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = -1;
         $line_item->cost = 100;
@@ -304,18 +299,16 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(-11, $invoice->total_taxes);
     }
 
-
-
     public function testDicountPercentageWithTaxes()
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->uses_inclusive_taxes = false;
-        $invoice->is_amount_discount =true;
+        $invoice->is_amount_discount = true;
         $invoice->discount = 10;
-        
+
         $line_items = [];
-              
+
         $line_item = new InvoiceItem;
         $line_item->quantity = 1;
         $line_item->cost = 100;
@@ -333,9 +326,6 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(99, $invoice->amount);
         $this->assertEquals(9, $invoice->total_taxes);
     }
-
-
-
 
     public function testInvoiceItemTotalSimple()
     {

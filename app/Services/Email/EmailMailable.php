@@ -5,22 +5,21 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Email;
 
-use App\Utils\Ninja;
 use App\Models\Document;
-use Illuminate\Support\Str;
-use Illuminate\Mail\Mailable;
+use App\Utils\Ninja;
 use Illuminate\Mail\Attachment;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class EmailMailable extends Mailable
 {
@@ -43,7 +42,7 @@ class EmailMailable extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: str_replace("<br>", "", $this->email_object->subject),
+            subject: str_replace('<br>', '', $this->email_object->subject),
             tags: [$this->email_object->company_key],
             replyTo: $this->email_object->reply_to,
             from: $this->email_object->from,
@@ -61,15 +60,15 @@ class EmailMailable extends Mailable
     public function content()
     {
         $links = Document::query()->whereIn('id', $this->email_object->documents)
-                ->where('size', '>', $this->max_attachment_size)
-                ->cursor()
-                ->map(function ($document) {
+            ->where('size', '>', $this->max_attachment_size)
+            ->cursor()
+            ->map(function ($document) {
 
-                    $hash = Str::random(64);
-                    Cache::put($hash, ['db' => $this->email_object->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
+                $hash = Str::random(64);
+                Cache::put($hash, ['db' => $this->email_object->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                    return "<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>";
-                });
+                return "<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>';
+            });
 
         return new Content(
             view: $this->email_object->html_template,
@@ -98,19 +97,19 @@ class EmailMailable extends Mailable
      */
     public function attachments()
     {
-        $attachments  = [];
+        $attachments = [];
 
         $attachments = collect($this->email_object->attachments)->map(function ($file) {
             return Attachment::fromData(fn () => base64_decode($file['file']), $file['name']);
         });
 
         $documents = Document::query()->whereIn('id', $this->email_object->documents)
-                ->where('size', '<', $this->max_attachment_size)
-                ->where('is_public', 1)
-                ->cursor()
-                ->map(function ($document) {
-                    return Attachment::fromData(fn () => $document->getFile(), $document->name);
-                });
+            ->where('size', '<', $this->max_attachment_size)
+            ->where('is_public', 1)
+            ->cursor()
+            ->map(function ($document) {
+                return Attachment::fromData(fn () => $document->getFile(), $document->name);
+            });
 
         return $attachments->merge($documents)->toArray();
     }

@@ -5,14 +5,12 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Requests\Login;
 
 use App\Http\Requests\Request;
-use App\Http\ValidationRules\Account\BlackListRule;
 use App\Http\ValidationRules\Account\EmailBlackListRule;
 use App\Utils\Ninja;
 

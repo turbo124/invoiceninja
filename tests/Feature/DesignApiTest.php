@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,19 +21,20 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\DesignController
  */
 class DesignApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $id;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -59,14 +59,14 @@ class DesignApiTest extends TestCase
         $searchable = 'searchable';
 
         $q = Design::query()
-              ->where('is_template', true)
-              ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
-        
+            ->where('is_template', true)
+            ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
+
         $this->assertEquals(1, $q->count());
 
         $response = $this->withHeaders([
-        'X-API-SECRET' => config('ninja.api_secret'),
-        'X-API-TOKEN' => $this->token,
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/designs?entities=payment');
 
         $response->assertStatus(200);
@@ -75,8 +75,8 @@ class DesignApiTest extends TestCase
         $this->assertCount(1, $arr['data']);
 
         $response = $this->withHeaders([
-        'X-API-SECRET' => config('ninja.api_secret'),
-        'X-API-TOKEN' => $this->token,
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/designs?entities=,,,3,3,3,');
 
         $response->assertStatus(200);
@@ -84,8 +84,8 @@ class DesignApiTest extends TestCase
         $arr = $response->json();
 
         $response = $this->withHeaders([
-        'X-API-SECRET' => config('ninja.api_secret'),
-        'X-API-TOKEN' => $this->token,
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/designs?entities=unsearchable');
 
         $response->assertStatus(200);
@@ -104,7 +104,7 @@ class DesignApiTest extends TestCase
         $q = Design::query()
             ->where('is_template', true)
             ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
-                
+
         $this->assertEquals(0, $q->count());
 
         $design = DesignFactory::create($this->company->id, $this->user->id);
@@ -118,10 +118,8 @@ class DesignApiTest extends TestCase
         $q = Design::query()
             ->where('is_template', true)
             ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
-                        
+
         $this->assertEquals(0, $q->count());
-
-
 
     }
 
@@ -131,16 +129,16 @@ class DesignApiTest extends TestCase
         $design->is_template = true;
         $design->name = 'Test Template';
         $design->save();
-        
+
         $response = $this->withHeaders([
-          'X-API-SECRET' => config('ninja.api_secret'),
-          'X-API-TOKEN' => $this->token,
-          ])->get('/api/v1/designs?template=true');
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->get('/api/v1/designs?template=true');
 
         $response->assertStatus(200);
 
         $arr = $response->json();
-        
+
         $this->assertCount(1, $arr['data']);
     }
 
@@ -150,32 +148,30 @@ class DesignApiTest extends TestCase
         $design->is_template = true;
         $design->name = 'Test Template';
         $design->save();
-        
+
         $response = $this->withHeaders([
-          'X-API-SECRET' => config('ninja.api_secret'),
-          'X-API-TOKEN' => $this->token,
-          ])->get('/api/v1/designs?template=false');
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->get('/api/v1/designs?template=false');
 
         $response->assertStatus(200);
 
         $arr = $response->json();
-        
+
         $this->assertCount(11, $arr['data']);
 
         $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-                ])->get('/api/v1/designs');
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->get('/api/v1/designs');
 
         $response->assertStatus(200);
 
         $arr = $response->json();
-                
+
         $this->assertCount(12, $arr['data']);
 
-
     }
-
 
     public function testDesignPost()
     {

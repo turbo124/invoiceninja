@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,7 @@ class CreditFilters extends QueryFilters
      * - overdue
      * - reversed
      *
-     * @param string $value The credit status as seen by the client
-     * @return Builder
+     * @param  string  $value  The credit status as seen by the client
      */
     public function client_status(string $value = ''): Builder
     {
@@ -70,8 +68,6 @@ class CreditFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -80,24 +76,24 @@ class CreditFilters extends QueryFilters
             return $this->builder;
         }
 
-        return  $this->builder->where(function ($query) use ($filter) {
+        return $this->builder->where(function ($query) use ($filter) {
             $query->where('credits.number', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.number', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.date', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.amount', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.balance', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.custom_value1', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.custom_value2', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.custom_value3', 'like', '%'.$filter.'%')
-                          ->orWhere('credits.custom_value4', 'like', '%'.$filter.'%')
-                          ->orWhereHas('client', function ($q) use ($filter) {
-                              $q->where('name', 'like', '%'.$filter.'%');
-                          })
-                          ->orWhereHas('client.contacts', function ($q) use ($filter) {
-                              $q->where('first_name', 'like', '%'.$filter.'%')
-                                ->orWhere('last_name', 'like', '%'.$filter.'%')
-                                ->orWhere('email', 'like', '%'.$filter.'%');
-                          });
+                ->orWhere('credits.number', 'like', '%'.$filter.'%')
+                ->orWhere('credits.date', 'like', '%'.$filter.'%')
+                ->orWhere('credits.amount', 'like', '%'.$filter.'%')
+                ->orWhere('credits.balance', 'like', '%'.$filter.'%')
+                ->orWhere('credits.custom_value1', 'like', '%'.$filter.'%')
+                ->orWhere('credits.custom_value2', 'like', '%'.$filter.'%')
+                ->orWhere('credits.custom_value3', 'like', '%'.$filter.'%')
+                ->orWhere('credits.custom_value4', 'like', '%'.$filter.'%')
+                ->orWhereHas('client', function ($q) use ($filter) {
+                    $q->where('name', 'like', '%'.$filter.'%');
+                })
+                ->orWhereHas('client.contacts', function ($q) use ($filter) {
+                    $q->where('first_name', 'like', '%'.$filter.'%')
+                        ->orWhere('last_name', 'like', '%'.$filter.'%')
+                        ->orWhere('email', 'like', '%'.$filter.'%');
+                });
         });
     }
 
@@ -109,10 +105,10 @@ class CreditFilters extends QueryFilters
 
         return $this->builder->where(function ($query) {
             $query->whereIn('status_id', [Credit::STATUS_SENT, Credit::STATUS_PARTIAL])
-                  ->where('balance', '>', 0)
-                  ->where(function ($q) {
-                      $q->whereNull('due_date')->orWhere('due_date', '>', now());
-                  });
+                ->where('balance', '>', 0)
+                ->where(function ($q) {
+                    $q->whereNull('due_date')->orWhere('due_date', '>', now());
+                });
         });
     }
 
@@ -128,14 +124,13 @@ class CreditFilters extends QueryFilters
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
@@ -143,12 +138,11 @@ class CreditFilters extends QueryFilters
 
         if ($sort_col[0] == 'client_id') {
             return $this->builder->orderBy(\App\Models\Client::select('name')
-                    ->whereColumn('clients.id', 'credits.client_id'), $dir);
+                ->whereColumn('clients.id', 'credits.client_id'), $dir);
         }
 
-
-        if($sort_col[0] == 'number') {
-            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
+        if ($sort_col[0] == 'number') {
+            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 ".$dir);
         }
 
         return $this->builder->orderBy($sort_col[0], $dir);
@@ -176,13 +170,11 @@ class CreditFilters extends QueryFilters
     /**
      * We need additional filters when showing credits for the
      * client portal. Need to automatically exclude drafts and cancelled credits.
-     *
-     * @return Builder
      */
     private function contactViewFilter(): Builder
     {
         return $this->builder
-                    ->whereCompanyId(auth()->guard('contact')->user()->company->id)
-                    ->whereNotIn('status_id', [Credit::STATUS_DRAFT]);
+            ->whereCompanyId(auth()->guard('contact')->user()->company->id)
+            ->whereNotIn('status_id', [Credit::STATUS_DRAFT]);
     }
 }

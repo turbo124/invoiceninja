@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -60,6 +59,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read mixed $hashed_id
  * @property-read \App\Models\GroupSetting|null $group_settings
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\SubscriptionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Subscription filter(\App\Filters\QueryFilters $filters)
@@ -71,13 +71,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Subscription withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Subscription withoutTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Subscription with($value)
+ *
  * @mixin \Eloquent
  */
 class Subscription extends BaseModel
 {
+    use Filterable;
     use HasFactory;
     use SoftDeletes;
-    use Filterable;
 
     protected $hidden = [
         'id',

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,15 +21,15 @@ class TaskDecorator extends Decorator implements DecoratorInterface
     {
         $task = false;
 
-        if($entity instanceof Task) {
+        if ($entity instanceof Task) {
             $task = $entity;
-        } elseif($entity->task) {
+        } elseif ($entity->task) {
             $task = $entity->task;
         }
 
-        if($task && method_exists($this, $key)) {
+        if ($task && method_exists($this, $key)) {
             return $this->{$key}($task);
-        } elseif($task && $task->{$key} ?? false) {
+        } elseif ($task && $task->{$key} ?? false) {
             return $task->{$key};
         }
 
@@ -58,8 +57,9 @@ class TaskDecorator extends Decorator implements DecoratorInterface
             $date_format_default = $date_format->format;
         }
 
-        if(is_array($logs)) {
+        if (is_array($logs)) {
             $item = $logs[0];
+
             return Carbon::createFromTimeStamp($item[0])->setTimezone($timezone_name)->format($date_format_default);
         }
 
@@ -87,14 +87,16 @@ class TaskDecorator extends Decorator implements DecoratorInterface
             $date_format_default = $date_format->format;
         }
 
-        if(is_array($logs)) {
+        if (is_array($logs)) {
             $item = $logs[1];
+
             return Carbon::createFromTimeStamp($item[1])->setTimezone($timezone_name)->format($date_format_default);
         }
 
         return '';
 
     }
+
     public function duration(Task $task)
     {
         return $task->calcDuration();
@@ -109,6 +111,4 @@ class TaskDecorator extends Decorator implements DecoratorInterface
     {
         return $task->project()->exists() ? $task->project->name : '';
     }
-
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -32,8 +31,8 @@ class ValidProjectForClient implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,17 +43,17 @@ class ValidProjectForClient implements Rule
             return true;
         }
 
-
-
         $project = Project::withTrashed()->find($this->input['project_id']);
 
         if (! $project) {
             $this->message = 'Project not found';
+
             return;
         }
 
-        if(!isset($this->input['client_id'])) {
+        if (! isset($this->input['client_id'])) {
             $this->message = 'No Client ID provided.';
+
             return false;
         }
 

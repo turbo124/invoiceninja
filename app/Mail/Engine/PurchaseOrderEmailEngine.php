@@ -5,25 +5,24 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Mail\Engine;
 
+use App\DataMapper\EmailTemplateDefaults;
+use App\Jobs\Entity\CreateRawPdf;
+use App\Models\Account;
+use App\Models\PurchaseOrder;
+use App\Models\Vendor;
 use App\Utils\Ninja;
 use App\Utils\Number;
-use App\Models\Vendor;
-use App\Models\Account;
-use Illuminate\Support\Str;
-use App\Models\PurchaseOrder;
 use App\Utils\Traits\MakesHash;
 use App\Utils\VendorHtmlEngine;
-use App\Jobs\Entity\CreateRawPdf;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Cache;
-use App\DataMapper\EmailTemplateDefaults;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class PurchaseOrderEmailEngine extends BaseEmailEngine
 {
@@ -135,8 +134,7 @@ class PurchaseOrderEmailEngine extends BaseEmailEngine
                     $hash = Str::random(64);
                     Cache::put($hash, ['db' => $this->purchase_order->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-
-                    $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
+                    $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
                 } else {
                     $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
                 }
@@ -148,7 +146,7 @@ class PurchaseOrderEmailEngine extends BaseEmailEngine
                     $hash = Str::random(64);
                     Cache::put($hash, ['db' => $this->purchase_order->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                    $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
+                    $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
                 } else {
                     $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
                 }

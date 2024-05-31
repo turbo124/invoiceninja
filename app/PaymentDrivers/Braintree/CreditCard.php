@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,7 +38,7 @@ class CreditCard
     public function authorizeView(array $data)
     {
         $data['gateway'] = $this->braintree;
-        $data['threeds_enable'] = $this->braintree->company_gateway->getConfigField('threeds') ? "true" : "false";
+        $data['threeds_enable'] = $this->braintree->company_gateway->getConfigField('threeds') ? 'true' : 'false';
 
         return render('gateways.braintree.credit_card.authorize', $data);
     }
@@ -52,10 +51,8 @@ class CreditCard
     /**
      * Credit card payment page.
      *
-     * @param array $data
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-
     private function threeDParameters(array $data)
     {
         return [
@@ -70,7 +67,7 @@ class CreditCard
                 'locality' => $this->braintree->client->city ?: '',
                 'postalCode' => $this->braintree->client->postal_code ?: '',
                 'countryCodeAlpha2' => $this->braintree->client->country ? $this->braintree->client->country->iso_3166_2 : 'US',
-            ]
+            ],
         ];
     }
 
@@ -79,7 +76,7 @@ class CreditCard
         $data['gateway'] = $this->braintree;
         $data['client_token'] = $this->braintree->gateway->clientToken()->generate();
         $data['threeds'] = $this->threeDParameters($data);
-        $data['threeds_enable'] = $this->braintree->company_gateway->getConfigField('threeds') ? "true" : "false";
+        $data['threeds_enable'] = $this->braintree->company_gateway->getConfigField('threeds') ? 'true' : 'false';
 
         if ($this->braintree->company_gateway->getConfigField('merchantAccountId')) {
             /** https://developer.paypal.com/braintree/docs/reference/request/client-token/generate#merchant_account_id */
@@ -94,8 +91,8 @@ class CreditCard
     /**
      * Process the credit card payments.
      *
-     * @param PaymentResponseRequest $request
      * @return \Illuminate\Http\RedirectResponse|void
+     *
      * @throws PaymentFailed
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -130,7 +127,7 @@ class CreditCard
                 'locality' => $this->braintree->client->city ?: '',
                 'postalCode' => $this->braintree->client->postal_code ?: '',
                 'countryCodeAlpha2' => $this->braintree->client->country ? $this->braintree->client->country->iso_3166_2 : 'US',
-            ]
+            ],
         ];
 
         if ($this->braintree->company_gateway->getConfigField('merchantAccountId')) {
@@ -189,7 +186,7 @@ class CreditCard
                 'locality' => $this->braintree->client->city ?: '',
                 'postalCode' => $this->braintree->client->postal_code ?: '',
                 'countryCodeAlpha2' => $this->braintree->client->country ? $this->braintree->client->country->iso_3166_2 : 'US',
-            ]
+            ],
         ];
 
         if ($this->braintree->company_gateway->getConfigField('merchantAccountId')) {

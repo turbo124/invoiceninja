@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,11 +27,11 @@ class RecurringQuoteInvitationTransformer extends EntityTransformer
             'sent_date' => $invitation->sent_date ?: '',
             'viewed_date' => $invitation->viewed_date ?: '',
             'opened_date' => $invitation->opened_date ?: '',
-            'updated_at'        => (int) $invitation->updated_at,
-            'archived_at'       => (int) $invitation->deleted_at,
-            'created_at'       => (int) $invitation->created_at,
-            'email_status'      => $invitation->email_status ?: '',
-            'email_error'       => (string) $invitation->email_error,
+            'updated_at' => (int) $invitation->updated_at,
+            'archived_at' => (int) $invitation->deleted_at,
+            'created_at' => (int) $invitation->created_at,
+            'email_status' => $invitation->email_status ?: '',
+            'email_error' => (string) $invitation->email_error,
         ];
     }
 }

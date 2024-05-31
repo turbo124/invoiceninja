@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -86,13 +85,13 @@ class ClientContactRepository extends BaseRepository
                 $update_contact->password = Hash::make($contact['password']);
 
                 ClientContact::withTrashed()
-                            ->where('company_id', $client->company_id)
-                            ->where('client_id', $client->id)
-                            ->where('email', $update_contact->email)->cursor()
-                                    ->each(function ($saveable_contact) use ($update_contact) {
-                                        $saveable_contact->password = $update_contact->password;
-                                        $saveable_contact->save();
-                                    });
+                    ->where('company_id', $client->company_id)
+                    ->where('client_id', $client->id)
+                    ->where('email', $update_contact->email)->cursor()
+                    ->each(function ($saveable_contact) use ($update_contact) {
+                        $saveable_contact->password = $update_contact->password;
+                        $saveable_contact->save();
+                    });
             }
 
             if (array_key_exists('email', $contact)) {

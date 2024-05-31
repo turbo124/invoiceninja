@@ -5,24 +5,23 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Libraries;
 
-use App\Models\User;
-use App\Models\Client;
+use App\DataProviders\SMSNumbers;
 use App\Models\Account;
+use App\Models\Client;
+use App\Models\ClientContact;
 use App\Models\Company;
+use App\Models\CompanyToken;
 use App\Models\Document;
 use App\Models\PaymentHash;
-use Illuminate\Support\Str;
-use App\Models\CompanyToken;
-use App\Models\ClientContact;
+use App\Models\User;
 use App\Models\VendorContact;
-use App\DataProviders\SMSNumbers;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Class MultiDB.
@@ -73,9 +72,6 @@ class MultiDB
         'socket',
     ];
 
-    /**
-     * @return array
-     */
     public static function getDbs(): array
     {
         return self::$dbs;
@@ -137,9 +133,9 @@ class MultiDB
      * If no user is found, then we also return true as this must be
      * a new user request.
      *
-     * @param  string $email       The user email
-     * @param  string $company_key The company key
-     * @return bool             True|False
+     * @param  string  $email  The user email
+     * @param  string  $company_key  The company key
+     * @return bool True|False
      */
     public static function checkUserAndCompanyCoExist($email, $company_key): bool
     {
@@ -164,10 +160,6 @@ class MultiDB
         return true;
     }
 
-    /**
-     * @param array $data
-     * @return User|null
-     */
     public static function hasUser(array $data): ?User
     {
         if (! config('ninja.db.multi_db_enabled')) {
@@ -188,10 +180,6 @@ class MultiDB
         return null;
     }
 
-    /**
-     * @param string $email
-     * @return ClientContact|null
-     */
     public static function hasContact(string $email): ?ClientContact
     {
         if (! config('ninja.db.multi_db_enabled')) {
@@ -215,10 +203,6 @@ class MultiDB
         return null;
     }
 
-    /**
-     * @param array $search
-     * @return ClientContact|null
-     */
     public static function findContact(array $search): ?ClientContact
     {
         if (! config('ninja.db.multi_db_enabled')) {
@@ -397,7 +381,6 @@ class MultiDB
         return false;
     }
 
-
     public static function findAndSetDbByContactKey($contact_key): bool
     {
         $current_db = config('database.default');
@@ -526,10 +509,6 @@ class MultiDB
         return false;
     }
 
-    /**
-     * @param string $phone
-     * @return bool
-     */
     public static function hasPhoneNumber(string $phone): bool
     {
         if (! config('ninja.db.multi_db_enabled')) {
@@ -538,7 +517,7 @@ class MultiDB
 
         $current_db = config('database.default');
 
-        if(SMSNumbers::hasNumber($phone)){
+        if (SMSNumbers::hasNumber($phone)) {
             return true;
         }
 
@@ -546,6 +525,7 @@ class MultiDB
             self::setDB($db);
             if ($exists = Account::where('account_sms_verification_number', $phone)->where('account_sms_verified', true)->exists()) {
                 self::setDb($current_db);
+
                 return true;
             }
         }
@@ -554,8 +534,6 @@ class MultiDB
 
         return false;
     }
-
-
 
     public static function randomSubdomainGenerator(): string
     {
@@ -582,10 +560,6 @@ class MultiDB
         return $string;
     }
 
-    /**
-     * @param $database
-     * @return void
-     */
     public static function setDB(string $database): void
     {
         /* This will set the database connection for the request */

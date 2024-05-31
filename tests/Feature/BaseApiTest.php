@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -56,6 +55,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\BaseController
  */
 class BaseApiTest extends TestCase
@@ -104,7 +104,7 @@ class BaseApiTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -147,7 +147,7 @@ class BaseApiTest extends TestCase
         $owner_user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' =>  $this->faker->safeEmail(),
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $this->owner_cu = CompanyUserFactory::create($owner_user->id, $company->id, $this->account->id);
@@ -170,11 +170,10 @@ class BaseApiTest extends TestCase
         $company_token->is_system = true;
         $company_token->save();
 
-
         $lower_permission_user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' =>  $this->faker->safeEmail(),
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $this->low_cu = CompanyUserFactory::create($lower_permission_user->id, $company->id, $this->account->id);
@@ -301,7 +300,6 @@ class BaseApiTest extends TestCase
             'vendor_id' => $vendor->id,
         ]);
 
-
         $recurring_invoice = RecurringInvoice::factory()->create([
             'user_id' => $user_id,
             'company_id' => $company->id,
@@ -358,7 +356,6 @@ class BaseApiTest extends TestCase
             'company_id' => $company->id,
         ]);
 
-
         $subscription = Subscription::factory()->create([
             'user_id' => $user_id,
             'company_id' => $company->id,
@@ -395,9 +392,8 @@ class BaseApiTest extends TestCase
 
     // $this->assertEquals('user',lcfirst(class_basename(Str::snake(User::class))));
 
-
     // }
-    
+
     /**
      * Tests admin/owner facing routes respond with the correct status and/or data set
      */
@@ -409,22 +405,21 @@ class BaseApiTest extends TestCase
         ])->get('/api/v1/users/');
 
         $response->assertStatus(200)
-        ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
+            ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
 
         /*does not test the number of records however*/
         collect($this->list_routes)->filter(function ($route) {
-            return !in_array($route, ['users','designs','payment_terms']);
+            return ! in_array($route, ['users', 'designs', 'payment_terms']);
         })->each(function ($route) {
             // nlog($route);
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->owner_token,
             ])->get("/api/v1/{$route}/")
-              ->assertJson(
-                  fn (AssertableJson $json) =>
-                $json->has('meta')
-                 ->has('data', 1)
-              );
+                ->assertJson(
+                    fn (AssertableJson $json) => $json->has('meta')
+                        ->has('data', 1)
+                );
         });
     }
 
@@ -434,9 +429,8 @@ class BaseApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->low_token,
         ])->get('/api/v1/companies/'.$this->company->hashed_id)
-          ->assertStatus(200);
+            ->assertStatus(200);
     }
-
 
     public function testAdminRoutes()
     {
@@ -453,32 +447,31 @@ class BaseApiTest extends TestCase
         ])->get('/api/v1/users/');
 
         $response->assertStatus(200)
-        ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
+            ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
 
         collect($this->list_routes)->filter(function ($route) {
-            return !in_array($route, ['users','designs','payment_terms']);
+            return ! in_array($route, ['users', 'designs', 'payment_terms']);
         })->each(function ($route) {
             // nlog($route);
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->owner_token,
             ])->get("/api/v1/{$route}/")
-              ->assertStatus(200)
-              ->assertJson(
-                  fn (AssertableJson $json) =>
-                $json->has('meta')
-                 ->has('data', 1)
-              );
+                ->assertStatus(200)
+                ->assertJson(
+                    fn (AssertableJson $json) => $json->has('meta')
+                        ->has('data', 1)
+                );
         });
     }
 
     public function testAdminAccessCompany()
     {
         $response = $this->withHeaders([
-         'X-API-SECRET' => config('ninja.api_secret'),
-         'X-API-TOKEN' => $this->owner_token,
-         ])->get('/api/v1/companies/'.$this->company->hashed_id)
-           ->assertStatus(200);
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->owner_token,
+        ])->get('/api/v1/companies/'.$this->company->hashed_id)
+            ->assertStatus(200);
     }
 
     public function testAdminLockedRoutes()
@@ -494,17 +487,17 @@ class BaseApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->owner_token,
         ])->get('/api/v1/users/')
-          ->assertStatus(403);
+            ->assertStatus(403);
 
         collect($this->list_routes)->filter(function ($route) {
-            return !in_array($route, ['users','designs','payment_terms']);
+            return ! in_array($route, ['users', 'designs', 'payment_terms']);
         })->each(function ($route) {
             // nlog($route);
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->owner_token,
             ])->get("/api/v1/{$route}/")
-              ->assertStatus(403);
+                ->assertStatus(403);
         });
     }
 
@@ -518,10 +511,10 @@ class BaseApiTest extends TestCase
         $this->owner_cu->save();
 
         $response = $this->withHeaders([
-         'X-API-SECRET' => config('ninja.api_secret'),
-         'X-API-TOKEN' => $this->owner_token,
-         ])->get('/api/v1/companies/'.$this->company->hashed_id)
-           ->assertStatus(403);
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->owner_token,
+        ])->get('/api/v1/companies/'.$this->company->hashed_id)
+            ->assertStatus(403);
     }
 
     /**
@@ -533,23 +526,22 @@ class BaseApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/tasks/')
-          ->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data', 1)->etc());
+            ->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json->has('data', 1)->etc());
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/group_settings/')
-          ->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
+            ->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json->has('data', 2)->etc());
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/designs/')
-          ->assertStatus(200)
-          ->assertJson(fn (AssertableJson $json) => $json->has('data', 11)->etc());
-
+            ->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json->has('data', 11)->etc());
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -557,27 +549,26 @@ class BaseApiTest extends TestCase
         ])->get('/api/v1/users/');
 
         $response->assertStatus(200)
-        ->assertJson(fn (AssertableJson $json) => $json->has('data', 1)->etc());
+            ->assertJson(fn (AssertableJson $json) => $json->has('data', 1)->etc());
 
         collect($this->list_routes)->filter(function ($route) {
-            return !in_array($route, ['tasks', 'users', 'group_settings','designs','client_gateway_tokens']);
+            return ! in_array($route, ['tasks', 'users', 'group_settings', 'designs', 'client_gateway_tokens']);
         })->each(function ($route) {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->low_token,
             ])->get("/api/v1/{$route}/")
-              ->assertJson(
-                  fn (AssertableJson $json) =>
-                $json->has('meta')
-                 ->has('data', 0)
-              );
+                ->assertJson(
+                    fn (AssertableJson $json) => $json->has('meta')
+                        ->has('data', 0)
+                );
         });
 
         $response = $this->withHeaders([
-                 'X-API-SECRET' => config('ninja.api_secret'),
-                 'X-API-TOKEN' => $this->low_token,
-             ])->get('/api/v1/companies/'.$this->company->hashed_id)
-               ->assertStatus(200);
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->low_token,
+        ])->get('/api/v1/companies/'.$this->company->hashed_id)
+            ->assertStatus(200);
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

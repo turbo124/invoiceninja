@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -64,9 +63,10 @@ use App\Utils\Traits\MakesHash;
  * @property-read \App\Models\User|null $user
  * @property-read \App\Models\Vendor|null $vendor
  * @property-read \App\Models\VendorContact|null $vendor_contact
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
-
+ *
  * @mixin \Eloquent
  */
 class Activity extends StaticModel
@@ -258,9 +258,8 @@ class Activity extends StaticModel
     public const PAYMENT_EMAILED = 138;
 
     public const VENDOR_NOTIFICATION_EMAIL = 139;
-    
-    public const EMAIL_STATEMENT = 140;
 
+    public const EMAIL_STATEMENT = 140;
 
     protected $casts = [
         'is_system' => 'boolean',
@@ -277,12 +276,10 @@ class Activity extends StaticModel
         'backup',
     ];
 
-
     public function getHashedIdAttribute(): string
     {
         return $this->encodePrimaryKey($this->id);
     }
-
 
     public function getEntityType()
     {
@@ -319,12 +316,10 @@ class Activity extends StaticModel
         return $this->belongsTo(Invoice::class)->withTrashed();
     }
 
-
     public function vendor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Vendor::class)->withTrashed();
     }
-
 
     public function recurring_invoice(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -408,34 +403,34 @@ class Activity extends StaticModel
             ':number',
             ':payment_amount',
             ':gateway',
-            ':adjustment'
+            ':adjustment',
         ];
 
-        $found_variables = array_intersect(explode(" ", trans("texts.activity_{$this->activity_type_id}")), $intersect);
+        $found_variables = array_intersect(explode(' ', trans("texts.activity_{$this->activity_type_id}")), $intersect);
 
-        if($this->activity_type_id == 10 && $this->client_contact_id && !$this->token_id) {
-            $found_variables = array_intersect(explode(" ", trans("texts.activity_10_online")), $intersect);
+        if ($this->activity_type_id == 10 && $this->client_contact_id && ! $this->token_id) {
+            $found_variables = array_intersect(explode(' ', trans('texts.activity_10_online')), $intersect);
         }
 
-        if($this->activity_type_id == 54 && !$this->token_id) {
+        if ($this->activity_type_id == 54 && ! $this->token_id) {
             array_push($found_variables, ':contact');
         }
 
         $replacements = [];
 
-        foreach($found_variables as $var) {
+        foreach ($found_variables as $var) {
             $replacements = array_merge($replacements, $this->matchVar($var));
         }
 
-        if($this->client) {
+        if ($this->client) {
             $replacements['client'] = ['label' => $this?->client?->present()->name() ?? '', 'hashed_id' => $this->client->hashed_id ?? ''];
         }
 
-        if($this->vendor) {
+        if ($this->vendor) {
             $replacements['vendor'] = ['label' => $this?->vendor?->present()->name() ?? '', 'hashed_id' => $this->vendor->hashed_id ?? ''];
         }
 
-        if($this->activity_type_id == 4 && $this->recurring_invoice) {
+        if ($this->activity_type_id == 4 && $this->recurring_invoice) {
             $replacements['recurring_invoice'] = ['label' => $this?->recurring_invoice?->number ?? '', 'hashed_id' => $this->recurring_invoice->hashed_id ?? ''];
         }
 
@@ -456,24 +451,24 @@ class Activity extends StaticModel
 
         $translation = '';
 
-        match($variable) {
-            ':invoice' => $translation = [substr($variable, 1) => [ 'label' => $this?->invoice?->number ?? '', 'hashed_id' => $this->invoice?->hashed_id ?? '']],
-            ':user' => $translation =  [substr($variable, 1) => [ 'label' => $this?->user?->present()->name() ?? $system, 'hashed_id' => $this->user->hashed_id ?? '']],
-            ':quote' => $translation =  [substr($variable, 1) => [ 'label' => $this?->quote?->number ?? '', 'hashed_id' => $this->quote->hashed_id ?? '']],
-            ':credit' => $translation =  [substr($variable, 1) => [ 'label' => $this?->credit?->number ?? '', 'hashed_id' => $this->credit->hashed_id ?? '']],
-            ':payment' => $translation =  [substr($variable, 1) => [ 'label' => $this?->payment?->number ?? '', 'hashed_id' => $this->payment->hashed_id ?? '']],
-            ':task' => $translation =  [substr($variable, 1) => [ 'label' => $this?->task?->number ?? '', 'hashed_id' => $this->task->hashed_id ?? '']],
-            ':expense' => $translation =  [substr($variable, 1) => [ 'label' => $this?->expense?->number ?? '', 'hashed_id' => $this->expense->hashed_id ?? '']],
-            ':purchase_order' => $translation =  [substr($variable, 1) => [ 'label' => $this?->purchase_order?->number ?? '', 'hashed_id' => $this->purchase_order->hashed_id ?? '']],
-            ':subscription' => $translation =  [substr($variable, 1) => [ 'label' => $this?->subscription?->number ?? '', 'hashed_id' => $this->subscription->hashed_id ?? '' ]],
-            ':recurring_invoice' => $translation =  [substr($variable, 1) => [ 'label' =>  $this?->recurring_invoice?->number ?? '', 'hashed_id' => $this->recurring_invoice->hashed_id ?? '']],
-            ':recurring_expense' => $translation =  [substr($variable, 1) => [ 'label' => $this?->recurring_expense?->number ?? '', 'hashed_id' => $this->recurring_expense->hashed_id ?? '']],
-            ':payment_amount' => $translation =  [substr($variable, 1) => [ 'label' =>  Number::formatMoney($this?->payment?->amount, $this?->payment?->client ?? $this->company) ?? '', 'hashed_id' => '']],
-            ':adjustment' => $translation =  [substr($variable, 1) => [ 'label' =>  Number::formatMoney($this?->payment?->refunded, $this?->payment?->client ?? $this->company) ?? '', 'hashed_id' => '']],
-            ':ip' => $translation = [ 'ip' => $this->ip ?? ''],
+        match ($variable) {
+            ':invoice' => $translation = [substr($variable, 1) => ['label' => $this?->invoice?->number ?? '', 'hashed_id' => $this->invoice?->hashed_id ?? '']],
+            ':user' => $translation = [substr($variable, 1) => ['label' => $this?->user?->present()->name() ?? $system, 'hashed_id' => $this->user->hashed_id ?? '']],
+            ':quote' => $translation = [substr($variable, 1) => ['label' => $this?->quote?->number ?? '', 'hashed_id' => $this->quote->hashed_id ?? '']],
+            ':credit' => $translation = [substr($variable, 1) => ['label' => $this?->credit?->number ?? '', 'hashed_id' => $this->credit->hashed_id ?? '']],
+            ':payment' => $translation = [substr($variable, 1) => ['label' => $this?->payment?->number ?? '', 'hashed_id' => $this->payment->hashed_id ?? '']],
+            ':task' => $translation = [substr($variable, 1) => ['label' => $this?->task?->number ?? '', 'hashed_id' => $this->task->hashed_id ?? '']],
+            ':expense' => $translation = [substr($variable, 1) => ['label' => $this?->expense?->number ?? '', 'hashed_id' => $this->expense->hashed_id ?? '']],
+            ':purchase_order' => $translation = [substr($variable, 1) => ['label' => $this?->purchase_order?->number ?? '', 'hashed_id' => $this->purchase_order->hashed_id ?? '']],
+            ':subscription' => $translation = [substr($variable, 1) => ['label' => $this?->subscription?->number ?? '', 'hashed_id' => $this->subscription->hashed_id ?? '']],
+            ':recurring_invoice' => $translation = [substr($variable, 1) => ['label' => $this?->recurring_invoice?->number ?? '', 'hashed_id' => $this->recurring_invoice->hashed_id ?? '']],
+            ':recurring_expense' => $translation = [substr($variable, 1) => ['label' => $this?->recurring_expense?->number ?? '', 'hashed_id' => $this->recurring_expense->hashed_id ?? '']],
+            ':payment_amount' => $translation = [substr($variable, 1) => ['label' => Number::formatMoney($this?->payment?->amount, $this?->payment?->client ?? $this->company) ?? '', 'hashed_id' => '']],
+            ':adjustment' => $translation = [substr($variable, 1) => ['label' => Number::formatMoney($this?->payment?->refunded, $this?->payment?->client ?? $this->company) ?? '', 'hashed_id' => '']],
+            ':ip' => $translation = ['ip' => $this->ip ?? ''],
             ':contact' => $translation = $this->resolveContact(),
-            ':notes' => $translation = [ 'notes' => $this->notes ?? ''],
-            
+            ':notes' => $translation = ['notes' => $this->notes ?? ''],
+
             default => $translation = [],
         };
 
@@ -488,10 +483,10 @@ class Activity extends StaticModel
 
         $contact_entity = $this->contact ? 'clients' : 'vendors';
 
-        if(!$contact) {
+        if (! $contact) {
             return [];
         }
 
-        return ['contact' => [ 'label' => $contact?->present()->name() ?? '', 'hashed_id' => $entity->hashed_id ?? '', 'contact_entity' => $contact_entity]];
+        return ['contact' => ['label' => $contact?->present()->name() ?? '', 'hashed_id' => $entity->hashed_id ?? '', 'contact_entity' => $contact_entity]];
     }
 }

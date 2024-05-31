@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,23 +24,24 @@ use App\Utils\Traits\AppSetup;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
-use function now;
 use Tests\TestCase;
+
+use function now;
 
 class CreditsTest extends TestCase
 {
-    use DatabaseTransactions;
     use AppSetup;
+    use DatabaseTransactions;
 
     private $faker;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->faker = Factory::create();
         $this->buildCache(true);
-        
+
     }
 
     public function testShowingOnlyCreditsWithDueDateLessOrEqualToNow()

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -50,8 +49,6 @@ class PayPalExpressPaymentDriver extends BaseDriver
 
     /**
      * Initialize Omnipay PayPal_Express gateway.
-     *
-     * @return void
      */
     private function initializeOmnipayGateway(): void
     {
@@ -129,7 +126,7 @@ class PayPalExpressPaymentDriver extends BaseDriver
 
         if ($response->isCancelled() && $this->client->getSetting('enable_client_portal')) {
             return redirect()->route('client.invoices.index')->with('warning', ctrans('texts.status_cancelled'));
-        } elseif($response->isCancelled() && !$this->client->getSetting('enable_client_portal')) {
+        } elseif ($response->isCancelled() && ! $this->client->getSetting('enable_client_portal')) {
             redirect()->route('client.invoices.show', ['invoice' => $this->payment_hash->fee_invoice])->with('warning', ctrans('texts.status_cancelled'));
         }
 

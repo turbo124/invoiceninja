@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,10 +41,9 @@ class ACH implements MethodInterface
         try {
             $data['gateway'] = $this->braintree;
             $data['client_token'] = $this->braintree->gateway->clientToken()->generate();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
-            throw new PaymentFailed("Unable to generate client token, check your Braintree credentials. Error: " . $e->getMessage(), 500);
-
+            throw new PaymentFailed('Unable to generate client token, check your Braintree credentials. Error: '.$e->getMessage(), 500);
         }
 
         return render('gateways.braintree.ach.authorize', $data);

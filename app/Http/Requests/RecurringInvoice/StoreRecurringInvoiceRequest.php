@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,13 +20,11 @@ use App\Utils\Traits\MakesHash;
 
 class StoreRecurringInvoiceRequest extends Request
 {
-    use MakesHash;
     use CleanLineItems;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -49,7 +46,7 @@ class StoreRecurringInvoiceRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -94,7 +91,7 @@ class StoreRecurringInvoiceRequest extends Request
             $input['due_date_days'] = 'terms';
         }
 
-        if(!isset($input['next_send_date']) || $input['next_send_date'] == '') {
+        if (! isset($input['next_send_date']) || $input['next_send_date'] == '') {
             $input['next_send_date'] = now()->format('Y-m-d');
         }
 

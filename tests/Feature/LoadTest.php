@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,12 +40,12 @@ use Tests\TestCase;
  */
 class LoadTest extends TestCase
 {
-    use MakesHash;
     use GeneratesCounter;
+    use MakesHash;
 
     public int $count = 1;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 

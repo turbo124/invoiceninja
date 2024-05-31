@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -111,8 +110,7 @@ use Illuminate\Support\Facades\Cache;
 
 [checkNumber] => 998
 )
-*/
-
+ */
 class IncomeTransformer implements BankRevenueInterface
 {
     use AppSetup;
@@ -121,7 +119,7 @@ class IncomeTransformer implements BankRevenueInterface
     {
         $data = [];
 
-        if (!property_exists($transaction, 'transaction')) {
+        if (! property_exists($transaction, 'transaction')) {
             return $data;
         }
 
@@ -132,7 +130,7 @@ class IncomeTransformer implements BankRevenueInterface
             }
 
             //some object do no store amounts ignore these
-            if(!property_exists($transaction, 'amount')) {
+            if (! property_exists($transaction, 'amount')) {
                 continue;
             }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,14 +26,10 @@ class GroupSettingTransformer extends EntityTransformer
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
     ];
 
     /**
-     * @param GroupSetting $group_setting
      * @return array
      */
     public function transform(GroupSetting $group_setting)

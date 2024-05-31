@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,10 +20,10 @@ use Tests\TestCase;
  */
 class DatesTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,10 +40,10 @@ class DatesTest extends TestCase
 
         $fin_year_start->subYearNoOverflow();
 
-        if(now()->subYear()->lt($fin_year_start)) {
+        if (now()->subYear()->lt($fin_year_start)) {
             $fin_year_start->subYearNoOverflow();
         }
-                    
+
         $this->assertEquals('2018-07-01', $fin_year_start->format('Y-m-d'));
         $this->assertEquals('2019-06-30', $fin_year_start->copy()->addYear()->subDay()->format('Y-m-d'));
 
@@ -62,10 +61,10 @@ class DatesTest extends TestCase
 
         $fin_year_start->subYearNoOverflow();
 
-        if(now()->subYear()->lt($fin_year_start)) {
+        if (now()->subYear()->lt($fin_year_start)) {
             $fin_year_start->subYearNoOverflow();
         }
-                    
+
         $this->assertEquals('2019-07-01', $fin_year_start->format('Y-m-d'));
         $this->assertEquals('2020-06-30', $fin_year_start->copy()->addYear()->subDay()->format('Y-m-d'));
 
@@ -83,10 +82,10 @@ class DatesTest extends TestCase
 
         $fin_year_start->subYearNoOverflow();
 
-        if(now()->subYear()->lt($fin_year_start)) {
+        if (now()->subYear()->lt($fin_year_start)) {
             $fin_year_start->subYearNoOverflow();
         }
-                    
+
         $this->assertEquals('2019-07-01', $fin_year_start->format('Y-m-d'));
         $this->assertEquals('2020-06-30', $fin_year_start->copy()->addYear()->subDay()->format('Y-m-d'));
 
@@ -102,7 +101,7 @@ class DatesTest extends TestCase
 
         $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
-        if(now()->lt($fin_year_start)) {
+        if (now()->lt($fin_year_start)) {
             $fin_year_start->subYear();
         }
 
@@ -112,7 +111,7 @@ class DatesTest extends TestCase
         $this->assertEquals('2021-06-30', $fin_year_end->format('Y-m-d'));
 
         $this->travelBack();
-        
+
     }
 
     public function testFinancialYearDates3()
@@ -123,7 +122,7 @@ class DatesTest extends TestCase
 
         $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
-        if(now()->lt($fin_year_start)) {
+        if (now()->lt($fin_year_start)) {
             $fin_year_start->subYear();
         }
 
@@ -133,7 +132,7 @@ class DatesTest extends TestCase
         $this->assertEquals('2022-06-30', $fin_year_end->format('Y-m-d'));
 
         $this->travelBack();
-        
+
     }
 
     public function testFinancialYearDates2()
@@ -144,7 +143,7 @@ class DatesTest extends TestCase
 
         $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
-        if(now()->lt($fin_year_start)) {
+        if (now()->lt($fin_year_start)) {
             $fin_year_start->subYear();
         }
 
@@ -154,9 +153,8 @@ class DatesTest extends TestCase
         $this->assertEquals('2022-06-30', $fin_year_end->format('Y-m-d'));
 
         $this->travelBack();
-        
-    }
 
+    }
 
     public function testFinancialYearDates()
     {
@@ -166,7 +164,7 @@ class DatesTest extends TestCase
 
         $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
-        if(now()->lt($fin_year_start)) {
+        if (now()->lt($fin_year_start)) {
             $fin_year_start->subYear();
         }
 

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,7 +27,7 @@ trait PdfMakerUtilities
         $this->xpath = new DOMXPath($document);
     }
 
-    public function getSection(string $selector, string $section = null)
+    public function getSection(string $selector, ?string $section = null)
     {
         $element = $this->document->getElementById($selector);
 

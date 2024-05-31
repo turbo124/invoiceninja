@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -66,10 +65,10 @@ class CreateInvitations
                 $contact = $contacts->first();
 
                 $invitation = QuoteInvitation::query()->where('company_id', $this->quote->company_id)
-                                        ->where('client_contact_id', $contact->id)
-                                        ->where('quote_id', $this->quote->id)
-                                        ->withTrashed()
-                                        ->first();
+                    ->where('client_contact_id', $contact->id)
+                    ->where('quote_id', $this->quote->id)
+                    ->withTrashed()
+                    ->first();
 
                 if ($invitation) {
                     $invitation->restore();

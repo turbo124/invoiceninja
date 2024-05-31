@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="ExpenseCategory",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The expense hashed id"),
  *       @OA\Property(property="name", type="string", example="Accounting", description="The expense category name"),
  *       @OA\Property(property="user_id", type="string", example="XS987sD", description="The user hashed id"),

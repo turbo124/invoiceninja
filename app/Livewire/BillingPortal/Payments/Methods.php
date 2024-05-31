@@ -6,15 +6,14 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Livewire\BillingPortal\Payments;
 
-use Livewire\Component;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Component;
 
 class Methods extends Component
 {

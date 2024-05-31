@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -59,7 +58,7 @@ class ZipCredits implements ShouldQueue
         try {
             foreach ($invitations as $invitation) {
                 $file = (new \App\Jobs\Entity\CreateRawPdf($invitation))->handle();
-                $zipFile->addFromString($invitation->credit->numberFormatter() . '.pdf', $file);
+                $zipFile->addFromString($invitation->credit->numberFormatter().'.pdf', $file);
             }
 
             Storage::put($path.$file_name, $zipFile->outputAsString());

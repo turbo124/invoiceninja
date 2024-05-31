@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -91,11 +90,9 @@ class AuthorizePaymentDriver extends BaseDriver
             $fields[] = ['name' => 'client_custom_value1', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client1'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
         if ($this->company_gateway->require_custom_value2) {
             $fields[] = ['name' => 'client_custom_value2', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client2'), 'type' => 'text', 'validation' => 'required'];
         }
-
 
         if ($this->company_gateway->require_custom_value3) {
             $fields[] = ['name' => 'client_custom_value3', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client3'), 'type' => 'text', 'validation' => 'required'];
@@ -167,7 +164,7 @@ class AuthorizePaymentDriver extends BaseDriver
     public function mode()
     {
         if ($this->company_gateway->getConfigField('testMode')) {
-            return  ANetEnvironment::SANDBOX;
+            return ANetEnvironment::SANDBOX;
         }
 
         return $env = ANetEnvironment::PRODUCTION;
@@ -176,14 +173,13 @@ class AuthorizePaymentDriver extends BaseDriver
     public function findClientGatewayRecord(): ?ClientGatewayToken
     {
         return ClientGatewayToken::where('client_id', $this->client->id)
-                                 ->where('company_gateway_id', $this->company_gateway->id)
-                                 ->first();
+            ->where('company_gateway_id', $this->company_gateway->id)
+            ->first();
     }
 
     /**
      * Detach payment method from Authorize.net.
      *
-     * @param ClientGatewayToken $token
      * @return void
      */
     public function detach(ClientGatewayToken $token)
@@ -194,8 +190,8 @@ class AuthorizePaymentDriver extends BaseDriver
     public function import()
     {
         $this->init();
-        
-        nlog("starting import auth.net");
+
+        nlog('starting import auth.net');
 
         return (new AuthorizeCustomer($this))->importCustomers();
     }

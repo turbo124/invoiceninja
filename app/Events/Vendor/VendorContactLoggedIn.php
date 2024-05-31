@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,7 +28,6 @@ class VendorContactLoggedIn
 
     /**
      * Create a new event instance.
-     *
      */
     public function __construct(public VendorContact $contact, public Company $company, public array $event_vars)
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,9 +34,8 @@ class ZipInvoices implements ShouldQueue
     public $tries = 1;
 
     /**
-     * @param $invoices
-     * @param Company $company
-     * @param $email
+     * @param  $email
+     *
      * @deprecated confirm to be deleted
      * Create a new job instance.
      */
@@ -47,8 +45,6 @@ class ZipInvoices implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -63,12 +59,11 @@ class ZipInvoices implements ShouldQueue
 
         try {
 
-
             foreach ($this->invoices as $invoice) {
 
                 if ($invoice->client->getSetting('enable_e_invoice')) {
                     $xml = $invoice->service()->getEInvoice();
-                    $zipFile->addFromString($invoice->getFileName("xml"), $xml);
+                    $zipFile->addFromString($invoice->getFileName('xml'), $xml);
                 }
 
                 $file = $invoice->service()->getRawInvoicePdf();

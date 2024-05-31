@@ -5,25 +5,24 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Listeners\User;
 
-use App\Utils\Ninja;
-use App\Models\SystemLog;
-use App\Libraries\MultiDB;
-use App\Jobs\Util\SystemLogger;
-use App\Mail\User\UserLoggedIn;
 use App\Jobs\Mail\NinjaMailerJob;
-use Illuminate\Support\Facades\App;
 use App\Jobs\Mail\NinjaMailerObject;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Queue\SerializesModels;
+use App\Jobs\Util\SystemLogger;
+use App\Libraries\MultiDB;
+use App\Mail\User\UserLoggedIn;
+use App\Models\SystemLog;
+use App\Utils\Ninja;
+use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 
 class UpdateUserLastLogin implements ShouldQueue
 {
@@ -77,7 +76,7 @@ class UpdateUserLastLogin implements ShouldQueue
 
         Cache::put($key, true, 60 * 24);
         $arr = json_encode(['ip' => $ip]);
-        $arr = ctrans('texts.new_login_detected'). " {$ip}";
+        $arr = ctrans('texts.new_login_detected')." {$ip}";
 
         SystemLogger::dispatch(
             $arr,

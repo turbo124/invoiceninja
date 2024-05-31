@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,11 +28,11 @@ use Tests\TestCase;
  */
 class FactoryCreationTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,6 +47,7 @@ class FactoryCreationTest extends TestCase
 
     /**
      * @test
+     *
      * @covers      App\Factory\ProductFactory
      */
     public function testProductionCreation()
@@ -62,6 +62,7 @@ class FactoryCreationTest extends TestCase
 
     /**
      * @test
+     *
      * @covers      App\Factory\InvoiceFactory
      */
     public function testInvoiceCreation()
@@ -81,6 +82,7 @@ class FactoryCreationTest extends TestCase
 
     /**
      * @test
+     *
      * @covers App\Factory\CloneInvoiceFactory
      */
     public function testCloneInvoiceCreation()
@@ -107,6 +109,7 @@ class FactoryCreationTest extends TestCase
 
     /**
      * @test
+     *
      * @covers App\Factory\ClientFactory
      */
     public function testClientCreate()
@@ -122,6 +125,7 @@ class FactoryCreationTest extends TestCase
 
     /**
      * @test
+     *
      * @covers App\Factory\ClientContactFactory
      */
     public function testClientContactCreate()
@@ -137,6 +141,7 @@ class FactoryCreationTest extends TestCase
 
     /**
      * @test
+     *
      * @covers App\Factory\UserFactory
      */
     public function testUserCreate()

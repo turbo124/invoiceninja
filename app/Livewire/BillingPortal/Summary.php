@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -16,7 +15,6 @@ use App\Models\RecurringInvoice;
 use App\Models\Subscription;
 use App\Utils\Number;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Summary extends Component
@@ -139,13 +137,13 @@ class Summary extends Component
         }
 
         $products = [];
-        
+
         foreach ($this->context['bundle']['recurring_products'] as $key => $item) {
             $products[] = [
                 'product_key' => $item['product']['product_key'],
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
-                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription->frequency_id),
+                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company).' / '.RecurringInvoice::frequencyForKey($this->subscription->frequency_id),
             ];
         }
 
@@ -154,7 +152,7 @@ class Summary extends Component
                 'product_key' => $item['product']['product_key'],
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
-                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription->frequency_id),
+                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company).' / '.RecurringInvoice::frequencyForKey($this->subscription->frequency_id),
             ];
         }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,8 +22,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 class CreateCompany
 {
-    use MakesHash;
     use Dispatchable;
+    use MakesHash;
 
     protected $request;
 
@@ -32,9 +31,6 @@ class CreateCompany
 
     /**
      * Create a new job instance.
-     *
-     * @param array $request
-     * @param $account
      */
     public function __construct(array $request, $account)
     {
@@ -45,8 +41,6 @@ class CreateCompany
 
     /**
      * Execute the job.
-     *
-     * @return Company|null
      */
     public function handle(): ?Company
     {
@@ -54,7 +48,7 @@ class CreateCompany
 
         $settings->name = isset($this->request['name']) ? $this->request['name'] : '';
 
-        if($country_id = $this->resolveCountry()) {
+        if ($country_id = $this->resolveCountry()) {
             $settings->country_id = $country_id;
         }
 
@@ -80,9 +74,9 @@ class CreateCompany
         }
 
         /** Location Specific Configuration */
-        match($settings->country_id) {
+        match ($settings->country_id) {
             '724' => $company = $this->spanishSetup($company),
-            '36'  => $company = $this->australiaSetup($company),
+            '36' => $company = $this->australiaSetup($company),
             '710' => $company = $this->southAfticaSetup($company),
             default => $company->save(),
         };
@@ -92,8 +86,6 @@ class CreateCompany
 
     /**
      * Resolve Country
-     *
-     * @return string
      */
     private function resolveCountry(): string
     {
@@ -101,28 +93,28 @@ class CreateCompany
 
             $ip = request()->ip();
 
-            if(request()->hasHeader('cf-ipcountry')) {
+            if (request()->hasHeader('cf-ipcountry')) {
 
                 $c = Country::query()->where('iso_3166_2', request()->header('cf-ipcountry'))->first();
 
-                if($c) {
-                    return (string)$c->id;
+                if ($c) {
+                    return (string) $c->id;
                 }
 
             }
 
             $details = json_decode(file_get_contents("http://ip-api.com/json/{$ip}"));
 
-            if($details && property_exists($details, 'countryCode')) {
+            if ($details && property_exists($details, 'countryCode')) {
 
                 $c = Country::query()->where('iso_3166_2', $details->countryCode)->first();
 
-                if($c) {
-                    return (string)$c->id;
+                if ($c) {
+                    return (string) $c->id;
                 }
 
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog("Could not resolve country => {$e->getMessage()}");
         }
 
@@ -135,10 +127,10 @@ class CreateCompany
         try {
 
             $custom_fields = new \stdClass();
-            $custom_fields->contact1 = "Rol|CONTABLE,FISCAL,GESTOR,RECEPTOR,TRAMITADOR,PAGADOR,PROPONENTE,B2B_FISCAL,B2B_PAYER,B2B_BUYER,B2B_COLLECTOR,B2B_SELLER,B2B_PAYMENT_RECEIVER,B2B_COLLECTION_RECEIVER,B2B_ISSUER";
-            $custom_fields->contact2 = "Code|single_line_text";
-            $custom_fields->contact3 = "Nombre|single_line_text";
-            $custom_fields->client1 = "Administración Pública|switch";
+            $custom_fields->contact1 = 'Rol|CONTABLE,FISCAL,GESTOR,RECEPTOR,TRAMITADOR,PAGADOR,PROPONENTE,B2B_FISCAL,B2B_PAYER,B2B_BUYER,B2B_COLLECTOR,B2B_SELLER,B2B_PAYMENT_RECEIVER,B2B_COLLECTION_RECEIVER,B2B_ISSUER';
+            $custom_fields->contact2 = 'Code|single_line_text';
+            $custom_fields->contact3 = 'Nombre|single_line_text';
+            $custom_fields->client1 = 'Administración Pública|switch';
 
             $company->custom_fields = $custom_fields;
             $company->enabled_item_tax_rates = 1;
@@ -155,8 +147,8 @@ class CreateCompany
 
             return $company;
 
-        } catch(\Exception $e) {
-            nlog("SETUP: could not complete setup for Spanish Locale");
+        } catch (\Exception $e) {
+            nlog('SETUP: could not complete setup for Spanish Locale');
         }
 
         $company->save();
@@ -174,7 +166,7 @@ class CreateCompany
             $company->enabled_tax_rates = 1;
 
             $translations = new \stdClass();
-            $translations->invoice = "Tax Invoice";
+            $translations->invoice = 'Tax Invoice';
 
             $settings = $company->settings;
             $settings->currency_id = '4';
@@ -187,15 +179,14 @@ class CreateCompany
 
             return $company;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog($e->getMessage());
-            nlog("SETUP: could not complete setup for South African Locale");
+            nlog('SETUP: could not complete setup for South African Locale');
         }
 
         $company->save();
 
         return $company;
-
 
     }
 
@@ -207,7 +198,7 @@ class CreateCompany
             $company->enabled_tax_rates = 1;
 
             $translations = new \stdClass();
-            $translations->invoice = "Tax Invoice";
+            $translations->invoice = 'Tax Invoice';
 
             $settings = $company->settings;
             $settings->currency_id = '12';
@@ -220,9 +211,9 @@ class CreateCompany
 
             return $company;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog($e->getMessage());
-            nlog("SETUP: could not complete setup for Australian Locale");
+            nlog('SETUP: could not complete setup for Australian Locale');
         }
 
         $company->save();
@@ -230,5 +221,4 @@ class CreateCompany
         return $company;
 
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,13 +17,11 @@ use Illuminate\Validation\Rule;
 
 class UpdateRecurringExpenseRequest extends Request
 {
-    use MakesHash;
     use ChecksEntityStatus;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -75,7 +72,7 @@ class UpdateRecurringExpenseRequest extends Request
 
     public function prepareForValidation()
     {
-        /** @var \App\Models\User $user*/
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         $input = $this->all();

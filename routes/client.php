@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\ClientPortal\EmailPreferencesController;
 use App\Http\Controllers\Auth\ContactForgotPasswordController;
 use App\Http\Controllers\Auth\ContactLoginController;
 use App\Http\Controllers\Auth\ContactRegisterController;
 use App\Http\Controllers\Auth\ContactResetPasswordController;
+use App\Http\Controllers\ClientPortal\EmailPreferencesController;
 use App\Http\Controllers\ClientPortal\PaymentMethodController;
 use App\Http\Controllers\ClientPortal\PrePaymentController;
 use App\Http\Controllers\ClientPortal\SubscriptionController;
@@ -18,34 +18,34 @@ use App\Utils\Ninja;
 use App\Utils\PhantomJS\Phantom;
 use Illuminate\Support\Facades\Route;
 
-Route::get('client', [ContactLoginController::class, 'showLoginForm'])->name('client.catchall')->middleware(['domain_db', 'contact_account','locale', 'throttle:portal']); //catch all
+Route::get('client', [ContactLoginController::class, 'showLoginForm'])->name('client.catchall')->middleware(['domain_db', 'contact_account', 'locale', 'throttle:portal']); //catch all
 
-Route::get('client/login/{company_key?}', [ContactLoginController::class, 'showLoginForm'])->name('client.login')->middleware(['domain_db', 'contact_account','locale', 'throttle:portal']);
+Route::get('client/login/{company_key?}', [ContactLoginController::class, 'showLoginForm'])->name('client.login')->middleware(['domain_db', 'contact_account', 'locale', 'throttle:portal']);
 Route::post('client/login/{company_key?}', [ContactLoginController::class, 'login'])->name('client.login.submit');
 
-Route::get('client/register/{company_key?}', [ContactRegisterController::class, 'showRegisterForm'])->name('client.register')->middleware(['domain_db', 'contact_account', 'contact_register','locale']);
+Route::get('client/register/{company_key?}', [ContactRegisterController::class, 'showRegisterForm'])->name('client.register')->middleware(['domain_db', 'contact_account', 'contact_register', 'locale']);
 Route::post('client/register/{company_key?}', [ContactRegisterController::class, 'register'])->middleware(['domain_db', 'contact_account', 'contact_register', 'locale', 'throttle:portal']);
 
-Route::get('client/password/reset', [ContactForgotPasswordController::class, 'showLinkRequestForm'])->name('client.password.request')->middleware(['domain_db', 'contact_account','locale', 'throttle:portal']);
+Route::get('client/password/reset', [ContactForgotPasswordController::class, 'showLinkRequestForm'])->name('client.password.request')->middleware(['domain_db', 'contact_account', 'locale', 'throttle:portal']);
 Route::post('client/password/email', [ContactForgotPasswordController::class, 'sendResetLinkEmail'])->name('client.password.email')->middleware(['locale', 'throttle:portal']);
-Route::get('client/password/reset/{token}', [ContactResetPasswordController::class, 'showResetForm'])->name('client.password.reset')->middleware(['domain_db', 'contact_account','locale', 'throttle:portal']);
-Route::post('client/password/reset', [ContactResetPasswordController::class, 'reset'])->name('client.password.update')->middleware(['domain_db', 'contact_account','locale', 'throttle:portal']);
+Route::get('client/password/reset/{token}', [ContactResetPasswordController::class, 'showResetForm'])->name('client.password.reset')->middleware(['domain_db', 'contact_account', 'locale', 'throttle:portal']);
+Route::post('client/password/reset', [ContactResetPasswordController::class, 'reset'])->name('client.password.update')->middleware(['domain_db', 'contact_account', 'locale', 'throttle:portal']);
 
 Route::post('set_password', [App\Http\Controllers\ClientPortal\InvitationController::class, 'handlePasswordSet'])->name('client.set_password')->middleware('domain_db');
 
 Route::get('tmp_pdf/{hash}', [App\Http\Controllers\ClientPortal\TempRouteController::class, 'index'])->name('tmp_pdf');
 
-Route::get('client/key_login/{contact_key}', [App\Http\Controllers\ClientPortal\ContactHashLoginController::class, 'login'])->name('client.contact_login')->middleware(['domain_db','contact_key_login']);
-Route::get('client/magic_link/{magic_link}', [App\Http\Controllers\ClientPortal\ContactHashLoginController::class, 'magicLink'])->name('client.contact_magic_link')->middleware(['domain_db','contact_key_login']);
+Route::get('client/key_login/{contact_key}', [App\Http\Controllers\ClientPortal\ContactHashLoginController::class, 'login'])->name('client.contact_login')->middleware(['domain_db', 'contact_key_login']);
+Route::get('client/magic_link/{magic_link}', [App\Http\Controllers\ClientPortal\ContactHashLoginController::class, 'magicLink'])->name('client.contact_magic_link')->middleware(['domain_db', 'contact_key_login']);
 
-Route::get('documents/{document_hash}', [App\Http\Controllers\ClientPortal\DocumentController::class, 'publicDownload'])->name('documents.public_download')->middleware(['api_db','token_auth']);
+Route::get('documents/{document_hash}', [App\Http\Controllers\ClientPortal\DocumentController::class, 'publicDownload'])->name('documents.public_download')->middleware(['api_db', 'token_auth']);
 Route::get('documents/{hash}/hashed', [App\Http\Controllers\ClientPortal\DocumentController::class, 'hashDownload'])->name('documents.hashed_download');
 Route::get('error', [App\Http\Controllers\ClientPortal\ContactHashLoginController::class, 'errorPage'])->name('client.error');
-Route::get('client/payment/{contact_key}/{payment_id}', [App\Http\Controllers\ClientPortal\InvitationController::class, 'paymentRouter'])->middleware(['domain_db','contact_key_login']);
+Route::get('client/payment/{contact_key}/{payment_id}', [App\Http\Controllers\ClientPortal\InvitationController::class, 'paymentRouter'])->middleware(['domain_db', 'contact_key_login']);
 Route::get('client/ninja/{contact_key}/{company_key}', [App\Http\Controllers\ClientPortal\NinjaPlanController::class, 'index'])->name('client.ninja_contact_login')->middleware(['domain_db']);
 Route::post('client/ninja/trial_confirmation', [App\Http\Controllers\ClientPortal\NinjaPlanController::class, 'trial_confirmation'])->name('client.trial.response')->middleware(['domain_db']);
 
-Route::group(['middleware' => ['auth:contact', 'locale', 'domain_db','check_client_existence'], 'prefix' => 'client', 'as' => 'client.'], function () {
+Route::group(['middleware' => ['auth:contact', 'locale', 'domain_db', 'check_client_existence'], 'prefix' => 'client', 'as' => 'client.'], function () {
     Route::get('dashboard', [App\Http\Controllers\ClientPortal\DashboardController::class, 'index'])->name('dashboard'); // name = (dashboard. index / create / show / update / destroy / edit
 
     Route::get('plan', [App\Http\Controllers\ClientPortal\NinjaPlanController::class, 'plan'])->name('plan'); // name = (dashboard. index / create / show / update / destroy / edit
@@ -93,7 +93,7 @@ Route::group(['middleware' => ['auth:contact', 'locale', 'domain_db','check_clie
     Route::get('credits', [App\Http\Controllers\ClientPortal\CreditController::class, 'index'])->name('credits.index');
     Route::get('credits/{credit}', [App\Http\Controllers\ClientPortal\CreditController::class, 'show'])->name('credit.show');
 
-    Route::get('credits/{credit_invitation}', [App\Http\Controllers\ClientPortal\CreditController::class,'show'])->name('credits.show_invitation');
+    Route::get('credits/{credit_invitation}', [App\Http\Controllers\ClientPortal\CreditController::class, 'show'])->name('credits.show_invitation');
 
     Route::get('client/switch_company/{contact}', App\Http\Controllers\ClientPortal\SwitchCompanyController::class)->name('switch_company');
 
@@ -132,7 +132,7 @@ Route::group(['middleware' => ['invite_db'], 'prefix' => 'client', 'as' => 'clie
     Route::get('invoice/{invitation_key}/download_pdf', [InvoiceController::class, 'downloadPdf'])->name('invoice.download_invitation_key')->middleware('token_auth');
     Route::get('invoice/{invitation_key}/download_e_invoice', [InvoiceController::class, 'downloadEInvoice'])->name('invoice.download_e_invoice')->middleware('token_auth');
     Route::get('quote/{invitation_key}/download_pdf', [QuoteController::class, 'downloadPdf'])->name('quote.download_invitation_key')->middleware('token_auth');
-    Route::get('quote/{invitation_key}/download_e_quote', [QuoteController::class, "downloadEQuote"])->name('invoice.download_e_quote')->middleware('token_auth');
+    Route::get('quote/{invitation_key}/download_e_quote', [QuoteController::class, 'downloadEQuote'])->name('invoice.download_e_quote')->middleware('token_auth');
     Route::get('credit/{invitation_key}/download_pdf', [CreditController::class, 'downloadPdf'])->name('credit.download_invitation_key')->middleware('token_auth');
     Route::get('credit/{invitation_key}/download_e_credit', [CreditController::class, 'downloadECredit'])->name('credit.download_e_credit')->middleware('token_auth');
     Route::get('{entity}/{invitation_key}/download', [App\Http\Controllers\ClientPortal\InvitationController::class, 'routerForDownload'])->middleware('token_auth');
@@ -149,9 +149,8 @@ Route::get('route/{hash}', function ($hash) {
     $route = '/';
 
     try {
-        $route = decrypt($hash); 
-    }
-    catch (\Exception $e) { 
+        $route = decrypt($hash);
+    } catch (\Exception $e) {
         abort(404);
     }
 
@@ -173,11 +172,11 @@ Route::fallback(function () {
         try {
             $result = DB::connection()->getPdo();
             $result = DB::connection()->getDatabaseName();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $result = false;
         }
 
-        if(!$result) {
+        if (! $result) {
             return redirect('/setup');
         }
 

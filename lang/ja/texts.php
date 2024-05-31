@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => '組織',
     'name' => '名前',
     'website' => 'WEBサイト',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'The Enterprise Plan adds support for multiple users and file attachments, :link to see the full list of features.',
     'return_to_app' => 'Appに戻る',
 
-
     // Payment updates
     'refund_payment' => 'Refund Payment',
     'refund_max' => '最大:',
@@ -1705,7 +1704,6 @@ $lang = array(
     'lang_Serbian' => 'Serbian',
     'lang_Bulgarian' => 'Bulgarian',
     'lang_Russian (Russia)' => 'Russian (Russia)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Accounting & Legal',
@@ -2364,7 +2362,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'Gold Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguan Córdoba',
     'currency_malagasy_ariary' => 'Malagasy ariary',
-    "currency_tongan_pa_anga" => "Tongan Pa'anga",
+    'currency_tongan_pa_anga' => "Tongan Pa'anga",
 
     'review_app_help' => 'アプリをお楽しみいただければ幸いです。<br/> :link をご検討いただければ幸いです。',
     'writing_a_review' => 'writing a review',
@@ -4426,7 +4424,7 @@ $lang = array(
     'activity_122' => ':user アーカイブされた経常経費 :recurring_expense',
     'activity_123' => ':user 削除された経常費用 :recurring_expense',
     'activity_124' => ':user 経常費用を復元しました :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'To view the :entity you need to set a password.',
     'unsubscribe' => 'Unsubscribe',
     'unsubscribed' => 'Unsubscribed',
@@ -5036,7 +5034,7 @@ $lang = array(
     'light_dark_mode' => 'Light/Dark Mode',
     'activities' => 'Activities',
     'recent_transactions' => "Here are your company's most recent transactions:",
-    'country_Palestine' => "Palestine",
+    'country_Palestine' => 'Palestine',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Duties',
     'order_number' => 'Order Number',
@@ -5251,7 +5249,7 @@ $lang = array(
     'rff' => 'Required fields form',
     'add_step' => 'Add step',
     'steps' => 'Steps',
-    'steps_order_help' =>  'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
+    'steps_order_help' => 'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
     'other_steps' => 'Other steps',
     'use_available_payments' => 'Use Available Payments',
     'test_email_sent' => 'Successfully sent email',
@@ -5320,6 +5318,6 @@ $lang = array(
     'task_round_to_nearest' => 'Round To Nearest',
     'bulk_updated' => 'Successfully updated data',
     'bulk_update' => 'Bulk Update',
-);
+];
 
 return $lang;

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,8 +33,8 @@ use Illuminate\View\View;
 
 class CreditCard implements MethodInterface
 {
-    use Utilities;
     use MakesHash;
+    use Utilities;
 
     /**
      * @var CheckoutComPaymentDriver
@@ -52,7 +51,7 @@ class CreditCard implements MethodInterface
     /**
      * An authorization view for credit card.
      *
-     * @param mixed $data
+     * @param  mixed  $data
      * @return Factory|View
      */
     public function authorizeView($data)
@@ -82,7 +81,6 @@ class CreditCard implements MethodInterface
     /**
      * Handle authorization for credit card.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function authorizeResponse(Request $request)
@@ -136,7 +134,7 @@ class CreditCard implements MethodInterface
         } catch (CheckoutAuthorizationException $e) {
             // Bad Invalid authorization
 
-            throw new PaymentFailed("There is a problem with your Checkout Gateway API keys", 401);
+            throw new PaymentFailed('There is a problem with your Checkout Gateway API keys', 401);
         }
     }
 
@@ -232,7 +230,7 @@ class CreditCard implements MethodInterface
         try {
             $response = $this->checkout->gateway->getPaymentsClient()->requestPayment($paymentRequest);
 
-            if($this->checkout->company_gateway->update_details && isset($response['customer'])) {
+            if ($this->checkout->company_gateway->update_details && isset($response['customer'])) {
                 $this->checkout->updateCustomer($response['customer']['id'] ?? '');
             }
 
@@ -324,7 +322,7 @@ class CreditCard implements MethodInterface
                 $this->checkout->client->company,
             );
 
-            return new PaymentFailed("There was a problem communicating with the API credentials for Checkout", $e->getCode());
+            return new PaymentFailed('There was a problem communicating with the API credentials for Checkout', $e->getCode());
 
         }
     }

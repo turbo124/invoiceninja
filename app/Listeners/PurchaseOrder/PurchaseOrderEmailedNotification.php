@@ -5,7 +5,6 @@
  * @link https://github.com/purchase_orderninja/purchase_orderninja source repository
  *
  * @copyright Copyright (c) 2022. PurchaseOrder Ninja LLC (https://purchase_orderninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 

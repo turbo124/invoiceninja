@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Subscription",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="______"),
  *       @OA\Property(property="user_id", type="string", example="Opnel5aKBz", description="______"),
  *       @OA\Property(property="product_id", type="string", example="Opnel5aKBz", description="______"),

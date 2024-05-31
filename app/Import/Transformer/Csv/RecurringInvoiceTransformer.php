@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,8 +21,7 @@ use App\Models\RecurringInvoice;
 class RecurringInvoiceTransformer extends BaseTransformer
 {
     /**
-     * @param $data
-     *
+     * @param  $data
      * @return bool|array
      */
     public function transform($line_items_data)

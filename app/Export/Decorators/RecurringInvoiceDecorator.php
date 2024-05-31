@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,15 +18,15 @@ class RecurringInvoiceDecorator extends Decorator implements DecoratorInterface
     {
         $recurring_invoice = false;
 
-        if($entity instanceof RecurringInvoice) {
+        if ($entity instanceof RecurringInvoice) {
             $recurring_invoice = $entity;
-        } elseif($entity->recurring_invoice) {
+        } elseif ($entity->recurring_invoice) {
             $recurring_invoice = $entity->recurring_invoice;
         }
 
-        if($recurring_invoice && method_exists($this, $key)) {
+        if ($recurring_invoice && method_exists($this, $key)) {
             return $this->{$key}($recurring_invoice);
-        } elseif($recurring_invoice->{$key} ?? false) {
+        } elseif ($recurring_invoice->{$key} ?? false) {
             return $recurring_invoice->{$key} ?? '';
         }
 
@@ -74,5 +73,4 @@ class RecurringInvoiceDecorator extends Decorator implements DecoratorInterface
     {
         return $recurring_invoice->auto_bill_enabled ? ctrans('texts.yes') : ctrans('texts.no');
     }
-
 }

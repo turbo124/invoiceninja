@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,22 +32,29 @@ class ImportJsonController extends BaseController
      *      tags={"import"},
      *      summary="Import data from the system",
      *      description="Import data from the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="success",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

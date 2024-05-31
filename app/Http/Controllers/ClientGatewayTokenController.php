@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,14 +32,15 @@ use Illuminate\Http\Response;
 
 /**
  * Class ClientGatewayTokenController.
+ *
  * @covers App\Http\Controllers\ClientGatewayTokenController
  */
 class ClientGatewayTokenController extends BaseController
 {
-    use MakesHash;
-    use Uploadable;
     use BulkOptions;
+    use MakesHash;
     use SavesDocuments;
+    use Uploadable;
 
     protected $entity_type = ClientGatewayToken::class;
 
@@ -48,7 +48,6 @@ class ClientGatewayTokenController extends BaseController
 
     /**
      * ClientGatewayTokenController constructor.
-     * @param ClientGatewayTokenRepository $client_gateway_token_repo
      */
     public function __construct(protected ClientGatewayTokenRepository $client_gateway_token_repo)
     {
@@ -65,30 +64,38 @@ class ClientGatewayTokenController extends BaseController
      *      summary="Gets a list of client_gateway_tokens",
      *      description="Lists client_gateway_tokens, search and filters allow fine grained lists to be generated.
      * Query parameters can be added to performed more fine grained filtering of the client_gateway_tokens, these are handled by the ClientGatewayTokenFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of client_gateway_tokens",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ClientGatewayToken"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param ListClientGatewayTokenRequest $request
+     *
      * @return Response|mixed
      */
     public function index(ListClientGatewayTokenRequest $request)
@@ -101,10 +108,7 @@ class ClientGatewayTokenController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowClientGatewayTokenRequest $request
-     * @param ClientGatewayToken $client_gateway_token
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/client_gateway_tokens/{id}",
@@ -112,6 +116,7 @@ class ClientGatewayTokenController extends BaseController
      *      tags={"client_gateway_tokens"},
      *      summary="Shows a client",
      *      description="Displays a client by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -121,28 +126,36 @@ class ClientGatewayTokenController extends BaseController
      *          description="The ClientGatewayToken Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the cl.ient object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ClientGatewayToken"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -155,10 +168,7 @@ class ClientGatewayTokenController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditClientGatewayTokenRequest $request
-     * @param ClientGatewayToken $client_gateway_token
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/client_gateway_tokens/{id}/edit",
@@ -166,6 +176,7 @@ class ClientGatewayTokenController extends BaseController
      *      tags={"client_gateway_tokens"},
      *      summary="Shows a client for editting",
      *      description="Displays a client by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -175,28 +186,36 @@ class ClientGatewayTokenController extends BaseController
      *          description="The ClientGatewayToken Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the client object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ClientGatewayToken"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -209,11 +228,7 @@ class ClientGatewayTokenController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateClientGatewayTokenRequest $request
-     * @param ClientGatewayToken $client_gateway_token
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/client_gateway_tokens/{id}",
@@ -221,6 +236,7 @@ class ClientGatewayTokenController extends BaseController
      *      tags={"client_gateway_tokens"},
      *      summary="Updates a client",
      *      description="Handles the updating of a client by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -230,28 +246,36 @@ class ClientGatewayTokenController extends BaseController
      *          description="The ClientGatewayToken Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the client object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ClientGatewayToken"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -266,10 +290,7 @@ class ClientGatewayTokenController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateClientGatewayTokenRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/client_gateway_tokens/create",
@@ -277,26 +298,34 @@ class ClientGatewayTokenController extends BaseController
      *      tags={"client_gateway_tokens"},
      *      summary="Gets a new blank client object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank client object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ClientGatewayToken"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -316,10 +345,7 @@ class ClientGatewayTokenController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreClientGatewayTokenRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/client_gateway_tokens",
@@ -327,26 +353,34 @@ class ClientGatewayTokenController extends BaseController
      *      tags={"client_gateway_tokens"},
      *      summary="Adds a client",
      *      description="Adds an client to a company",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved client object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ClientGatewayToken"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -367,18 +401,17 @@ class ClientGatewayTokenController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyClientGatewayTokenRequest $request
-     * @param ClientGatewayToken $client_gateway_token
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/client_gateway_tokens/{id}",
      *      operationId="deleteClientGatewayToken",
      *      tags={"client_gateway_tokens"},
      *      summary="Deletes a client",
      *      description="Handles the deletion of a client by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -388,27 +421,34 @@ class ClientGatewayTokenController extends BaseController
      *          description="The ClientGatewayToken Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

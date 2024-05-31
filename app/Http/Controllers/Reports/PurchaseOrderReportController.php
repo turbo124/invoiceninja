@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. PurchaseOrder Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,7 +33,6 @@ class PurchaseOrderReportController extends BaseController
 
         /** @var \App\Models\User $user */
         $user = auth()->user();
-
 
         if ($request->has('send_email') && $request->get('send_email') && $request->missing('output')) {
             SendToAdmin::dispatch($user->company(), $request->all(), PurchaseOrderExport::class, $this->filename);

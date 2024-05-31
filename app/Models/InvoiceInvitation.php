@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -43,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @property mixed $hashed_id
  * @property \App\Models\Invoice $invoice
  * @property \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\InvoiceInvitationFactory factory($count = null, $state = [])
@@ -73,13 +73,14 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|InvoiceInvitation withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|InvoiceInvitation withoutTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|InvoiceInvitation where()
+ *
  * @mixin \Eloquent
  */
 class InvoiceInvitation extends BaseModel
 {
+    use Inviteable;
     use MakesDates;
     use SoftDeletes;
-    use Inviteable;
 
     protected $fillable = [
         'client_contact_id',
@@ -157,5 +158,4 @@ class InvoiceInvitation extends BaseModel
         $this->opened_date = Carbon::now();
         $this->save();
     }
-
 }

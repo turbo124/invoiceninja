@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,14 +20,12 @@ use Illuminate\Validation\Rule;
 
 class UpdateInvoiceRequest extends Request
 {
-    use MakesHash;
-    use CleanLineItems;
     use ChecksEntityStatus;
+    use CleanLineItems;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -49,7 +46,7 @@ class UpdateInvoiceRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -67,7 +64,7 @@ class UpdateInvoiceRequest extends Request
         $rules['client_id'] = ['bail', 'sometimes', Rule::in([$this->invoice->client_id])];
         $rules['line_items'] = 'array';
 
-$rules['discount'] = 'sometimes|numeric|max:99999999999999';
+        $rules['discount'] = 'sometimes|numeric|max:99999999999999';
         $rules['project_id'] = ['bail', 'sometimes', new ValidProjectForClient($this->all())];
         $rules['tax_rate1'] = 'bail|sometimes|numeric';
         $rules['tax_rate2'] = 'bail|sometimes|numeric';
@@ -80,7 +77,7 @@ $rules['discount'] = 'sometimes|numeric|max:99999999999999';
         $rules['partial'] = 'bail|sometimes|nullable|numeric';
         $rules['amount'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
 
-$rules['date'] = 'bail|sometimes|date:Y-m-d';
+        $rules['date'] = 'bail|sometimes|date:Y-m-d';
 
         // $rules['partial_due_date'] = ['bail', 'sometimes', 'exclude_if:partial,0', Rule::requiredIf(fn () => $this->partial > 0), 'date', 'before:due_date'];
         // $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', Rule::requiredIf(fn () => strlen($this->partial_due_date) > 1), 'date'];
@@ -96,7 +93,7 @@ $rules['date'] = 'bail|sometimes|date:Y-m-d';
 
         $input['id'] = $this->invoice->id;
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 
@@ -114,7 +111,7 @@ $rules['date'] = 'bail|sometimes|date:Y-m-d';
         }
 
         //handles edge case where we need for force set the due date of the invoice.
-        if((isset($input['partial_due_date']) && strlen($input['partial_due_date']) > 1) && (!array_key_exists('due_date', $input) || (empty($input['due_date']) && empty($this->invoice->due_date)))) {
+        if ((isset($input['partial_due_date']) && strlen($input['partial_due_date']) > 1) && (! array_key_exists('due_date', $input) || (empty($input['due_date']) && empty($this->invoice->due_date)))) {
             $client = \App\Models\Client::withTrashed()->find($input['client_id']);
             $input['due_date'] = \Illuminate\Support\Carbon::parse($input['date'])->addDays($client->getSetting('payment_terms'))->format('Y-m-d');
         }

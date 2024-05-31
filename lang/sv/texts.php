@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organisation',
     'name' => 'Namn',
     'website' => 'Hemsida',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'The Enterprise Plan adds support for multiple users and file attachments, :link to see the full list of features.',
     'return_to_app' => 'Återgå till Appen',
 
-
     // Payment updates
     'refund_payment' => 'Återbetala betalning',
     'refund_max' => 'Max:',
@@ -1711,7 +1710,6 @@ Nya Kaledonien',
     'lang_Serbian' => 'Serbian',
     'lang_Bulgarian' => 'Bulgarian',
     'lang_Russian (Russia)' => 'Ryska',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Redovisning & Legala',
@@ -2372,7 +2370,7 @@ Den här funktionen kräver att en produkt skapas och en betalningsgateway är k
     'currency_gold_troy_ounce' => 'Guld Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguanska Córdoba',
     'currency_malagasy_ariary' => 'Madagaskar ariary',
-    "currency_tongan_pa_anga" => "tonganska Pa&#39;anga",
+    'currency_tongan_pa_anga' => 'tonganska Pa&#39;anga',
 
     'review_app_help' => 'We hope you\'re enjoying using the app.<br/>If you\'d consider :link we\'d greatly appreciate it!',
     'writing_a_review' => 'writing a review',
@@ -4434,7 +4432,7 @@ Den här funktionen kräver att en produkt skapas och en betalningsgateway är k
     'activity_122' => ':user arkiverad återkommande utgift :recurring_expense',
     'activity_123' => ':user raderade återkommande utgifter :recurring_expense',
     'activity_124' => ':user återställd återkommande utgift :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'För att se :entity måste du ange ett lösenord.',
     'unsubscribe' => 'Säga upp',
     'unsubscribed' => 'Avslutad prenumeration',
@@ -4938,7 +4936,7 @@ Den här funktionen kräver att en produkt skapas och en betalningsgateway är k
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'Betalning inom :payeddue dagar netto till :paydate',
-    'xinvoice_no_buyers_reference' => "Ingen köparens referens ges",
+    'xinvoice_no_buyers_reference' => 'Ingen köparens referens ges',
     'xinvoice_online_payment' => 'Fakturan måste betalas online via den angivna länken',
     'pre_payment' => 'Förskottsbetalning',
     'number_of_payments' => 'Antal betalningar',
@@ -5043,8 +5041,8 @@ Den här funktionen kräver att en produkt skapas och en betalningsgateway är k
     'e_invoice' => 'E-faktura',
     'light_dark_mode' => 'Ljus/mörkt läge',
     'activities' => 'Aktiviteter',
-    'recent_transactions' => "Här är ditt företags senaste transaktioner:",
-    'country_Palestine' => "Palestina",
+    'recent_transactions' => 'Här är ditt företags senaste transaktioner:',
+    'country_Palestine' => 'Palestina',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'plikter',
     'order_number' => 'Ordernummer',
@@ -5259,7 +5257,7 @@ Den här funktionen kräver att en produkt skapas och en betalningsgateway är k
     'rff' => 'Required fields form',
     'add_step' => 'Add step',
     'steps' => 'Steps',
-    'steps_order_help' =>  'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
+    'steps_order_help' => 'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
     'other_steps' => 'Other steps',
     'use_available_payments' => 'Använd tillgängliga betalningar',
     'test_email_sent' => 'Skickat e-postmeddelande',
@@ -5308,6 +5306,6 @@ Den här funktionen kräver att en produkt skapas och en betalningsgateway är k
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,20 +26,24 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Utils\Traits\GeneratesConvertedQuoteCounter
  */
 class GeneratesConvertedQuoteCounterTest extends TestCase
 {
-    use GeneratesConvertedQuoteCounter;
     use DatabaseTransactions;
+    use GeneratesConvertedQuoteCounter;
     use MakesHash;
 
     protected $account;
+
     protected $faker;
+
     protected $client;
+
     protected $company;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -115,8 +118,8 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
 
         $this->assertNotNull($invoice);
 
-        $this->assertEquals(now()->format('Y'). '-Q0001', $quote->number);
-        $this->assertEquals(now()->format('Y'). '-I0001', $invoice->number);
+        $this->assertEquals(now()->format('Y').'-Q0001', $quote->number);
+        $this->assertEquals(now()->format('Y').'-I0001', $invoice->number);
 
         $settings = $this->client->getMergedSettings();
         $settings->invoice_number_counter = 100;

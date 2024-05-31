@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,16 +24,17 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Models\CompanyGateway
  */
 class CompanyGatewayApiTest extends TestCase
 {
-    use MakesHash;
-    use DatabaseTransactions;
-    use MockAccountData;
     use CompanyGatewayFeesAndLimitsSaver;
+    use DatabaseTransactions;
+    use MakesHash;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,39 +55,36 @@ class CompanyGatewayApiTest extends TestCase
 
         $data = [
             'action' => 'archive',
-            'ids' => [$cg->hashed_id]
+            'ids' => [$cg->hashed_id],
         ];
 
         $response = $this->withHeaders([
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/company_gateways/bulk', $data)
-          ->assertStatus(200);
-
+            ->assertStatus(200);
 
         $data = [
             'ids' => [$cg->hashed_id],
-            'action' => 'restore'
+            'action' => 'restore',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/company_gateways/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
 
         $data = [
             'ids' => [$cg->hashed_id],
-            'action' => 'delete'
+            'action' => 'delete',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/company_gateways/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
     }
-
-
 
     public function testCompanyGatewayEndPointsWithIncorrectFields()
     {

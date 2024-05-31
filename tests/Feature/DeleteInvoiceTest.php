@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,10 +27,10 @@ use Tests\TestCase;
 class DeleteInvoiceTest extends TestCase
 {
     use DatabaseTransactions;
-    use MockAccountData;
     use MakesHash;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -106,7 +105,6 @@ class DeleteInvoiceTest extends TestCase
 
         $this->assertEquals(6000, $invoice->partial);
         $this->assertEquals(36000, $invoice->amount);
-
 
         // apply a payment of 6000
 

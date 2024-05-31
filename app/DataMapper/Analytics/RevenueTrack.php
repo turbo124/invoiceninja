@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,6 +27,7 @@ class RevenueTrack extends GenericMixedMetric
 
     /**
      * The name of the counter.
+     *
      * @var string
      */
     public $name = 'app.cac';
@@ -36,7 +36,6 @@ class RevenueTrack extends GenericMixedMetric
      * The datetime of the counter measurement.
      *
      * date("Y-m-d H:i:s")
-     *
      */
     public $datetime;
 
@@ -83,7 +82,7 @@ class RevenueTrack extends GenericMixedMetric
     /**
      * Amount Received
      *
-     * @var double
+     * @var float
      */
     public $double_metric2 = 0;
 

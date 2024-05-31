@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,11 +39,11 @@ use Illuminate\Support\Facades\Cache;
 class MatchBankTransactions implements ShouldQueue
 {
     use Dispatchable;
+    use GeneratesCounter;
     use InteractsWithQueue;
+    use MakesHash;
     use Queueable;
     use SerializesModels;
-    use GeneratesCounter;
-    use MakesHash;
 
     private int $company_id;
 
@@ -52,12 +51,10 @@ class MatchBankTransactions implements ShouldQueue
 
     private array $input;
 
-    /** @var \App\Models\Company */
     protected ?Company $company;
 
     public Invoice $invoice;
 
-    /** @var \App\Models\BankTransaction $bt */
     private ?BankTransaction $bt;
 
     private $categories;
@@ -84,7 +81,6 @@ class MatchBankTransactions implements ShouldQueue
 
     /**
      * Execute the job.
-     *
      */
     public function handle()
     {
@@ -99,7 +95,7 @@ class MatchBankTransactions implements ShouldQueue
         }
 
         $bank_categories = Cache::get('bank_categories');
-        if (!$bank_categories && $yodlee) {
+        if (! $bank_categories && $yodlee) {
             $_categories = $yodlee->getTransactionCategories();
             $this->categories = collect($_categories->transactionCategory);
             Cache::forever('bank_categories', $this->categories);
@@ -126,7 +122,7 @@ class MatchBankTransactions implements ShouldQueue
     {
         $collection = collect();
 
-        $invoices = explode(",", $invoice_hashed_ids);
+        $invoices = explode(',', $invoice_hashed_ids);
 
         if (count($invoices) >= 1) {
             foreach ($invoices as $invoice) {
@@ -144,7 +140,7 @@ class MatchBankTransactions implements ShouldQueue
         foreach ($invoices as $invoice) {
             $invoice->service()->markSent();
 
-            if (!$invoice->isPayable()) {
+            if (! $invoice->isPayable()) {
                 return false;
             }
         }
@@ -156,11 +152,11 @@ class MatchBankTransactions implements ShouldQueue
     {
         $this->bt = BankTransaction::withTrashed()->find($input['id']);
 
-        if (!$this->bt) {
+        if (! $this->bt) {
             return $this;
         }
 
-        $_expenses = explode(",", $input['expense_id']);
+        $_expenses = explode(',', $input['expense_id']);
 
         foreach ($_expenses as $_expense) {
 
@@ -169,7 +165,7 @@ class MatchBankTransactions implements ShouldQueue
                 ->where('company_id', $this->bt->company_id)
                 ->first();
 
-            if ($expense && !$expense->transaction_id) {
+            if ($expense && ! $expense->transaction_id) {
                 $expense->transaction_id = $this->bt->id;
                 $expense->save();
 
@@ -189,11 +185,11 @@ class MatchBankTransactions implements ShouldQueue
     private function coalesceExpenses($expense): string
     {
 
-        if (!$this->bt->expense_id || strlen($this->bt->expense_id) < 1) {
+        if (! $this->bt->expense_id || strlen($this->bt->expense_id) < 1) {
             return $expense;
         }
 
-        return collect(explode(",", $this->bt->expense_id))->push($expense)->implode(",");
+        return collect(explode(',', $this->bt->expense_id))->push($expense)->implode(',');
 
     }
 
@@ -201,13 +197,13 @@ class MatchBankTransactions implements ShouldQueue
     {
         $this->bt = BankTransaction::query()->withTrashed()->find($input['id']);
 
-        if (!$this->bt || $this->bt->status_id == BankTransaction::STATUS_CONVERTED) {
+        if (! $this->bt || $this->bt->status_id == BankTransaction::STATUS_CONVERTED) {
             return $this;
         }
 
         $payment = Payment::withTrashed()->find($input['payment_id']);
 
-        if ($payment && !$payment->transaction_id) {
+        if ($payment && ! $payment->transaction_id) {
             $payment->transaction_id = $this->bt->id;
             $payment->saveQuietly();
 
@@ -226,7 +222,7 @@ class MatchBankTransactions implements ShouldQueue
     {
         $this->bt = BankTransaction::withTrashed()->find($input['id']);
 
-        if (!$this->bt || $this->bt->status_id == BankTransaction::STATUS_CONVERTED) {
+        if (! $this->bt || $this->bt->status_id == BankTransaction::STATUS_CONVERTED) {
             return $this;
         }
 
@@ -251,7 +247,7 @@ class MatchBankTransactions implements ShouldQueue
         //if there is a category id, pull it from Yodlee and insert - or just reuse!!
         $this->bt = BankTransaction::query()->withTrashed()->find($input['id']);
 
-        if (!$this->bt || $this->bt->status_id == BankTransaction::STATUS_CONVERTED) {
+        if (! $this->bt || $this->bt->status_id == BankTransaction::STATUS_CONVERTED) {
             return $this;
         }
 
@@ -289,7 +285,7 @@ class MatchBankTransactions implements ShouldQueue
 
     private function createPayment($invoices, float $amount): void
     {
-        
+
         $this->attachable_invoices = [];
         $this->available_balance = $amount;
 
@@ -323,7 +319,7 @@ class MatchBankTransactions implements ShouldQueue
             });
         }, 2);
 
-        if (!$this->invoice) {
+        if (! $this->invoice) {
             return;
         }
 
@@ -339,7 +335,6 @@ class MatchBankTransactions implements ShouldQueue
         $payment->currency_id = $this->bt->currency_id;
         $payment->is_manual = false;
         $payment->date = $this->bt->date ? Carbon::parse($this->bt->date) : now();
-
 
         /* Bank Transfer! */
         $payment_type_id = 1;
@@ -420,7 +415,6 @@ class MatchBankTransactions implements ShouldQueue
 
             return $ec->id;
         }
-
 
         return null;
     }

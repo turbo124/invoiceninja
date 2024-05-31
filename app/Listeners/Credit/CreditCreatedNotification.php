@@ -5,7 +5,6 @@
  * @link https://github.com/creditninja/creditninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://creditninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 

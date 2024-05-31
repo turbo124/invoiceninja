@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -43,7 +42,6 @@ class GmailCredentialNotification extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     *
      */
     public function toMail($notifiable)
     {
@@ -71,9 +69,9 @@ class GmailCredentialNotification extends Notification
         $content .= "Owner {$owner->present()->name() } | {$owner->email}";
 
         return (new SlackMessage())
-                ->success()
-                ->from(ctrans('texts.notification_bot'))
-                ->image('https://app.invoiceninja.com/favicon.png')
-                ->content($content);
+            ->success()
+            ->from(ctrans('texts.notification_bot'))
+            ->image('https://app.invoiceninja.com/favicon.png')
+            ->content($content);
     }
 }

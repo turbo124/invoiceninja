@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,23 +17,11 @@ use League\Fractal\Serializer\ArraySerializer as FractalArraySerializer;
  */
 class ArraySerializer extends FractalArraySerializer
 {
-    /**
-     * @param string $resourceKey
-     * @param array  $data
-     *
-     * @return array
-     */
     public function collection(?string $resourceKey, array $data): array
     {
         return $data;
     }
 
-    /**
-     * @param string $resourceKey
-     * @param array  $data
-     *
-     * @return array
-     */
     public function item(?string $resourceKey, array $data): array
     {
         return $data;

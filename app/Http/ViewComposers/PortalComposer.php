@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -55,9 +54,6 @@ class PortalComposer
 
     /**
      * Bind data to the view.
-     *
-     * @param  View  $view
-     * @return void
      */
     public function compose(View $view): void
     {
@@ -70,9 +66,6 @@ class PortalComposer
         }
     }
 
-    /**
-     * @return array
-     */
     private function portalData(): array
     {
         if (! auth()->guard('contact')->user()) {
@@ -102,7 +95,7 @@ class PortalComposer
         $data = [];
 
         if ($this->settings->enable_client_portal_dashboard) {
-            $data[] = [ 'title' => ctrans('texts.dashboard'), 'url' => 'client.dashboard', 'icon' => 'activity'];
+            $data[] = ['title' => ctrans('texts.dashboard'), 'url' => 'client.dashboard', 'icon' => 'activity'];
         }
 
         if (self::MODULE_INVOICES & $enabled_modules) {

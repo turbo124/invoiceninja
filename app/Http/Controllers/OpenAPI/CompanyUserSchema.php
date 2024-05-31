@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="CompanyUser",
  *   type="object",
+ *
  *       @OA\Property(property="permissions", type="string", example="[create_invoice]", description="The company user permissions"),
  *       @OA\Property(property="settings", type="object", example="The local shop", description="The company name"),
  *       @OA\Property(property="is_owner", type="boolean", example=true, description="Determines whether the user owns this company"),

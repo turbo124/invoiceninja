@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -107,19 +106,21 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Backup> $history
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\QuoteInvitation> $invitations
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
+ *
  * @mixin \Eloquent
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Quote extends BaseModel
 {
-    use MakesHash;
-    use MakesDates;
     use Filterable;
-    use SoftDeletes;
+    use MakesDates;
+    use MakesHash;
+    use MakesInvoiceValues;
     use MakesReminders;
     use PresentableTrait;
-    use MakesInvoiceValues;
+    use SoftDeletes;
 
     protected $presenter = QuotePresenter::class;
 
@@ -198,10 +199,10 @@ class Quote extends BaseModel
         return $this->dateMutator($value);
     }
 
-//    public function getDueDateAttribute($value)
-//    {
-//        return $value ? $this->dateMutator($value) : null;
-//    }
+    //    public function getDueDateAttribute($value)
+    //    {
+    //        return $value ? $this->dateMutator($value) : null;
+    //    }
 
     // public function getPartialDueDateAttribute($value)
     // {
@@ -283,7 +284,7 @@ class Quote extends BaseModel
      *
      * @return InvoiceSumInclusive | InvoiceSum The quote calculator object getters
      */
-    public function calc(): InvoiceSumInclusive | InvoiceSum
+    public function calc(): InvoiceSumInclusive|InvoiceSum
     {
         $quote_calc = null;
 
@@ -314,10 +315,6 @@ class Quote extends BaseModel
         return new QuoteService($this);
     }
 
-    /**
-     * @param int $status
-     * @return string
-     */
     public static function badgeForStatus(int $status): string
     {
         switch ($status) {
@@ -357,8 +354,6 @@ class Quote extends BaseModel
 
     /**
      * Check if the quote has been approved.
-     *
-     * @return bool
      */
     public function isApproved(): bool
     {
@@ -391,9 +386,6 @@ class Quote extends BaseModel
 
     /**
      * calculateTemplate
-     *
-     * @param  string $entity_string
-     * @return string
      */
     public function calculateTemplate(string $entity_string): string
     {

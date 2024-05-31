@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,15 +27,16 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Services\Invoice\HandleReversal
  */
 class ReverseInvoiceTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -73,8 +73,8 @@ class ReverseInvoiceTest extends TestCase
         /*Adjust payment applied and the paymentables to the correct amount */
 
         $paymentables = Paymentable::wherePaymentableType(Invoice::class)
-                                    ->wherePaymentableId($this->invoice->id)
-                                    ->get();
+            ->wherePaymentableId($this->invoice->id)
+            ->get();
 
         $paymentables->each(function ($paymentable) use ($total_paid) {
             $reversable_amount = $paymentable->amount - $paymentable->refunded;
@@ -106,8 +106,8 @@ class ReverseInvoiceTest extends TestCase
         $credit = $credit_calc->getCredit();
 
         $credit->service()
-                ->setStatus(Credit::STATUS_SENT)
-                ->markSent()->save();
+            ->setStatus(Credit::STATUS_SENT)
+            ->markSent()->save();
 
         /* Set invoice balance to 0 */
         $this->invoice->ledger()->updateInvoiceBalance($balance_remaining * -1, $item->notes)->save();

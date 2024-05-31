@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -56,7 +55,7 @@ class ARSummaryReport extends BaseExport
             'clients',
             'client_id',
         ]
-    */
+     */
     public function __construct(public Company $company, public array $input)
     {
     }
@@ -77,7 +76,7 @@ class ARSummaryReport extends BaseExport
         $this->csv->insertOne([]);
         $this->csv->insertOne([]);
         $this->csv->insertOne([ctrans('texts.aged_receivable_summary_report')]);
-        $this->csv->insertOne([ctrans('texts.created_on'),' ',$this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale())]);
+        $this->csv->insertOne([ctrans('texts.created_on'), ' ', $this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale())]);
 
         if (count($this->input['report_keys']) == 0) {
             $this->input['report_keys'] = $this->report_keys;
@@ -140,10 +139,11 @@ class ARSummaryReport extends BaseExport
         return Number::formatMoney($amount, $this->client);
 
     }
+
     /**
      * Generate aging amount.
      *
-     * @param mixed $range
+     * @param  mixed  $range
      * @return string
      */
     private function getAgingAmount($range)
@@ -170,7 +170,7 @@ class ARSummaryReport extends BaseExport
     /**
      * Calculate date ranges for aging.
      *
-     * @param mixed $range
+     * @param  mixed  $range
      * @return array
      */
     private function calculateDateRanges($range)
@@ -222,5 +222,4 @@ class ARSummaryReport extends BaseExport
 
         return $header;
     }
-
 }

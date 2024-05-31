@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -67,6 +66,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read int|null $purchase_order_invitations_count
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor $vendor
+ *
  * @method static \Database\Factories\VendorContactFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|VendorContact newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VendorContact newQuery()
@@ -74,17 +74,19 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|VendorContact query()
  * @method static \Illuminate\Database\Eloquent\Builder|VendorContact withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|VendorContact withoutTrashed()
+ *
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseOrderInvitation> $purchase_order_invitations
+ *
  * @mixin \Eloquent
  */
 class VendorContact extends Authenticatable implements HasLocalePreference
 {
-    use Notifiable;
+    use HasFactory;
     use MakesHash;
+    use Notifiable;
     use PresentableTrait;
     use SoftDeletes;
-    use HasFactory;
 
     /* Used to authenticate a vendor */
     protected $guard = 'vendor';
@@ -193,8 +195,8 @@ class VendorContact extends Authenticatable implements HasLocalePreference
     /**
      * Retrieve the model for a bound value.
      *
-     * @param mixed $value
-     * @param null $field
+     * @param  mixed  $value
+     * @param  null  $field
      * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)

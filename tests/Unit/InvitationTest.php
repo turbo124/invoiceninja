@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,11 +20,11 @@ use Tests\TestCase;
 
 class InvitationTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
     use MakesHash;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -86,14 +85,14 @@ class InvitationTest extends TestCase
 
         /** @phpstan-ignore-next-line **/
         $this->invoice->invitations = $invitations->toArray();
-        
+
         $this->invoice->line_items = [];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->put('/api/v1/invoices/'.$this->encodePrimaryKey($this->invoice->id), $this->invoice->toArray())
-        ->assertStatus(200);
+            ->assertStatus(200);
 
         $arr = $response->json();
 

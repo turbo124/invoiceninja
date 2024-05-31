@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,12 +22,12 @@ use Illuminate\Support\Collection;
 
 class InvoiceSum
 {
-    use Taxer;
     use CustomValuer;
     use Discounter;
     use NumberFormatter;
+    use Taxer;
 
-    protected RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice;
+    protected RecurringInvoice|Invoice|Quote|Credit|PurchaseOrder|RecurringQuote $invoice;
 
     public $tax_map;
 
@@ -53,10 +52,11 @@ class InvoiceSum
     public InvoiceItemSum $invoice_items;
 
     private $rappen_rounding = false;
+
     /**
      * Constructs the object with Invoice and Settings object.
      *
-     * @param RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice;
+     * @param  RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote  $invoice;
      */
     public function __construct($invoice)
     {
@@ -77,13 +77,13 @@ class InvoiceSum
     public function build()
     {
         $this->calculateLineItems()
-             ->calculateDiscount()
-             ->calculateInvoiceTaxes()
-             ->calculateCustomValues()
-             ->setTaxMap()
-             ->calculateTotals()
-             ->calculateBalance()
-             ->calculatePartial();
+            ->calculateDiscount()
+            ->calculateInvoiceTaxes()
+            ->calculateCustomValues()
+            ->setTaxMap()
+            ->calculateTotals()
+            ->calculateBalance()
+            ->calculatePartial();
 
         return $this;
     }
@@ -156,7 +156,7 @@ class InvoiceSum
     /**
      * Calculates the balance.
      *
-     * @return     self  The balance.
+     * @return self The balance.
      */
     private function calculateBalance(): self
     {
@@ -183,6 +183,7 @@ class InvoiceSum
 
     /**
      * Allow us to get the entity without persisting it
+     *
      * @return Invoice the temp
      */
     public function getTempEntity()
@@ -229,7 +230,7 @@ class InvoiceSum
     {
         // $this->invoice->amount = $this->formatValue($this->getTotal(), $this->precision);
         // $this->invoice->total_taxes = $this->getTotalTaxes();
-        
+
         $this->setCalculatedAttributes();
         $this->invoice->balance = $this->invoice->amount;
         $this->invoice->saveQuietly();
@@ -245,10 +246,9 @@ class InvoiceSum
      */
     private function setCalculatedAttributes(): self
     {
-        if($this->invoice->status_id == Invoice::STATUS_CANCELLED){
+        if ($this->invoice->status_id == Invoice::STATUS_CANCELLED) {
             $this->invoice->balance = 0;
-        }
-        elseif ($this->invoice->status_id != Invoice::STATUS_DRAFT) {
+        } elseif ($this->invoice->status_id != Invoice::STATUS_DRAFT) {
             if ($this->invoice->amount != $this->invoice->balance) {
                 $this->invoice->balance = Number::roundValue($this->getTotal(), $this->precision) - $this->invoice->paid_to_date; //21-02-2024 cannot use the calculated $paid_to_date here as it could send the balance backward.
             } else {
@@ -258,7 +258,7 @@ class InvoiceSum
         /* Set new calculated total */
         $this->invoice->amount = $this->formatValue($this->getTotal(), $this->precision);
 
-        if($this->rappen_rounding){
+        if ($this->rappen_rounding) {
             $this->invoice->amount = $this->roundRappen($this->invoice->amount);
             $this->invoice->balance = $this->roundRappen($this->invoice->balance);
         }
@@ -268,8 +268,7 @@ class InvoiceSum
         return $this;
     }
 
-
-    function roundRappen($value): float
+    public function roundRappen($value): float
     {
         return round($value / .05, 0) * .05;
     }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,8 +40,7 @@ class CreditCard implements MethodInterface
     /**
      * Authorization page for credit card.
      *
-     * @param array $data
-     * @return \Illuminate\View\View
+     * @param  array  $data
      */
     public function authorizeView($data): View
     {
@@ -54,8 +52,7 @@ class CreditCard implements MethodInterface
     /**
      * Handle authorization for credit card.
      *
-     * @param Request $request
-     * @return RedirectResponse
+     * @param  Request  $request
      */
     public function authorizeResponse($request): RedirectResponse
     {
@@ -134,15 +131,15 @@ class CreditCard implements MethodInterface
 
             $body = json_decode($response->getBody());
 
-            if($request->store_card) {
+            if ($request->store_card) {
                 $this->createCard($body->payment->id);
             }
 
             return $this->processSuccessfulPayment($response);
         }
 
-        if(is_array($response)) {
-            nlog("square");
+        if (is_array($response)) {
+            nlog('square');
             nlog($response);
         }
 
@@ -199,13 +196,13 @@ class CreditCard implements MethodInterface
         $square_card = new \Square\Models\Card();
         $square_card->setCustomerId($this->square_driver->findOrCreateClient());
 
-        $body = new \Square\Models\CreateCardRequest(uniqid("st", true), $source_id, $square_card);
+        $body = new \Square\Models\CreateCardRequest(uniqid('st', true), $source_id, $square_card);
 
         $api_response = $this->square_driver
-                             ->init()
-                             ->square
-                             ->getCardsApi()
-                             ->createCard($body);
+            ->init()
+            ->square
+            ->getCardsApi()
+            ->createCard($body);
 
         $body = json_decode($api_response->getBody());
 
@@ -237,6 +234,4 @@ class CreditCard implements MethodInterface
 
         return false;
     }
-
-    
 }

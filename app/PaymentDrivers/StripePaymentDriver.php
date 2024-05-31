@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -107,6 +106,7 @@ class StripePaymentDriver extends BaseDriver
 
     /**
      * Initializes the Stripe API.
+     *
      * @return self
      */
     public function init()
@@ -140,7 +140,6 @@ class StripePaymentDriver extends BaseDriver
 
         return $this;
     }
-
 
     /**
      * Returns the gateway types.
@@ -253,17 +252,17 @@ class StripePaymentDriver extends BaseDriver
             && $this->client->currency()
             && in_array($this->client->currency()->code, ['EUR', 'DKK', 'GBP', 'NOK', 'SEK', 'AUD', 'NZD', 'CAD', 'PLN', 'CHF'])
             && isset($this->client->country)
-            && in_array($this->client->country->iso_3166_3, ['AUT','BEL','DNK','FIN','FRA','DEU','IRL','ITA','NLD','NOR','ESP','SWE','GBR'])) {
+            && in_array($this->client->country->iso_3166_3, ['AUT', 'BEL', 'DNK', 'FIN', 'FRA', 'DEU', 'IRL', 'ITA', 'NLD', 'NOR', 'ESP', 'SWE', 'GBR'])) {
             $types[] = GatewayType::KLARNA;
         }
         if ($this->client
             && $this->client->currency()
             && in_array($this->client->currency()->code, ['EUR', 'DKK', 'GBP', 'NOK', 'SEK', 'AUD', 'NZD', 'CAD', 'PLN', 'CHF', 'USD'])
             && isset($this->client->country)
-            && in_array($this->client->country->iso_3166_3, ['AUT','BEL','DNK','FIN','FRA','DEU','IRL','ITA','NLD','NOR','ESP','SWE','GBR','USA'])) {
+            && in_array($this->client->country->iso_3166_3, ['AUT', 'BEL', 'DNK', 'FIN', 'FRA', 'DEU', 'IRL', 'ITA', 'NLD', 'NOR', 'ESP', 'SWE', 'GBR', 'USA'])) {
             $types[] = GatewayType::KLARNA;
         }
-        
+
         if (
             $this->client
             && isset($this->client->country)
@@ -330,12 +329,12 @@ class StripePaymentDriver extends BaseDriver
         }
 
         // if ($this->company_gateway->require_contact_name) {
-            $fields[] = ['name' => 'contact_first_name', 'label' => ctrans('texts.first_name'), 'type' => 'text', 'validation' => 'required'];
-            $fields[] = ['name' => 'contact_last_name', 'label' => ctrans('texts.last_name'), 'type' => 'text', 'validation' => 'required'];
+        $fields[] = ['name' => 'contact_first_name', 'label' => ctrans('texts.first_name'), 'type' => 'text', 'validation' => 'required'];
+        $fields[] = ['name' => 'contact_last_name', 'label' => ctrans('texts.last_name'), 'type' => 'text', 'validation' => 'required'];
         // }
 
         // if ($this->company_gateway->require_contact_email) {
-            $fields[] = ['name' => 'contact_email', 'label' => ctrans('texts.email'), 'type' => 'text', 'validation' => 'required,email:rfc'];
+        $fields[] = ['name' => 'contact_email', 'label' => ctrans('texts.email'), 'type' => 'text', 'validation' => 'required,email:rfc'];
         // }
 
         if ($this->company_gateway->require_client_phone) {
@@ -367,16 +366,13 @@ class StripePaymentDriver extends BaseDriver
             $fields[] = ['name' => 'client_custom_value1', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client1'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
         if ($this->company_gateway->require_custom_value2) {
             $fields[] = ['name' => 'client_custom_value2', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client2'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
         if ($this->company_gateway->require_custom_value3) {
             $fields[] = ['name' => 'client_custom_value3', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client3'), 'type' => 'text', 'validation' => 'required'];
         }
-
 
         if ($this->company_gateway->require_custom_value4) {
             $fields[] = ['name' => 'client_custom_value4', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client4'), 'type' => 'text', 'validation' => 'required'];
@@ -388,7 +384,6 @@ class StripePaymentDriver extends BaseDriver
     /**
      * Proxy method to pass the data into payment method authorizeView().
      *
-     * @param array $data
      * @return RedirectResponse|mixed
      */
     public function authorizeView(array $data)
@@ -399,7 +394,7 @@ class StripePaymentDriver extends BaseDriver
     /**
      * Processes the gateway response for credit card authorization.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return RedirectResponse|mixed
      */
     public function authorizeResponse($request)
@@ -410,7 +405,6 @@ class StripePaymentDriver extends BaseDriver
     /**
      * Process the payment with gateway.
      *
-     * @param array $data
      * @return RedirectResponse|mixed
      */
     public function processPaymentView(array $data)
@@ -426,8 +420,9 @@ class StripePaymentDriver extends BaseDriver
     /**
      * Creates a new String Payment Intent.
      *
-     * @param array $data The data array to be passed to Stripe
-     * @return PaymentIntent       The Stripe payment intent object
+     * @param  array  $data  The data array to be passed to Stripe
+     * @return PaymentIntent The Stripe payment intent object
+     *
      * @throws ApiErrorException
      */
     public function createPaymentIntent($data): ?PaymentIntent
@@ -436,7 +431,7 @@ class StripePaymentDriver extends BaseDriver
 
         $meta = $this->stripe_connect_auth;
 
-        return PaymentIntent::create($data, array_merge($meta, ['idempotency_key' => uniqid("st", true)]));
+        return PaymentIntent::create($data, array_merge($meta, ['idempotency_key' => uniqid('st', true)]));
     }
 
     public function getPaymentIntent($payment_intent_id): ?PaymentIntent
@@ -453,7 +448,6 @@ class StripePaymentDriver extends BaseDriver
      * Returns a setup intent that allows the user
      * to enter card details without initiating a transaction.
      *
-     * @return SetupIntent
      * @throws ApiErrorException
      */
     public function getSetupIntent(): SetupIntent
@@ -463,7 +457,7 @@ class StripePaymentDriver extends BaseDriver
         $params = ['usage' => 'off_session'];
         $meta = $this->stripe_connect_auth;
 
-        return SetupIntent::create($params, array_merge($meta, ['idempotency_key' => uniqid("st", true)]));
+        return SetupIntent::create($params, array_merge($meta, ['idempotency_key' => uniqid('st', true)]));
     }
 
     public function getSetupIntentId(string $id): SetupIntent
@@ -478,6 +472,7 @@ class StripePaymentDriver extends BaseDriver
 
     /**
      * Returns the Stripe publishable key.
+     *
      * @return null|string The stripe publishable key
      */
     public function getPublishableKey(): ?string
@@ -500,6 +495,7 @@ class StripePaymentDriver extends BaseDriver
      * Finds or creates a Stripe Customer object.
      *
      * @return null|Customer A Stripe customer object
+     *
      * @throws PresenterException
      * @throws ApiErrorException
      */
@@ -510,9 +506,9 @@ class StripePaymentDriver extends BaseDriver
         $this->init();
 
         $client_gateway_token = ClientGatewayToken::query()
-                                                  ->whereClientId($this->client->id)
-                                                  ->whereCompanyGatewayId($this->company_gateway->id)
-                                                  ->first();
+            ->whereClientId($this->client->id)
+            ->whereCompanyGatewayId($this->company_gateway->id)
+            ->first();
 
         //Search by customer reference
         if ($client_gateway_token && $client_gateway_token->gateway_customer_reference) {
@@ -532,6 +528,7 @@ class StripePaymentDriver extends BaseDriver
 
         if (count($searchResults) == 1) {
             $customer = $searchResults->data[0];
+
             // $this->updateStripeCustomer($customer);
             return $customer;
         }
@@ -551,7 +548,7 @@ class StripePaymentDriver extends BaseDriver
         $data['address']['state'] = $this->client->state;
         $data['address']['country'] = $this->client->country ? $this->client->country->iso_3166_2 : '';
 
-        $customer = Customer::create($data, array_merge($this->stripe_connect_auth, ['idempotency_key' => uniqid("st", true)]));
+        $customer = Customer::create($data, array_merge($this->stripe_connect_auth, ['idempotency_key' => uniqid('st', true)]));
 
         if (! $customer) {
             throw new Exception('Unable to create gateway customer');
@@ -680,7 +677,8 @@ class StripePaymentDriver extends BaseDriver
         }
 
         if ($request->type === 'payment_intent.processing') {
-            PaymentIntentProcessingWebhook::dispatch($request->data, $request->company_key, $this->company_gateway->id)->delay(now()->addSeconds(rand(10,12)));
+            PaymentIntentProcessingWebhook::dispatch($request->data, $request->company_key, $this->company_gateway->id)->delay(now()->addSeconds(rand(10, 12)));
+
             return response()->json([], 200);
         }
 
@@ -705,31 +703,29 @@ class StripePaymentDriver extends BaseDriver
 
         if ($request->type === 'charge.succeeded') {
             foreach ($request->data as $transaction) {
-                
 
-            $payment = Payment::query()
-                ->where('company_id', $this->company_gateway->company_id)
-                ->where(function ($query) use ($transaction) {
+                $payment = Payment::query()
+                    ->where('company_id', $this->company_gateway->company_id)
+                    ->where(function ($query) use ($transaction) {
 
-                    if(isset($transaction['payment_intent'])) {
-                        $query->where('transaction_reference', $transaction['payment_intent']);
-                    }
+                        if (isset($transaction['payment_intent'])) {
+                            $query->where('transaction_reference', $transaction['payment_intent']);
+                        }
 
-                    if(isset($transaction['payment_intent']) && isset($transaction['id'])) {
-                        $query->orWhere('transaction_reference', $transaction['id']);
-                    }
+                        if (isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                            $query->orWhere('transaction_reference', $transaction['id']);
+                        }
 
-                    if(!isset($transaction['payment_intent']) && isset($transaction['id'])) {
-                        $query->where('transaction_reference', $transaction['id']);
-                    }
+                        if (! isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                            $query->where('transaction_reference', $transaction['id']);
+                        }
 
-                })
-                ->first();
-
+                    })
+                    ->first();
 
                 if ($payment) {
 
-                    if(isset($transaction['payment_method_details']['au_becs_debit'])) {
+                    if (isset($transaction['payment_method_details']['au_becs_debit'])) {
                         $payment->transaction_reference = $transaction['id'];
                     }
 
@@ -752,28 +748,25 @@ class StripePaymentDriver extends BaseDriver
                 ], $this->stripe_connect_auth);
 
                 if ($charge->captured) {
-                    
 
-                $payment = Payment::query()
-                    ->where('company_id', $this->company_gateway->company_id)
-                    ->where(function ($query) use ($transaction) {
+                    $payment = Payment::query()
+                        ->where('company_id', $this->company_gateway->company_id)
+                        ->where(function ($query) use ($transaction) {
 
-                        if(isset($transaction['payment_intent'])) {
-                            $query->where('transaction_reference', $transaction['payment_intent']);
-                        }
+                            if (isset($transaction['payment_intent'])) {
+                                $query->where('transaction_reference', $transaction['payment_intent']);
+                            }
 
-                        if(isset($transaction['payment_intent']) && isset($transaction['id'])) {
-                            $query->orWhere('transaction_reference', $transaction['id']);
-                        }
+                            if (isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                                $query->orWhere('transaction_reference', $transaction['id']);
+                            }
 
-                        if(!isset($transaction['payment_intent']) && isset($transaction['id'])) {
-                            $query->where('transaction_reference', $transaction['id']);
-                        }
+                            if (! isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                                $query->where('transaction_reference', $transaction['id']);
+                            }
 
-                    })
-                    ->first();
-
-
+                        })
+                        ->first();
 
                     if ($payment) {
                         $payment->status_id = Payment::STATUS_COMPLETED;
@@ -781,11 +774,11 @@ class StripePaymentDriver extends BaseDriver
                     }
                 }
             }
-        } elseif ($request->type === "payment_method.automatically_updated") {
+        } elseif ($request->type === 'payment_method.automatically_updated') {
             // Will notify customer on updated information
             return response()->json([], 200);
-        } elseif ($request->type === "mandate.updated") {
-            if ($request->data['object']['status'] == "active") {
+        } elseif ($request->type === 'mandate.updated') {
+            if ($request->data['object']['status'] == 'active') {
                 // Check if payment method existsn
                 $payment_method = (string) $request->data['object']['payment_method'];
 
@@ -801,18 +794,18 @@ class StripePaymentDriver extends BaseDriver
                 }
 
                 return response()->json([], 200);
-            } elseif ($request->data['object']['status'] == "inactive" && $request->data['object']['payment_method']) {
+            } elseif ($request->data['object']['status'] == 'inactive' && $request->data['object']['payment_method']) {
                 // Delete payment method
                 $clientgateway = ClientGatewayToken::query()
                     ->where('token', $request->data['object']['payment_method'])
                     ->first();
 
-                if($clientgateway) {
+                if ($clientgateway) {
                     $clientgateway->delete();
                 }
 
                 return response()->json([], 200);
-            } elseif ($request->data['object']['status'] == "pending") {
+            } elseif ($request->data['object']['status'] == 'pending') {
                 return response()->json([], 200);
             }
         }
@@ -828,10 +821,7 @@ class StripePaymentDriver extends BaseDriver
     /**
      * Attach Stripe payment method to Stripe client.
      *
-     * @param string $payment_method
-     * @param mixed $customer
-     *
-     * @return void
+     * @param  mixed  $customer
      */
     public function attach(string $payment_method, $customer): void
     {
@@ -840,14 +830,14 @@ class StripePaymentDriver extends BaseDriver
         try {
             $stripe_payment_method = $this->getStripePaymentMethod($payment_method);
             $stripe_payment_method->attach(['customer' => $customer->id], $this->stripe_connect_auth);
-        } catch (ApiErrorException | Exception $e) {
+        } catch (ApiErrorException|Exception $e) {
             nlog($e->getMessage());
 
             SystemLogger::dispatch(
                 [
-                'server_response' => $e->getMessage(),
-                'data' => request()->all(),
-            ],
+                    'server_response' => $e->getMessage(),
+                    'data' => request()->all(),
+                ],
                 SystemLog::CATEGORY_GATEWAY_RESPONSE,
                 SystemLog::EVENT_GATEWAY_FAILURE,
                 SystemLog::TYPE_STRIPE,
@@ -861,7 +851,6 @@ class StripePaymentDriver extends BaseDriver
      * Detach payment method from the Stripe.
      * https://stripe.com/docs/api/payment_methods/detach
      *
-     * @param ClientGatewayToken $token
      * @return void
      */
     public function detach(ClientGatewayToken $token)
@@ -871,14 +860,14 @@ class StripePaymentDriver extends BaseDriver
         try {
             $pm = $this->getStripePaymentMethod($token->token);
             $pm->detach([], $this->stripe_connect_auth);
-        } catch (ApiErrorException | Exception $e) {
+        } catch (ApiErrorException|Exception $e) {
             nlog($e->getMessage());
 
             SystemLogger::dispatch(
                 [
-                'server_response' => $e->getMessage(),
-                'data' => request()->all(),
-            ],
+                    'server_response' => $e->getMessage(),
+                    'data' => request()->all(),
+                ],
                 SystemLog::CATEGORY_GATEWAY_RESPONSE,
                 SystemLog::EVENT_GATEWAY_FAILURE,
                 SystemLog::TYPE_STRIPE,
@@ -896,7 +885,6 @@ class StripePaymentDriver extends BaseDriver
     /**
      * Retrieve payment method from Stripe.
      *
-     * @param string $source
      *
      * @return PaymentMethod|void
      */
@@ -904,7 +892,7 @@ class StripePaymentDriver extends BaseDriver
     {
         try {
             return PaymentMethod::retrieve($source, $this->stripe_connect_auth);
-        } catch (ApiErrorException | Exception $e) {
+        } catch (ApiErrorException|Exception $e) {
             throw new PaymentFailed($e->getMessage(), $e->getCode());
         }
     }
@@ -1009,10 +997,10 @@ class StripePaymentDriver extends BaseDriver
 
         try {
             $this->verifyConnect();
+
             return true;
-        }
-        catch(\Exception $e) {
-            
+        } catch (\Exception $e) {
+
         }
 
         return false;

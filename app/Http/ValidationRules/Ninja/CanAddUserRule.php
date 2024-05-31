@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,8 +24,8 @@ class CanAddUserRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -40,12 +39,12 @@ class CanAddUserRule implements Rule
         }
 
         $count = CompanyUser::query()
-                        ->where("company_user.account_id", $user->account_id)
-                        ->join("users", "users.id", "=", "company_user.user_id")
-                        ->whereNull("users.deleted_at")
-                        ->whereNull("company_user.deleted_at")
-                        ->distinct()
-                        ->count("users.email");
+            ->where('company_user.account_id', $user->account_id)
+            ->join('users', 'users.id', '=', 'company_user.user_id')
+            ->whereNull('users.deleted_at')
+            ->whereNull('company_user.deleted_at')
+            ->distinct()
+            ->count('users.email');
 
         return $count < $user->company()->account->num_users;
     }

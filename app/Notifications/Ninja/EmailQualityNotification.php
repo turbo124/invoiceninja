@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class EmailQualityNotification extends Notification
      *
      * @return void
      */
-
     protected Company $company;
 
     protected string $spam_string;
@@ -76,9 +74,9 @@ class EmailQualityNotification extends Notification
         $content .= "Spam trigger: {$this->spam_string}";
 
         return (new SlackMessage())
-                ->success()
-                ->from(ctrans('texts.notification_bot'))
-                ->image('https://app.invoiceninja.com/favicon.png')
-                ->content($content);
+            ->success()
+            ->from(ctrans('texts.notification_bot'))
+            ->image('https://app.invoiceninja.com/favicon.png')
+            ->content($content);
     }
 }

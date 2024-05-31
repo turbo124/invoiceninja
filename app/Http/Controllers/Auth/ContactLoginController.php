@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,7 +51,7 @@ class ContactLoginController extends Controller
             $company = Company::where('company_key', $company_key)->first();
         }
 
-        /** @var \App\Models\Company $company **/
+        /** @var \App\Models\Company $company * */
         if ($company) {
             $account = $company->account;
         } elseif (! $company && strpos($request->getHost(), config('ninja.app_domain')) !== false) {
@@ -64,7 +63,7 @@ class ContactLoginController extends Controller
 
             $company = Company::where('portal_domain', $request->getSchemeAndHttpHost())->first();
         } elseif (Ninja::isSelfHost()) {
-            /** @var \App\Models\Account $account **/
+            /** @var \App\Models\Account $account * */
             $account = Account::first();
             $company = $account->default_company;
         } else {
@@ -99,11 +98,11 @@ class ContactLoginController extends Controller
         }
 
         if (Ninja::isHosted() && $request->has('password') && $company = Company::where('company_key', $request->input('company_key'))->first()) {
-            /** @var \App\Models\Company $company **/
+            /** @var \App\Models\Company $company * */
             $contact = ClientContact::where(['email' => $request->input('email'), 'company_id' => $company->id])
-                                     ->whereHas('client', function ($query) {
-                                         $query->where('is_deleted', 0);
-                                     })->first();
+                ->whereHas('client', function ($query) {
+                    $query->where('is_deleted', 0);
+                })->first();
 
             if (! $contact) {
                 return $this->sendFailedLoginResponse($request);
@@ -166,7 +165,7 @@ class ContactLoginController extends Controller
     private function setRedirectPath()
     {
         if (auth()->guard('contact')->user()->client->getSetting('enable_client_portal_dashboard') === true) {
-            $this->redirectTo = '/client/dashboard';                                                                                              
+            $this->redirectTo = '/client/dashboard';
         } elseif (auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_INVOICES) {
             $this->redirectTo = '/client/invoices';
         } elseif (auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_RECURRING_INVOICES) {

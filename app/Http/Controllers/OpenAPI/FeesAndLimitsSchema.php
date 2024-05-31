@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="FeesAndLimits",
  *   type="object",
+ *
  *       @OA\Property(property="min_limit", type="string", example="2", description="The minimum amount accepted for this gateway"),
  *       @OA\Property(property="max_limit", type="string", example="2", description="The maximum amount accepted for this gateway"),
  *       @OA\Property(property="fee_amount", type="number", format="float", example="2.0", description="The gateway fee amount"),

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,9 +38,9 @@ class UpdatePaymentMethods
 
         $card_methods = PaymentMethod::all(
             [
-            'customer' => $customer->id,
-            'type' => 'card',
-        ],
+                'customer' => $customer->id,
+                'type' => 'card',
+            ],
             $this->stripe->stripe_connect_auth
         );
 
@@ -51,9 +50,9 @@ class UpdatePaymentMethods
 
         $alipay_methods = PaymentMethod::all(
             [
-            'customer' => $customer->id,
-            'type' => 'alipay',
-        ],
+                'customer' => $customer->id,
+                'type' => 'alipay',
+            ],
             $this->stripe->stripe_connect_auth
         );
 
@@ -63,9 +62,9 @@ class UpdatePaymentMethods
 
         $sofort_methods = PaymentMethod::all(
             [
-            'customer' => $customer->id,
-            'type' => 'sofort',
-        ],
+                'customer' => $customer->id,
+                'type' => 'sofort',
+            ],
             $this->stripe->stripe_connect_auth
         );
 
@@ -75,9 +74,9 @@ class UpdatePaymentMethods
 
         $sepa_methods = PaymentMethod::all(
             [
-                    'customer' => $customer->id,
-                    'type' => 'sepa_debit',
-                ],
+                'customer' => $customer->id,
+                'type' => 'sepa_debit',
+            ],
             $this->stripe->stripe_connect_auth
         );
 
@@ -95,9 +94,9 @@ class UpdatePaymentMethods
     {
         $bank_methods = \Stripe\PaymentMethod::all(
             [
-            'customer' => $customer->id,
-            'type' => 'us_bank_account',
-        ],
+                'customer' => $customer->id,
+                'type' => 'us_bank_account',
+            ],
             $this->stripe->stripe_connect_auth
         );
 
@@ -147,7 +146,7 @@ class UpdatePaymentMethods
     {
         $sources = $customer->sources ?? false;
 
-        if (!$customer || is_null($sources) || !property_exists($sources, 'data')) {
+        if (! $customer || is_null($sources) || ! property_exists($sources, 'data')) {
             return;
         }
 
@@ -222,14 +221,16 @@ class UpdatePaymentMethods
 
                 /**
                  * @class \Stripe\PaymentMethod $method
+                 *
                  * @property \Stripe\StripeObject $card
+                 *
                  * @class \Stripe\StripeObject $card
+                 *
                  * @property string $exp_year
                  * @property string $exp_month
                  * @property string $brand
                  * @property string $last4
-                */
-
+                 */
                 $payment_meta = new \stdClass();
                 $payment_meta->exp_month = (string) $method->card->exp_month;
                 $payment_meta->exp_year = (string) $method->card->exp_year;

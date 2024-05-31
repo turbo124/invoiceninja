@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,10 +27,13 @@ class PingController extends BaseController
      *      tags={"ping"},
      *      summary="Attempts to ping the API",
      *      description="Attempts to ping the API",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The company and user name",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
@@ -63,10 +65,13 @@ class PingController extends BaseController
      *      tags={"health_check"},
      *      summary="Attempts to get a health check from the API",
      *      description="Attempts to get a health check from the API",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A key/value map of the system health",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),

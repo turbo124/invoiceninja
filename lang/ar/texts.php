@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'الشركة',
     'name' => 'الاسم',
     'website' => 'الموقع الإلكتروني',
@@ -1157,7 +1157,6 @@ $lang = array(
     'enterprise_plan_features' => 'تضيف خطة Enterprise دعمًا لعدة مستخدمين ومرفقات الملفات، :link للاطلاع على القائمة الكاملة للميزات.',
     'return_to_app' => 'العودة إلى التطبيق',
 
-
     // Payment updates
     'refund_payment' => 'دفع مبلغ معاد',
     'refund_max' => 'الأعلى:',
@@ -1686,7 +1685,6 @@ $lang = array(
     'lang_Serbian' => 'الصربية',
     'lang_Bulgarian' => 'البلغارية',
     'lang_Russian (Russia)' => 'الروسية (روسيا)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'المحاسبة والقانون',
@@ -2345,7 +2343,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'أونصة تروي ذهبية',
     'currency_nicaraguan_córdoba' => 'قرطبة نيكاراغوا',
     'currency_malagasy_ariary' => 'أرياري مدغشقر',
-    "currency_tongan_pa_anga" => "تونجا بانجا",
+    'currency_tongan_pa_anga' => 'تونجا بانجا',
 
     'review_app_help' => 'نأمل أن تستمتع باستخدام التطبيق.<br/> إذا كنت تفكر في :link فإننا نقدر ذلك كثيرًا!',
     'writing_a_review' => 'كتابة مراجعة',
@@ -4407,7 +4405,7 @@ $lang = array(
     'activity_122' => ':user المصاريف المتكررة المؤرشفة :recurring_expense',
     'activity_123' => ':user المصاريف المتكررة المحذوفة :recurring_expense',
     'activity_124' => ':user المصاريف المتكررة المستعادة :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'لعرض :entity تحتاج إلى تعيين كلمة مرور.',
     'unsubscribe' => 'إلغاء الاشتراك',
     'unsubscribed' => 'غير مشترك',
@@ -4911,7 +4909,7 @@ $lang = array(
     'payment_type_Klarna' => 'كلارنا',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'مستحق الدفع paydate: صافي أيام الدفع payeddue: تاريخ الدفع',
-    'xinvoice_no_buyers_reference' => "لم يتم إعطاء إشارة للمشتري",
+    'xinvoice_no_buyers_reference' => 'لم يتم إعطاء إشارة للمشتري',
     'xinvoice_online_payment' => 'يجب دفع الفاتورة عبر الإنترنت من خلال الرابط المقدم',
     'pre_payment' => 'الدفع المسبق',
     'number_of_payments' => 'عدد الدفعات',
@@ -5016,8 +5014,8 @@ $lang = array(
     'e_invoice' => 'الفاتورة الإلكترونية',
     'light_dark_mode' => 'وضع الضوء/الظلام',
     'activities' => 'أنشطة',
-    'recent_transactions' => "فيما يلي أحدث معاملات شركتك:",
-    'country_Palestine' => "فلسطين",
+    'recent_transactions' => 'فيما يلي أحدث معاملات شركتك:',
+    'country_Palestine' => 'فلسطين',
     'country_Taiwan' => 'تايوان',
     'duties' => 'الواجبات',
     'order_number' => 'رقم الأمر',
@@ -5232,7 +5230,7 @@ $lang = array(
     'rff' => 'نموذج الحقول المطلوبة',
     'add_step' => 'اضافة خطوة',
     'steps' => 'خطوات',
-    'steps_order_help' =>  'ترتيب الخطوات مهم. ولا ينبغي أن تعتمد الخطوة الأولى على أي خطوة أخرى. ويجب أن تعتمد الخطوة الثانية على الخطوة الأولى، وهكذا.',
+    'steps_order_help' => 'ترتيب الخطوات مهم. ولا ينبغي أن تعتمد الخطوة الأولى على أي خطوة أخرى. ويجب أن تعتمد الخطوة الثانية على الخطوة الأولى، وهكذا.',
     'other_steps' => 'خطوات أخرى',
     'use_available_payments' => 'استخدم المدفوعات المتاحة',
     'test_email_sent' => 'تم إرسال البريد الإلكتروني بنجاح',
@@ -5281,6 +5279,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

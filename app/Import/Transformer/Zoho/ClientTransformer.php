@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,18 +20,16 @@ use Illuminate\Support\Str;
 class ClientTransformer extends BaseTransformer
 {
     /**
-     * @param $data
-     *
      * @return array|bool
      */
     public function transform($data)
     {
         $client_id_proxy = array_key_exists('Customer ID', $data) ? 'Customer ID' : 'Primary Contact ID';
 
-        if(isset($data[$client_id_proxy]) && $this->hasClientIdNumber($data[$client_id_proxy])) {
-            throw new ImportException('Client ID already exists => '. $data[$client_id_proxy]);
+        if (isset($data[$client_id_proxy]) && $this->hasClientIdNumber($data[$client_id_proxy])) {
+            throw new ImportException('Client ID already exists => '.$data[$client_id_proxy]);
         } elseif (isset($data['Company Name']) && $this->hasClient($data['Company Name'])) {
-            throw new ImportException('Client already exists => '. $data['Company Name']);
+            throw new ImportException('Client already exists => '.$data['Company Name']);
         }
 
         $settings = new \stdClass();
@@ -43,34 +40,34 @@ class ClientTransformer extends BaseTransformer
         }
 
         $data = [
-            'company_id'    => $this->company->id,
-            'name'          => $this->getString($data, 'Display Name'),
-            'phone'    		=> $this->getString($data, 'Phone'),
+            'company_id' => $this->company->id,
+            'name' => $this->getString($data, 'Display Name'),
+            'phone' => $this->getString($data, 'Phone'),
             'private_notes' => $this->getString($data, 'Notes'),
-            'website'       => $this->getString($data, 'Website'),
-            'id_number'		=> $this->getString($data, $client_id_proxy),
-            'address1'    => $this->getString($data, 'Billing Address'),
-            'address2'    => $this->getString($data, 'Billing Street2'),
-            'city'        => $this->getString($data, 'Billing City'),
-            'state'       => $this->getString($data, 'Billing State'),
+            'website' => $this->getString($data, 'Website'),
+            'id_number' => $this->getString($data, $client_id_proxy),
+            'address1' => $this->getString($data, 'Billing Address'),
+            'address2' => $this->getString($data, 'Billing Street2'),
+            'city' => $this->getString($data, 'Billing City'),
+            'state' => $this->getString($data, 'Billing State'),
             'postal_code' => $this->getString($data, 'Billing Code'),
-            'country_id'  => isset($data['Billing Country']) ? $this->getCountryId($data['Billing Country']) : null,
+            'country_id' => isset($data['Billing Country']) ? $this->getCountryId($data['Billing Country']) : null,
 
-            'shipping_address1'    => $this->getString($data, 'Shipping Address'),
-            'shipping_address2'    => $this->getString($data, 'Shipping Street2'),
-            'shipping_city'        => $this->getString($data, 'Shipping City'),
-            'shipping_state'       => $this->getString($data, 'Shipping State'),
+            'shipping_address1' => $this->getString($data, 'Shipping Address'),
+            'shipping_address2' => $this->getString($data, 'Shipping Street2'),
+            'shipping_city' => $this->getString($data, 'Shipping City'),
+            'shipping_state' => $this->getString($data, 'Shipping State'),
             'shipping_postal_code' => $this->getString($data, 'Shipping Code'),
-            'shipping_country_id'  => isset($data['Shipping Country']) ? $this->getCountryId($data['Shipping Country']) : null,
+            'shipping_country_id' => isset($data['Shipping Country']) ? $this->getCountryId($data['Shipping Country']) : null,
             'credit_balance' => 0,
-            'settings'       => $settings,
-            'client_hash'    => Str::random(40),
-            'contacts'       => [
+            'settings' => $settings,
+            'client_hash' => Str::random(40),
+            'contacts' => [
                 [
                     'first_name' => $this->getString($data, 'First Name'),
-                    'last_name'  => $this->getString($data, 'Last Name'),
-                    'email'      => $this->getString($data, 'EmailID'),
-                    'phone'      => $this->getString($data, 'Phone'),
+                    'last_name' => $this->getString($data, 'Last Name'),
+                    'email' => $this->getString($data, 'EmailID'),
+                    'phone' => $this->getString($data, 'Phone'),
                 ],
             ],
         ];

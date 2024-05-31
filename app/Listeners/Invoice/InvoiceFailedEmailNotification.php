@@ -5,19 +5,18 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Listeners\Invoice;
 
-use App\Libraries\MultiDB;
 use App\Jobs\Mail\NinjaMailer;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
-use Illuminate\Support\Facades\Cache;
+use App\Libraries\MultiDB;
 use App\Mail\Admin\EntityFailedSendObject;
 use App\Utils\Traits\Notifications\UserNotifies;
+use Illuminate\Support\Facades\Cache;
 
 class InvoiceFailedEmailNotification
 {
@@ -37,7 +36,7 @@ class InvoiceFailedEmailNotification
     {
         MultiDB::setDb($event->company->db);
 
-        if(Cache::has("invoice_failed_email_notification_{$event->invitation->key}")) {
+        if (Cache::has("invoice_failed_email_notification_{$event->invitation->key}")) {
             return;
         }
 

@@ -5,34 +5,33 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\PaymentDrivers;
 
+use App\Factory\ClientContactFactory;
+use App\Factory\ClientFactory;
+use App\Http\Requests\Payments\PaymentWebhookRequest;
+use App\Jobs\Mail\PaymentFailedMailer;
+use App\Jobs\Util\SystemLogger;
 use App\Models\Client;
+use App\Models\ClientGatewayToken;
 use App\Models\Country;
+use App\Models\GatewayType;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\SystemLog;
-use App\Models\GatewayType;
 use App\Models\PaymentHash;
 use App\Models\PaymentType;
-use App\Factory\ClientFactory;
-use App\Jobs\Util\SystemLogger;
-use App\Utils\Traits\MakesHash;
-use App\Models\ClientGatewayToken;
-use App\Factory\ClientContactFactory;
-use App\Jobs\Mail\PaymentFailedMailer;
+use App\Models\SystemLog;
 use App\Utils\Traits\GeneratesCounter;
+use App\Utils\Traits\MakesHash;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\Payments\PaymentWebhookRequest;
 
 class GoCardlessPaymentDriver extends BaseDriver
 {
-    use MakesHash;
     use GeneratesCounter;
+    use MakesHash;
 
     public $refundable = true;
 
@@ -79,7 +78,7 @@ class GoCardlessPaymentDriver extends BaseDriver
         if (
             $this->client
             && isset($this->client->country)
-            && in_array($this->client->currency()->code, ['EUR', 'GBP','DKK','SEK','AUD','NZD','CAD'])
+            && in_array($this->client->currency()->code, ['EUR', 'GBP', 'DKK', 'SEK', 'AUD', 'NZD', 'CAD'])
         ) {
             $types[] = GatewayType::DIRECT_DEBIT;
         }
@@ -100,12 +99,11 @@ class GoCardlessPaymentDriver extends BaseDriver
         try {
             $this->gateway = new \GoCardlessPro\Client([
                 'access_token' => $this->company_gateway->getConfigField('accessToken'),
-                'environment'  => $this->company_gateway->getConfigField('testMode') ? \GoCardlessPro\Environment::SANDBOX : \GoCardlessPro\Environment::LIVE,
+                'environment' => $this->company_gateway->getConfigField('testMode') ? \GoCardlessPro\Environment::SANDBOX : \GoCardlessPro\Environment::LIVE,
             ]);
-        } catch(\GoCardlessPro\Core\Exception\AuthenticationException $e) {
+        } catch (\GoCardlessPro\Core\Exception\AuthenticationException $e) {
 
             throw new \Exception('GoCardless: Invalid Access Token', 403);
-
         }
 
         return $this;
@@ -323,8 +321,9 @@ class GoCardlessPaymentDriver extends BaseDriver
             if ($event['action'] == 'fulfilled' && array_key_exists('billing_request', $event['links'])) {
                 $hash = PaymentHash::whereJsonContains('data->billing_request', $event['links']['billing_request'])->first();
 
-                if (!$hash) {
-                    nlog("GoCardless: couldn't find a hash, need to abort => Billing Request => " . $event['links']['billing_request']);
+                if (! $hash) {
+                    nlog("GoCardless: couldn't find a hash, need to abort => Billing Request => ".$event['links']['billing_request']);
+
                     return response()->json([], 200);
                 }
 
@@ -360,7 +359,8 @@ class GoCardlessPaymentDriver extends BaseDriver
 
                     //return early if nothing to do
                     if ($invoices->count() == 0) {
-                        nlog("GoCardless: Could not harvest any invoices - probably all paid!!");
+                        nlog('GoCardless: Could not harvest any invoices - probably all paid!!');
+
                         return response()->json([], 200);
                     }
 
@@ -371,7 +371,6 @@ class GoCardlessPaymentDriver extends BaseDriver
 
         return response()->json([], 200);
     }
-
 
     public function processSuccessfulPayment(\GoCardlessPro\Resources\Payment $payment, array $data = [])
     {
@@ -403,7 +402,7 @@ class GoCardlessPaymentDriver extends BaseDriver
             $this->init();
             $mandate = $this->gateway->mandates()->get($token);
 
-            if(!in_array($mandate->status, ['pending_submission', 'submitted', 'active','pending_customer_approval'])) {
+            if (! in_array($mandate->status, ['pending_submission', 'submitted', 'active', 'pending_customer_approval'])) {
 
                 // if ($mandate->status !== 'active') {
                 throw new \Exception(ctrans('texts.gocardless_mandate_not_ready'));
@@ -421,9 +420,9 @@ class GoCardlessPaymentDriver extends BaseDriver
 
         foreach ($customers->records as $customer) {
             $existing_customer_token = $this->company_gateway
-                            ->client_gateway_tokens()
-                            ->where('gateway_customer_reference', $customer->id)
-                            ->first();
+                ->client_gateway_tokens()
+                ->where('gateway_customer_reference', $customer->id)
+                ->first();
 
             if ($existing_customer_token) {
                 nlog("Skipping - Customer exists: {$customer->email} just updating payment methods");
@@ -563,9 +562,9 @@ class GoCardlessPaymentDriver extends BaseDriver
     {
         try {
             $customers = $this->init()->gateway->customers()->list();
+
             return true;
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
 
         }
 

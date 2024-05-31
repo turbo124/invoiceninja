@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -13,12 +12,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Smtp\CheckSmtpRequest;
 use App\Mail\TestMailServer;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class SmtpController extends BaseController
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -51,16 +48,16 @@ class SmtpController extends BaseController
                 'timeout' => 5,
             ],
         ]);
-        
+
         (new \Illuminate\Mail\MailServiceProvider(app()))->register();
 
         try {
 
-            $sending_email = (isset($company->settings->custom_sending_email) && stripos($company->settings->custom_sending_email, "@")) ? $company->settings->custom_sending_email : $user->email;
+            $sending_email = (isset($company->settings->custom_sending_email) && stripos($company->settings->custom_sending_email, '@')) ? $company->settings->custom_sending_email : $user->email;
             $sending_user = (isset($company->settings->email_from_name) && strlen($company->settings->email_from_name) > 2) ? $company->settings->email_from_name : $user->name();
 
             $mailable = new TestMailServer('Email Server Works!', $sending_email);
-            $mailable->from($sending_email,$sending_user);
+            $mailable->from($sending_email, $sending_user);
 
             Mail::mailer('smtp')
                 ->to($user->email, $user->present()->name())
@@ -68,7 +65,8 @@ class SmtpController extends BaseController
 
         } catch (\Exception $e) {
             app('mail.manager')->forgetMailers();
-            return response()->json(['message' => $e->getMessage()], 400);        
+
+            return response()->json(['message' => $e->getMessage()], 400);
         }
 
         app('mail.manager')->forgetMailers();
@@ -76,5 +74,4 @@ class SmtpController extends BaseController
         return response()->json(['message' => 'Ok'], 200);
 
     }
-
 }

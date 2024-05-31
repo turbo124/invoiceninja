@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,6 +18,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\ActivityController
  */
 class ActivityApiTest extends TestCase
@@ -26,7 +26,7 @@ class ActivityApiTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,21 +35,21 @@ class ActivityApiTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-        
+
         $this->withoutExceptionHandling();
 
     }
 
     public function testActivityEntity()
     {
-    
+
         $invoice = $this->company->invoices()->first();
 
         $invoice->service()->markSent()->markPaid()->markDeleted()->handleRestore()->save();
 
         $data = [
             'entity' => 'invoice',
-            'entity_id' => $invoice->hashed_id
+            'entity_id' => $invoice->hashed_id,
         ];
 
         $response = false;
@@ -65,7 +65,6 @@ class ActivityApiTest extends TestCase
         }
 
         $response->assertStatus(200);
-
 
     }
 

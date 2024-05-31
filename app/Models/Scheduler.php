@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $remaining_cycles
  * @property-read \App\Models\Company $company
  * @property-read mixed $hashed_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\SchedulerFactory factory($count = null, $state = [])
@@ -45,13 +45,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|Scheduler withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Scheduler withoutTrashed()
+ *
  * @property-read \App\Models\User $user
+ *
  * @mixin \Eloquent
  */
 class Scheduler extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -99,8 +101,6 @@ class Scheduler extends BaseModel
 
     /**
      * remainingCycles
-     *
-     * @return int
      */
     public function remainingCycles(): int
     {
@@ -162,7 +162,7 @@ class Scheduler extends BaseModel
                 $next_run = now()->startOfDay()->addYears(3);
                 break;
             default:
-                $next_run =  null;
+                $next_run = null;
         }
 
         $this->next_run_client = $next_run ?: null;

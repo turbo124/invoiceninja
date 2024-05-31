@@ -5,7 +5,6 @@
  * @link https://github.com/creditninja/creditninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://creditninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,8 +23,8 @@ class CountryCodeExistsRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -41,14 +40,11 @@ class CountryCodeExistsRule implements Rule
         return 'Country code does not exist';
     }
 
-    /**
-     * @return bool
-     */
     private function checkIfCodeExists($value): bool
     {
         $country = Country::where('iso_3166_2', $value)
-                        ->orWhere('iso_3166_3', $value)
-                        ->exists();
+            ->orWhere('iso_3166_3', $value)
+            ->exists();
 
         if ($country) {
             return true;

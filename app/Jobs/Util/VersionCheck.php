@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -53,7 +52,7 @@ class VersionCheck implements ShouldQueue
         if (Ninja::isSelfHost()) {
             nlog("latest version = {$version_file}");
 
-            /** @var \App\Models\Account $account **/
+            /** @var \App\Models\Account $account * */
             $account = Account::first();
 
             if (! $account) {
@@ -77,45 +76,43 @@ class VersionCheck implements ShouldQueue
             });
 
             ClientContact::whereNull('email')
-                            ->where('send_email', true)
-                            ->cursor()
-                            ->each(function ($c) {
+                ->where('send_email', true)
+                ->cursor()
+                ->each(function ($c) {
 
-                                $c->send_email = false;
-                                $c->saveQuietly();
+                    $c->send_email = false;
+                    $c->saveQuietly();
 
-                            });
+                });
 
             ClientContact::query()
-                            ->whereNull('contact_key')
-                            ->update([
-                                'contact_key' => Str::random(config('ninja.key_length')),
-                            ]);
+                ->whereNull('contact_key')
+                ->update([
+                    'contact_key' => Str::random(config('ninja.key_length')),
+                ]);
 
             Client::doesntHave('contacts')
-                            ->cursor()
-                            ->each(function (Client $client) {
+                ->cursor()
+                ->each(function (Client $client) {
 
-                                $new_contact = ClientContactFactory::create($client->company_id, $client->user_id);
-                                $new_contact->client_id = $client->id;
-                                $new_contact->contact_key = Str::random(40);
-                                $new_contact->is_primary = true;
-                                $new_contact->save();
+                    $new_contact = ClientContactFactory::create($client->company_id, $client->user_id);
+                    $new_contact->client_id = $client->id;
+                    $new_contact->contact_key = Str::random(40);
+                    $new_contact->is_primary = true;
+                    $new_contact->save();
 
-                            });
-
+                });
 
             Vendor::doesntHave('contacts')
-                            ->cursor()
-                            ->each(function (Vendor $vendor) {
+                ->cursor()
+                ->each(function (Vendor $vendor) {
 
-                                $new_contact = VendorContactFactory::create($vendor->company_id, $vendor->user_id);
-                                $new_contact->vendor_id = $vendor->id;
-                                $new_contact->contact_key = Str::random(40);
-                                $new_contact->is_primary = true;
-                                $new_contact->save();
-                            });
-
+                    $new_contact = VendorContactFactory::create($vendor->company_id, $vendor->user_id);
+                    $new_contact->vendor_id = $vendor->id;
+                    $new_contact->contact_key = Str::random(40);
+                    $new_contact->is_primary = true;
+                    $new_contact->save();
+                });
 
         }
     }

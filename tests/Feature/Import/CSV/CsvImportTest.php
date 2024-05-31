@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,6 +25,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Import\Providers\Csv
  */
 class CsvImportTest extends TestCase
@@ -131,7 +131,6 @@ class CsvImportTest extends TestCase
         $this->assertTrue($base_transformer->hasRecurringInvoice('54'));
 
     }
-
 
     public function testExpenseCsvImport()
     {

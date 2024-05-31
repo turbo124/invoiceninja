@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,17 +23,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\RecurringExpenseController
  */
 class RecurringExpenseApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -90,7 +90,7 @@ class RecurringExpenseApiTest extends TestCase
             'currency_id' => 1,
             'next_send_date' => now(),
             'next_send_date_client' => now(),
-            'invoice_currency_id' => null
+            'invoice_currency_id' => null,
         ]);
 
         (new RecurringExpensesCron())->handle();
@@ -135,8 +135,8 @@ class RecurringExpenseApiTest extends TestCase
             'client_id' => $this->client->hashed_id,
             'number' => '123321',
             'frequency_id' => 5,
-            'remaining_cycles' =>5,
-            'currency_id' => 34545435425
+            'remaining_cycles' => 5,
+            'currency_id' => 34545435425,
         ];
 
         $response = $this->withHeaders([
@@ -155,8 +155,8 @@ class RecurringExpenseApiTest extends TestCase
             'client_id' => $this->client->hashed_id,
             'number' => '123321',
             'frequency_id' => 5,
-            'remaining_cycles' =>5,
-            'currency_id' => 1
+            'remaining_cycles' => 5,
+            'currency_id' => 1,
         ];
 
         $response = $this->withHeaders([
@@ -175,15 +175,15 @@ class RecurringExpenseApiTest extends TestCase
             'client_id' => $this->client->hashed_id,
             'number' => '123321',
             'frequency_id' => 5,
-            'remaining_cycles' =>5,
-            'currency_id' => null
+            'remaining_cycles' => 5,
+            'currency_id' => null,
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/recurring_expenses?start=true', $data);
-        
+
         $data = $response->json();
 
         $response->assertStatus(200);
@@ -199,15 +199,15 @@ class RecurringExpenseApiTest extends TestCase
             'client_id' => $this->client->hashed_id,
             'number' => '123321',
             'frequency_id' => 5,
-            'remaining_cycles' =>5,
-            'currency_id' => ""
+            'remaining_cycles' => 5,
+            'currency_id' => '',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/recurring_expenses?start=true', $data);
-        
+
         $data = $response->json();
 
         $response->assertStatus(200);
@@ -423,7 +423,7 @@ class RecurringExpenseApiTest extends TestCase
             'client_id' => $this->client->hashed_id,
             'number' => '123321',
             'frequency_id' => 5,
-            'remaining_cycles' =>5,
+            'remaining_cycles' => 5,
         ];
 
         $response = $this->withHeaders([

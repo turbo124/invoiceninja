@@ -5,46 +5,45 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Scheduler;
 
-use App\Models\Client;
-use App\Models\Scheduler;
-use App\Mail\DownloadReport;
-use App\Export\CSV\TaskExport;
-use App\Export\CSV\QuoteExport;
-use App\Utils\Traits\MakesHash;
+use App\Export\CSV\ActivityExport;
 use App\Export\CSV\ClientExport;
-use App\Export\CSV\CreditExport;
-use App\Utils\Traits\MakesDates;
 use App\Export\CSV\ContactExport;
+use App\Export\CSV\CreditExport;
+use App\Export\CSV\DocumentExport;
 use App\Export\CSV\ExpenseExport;
 use App\Export\CSV\InvoiceExport;
+use App\Export\CSV\InvoiceItemExport;
 use App\Export\CSV\PaymentExport;
 use App\Export\CSV\ProductExport;
-use App\Jobs\Mail\NinjaMailerJob;
-use App\Export\CSV\ActivityExport;
-use App\Export\CSV\DocumentExport;
-use App\Export\CSV\QuoteItemExport;
-use App\Services\Report\ProfitLoss;
-use App\Jobs\Mail\NinjaMailerObject;
-use App\Export\CSV\InvoiceItemExport;
 use App\Export\CSV\ProductSalesExport;
+use App\Export\CSV\QuoteExport;
+use App\Export\CSV\QuoteItemExport;
+use App\Export\CSV\RecurringInvoiceExport;
+use App\Export\CSV\TaskExport;
+use App\Jobs\Mail\NinjaMailerJob;
+use App\Jobs\Mail\NinjaMailerObject;
+use App\Mail\DownloadReport;
+use App\Models\Client;
+use App\Models\Scheduler;
 use App\Services\Report\ARDetailReport;
 use App\Services\Report\ARSummaryReport;
-use App\Services\Report\UserSalesReport;
-use App\Services\Report\TaxSummaryReport;
-use App\Export\CSV\RecurringInvoiceExport;
-use App\Services\Report\ClientSalesReport;
 use App\Services\Report\ClientBalanceReport;
+use App\Services\Report\ClientSalesReport;
+use App\Services\Report\ProfitLoss;
+use App\Services\Report\TaxSummaryReport;
+use App\Services\Report\UserSalesReport;
+use App\Utils\Traits\MakesDates;
+use App\Utils\Traits\MakesHash;
 
 class EmailReport
 {
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
 
     private Client $client;
 
@@ -69,7 +68,7 @@ class EmailReport
 
         $export = false;
 
-        match($this->scheduler->parameters['report_name']) {
+        match ($this->scheduler->parameters['report_name']) {
             'product_sales' => $export = (new ProductSalesExport($this->scheduler->company, $data)),
             'ar_detailed' => $export = (new ARDetailReport($this->scheduler->company, $data)),
             'ar_summary' => $export = (new ARSummaryReport($this->scheduler->company, $data)),
@@ -108,8 +107,9 @@ class EmailReport
             default => $export = false,
         };
 
-        if(!$export) {
+        if (! $export) {
             $this->cancelSchedule();
+
             return;
         }
 
@@ -134,7 +134,4 @@ class EmailReport
     {
         $this->scheduler->forceDelete();
     }
-
-
-
 }

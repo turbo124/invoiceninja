@@ -3,7 +3,8 @@
 use App\Models\Currency;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +14,7 @@ return new class extends Migration {
     {
         $tb = Currency::find(21);
 
-        if($tb) {
+        if ($tb) {
             $tb->symbol = '฿';
             $tb->save();
         }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -55,30 +54,38 @@ class WebhookController extends BaseController
      *      description="Lists Webhooks, search and filters allow fine grained lists to be generated.
      *
      *      Query parameters can be added to performed more fine grained filtering of the Webhooks, these are handled by the WebhookFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of Webhooks",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param WebhookFilters $filters
+     *
      * @return Response|mixed
      */
     public function index(WebhookFilters $filters)
@@ -91,10 +98,7 @@ class WebhookController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowWebhookRequest $request
-     * @param Webhook $webhook
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/webhooks/{id}",
@@ -102,6 +106,7 @@ class WebhookController extends BaseController
      *      tags={"webhooks"},
      *      summary="Shows a Webhook",
      *      description="Displays a Webhook by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -111,28 +116,36 @@ class WebhookController extends BaseController
      *          description="The Webhook Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Webhook object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -145,10 +158,7 @@ class WebhookController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditWebhookRequest $request
-     * @param Webhook $webhook
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/webhooks/{id}/edit",
@@ -156,6 +166,7 @@ class WebhookController extends BaseController
      *      tags={"webhooks"},
      *      summary="Shows a Webhook for editting",
      *      description="Displays a Webhook by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -165,28 +176,36 @@ class WebhookController extends BaseController
      *          description="The Webhook Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Webhook object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -199,11 +218,7 @@ class WebhookController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateWebhookRequest $request
-     * @param Webhook $webhook
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/webhooks/{id}",
@@ -211,6 +226,7 @@ class WebhookController extends BaseController
      *      tags={"webhooks"},
      *      summary="Updates a Webhook",
      *      description="Handles the updating of a Webhook by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -220,28 +236,36 @@ class WebhookController extends BaseController
      *          description="The Webhook Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Webhook object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -261,10 +285,7 @@ class WebhookController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateWebhookRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/webhooks/create",
@@ -272,26 +293,34 @@ class WebhookController extends BaseController
      *      tags={"webhooks"},
      *      summary="Gets a new blank Webhook object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank Webhook object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -311,10 +340,7 @@ class WebhookController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreWebhookRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/webhooks",
@@ -322,26 +348,34 @@ class WebhookController extends BaseController
      *      tags={"webhooks"},
      *      summary="Adds a Webhook",
      *      description="Adds an Webhook to a company",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved Webhook object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -376,18 +410,17 @@ class WebhookController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyWebhookRequest $request
-     * @param Webhook $webhook
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/webhooks/{id}",
      *      operationId="deleteWebhook",
      *      tags={"Webhooks"},
      *      summary="Deletes a Webhook",
      *      description="Handles the deletion of a Webhook by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -397,27 +430,34 @@ class WebhookController extends BaseController
      *          description="The Webhook Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -435,23 +475,27 @@ class WebhookController extends BaseController
      *
      * @return Response
      *
-     *
      * @OA\Post(
      *      path="/api/v1/webhooks/bulk",
      *      operationId="bulkWebhooks",
      *      tags={"webhooks"},
      *      summary="Performs bulk actions on an array of Webhooks",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="User credentials",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -460,22 +504,29 @@ class WebhookController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Webhook User response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -517,7 +568,7 @@ class WebhookController extends BaseController
 
         $entity = $class::query()->withTrashed()->where('id', $this->decodePrimaryKey($request->entity_id))->company()->first();
 
-        if (!$entity) {
+        if (! $entity) {
             return response()->json(['message' => ctrans('texts.record_not_found')], 400);
         }
 

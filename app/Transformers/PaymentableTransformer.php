@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,7 +37,7 @@ class PaymentableTransformer extends EntityTransformer
             $entity_key = 'credit_id';
         }
 
-        return  [
+        return [
             'id' => $this->encodePrimaryKey($paymentable->id),
             $entity_key => $this->encodePrimaryKey($paymentable->paymentable_id),
             'amount' => (float) $paymentable->amount,

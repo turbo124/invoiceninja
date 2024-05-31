@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,7 +36,7 @@ class ContactRegisterController extends Controller
             $key = request()->session()->has('company_key') ? request()->session()->get('company_key') : $company_key;
         }
 
-        /** @var \App\Models\Company $company **/
+        /** @var \App\Models\Company $company * */
         $company = Company::where('company_key', $key)->firstOrFail();
 
         App::forgetInstance('translator');
@@ -50,7 +49,7 @@ class ContactRegisterController extends Controller
     public function register(RegisterRequest $request)
     {
         $request->merge(['company' => $request->company()]);
-        
+
         $service = new ClientRegisterService(
             company: $request->company(),
         );

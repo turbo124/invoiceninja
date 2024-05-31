@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -30,7 +29,7 @@ class GmailTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        nlog("In Do Send");
+        nlog('In Do Send');
         $message = MessageConverter::toEmail($message->getOriginalMessage());
 
         /** @phpstan-ignore-next-line **/
@@ -53,30 +52,29 @@ class GmailTransport extends AbstractTransport
         if ($bccs) {
             $bcc_list = 'Bcc: ';
 
-
             /** @phpstan-ignore-next-line **/
             foreach ($bccs->getAddresses() as $address) {
-                $bcc_list .= $address->getAddress() .',';
+                $bcc_list .= $address->getAddress().',';
             }
 
-            $bcc_list = rtrim($bcc_list, ",") . "\r\n";
+            $bcc_list = rtrim($bcc_list, ',')."\r\n";
         }
 
         $body->setRaw($this->base64_encode($bcc_list.$message->toString()));
 
         // try {
-            $service->users_messages->send('me', $body, []);
+        $service->users_messages->send('me', $body, []);
         // } catch(\Google\Service\Exception $e) {
         //     /* Need to slow down */
         //     if ($e->getCode() == '429') {
         //         nlog("429 google - retrying ");
 
         //         sleep(rand(3,8));
-                
+
         //         try {
         //             $service->users_messages->send('me', $body, []);
         //         } catch(\Google\Service\Exception $e) {
-                
+
         //         }
 
         //     }

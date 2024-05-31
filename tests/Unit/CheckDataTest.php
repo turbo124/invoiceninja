@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,22 +30,29 @@ use Tests\TestCase;
 class CheckDataTest extends TestCase
 {
     protected $account;
+
     protected $user;
+
     protected $company;
+
     protected $cu;
+
     protected $token;
+
     protected $client;
+
     protected $faker;
+
     /**
      * Important consideration with Base64
      * encoding checks.
      *
      * No method can guarantee against false positives.
      */
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->faker = \Faker\Factory::create();
 
         $this->withoutMiddleware(
@@ -112,14 +118,14 @@ class CheckDataTest extends TestCase
         ]);
 
         ClientContact::factory()->create([
-                'user_id' => $this->user->id,
-                'client_id' => $this->client->id,
-                'company_id' => $this->company->id,
-                'is_primary' => 1,
-                'first_name' => 'john',
-                'last_name' => 'doe',
-                'email' => 'john@doe.com'
-            ]);
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'company_id' => $this->company->id,
+            'is_primary' => 1,
+            'first_name' => 'john',
+            'last_name' => 'doe',
+            'email' => 'john@doe.com',
+        ]);
 
     }
 
@@ -141,12 +147,12 @@ class CheckDataTest extends TestCase
 
         Payment::with('paymentables')->cursor()->each(function ($payment) {
             $this->assertNotNull($payment->paymentables()->where('paymentable_type', \App\Models\Credit::class)->get()
-            ->sum(\DB::raw('amount')->getValue(\DB::connection()->getQueryGrammar())));
+                ->sum(\DB::raw('amount')->getValue(\DB::connection()->getQueryGrammar())));
         });
-     
+
         Payment::with('paymentables')->cursor()->each(function ($payment) {
             $this->assertNotNull($payment->paymentables()->where('paymentable_type', \App\Models\Credit::class)->get()
-            ->sum('amount'));
+                ->sum('amount'));
         });
 
         $amount = Paymentable::first()->payment->paymentables()->where('paymentable_type', 'invnoices')->get()->sum('amount');
@@ -166,10 +172,10 @@ class CheckDataTest extends TestCase
         ]);
 
         $clients_refactor = \DB::table('clients')
-                    ->leftJoin('client_contacts', function ($join) {
-                        $join->on('client_contacts.client_id', '=', 'clients.id');
-                    })
-                    ->get(['clients.id', \DB::raw('count(client_contacts.id) as contact_count')]);
+            ->leftJoin('client_contacts', function ($join) {
+                $join->on('client_contacts.client_id', '=', 'clients.id');
+            })
+            ->get(['clients.id', \DB::raw('count(client_contacts.id) as contact_count')]);
 
         // $this->assertNotNull($clients);
         $this->assertNotNull($clients_refactor);
@@ -184,7 +190,7 @@ class CheckDataTest extends TestCase
             'account_id' => $this->account->id,
             'email' => $this->faker->unique()->safeEmail(),
         ]);
-        
+
         User::factory()->create([
             'account_id' => $this->account->id,
             'email' => $this->faker->unique()->safeEmail(),
@@ -203,7 +209,6 @@ class CheckDataTest extends TestCase
         $user_count_refactor = User::whereRaw("account_id = ? AND CONCAT_WS(' ', first_name, last_name) like ?", [$this->company->account_id, '%'.$user_hash.'%'])
             ->get();
 
-
         $this->assertEquals($user_count_refactor->count(), $user_count->count());
     }
 
@@ -211,16 +216,15 @@ class CheckDataTest extends TestCase
     {
         $this->buildData();
 
-        $results = \DB::select(\DB::raw("
+        $results = \DB::select(\DB::raw('
             SELECT count(clients.id) as count
             FROM clients
-        ")->getValue(\DB::connection()->getQueryGrammar()));
-    
+        ')->getValue(\DB::connection()->getQueryGrammar()));
 
-        $refactored = \DB::select("
+        $refactored = \DB::select('
             SELECT count(clients.id) as count
             FROM clients
-        ");
+        ');
 
         $this->assertEquals($refactored[0]->count, $results[0]->count);
 
@@ -248,7 +252,7 @@ class CheckDataTest extends TestCase
 
         });
 
-        $results = \DB::select(\DB::raw("
+        $results = \DB::select(\DB::raw('
                 SELECT 
                 SUM(payments.amount) as amount
                 FROM payments
@@ -260,9 +264,9 @@ class CheckDataTest extends TestCase
                 AND paymentables.amount > 0
                 AND payments.is_deleted = 0
                 AND payments.client_id = ?;
-                ")->getValue(\DB::connection()->getQueryGrammar()), ['invoices', $this->client->id]);
-            
-        $refactored = \DB::select("
+                ')->getValue(\DB::connection()->getQueryGrammar()), ['invoices', $this->client->id]);
+
+        $refactored = \DB::select('
                 SELECT 
                 SUM(payments.amount) as amount
                 FROM payments
@@ -274,10 +278,9 @@ class CheckDataTest extends TestCase
                 AND paymentables.amount > 0
                 AND payments.is_deleted = 0
                 AND payments.client_id = ?;
-                ", ['invoices', $this->client->id]);
+                ', ['invoices', $this->client->id]);
 
         $this->assertEquals($refactored[0]->amount, $results[0]->amount);
 
     }
-
 }

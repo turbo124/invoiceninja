@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -13,7 +12,6 @@ namespace App\Exceptions;
 
 use App\Utils\Ninja;
 use Aws\Exception\CredentialsException;
-use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
@@ -88,14 +86,15 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param Throwable $exception
      * @return void
+     *
      * @throws Throwable
      */
     public function report(Throwable $exception)
     {
         if (! Schema::hasTable('accounts')) {
             info('account table not found');
+
             return;
         }
 
@@ -120,9 +119,9 @@ class Handler extends ExceptionHandler
                 }
 
                 $scope->setUser([
-                    'id'    => $key,
+                    'id' => $key,
                     'email' => 'hosted@invoiceninja.com',
-                    'name'  => $name,
+                    'name' => $name,
                 ]);
             });
 
@@ -133,15 +132,15 @@ class Handler extends ExceptionHandler
             Integration::configureScope(function (Scope $scope): void {
                 if (auth()->guard('contact') && auth()->guard('contact')->user() && auth()->guard('contact')->user()->company->account->report_errors) {
                     $scope->setUser([
-                        'id'    => auth()->guard('contact')->user()->company->account->key,
+                        'id' => auth()->guard('contact')->user()->company->account->key,
                         'email' => 'anonymous@example.com',
-                        'name'  => 'Anonymous User',
+                        'name' => 'Anonymous User',
                     ]);
                 } elseif (auth()->guard('user') && auth()->guard('user')->user() && auth()->user()->companyIsSet() && auth()->user()->company()->account->report_errors) {
                     $scope->setUser([
-                        'id'    => auth()->user()->account->key,
+                        'id' => auth()->user()->account->key,
                         'email' => 'anonymous@example.com',
-                        'name'  => 'Anonymous User',
+                        'name' => 'Anonymous User',
                     ]);
                 }
             });
@@ -183,11 +182,9 @@ class Handler extends ExceptionHandler
         return true;
     }
 
-
     /**
      * Determine if the exception is in the "do not report" list.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     protected function sentryShouldReport(Throwable $e)
@@ -204,8 +201,8 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param Request $request
-     * @param Throwable $exception
+     * @param  Request  $request
+     *
      * @throws Throwable
      */
     public function render($request, Throwable $exception)
@@ -226,11 +223,11 @@ class Handler extends ExceptionHandler
             return response()->json(['message' => $exception->getMessage()], 401);
         } elseif ($exception instanceof TokenMismatchException) {
             return redirect()
-                    ->back()
-                    ->withInput($request->except('password', 'password_confirmation', '_token'))
-                    ->with([
-                        'message' => ctrans('texts.token_expired'),
-                        'message-type' => 'danger', ]);
+                ->back()
+                ->withInput($request->except('password', 'password_confirmation', '_token'))
+                ->with([
+                    'message' => ctrans('texts.token_expired'),
+                    'message-type' => 'danger', ]);
         } elseif ($exception instanceof NotFoundHttpException && $request->expectsJson()) {
             return response()->json(['message' => 'Route does not exist'], 404);
         } elseif ($exception instanceof MethodNotAllowedHttpException && $request->expectsJson()) {

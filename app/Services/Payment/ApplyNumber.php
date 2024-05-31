@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Payment Ninja LLC (https://paymentninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 

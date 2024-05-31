@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,25 +34,25 @@ class MarkSent extends AbstractService
 
         /*Set status*/
         $this->invoice
-             ->service()
-             ->setStatus(Invoice::STATUS_SENT)
-             ->updateBalance($adjustment, true)
-             ->save();
+            ->service()
+            ->setStatus(Invoice::STATUS_SENT)
+            ->updateBalance($adjustment, true)
+            ->save();
 
         /*Update ledger*/
         $this->invoice
-             ->ledger()
-             ->updateInvoiceBalance($adjustment, "Invoice {$this->invoice->number} marked as sent.");
+            ->ledger()
+            ->updateInvoiceBalance($adjustment, "Invoice {$this->invoice->number} marked as sent.");
 
         $this->invoice->client->service()->calculateBalance();
 
         /* Perform additional actions on invoice */
         $this->invoice
-             ->service()
-             ->applyNumber()
-             ->setDueDate()
-             ->setReminder()
-             ->save();
+            ->service()
+            ->applyNumber()
+            ->setDueDate()
+            ->setReminder()
+            ->save();
 
         $this->invoice->markInvitationsSent();
 
@@ -61,7 +60,7 @@ class MarkSent extends AbstractService
 
         if ($fire_webhook) {
             event('eloquent.updated: App\Models\Invoice', $this->invoice);
-            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
+            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, 'client');
         }
 
         return $this->invoice->fresh();

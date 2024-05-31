@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'free_export_item' => 'Free export item',
     'outside_tax_scope' => 'Outside tax scope',
     'eea_goods_and_services' => 'EEA goods and services',
@@ -23,6 +23,6 @@ $lang = array(
     'canary_islands_tax' => 'Canary Islands tax',
     'tax_ceuta_melilla' => 'Tax Ceuta Melilla',
     'services_outside_scope' => 'Services outside scope',
-);
+];
 
 return $lang;

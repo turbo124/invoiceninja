@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,8 @@ use Illuminate\Validation\Rule;
 
 class StorePurchaseOrderRequest extends Request
 {
-    use MakesHash;
     use CleanLineItems;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -34,6 +33,7 @@ class StorePurchaseOrderRequest extends Request
 
         return $user->can('create', PurchaseOrder::class);
     }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -50,7 +50,7 @@ class StorePurchaseOrderRequest extends Request
 
         $rules['number'] = ['nullable', Rule::unique('purchase_orders')->where('company_id', $user->company()->id)];
 
-$rules['discount'] = 'sometimes|numeric|max:99999999999999';
+        $rules['discount'] = 'sometimes|numeric|max:99999999999999';
         $rules['is_amount_discount'] = ['boolean'];
         $rules['line_items'] = 'array';
 
@@ -85,7 +85,7 @@ $rules['discount'] = 'sometimes|numeric|max:99999999999999';
         $input['amount'] = 0;
         $input['balance'] = 0;
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 

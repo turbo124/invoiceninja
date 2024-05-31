@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ use Tests\TestCase;
 
 class PurchaseOrderTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
@@ -60,9 +59,8 @@ class PurchaseOrderTest extends TestCase
 
         $this->assertEquals($expense->project_id, $this->project->id);
         $this->assertEquals($expense->client_id, $p->project->client_id);
-        
+
     }
-    
 
     public function testPurchaseOrderHistory()
     {
@@ -83,13 +81,13 @@ class PurchaseOrderTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get("/api/v1/purchase_orders/{$this->purchase_order->hashed_id}?include=activities.history")
-        ->assertStatus(200);
+            ->assertStatus(200);
 
         $arr = $response->json();
 
         $activities = $arr['data']['activities'];
 
-        foreach($activities as $activity) {
+        foreach ($activities as $activity) {
             $this->assertTrue(count($activity['history']) >= 1);
         }
 
@@ -100,94 +98,92 @@ class PurchaseOrderTest extends TestCase
         $i = $this->purchase_order->invitations->first();
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'archive',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(200);
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'restore',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(200);
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'delete',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(200);
-
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'restore',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(200);
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'download',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(200);
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(200);
 
         $data = [
-            'ids' =>[],
+            'ids' => [],
             'action' => 'archive',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(302);
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(302);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => '',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(302);
-
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(302);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'molly',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(302);
+        ])->post('/api/v1/purchase_orders/bulk', $data)
+            ->assertStatus(302);
     }
 
     public function testPurchaseOrderDownloadPDF()
@@ -202,7 +198,6 @@ class PurchaseOrderTest extends TestCase
         $response->assertStatus(200);
         $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
     }
-
 
     public function testPurchaseOrderGetWithClientStatus()
     {

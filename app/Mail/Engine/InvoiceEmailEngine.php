@@ -5,25 +5,24 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Mail\Engine;
 
-use App\Models\Task;
-use App\Utils\Ninja;
-use App\Utils\Number;
+use App\DataMapper\EmailTemplateDefaults;
+use App\Jobs\Entity\CreateRawPdf;
 use App\Models\Account;
 use App\Models\Expense;
+use App\Models\Task;
 use App\Utils\HtmlEngine;
-use Illuminate\Support\Str;
+use App\Utils\Ninja;
+use App\Utils\Number;
 use App\Utils\Traits\MakesHash;
-use App\Jobs\Entity\CreateRawPdf;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Cache;
-use App\DataMapper\EmailTemplateDefaults;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class InvoiceEmailEngine extends BaseEmailEngine
 {
@@ -141,9 +140,9 @@ class InvoiceEmailEngine extends BaseEmailEngine
                     if ($document->size > $this->max_attachment_size) {
                         $hash = Str::random(64);
                         Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
-                        $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
+                        $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
                     } else {
-                        $this->setAttachments([['file' => base64_encode($document->getFile()), 'path' => $document->filePath(), 'name' => $document->name, 'mime' => null, ]]);
+                        $this->setAttachments([['file' => base64_encode($document->getFile()), 'path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
                     }
                 });
             }
@@ -155,9 +154,9 @@ class InvoiceEmailEngine extends BaseEmailEngine
                     $hash = Str::random(64);
                     Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                    $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
+                    $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
                 } else {
-                    $this->setAttachments([['file' => base64_encode($document->getFile()), 'path' => $document->filePath(), 'name' => $document->name, 'mime' => null, ]]);
+                    $this->setAttachments([['file' => base64_encode($document->getFile()), 'path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
                 }
             });
 
@@ -167,9 +166,9 @@ class InvoiceEmailEngine extends BaseEmailEngine
                     $hash = Str::random(64);
                     Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                    $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
+                    $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
                 } else {
-                    $this->setAttachments([['file' => base64_encode($document->getFile()), 'path' => $document->filePath(), 'name' => $document->name, 'mime' => null, ]]);
+                    $this->setAttachments([['file' => base64_encode($document->getFile()), 'path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
                 }
             });
 
@@ -184,21 +183,21 @@ class InvoiceEmailEngine extends BaseEmailEngine
 
                 if (count($expense_ids) > 0) {
                     $expenses = Expense::query()->whereIn('id', $this->transformKeys($expense_ids))
-                                       ->where('invoice_documents', 1)
-                                       ->cursor()
-                                       ->each(function ($expense) {
-                                           $expense->documents()->where('is_public', true)->cursor()->each(function ($document) {
-                                               if ($document->size > $this->max_attachment_size) {
+                        ->where('invoice_documents', 1)
+                        ->cursor()
+                        ->each(function ($expense) {
+                            $expense->documents()->where('is_public', true)->cursor()->each(function ($document) {
+                                if ($document->size > $this->max_attachment_size) {
 
-                                                   $hash = Str::random(64);
-                                                   Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
+                                    $hash = Str::random(64);
+                                    Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                                                   $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
-                                               } else {
-                                                   $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null, ]]);
-                                               }
-                                           });
-                                       });
+                                    $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
+                                } else {
+                                    $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
+                                }
+                            });
+                        });
                 }
 
                 $task_ids = [];
@@ -209,20 +208,20 @@ class InvoiceEmailEngine extends BaseEmailEngine
 
                 if (count($task_ids) > 0 && $this->invoice->company->invoice_task_documents) {
                     $tasks = Task::query()->whereIn('id', $this->transformKeys($task_ids))
-                                       ->cursor()
-                                       ->each(function ($task) {
-                                           $task->documents()->where('is_public', true)->cursor()->each(function ($document) {
-                                               if ($document->size > $this->max_attachment_size) {
+                        ->cursor()
+                        ->each(function ($task) {
+                            $task->documents()->where('is_public', true)->cursor()->each(function ($document) {
+                                if ($document->size > $this->max_attachment_size) {
 
-                                                   $hash = Str::random(64);
-                                                   Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
+                                    $hash = Str::random(64);
+                                    Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                                                   $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
-                                               } else {
-                                                   $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null, ]]);
-                                               }
-                                           });
-                                       });
+                                    $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
+                                } else {
+                                    $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
+                                }
+                            });
+                        });
                 }
             }
         }

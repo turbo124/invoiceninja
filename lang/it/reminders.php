@@ -15,10 +15,10 @@ return [
 
     'password' => 'Le password devono essere di almeno 6 caratteri e devono coincidere.',
 
-    'user'     => 'Non esiste un utente associato a questo indirizzo e-mail.',
+    'user' => 'Non esiste un utente associato a questo indirizzo e-mail.',
 
-    'token'    => 'Questo token per la reimpostazione della password non è valido.',
+    'token' => 'Questo token per la reimpostazione della password non è valido.',
 
-    'sent'     => 'Promemoria della password inviato!',
+    'sent' => 'Promemoria della password inviato!',
 
 ];

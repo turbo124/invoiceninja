@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -508,27 +507,27 @@ class CompanySettings extends BaseSettings
     public int $task_round_to_nearest = 1;
 
     public static $casts = [
-        'task_round_up'                      => 'bool',
-        'task_round_to_nearest'              => 'int',
-        'e_quote_type'                       => 'string',
-        'enable_rappen_rounding'             => 'bool',
-        'use_unapplied_payment'              => 'string',
-        'show_pdfhtml_on_mobile'             => 'bool',
-        'payment_email_all_contacts'         => 'bool',
-        'statement_design_id'                => 'string',
-        'delivery_note_design_id'            => 'string',
-        'payment_receipt_design_id'          => 'string',
-        'payment_refund_design_id'           => 'string',
-        'enable_e_invoice'                   => 'bool',
-        'classification'                     => 'string',
-        'default_expense_payment_type_id'    => 'string',
-        'e_invoice_type'                     => 'string',
-        'mailgun_endpoint'                   => 'string',
-        'client_initiated_payments'          => 'bool',
-        'client_initiated_payments_minimum'  => 'float',
-        'sync_invoice_quote_columns'         => 'bool',
-        'show_task_item_description'         => 'bool',
-        'allow_billable_task_items'          => 'bool',
+        'task_round_up' => 'bool',
+        'task_round_to_nearest' => 'int',
+        'e_quote_type' => 'string',
+        'enable_rappen_rounding' => 'bool',
+        'use_unapplied_payment' => 'string',
+        'show_pdfhtml_on_mobile' => 'bool',
+        'payment_email_all_contacts' => 'bool',
+        'statement_design_id' => 'string',
+        'delivery_note_design_id' => 'string',
+        'payment_receipt_design_id' => 'string',
+        'payment_refund_design_id' => 'string',
+        'enable_e_invoice' => 'bool',
+        'classification' => 'string',
+        'default_expense_payment_type_id' => 'string',
+        'e_invoice_type' => 'string',
+        'mailgun_endpoint' => 'string',
+        'client_initiated_payments' => 'bool',
+        'client_initiated_payments_minimum' => 'float',
+        'sync_invoice_quote_columns' => 'bool',
+        'show_task_item_description' => 'bool',
+        'allow_billable_task_items' => 'bool',
         'accept_client_input_quote_approval' => 'bool',
         'custom_sending_email' => 'string',
         'show_paid_stamp' => 'bool',
@@ -823,8 +822,6 @@ class CompanySettings extends BaseSettings
 
     /**
      * Provides class defaults on init.
-     *
-     * @return stdClass
      */
     public static function defaults(): stdClass
     {
@@ -853,16 +850,14 @@ class CompanySettings extends BaseSettings
      * need to provide a fallback catch on old settings objects which will
      * set new properties to the object prior to being returned.
      *
-     * @param \stdClass $settings
-     *
-     * @return stdClass
+     * @param  \stdClass  $settings
      */
     public static function setProperties($settings): stdClass
     {
         $company_settings = (object) get_class_vars(self::class);
 
         foreach ($company_settings as $key => $value) {
-            if (!property_exists($settings, $key)) {
+            if (! property_exists($settings, $key)) {
                 $settings->{$key} = self::castAttribute($key, $company_settings->{$key});
             }
         }
@@ -872,8 +867,6 @@ class CompanySettings extends BaseSettings
 
     /**
      * Stubs the notification defaults
-     *
-     * @return stdClass
      */
     public static function notificationDefaults(): stdClass
     {
@@ -888,8 +881,6 @@ class CompanySettings extends BaseSettings
 
     /**
      * Stubs the notification defaults
-     *
-     * @return stdClass
      */
     public static function notificationAdminDefaults(): stdClass
     {
@@ -899,9 +890,6 @@ class CompanySettings extends BaseSettings
 
         return $notification;
     }
-
-
-
 
     /**
      * Defines entity variables for PDF generation
@@ -1039,7 +1027,7 @@ class CompanySettings extends BaseSettings
             ],
             'statement_details' => [
                 '$statement_date',
-                '$balance'
+                '$balance',
             ],
             'delivery_note_columns' => [
                 '$product.item',

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,6 +19,7 @@ use Illuminate\Support\Facades\App;
 class MigrationCompleted extends Mailable
 {
     public ?Company $company;
+
     /**
      * Create a new message instance.
      *
@@ -51,7 +51,6 @@ class MigrationCompleted extends Mailable
         $data['logo'] = $this->company->present()->logo();
         $data['url'] = Ninja::isHosted() ? config('ninja.react_url') : config('ninja.app_url');
 
-
         $data = array_merge($data, [
             'logo' => $this->company->present()->logo(),
             'settings' => $this->company->settings,
@@ -75,8 +74,8 @@ class MigrationCompleted extends Mailable
         ]);
 
         $result = $this->from(config('mail.from.address'), config('mail.from.name'))
-                    ->text('email.import.completed_text', $data)
-                    ->view('email.import.completed', $data);
+            ->text('email.import.completed_text', $data)
+            ->view('email.import.completed', $data);
 
         return $result;
     }

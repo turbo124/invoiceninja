@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organizacja',
     'name' => 'Nazwa',
     'website' => 'Strona internetowa',
@@ -1174,7 +1174,6 @@ Przykłady dynamicznych zmiennych:
     'enterprise_plan_features' => 'The Enterprise Plan adds support for multiple users and file attachments, :link to see the full list of features.',
     'return_to_app' => 'Powrót do aplikacji',
 
-
     // Payment updates
     'refund_payment' => 'Zwrot płatności',
     'refund_max' => 'Max:',
@@ -1703,7 +1702,6 @@ Gdy przelewy zostaną zaksięgowane na Twoim koncie, wróć do tej strony i klik
     'lang_Serbian' => 'Serbski',
     'lang_Bulgarian' => 'Bułgarski',
     'lang_Russian (Russia)' => 'Rosyjski (Rosja)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Księgowość i prawo',
@@ -2362,7 +2360,7 @@ Gdy przelewy zostaną zaksięgowane na Twoim koncie, wróć do tej strony i klik
     'currency_gold_troy_ounce' => 'Gold Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguan Córdoba',
     'currency_malagasy_ariary' => 'Malagasy ariary',
-    "currency_tongan_pa_anga" => "Tongan Pa'anga",
+    'currency_tongan_pa_anga' => "Tongan Pa'anga",
 
     'review_app_help' => 'We hope you\'re enjoying using the app.<br/>If you\'d consider :link we\'d greatly appreciate it!',
     'writing_a_review' => 'pisanie recenzji',
@@ -4424,7 +4422,7 @@ Gdy przelewy zostaną zaksięgowane na Twoim koncie, wróć do tej strony i klik
     'activity_122' => ':user archived recurring expense :recurring_expense',
     'activity_123' => ':user deleted recurring expense :recurring_expense',
     'activity_124' => ':user restored recurring expense :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'To view the :entity you need to set a password.',
     'unsubscribe' => 'Unsubscribe',
     'unsubscribed' => 'Unsubscribed',
@@ -5034,7 +5032,7 @@ Gdy przelewy zostaną zaksięgowane na Twoim koncie, wróć do tej strony i klik
     'light_dark_mode' => 'Light/Dark Mode',
     'activities' => 'Activities',
     'recent_transactions' => "Here are your company's most recent transactions:",
-    'country_Palestine' => "Palestine",
+    'country_Palestine' => 'Palestine',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Duties',
     'order_number' => 'Order Number',
@@ -5249,7 +5247,7 @@ Gdy przelewy zostaną zaksięgowane na Twoim koncie, wróć do tej strony i klik
     'rff' => 'Required fields form',
     'add_step' => 'Add step',
     'steps' => 'Steps',
-    'steps_order_help' =>  'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
+    'steps_order_help' => 'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
     'other_steps' => 'Other steps',
     'use_available_payments' => 'Use Available Payments',
     'test_email_sent' => 'Successfully sent email',
@@ -5295,6 +5293,6 @@ Gdy przelewy zostaną zaksięgowane na Twoim koncie, wróć do tej strony i klik
     'rappen_rounding_help' => 'Round amount to 5 cents',
     'assign_group' => 'Assign group',
     'paypal_advanced_cards' => 'Advanced Card Payments',
-);
+];
 
 return $lang;

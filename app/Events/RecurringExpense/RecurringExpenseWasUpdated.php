@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,10 +32,6 @@ class RecurringExpenseWasUpdated
 
     /**
      * Create a new event instance.
-     *
-     * @param RecurringExpense $recurring_expense
-     * @param Company $company
-     * @param array $event_vars
      */
     public function __construct(RecurringExpense $recurring_expense, Company $company, array $event_vars)
     {

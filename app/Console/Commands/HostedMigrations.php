@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,8 +27,8 @@ use ZipArchive;
 
 class HostedMigrations extends Command
 {
-    use MakesHash;
     use AppSetup;
+    use MakesHash;
 
     /**
      * The name and signature of the console command.
@@ -104,7 +103,7 @@ class HostedMigrations extends Command
                     $import_file = public_path("storage/migrations/$filename/migration.json");
 
                     Import::dispatch($import_file, $user->companies()->first(), $user);
-                } catch (NonExistingMigrationFile | ProcessingMigrationArchiveFailed | ResourceNotAvailableForMigration | MigrationValidatorFailed | ResourceDependencyMissing $e) {
+                } catch (NonExistingMigrationFile|ProcessingMigrationArchiveFailed|ResourceNotAvailableForMigration|MigrationValidatorFailed|ResourceDependencyMissing $e) {
                     \Mail::to($user)->send(new MigrationFailed($e, $company));
 
                     if (app()->environment() !== 'production') {

@@ -5,7 +5,6 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,6 @@ class QuoteApprovedNotification implements ShouldQueue
         $first_notification_sent = true;
 
         $quote = $event->quote;
-
 
         /* We loop through each user and determine whether they need to be notified */
         foreach ($event->company->company_users as $company_user) {

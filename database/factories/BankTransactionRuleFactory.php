@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,8 +24,8 @@ class BankTransactionRuleFactory extends Factory
         return [
             'name' => $this->faker->name(),
             // 'applies_to' => (bool)rand(0,1) ? 'CREDIT' : 'DEBIT',
-            'matches_on_all' => (bool)rand(0, 1),
-            'auto_convert' => (bool)rand(0, 1),
+            'matches_on_all' => (bool) rand(0, 1),
+            'auto_convert' => (bool) rand(0, 1),
         ];
     }
 }

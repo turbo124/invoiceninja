@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,9 +33,6 @@ class LedgerBalanceUpdate implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -66,10 +62,10 @@ class LedgerBalanceUpdate implements ShouldQueue
             }
 
             $last_record = CompanyLedger::where('client_id', $company_ledger->client_id)
-                            ->where('company_id', $company_ledger->company_id)
-                            ->where('balance', '!=', 0)
-                            ->orderBy('id', 'DESC')
-                            ->first();
+                ->where('company_id', $company_ledger->company_id)
+                ->where('balance', '!=', 0)
+                ->orderBy('id', 'DESC')
+                ->first();
 
             if (! $last_record) {
                 return;

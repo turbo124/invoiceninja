@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -108,7 +107,7 @@ class StoreShopClientRequest extends Request
             $settings->currency_id = $this->getCurrencyCode($input['currency_code']);
         }
 
-        $input['settings'] = (array)$settings;
+        $input['settings'] = (array) $settings;
 
         if (isset($input['contacts'])) {
             foreach ($input['contacts'] as $key => $contact) {

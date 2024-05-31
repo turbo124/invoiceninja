@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,8 +21,6 @@ class UpdateUserRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -76,7 +73,6 @@ class UpdateUserRequest extends Request
         if (array_key_exists('oauth_user_token', $input) && $input['oauth_user_token'] == '***') {
             unset($input['oauth_user_token']);
         }
-
 
         $this->replace($input);
     }

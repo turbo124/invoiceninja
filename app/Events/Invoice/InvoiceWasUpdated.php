@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,10 +36,6 @@ class InvoiceWasUpdated
 
     /**
      * Create a new event instance.
-     *
-     * @param Invoice $invoice
-     * @param Company $company
-     * @param array $event_vars
      */
     public function __construct(Invoice $invoice, Company $company, array $event_vars)
     {

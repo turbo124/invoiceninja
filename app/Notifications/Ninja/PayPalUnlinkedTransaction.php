@@ -5,14 +5,11 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Notifications\Ninja;
 
-use App\Models\Account;
-use App\Models\Client;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
 
@@ -23,7 +20,6 @@ class PayPalUnlinkedTransaction extends Notification
      *
      * @return void
      */
-
     public function __construct(private string $order_id, private string $transaction_reference)
     {
     }
@@ -43,7 +39,6 @@ class PayPalUnlinkedTransaction extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     *
      */
     public function toMail($notifiable)
     {
@@ -68,11 +63,10 @@ class PayPalUnlinkedTransaction extends Notification
         $content .= "{$this->order_id}\n";
         $content .= "Transaction ref: {$this->transaction_reference}\n";
 
-
         return (new SlackMessage())
-                ->success()
-                ->from(ctrans('texts.notification_bot'))
-                ->image('https://app.invoiceninja.com/favicon.png')
-                ->content($content);
+            ->success()
+            ->from(ctrans('texts.notification_bot'))
+            ->image('https://app.invoiceninja.com/favicon.png')
+            ->content($content);
     }
 }

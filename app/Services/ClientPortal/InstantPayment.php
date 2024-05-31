@@ -6,14 +6,12 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\ClientPortal;
 
 use App\Exceptions\PaymentFailed;
-use App\Jobs\Invoice\CheckGatewayFee;
 use App\Jobs\Invoice\InjectSignature;
 use App\Jobs\Util\SystemLogger;
 use App\Models\CompanyGateway;
@@ -21,7 +19,6 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PaymentHash;
 use App\Models\SystemLog;
-use App\Utils\Ninja;
 use App\Utils\Number;
 use App\Utils\Traits\MakesDates;
 use App\Utils\Traits\MakesHash;
@@ -31,8 +28,8 @@ use Illuminate\Support\Str;
 
 class InstantPayment
 {
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
 
     /** $request mixed */
     public Request $request;
@@ -45,9 +42,8 @@ class InstantPayment
     public function run()
     {
         nlog($this->request->all());
-        
-        /** @var \App\Models\ClientContact $cc */
 
+        /** @var \App\Models\ClientContact $cc */
         $cc = auth()->guard('contact')->user();
 
         $cc->first_name = $this->request->contact_first_name;
@@ -79,9 +75,9 @@ class InstantPayment
 
         $invoices->each(function ($invoice) {
             $invoice->service()
-                    ->markSent()
-                    ->removeUnpaidGatewayFees()
-                    ->save();
+                ->markSent()
+                ->removeUnpaidGatewayFees()
+                ->save();
         });
 
         /* pop non payable invoice from the $payable_invoices array */
@@ -119,7 +115,6 @@ class InstantPayment
 
             $payable_amount = Number::roundValue(Number::parseFloat($payable_invoice['amount']), $client->currency()->precision);
             $invoice_balance = Number::roundValue(($invoice->partial > 0 ? $invoice->partial : $invoice->balance), $client->currency()->precision);
-
 
             /*If we don't allow under/over payments force the payable amount - prevents inspect element adjustments in JS*/
 

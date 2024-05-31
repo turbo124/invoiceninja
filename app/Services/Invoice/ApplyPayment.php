@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -72,20 +71,20 @@ class ApplyPayment extends AbstractService
         }
 
         $this->payment
-             ->ledger()
-             ->updatePaymentBalance($amount_paid, "ApplyPaymentInvoice");
+            ->ledger()
+            ->updatePaymentBalance($amount_paid, 'ApplyPaymentInvoice');
 
         $this->invoice
-             ->client
-             ->service()
-             ->updateBalance($amount_paid)
-             ->save();
+            ->client
+            ->service()
+            ->updateBalance($amount_paid)
+            ->save();
 
         $this->invoice
-             ->service()
-             ->applyNumber()
-             ->workFlow()
-             ->save();
+            ->service()
+            ->applyNumber()
+            ->workFlow()
+            ->save();
 
         return $this->invoice;
     }

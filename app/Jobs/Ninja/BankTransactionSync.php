@@ -5,14 +5,13 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Jobs\Ninja;
 
-use App\Jobs\Bank\ProcessBankTransactionsYodlee;
 use App\Jobs\Bank\ProcessBankTransactionsNordigen;
+use App\Jobs\Bank\ProcessBankTransactionsYodlee;
 use App\Libraries\MultiDB;
 use App\Models\Account;
 use App\Models\BankIntegration;
@@ -35,7 +34,6 @@ class BankTransactionSync implements ShouldQueue
      *
      * @return void
      */
-
     public function __construct()
     {
         //
@@ -62,13 +60,13 @@ class BankTransactionSync implements ShouldQueue
             $this->processNordigen();
         }
 
-        nlog("syncing transactions - done");
+        nlog('syncing transactions - done');
     }
 
     private function processYodlee()
     {
         if (Ninja::isHosted()) {
-            nlog("syncing transactions - yodlee");
+            nlog('syncing transactions - yodlee');
 
             Account::with('bank_integrations')->whereNotNull('bank_integration_account_id')->cursor()->each(function ($account) {
 
@@ -81,10 +79,11 @@ class BankTransactionSync implements ShouldQueue
             });
         }
     }
+
     private function processNordigen()
     {
-        if (config("ninja.nordigen.secret_id") && config("ninja.nordigen.secret_key")) {
-            nlog("syncing transactions - nordigen");
+        if (config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key')) {
+            nlog('syncing transactions - nordigen');
 
             Account::with('bank_integrations')->cursor()->each(function ($account) {
 
@@ -92,8 +91,7 @@ class BankTransactionSync implements ShouldQueue
                     $account->bank_integrations()->where('integration_type', BankIntegration::INTEGRATION_TYPE_NORDIGEN)->where('auto_sync', true)->where('disabled_upstream', 0)->cursor()->each(function ($bank_integration) {
                         try {
                             (new ProcessBankTransactionsNordigen($bank_integration))->handle();
-                        }
-                        catch(\Exception $e) {
+                        } catch (\Exception $e) {
                             sleep(20);
                         }
 

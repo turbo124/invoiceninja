@@ -5,7 +5,6 @@
  * @link https://github.com/entityninja/entityninja source repository
  *
  * @copyright Copyright (c) 2022. Entity Ninja LLC (https://entityninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -32,13 +31,13 @@ use App\Utils\Traits\Pdf\PdfMaker;
 
 class CreateRawPdf
 {
-    use NumberFormatter;
-    use MakesInvoiceHtml;
-    use PdfMaker;
     use MakesHash;
+    use MakesInvoiceHtml;
+    use NumberFormatter;
     use PageNumbering;
+    use PdfMaker;
 
-    public Invoice | Credit | Quote | RecurringInvoice | PurchaseOrder $entity;
+    public Invoice|Credit|Quote|RecurringInvoice|PurchaseOrder $entity;
 
     public $company;
 
@@ -48,9 +47,6 @@ class CreateRawPdf
 
     public $entity_string = '';
 
-    /**
-     * @param $invitation
-     */
     public function __construct($invitation, private ?string $type = null)
     {
 
@@ -77,13 +73,13 @@ class CreateRawPdf
 
     private function resolveType(): string
     {
-        if($this->type) {
+        if ($this->type) {
             return $this->type;
         }
 
         $type = 'product';
 
-        match($this->entity_string) {
+        match ($this->entity_string) {
             'purchase_order' => $type = 'purchase_order',
             'invoice' => $type = 'product',
             'quote' => $type = 'product',
@@ -113,9 +109,10 @@ class CreateRawPdf
         } catch (\Exception) {
             throw new FilePermissionsFailure('Unable to generate the raw PDF');
         }
-        if ($this->entity_string == "invoice" && $this->entity->client->getSetting("merge_e_invoice_to_pdf")){
+        if ($this->entity_string == 'invoice' && $this->entity->client->getSetting('merge_e_invoice_to_pdf')) {
             $pdf = (new MergeEDocument($this->entity, $pdf))->handle();
         }
+
         return $pdf;
     }
 

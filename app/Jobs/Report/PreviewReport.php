@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,7 @@ class PreviewReport implements ShouldQueue
         /** @var \App\Export\CSV\CreditExport $export */
         $export = new $this->report_class($this->company, $this->request);
 
-        if(isset($this->request['output']) && $this->request['output'] == 'json') {
+        if (isset($this->request['output']) && $this->request['output'] == 'json') {
             $report = $export->returnJson();
         } else {
             $report = $export->run();

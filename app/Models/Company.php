@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -118,7 +117,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property string $smtp_port
  * @property string $smtp_encryption
  * @property string $smtp_local_domain
- * @property boolean $smtp_verify_peer
+ * @property bool $smtp_verify_peer
  * @property-read \App\Models\Account $account
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
  * @property-read int|null $activities_count
@@ -211,21 +210,25 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Vendor> $vendors
  * @property-read int|null $vendors_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Webhook> $webhooks
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Company where($query)
  * @method static \Illuminate\Database\Eloquent\Builder|Company find($query)
+ *
  * @property-read int|null $webhooks_count
  * @property int $calculate_taxes
  * @property mixed $tax_data
+ *
  * @method \App\Models\User|null owner()
+ *
  * @mixin \Eloquent
  */
 class Company extends BaseModel
 {
-    use PresentableTrait;
-    use MakesHash;
-    use CompanySettingsSaver;
     use AppSetup;
     use \Awobaz\Compoships\Compoships;
+    use CompanySettingsSaver;
+    use MakesHash;
+    use PresentableTrait;
 
     // const ENTITY_RECURRING_INVOICE = 'recurring_invoice';
 
@@ -477,9 +480,6 @@ class Company extends BaseModel
         return $this->hasMany(ClientContact::class)->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
-     */
     public function users(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(User::class, CompanyUser::class, 'company_id', 'id', 'id', 'user_id')->withTrashed();
@@ -510,9 +510,6 @@ class Company extends BaseModel
         return $this->hasMany(Client::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class)->withTrashed();
@@ -523,25 +520,16 @@ class Company extends BaseModel
         return $this->hasMany(Webhook::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function vendor_contacts(): HasMany
     {
         return $this->hasMany(VendorContact::class)->withTrashed();
     }
 
-    /**
-     * @return HasMany
-     */
     public function vendors(): HasMany
     {
         return $this->hasMany(Vendor::class)->withTrashed();
@@ -703,7 +691,7 @@ class Company extends BaseModel
         }
 
         //if the cache is still dead, get from DB
-        if (!$languages && property_exists($this->settings, 'language_id')) {
+        if (! $languages && property_exists($this->settings, 'language_id')) {
             return Language::find($this->settings->language_id);
         }
 
@@ -833,9 +821,6 @@ class Company extends BaseModel
         return $this->hasMany(PurchaseOrderInvitation::class);
     }
 
-    /**
-     * @return \App\Models\User|null
-     */
     public function owner(): ?User
     {
         return $this->company_users()->withTrashed()->where('is_owner', true)->first()?->user;
@@ -844,25 +829,24 @@ class Company extends BaseModel
     public function credit_rules()
     {
         return BankTransactionRule::query()
-                                  ->where('company_id', $this->id)
-                                  ->where('applies_to', 'CREDIT')
-                                  ->get();
+            ->where('company_id', $this->id)
+            ->where('applies_to', 'CREDIT')
+            ->get();
     }
 
     public function debit_rules()
     {
         return BankTransactionRule::query()
-                          ->where('company_id', $this->id)
-                          ->where('applies_to', 'DEBIT')
-                          ->get();
+            ->where('company_id', $this->id)
+            ->where('applies_to', 'DEBIT')
+            ->get();
     }
-
 
     public function resolveRouteBinding($value, $field = null)
     {
         return $this->where('id', $this->decodePrimaryKey($value))
-                    ->where('account_id', auth()->user()->account_id)
-                    ->firstOrFail();
+            ->where('account_id', auth()->user()->account_id)
+            ->firstOrFail();
     }
 
     public function domain(): string
@@ -933,7 +917,7 @@ class Company extends BaseModel
         $timezone = $this->timezone();
 
         date_default_timezone_set('GMT');
-        $date = new \DateTime("now", new \DateTimeZone($timezone->name));
+        $date = new \DateTime('now', new \DateTimeZone($timezone->name));
         $offset = $date->getOffset();
 
         return $offset;
@@ -952,7 +936,7 @@ class Company extends BaseModel
         $timezone = $this->timezone();
 
         date_default_timezone_set('GMT');
-        $date = new \DateTime("now", new \DateTimeZone($timezone->name));
+        $date = new \DateTime('now', new \DateTimeZone($timezone->name));
         $offset -= $date->getOffset();
 
         $offset += ($entity_send_time * 3600);
@@ -980,7 +964,7 @@ class Company extends BaseModel
 
     public function getInvoiceCert()
     {
-        if($this->e_invoice_certificate) {
+        if ($this->e_invoice_certificate) {
             return base64_decode($this->e_invoice_certificate);
         }
 
@@ -996,5 +980,4 @@ class Company extends BaseModel
     {
         return new CompanyService($this);
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -55,9 +54,9 @@ class PurchaseOrderRepository extends BaseRepository
 
                     if ($contact && $purchase_order->vendor_id == $contact->vendor_id) {
                         $new_invitation = PurchaseOrderInvitation::withTrashed()
-                                            ->where('vendor_contact_id', $contact->id)
-                                            ->where('purchase_order_id', $purchase_order->id)
-                                            ->first();
+                            ->where('vendor_contact_id', $contact->id)
+                            ->where('purchase_order_id', $purchase_order->id)
+                            ->first();
 
                         if ($new_invitation && $new_invitation->trashed()) {
                             $new_invitation->restore();

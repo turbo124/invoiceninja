@@ -6,39 +6,38 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Controllers\ClientPortal;
 
+use App\Factory\PaymentFactory;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest;
+use App\Models\CompanyGateway;
+use App\Models\GatewayType;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Utils\HtmlEngine;
-use Illuminate\View\View;
-use App\Models\GatewayType;
 use App\Models\PaymentHash;
 use App\Models\PaymentType;
-use Illuminate\Http\Request;
-use App\Models\CompanyGateway;
-use App\Factory\PaymentFactory;
-use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\MakesDates;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\Factory;
 use App\PaymentDrivers\Stripe\BankTransfer;
 use App\Services\ClientPortal\InstantPayment;
 use App\Services\Subscription\SubscriptionService;
-use App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest;
+use App\Utils\HtmlEngine;
+use App\Utils\Traits\MakesDates;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 /**
  * Class PaymentController.
  */
 class PaymentController extends Controller
 {
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
 
     /**
      * Show the list of payments.
@@ -53,8 +52,6 @@ class PaymentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Request $request
-     * @param Payment $payment
      * @return Factory|View
      */
     public function show(Request $request, Payment $payment)
@@ -83,7 +80,6 @@ class PaymentController extends Controller
             }
         }
 
-
         return $this->render('payments.show', [
             'payment' => $payment,
             'bank_details' => $payment_intent ? $data : false,
@@ -102,7 +98,6 @@ class PaymentController extends Controller
      * The request will also contain the amount
      * and invoice ids for reference.
      *
-     * @param Request $request
      * @return RedirectResponse|mixed
      */
     public function process(Request $request)
@@ -118,7 +113,7 @@ class PaymentController extends Controller
 
     public function response(PaymentResponseRequest $request)
     {
-        /** @var \App\Models\CompanyGateway $gateway **/
+        /** @var \App\Models\CompanyGateway $gateway * */
         $gateway = CompanyGateway::findOrFail($request->input('company_gateway_id'));
         $payment_hash = PaymentHash::where('hash', $request->payment_hash)->firstOrFail();
         $invoice = Invoice::with('client')->find($payment_hash->fee_invoice_id);
@@ -156,8 +151,8 @@ class PaymentController extends Controller
     /**
      * Pay for invoice/s using credits only.
      *
-     * @param Request $request The request object
-     * @return \Response         The response view
+     * @param  Request  $request  The request object
+     * @return \Response The response view
      */
     public function credit_response(Request $request)
     {
@@ -184,7 +179,7 @@ class PaymentController extends Controller
         $invoices = Invoice::query()->whereIn('id', $this->transformKeys(array_column($payment_hash->invoices(), 'invoice_id')));
 
         $invoices->each(function ($invoice) {
-            /** @var \App\Models\Invoice $invoice **/
+            /** @var \App\Models\Invoice $invoice * */
             $invoice->is_proforma = false;
             $invoice->saveQuietly();
         });
@@ -192,7 +187,7 @@ class PaymentController extends Controller
         event('eloquent.created: App\Models\Payment', $payment);
 
         if ($invoices->sum('balance') > 0) {
-            /** @var \App\Models\Invoice $invoice **/
+            /** @var \App\Models\Invoice $invoice * */
             $invoice = $invoices->first();
 
             return redirect()->route('client.invoice.show', ['invoice' => $invoice->hashed_id, 'hash' => $request->input('hash')]);

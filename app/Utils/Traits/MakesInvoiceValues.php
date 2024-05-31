@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,6 +24,7 @@ trait MakesInvoiceValues
     /**
      * Master list of columns used
      * for invoice tables.
+     *
      * @var array
      */
     private static $master_columns = [
@@ -98,9 +98,9 @@ trait MakesInvoiceValues
      * Transforms all placeholders
      * to invoice values.
      *
-     * @param null $contact
+     * @param  null  $contact
      * @return array returns an array
-     * of keyed labels (appended with _label)
+     *               of keyed labels (appended with _label)
      */
     public function makeValues($contact = null): array
     {
@@ -117,8 +117,9 @@ trait MakesInvoiceValues
 
     /**
      * V2 of building a table header for PDFs.
-     * @param  array $columns The array (or string of column headers)
-     * @return string  injectable HTML string
+     *
+     * @param  array  $columns  The array (or string of column headers)
+     * @return string injectable HTML string
      */
     public function buildTableHeader($columns): ?string
     {
@@ -139,10 +140,8 @@ trait MakesInvoiceValues
 
     /**
      * V2 of building a table body for PDFs.
-     * @param array $default_columns
-     * @param $user_columns
-     * @param string $table_prefix
-     * @return string  injectable HTML string
+     *
+     * @return string injectable HTML string
      */
     public function buildTableBody(array $default_columns, $user_columns, string $table_prefix): ?string
     {
@@ -186,8 +185,8 @@ trait MakesInvoiceValues
     /**
      * Transform the column headers into translated header values.
      *
-     * @param  array  $columns The column header values
-     * @return array          The new column header variables
+     * @param  array  $columns  The column header values
+     * @return array The new column header variables
      */
     private function transformColumnsForHeader(array $columns): array
     {
@@ -218,8 +217,8 @@ trait MakesInvoiceValues
     /**
      * Transform the column headers into invoice variables.
      *
-     * @param  array  $columns The column header values
-     * @return array          The invoice variables
+     * @param  array  $columns  The column header values
+     * @return array The invoice variables
      */
     private function transformColumnsForLineItems(array $columns): array
     {
@@ -252,11 +251,9 @@ trait MakesInvoiceValues
     /**
      * Formats the line items for display.
      *
-     * @param mixed $items
-     * @param string $table_type
-     * @param mixed|null $custom_fields
-     *
-     * @return array
+     * @param  mixed  $items
+     * @param  string  $table_type
+     * @param  mixed|null  $custom_fields
      */
     public function transformLineItems($items, $table_type = '$product'): array
     {   //$start = microtime(true);
@@ -377,7 +374,7 @@ trait MakesInvoiceValues
      * we use this function to format a section of rows.
      *
      * @return string a collection of <tr> rows with line item
-     * aggregate data
+     *                aggregate data
      */
     private function makeLineTaxes(): string
     {
@@ -397,7 +394,7 @@ trait MakesInvoiceValues
 
     /**
      * @return string a collectino of <tr> with
-     * itemised total tax data
+     *                itemised total tax data
      */
     private function makeTotalTaxes(): string
     {
@@ -487,6 +484,7 @@ trait MakesInvoiceValues
     /**
      * Builds CSS to assist with the generation
      * of Repeating headers and footers on the PDF.
+     *
      * @return string The css string
      */
     public function generateCustomCSS(): string

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,7 @@ class TaskStatusController extends BaseController
     /**
      * TaskStatusController constructor.
      *
-     * @param TaskStatusRepository $task_status_repo  The payment term repo
+     * @param  TaskStatusRepository  $task_status_repo  The payment term repo
      */
     public function __construct(TaskStatusRepository $task_status_repo)
     {
@@ -54,7 +53,6 @@ class TaskStatusController extends BaseController
     /**
      * index
      *
-     * @param  TaskStatusFilters $filters
      * @return Response
      */
     public function index(TaskStatusFilters $filters)
@@ -64,11 +62,9 @@ class TaskStatusController extends BaseController
         return $this->listResponse($task_status);
     }
 
-
     /**
      * create
      *
-     * @param  CreateTaskStatusRequest $request
      * @return Response
      */
     public function create(CreateTaskStatusRequest $request)
@@ -84,10 +80,9 @@ class TaskStatusController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreTaskStatusRequest $request  The request
+     * @param  StoreTaskStatusRequest  $request  The request
      * @return Response
-     *
-    */
+     */
     public function store(StoreTaskStatusRequest $request)
     {
         /** @var \App\Models\User $user */
@@ -102,8 +97,6 @@ class TaskStatusController extends BaseController
     }
 
     /**
-     * @param ShowTaskStatusRequest $request
-     * @param TaskStatus $task_status
      * @return Response|mixed
      */
     public function show(ShowTaskStatusRequest $request, TaskStatus $task_status)
@@ -112,8 +105,6 @@ class TaskStatusController extends BaseController
     }
 
     /**
-     * @param EditTaskStatusRequest $request
-     * @param TaskStatus $payment
      * @return Response|mixed
      */
     public function edit(EditTaskStatusRequest $request, TaskStatus $payment)
@@ -124,8 +115,8 @@ class TaskStatusController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateTaskStatusRequest $request  The request
-     * @param TaskStatus $task_status   The payment term
+     * @param  UpdateTaskStatusRequest  $request  The request
+     * @param  TaskStatus  $task_status  The payment term
      * @return Response
      */
     public function update(UpdateTaskStatusRequest $request, TaskStatus $task_status)
@@ -146,8 +137,6 @@ class TaskStatusController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyTaskStatusRequest $request
-     * @param TaskStatus $task_status
      * @return Response
      *
      * @throws \Exception
@@ -161,7 +150,7 @@ class TaskStatusController extends BaseController
 
     /**
      * Perform bulk actions on the list view.
-     * @param  ActionTaskStatusRequest $request
+     *
      * @return Response
      */
     public function bulk(ActionTaskStatusRequest $request)
@@ -171,12 +160,12 @@ class TaskStatusController extends BaseController
         $ids = $request->input('ids');
 
         TaskStatus::withTrashed()
-                ->company()
-                ->whereIn('id', $this->transformKeys($ids))
-                ->cursor()
-                ->each(function ($task_status, $key) use ($action) {
-                    $this->task_status_repo->{$action}($task_status);
-                });
+            ->company()
+            ->whereIn('id', $this->transformKeys($ids))
+            ->cursor()
+            ->each(function ($task_status, $key) use ($action) {
+                $this->task_status_repo->{$action}($task_status);
+            });
 
         return $this->listResponse(TaskStatus::withTrashed()->whereIn('id', $this->transformKeys($ids)));
     }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,13 +32,12 @@ class ExpenseRepository extends BaseRepository
     private $completed = true;
 
     private $notify_vendor = false;
+
     /**
      * Saves the expense and its contacts.
      *
-     * @param      array                     $data     The data
-     * @param      \App\Models\Expense       $expense  The expense
-     *
-     * @return     \App\Models\Expense
+     * @param  array  $data  The data
+     * @param  \App\Models\Expense  $expense  The expense
      */
     public function save(array $data, Expense $expense): Expense
     {
@@ -49,15 +47,15 @@ class ExpenseRepository extends BaseRepository
         $payment_date = &$data['payment_date'];
         $vendor_id = &$data['vendor_id'];
 
-        if($payment_date && $payment_date == $expense->payment_date) {
+        if ($payment_date && $payment_date == $expense->payment_date) {
             //do nothing
-        } elseif($payment_date && strlen($payment_date) > 1 && $user->company()->notify_vendor_when_paid && ($vendor_id || $expense->vendor_id)) {
+        } elseif ($payment_date && strlen($payment_date) > 1 && $user->company()->notify_vendor_when_paid && ($vendor_id || $expense->vendor_id)) {
             $this->notify_vendor = true;
         }
 
         $expense->fill($data);
 
-        if (!$expense->id) {
+        if (! $expense->id) {
             $expense = $this->processExchangeRates($data, $expense);
         }
 
@@ -71,11 +69,11 @@ class ExpenseRepository extends BaseRepository
             $this->saveDocuments($data['documents'], $expense);
         }
 
-        if($this->notify_vendor) {
+        if ($this->notify_vendor) {
             VendorExpenseNotify::dispatch($expense, $expense->company->db);
         }
 
-        if($payment_date && strlen($payment_date) > 1 && $expense->purchase_order) {
+        if ($payment_date && strlen($payment_date) > 1 && $expense->purchase_order) {
             $purchase_order = $expense->purchase_order;
             $purchase_order->balance = round($purchase_order->amount - $expense->amount, 2);
             $purchase_order->paid_to_date = $expense->amount;
@@ -88,9 +86,7 @@ class ExpenseRepository extends BaseRepository
     /**
      * Store expenses in bulk.
      *
-     * @param array $expense
-     *
-     * @return \App\Models\Expense|null
+     * @param  array  $expense
      */
     public function create($expense): ?Expense
     {
@@ -104,9 +100,9 @@ class ExpenseRepository extends BaseRepository
     }
 
     /**
-     * @param mixed $data
-     * @param mixed $expense
-     * @return Expense
+     * @param  mixed  $data
+     * @param  mixed  $expense
+     *
      * @throws InvalidFormatException
      */
     public function processExchangeRates($data, $expense): Expense
@@ -129,7 +125,6 @@ class ExpenseRepository extends BaseRepository
         return $expense;
     }
 
-
     public function delete($expense): Expense
     {
 
@@ -144,7 +139,7 @@ class ExpenseRepository extends BaseRepository
 
             $expense->transaction->expense_id = $exp_ids;
 
-            if(strlen($exp_ids) <= 2) {
+            if (strlen($exp_ids) <= 2) {
                 $expense->transaction->status_id = 1;
             }
 
@@ -157,12 +152,10 @@ class ExpenseRepository extends BaseRepository
         return $expense;
     }
 
-
     /**
      * Handle race conditions when creating expense numbers
      *
-     * @param Expense $expense
-     * @return \App\Models\Expense
+     * @param  Expense  $expense
      */
     private function findAndSaveNumber($expense): Expense
     {
@@ -188,22 +181,17 @@ class ExpenseRepository extends BaseRepository
 
     /**
      * Categorize Expenses in bulk
-     *
-     * @param  Collection $expenses
-     * @param  int $category_id
-     * @return void
      */
     public function categorize(Collection $expenses, int $category_id): void
     {
         $ec = ExpenseCategory::withTrashed()->find($category_id);
 
         $expenses->when($ec)
-                 ->each(function ($expense) use ($ec) {
+            ->each(function ($expense) use ($ec) {
 
-                     $expense->category_id = $ec->id;
-                     $expense->save();
+                $expense->category_id = $ec->id;
+                $expense->save();
 
-                 });
+            });
     }
-
 }

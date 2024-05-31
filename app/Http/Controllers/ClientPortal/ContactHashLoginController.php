@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,21 +19,22 @@ class ContactHashLoginController extends Controller
 {
     /**
      * Logs a user into the client portal using their contact_key
-     * @param  string $contact_key  The contact key
+     *
+     * @param  string  $contact_key  The contact key
      * @return Redirect
      */
     public function login(string $contact_key)
     {
         if (request()->has('subscription') && request()->subscription == 'true') {
 
-            /** @var \App\Models\ClientContact $client_contact **/
+            /** @var \App\Models\ClientContact $client_contact * */
             $client_contact = auth()->guard('contact');
 
-            /** @var \App\Models\RecurringInvoice $recurring_invoice **/
+            /** @var \App\Models\RecurringInvoice $recurring_invoice * */
             $recurring_invoice = RecurringInvoice::where('client_id', $client_contact->client->id)
-                                                 ->whereNotNull('subscription_id')
-                                                 ->whereNull('deleted_at')
-                                                 ->first();
+                ->whereNotNull('subscription_id')
+                ->whereNull('deleted_at')
+                ->first();
 
             return redirect()->route('client.recurring_invoice.show', $recurring_invoice->hashed_id);
         }
@@ -58,7 +58,7 @@ class ContactHashLoginController extends Controller
             'title' => session()->get('title'),
             'notification' => session()->get('notification'),
             'account' => auth()->guard('contact')?->user()?->user?->account,
-            'company' => auth()->guard('contact')?->user()?->user?->company
+            'company' => auth()->guard('contact')?->user()?->user?->company,
         ]);
     }
 

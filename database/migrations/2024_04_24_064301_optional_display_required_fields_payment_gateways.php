@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
+
         Schema::table('company_gateways', function (Blueprint $table) {
             $table->boolean('always_show_required_fields')->default(true);
         });

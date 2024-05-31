@@ -5,20 +5,19 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Credit;
 
-use App\Utils\Ninja;
+use App\Events\Credit\CreditWasEmailed;
+use App\Jobs\Entity\EmailEntity;
 use App\Models\Credit;
 use App\Models\Webhook;
-use Illuminate\Http\Request;
-use App\Jobs\Entity\EmailEntity;
 use App\Services\AbstractService;
+use App\Utils\Ninja;
 use App\Utils\Traits\GeneratesCounter;
-use App\Events\Credit\CreditWasEmailed;
+use Illuminate\Http\Request;
 
 class TriggeredActions extends AbstractService
 {
@@ -79,7 +78,7 @@ class TriggeredActions extends AbstractService
 
         if ($this->credit->invitations->count() > 0) {
             event(new CreditWasEmailed($this->credit->invitations->first(), $this->credit->company, Ninja::eventVars(), 'credit'));
-            $this->credit->sendEvent(Webhook::EVENT_SENT_CREDIT, "client");
+            $this->credit->sendEvent(Webhook::EVENT_SENT_CREDIT, 'client');
         }
     }
 }

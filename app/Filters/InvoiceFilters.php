@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,8 +35,7 @@ class InvoiceFilters extends QueryFilters
      * - overdue
      * - reversed
      *
-     * @param string $value The invoice status as seen by the client
-     * @return Builder
+     * @param  string  $value  The invoice status as seen by the client
      */
     public function client_status(string $value = ''): Builder
     {
@@ -77,8 +75,8 @@ class InvoiceFilters extends QueryFilters
 
             if (in_array('overdue', $status_parameters)) {
                 $query->orWhereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                                ->where('due_date', '<', Carbon::now())
-                                ->orWhere('partial_due_date', '<', Carbon::now());
+                    ->where('due_date', '<', Carbon::now())
+                    ->orWhere('partial_due_date', '<', Carbon::now());
             }
         });
 
@@ -97,8 +95,6 @@ class InvoiceFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -109,27 +105,26 @@ class InvoiceFilters extends QueryFilters
 
         return $this->builder->where(function ($query) use ($filter) {
             $query->where('number', 'like', '%'.$filter.'%')
-                          ->orWhere('po_number', 'like', '%'.$filter.'%')
-                          ->orWhere('date', 'like', '%'.$filter.'%')
-                          ->orWhere('amount', 'like', '%'.$filter.'%')
-                          ->orWhere('balance', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value1', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value2', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value3', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value4', 'like', '%'.$filter.'%')
-                          ->orWhereHas('client', function ($q) use ($filter) {
-                              $q->where('name', 'like', '%'.$filter.'%');
-                          })
-                          ->orWhereHas('client.contacts', function ($q) use ($filter) {
-                              $q->where('first_name', 'like', '%'.$filter.'%')
-                                ->orWhere('last_name', 'like', '%'.$filter.'%')
-                                ->orWhere('email', 'like', '%'.$filter.'%');
-                          });
+                ->orWhere('po_number', 'like', '%'.$filter.'%')
+                ->orWhere('date', 'like', '%'.$filter.'%')
+                ->orWhere('amount', 'like', '%'.$filter.'%')
+                ->orWhere('balance', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value1', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value2', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value3', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value4', 'like', '%'.$filter.'%')
+                ->orWhereHas('client', function ($q) use ($filter) {
+                    $q->where('name', 'like', '%'.$filter.'%');
+                })
+                ->orWhereHas('client.contacts', function ($q) use ($filter) {
+                    $q->where('first_name', 'like', '%'.$filter.'%')
+                        ->orWhere('last_name', 'like', '%'.$filter.'%')
+                        ->orWhere('email', 'like', '%'.$filter.'%');
+                });
         });
     }
 
     /**
-     * @return Builder
      * @throws RuntimeException
      */
     public function status_id(string $status = ''): Builder
@@ -139,13 +134,11 @@ class InvoiceFilters extends QueryFilters
             return $this->builder;
         }
 
-        return $this->builder->whereIn('status_id', explode(",", $status));
+        return $this->builder->whereIn('status_id', explode(',', $status));
 
     }
 
     /**
-     * @return Builder
-     * @return Builder
      * @throws InvalidArgumentException
      */
     public function upcoming(): Builder
@@ -153,28 +146,28 @@ class InvoiceFilters extends QueryFilters
 
         return $this->builder->where(function ($query) {
             $query->whereIn('status_id', [Invoice::STATUS_PARTIAL, Invoice::STATUS_SENT])
-            ->where('is_deleted', 0)
-            ->where('balance', '>', 0)
-            ->where(function ($query) {
+                ->where('is_deleted', 0)
+                ->where('balance', '>', 0)
+                ->where(function ($query) {
 
-                $query->whereNull('due_date')
-                    ->orWhere(function ($q) {
-                        $q->where('due_date', '>=', now()->startOfDay()->subSecond())->where('partial', 0);
-                    })
-                    ->orWhere(function ($q) {
-                        $q->where('partial_due_date', '>=', now()->startOfDay()->subSecond())->where('partial', '>', 0);
-                    });
+                    $query->whereNull('due_date')
+                        ->orWhere(function ($q) {
+                            $q->where('due_date', '>=', now()->startOfDay()->subSecond())->where('partial', 0);
+                        })
+                        ->orWhere(function ($q) {
+                            $q->where('partial_due_date', '>=', now()->startOfDay()->subSecond())->where('partial', '>', 0);
+                        });
 
-            })
-            ->orderByRaw('ISNULL(due_date), due_date ' . 'desc')
-            ->orderByRaw('ISNULL(partial_due_date), partial_due_date ' . 'desc');
+                })
+                ->orderByRaw('ISNULL(due_date), due_date '.'desc')
+                ->orderByRaw('ISNULL(partial_due_date), partial_due_date '.'desc');
         });
 
     }
 
     /**
      * @return void
-     * @return Builder
+     *
      * @throws InvalidArgumentException
      */
     public function overdue(): Builder
@@ -182,20 +175,18 @@ class InvoiceFilters extends QueryFilters
         return $this->builder->where(function ($query) {
 
             $query->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                    ->where('is_deleted', 0)
-                    ->where('balance', '>', 0)
-                    ->where(function ($query) {
-                        $query->where('due_date', '<', now())
-                            ->orWhere('partial_due_date', '<', now());
-                    })
-                    ->orderBy('due_date', 'ASC');
+                ->where('is_deleted', 0)
+                ->where('balance', '>', 0)
+                ->where(function ($query) {
+                    $query->where('due_date', '<', now())
+                        ->orWhere('partial_due_date', '<', now());
+                })
+                ->orderBy('due_date', 'ASC');
         });
 
     }
 
     /**
-     * @param string $client_id
-     * @return Builder
      * @throws InvalidArgumentException
      */
     public function payable(string $client_id = ''): Builder
@@ -206,16 +197,13 @@ class InvoiceFilters extends QueryFilters
         }
 
         return $this->builder
-                    ->where('client_id', $this->decodePrimaryKey($client_id))
-                    ->whereIn('status_id', [Invoice::STATUS_DRAFT, Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                    ->where('is_deleted', 0)
-                    ->where('balance', '>', 0);
+            ->where('client_id', $this->decodePrimaryKey($client_id))
+            ->whereIn('status_id', [Invoice::STATUS_DRAFT, Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
+            ->where('is_deleted', 0)
+            ->where('balance', '>', 0);
     }
 
-
     /**
-     * @param string $date
-     * @return Builder
      * @throws InvalidArgumentException
      */
     public function date(string $date = ''): Builder
@@ -225,13 +213,12 @@ class InvoiceFilters extends QueryFilters
         }
 
         if (is_numeric($date)) {
-            $date = Carbon::createFromTimestamp((int)$date);
+            $date = Carbon::createFromTimestamp((int) $date);
         } else {
 
-            try{
+            try {
                 $date = Carbon::parse($date);
-            }
-            catch(\Exception $e){
+            } catch (\Exception $e) {
                 return $this->builder;
             }
         }
@@ -240,8 +227,6 @@ class InvoiceFilters extends QueryFilters
     }
 
     /**
-     * @param string $date
-     * @return Builder
      * @throws InvalidArgumentException
      */
     public function due_date(string $date = ''): Builder
@@ -251,7 +236,7 @@ class InvoiceFilters extends QueryFilters
         }
 
         if (is_numeric($date)) {
-            $date = Carbon::createFromTimestamp((int)$date);
+            $date = Carbon::createFromTimestamp((int) $date);
         } else {
             $date = Carbon::parse($date);
         }
@@ -261,13 +246,10 @@ class InvoiceFilters extends QueryFilters
 
     /**
      * Filter by date range
-     *
-     * @param string $date_range
-     * @return Builder
      */
     public function date_range(string $date_range = ''): Builder
     {
-        $parts = explode(",", $date_range);
+        $parts = explode(',', $date_range);
 
         if (count($parts) != 2) {
             return $this->builder;
@@ -278,7 +260,7 @@ class InvoiceFilters extends QueryFilters
             $end_date = Carbon::parse($parts[1]);
 
             return $this->builder->whereBetween('date', [$start_date, $end_date]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $this->builder;
         }
 
@@ -287,13 +269,10 @@ class InvoiceFilters extends QueryFilters
 
     /**
      * Filter by due date range
-     *
-     * @param string $date_range
-     * @return Builder
      */
     public function due_date_range(string $date_range = ''): Builder
     {
-        $parts = explode(",", $date_range);
+        $parts = explode(',', $date_range);
 
         if (count($parts) != 2) {
             return $this->builder;
@@ -304,25 +283,23 @@ class InvoiceFilters extends QueryFilters
             $end_date = Carbon::parse($parts[1]);
 
             return $this->builder->whereBetween('due_date', [$start_date, $end_date]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $this->builder;
         }
 
         return $this->builder;
     }
 
-
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
@@ -331,15 +308,15 @@ class InvoiceFilters extends QueryFilters
         if ($sort_col[0] == 'client_id') {
 
             return $this->builder->orderBy(\App\Models\Client::select('name')
-                             ->whereColumn('clients.id', 'invoices.client_id'), $dir);
+                ->whereColumn('clients.id', 'invoices.client_id'), $dir);
 
         }
 
-        if($sort_col[0] == 'number') {
+        if ($sort_col[0] == 'number') {
             // return $this->builder->orderByRaw('CAST(number AS UNSIGNED), number ' . $dir);
             // return $this->builder->orderByRaw("number REGEXP '^[A-Za-z]+$',CAST(number as SIGNED INTEGER),CAST(REPLACE(number,'-','')AS SIGNED INTEGER) ,number");
             // return $this->builder->orderByRaw('ABS(number) ' . $dir);
-               return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
+            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 ".$dir);
         }
 
         return $this->builder->orderBy($sort_col[0], $dir);
@@ -350,8 +327,6 @@ class InvoiceFilters extends QueryFilters
      *
      * We need to ensure we are using the correct company ID
      * as we could be hitting this from either the client or company auth guard
-     *
-     * @return Builder
      */
     public function entityFilter(): Builder
     {
@@ -363,8 +338,8 @@ class InvoiceFilters extends QueryFilters
     }
 
     /**
-     * @param string $filter
-     * @return Builder
+     * @param  string  $filter
+     *
      * @throws InvalidArgumentException
      */
     public function private_notes($filter = ''): Builder
@@ -379,13 +354,11 @@ class InvoiceFilters extends QueryFilters
     /**
      * We need additional filters when showing invoices for the
      * client portal. Need to automatically exclude drafts and cancelled invoices.
-     *
-     * @return Builder
      */
     private function contactViewFilter(): Builder
     {
         return $this->builder
-                    ->whereCompanyId(auth()->guard('contact')->user()->company->id)
-                    ->whereNotIn('status_id', [Invoice::STATUS_DRAFT, Invoice::STATUS_CANCELLED]);
+            ->whereCompanyId(auth()->guard('contact')->user()->company->id)
+            ->whereNotIn('status_id', [Invoice::STATUS_DRAFT, Invoice::STATUS_CANCELLED]);
     }
 }

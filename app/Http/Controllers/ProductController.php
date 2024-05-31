@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,6 @@ class ProductController extends BaseController
 
     /**
      * ProductController constructor.
-     * @param ProductRepository $product_repo
      */
     public function __construct(ProductRepository $product_repo)
     {
@@ -60,29 +58,37 @@ class ProductController extends BaseController
      *      description="Lists products, search and filters allow fine grained lists to be generated.
 
      *  Query parameters can be added to performed more fine grained filtering of the products, these are handled by the ProductFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of products",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param ProductFilters $filters
+     *
      * @return Response|mixed
      */
     public function index(ProductFilters $filters)
@@ -95,10 +101,7 @@ class ProductController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateProductRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/products/create",
@@ -106,26 +109,34 @@ class ProductController extends BaseController
      *      tags={"products"},
      *      summary="Gets a new blank Product object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank Product object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -144,10 +155,7 @@ class ProductController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreProductRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/products",
@@ -155,26 +163,34 @@ class ProductController extends BaseController
      *      tags={"products"},
      *      summary="Adds a Product",
      *      description="Adds an Product to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved Product object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -193,10 +209,7 @@ class ProductController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowProductRequest $request
-     * @param Product $product
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/products/{id}",
@@ -204,6 +217,7 @@ class ProductController extends BaseController
      *      tags={"products"},
      *      summary="Shows an Product",
      *      description="Displays an Product by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -213,28 +227,36 @@ class ProductController extends BaseController
      *          description="The Product Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Product object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -247,8 +269,6 @@ class ProductController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditProductRequest $request
-     * @param Product $product
      * @return Response
      *
      * @OA\Get(
@@ -257,6 +277,7 @@ class ProductController extends BaseController
      *      tags={"products"},
      *      summary="Shows an Product for editting",
      *      description="Displays an Product by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -266,28 +287,36 @@ class ProductController extends BaseController
      *          description="The Product Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Product object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -300,10 +329,7 @@ class ProductController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateProductRequest $request
-     * @param Product $product
      * @return Response
-     *
      *
      * @OA\Put(
      *      path="/api/v1/products/{id}",
@@ -311,6 +337,7 @@ class ProductController extends BaseController
      *      tags={"products"},
      *      summary="Updates an Product",
      *      description="Handles the updating of an Product by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -320,28 +347,36 @@ class ProductController extends BaseController
      *          description="The Product Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Product object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -360,18 +395,17 @@ class ProductController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyProductRequest $request
-     * @param Product $product
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/products/{id}",
      *      operationId="deleteProduct",
      *      tags={"products"},
      *      summary="Deletes a Product",
      *      description="Handles the deletion of an Product by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -381,27 +415,34 @@ class ProductController extends BaseController
      *          description="The Product Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -418,23 +459,27 @@ class ProductController extends BaseController
      *
      * @return \Illuminate\Support\Collection
      *
-     *
      * @OA\Post(
      *      path="/api/v1/products/bulk",
      *      operationId="bulkProducts",
      *      tags={"products"},
      *      summary="Performs bulk actions on an array of products",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="Hashed IDs",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -443,23 +488,30 @@ class ProductController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Product response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -475,7 +527,7 @@ class ProductController extends BaseController
 
         $products = Product::withTrashed()->whereIn('id', $ids);
 
-        if($action == 'set_tax_id') {
+        if ($action == 'set_tax_id') {
 
             $tax_id = $request->input('tax_id');
 
@@ -496,11 +548,7 @@ class ProductController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadProductRequest $request
-     * @param Product $product
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/products/{id}/upload",
@@ -508,6 +556,7 @@ class ProductController extends BaseController
      *      tags={"products"},
      *      summary="Uploads a document to a product",
      *      description="Handles the uploading of a document to a product",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -517,28 +566,36 @@ class ProductController extends BaseController
      *          description="The Product Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Product object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Product"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

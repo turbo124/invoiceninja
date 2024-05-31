@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -48,6 +47,7 @@ class MigrationController extends BaseController
      *      tags={"migration"},
      *      summary="Attempts to purge a company record and all its child records",
      *      description="Attempts to purge a company record and all its child records",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -56,31 +56,39 @@ class MigrationController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Success",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param Company $company
+     *
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function purgeCompany(Company $company)
@@ -138,6 +146,7 @@ class MigrationController extends BaseController
      *      tags={"migration"},
      *      summary="Attempts to purge a companies child records but save the company record and its settings",
      *      description="Attempts to purge a companies child records but save the company record and its settings",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -146,31 +155,37 @@ class MigrationController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Success",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param Request $request
-     * @param Company $company
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function purgeCompanySaveSettings(Request $request, Company $company)
@@ -222,6 +237,7 @@ class MigrationController extends BaseController
      *      tags={"migration"},
      *      summary="Starts the migration from previous version of Invoice Ninja",
      *      description="Starts the migration from previous version of Invoice Ninja",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/X-API-PASSWORD"),
@@ -231,37 +247,44 @@ class MigrationController extends BaseController
      *          description="The migraton file",
      *          example="migration.zip",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="object",
      *              format="file",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Success",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse|void
      */
     public function startMigration(Request $request)
     {
         nlog('Starting Migration');
 
-        if($request->has('silent_migration')) {
+        if ($request->has('silent_migration')) {
             $this->silent_migration = true;
         }
 
@@ -319,7 +342,7 @@ class MigrationController extends BaseController
                     $nmo->settings = $user->account->companies()->first()->settings;
                     $nmo->to_user = $user;
 
-                    if(!$this->silent_migration) {
+                    if (! $this->silent_migration) {
                         NinjaMailerJob::dispatch($nmo, true);
                     }
 
@@ -331,7 +354,7 @@ class MigrationController extends BaseController
                     $nmo->settings = $user->account->companies()->first()->settings;
                     $nmo->to_user = $user;
 
-                    if(!$this->silent_migration) {
+                    if (! $this->silent_migration) {
                         NinjaMailerJob::dispatch($nmo, true);
                     }
 
@@ -353,7 +376,7 @@ class MigrationController extends BaseController
                     $nmo->settings = $user->account->companies()->first();
                     $nmo->to_user = $user;
 
-                    if(!$this->silent_migration) {
+                    if (! $this->silent_migration) {
                         NinjaMailerJob::dispatch($nmo, true);
                     }
 
@@ -431,11 +454,11 @@ class MigrationController extends BaseController
                 }
 
                 $migration_file = $request->file($company['company_index'])
-                ->storeAs(
-                    'migrations',
-                    $request->file($company['company_index'])->getClientOriginalName(),
-                    'public'
-                );
+                    ->storeAs(
+                        'migrations',
+                        $request->file($company['company_index'])->getClientOriginalName(),
+                        'public'
+                    );
 
                 if (app()->environment() == 'testing') {
                     nlog('environment is testing = bailing out now');

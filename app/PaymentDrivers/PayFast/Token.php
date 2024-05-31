@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -69,7 +68,7 @@ class Token
                 continue;
             }
 
-            if ('signature' !== $key) {
+            if ($key !== 'signature') {
                 $val = urlencode($val);
                 $parameter_string .= "$key=$val&";
             }

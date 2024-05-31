@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Design",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="AS3df3A", description="The design hashed id"),
  *       @OA\Property(property="name", type="string", example="Beauty", description="The design name"),
  *       @OA\Property(property="design", type="string", example="<html></html>", description="The design HTML"),

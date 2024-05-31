@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -16,18 +15,17 @@ use Illuminate\Support\Carbon;
 
 /**
  * Class MakesReminders.
- *
  */
 trait MakesReminders
 {
     /**
-     * @param string $schedule_reminder
-     * @param string $num_days_reminder
+     * @param  string  $schedule_reminder
+     * @param  string  $num_days_reminder
      * @return ?bool
      */
     public function inReminderWindow($schedule_reminder, $num_days_reminder)
     {
-        /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this **/
+        /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this * */
         $offset = $this->client->timezone_offset();
 
         switch ($schedule_reminder) {
@@ -35,9 +33,11 @@ trait MakesReminders
                 return Carbon::parse($this->date)->addDays($num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
             case 'before_due_date':
                 $partial_or_due_date = ($this->partial > 0 && isset($this->partial_due_date)) ? $this->partial_due_date : $this->due_date;
+
                 return Carbon::parse($partial_or_due_date)->subDays($num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
             case 'after_due_date':
                 $partial_or_due_date = ($this->partial > 0 && isset($this->partial_due_date)) ? $this->partial_due_date : $this->due_date;
+
                 return Carbon::parse($partial_or_due_date)->addDays($num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
             default:
                 return null;
@@ -47,7 +47,7 @@ trait MakesReminders
     public function calculateTemplate(string $entity_string): string
     {
 
-        /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this **/
+        /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this * */
         $client = $this->client;
 
         if ($entity_string != 'invoice') {

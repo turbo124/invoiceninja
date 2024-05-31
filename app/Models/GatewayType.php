@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,6 +19,7 @@ namespace App\Models;
  * @property-read \App\Models\Gateway|null $gateway
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PaymentType> $payment_methods
  * @property-read int|null $payment_methods_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|GatewayType newModelQuery()
@@ -28,7 +28,9 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GatewayType whereAlias($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GatewayType whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GatewayType whereName($value)
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PaymentType> $payment_methods
+ *
  * @mixin \Eloquent
  */
 class GatewayType extends StaticModel
@@ -92,7 +94,7 @@ class GatewayType extends StaticModel
     public const PAYLATER = 28;
 
     public const PAYPAL_ADVANCED_CARDS = 29;
-    
+
     public function gateway()
     {
         return $this->belongsTo(Gateway::class);
@@ -145,7 +147,7 @@ class GatewayType extends StaticModel
             case self::ACSS:
                 return ctrans('texts.acss');
             case self::DIRECT_DEBIT:
-                return ctrans('texts.bank_transfer') . " / " . ctrans('texts.payment_type_direct_debit');
+                return ctrans('texts.bank_transfer').' / '.ctrans('texts.payment_type_direct_debit');
             case self::INSTANT_BANK_PAY:
                 return ctrans('texts.payment_type_instant_bank_pay');
             case self::FPX:
@@ -162,7 +164,7 @@ class GatewayType extends StaticModel
                 return ctrans('texts.paypal_paylater');
             case self::PAYPAL_ADVANCED_CARDS:
                 return ctrans('texts.credit_card');
-    
+
             default:
                 return ' ';
         }

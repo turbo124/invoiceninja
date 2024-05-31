@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,8 +38,8 @@ use Illuminate\Support\Facades\Cache;
 
 class PdfConfiguration
 {
-    use MakesHash;
     use AppSetup;
+    use MakesHash;
 
     public ?Client $client;
 
@@ -50,11 +49,11 @@ class PdfConfiguration
 
     public Currency $currency;
 
-    public Client | Vendor $currency_entity;
+    public Client|Vendor $currency_entity;
 
     public Design $design;
 
-    public Invoice | Credit | Quote | PurchaseOrder | RecurringInvoice $entity;
+    public Invoice|Credit|Quote|PurchaseOrder|RecurringInvoice $entity;
 
     public string $entity_design_id;
 
@@ -79,10 +78,10 @@ class PdfConfiguration
     public Collection $tax_map;
 
     public ?array $total_tax_map;
+
     /**
      * __construct
      *
-     * @param  PdfService $service
      * @return void
      */
     public function __construct(public PdfService $service)
@@ -91,27 +90,23 @@ class PdfConfiguration
 
     /**
      * init
-     *
-     * @return self
      */
     public function init(): self
     {
         MultiDB::setDb($this->service->company->db);
 
         $this->setEntityType()
-             ->setDateFormat()
-             ->setPdfVariables()
-             ->setDesign()
-             ->setCurrencyForPdf()
-             ->setLocale();
+            ->setDateFormat()
+            ->setPdfVariables()
+            ->setDesign()
+            ->setCurrencyForPdf()
+            ->setLocale();
 
         return $this;
     }
 
     /**
      * setLocale
-     *
-     * @return self
      */
     private function setLocale(): self
     {
@@ -130,8 +125,6 @@ class PdfConfiguration
 
     /**
      * setCurrency
-     *
-     * @return self
      */
     private function setCurrencyForPdf(): self
     {
@@ -144,15 +137,13 @@ class PdfConfiguration
 
     /**
      * setPdfVariables
-     *
-     * @return self
      */
     public function setPdfVariables(): self
     {
         $default = (array) CompanySettings::getEntityVariableDefaults();
 
         // $variables = (array)$this->service->company->settings->pdf_variables;
-        $variables = (array)$this->settings->pdf_variables;
+        $variables = (array) $this->settings->pdf_variables;
 
         foreach ($default as $property => $value) {
             if (array_key_exists($property, $variables)) {
@@ -169,8 +160,6 @@ class PdfConfiguration
 
     /**
      * setEntityType
-     *
-     * @return self
      */
     private function setEntityType(): self
     {
@@ -269,8 +258,6 @@ class PdfConfiguration
 
     /**
      * setDesign
-     *
-     * @return self
      */
     private function setDesign(): self
     {
@@ -285,8 +272,7 @@ class PdfConfiguration
     /**
      * formatMoney
      *
-     * @param  float $value
-     * @return string
+     * @param  float  $value
      */
     public function formatMoney($value): string
     {
@@ -334,9 +320,8 @@ class PdfConfiguration
     /**
      * Formats a given value based on the clients currency.
      *
-     * @param  float  $value    The number to be formatted
-     *
-     * @return string           The formatted value
+     * @param  float  $value  The number to be formatted
+     * @return string The formatted value
      */
     public function formatValueNoTrailingZeroes($value): string
     {
@@ -359,12 +344,11 @@ class PdfConfiguration
         return rtrim(rtrim(number_format($value, $precision, $decimal, $thousand), '0'), $decimal);
     }
 
-
     /**
      * Formats a given value based on the clients currency AND country.
      *
-     * @param float $value The number to be formatted
-     * @return string           The formatted value
+     * @param  float  $value  The number to be formatted
+     * @return string The formatted value
      */
     public function formatMoneyNoRounding($value): string
     {
@@ -406,7 +390,7 @@ class PdfConfiguration
         }
 
         //04-04-2023 if currency = JPY override precision to 0
-        if($this->currency->code == 'JPY') {
+        if ($this->currency->code == 'JPY') {
             $precision = 0;
         }
 
@@ -434,9 +418,8 @@ class PdfConfiguration
     /**
      * Formats a given value based on the clients currency.
      *
-     * @param  float  $value    The number to be formatted
-     *
-     * @return string           The formatted value
+     * @param  float  $value  The number to be formatted
+     * @return string The formatted value
      */
     public function formatValue($value): string
     {
@@ -449,11 +432,8 @@ class PdfConfiguration
         return number_format($value, $precision, $decimal, $thousand);
     }
 
-
     /**
      * date_format
-     *
-     * @return self
      */
     public function setDateFormat(): self
     {

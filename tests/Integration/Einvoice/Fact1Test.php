@@ -5,72 +5,70 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Integration\Einvoice;
 
-use DateTime;
-use Tests\TestCase;
-use App\Models\Client;
-use App\Models\Invoice;
-use Tests\MockAccountData;
-use App\Models\ClientContact;
-use App\DataMapper\InvoiceItem;
 use App\DataMapper\ClientSettings;
-use Illuminate\Support\Facades\Cache;
-use Symfony\Component\Validator\Validation;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Invoiceninja\Einvoice\Models\FACT1\ItemType\Item;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use App\DataMapper\InvoiceItem;
+use App\Models\Client;
+use App\Models\ClientContact;
+use App\Models\Invoice;
+use DateTime;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Invoiceninja\Einvoice\Models\FACT1\PartyType\Party;
-use Invoiceninja\Einvoice\Models\FACT1\PriceType\Price;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Invoiceninja\Einvoice\Models\FACT1\ContactType\Contact;
-use Invoiceninja\Einvoice\Models\FACT1\CountryType\Country;
-use Invoiceninja\Einvoice\Models\FACT1\AmountType\TaxAmount;
-use Invoiceninja\Einvoice\Models\FACT1\TaxTotalType\TaxTotal;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Invoiceninja\Einvoice\Models\FACT1\AmountType\PriceAmount;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Invoiceninja\Einvoice\Models\FACT1\TaxSchemeType\TaxScheme;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Invoiceninja\Einvoice\Models\FACT1\AddressType\PostalAddress;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Invoiceninja\Einvoice\Models\FACT1\InvoiceLineType\InvoiceLine;
-use Invoiceninja\Einvoice\Models\FACT1\TaxScheme as FACT1TaxScheme;
-use Invoiceninja\Einvoice\Models\FACT1\TaxSubtotalType\TaxSubtotal;
-use Invoiceninja\Einvoice\Models\FACT1\QuantityType\InvoicedQuantity;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Invoiceninja\Einvoice\Models\FACT1\AmountType\LineExtensionAmount;
 use Invoiceninja\Einvoice\Models\FACT1\AmountType\PayableAmount;
+use Invoiceninja\Einvoice\Models\FACT1\AmountType\PriceAmount;
 use Invoiceninja\Einvoice\Models\FACT1\AmountType\TaxableAmount;
+use Invoiceninja\Einvoice\Models\FACT1\AmountType\TaxAmount;
 use Invoiceninja\Einvoice\Models\FACT1\AmountType\TaxExclusiveAmount;
 use Invoiceninja\Einvoice\Models\FACT1\AmountType\TaxInclusiveAmount;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Invoiceninja\Einvoice\Models\FACT1\PartyTaxSchemeType\PartyTaxScheme;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
-use Invoiceninja\Einvoice\Models\FACT1\MonetaryTotalType\LegalMonetaryTotal;
-use Invoiceninja\Einvoice\Models\FACT1\PartyLegalEntityType\PartyLegalEntity;
-use Invoiceninja\Einvoice\Models\FACT1\TaxCategoryType\ClassifiedTaxCategory;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Invoiceninja\Einvoice\Models\FACT1\ContactType\Contact;
+use Invoiceninja\Einvoice\Models\FACT1\CountryType\Country;
 use Invoiceninja\Einvoice\Models\FACT1\CustomerPartyType\AccountingCustomerParty;
-use Invoiceninja\Einvoice\Models\FACT1\SupplierPartyType\AccountingSupplierParty;
+use Invoiceninja\Einvoice\Models\FACT1\InvoiceLineType\InvoiceLine;
+use Invoiceninja\Einvoice\Models\FACT1\ItemType\Item;
+use Invoiceninja\Einvoice\Models\FACT1\MonetaryTotalType\LegalMonetaryTotal;
 use Invoiceninja\Einvoice\Models\FACT1\PartyIdentificationType\PartyIdentification;
+use Invoiceninja\Einvoice\Models\FACT1\PartyLegalEntityType\PartyLegalEntity;
+use Invoiceninja\Einvoice\Models\FACT1\PartyTaxSchemeType\PartyTaxScheme;
+use Invoiceninja\Einvoice\Models\FACT1\PartyType\Party;
+use Invoiceninja\Einvoice\Models\FACT1\PriceType\Price;
+use Invoiceninja\Einvoice\Models\FACT1\QuantityType\InvoicedQuantity;
+use Invoiceninja\Einvoice\Models\FACT1\SupplierPartyType\AccountingSupplierParty;
+use Invoiceninja\Einvoice\Models\FACT1\TaxCategoryType\ClassifiedTaxCategory;
 use Invoiceninja\Einvoice\Models\FACT1\TaxCategoryType\TaxCategory;
+use Invoiceninja\Einvoice\Models\FACT1\TaxScheme as FACT1TaxScheme;
+use Invoiceninja\Einvoice\Models\FACT1\TaxSchemeType\TaxScheme;
+use Invoiceninja\Einvoice\Models\FACT1\TaxSubtotalType\TaxSubtotal;
+use Invoiceninja\Einvoice\Models\FACT1\TaxTotalType\TaxTotal;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Validation;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 /**
  * @test
  */
 class Fact1Test extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
     protected function setUp(): void
     {
@@ -91,21 +89,21 @@ class Fact1Test extends TestCase
         $settings = ClientSettings::defaults();
         $settings->currency_id = '42';
 
-//VAT
-//19%
+        //VAT
+        //19%
         $client = Client::factory()
-        ->create([
-            'user_id' => $this->user->id,
-            'company_id' => $this->company->id,
-            'id_number' => '646546549',
-            'address1' => '40D, Șoseaua București-Ploiești',
-            'city' => 'SECTOR3',
-            'state' => 'RO-B',
-            'country_id' => 642,
-            'vat_number' => 646546549,
-            'name' => 'Client Company Name',
-            'settings' => $settings,
-        ]);
+            ->create([
+                'user_id' => $this->user->id,
+                'company_id' => $this->company->id,
+                'id_number' => '646546549',
+                'address1' => '40D, Șoseaua București-Ploiești',
+                'city' => 'SECTOR3',
+                'state' => 'RO-B',
+                'country_id' => 642,
+                'vat_number' => 646546549,
+                'name' => 'Client Company Name',
+                'settings' => $settings,
+            ]);
 
         ClientContact::factory()->create([
             'user_id' => $this->user->id,
@@ -123,23 +121,23 @@ class Fact1Test extends TestCase
         $item->quantity = 10;
         $item->tax_name1 = 'VAT';
         $item->tax_rate1 = '19';
-        $item->product_key = "Product Name";
-        $item->notes = "A great product description";
+        $item->product_key = 'Product Name';
+        $item->notes = 'A great product description';
 
         $_invoice = Invoice::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
             'client_id' => $client->id,
-            'number' => 'INV-'.rand(1000,1000000),
+            'number' => 'INV-'.rand(1000, 1000000),
             'line_items' => [$item],
             'due_date' => now()->addDays(20)->format('Y-m-d'),
             'status_id' => 1,
             'discount' => 0,
         ]);
-        
+
         $_invoice->service()->markSent()->save();
         $calc = $_invoice->calc();
-        
+
         $invoice = new \Invoiceninja\Einvoice\Models\FACT1\Invoice();
         $invoice->UBLVersionID = '2.1';
         $invoice->CustomizationID = 'urn:cen.eu:en16931:2017#compliant#urn:efactura.mfinante.ro:CIUS-RO:1.0.1';
@@ -152,18 +150,18 @@ class Fact1Test extends TestCase
 
         $asp = new AccountingSupplierParty();
         $party = new Party();
-        
+
         $party_identification = new PartyIdentification();
         $party_identification->ID = 'company_id_number';
         $party->PartyIdentification[] = $party_identification;
-        
+
         $sp_address = new PostalAddress();
         $sp_address->StreetName = $this->company->settings->address1;
         $sp_address->CityName = 'SECTOR2';
         $sp_address->CountrySubentity = 'RO-B';
 
         $country = new Country();
-        $country->IdentificationCode='RO';
+        $country->IdentificationCode = 'RO';
         $sp_address->Country = $country;
 
         $party->PostalAddress = $sp_address;
@@ -234,10 +232,10 @@ class Fact1Test extends TestCase
         $tax_amount->currencyID = $_invoice->client->currency()->code;
 
         $tc = new TaxCategory();
-        $tc->ID = "S";
+        $tc->ID = 'S';
 
         $taxable = $this->getTaxable($_invoice);
-        
+
         $taxable_amount = new TaxableAmount();
         $taxable_amount->amount = $taxable;
         $taxable_amount->currencyID = $_invoice->client->currency()->code;
@@ -247,9 +245,9 @@ class Fact1Test extends TestCase
         $tax_sub_total->TaxCategory = $tc;
         $tax_sub_total->TaxableAmount = $taxable_amount;
         $taxtotal->TaxSubtotal[] = $tax_sub_total;
-        
+
         $invoice->TaxTotal[] = $taxtotal;
-        
+
         $lmt = new LegalMonetaryTotal();
 
         $lea = new LineExtensionAmount();
@@ -277,8 +275,7 @@ class Fact1Test extends TestCase
         $lmt->PayableAmount = $pa;
         $invoice->LegalMonetaryTotal = $lmt;
 
-        foreach($_invoice->line_items as $key => $item)
-        {
+        foreach ($_invoice->line_items as $key => $item) {
 
             $invoice_line = new InvoiceLine;
             $invoice_line->ID = $key++;
@@ -286,7 +283,7 @@ class Fact1Test extends TestCase
             $iq = new InvoicedQuantity();
             $iq->amount = $item->cost;
             $iq->unitCode = 'H87';
-            
+
             $invoice_line->InvoicedQuantity = $iq;
 
             $invoice_line->Note = substr($item->notes, 0, 200);
@@ -310,7 +307,6 @@ class Fact1Test extends TestCase
 
             $invoice_line->Item = $i;
 
-
             $lea = new LineExtensionAmount;
             $lea->amount = $item->line_total;
             $lea->currencyID = $_invoice->client->currency()->code;
@@ -327,7 +323,7 @@ class Fact1Test extends TestCase
             $lea = new LineExtensionAmount();
             $lea->amount = $item->line_total;
             $lea->currencyID = $_invoice->client->currency()->code;
-            
+
             $invoice_line->LineExtensionAmount = $lea;
 
             $invoice->InvoiceLine[] = $invoice_line;
@@ -339,7 +335,7 @@ class Fact1Test extends TestCase
 
         $errors = $validator->validate($invoice);
 
-        foreach($errors as $error) {
+        foreach ($errors as $error) {
             // echo $error->getPropertyPath() . ': ' . $error->getMessage() . "\n";
         }
 
@@ -350,7 +346,7 @@ class Fact1Test extends TestCase
         // list of PropertyListExtractorInterface (any iterable)
         $listExtractors = [$reflectionExtractor];
         // list of PropertyTypeExtractorInterface (any iterable)
-        $typeExtractors = [$reflectionExtractor,$phpDocExtractor];
+        $typeExtractors = [$reflectionExtractor, $phpDocExtractor];
         // list of PropertyDescriptionExtractorInterface (any iterable)
         $descriptionExtractors = [$phpDocExtractor];
         // list of PropertyAccessExtractorInterface (any iterable)
@@ -375,8 +371,8 @@ class Fact1Test extends TestCase
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
 
         $normalizer = new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter, null, $propertyInfo);
-        
-        $normalizers = [  new DateTimeNormalizer(), $normalizer,  new ArrayDenormalizer() , ];
+
+        $normalizers = [new DateTimeNormalizer(), $normalizer,  new ArrayDenormalizer()];
         $encoders = [$encoder, new JsonEncoder()];
         $serializer = new Serializer($normalizers, $encoders);
 
@@ -385,7 +381,6 @@ class Fact1Test extends TestCase
             // AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
         ];
 
-        
         // $invoice = $normalizer->normalize($invoice, 'json', $n_context);
         // echo print_r($invoice);
         // $invoice = $serializer->serialize($invoice, 'xml', $n_context);
@@ -395,9 +390,6 @@ class Fact1Test extends TestCase
 
         //set default standard props
     }
-
-
-
 
     /**
      * @return float|int|mixed
@@ -447,6 +439,4 @@ class Fact1Test extends TestCase
 
         return $total;
     }
-
-
 }

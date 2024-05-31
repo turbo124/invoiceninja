@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -30,21 +29,18 @@ class PdfBuilder
     private CommonMarkConverter $commonmark;
 
     private float $payment_amount_total = 0;
+
     /**
      * an array of sections to be injected into the template
-     *
-     * @var array
      */
     public array $sections = [];
 
     /**
      * The DOM Document;
-     *
      */
     public DomDocument $document;
 
     /**
-     * @param PdfService $service
      * @return void
      */
     public function __construct(PdfService $service)
@@ -58,9 +54,6 @@ class PdfBuilder
 
     /**
      * Builds the template sections
-     *
-     * @return self
-     *
      */
     public function build(): self
     {
@@ -75,11 +68,11 @@ class PdfBuilder
     }
 
     /**
-    * Final method to get compiled HTML.
-    *
-    * @param bool $final @deprecated // is it? i still see it being called elsewhere
-    * @return string
-    */
+     * Final method to get compiled HTML.
+     *
+     * @param  bool  $final  @deprecated // is it? i still see it being called elsewhere
+     * @return string
+     */
     public function getCompiledHTML($final = false)
     {
         $html = $this->document->saveHTML();
@@ -89,9 +82,6 @@ class PdfBuilder
 
     /**
      * Generate the template
-     *
-     * @return self
-     *
      */
     private function getTemplate(): self
     {
@@ -131,7 +121,7 @@ class PdfBuilder
 
         }
 
-        foreach($contents as $key => $content) {
+        foreach ($contents as $key => $content) {
             $content->parentNode->replaceChild($replacements[$key], $content);
         }
 
@@ -150,17 +140,14 @@ class PdfBuilder
 
     /**
      * Generates product entity sections
-     *
-     * @return self
-     *
      */
     private function getProductSections(): self
     {
         $this->genericSectionBuilder()
-             ->getClientDetails()
-             ->getProductAndTaskTables()
-             ->getProductEntityDetails()
-             ->getProductTotals();
+            ->getClientDetails()
+            ->getProductAndTaskTables()
+            ->getProductEntityDetails()
+            ->getProductTotals();
 
         return $this;
     }
@@ -181,14 +168,11 @@ class PdfBuilder
 
     /**
      * Generates delivery note sections
-     *
-     * @return self
-     *
      */
     private function getDeliveryNoteSections(): self
     {
         $this->genericSectionBuilder()
-             ->getProductTotals();
+            ->getProductTotals();
 
         $this->mergeSections([
             'client-details' => [
@@ -210,9 +194,6 @@ class PdfBuilder
 
     /**
      * Generates statement sections
-     *
-     * @return self
-     *
      */
     private function getStatementSections(): self
     {
@@ -259,22 +240,18 @@ class PdfBuilder
     /**
      * Parent method for building invoice table totals
      * for statements.
-     *
-     * @return array
      */
     public function statementInvoiceTableTotals(): array
     {
         $outstanding = $this->service->options['invoices']->sum('balance');
 
         return [
-            ['element' => 'p', 'content' => '$outstanding_label: ' . $this->service->config->formatMoney($outstanding)],
+            ['element' => 'p', 'content' => '$outstanding_label: '.$this->service->config->formatMoney($outstanding)],
         ];
     }
 
     /**
      * Parent method for building payments table within statement.
-     *
-     * @return array
      */
     public function statementCreditTable(): array
     {
@@ -309,23 +286,18 @@ class PdfBuilder
     /**
      * Parent method for building invoice table totals
      * for statements.
-     *
-     * @return array
      */
     public function statementCreditTableTotals(): array
     {
         $outstanding = $this->service->options['credits']->sum('balance');
 
         return [
-            ['element' => 'p', 'content' => '$credit.balance_label: ' . $this->service->config->formatMoney($outstanding)],
+            ['element' => 'p', 'content' => '$credit.balance_label: '.$this->service->config->formatMoney($outstanding)],
         ];
     }
 
-
     /**
      * Parent method for building payments table within statement.
-     *
-     * @return array
      */
     public function statementPaymentTable(): array
     {
@@ -367,13 +339,10 @@ class PdfBuilder
 
     /**
      * Generates the statement payments table
-     *
-     * @return array
-     *
      */
     public function statementPaymentTableTotals(): array
     {
-        if (is_null($this->service->options['payments']) || !$this->service->options['payments']->first()) {
+        if (is_null($this->service->options['payments']) || ! $this->service->options['payments']->first()) {
             return [];
         }
 
@@ -392,9 +361,6 @@ class PdfBuilder
 
     /**
      * Generates the statement aging table
-     *
-     * @return array
-     *
      */
     public function statementAgingTable(): array
     {
@@ -417,12 +383,8 @@ class PdfBuilder
         return $elements;
     }
 
-
     /**
      * Generates the statement aging table
-     *
-     * @return array
-     *
      */
     public function statementCreditsTable(): array
     {
@@ -447,15 +409,12 @@ class PdfBuilder
 
     /**
      * Generates the purchase order sections
-     *
-     * @return self
-     *
      */
     private function getPurchaseOrderSections(): self
     {
         $this->genericSectionBuilder()
-             ->getProductAndTaskTables()
-             ->getProductTotals();
+            ->getProductAndTaskTables()
+            ->getProductTotals();
 
         $this->mergeSections([
             'vendor-details' => [
@@ -474,9 +433,6 @@ class PdfBuilder
     /**
      * Generates the generic section which apply
      * across all design templates
-     *
-     * @return self
-     *
      */
     private function genericSectionBuilder(): self
     {
@@ -502,9 +458,6 @@ class PdfBuilder
 
     /**
      * Generates the invoices table for statements
-     *
-     * @return array
-     *
      */
     public function statementInvoiceTable(): array
     {
@@ -528,13 +481,10 @@ class PdfBuilder
         ];
     }
 
-
     /**
      * Generate the structure of table body. (<tbody/>)
      *
-     * @param string $type "$product" or "$task"
-     * @return array
-     *
+     * @param  string  $type  "$product" or "$task"
      */
     public function buildTableBody(string $type): array
     {
@@ -553,7 +503,7 @@ class PdfBuilder
 
             foreach ($items as $row) {
                 for ($i = 0; $i < count($product_customs); $i++) {
-                    if (!empty($row['delivery_note.delivery_note' . ($i + 1)])) {
+                    if (! empty($row['delivery_note.delivery_note'.($i + 1)])) {
                         $product_customs[$i] = true;
                     }
                 }
@@ -568,7 +518,7 @@ class PdfBuilder
 
                 for ($i = 0; $i < count($product_customs); $i++) {
                     if ($product_customs[$i]) {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row['delivery_note.delivery_note' . ($i + 1)], 'properties' => ['data-ref' => 'delivery_note_table.product' . ($i + 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row['delivery_note.delivery_note'.($i + 1)], 'properties' => ['data-ref' => 'delivery_note_table.product'.($i + 1).'-td']];
                     }
                 }
 
@@ -581,18 +531,17 @@ class PdfBuilder
         $_type = Str::startsWith($type, '$') ? ltrim($type, '$') : $type;
         $table_type = "{$_type}_columns";
 
-        if ($_type == 'product' && $this->service->config->entity instanceof Quote && !$this->service->config->settings?->sync_invoice_quote_columns) {
-            $table_type = "product_quote_columns";
+        if ($_type == 'product' && $this->service->config->entity instanceof Quote && ! $this->service->config->settings?->sync_invoice_quote_columns) {
+            $table_type = 'product_quote_columns';
         }
-
 
         foreach ($items as $row) {
             $element = ['element' => 'tr', 'elements' => []];
 
             if (
                 array_key_exists($type, $this->service->options) &&
-                !empty($this->service->options[$type]) &&
-                !is_null($this->service->options[$type])
+                ! empty($this->service->options[$type]) &&
+                ! is_null($this->service->options[$type])
             ) {
                 $document = new DOMDocument();
                 $document->loadHTML($this->service->options[$type], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -622,7 +571,7 @@ class PdfBuilder
 
                     if ($cell == '$task.rate') {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$task.cost'], 'properties' => ['data-ref' => 'task_table-task.cost-td']];
-                    } elseif ($cell == '$product.discount' && !$this->service->company->enable_product_discount) {
+                    } elseif ($cell == '$product.discount' && ! $this->service->company->enable_product_discount) {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$product.discount'], 'properties' => ['data-ref' => 'product_table-product.discount-td', 'style' => 'display: none;']];
                     } elseif ($cell == '$task.hours') {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$task.quantity'], 'properties' => ['data-ref' => 'task_table-task.hours-td']];
@@ -632,7 +581,7 @@ class PdfBuilder
                         $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax2-td']];
                     } elseif ($cell == '$product.tax_rate3') {
                         $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax3-td']];
-                    } elseif ($cell == '$task.discount' && !$this->service->company->enable_product_discount) {
+                    } elseif ($cell == '$task.discount' && ! $this->service->company->enable_product_discount) {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$task.discount'], 'properties' => ['data-ref' => 'task_table-task.discount-td', 'style' => 'display: none;']];
                     } elseif ($cell == '$task.tax_rate1') {
                         $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax1-td']];
@@ -641,9 +590,9 @@ class PdfBuilder
                     } elseif ($cell == '$task.tax_rate3') {
                         $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax3-td']];
                     } elseif ($cell == '$product.unit_cost' || $cell == '$task.rate') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['style' => 'white-space: nowrap;', 'data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['style' => 'white-space: nowrap;', 'data-ref' => "{$_type}_table-".substr($cell, 1).'-td']];
                     } else {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => "{$_type}_table-".substr($cell, 1).'-td']];
                     }
                 }
             }
@@ -659,10 +608,8 @@ class PdfBuilder
     /**
      * Formats the line items for display.
      *
-     * @param array $items
-     * @param string $table_type
-     *
-     * @return array
+     * @param  array  $items
+     * @param  string  $table_type
      */
     public function transformLineItems($items, $table_type = '$product'): array
     {
@@ -672,7 +619,6 @@ class PdfBuilder
 
         foreach ($items as $key => $item) {
             /** @var \App\DataMapper\InvoiceItem $item */
-
             if ($table_type == '$product' && $item->type_id != 1) {
                 if ($item->type_id != 4 && $item->type_id != 6 && $item->type_id != 5) {
                     continue;
@@ -772,12 +718,10 @@ class PdfBuilder
     }
 
     /**
-    * Generate the structure of table headers. (<thead/>)
-    *
-    * @param string $type "product" or "task"
-    * @return array
-    *
-    */
+     * Generate the structure of table headers. (<thead/>)
+     *
+     * @param  string  $type  "product" or "task"
+     */
     public function buildTableHeader(string $type): array
     {
 
@@ -794,8 +738,8 @@ class PdfBuilder
 
         $column_type = $type;
 
-        if ($type == 'product' && $this->service->config->entity instanceof Quote && !$this->service->config->settings?->sync_invoice_quote_columns) {
-            $table_type = "product_quote_columns";
+        if ($type == 'product' && $this->service->config->entity instanceof Quote && ! $this->service->config->settings?->sync_invoice_quote_columns) {
+            $table_type = 'product_quote_columns';
             $column_type = 'product_quote';
         }
 
@@ -803,25 +747,25 @@ class PdfBuilder
 
         foreach ($this->service->config->pdf_variables[$table_type] as $column) {
             if (array_key_exists($column, $aliases)) {
-                $elements[] = ['element' => 'th', 'content' => $aliases[$column] . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($aliases[$column], 1) . '-th', 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
-            } elseif ($column == '$product.discount' && !$this->service->company->enable_product_discount) {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'style' => 'display: none;']];
+                $elements[] = ['element' => 'th', 'content' => $aliases[$column].'_label', 'properties' => ['data-ref' => "{$type}_table-".substr($aliases[$column], 1).'-th', 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+            } elseif ($column == '$product.discount' && ! $this->service->company->enable_product_discount) {
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-".substr($column, 1).'-th', 'style' => 'display: none;']];
             } elseif ($column == '$product.tax_rate1') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax1-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-product.tax1-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
             } elseif ($column == '$product.tax_rate2') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax2-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-product.tax2-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
             } elseif ($column == '$product.tax_rate3') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax3-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
-            } elseif ($column == '$task.discount' && !$this->service->company->enable_product_discount) {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'style' => 'display: none;']];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-product.tax3-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+            } elseif ($column == '$task.discount' && ! $this->service->company->enable_product_discount) {
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-".substr($column, 1).'-th', 'style' => 'display: none;']];
             } elseif ($column == '$task.tax_rate1') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-task.tax1-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-task.tax1-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
             } elseif ($column == '$task.tax_rate2') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-task.tax2-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-task.tax2-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
             } elseif ($column == '$task.tax_rate3') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-task.tax3-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-task.tax3-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
             } else {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column.'_label', 'properties' => ['data-ref' => "{$type}_table-".substr($column, 1).'-th', 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
             }
         }
 
@@ -835,8 +779,7 @@ class PdfBuilder
      * Logic below will help us calculate that & inject the result in the
      * global state of the $context (design state).
      *
-     * @param string $type "product" or "task"
-     * @return void
+     * @param  string  $type  "product" or "task"
      */
     public function processTaxColumns(string $type): void
     {
@@ -897,9 +840,6 @@ class PdfBuilder
     /**
      * Generates the javascript block for
      * hiding elements which need to be hidden
-     *
-     * @return array
-     *
      */
     public function sharedFooterElements(): array
     {
@@ -927,9 +867,6 @@ class PdfBuilder
     /**
      * Generates the totals table for
      * the product type entities
-     *
-     * @return self
-     *
      */
     private function getProductTotals(): self
     {
@@ -948,9 +885,6 @@ class PdfBuilder
      * Credits
      * Quotes
      * Invoices
-     *
-     * @return self
-     *
      */
     private function getProductEntityDetails(): self
     {
@@ -982,9 +916,6 @@ class PdfBuilder
 
     /**
      * Parent entry point when building sections of the design content
-     *
-     * @return self
-     *
      */
     private function buildSections(): self
     {
@@ -998,9 +929,6 @@ class PdfBuilder
 
     /**
      * Generates the table totals for statements
-     *
-     * @return array
-     *
      */
     private function statementTableTotals(): array
     {
@@ -1016,10 +944,6 @@ class PdfBuilder
     /**
      * Performs a variable check to ensure
      * the variable exists
-     *
-     * @param  string $variable
-     * @return bool
-     *
      */
     public function entityVariableCheck(string $variable): bool
     {
@@ -1057,9 +981,6 @@ class PdfBuilder
     //First pass done, need a second pass to abstract this content completely.
     /**
      * Builds the table totals for all entities, we'll want to split this
-     *
-     * @return array
-     *
      */
     public function getTableTotals(): array
     {
@@ -1075,10 +996,10 @@ class PdfBuilder
 
         $elements = [
             ['element' => 'div', 'properties' => ['style' => 'display: flex; flex-direction: column;'], 'elements' => [
-                ['element' => 'p', 'content' => strtr(str_replace(["labels", "values"], ["",""], $_variables['values']['$entity.public_notes']), $_variables), 'properties' => ['data-ref' => 'total_table-public_notes', 'style' => 'text-align: left;']],
+                ['element' => 'p', 'content' => strtr(str_replace(['labels', 'values'], ['', ''], $_variables['values']['$entity.public_notes']), $_variables), 'properties' => ['data-ref' => 'total_table-public_notes', 'style' => 'text-align: left;']],
                 ['element' => 'p', 'content' => '', 'properties' => ['style' => 'text-align: left; display: flex; flex-direction: column; page-break-inside: auto;'], 'elements' => [
                     ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['hidden' => $this->entityVariableCheck('$entity.terms'), 'data-ref' => 'total_table-terms-label', 'style' => 'font-weight: bold; text-align: left; margin-top: 1rem;']],
-                    ['element' => 'span', 'content' => strtr(str_replace("labels", "", $_variables['values']['$entity.terms']), $_variables['labels']), 'properties' => ['data-ref' => 'total_table-terms', 'style' => 'text-align: left;']],
+                    ['element' => 'span', 'content' => strtr(str_replace('labels', '', $_variables['values']['$entity.terms']), $_variables['labels']), 'properties' => ['data-ref' => 'total_table-terms', 'style' => 'text-align: left;']],
                 ]],
                 ['element' => 'img', 'properties' => ['style' => 'max-width: 50%; height: auto;', 'src' => '$contact.signature', 'id' => 'contact-signature']],
                 ['element' => 'div', 'properties' => ['style' => 'display: flex; align-items: flex-start; page-break-inside: auto;'], 'elements' => [
@@ -1087,7 +1008,6 @@ class PdfBuilder
             ]],
             ['element' => 'div', 'properties' => ['class' => 'totals-table-right-side', 'dir' => '$dir'], 'elements' => []],
         ];
-
 
         if ($this->service->document_type == PdfService::DELIVERY_NOTE) {
             return $elements;
@@ -1115,8 +1035,8 @@ class PdfBuilder
             $variable = sprintf('%s%s', '$', $property);
 
             if (
-                !is_null($this->service->config->entity->{$property}) &&
-                !empty($this->service->config->entity->{$property}) &&
+                ! is_null($this->service->config->entity->{$property}) &&
+                ! empty($this->service->config->entity->{$property}) &&
                 $this->service->config->entity->{$property} != 0
             ) {
                 continue;
@@ -1131,56 +1051,56 @@ class PdfBuilder
             if ($variable == '$total_taxes') {
                 $taxes = $this->service->config->entity->calc()->getTotalTaxMap();
 
-                if (!$taxes) {
+                if (! $taxes) {
                     continue;
                 }
 
                 foreach ($taxes as $i => $tax) {
                     $elements[1]['elements'][] = ['element' => 'div', 'elements' => [
-                        ['element' => 'span', 'content', 'content' => $tax['name'], 'properties' => ['data-ref' => 'totals-table-total_tax_' . $i . '-label']],
-                        ['element' => 'span', 'content', 'content' => $this->service->config->formatMoney($tax['total']), 'properties' => ['data-ref' => 'totals-table-total_tax_' . $i]],
+                        ['element' => 'span', 'content', 'content' => $tax['name'], 'properties' => ['data-ref' => 'totals-table-total_tax_'.$i.'-label']],
+                        ['element' => 'span', 'content', 'content' => $this->service->config->formatMoney($tax['total']), 'properties' => ['data-ref' => 'totals-table-total_tax_'.$i]],
                     ]];
                 }
             } elseif ($variable == '$line_taxes') {
                 $taxes = $this->service->config->entity->calc()->getTaxMap();
 
-                if (!$taxes) {
+                if (! $taxes) {
                     continue;
                 }
 
                 foreach ($taxes as $i => $tax) {
                     $elements[1]['elements'][] = ['element' => 'div', 'elements' => [
-                        ['element' => 'span', 'content', 'content' => $tax['name'], 'properties' => ['data-ref' => 'totals-table-line_tax_' . $i . '-label']],
-                        ['element' => 'span', 'content', 'content' => $this->service->config->formatMoney($tax['total']), 'properties' => ['data-ref' => 'totals-table-line_tax_' . $i]],
+                        ['element' => 'span', 'content', 'content' => $tax['name'], 'properties' => ['data-ref' => 'totals-table-line_tax_'.$i.'-label']],
+                        ['element' => 'span', 'content', 'content' => $this->service->config->formatMoney($tax['total']), 'properties' => ['data-ref' => 'totals-table-line_tax_'.$i]],
                     ]];
                 }
             } elseif (Str::startsWith($variable, '$custom_surcharge')) {
                 $_variable = ltrim($variable, '$'); // $custom_surcharge1 -> custom_surcharge1
 
-                $visible = intval(str_replace(['0','.'], '', ($this->service->config->entity->{$_variable} ?? ''))) != 0;
+                $visible = intval(str_replace(['0', '.'], '', ($this->service->config->entity->{$_variable} ?? ''))) != 0;
 
                 $elements[1]['elements'][] = ['element' => 'div', 'elements' => [
-                    ['element' => 'span', 'content' => $variable . '_label', 'properties' => ['hidden' => !$visible, 'data-ref' => 'totals_table-' . substr($variable, 1) . '-label']],
-                    ['element' => 'span', 'content' => $variable, 'properties' => ['hidden' => !$visible, 'data-ref' => 'totals_table-' . substr($variable, 1)]],
+                    ['element' => 'span', 'content' => $variable.'_label', 'properties' => ['hidden' => ! $visible, 'data-ref' => 'totals_table-'.substr($variable, 1).'-label']],
+                    ['element' => 'span', 'content' => $variable, 'properties' => ['hidden' => ! $visible, 'data-ref' => 'totals_table-'.substr($variable, 1)]],
                 ]];
             } elseif (Str::startsWith($variable, '$custom')) {
                 $field = explode('_', $variable);
-                $visible = is_object($this->service->company->custom_fields) && property_exists($this->service->company->custom_fields, $field[1]) && !empty($this->service->company->custom_fields->{$field[1]});
+                $visible = is_object($this->service->company->custom_fields) && property_exists($this->service->company->custom_fields, $field[1]) && ! empty($this->service->company->custom_fields->{$field[1]});
 
                 $elements[1]['elements'][] = ['element' => 'div', 'elements' => [
-                    ['element' => 'span', 'content' => $variable . '_label', 'properties' => ['hidden' => !$visible, 'data-ref' => 'totals_table-' . substr($variable, 1) . '-label']],
-                    ['element' => 'span', 'content' => $variable, 'properties' => ['hidden' => !$visible, 'data-ref' => 'totals_table-' . substr($variable, 1)]],
+                    ['element' => 'span', 'content' => $variable.'_label', 'properties' => ['hidden' => ! $visible, 'data-ref' => 'totals_table-'.substr($variable, 1).'-label']],
+                    ['element' => 'span', 'content' => $variable, 'properties' => ['hidden' => ! $visible, 'data-ref' => 'totals_table-'.substr($variable, 1)]],
                 ]];
             } else {
                 $elements[1]['elements'][] = ['element' => 'div', 'elements' => [
-                    ['element' => 'span', 'content' => $variable . '_label', 'properties' => ['data-ref' => 'totals_table-' . substr($variable, 1) . '-label']],
-                    ['element' => 'span', 'content' => $variable, 'properties' => ['data-ref' => 'totals_table-' . substr($variable, 1)]],
+                    ['element' => 'span', 'content' => $variable.'_label', 'properties' => ['data-ref' => 'totals_table-'.substr($variable, 1).'-label']],
+                    ['element' => 'span', 'content' => $variable, 'properties' => ['data-ref' => 'totals_table-'.substr($variable, 1)]],
                 ]];
             }
         }
 
         $elements[1]['elements'][] = ['element' => 'div', 'elements' => [
-            ['element' => 'span', 'content' => '',],
+            ['element' => 'span', 'content' => ''],
             ['element' => 'span', 'content' => ''],
         ]];
 
@@ -1189,9 +1109,6 @@ class PdfBuilder
 
     /**
      * Generates the product and task tables
-     *
-     * @return self
-     *
      */
     public function getProductAndTaskTables(): self
     {
@@ -1211,9 +1128,6 @@ class PdfBuilder
 
     /**
      * Generates the client details
-     *
-     * @return self
-     *
      */
     public function getClientDetails(): self
     {
@@ -1233,8 +1147,6 @@ class PdfBuilder
 
     /**
      * Generates the product table
-     *
-     * @return array
      */
     public function productTable(): array
     {
@@ -1254,8 +1166,6 @@ class PdfBuilder
 
     /**
      * Generates the task table
-     *
-     * @return array
      */
     public function taskTable(): array
     {
@@ -1273,12 +1183,8 @@ class PdfBuilder
         ];
     }
 
-
     /**
      * Generates the statement details
-     *
-     * @return array
-     *
      */
     public function statementDetails(): array
     {
@@ -1286,8 +1192,8 @@ class PdfBuilder
 
         return [
             ['element' => 'tr', 'properties' => ['data-ref' => 'statement-label'], 'elements' => [
-                ['element' => 'th', 'properties' => [], 'content' => ""],
-                ['element' => 'th', 'properties' => [], 'content' => "<h2>".ctrans('texts.statement')."</h2>"],
+                ['element' => 'th', 'properties' => [], 'content' => ''],
+                ['element' => 'th', 'properties' => [], 'content' => '<h2>'.ctrans('texts.statement').'</h2>'],
             ]],
             ['element' => 'tr', 'properties' => [], 'elements' => [
                 ['element' => 'th', 'properties' => [], 'content' => ctrans('texts.statement_date')],
@@ -1302,9 +1208,6 @@ class PdfBuilder
 
     /**
      * Generates the invoice details
-     *
-     * @return array
-     *
      */
     public function invoiceDetails(): array
     {
@@ -1315,9 +1218,6 @@ class PdfBuilder
 
     /**
      * Generates the quote details
-     *
-     * @return array
-     *
      */
     public function quoteDetails(): array
     {
@@ -1330,12 +1230,8 @@ class PdfBuilder
         return $this->genericDetailsBuilder($variables);
     }
 
-
     /**
      * Generates the credit note details
-     *
-     * @return array
-     *
      */
     public function creditDetails(): array
     {
@@ -1346,8 +1242,6 @@ class PdfBuilder
 
     /**
      * Generates the purchase order details
-     *
-     * @return array
      */
     public function purchaseOrderDetails(): array
     {
@@ -1358,16 +1252,13 @@ class PdfBuilder
 
     /**
      * Generates the deliveyr note details
-     *
-     * @return array
-     *
      */
     public function deliveryNoteDetails(): array
     {
         $variables = $this->service->config->pdf_variables['invoice_details'];
 
         $variables = array_filter($variables, function ($m) {
-            return !in_array($m, ['$invoice.balance_due', '$invoice.total']);
+            return ! in_array($m, ['$invoice.balance_due', '$invoice.total']);
         });
 
         return $this->genericDetailsBuilder($variables);
@@ -1376,9 +1267,6 @@ class PdfBuilder
     /**
      * Generates the custom values for the
      * entity.
-     *
-     * @param  array $variables
-     * @return array
      */
     public function genericDetailsBuilder(array $variables): array
     {
@@ -1388,17 +1276,17 @@ class PdfBuilder
             $_variable = explode('.', $variable)[1];
             $_customs = ['custom1', 'custom2', 'custom3', 'custom4'];
 
-            $var = str_replace("custom", "custom_value", $_variable);
+            $var = str_replace('custom', 'custom_value', $_variable);
 
-            if (in_array($_variable, $_customs) && !empty($this->service->config->entity->{$var})) {
+            if (in_array($_variable, $_customs) && ! empty($this->service->config->entity->{$var})) {
                 $elements[] = ['element' => 'tr', 'elements' => [
-                    ['element' => 'th', 'content' => $variable . '_label', 'properties' => ['data-ref' => 'entity_details-' . substr($variable, 1) . '_label']],
-                    ['element' => 'th', 'content' => $variable, 'properties' => ['data-ref' => 'entity_details-' . substr($variable, 1)]],
+                    ['element' => 'th', 'content' => $variable.'_label', 'properties' => ['data-ref' => 'entity_details-'.substr($variable, 1).'_label']],
+                    ['element' => 'th', 'content' => $variable, 'properties' => ['data-ref' => 'entity_details-'.substr($variable, 1)]],
                 ]];
             } else {
                 $elements[] = ['element' => 'tr', 'properties' => ['hidden' => $this->entityVariableCheck($variable)], 'elements' => [
-                    ['element' => 'th', 'content' => $variable . '_label', 'properties' => ['data-ref' => 'entity_details-' . substr($variable, 1) . '_label']],
-                    ['element' => 'th', 'content' => $variable, 'properties' => ['data-ref' => 'entity_details-' . substr($variable, 1)]],
+                    ['element' => 'th', 'content' => $variable.'_label', 'properties' => ['data-ref' => 'entity_details-'.substr($variable, 1).'_label']],
+                    ['element' => 'th', 'content' => $variable, 'properties' => ['data-ref' => 'entity_details-'.substr($variable, 1)]],
                 ]];
             }
         }
@@ -1406,36 +1294,32 @@ class PdfBuilder
         return $elements;
     }
 
-
     /**
      * Generates the client delivery
      * details array
-     *
-     * @return array
-     *
      */
     public function clientDeliveryDetails(): array
     {
         $elements = [];
 
-        if (!$this->service->config->client) {
+        if (! $this->service->config->client) {
             return $elements;
         }
 
         $elements = [
-                ['element' => 'p', 'content' => ctrans('texts.delivery_note'), 'properties' => ['data-ref' => 'delivery_note-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
-                ['element' => 'p', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
-                ['element' => 'p', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
-                ['element' => 'p', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
-                ['element' => 'p', 'show_empty' => false, 'elements' => [
-                    ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['ref' => 'delivery_note-client.shipping_city']],
-                    ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
-                    ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
-                ]],
-                ['element' => 'p', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
-            ];
+            ['element' => 'p', 'content' => ctrans('texts.delivery_note'), 'properties' => ['data-ref' => 'delivery_note-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
+            ['element' => 'p', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
+            ['element' => 'p', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
+            ['element' => 'p', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
+            ['element' => 'p', 'show_empty' => false, 'elements' => [
+                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['ref' => 'delivery_note-client.shipping_city']],
+                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
+                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
+            ]],
+            ['element' => 'p', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
+        ];
 
-        if (!is_null($this->service->config->contact)) {
+        if (! is_null($this->service->config->contact)) {
             $elements[] = ['element' => 'p', 'content' => $this->service->config->contact->email, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-contact.email']];
         }
 
@@ -1444,21 +1328,19 @@ class PdfBuilder
 
     /**
      * Generates the client details section
-     *
-     * @return array
      */
     public function clientDetails(): array
     {
         $elements = [];
 
-        if (!$this->service->config->client) {
+        if (! $this->service->config->client) {
             return $elements;
         }
 
         $variables = $this->service->config->pdf_variables['client_details'];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'client_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'client_details-'.substr($variable, 1)]];
         }
 
         return $elements;
@@ -1468,7 +1350,7 @@ class PdfBuilder
     {
         $elements = [];
 
-        if (!$this->service->config->client) {
+        if (! $this->service->config->client) {
             return $elements;
         }
 
@@ -1488,11 +1370,8 @@ class PdfBuilder
         return $elements;
     }
 
-
     /**
      * Generates the delivery note table
-     *
-     * @return array
      */
     public function deliveryNoteTable(): array
     {
@@ -1511,7 +1390,7 @@ class PdfBuilder
 
         foreach ($items as $row) {
             for ($i = 0; $i < count($product_customs); $i++) {
-                if (!empty($row['delivery_note.delivery_note' . ($i + 1)])) {
+                if (! empty($row['delivery_note.delivery_note'.($i + 1)])) {
                     $product_customs[$i] = true;
                 }
             }
@@ -1519,7 +1398,7 @@ class PdfBuilder
 
         for ($i = 0; $i < count($product_customs); $i++) {
             if ($product_customs[$i]) {
-                array_push($thead, ['element' => 'th', 'content' => '$product.product' . ($i + 1) . '_label', 'properties' => ['data-ref' => 'delivery_note-product.product' . ($i + 1) . '_label']]);
+                array_push($thead, ['element' => 'th', 'content' => '$product.product'.($i + 1).'_label', 'properties' => ['data-ref' => 'delivery_note-product.product'.($i + 1).'_label']]);
             }
         }
 
@@ -1532,10 +1411,6 @@ class PdfBuilder
     /**
      * Passes an array of items by reference
      * and performs a nl2br
-     *
-     * @param  array $items
-     * @return void
-     *
      */
     public function processNewLines(array &$items): void
     {
@@ -1550,9 +1425,6 @@ class PdfBuilder
 
     /**
      * Generates an arary of the company details
-     *
-     * @return array
-     *
      */
     public function companyDetails(): array
     {
@@ -1561,18 +1433,14 @@ class PdfBuilder
         $elements = [];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_details-'.substr($variable, 1)]];
         }
 
         return $elements;
     }
 
     /**
-     *
      * Generates an array of the company address
-     *
-     * @return array
-     *
      */
     public function companyAddress(): array
     {
@@ -1581,18 +1449,14 @@ class PdfBuilder
         $elements = [];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_address-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_address-'.substr($variable, 1)]];
         }
 
         return $elements;
     }
 
     /**
-     *
      * Generates an array of vendor details
-     *
-     * @return array
-     *
      */
     public function vendorDetails(): array
     {
@@ -1601,12 +1465,11 @@ class PdfBuilder
         $variables = $this->service->config->pdf_variables['vendor_details'];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'vendor_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'vendor_details-'.substr($variable, 1)]];
         }
 
         return $elements;
     }
-
 
     ////////////////////////////////////////
     // Dom Traversal
@@ -1686,7 +1549,6 @@ class PdfBuilder
                 $_child = $this->document->createElement($child['element'], '');
                 $_child->setAttribute('data-state', 'encoded-html');
                 $_child->nodeValue = htmlspecialchars($child['content']);
-
 
             } else {
                 // .. in case string doesn't contain any HTML, we'll just return

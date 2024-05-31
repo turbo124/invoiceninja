@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,16 +60,15 @@ class CompanyService
                     return;
             }
 
-            foreach($taxes as $tax) {
+            foreach ($taxes as $tax) {
                 $tax_rate = TaxRateFactory::create($this->company->id, $user->id);
                 $tax_rate->fill($tax);
                 $tax_rate->save();
             }
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog($e->getMessage());
         }
 
     }
-
 }

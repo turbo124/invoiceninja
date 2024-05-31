@@ -5,7 +5,6 @@
  *   schema="TaskSchedulerSchema",
  *   type="object",
  *
- *
  *     @OA\Property(property="paused",type="boolean",example="false",description="The scheduler paused state"),
  *     @OA\Property(property="repeat_every",type="string",example="DAY",description="Accepted values (DAY,WEEK,MONTH,3MONTHS,YEAR)"),
  *     @OA\Property(property="start_from",type="integer",example="1652898504",description="Timestamp when we should start the scheduler, default is today"),
@@ -17,6 +16,7 @@
  *     @OA\Property(
  *          property="report_keys",
  *          type="array",
+ *
  *                 @OA\Items(
  *                     type="string",
  *                     description="Array of Keys to export",
@@ -47,6 +47,7 @@
  * @OA\Schema(
  *   schema="UpdateJobForASchedulerSchema",
  *   type="object",
+ *
  *     @OA\Property(property="job",type="string",example="create_client_report",description="Set action name, action names can be found in Scheduler Model"),
  *
  * )

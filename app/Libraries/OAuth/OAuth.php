@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,7 +43,7 @@ class OAuth
     public $provider_id;
 
     /**
-     * @param \Laravel\Socialite\Facades\Socialite $socialite_user
+     * @param  \Laravel\Socialite\Facades\Socialite  $socialite_user
      * @return bool | \App\Models\User | \App\Models\User | null
      */
     public static function handleAuth($socialite_user, $provider)

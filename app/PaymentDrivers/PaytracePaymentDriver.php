@@ -5,30 +5,29 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\PaymentDrivers;
 
+use App\Exceptions\SystemError;
+use App\Factory\ClientFactory;
+use App\Http\Requests\Payments\PaymentWebhookRequest;
+use App\Jobs\Util\SystemLogger;
+use App\Models\ClientContact;
+use App\Models\ClientGatewayToken;
+use App\Models\GatewayType;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Utils\CurlUtils;
-use App\Models\SystemLog;
-use App\Models\GatewayType;
 use App\Models\PaymentHash;
 use App\Models\PaymentType;
-use App\Factory\ClientFactory;
-use App\Exceptions\SystemError;
-use App\Jobs\Util\SystemLogger;
-use App\Utils\Traits\MakesHash;
-use App\Models\ClientGatewayToken;
-use App\Repositories\ClientRepository;
+use App\Models\SystemLog;
+use App\PaymentDrivers\Factory\PaytraceCustomerFactory;
 use App\PaymentDrivers\PayTrace\CreditCard;
 use App\Repositories\ClientContactRepository;
-use App\Http\Requests\Payments\PaymentWebhookRequest;
-use App\Models\ClientContact;
-use App\PaymentDrivers\Factory\PaytraceCustomerFactory;
+use App\Repositories\ClientRepository;
+use App\Utils\CurlUtils;
+use App\Utils\Traits\MakesHash;
 
 class PaytracePaymentDriver extends BaseDriver
 {
@@ -135,14 +134,14 @@ class PaytracePaymentDriver extends BaseDriver
         $invoice = Invoice::withTrashed()->find($this->decodePrimaryKey($_invoice->invoice_id));
 
         if ($invoice) {
-            $invoice_id =  ctrans('texts.invoice_number').'# '.$invoice->number;
+            $invoice_id = ctrans('texts.invoice_number').'# '.$invoice->number;
         }
 
         $invoice_id = ctrans('texts.invoice_number').'# '.substr($payment_hash->hash, 0, 6);
 
         $data = [
             'customer_id' => $cgt->token,
-            'integrator_id' =>  $this->company_gateway->getConfigField('integratorId'),
+            'integrator_id' => $this->company_gateway->getConfigField('integratorId'),
             'amount' => $amount,
             'invoice_id' => $invoice_id,
         ];
@@ -182,7 +181,7 @@ class PaytracePaymentDriver extends BaseDriver
         $this->processUnsuccessfulTransaction($data, false);
     }
 
-    public function processWebhookRequest(PaymentWebhookRequest $request, Payment $payment = null)
+    public function processWebhookRequest(PaymentWebhookRequest $request, ?Payment $payment = null)
     {
     }
 
@@ -203,7 +202,7 @@ class PaytracePaymentDriver extends BaseDriver
 
         $auth_data = json_decode($response);
 
-        if (!isset($auth_data) || ! property_exists($auth_data, 'access_token')) {
+        if (! isset($auth_data) || ! property_exists($auth_data, 'access_token')) {
             throw new SystemError('Error authenticating with PayTrace');
         }
 
@@ -269,9 +268,9 @@ class PaytracePaymentDriver extends BaseDriver
     {
         try {
             $this->init()->generateAuthHeaders() && strlen($this->company_gateway->getConfigField('integratorId')) > 2;
+
             return true;
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
 
         }
 
@@ -283,7 +282,7 @@ class PaytracePaymentDriver extends BaseDriver
     {
 
         $data = [
-            'integrator_id' =>  $this->company_gateway->getConfigField('integratorId'),
+            'integrator_id' => $this->company_gateway->getConfigField('integratorId'),
         ];
 
         $response = $this->gatewayRequest('/v1/customer/export', $data);
@@ -291,31 +290,31 @@ class PaytracePaymentDriver extends BaseDriver
         nlog($response);
 
         if ($response && $response->success) {
-     
+
             $client_repo = new ClientRepository(new ClientContactRepository());
             $factory = new PaytraceCustomerFactory();
 
-            foreach($response->customers as $customer)
-            {
+            foreach ($response->customers as $customer) {
                 $data = $factory->convertToNinja($customer, $this->company_gateway->company);
-                
+
                 $client = false;
 
-                if(str_contains($data['contacts'][0]['email'], "@"))
-                {
+                if (str_contains($data['contacts'][0]['email'], '@')) {
                     $client = ClientContact::query()
-                                    ->where('company_id', $this->company_gateway->company_id)
-                                    ->where('email', $data['contacts'][0]['email'])
-                                    ->first()->client ?? false;
+                        ->where('company_id', $this->company_gateway->company_id)
+                        ->where('email', $data['contacts'][0]['email'])
+                        ->first()->client ?? false;
                 }
 
-                if(!$client)
+                if (! $client) {
                     $client = $client_repo->save($data, ClientFactory::create($this->company_gateway->company_id, $this->company_gateway->user_id));
-                
+                }
+
                 $this->client = $client;
 
-                if(ClientGatewayToken::query()->where('client_id', $client->id)->where('token',$data['card']['token'])->exists())
+                if (ClientGatewayToken::query()->where('client_id', $client->id)->where('token', $data['card']['token'])->exists()) {
                     continue;
+                }
 
                 $cgt = [];
                 $cgt['token'] = $data['card']['token'];
@@ -331,7 +330,7 @@ class PaytracePaymentDriver extends BaseDriver
                 $cgt['payment_meta'] = $payment_meta;
 
                 $token = $this->storeGatewayToken($cgt, []);
-            
+
             }
         }
 

@@ -11,14 +11,9 @@ class WebhookTransformer extends EntityTransformer
 
     protected array $defaultIncludes = [];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [];
 
     /**
-     * @param Webhook $webhook
-     *
      * @return array
      */
     public function transform(Webhook $webhook)

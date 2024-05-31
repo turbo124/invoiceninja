@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -49,7 +48,7 @@ class SubscriptionRepository extends BaseRepository
         DB::connection(config('database.default'))->beginTransaction();
         $data = [];
 
-        /** @var \App\Models\Client $client **/
+        /** @var \App\Models\Client $client * */
         $client = Client::factory()->create([
             'user_id' => $subscription->user_id,
             'company_id' => $subscription->company_id,
@@ -58,7 +57,7 @@ class SubscriptionRepository extends BaseRepository
             'settings' => ClientSettings::defaults(),
         ]);
 
-        /** @var \App\Models\ClientContact $contact **/
+        /** @var \App\Models\ClientContact $contact * */
         $contact = ClientContact::factory()->create([
             'user_id' => $subscription->user_id,
             'company_id' => $subscription->company_id,
@@ -118,23 +117,23 @@ class SubscriptionRepository extends BaseRepository
 
         return $line_items;
     }
-    
+
     /**
      * ConvertV3Bundle
      *
      * Removing the nested keys of the items array
-     * 
-     * @param  array $bundle
-     * @return array
+     *
+     * @param  array  $bundle
      */
     private function convertV3Bundle($bundle): array
     {
-        if(is_object($bundle))
-            $bundle = json_decode(json_encode($bundle),1);
+        if (is_object($bundle)) {
+            $bundle = json_decode(json_encode($bundle), 1);
+        }
 
         $items = [];
 
-        foreach($bundle['recurring_products'] as $key => $value) {
+        foreach ($bundle['recurring_products'] as $key => $value) {
 
             $line_item = new \stdClass;
             $line_item->product_key = $value['product']['product_key'];
@@ -145,7 +144,7 @@ class SubscriptionRepository extends BaseRepository
             $items[] = $line_item;
         }
 
-        foreach($bundle['recurring_products'] as $key => $value) {
+        foreach ($bundle['recurring_products'] as $key => $value) {
 
             $line_item = new \stdClass;
             $line_item->product_key = $value['product']['product_key'];
@@ -163,8 +162,9 @@ class SubscriptionRepository extends BaseRepository
     public function generateBundleLineItems($bundle, $is_recurring = false, $is_credit = false)
     {
 
-        if(isset($bundle->recurring_products))
+        if (isset($bundle->recurring_products)) {
             $bundle = $this->convertV3Bundle($bundle);
+        }
 
         $multiplier = $is_credit ? -1 : 1;
 
@@ -175,19 +175,17 @@ class SubscriptionRepository extends BaseRepository
         })->map(function ($item) {
             $line_item = new InvoiceItem();
             $line_item->product_key = $item->product_key;
-            $line_item->quantity = (float)$item->qty;
-            $line_item->cost = (float)$item->unit_cost;
+            $line_item->quantity = (float) $item->qty;
+            $line_item->cost = (float) $item->unit_cost;
             $line_item->notes = $item->description;
 
             return $line_item;
         })->toArray();
 
-
         $line_items = $this->cleanItems($line_items);
 
         return $line_items;
     }
-
 
     private function makeLineItem($product, $multiplier)
     {
@@ -212,11 +210,11 @@ class SubscriptionRepository extends BaseRepository
 
     public function assign_invoice(Subscription $subscription, $request)
     {
-        $class = "\\App\\Models\\".ucfirst(Str::camel($request->entity));
+        $class = '\\App\\Models\\'.ucfirst(Str::camel($request->entity));
 
         $entity = $class::withTrashed()->find($request->entity_id);
 
-        if($entity) {
+        if ($entity) {
             $entity->subscription_id = $subscription->id;
             $entity->save();
         }

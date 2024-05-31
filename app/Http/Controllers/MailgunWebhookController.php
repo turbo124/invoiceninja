@@ -5,14 +5,12 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Controllers;
 
 use App\Jobs\Mailgun\ProcessMailgunWebhook;
-use App\Jobs\PostMark\ProcessPostmarkWebhook;
 use Illuminate\Http\Request;
 
 /**
@@ -35,7 +33,7 @@ class MailgunWebhookController extends BaseController
             return response()->json(['message' => 'Success'], 200);
         }
 
-        if(\hash_equals(\hash_hmac('sha256', $input['signature']['timestamp'] . $input['signature']['token'], config('services.mailgun.webhook_signing_key')), $input['signature']['signature'])) {
+        if (\hash_equals(\hash_hmac('sha256', $input['signature']['timestamp'].$input['signature']['token'], config('services.mailgun.webhook_signing_key')), $input['signature']['signature'])) {
             ProcessMailgunWebhook::dispatch($request->all())->delay(10);
         }
 

@@ -5,20 +5,16 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Models\Invoice;
-use Tests\MockAccountData;
 use App\Helpers\Invoice\InvoiceSum;
 use App\Models\Client;
 use App\Models\Credit;
-use App\Models\Document;
 use App\Models\Expense;
+use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Project;
@@ -27,14 +23,16 @@ use App\Models\Quote;
 use App\Models\Task;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 /**
  * @test
  */
 class EntityTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
     public $invoice;
 
@@ -42,7 +40,7 @@ class EntityTest extends TestCase
 
     public $settings;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 

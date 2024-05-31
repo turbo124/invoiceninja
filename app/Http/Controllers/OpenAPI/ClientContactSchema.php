@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="ClientContact",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed if of the contact"),
  *       @OA\Property(property="user_id", type="string", example="Opnel5aKBz", description="The hashed id of the user who created the contact"),
  *       @OA\Property(property="company_id", type="string", example="Opnel5aKBz", description="The hashed id of the company"),

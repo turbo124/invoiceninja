@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -146,11 +145,9 @@ trait UserNotifies
      * Underrated method right here, last ones
      * are always the best
      *
-     * @param  \App\Models\CompanyUser $company_user
-     * @param  Invoice | Quote | Credit | PurchaseOrder | Product $entity
-     * @param  array $required_notification
-     *
-     * @return bool
+     * @param  \App\Models\CompanyUser  $company_user
+     * @param  Invoice | Quote | Credit | PurchaseOrder | Product  $entity
+     * @param  array  $required_notification
      */
     private function checkNotificationExists($company_user, $entity, $required_notification): bool
     {

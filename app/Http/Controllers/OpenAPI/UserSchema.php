@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="User",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed id of the user"),
  *       @OA\Property(property="first_name", type="string", example="Brad", description="The first name of the user"),
  *       @OA\Property(property="last_name", type="string", example="Pitt", description="The last name of the user"),

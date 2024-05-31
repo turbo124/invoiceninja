@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -55,24 +54,24 @@ class PaymentExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_client_fields, $this->input['report_keys']));
 
         $query = Payment::query()
-                            ->withTrashed()
-                            ->whereHas('client', function ($q){
-                                $q->where('is_deleted', false);
-                            })
-                            ->where('company_id', $this->company->id)
-                            ->where('is_deleted', 0);
+            ->withTrashed()
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id)
+            ->where('is_deleted', 0);
 
         $query = $this->addDateRange($query);
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
         $query = $this->addPaymentStatusFilters($query, $this->input['status'] ?? '');
-        
-        if($this->input['document_email_attachment'] ?? false) {
+
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -91,10 +90,11 @@ class PaymentExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
 
@@ -102,7 +102,7 @@ class PaymentExport extends BaseExport
 
     public function run()
     {
-        $query =  $this->init();
+        $query = $this->init();
         //load the CSV document from a string
         $this->csv = Writer::createFromString();
         \League\Csv\CharsetConverter::addTo($this->csv, 'UTF-8', 'UTF-8');
@@ -111,9 +111,9 @@ class PaymentExport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query->cursor()
-              ->each(function ($entity) {
-                  $this->csv->insertOne($this->buildRow($entity));
-              });
+            ->each(function ($entity) {
+                $this->csv->insertOne($this->buildRow($entity));
+            });
 
         return $this->csv->toString();
     }

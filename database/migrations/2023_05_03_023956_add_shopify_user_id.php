@@ -4,7 +4,8 @@ use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -17,9 +18,9 @@ return new class extends Migration {
 
             $settings = $company->settings;
 
-            if(!property_exists($settings, 'enable_e_invoice')) {
+            if (! property_exists($settings, 'enable_e_invoice')) {
 
-                $company->saveSettings((array)$company->settings, $company);
+                $company->saveSettings((array) $company->settings, $company);
 
             }
 

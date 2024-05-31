@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,7 +44,7 @@ class NinjaPlanController extends Controller
         if (! $company) {
             MultiDB::findAndSetDbByAccountKey($account_or_company_key);
 
-            /** @var \App\Models\Account $account **/
+            /** @var \App\Models\Account $account * */
             $account = Account::query()->where('key', $account_or_company_key)->first();
         } else {
             $account = $company->account;
@@ -86,7 +85,7 @@ class NinjaPlanController extends Controller
 
     public function trial_confirmation(Request $request)
     {
-        $trial_started = "Trial Started @ ".now()->format('Y-m-d H:i:s');
+        $trial_started = 'Trial Started @ '.now()->format('Y-m-d H:i:s');
 
         $client = auth()->guard('contact')->user()->client;
         $client->private_notes = $trial_started;
@@ -143,7 +142,7 @@ class NinjaPlanController extends Controller
         if (auth()->guard('contact')->user()->client->custom_value2) {
             MultiDB::findAndSetDbByAccountKey(auth()->guard('contact')->user()->client->custom_value2);
 
-            /** @var \App\Models\Account $account **/
+            /** @var \App\Models\Account $account * */
             $account = Account::where('key', auth()->guard('contact')->user()->client->custom_value2)->first();
             // $account->trial_started = now();
             // $account->trial_plan = 'pro';
@@ -163,7 +162,7 @@ class NinjaPlanController extends Controller
         //create recurring invoice
         $subscription_repo = new SubscriptionRepository();
 
-        /** @var \App\Models\Subscription $subscription **/
+        /** @var \App\Models\Subscription $subscription * */
         $subscription = Subscription::find(6);
 
         $recurring_invoice = RecurringInvoiceFactory::create($subscription->company_id, $subscription->user_id);
@@ -185,13 +184,13 @@ class NinjaPlanController extends Controller
         $recurring_invoice->service()->applyNumber()->start()->save();
 
         LightLogs::create(new TrialStarted())
-                 ->increment()
-                 ->queue();
+            ->increment()
+            ->queue();
 
         $old_recurring = RecurringInvoice::query()->where('company_id', config('ninja.ninja_default_company_id'))
-                                            ->where('client_id', $client->id)
-                                            ->where('id', '!=', $recurring_invoice->id)
-                                            ->first();
+            ->where('client_id', $client->id)
+            ->where('id', '!=', $recurring_invoice->id)
+            ->first();
 
         if ($old_recurring) {
             $old_recurring->service()->stop()->save();
@@ -226,7 +225,7 @@ class NinjaPlanController extends Controller
 
             if ($account) {
                 //offer the option to have a free trial
-                if (!$account->plan && !$account->is_trial) {
+                if (! $account->plan && ! $account->is_trial) {
                     return $this->trial();
                 }
 
@@ -234,12 +233,12 @@ class NinjaPlanController extends Controller
                     //expired get the most recent invoice for payment
 
                     $late_invoice = Invoice::on('db-ninja-01')
-                                           ->where('company_id', Auth::guard('contact')->user()->company->id)
-                                           ->where('client_id', Auth::guard('contact')->user()->client->id)
-                                           ->where('status_id', Invoice::STATUS_SENT)
-                                           ->whereNotNull('subscription_id')
-                                           ->orderBy('id', 'DESC')
-                                           ->first();
+                        ->where('company_id', Auth::guard('contact')->user()->company->id)
+                        ->where('client_id', Auth::guard('contact')->user()->client->id)
+                        ->where('status_id', Invoice::STATUS_SENT)
+                        ->whereNotNull('subscription_id')
+                        ->orderBy('id', 'DESC')
+                        ->first();
 
                     //account status means user cannot perform upgrades until they pay their account.
                     // $data['late_invoice'] = $late_invoice;
@@ -249,24 +248,24 @@ class NinjaPlanController extends Controller
                 }
 
                 $recurring_invoice = RecurringInvoice::on('db-ninja-01')
-                                            ->where('client_id', auth()->guard('contact')->user()->client->id)
-                                            ->where('company_id', Auth::guard('contact')->user()->company->id)
-                                            ->whereNotNull('subscription_id')
-                                            ->where('status_id', RecurringInvoice::STATUS_ACTIVE)
-                                            ->orderBy('id', 'desc')
-                                            ->first();
+                    ->where('client_id', auth()->guard('contact')->user()->client->id)
+                    ->where('company_id', Auth::guard('contact')->user()->company->id)
+                    ->whereNotNull('subscription_id')
+                    ->where('status_id', RecurringInvoice::STATUS_ACTIVE)
+                    ->orderBy('id', 'desc')
+                    ->first();
 
                 $monthly_plans = Subscription::on('db-ninja-01')
-                                             ->where('company_id', Auth::guard('contact')->user()->company->id)
-                                             ->where('group_id', 6)
-                                             ->orderBy('promo_price', 'ASC')
-                                             ->get();
+                    ->where('company_id', Auth::guard('contact')->user()->company->id)
+                    ->where('group_id', 6)
+                    ->orderBy('promo_price', 'ASC')
+                    ->get();
 
                 $yearly_plans = Subscription::on('db-ninja-01')
-                                             ->where('company_id', Auth::guard('contact')->user()->company->id)
-                                             ->where('group_id', 31)
-                                             ->orderBy('promo_price', 'ASC')
-                                             ->get();
+                    ->where('company_id', Auth::guard('contact')->user()->company->id)
+                    ->where('group_id', 31)
+                    ->orderBy('promo_price', 'ASC')
+                    ->get();
 
                 $monthly_plans = $monthly_plans->merge($yearly_plans);
 

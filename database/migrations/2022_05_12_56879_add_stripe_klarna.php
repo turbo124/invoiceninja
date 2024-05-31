@@ -4,7 +4,8 @@ use App\Models\GatewayType;
 use App\Models\PaymentType;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -14,7 +15,7 @@ return new class extends Migration {
     {
         $pt = PaymentType::find(47);
 
-        if (!$pt) {
+        if (! $pt) {
             $type = new PaymentType();
             $type->id = 47;
             $type->name = 'Klarna';
@@ -22,10 +23,9 @@ return new class extends Migration {
             $type->save();
         }
 
-
         $pt = PaymentType::find(48);
 
-        if (!$pt) {
+        if (! $pt) {
             $type = new PaymentType();
             $type->id = 48;
             $type->name = 'Interac E-Transfer';
@@ -34,7 +34,7 @@ return new class extends Migration {
 
         $gt = GatewayType::find(23);
 
-        if (!$gt) {
+        if (! $gt) {
             $type = new GatewayType();
             $type->id = 23;
             $type->alias = 'klarna';

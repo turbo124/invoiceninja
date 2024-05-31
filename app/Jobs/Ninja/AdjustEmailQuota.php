@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -65,12 +64,12 @@ class AdjustEmailQuota implements ShouldQueue
         Account::query()->cursor()->each(function ($account) {
             nlog("resetting email quota for {$account->key}");
 
-            $email_count = Cache::get("email_quota".$account->key);
+            $email_count = Cache::get('email_quota'.$account->key);
 
             if ($email_count > 0) {
                 try {
                     LightLogs::create(new EmailCount($email_count, $account->key))->send(); // this runs syncronously
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     nlog($e->getMessage());
                 }
             }
@@ -78,7 +77,7 @@ class AdjustEmailQuota implements ShouldQueue
 
         /** Use redis pipelines to execute bulk deletes efficiently */
         $redis = Redis::connection('sentinel-cache');
-        $prefix =  config('cache.prefix'). ":email_quota*";
+        $prefix = config('cache.prefix').':email_quota*';
 
         $keys = $redis->keys($prefix);
 
@@ -91,7 +90,7 @@ class AdjustEmailQuota implements ShouldQueue
         }
         $keys = null;
 
-        $prefix =  config('cache.prefix'). ":throttle_notified*";
+        $prefix = config('cache.prefix').':throttle_notified*';
 
         $keys = $redis->keys($prefix);
 

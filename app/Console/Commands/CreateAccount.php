@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,8 +28,8 @@ use Illuminate\Support\Str;
 
 class CreateAccount extends Command
 {
-    use MakesHash;
     use GeneratesCounter;
+    use MakesHash;
 
     /**
      * @var string
@@ -65,7 +64,7 @@ class CreateAccount extends Command
     {
         $settings = CompanySettings::defaults();
 
-        $settings->name = "Untitled Company";
+        $settings->name = 'Untitled Company';
         $settings->currency_id = '1';
         $settings->language_id = '1';
 
@@ -93,9 +92,9 @@ class CreateAccount extends Command
             'password' => Hash::make($password),
             'confirmation_code' => $this->createDbHash(config('database.default')),
             'email_verified_at' => now(),
-            'first_name'        => 'New',
-            'last_name'         => 'User',
-            'phone'             => '',
+            'first_name' => 'New',
+            'last_name' => 'User',
+            'phone' => '',
         ]);
 
         $company_token = new CompanyToken();

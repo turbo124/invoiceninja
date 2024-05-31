@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -46,7 +45,9 @@ class PurchaseOrderController extends BaseController
     use SavesDocuments;
 
     protected $entity_type = PurchaseOrder::class;
+
     protected $entity_transformer = PurchaseOrderTransformer::class;
+
     protected $purchase_order_repository;
 
     public function __construct(PurchaseOrderRepository $purchase_order_repository)
@@ -55,11 +56,11 @@ class PurchaseOrderController extends BaseController
 
         $this->purchase_order_repository = $purchase_order_repository;
     }
+
     /**
      * Show the list of Purchase Orders.
      *
-     * @param \App\Filters\PurchaseOrderFilters $filters  The filters
-     *
+     * @param  \App\Filters\PurchaseOrderFilters  $filters  The filters
      * @return Response
      *
      * @OA\Get(
@@ -70,26 +71,34 @@ class PurchaseOrderController extends BaseController
      *      description="Lists purchase orders, search and filters allow fine grained lists to be generated.
      *
      *      Query parameters can be added to performed more fine grained filtering of the purchase orders, these are handled by the PurchaseOrderFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of purchase orders",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -100,13 +109,12 @@ class PurchaseOrderController extends BaseController
 
         return $this->listResponse($purchase_orders);
     }
+
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreatePurchaseOrderRequest $request  The request
-     *
+     * @param  CreatePurchaseOrderRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/purchase_orders/create",
@@ -114,26 +122,34 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Gets a new blank purchase order object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank purchase order object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -148,13 +164,12 @@ class PurchaseOrderController extends BaseController
 
         return $this->itemResponse($purchase_order);
     }
+
     /**
      * Store a newly created resource in storage.
      *
-     * @param StorePurchaseOrderRequest $request  The request
-     *
+     * @param  StorePurchaseOrderRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Post(
      *      path="/api/v1/purchase_orders",
@@ -162,26 +177,34 @@ class PurchaseOrderController extends BaseController
      *      tags={"purhcase_orders"},
      *      summary="Adds a purchase order",
      *      description="Adds an purchase order to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved purchase order object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -202,14 +225,13 @@ class PurchaseOrderController extends BaseController
 
         return $this->itemResponse($purchase_order->fresh());
     }
+
     /**
      * Display the specified resource.
      *
-     * @param ShowPurchaseOrderRequest $request  The request
-     * @param PurchaseOrder $purchase_order  The purchase order
-     *
+     * @param  ShowPurchaseOrderRequest  $request  The request
+     * @param  PurchaseOrder  $purchase_order  The purchase order
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/purchase_orders/{id}",
@@ -217,6 +239,7 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Shows an purcase orders",
      *      description="Displays an purchase order by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -226,28 +249,36 @@ class PurchaseOrderController extends BaseController
      *          description="The Purchase order Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the purchase order object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -256,12 +287,12 @@ class PurchaseOrderController extends BaseController
     {
         return $this->itemResponse($purchase_order);
     }
+
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditPurchaseOrderRequest $request The request
-     * @param PurchaseOrder $purchase_order The purchase order
-     *
+     * @param  EditPurchaseOrderRequest  $request  The request
+     * @param  PurchaseOrder  $purchase_order  The purchase order
      * @return Response
      *
      * @OA\Get(
@@ -270,6 +301,7 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Shows an purchase order for editting",
      *      description="Displays an purchase order by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -279,28 +311,36 @@ class PurchaseOrderController extends BaseController
      *          description="The purchase order Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the purchase order object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -309,21 +349,22 @@ class PurchaseOrderController extends BaseController
     {
         return $this->itemResponse($purchase_order);
     }
+
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdatePurchaseOrderRequest $request The request
-     * @param PurchaseOrder $purchase_order
+     * @param  UpdatePurchaseOrderRequest  $request  The request
      * @return Response
      *
-     *
      * @throws \ReflectionException
+     *
      * @OA\Put(
      *      path="/api/v1/purchase_order/{id}",
      *      operationId="updatePurchaseOrder",
      *      tags={"purchase_orders"},
      *      summary="Updates an purchase order",
      *      description="Handles the updating of an purchase order by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -333,28 +374,36 @@ class PurchaseOrderController extends BaseController
      *          description="The purchase order Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the purchase order object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -375,21 +424,22 @@ class PurchaseOrderController extends BaseController
 
         return $this->itemResponse($purchase_order);
     }
+
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyPurchaseOrderRequest $request
-     * @param PurchaseOrder $purchase_order
      *
-     * @return     Response
+     * @return Response
      *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/purchase_orders/{id}",
      *      operationId="deletePurchaseOrder",
      *      tags={"purchase_orders"},
      *      summary="Deletes a purchase order",
      *      description="Handles the deletion of an purchase orders by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -399,27 +449,34 @@ class PurchaseOrderController extends BaseController
      *          description="The purhcase order Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -442,16 +499,21 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Performs bulk actions on an array of purchase_orders",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="Purchase Order IDS",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -460,22 +522,28 @@ class PurchaseOrderController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Bulk Action response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -489,7 +557,7 @@ class PurchaseOrderController extends BaseController
 
         $ids = $request->input('ids');
 
-        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && !$user->company()->account->account_sms_verified) {
+        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && ! $user->company()->account->account_sms_verified) {
             return response(['message' => 'Please verify your account to send emails.'], 400);
         }
 
@@ -509,7 +577,7 @@ class PurchaseOrderController extends BaseController
                 }
             });
 
-            ZipPurchaseOrders::dispatch($purchase_orders->pluck("id")->toArray(), $purchase_orders->first()->company, auth()->user());
+            ZipPurchaseOrders::dispatch($purchase_orders->pluck('id')->toArray(), $purchase_orders->first()->company, auth()->user());
 
             return response()->json(['message' => ctrans('texts.sent_message')], 200);
         }
@@ -522,11 +590,11 @@ class PurchaseOrderController extends BaseController
             $merge = (new PdfMerge($paths->toArray()))->run();
 
             return response()->streamDownload(function () use ($merge) {
-                echo($merge);
+                echo $merge;
             }, 'print.pdf', ['Content-Type' => 'application/pdf']);
         }
 
-        if($action == 'template' && $user->can('view', $purchase_orders->first())) {
+        if ($action == 'template' && $user->can('view', $purchase_orders->first())) {
 
             $hash_or_response = $request->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 
@@ -572,6 +640,7 @@ class PurchaseOrderController extends BaseController
      *        - archive
      *        - delete
      *        - email",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -581,45 +650,53 @@ class PurchaseOrderController extends BaseController
      *          description="The Purchase Order Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Parameter(
      *          name="action",
      *          in="path",
      *          description="The action string to be performed",
      *          example="clone_to_quote",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param ActionPurchaseOrderRequest $request
-     * @param PurchaseOrder $purchase_order
-     * @param $action
+     *
      * @return \App\Http\Controllers\Response|\Illuminate\Http\JsonResponse|Response|mixed|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function action(ActionPurchaseOrderRequest $request, PurchaseOrder $purchase_order, $action)
@@ -644,7 +721,7 @@ class PurchaseOrderController extends BaseController
 
                 return response()->streamDownload(function () use ($file) {
                     echo $file;
-                }, $purchase_order->numberFormatter().".pdf", ['Content-Type' => 'application/pdf']);
+                }, $purchase_order->numberFormatter().'.pdf', ['Content-Type' => 'application/pdf']);
 
             case 'restore':
                 $this->purchase_order_repository->restore($purchase_order);
@@ -724,11 +801,7 @@ class PurchaseOrderController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadPurchaseOrderRequest $request
-     * @param PurchaseOrder $purchase_order
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/purchase_orders/{id}/upload",
@@ -736,6 +809,7 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Uploads a document to a purchase_orders",
      *      description="Handles the uploading of a document to a purchase_order",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -745,35 +819,43 @@ class PurchaseOrderController extends BaseController
      *          description="The Purchase Order Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Purchase Order object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Vendor"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
      */
     public function upload(UploadPurchaseOrderRequest $request, PurchaseOrder $purchase_order)
     {
-        if (!$this->checkFeature(Account::FEATURE_DOCUMENTS)) {
+        if (! $this->checkFeature(Account::FEATURE_DOCUMENTS)) {
             return $this->featureFailure();
         }
 
@@ -784,7 +866,6 @@ class PurchaseOrderController extends BaseController
         return $this->itemResponse($purchase_order->fresh());
     }
 
-
     /**
      * @OA\Get(
      *      path="/api/v1/purchase_order/{invitation_key}/download",
@@ -792,6 +873,7 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Download a specific purchase order by invitation key",
      *      description="Downloads a specific purchase order",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -801,31 +883,38 @@ class PurchaseOrderController extends BaseController
      *          description="The Purchase Order Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Purchase Order pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadPdf($invitation_key)
@@ -848,8 +937,9 @@ class PurchaseOrderController extends BaseController
 
         return response()->streamDownload(function () use ($file) {
             echo $file;
-        }, $purchase_order->numberFormatter().".pdf", $headers);
+        }, $purchase_order->numberFormatter().'.pdf', $headers);
     }
+
     /**
      * @OA\Get(
      *      path="/api/v1/credit/{invitation_key}/download_e_purchase_order",
@@ -857,6 +947,7 @@ class PurchaseOrderController extends BaseController
      *      tags={"purchase_orders"},
      *      summary="Download a specific E-Purchase-Order by invitation key",
      *      description="Downloads a specific E-Purchase-Order",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -866,31 +957,38 @@ class PurchaseOrderController extends BaseController
      *          description="The E-Purchase-Order Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the E-Purchase-Order pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadEPurchaseOrder($invitation_key)
@@ -905,7 +1003,7 @@ class PurchaseOrderController extends BaseController
         $purchase_order = $invitation->purchase_order;
 
         $file = $purchase_order->service()->getEPurchaseOrder($contact);
-        $file_name = $purchase_order->getFileName("xml");
+        $file_name = $purchase_order->getFileName('xml');
 
         $headers = ['Content-Type' => 'application/xml'];
 

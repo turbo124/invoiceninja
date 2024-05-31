@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => '組織',
     'name' => '姓名',
     'website' => '網站',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => '企業計畫增加了對多個使用者和文件附件的支持， :link查看完整的功能清單。',
     'return_to_app' => '返回 APP',
 
-
     // Payment updates
     'refund_payment' => '已退款的支付',
     'refund_max' => '最大值:',
@@ -1705,7 +1704,6 @@ $lang = array(
     'lang_Serbian' => 'Serbian',
     'lang_Bulgarian' => 'Bulgarian',
     'lang_Russian (Russia)' => '俄羅斯',
-
 
     // Industries
     'industry_Accounting & Legal' => '會計與法務',
@@ -2364,7 +2362,7 @@ $lang = array(
     'currency_gold_troy_ounce' => '金金衡盎司',
     'currency_nicaraguan_córdoba' => '尼加拉瓜科爾多瓦',
     'currency_malagasy_ariary' => '馬達加斯加阿里阿里',
-    "currency_tongan_pa_anga" => "東加潘加",
+    'currency_tongan_pa_anga' => '東加潘加',
 
     'review_app_help' => '我們希望您喜歡使用這個程式。<br/>若您考慮 :link，我們會非常感謝!',
     'writing_a_review' => '撰寫評語',
@@ -4426,7 +4424,7 @@ $lang = array(
     'activity_122' => ':user存檔的經常性費用:recurring_expense',
     'activity_123' => ':user刪除經常性費用:recurring_expense',
     'activity_124' => ':user恢復經常性費用:recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => '要查看:entity您需要設定密碼。',
     'unsubscribe' => '退訂',
     'unsubscribed' => '取消訂閱',
@@ -4930,7 +4928,7 @@ $lang = array(
     'payment_type_Klarna' => '克拉納',
     'payment_type_Interac E Transfer' => 'Interac E 傳輸',
     'xinvoice_payable' => '在:payeddue天內支付，直至:paydate',
-    'xinvoice_no_buyers_reference' => "沒有提供買家參考信息",
+    'xinvoice_no_buyers_reference' => '沒有提供買家參考信息',
     'xinvoice_online_payment' => '發票需要透過提供的連結在線支付',
     'pre_payment' => '預付款',
     'number_of_payments' => '付款次數',
@@ -5035,8 +5033,8 @@ $lang = array(
     'e_invoice' => '電子發票',
     'light_dark_mode' => '明/暗模式',
     'activities' => '活動',
-    'recent_transactions' => "以下是貴公司最近的交易：",
-    'country_Palestine' => "巴勒斯坦",
+    'recent_transactions' => '以下是貴公司最近的交易：',
+    'country_Palestine' => '巴勒斯坦',
     'country_Taiwan' => '台灣',
     'duties' => '職責',
     'order_number' => '訂單編號',
@@ -5251,7 +5249,7 @@ $lang = array(
     'rff' => '必填欄位表格',
     'add_step' => '新增步驟',
     'steps' => '腳步',
-    'steps_order_help' =>  '步驟的順序很重要。第一步不應依賴任何其他步驟。第二步應該取決於第一步，依此類推。',
+    'steps_order_help' => '步驟的順序很重要。第一步不應依賴任何其他步驟。第二步應該取決於第一步，依此類推。',
     'other_steps' => '其他步驟',
     'use_available_payments' => '使用可用付款',
     'test_email_sent' => '已成功發送電子郵件',
@@ -5300,6 +5298,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

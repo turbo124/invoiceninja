@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -55,15 +54,14 @@ class InvoiceExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_client_fields, $this->input['report_keys']));
 
         $query = Invoice::query()
-                        ->withTrashed()
-                        ->with('client')
-                        ->whereHas('client', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->where('company_id', $this->company->id);
-        
+            ->withTrashed()
+            ->with('client')
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id);
 
-        if(!$this->input['include_deleted'] ?? false){
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
@@ -71,15 +69,15 @@ class InvoiceExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
-        if($this->input['status'] ?? false) {
+        if ($this->input['status'] ?? false) {
             $query = $this->addInvoiceStatusFilter($query, $this->input['status']);
         }
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -98,10 +96,11 @@ class InvoiceExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }

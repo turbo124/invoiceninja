@@ -12,8 +12,6 @@ class CreateStatementRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -35,8 +33,8 @@ class CreateStatementRequest extends Request
 
         return [
             'start_date' => 'required|date_format:Y-m-d',
-            'end_date'   => 'required|date_format:Y-m-d',
-            'client_id'  => 'bail|required|exists:clients,id,company_id,'.$user->company()->id,
+            'end_date' => 'required|date_format:Y-m-d',
+            'client_id' => 'bail|required|exists:clients,id,company_id,'.$user->company()->id,
             'show_payments_table' => 'boolean',
             'show_aging_table' => 'boolean',
             'show_credits_table' => 'boolean',

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -219,11 +218,11 @@ class Ninja
         }
         // Decode the string in strict mode and check the results
         $decoded = base64_decode($s, true);
-        if (false === $decoded) {
+        if ($decoded === false) {
             return false;
         }
         // if string returned contains not printable chars
-        if (0 < preg_match('/((?![[:graph:]])(?!\s)(?!\p{L}))./', $decoded, $matched)) {
+        if (preg_match('/((?![[:graph:]])(?!\s)(?!\p{L}))./', $decoded, $matched) > 0) {
             return false;
         }
         // Encode the string again

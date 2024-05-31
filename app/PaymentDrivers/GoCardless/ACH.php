@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -47,7 +46,6 @@ class ACH implements MethodInterface
     /**
      * Authorization page for ACH.
      *
-     * @param array $data
      * @return Redirector|RedirectResponse
      */
     public function authorizeView(array $data)
@@ -85,9 +83,7 @@ class ACH implements MethodInterface
     /**
      * Handle unsuccessful authorization.
      *
-     * @param Exception $exception
      * @throws PaymentFailed
-     * @return void
      */
     public function processUnsuccessfulAuthorization(Exception $exception): void
     {
@@ -106,7 +102,6 @@ class ACH implements MethodInterface
     /**
      * Handle ACH post-redirect authorization.
      *
-     * @param Request $request
      * @return RedirectResponse|void
      */
     public function authorizeResponse(Request $request)
@@ -140,9 +135,6 @@ class ACH implements MethodInterface
 
     /**
      * Show the payment page for ACH.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function paymentView(array $data): View
     {
@@ -156,7 +148,6 @@ class ACH implements MethodInterface
     /**
      * Process payments for ACH.
      *
-     * @param PaymentResponseRequest $request
      * @return RedirectResponse|void
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -164,8 +155,8 @@ class ACH implements MethodInterface
         $this->go_cardless->ensureMandateIsReady($request->source);
 
         $invoice = Invoice::query()->whereIn('id', $this->transformKeys(array_column($this->go_cardless->payment_hash->invoices(), 'invoice_id')))
-                          ->withTrashed()
-                          ->first();
+            ->withTrashed()
+            ->first();
 
         if ($invoice) {
             $description = "Invoice {$invoice->number} for {$request->amount} for client {$this->go_cardless->client->present()->name()}";
@@ -204,8 +195,6 @@ class ACH implements MethodInterface
     /**
      * Handle pending payments for ACH.
      *
-     * @param ResourcesPayment $payment
-     * @param array $data
      * @return RedirectResponse
      */
     public function processPendingPayment(ResourcesPayment $payment, array $data = [])
@@ -234,7 +223,6 @@ class ACH implements MethodInterface
     /**
      * Process unsuccessful payments for ACH.
      *
-     * @param ResourcesPayment $payment
      * @return never
      */
     public function processUnsuccessfulPayment(ResourcesPayment $payment)

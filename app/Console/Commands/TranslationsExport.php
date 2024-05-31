@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -123,12 +122,11 @@ class TranslationsExport extends Command
 
                 file_put_contents(lang_path("/{$lang}/texts.php"), $trans);
             } else {
-                $this->logMessage("Could not open file");
+                $this->logMessage('Could not open file');
                 $this->logMessage($path);
             }
         }
     }
-
 
     private function export()
     {
@@ -138,7 +136,7 @@ class TranslationsExport extends Command
             Storage::disk('local')->makeDirectory("lang/{$lang}");
 
             $translations = Lang::getLoader()->load($lang, 'texts');
-            foreach($translations as $key => $value) {
+            foreach ($translations as $key => $value) {
                 $translations[$key] = html_entity_decode($value);
             }
 

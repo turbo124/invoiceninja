@@ -4,7 +4,7 @@ return [
 
     //'dsn' => env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')),
     'dsn' => config('ninja.sentry_dsn'),
-    
+
     'release' => config('ninja.app_version'),
 
     'breadcrumbs' => [

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -17,6 +16,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Services\Invoice\AutoBillInvoice
  */
 class AutoBillInvoiceTest extends TestCase
@@ -24,7 +24,7 @@ class AutoBillInvoiceTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +41,7 @@ class AutoBillInvoiceTest extends TestCase
 
         $this->assertNotNull($this->invoice->payments());
         $this->assertEquals(0, $this->invoice->payments()->sum('payments.amount'));
-        
+
         $this->assertEquals(10, $this->invoice->payments()->get()->sum('pivot.amount'));
 
         $this->assertEquals($this->client->fresh()->balance, 0);

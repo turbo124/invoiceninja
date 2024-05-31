@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,8 +39,6 @@ class RecurringExpensesCron
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -52,15 +49,15 @@ class RecurringExpensesCron
 
         if (! config('ninja.db.multi_db_enabled')) {
             $recurring_expenses = RecurringExpense::query()->where('next_send_date', '<=', now()->toDateTimeString())
-                                                        ->whereNotNull('next_send_date')
-                                                        ->whereNull('deleted_at')
-                                                        ->where('status_id', RecurringInvoice::STATUS_ACTIVE)
-                                                        ->where('remaining_cycles', '!=', '0')
-                                                        ->whereHas('company', function ($query) {
-                                                            $query->where('is_disabled', 0);
-                                                        })
-                                                        ->with('company')
-                                                        ->cursor();
+                ->whereNotNull('next_send_date')
+                ->whereNull('deleted_at')
+                ->where('status_id', RecurringInvoice::STATUS_ACTIVE)
+                ->where('remaining_cycles', '!=', '0')
+                ->whereHas('company', function ($query) {
+                    $query->where('is_disabled', 0);
+                })
+                ->with('company')
+                ->cursor();
 
             nlog(now()->format('Y-m-d').' Generating Recurring Expenses. Count = '.$recurring_expenses->count());
 
@@ -77,15 +74,15 @@ class RecurringExpensesCron
                 MultiDB::setDB($db);
 
                 $recurring_expenses = RecurringExpense::query()->where('next_send_date', '<=', now()->toDateTimeString())
-                                                            ->whereNotNull('next_send_date')
-                                                            ->whereNull('deleted_at')
-                                                            ->where('status_id', RecurringInvoice::STATUS_ACTIVE)
-                                                            ->where('remaining_cycles', '!=', '0')
-                                                            ->whereHas('company', function ($query) {
-                                                                $query->where('is_disabled', 0);
-                                                            })
-                                                            ->with('company')
-                                                            ->cursor();
+                    ->whereNotNull('next_send_date')
+                    ->whereNull('deleted_at')
+                    ->where('status_id', RecurringInvoice::STATUS_ACTIVE)
+                    ->where('remaining_cycles', '!=', '0')
+                    ->whereHas('company', function ($query) {
+                        $query->where('is_disabled', 0);
+                    })
+                    ->with('company')
+                    ->cursor();
 
                 nlog(now()->format('Y-m-d').' Generating Recurring Expenses. Count = '.$recurring_expenses->count());
 
@@ -105,7 +102,7 @@ class RecurringExpensesCron
         $expense = RecurringExpenseToExpenseFactory::create($recurring_expense);
         $expense->saveQuietly();
 
-        if($expense->company->mark_expenses_paid) {
+        if ($expense->company->mark_expenses_paid) {
             $expense->payment_date = now()->format('Y-m-d');
         }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -57,9 +56,9 @@ class StartMigration implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $filepath
-     * @param User $user
-     * @param Company $company
+     * @param  $filepath
+     * @param  User  $user
+     * @param  Company  $company
      */
     public $tries = 1;
 
@@ -82,7 +81,7 @@ class StartMigration implements ShouldQueue
     {
         nlog('Inside Migration Job');
 
-        Cache::put("migration-{$this->company->company_key}", "started", 86400);
+        Cache::put("migration-{$this->company->company_key}", 'started', 86400);
 
         set_time_limit(0);
 
@@ -129,22 +128,22 @@ class StartMigration implements ShouldQueue
             $this->company->update_products = $update_product_flag;
             $this->company->save();
 
-            Cache::put("migration-{$this->company->company_key}", "completed", 86400);
+            Cache::put("migration-{$this->company->company_key}", 'completed', 86400);
 
             App::forgetInstance('translator');
             $t = app('translator');
             $t->replace(Ninja::transformTranslations($this->company->settings));
-        } catch (ClientHostedMigrationException | NonExistingMigrationFile | ProcessingMigrationArchiveFailed | ResourceNotAvailableForMigration | MigrationValidatorFailed | ResourceDependencyMissing | \Exception $e) {
+        } catch (ClientHostedMigrationException|NonExistingMigrationFile|ProcessingMigrationArchiveFailed|ResourceNotAvailableForMigration|MigrationValidatorFailed|ResourceDependencyMissing|\Exception $e) {
             $this->company->update_products = $update_product_flag;
             $this->company->save();
 
-            Cache::put("migration-{$this->company->company_key}", "failed", 86400);
+            Cache::put("migration-{$this->company->company_key}", 'failed', 86400);
 
             if (Ninja::isHosted()) {
                 app('sentry')->captureException($e);
             }
 
-            if(!$this->silent_migration) {
+            if (! $this->silent_migration) {
                 Mail::to($this->user->email, $this->user->name())->send(new MigrationFailed($e, $this->company, $e->getMessage()));
             }
 

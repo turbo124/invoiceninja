@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,8 +44,8 @@ class HandleReversal extends AbstractService
 
         /*Adjust payment applied and the paymentables to the correct amount */
         $paymentables = Paymentable::query()->wherePaymentableType('invoices')
-                                    ->wherePaymentableId($this->invoice->id)
-                                    ->get();
+            ->wherePaymentableId($this->invoice->id)
+            ->get();
 
         $paymentables->each(function ($paymentable) use ($total_paid) {
             //new concept - when reversing, we unwind the payments

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,19 +19,22 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @coversDefaultClass App\Models\Client
  */
 class GroupSettingsTest extends TestCase
 {
-    use MockAccountData;
-    use DatabaseTransactions;
     use ClientGroupSettingsSaver;
+    use DatabaseTransactions;
+    use MockAccountData;
 
     public $company_settings;
+
     public $client_settings;
+
     public $settings;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 

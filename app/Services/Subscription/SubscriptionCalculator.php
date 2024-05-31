@@ -5,20 +5,19 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Subscription;
 
-use App\Models\Invoice;
-use App\Models\Subscription;
-use Illuminate\Support\Carbon;
 use App\DataMapper\InvoiceItem;
 use App\Factory\InvoiceFactory;
-use App\Utils\Traits\MakesHash;
 use App\Helpers\Invoice\ProRata;
+use App\Models\Invoice;
+use App\Models\Subscription;
 use App\Repositories\InvoiceRepository;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Support\Carbon;
 
 /**
  * SubscriptionCalculator.
@@ -27,13 +26,12 @@ class SubscriptionCalculator
 {
     use MakesHash;
 
-    public function __construct(public Subscription $subscription){}
-    
+    public function __construct(public Subscription $subscription)
+    {
+    }
+
     /**
      * BuildPurchaseInvoice
-     *
-     * @param  array $context
-     * @return Invoice
      */
     public function buildPurchaseInvoice(array $context): Invoice
     {
@@ -44,10 +42,10 @@ class SubscriptionCalculator
         $invoice->subscription_id = $this->subscription->id;
         $invoice->client_id = $this->decodePrimaryKey($context['client_id']);
         $invoice->is_proforma = true;
-        $invoice->number = "####" . ctrans('texts.subscription') . "_" . now()->format('Y-m-d') . "_" . rand(0, 100000);
+        $invoice->number = '####'.ctrans('texts.subscription').'_'.now()->format('Y-m-d').'_'.rand(0, 100000);
         $invoice->line_items = $this->buildItems($context);
 
-        if(isset($context['valid_coupon']) && $context['valid_coupon']) {
+        if (isset($context['valid_coupon']) && $context['valid_coupon']) {
             $invoice->discount = $this->subscription->promo_discount;
             $invoice->is_amount_discount = $this->subscription->is_amount_discount;
         }
@@ -55,13 +53,9 @@ class SubscriptionCalculator
         return $invoice_repo->save([], $invoice);
 
     }
-    
+
     /**
      * Build Line Items
-     * 
-     * @param array $context
-     * 
-     * @return array
      */
     private function buildItems(array $context): array
     {
@@ -73,24 +67,9 @@ class SubscriptionCalculator
 
         $items = [];
 
-        foreach($recurring as $item) {
-            
-            if($item['quantity'] < 1)
-                continue;
+        foreach ($recurring as $item) {
 
-            $line_item = new InvoiceItem();
-            $line_item->product_key = $item['product']['product_key'];
-            $line_item->quantity = (float) $item['quantity'];
-            $line_item->cost = (float) $item['product']['price'];
-            $line_item->notes = $item['product']['notes'];
-            $line_item->tax_id = (string)$item['product']['tax_id'] ?? '1';
-            $items[] = $line_item;
-
-        }
-
-        foreach($one_time as $item) {
-
-            if($item['quantity'] < 1) {
+            if ($item['quantity'] < 1) {
                 continue;
             }
 
@@ -99,7 +78,23 @@ class SubscriptionCalculator
             $line_item->quantity = (float) $item['quantity'];
             $line_item->cost = (float) $item['product']['price'];
             $line_item->notes = $item['product']['notes'];
-            $line_item->tax_id = (string)$item['product']['tax_id'] ?? '1';
+            $line_item->tax_id = (string) $item['product']['tax_id'] ?? '1';
+            $items[] = $line_item;
+
+        }
+
+        foreach ($one_time as $item) {
+
+            if ($item['quantity'] < 1) {
+                continue;
+            }
+
+            $line_item = new InvoiceItem();
+            $line_item->product_key = $item['product']['product_key'];
+            $line_item->quantity = (float) $item['quantity'];
+            $line_item->cost = (float) $item['product']['price'];
+            $line_item->notes = $item['product']['notes'];
+            $line_item->tax_id = (string) $item['product']['tax_id'] ?? '1';
             $items[] = $line_item;
 
         }
@@ -107,54 +102,18 @@ class SubscriptionCalculator
         return $items;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Tests if the user is currently up
      * to date with their payments for
      * a given recurring invoice
-     *
-     * @return bool
      */
     public function isPaidUp(Invoice $invoice): bool
     {
         $outstanding_invoices_exist = Invoice::query()->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                                             ->where('subscription_id', $invoice->subscription_id)
-                                             ->where('client_id', $invoice->client_id)
-                                             ->where('balance', '>', 0)
-                                             ->exists();
+            ->where('subscription_id', $invoice->subscription_id)
+            ->where('client_id', $invoice->client_id)
+            ->where('balance', '>', 0)
+            ->exists();
 
         return ! $outstanding_invoices_exist;
     }
@@ -174,7 +133,7 @@ class SubscriptionCalculator
         }
 
         if ($refund_invoice) {
-            /** @var \App\Models\Subscription $subscription **/
+            /** @var \App\Models\Subscription $subscription * */
             $subscription = Subscription::find($invoice->subscription_id);
             $pro_rata = new ProRata();
 
@@ -191,14 +150,16 @@ class SubscriptionCalculator
         return $this->subscription->price;
     }
 
-    public function executeUpgradePlan() {}
+    public function executeUpgradePlan()
+    {
+    }
 
     private function getRefundInvoice(Invoice $invoice)
     {
         return Invoice::where('subscription_id', $invoice->subscription_id)
-                      ->where('client_id', $invoice->client_id)
-                      ->where('is_deleted', 0)
-                      ->orderBy('id', 'desc')
-                      ->first();
+            ->where('client_id', $invoice->client_id)
+            ->where('is_deleted', 0)
+            ->orderBy('id', 'desc')
+            ->first();
     }
 }

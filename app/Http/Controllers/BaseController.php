@@ -5,46 +5,46 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Utils\Ninja;
-use App\Models\Client;
-use App\Models\Design;
-use App\Utils\Statics;
 use App\Models\Account;
-use App\Models\TaxRate;
-use App\Models\Webhook;
-use App\Models\Scheduler;
-use App\Models\TaskStatus;
-use App\Models\PaymentTerm;
-use Illuminate\Support\Str;
-use League\Fractal\Manager;
-use App\Models\GroupSetting;
-use Illuminate\Http\Response;
-use App\Models\CompanyGateway;
-use App\Utils\Traits\AppSetup;
 use App\Models\BankIntegration;
 use App\Models\BankTransaction;
-use App\Models\ExpenseCategory;
-use League\Fractal\Resource\Item;
 use App\Models\BankTransactionRule;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Client;
+use App\Models\CompanyGateway;
+use App\Models\Design;
+use App\Models\ExpenseCategory;
+use App\Models\GroupSetting;
+use App\Models\PaymentTerm;
+use App\Models\Scheduler;
+use App\Models\TaskStatus;
+use App\Models\TaxRate;
+use App\Models\User;
+use App\Models\Webhook;
 use App\Transformers\ArraySerializer;
 use App\Transformers\EntityTransformer;
-use League\Fractal\Resource\Collection;
-use Illuminate\Database\Eloquent\Builder;
-use Invoiceninja\Einvoice\Decoder\Schema;
-use League\Fractal\Serializer\JsonApiSerializer;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use App\Utils\Ninja;
+use App\Utils\Statics;
+use App\Utils\Traits\AppSetup;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Invoiceninja\Einvoice\Decoder\Schema;
+use League\Fractal\Manager;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
+use League\Fractal\Serializer\JsonApiSerializer;
 
 /**
  * Class BaseController.
+ *
  * @method static Illuminate\Database\Eloquent\Builder exclude($columns)
  */
 class BaseController extends Controller
@@ -63,6 +63,7 @@ class BaseController extends Controller
     /**
      * Passed from the parent when we need to force
      * the key of the response object.
+     *
      * @var string
      */
     public $forced_index = 'data';
@@ -74,28 +75,26 @@ class BaseController extends Controller
 
     /**
      * The calling controller Transformer type
-     *
      */
     protected $entity_transformer;
 
     /**
      * The serializer in use with Fractal
-     *
      */
     protected $serializer;
 
     /* Grouped permissions when we want to hide columns for particular permission groups*/
 
     private array $client_exclusion_fields = ['balance', 'paid_to_date', 'credit_balance', 'client_hash'];
+
     private array $client_excludable_permissions = ['view_client'];
+
     private array $client_excludable_overrides = ['edit_client', 'edit_all', 'view_invoice', 'view_all', 'edit_invoice'];
 
     /* Grouped permissions when we want to hide columns for particular permission groups*/
 
-
     /**
      * Fractal manager.
-     * @var Manager $manager
      */
     protected Manager $manager;
 
@@ -103,57 +102,57 @@ class BaseController extends Controller
      * An array of includes to be loaded by default.
      */
     private $first_load = [
-          'account',
-          'user.company_user',
-          'token.company_user',
-          'company.activities',
-          'company.designs.company',
-          'company.task_statuses',
-          'company.expense_categories',
-          'company.documents',
-          'company.users.company_user',
-          'company.clients.contacts.company',
-          'company.clients.gateway_tokens',
-          'company.clients.documents',
-          'company.company_gateways.gateway',
-          'company.credits.invitations.contact',
-          'company.credits.invitations.company',
-          'company.credits.documents',
-          'company.expenses.documents',
-          'company.groups.documents',
-          'company.invoices.invitations.contact',
-          'company.invoices.invitations.company',
-          'company.purchase_orders.invitations',
-          'company.invoices.documents',
-          'company.products',
-          'company.products.documents',
-          'company.payments.paymentables',
-          'company.payments.documents',
-          'company.purchase_orders.documents',
-          'company.payment_terms.company',
-          'company.projects.documents',
-          'company.recurring_expenses',
-          'company.recurring_invoices',
-          'company.recurring_invoices.invitations.contact',
-          'company.recurring_invoices.invitations.company',
-          'company.recurring_invoices.documents',
-          'company.quotes.invitations.contact',
-          'company.quotes.invitations.company',
-          'company.quotes.documents',
-          'company.tasks.documents',
+        'account',
+        'user.company_user',
+        'token.company_user',
+        'company.activities',
+        'company.designs.company',
+        'company.task_statuses',
+        'company.expense_categories',
+        'company.documents',
+        'company.users.company_user',
+        'company.clients.contacts.company',
+        'company.clients.gateway_tokens',
+        'company.clients.documents',
+        'company.company_gateways.gateway',
+        'company.credits.invitations.contact',
+        'company.credits.invitations.company',
+        'company.credits.documents',
+        'company.expenses.documents',
+        'company.groups.documents',
+        'company.invoices.invitations.contact',
+        'company.invoices.invitations.company',
+        'company.purchase_orders.invitations',
+        'company.invoices.documents',
+        'company.products',
+        'company.products.documents',
+        'company.payments.paymentables',
+        'company.payments.documents',
+        'company.purchase_orders.documents',
+        'company.payment_terms.company',
+        'company.projects.documents',
+        'company.recurring_expenses',
+        'company.recurring_invoices',
+        'company.recurring_invoices.invitations.contact',
+        'company.recurring_invoices.invitations.company',
+        'company.recurring_invoices.documents',
+        'company.quotes.invitations.contact',
+        'company.quotes.invitations.company',
+        'company.quotes.documents',
+        'company.tasks.documents',
         //   'company.tasks.project',
-          'company.subscriptions',
-          'company.tax_rates',
-          'company.tokens_hashed',
-          'company.vendors.contacts.company',
-          'company.vendors.documents',
-          'company.webhooks',
-          'company.system_logs',
-          'company.bank_integrations',
-          'company.bank_transactions',
-          'company.bank_transaction_rules',
-          'company.task_schedulers',
-        ];
+        'company.subscriptions',
+        'company.tax_rates',
+        'company.tokens_hashed',
+        'company.vendors.contacts.company',
+        'company.vendors.documents',
+        'company.webhooks',
+        'company.system_logs',
+        'company.bank_integrations',
+        'company.bank_transactions',
+        'company.bank_transaction_rules',
+        'company.task_schedulers',
+    ];
 
     /**
      * An array of includes to be loaded by default
@@ -227,8 +226,8 @@ class BaseController extends Controller
     public function notFound()
     {
         return response()->json(['message' => ctrans('texts.api_404')], 404)
-                         ->header('X-API-VERSION', config('ninja.minimum_client_version'))
-                         ->header('X-APP-VERSION', config('ninja.app_version'));
+            ->header('X-API-VERSION', config('ninja.minimum_client_version'))
+            ->header('X-APP-VERSION', config('ninja.app_version'));
     }
 
     /**
@@ -236,8 +235,8 @@ class BaseController extends Controller
      * end user has the correct permissions to
      * view the includes
      *
-     * @param  string  $includes The includes for the object
-     * @return string            The filtered array of includes
+     * @param  string  $includes  The includes for the object
+     * @return string The filtered array of includes
      */
     // private function filterIncludes(string $includes): string
     // {
@@ -262,6 +261,7 @@ class BaseController extends Controller
 
     /**
      * 404 for the client portal.
+     *
      * @return Response 404 response
      */
     public function notFoundClient()
@@ -277,9 +277,10 @@ class BaseController extends Controller
     /**
      * API Error response.
      *
-     * @param string|array    $message        The return error message
-     * @param int       $httpErrorCode  404/401/403 etc
-     * @return Response                 The JSON response
+     * @param  string|array  $message  The return error message
+     * @param  int  $httpErrorCode  404/401/403 etc
+     * @return Response The JSON response
+     *
      * @throws BindingResolutionException
      */
     protected function errorResponse($message, $httpErrorCode = 400)
@@ -296,7 +297,7 @@ class BaseController extends Controller
     /**
      * Refresh API response with latest cahnges
      *
-     * @param  Builder           $query
+     * @param  Builder  $query
      * @return Response
      */
     protected function refreshResponse($query)
@@ -460,7 +461,7 @@ class BaseController extends Controller
                     }
                 },
                 'company.tasks' => function ($query) use ($updated_at, $user) {
-                    $query->where('updated_at', '>=', $updated_at)->with('project','documents');
+                    $query->where('updated_at', '>=', $updated_at)->with('project', 'documents');
 
                     if (! $user->hasPermission('view_task')) {
                         $query->whereNested(function ($query) use ($user) {
@@ -507,8 +508,8 @@ class BaseController extends Controller
                     }
 
                     //allows us to return integrations for users who can create bank transactions
-                    if (!$user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
-                        $query->exclude(["balance"]);
+                    if (! $user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction'])) {
+                        $query->exclude(['balance']);
                     }
                 },
                 'company.bank_transactions' => function ($query) use ($updated_at, $user) {
@@ -549,13 +550,11 @@ class BaseController extends Controller
 
     /**
      * Returns the per page limit for the query.
-     *
-     * @return int
      */
     private function resolveQueryLimit(): int
     {
         if (request()->has('per_page')) {
-            return min(abs((int)request()->input('per_page', 20)), 5000);
+            return min(abs((int) request()->input('per_page', 20)), 5000);
         }
 
         return 20;
@@ -564,8 +563,7 @@ class BaseController extends Controller
     /**
      * Mini Load Query
      *
-     * @param  Builder $query
-     *
+     * @param  Builder  $query
      */
     protected function miniLoadResponse($query)
     {
@@ -615,12 +613,12 @@ class BaseController extends Controller
                         $query->where('bank_integrations.user_id', $user->id);
                     }
 
-                    if (!$user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
-                        $query->exclude(["balance"]);
+                    if (! $user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction'])) {
+                        $query->exclude(['balance']);
                     }
                 },
                 'company.bank_transaction_rules' => function ($query) use ($user) {
-                    if (! $user->isAdmin() && !$user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
+                    if (! $user->isAdmin() && ! $user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction'])) {
                         $query->where('bank_transaction_rules.user_id', $user->id);
                     }
                 },
@@ -638,7 +636,7 @@ class BaseController extends Controller
             $paginator = $query->paginate($limit);
 
             /** @phpstan-ignore-next-line **/
-            $query = $paginator->getCollection();// @phpstan-ignore-line
+            $query = $paginator->getCollection(); // @phpstan-ignore-line
 
             $resource = new Collection($query, $transformer, $this->entity_type);
             $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
@@ -653,8 +651,7 @@ class BaseController extends Controller
     /**
      * Passes back the miniloaded data response
      *
-     * @param  Builder $query
-     *
+     * @param  Builder  $query
      */
     protected function timeConstrainedResponse($query)
     {
@@ -798,7 +795,7 @@ class BaseController extends Controller
                     }
                 },
                 'company.tasks' => function ($query) use ($created_at, $user) {
-                    $query->where('created_at', '>=', $created_at)->with('project.documents','documents');
+                    $query->where('created_at', '>=', $created_at)->with('project.documents', 'documents');
 
                     if (! $user->hasPermission('view_task')) {
                         $query->whereNested(function ($query) use ($user) {
@@ -861,8 +858,8 @@ class BaseController extends Controller
                         $query->where('bank_integrations.user_id', $user->id);
                     }
 
-                    if (!$user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
-                        $query->exclude(["balance"]);
+                    if (! $user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction'])) {
+                        $query->exclude(['balance']);
                     }
                 },
                 'company.bank_transactions' => function ($query) use ($created_at, $user) {
@@ -888,7 +885,7 @@ class BaseController extends Controller
             $paginator = $query->paginate($limit);
 
             /** @phpstan-ignore-next-line **/
-            $query = $paginator->getCollection();// @phpstan-ignore-line
+            $query = $paginator->getCollection(); // @phpstan-ignore-line
 
             $resource = new Collection($query, $transformer, $this->entity_type);
             $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
@@ -903,8 +900,6 @@ class BaseController extends Controller
 
     /**
      * List response
-     *
-     * @param Builder $query
      */
     protected function listResponse(Builder $query)
     {
@@ -923,13 +918,13 @@ class BaseController extends Controller
         if ($user && ! $user->hasPermission('view_'.Str::snake(class_basename($this->entity_type)))) {
             if (in_array($this->entity_type, [User::class])) {
                 $query->where('id', $user->id);
-            } elseif (in_array($this->entity_type, [BankTransactionRule::class,CompanyGateway::class, TaxRate::class, BankIntegration::class, Scheduler::class, BankTransaction::class, Webhook::class, ExpenseCategory::class])) { //table without assigned_user_id
-                if ($this->entity_type == BankIntegration::class && !$user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
-                    $query->exclude(["balance"]);
+            } elseif (in_array($this->entity_type, [BankTransactionRule::class, CompanyGateway::class, TaxRate::class, BankIntegration::class, Scheduler::class, BankTransaction::class, Webhook::class, ExpenseCategory::class])) { //table without assigned_user_id
+                if ($this->entity_type == BankIntegration::class && ! $user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction'])) {
+                    $query->exclude(['balance']);
                 } //allows us to selective display bank integrations back to the user if they can view / create bank transactions but without the bank balance being present in the response
-                elseif($this->entity_type == TaxRate::class && $user->hasIntersectPermissions(['create_invoice','edit_invoice','create_quote','edit_quote','create_purchase_order','edit_purchase_order'])) {
+                elseif ($this->entity_type == TaxRate::class && $user->hasIntersectPermissions(['create_invoice', 'edit_invoice', 'create_quote', 'edit_quote', 'create_purchase_order', 'edit_purchase_order'])) {
                     // need to show tax rates if the user has the ability to create documents.
-                } elseif($this->entity_type == ExpenseCategory::class && $user->hasPermission('create_expense')) {
+                } elseif ($this->entity_type == ExpenseCategory::class && $user->hasPermission('create_expense')) {
                     // need to show expense categories if the user has the ability to create expenses.
                 } else {
                     $query->where('user_id', '=', $user->id);
@@ -956,7 +951,7 @@ class BaseController extends Controller
         if ($query instanceof Builder) {
             $limit = $this->resolveQueryLimit();
             $paginator = $query->paginate($limit);
-            $query = $paginator->getCollection();// @phpstan-ignore-line
+            $query = $paginator->getCollection(); // @phpstan-ignore-line
 
             $resource = new Collection($query, $transformer, $this->entity_type);
             $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
@@ -968,7 +963,7 @@ class BaseController extends Controller
     /**
      * Sorts the response by keys
      *
-     * @param  mixed $response
+     * @param  mixed  $response
      * @return Response
      */
     protected function response($response)
@@ -995,7 +990,7 @@ class BaseController extends Controller
 
                 $response_data = Statics::company($user->getCompany()->getLocale());
 
-                if(request()->has('einvoice')){
+                if (request()->has('einvoice')) {
 
                     $ro = new Schema();
                     $response_data['einvoice_schema'] = $ro('FACT1');
@@ -1003,7 +998,7 @@ class BaseController extends Controller
                 }
 
                 $response['static'] = $response_data;
-                
+
             }
         }
 
@@ -1019,7 +1014,7 @@ class BaseController extends Controller
     /**
      * Item Response
      *
-     * @param  mixed $item
+     * @param  mixed  $item
      * @return Response
      */
     protected function itemResponse($item)
@@ -1046,8 +1041,6 @@ class BaseController extends Controller
 
     /**
      * Returns the API headers.
-     *
-     * @return array
      */
     public static function getApiHeaders(): array
     {
@@ -1061,8 +1054,7 @@ class BaseController extends Controller
     /**
      * Returns the parsed relationship includes
      *
-     * @param  mixed $data
-     * @return array
+     * @param  mixed  $data
      */
     protected function getRequestIncludes($data): array
     {
@@ -1108,7 +1100,7 @@ class BaseController extends Controller
             /** @var \App\Models\Account $account */
 
             //always redirect invoicing.co to invoicing.co
-            if (Ninja::isHosted() && !in_array(request()->getSchemeAndHttpHost(), ['https://staging.invoicing.co', 'https://invoicing.co', 'https://demo.invoicing.co', 'https://invoiceninja.net', config('ninja.app_url')])) {
+            if (Ninja::isHosted() && ! in_array(request()->getSchemeAndHttpHost(), ['https://staging.invoicing.co', 'https://invoicing.co', 'https://demo.invoicing.co', 'https://invoiceninja.net', config('ninja.app_url')])) {
                 return redirect()->secure(config('ninja.app_url'));
             }
 
@@ -1128,7 +1120,7 @@ class BaseController extends Controller
             // 06-09-2022 - parse the path if loaded in a subdirectory for canvaskit resolution
             $canvas_path_array = parse_url(config('ninja.app_url'));
             $canvas_path = (array_key_exists('path', $canvas_path_array)) ? $canvas_path_array['path'] : '';
-            $canvas_path = rtrim(str_replace("index.php", "", $canvas_path), '/');
+            $canvas_path = rtrim(str_replace('index.php', '', $canvas_path), '/');
 
             $data = [];
 
@@ -1171,8 +1163,6 @@ class BaseController extends Controller
 
     /**
      * Sets the Flutter build to serve
-     *
-     * @return string
      */
     private function setBuild(): string
     {
@@ -1203,7 +1193,7 @@ class BaseController extends Controller
     /**
      * Checks in a account has a required feature
      *
-     * @param  mixed $feature
+     * @param  mixed  $feature
      * @return bool
      */
     public function checkFeature($feature)

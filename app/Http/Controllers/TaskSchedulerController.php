@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -63,7 +62,6 @@ class TaskSchedulerController extends BaseController
         return $this->itemResponse($scheduler);
     }
 
-
     public function show(ShowSchedulerRequest $request, Scheduler $scheduler)
     {
         return $this->itemResponse($scheduler);
@@ -91,7 +89,7 @@ class TaskSchedulerController extends BaseController
 
         $action = request()->input('action');
 
-        if (!in_array($action, ['archive', 'restore', 'delete'])) {
+        if (! in_array($action, ['archive', 'restore', 'delete'])) {
             return response()->json(['message' => 'Bulk action does not exist'], 400);
         }
 

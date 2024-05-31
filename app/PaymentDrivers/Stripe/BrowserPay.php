@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,9 +43,6 @@ class BrowserPay implements MethodInterface
 
     /**
      * Authorization page for browser pay.
-     *
-     * @param array $data
-     * @return RedirectResponse
      */
     public function authorizeView(array $data): RedirectResponse
     {
@@ -55,9 +51,6 @@ class BrowserPay implements MethodInterface
 
     /**
      * Handle the authorization for browser pay.
-     *
-     * @param Request $request
-     * @return RedirectResponse
      */
     public function authorizeResponse(Request $request): RedirectResponse
     {
@@ -99,7 +92,6 @@ class BrowserPay implements MethodInterface
     /**
      * Handle payment response for browser pay.
      *
-     * @param PaymentResponseRequest $request
      * @return RedirectResponse|App\PaymentDrivers\Stripe\never
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -188,6 +180,7 @@ class BrowserPay implements MethodInterface
      * Ensure Apple Pay domain is verified.
      *
      * @return void
+     *
      * @throws ApiErrorException
      */
     protected function ensureApplePayDomainIsValidated()

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -56,23 +55,33 @@ use League\CommonMark\CommonMarkConverter;
  * @property-read \App\Models\Vendor|null $vendor
  * @property int|null $tax_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereTaxId($value)
+ *
  * @mixin \Eloquent
  */
 class Product extends BaseModel
 {
+    use Filterable;
     use MakesHash;
     use SoftDeletes;
-    use Filterable;
 
     public const PRODUCT_TYPE_PHYSICAL = 1;
+
     public const PRODUCT_TYPE_SERVICE = 2;
+
     public const PRODUCT_TYPE_DIGITAL = 3;
+
     public const PRODUCT_TYPE_SHIPPING = 4;
+
     public const PRODUCT_TYPE_EXEMPT = 5;
+
     public const PRODUCT_TYPE_REDUCED_TAX = 6;
+
     public const PRODUCT_TYPE_OVERRIDE_TAX = 7;
+
     public const PRODUCT_TYPE_ZERO_RATED = 8;
+
     public const PRODUCT_TYPE_REVERSE_TAX = 9;
 
     protected $fillable = [
@@ -208,7 +217,7 @@ class Product extends BaseModel
 
     public static function markdownHelp(string $notes = '')
     {
-                
+
         $converter = new CommonMarkConverter([
             'allow_unsafe_links' => false,
             'renderer' => [
@@ -222,6 +231,6 @@ class Product extends BaseModel
 
     public function portalUrl($use_react_url): string
     {
-        return $use_react_url ? config('ninja.react_url') . "/#/products/{$this->hashed_id}/edit" : config('ninja.app_url');
+        return $use_react_url ? config('ninja.react_url')."/#/products/{$this->hashed_id}/edit" : config('ninja.app_url');
     }
 }

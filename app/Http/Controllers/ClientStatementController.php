@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -32,7 +31,6 @@ class ClientStatementController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param CreateStatementRequest $request
      * @return Response
      */
     public function statement(CreateStatementRequest $request)

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,11 +33,6 @@ class InvitationWasViewed
 
     /**
      * Create a new event instance.
-     *
-     * @param $entity
-     * @param $invitation
-     * @param $company
-     * @param $event_vars
      */
     public function __construct($entity, $invitation, $company, $event_vars)
     {

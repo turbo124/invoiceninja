@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,8 +30,8 @@ use Illuminate\View\View;
  */
 class RecurringInvoiceController extends Controller
 {
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
     use UserNotifies;
 
     /**
@@ -48,8 +47,6 @@ class RecurringInvoiceController extends Controller
     /**
      * Display the recurring invoice.
      *
-     * @param ShowRecurringInvoiceRequest $request
-     * @param RecurringInvoice $recurring_invoice
      *
      * @return Factory|View
      */
@@ -63,9 +60,8 @@ class RecurringInvoiceController extends Controller
     /**
      * Handle the request cancellation notification
      *
-     * @param  RequestCancellationRequest $request           [description]
-     * @param  RecurringInvoice           $recurring_invoice [description]
-     *
+     * @param  RequestCancellationRequest  $request  [description]
+     * @param  RecurringInvoice  $recurring_invoice  [description]
      * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
      */
     public function requestCancellation(RequestCancellationRequest $request, RecurringInvoice $recurring_invoice)

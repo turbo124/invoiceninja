@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Szervezet',
     'name' => 'Név',
     'website' => 'Weboldal',
@@ -1157,7 +1157,6 @@ $lang = array(
     'enterprise_plan_features' => 'A Vállalati terv támogatja a több felhasználót és a fájlmellékleteket: :link a szolgáltatások teljes listájának megtekintéséhez.',
     'return_to_app' => 'Vissza az alkalmazáshoz',
 
-
     // Payment updates
     'refund_payment' => 'Fizetés visszatérítése',
     'refund_max' => 'Max.:',
@@ -1689,7 +1688,6 @@ adva :date',
     'lang_Serbian' => 'Szerb',
     'lang_Bulgarian' => 'Bolgár',
     'lang_Russian (Russia)' => 'Orosz (Oroszország)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Könyvelés és jog',
@@ -2348,7 +2346,7 @@ adva :date',
     'currency_gold_troy_ounce' => 'Arany Troy Unce',
     'currency_nicaraguan_córdoba' => 'nicaraguai Córdoba',
     'currency_malagasy_ariary' => 'madagaszkári ariary',
-    "currency_tongan_pa_anga" => "Tonga Pa&#39;anga",
+    'currency_tongan_pa_anga' => 'Tonga Pa&#39;anga',
 
     'review_app_help' => 'Segítség az értékeléshez',
     'writing_a_review' => 'Értékelés írása',
@@ -4410,7 +4408,7 @@ adva :date',
     'activity_122' => 'Aktivitás 122',
     'activity_123' => 'Aktivitás 123',
     'activity_124' => 'Aktivitás 124',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'A megtekintéshez állítsa be a jelszót',
     'unsubscribe' => 'Leiratkozás',
     'unsubscribed' => 'Leiratkozva',
@@ -4914,7 +4912,7 @@ adva :date',
     'payment_type_Klarna' => 'fizetési típus: Klarna',
     'payment_type_Interac E Transfer' => 'fizetési típus: Interac E átutalás',
     'xinvoice_payable' => 'XInvoice fizetendő',
-    'xinvoice_no_buyers_reference' => "XInvoice nincs vevői hivatkozás",
+    'xinvoice_no_buyers_reference' => 'XInvoice nincs vevői hivatkozás',
     'xinvoice_online_payment' => 'XInvoice online fizetés',
     'pre_payment' => 'előfizetési díj',
     'number_of_payments' => 'fizetések száma',
@@ -5019,8 +5017,8 @@ adva :date',
     'e_invoice' => 'elektronikus számla',
     'light_dark_mode' => 'világos/sötét mód',
     'activities' => 'tevékenységek',
-    'recent_transactions' => "legutóbbi tranzakciók",
-    'country_Palestine' => "Palesztina",
+    'recent_transactions' => 'legutóbbi tranzakciók',
+    'country_Palestine' => 'Palesztina',
     'country_Taiwan' => 'Tajvan',
     'duties' => 'vámok',
     'order_number' => 'rendelési szám',
@@ -5235,7 +5233,7 @@ adva :date',
     'rff' => 'A kötelező mezők kitöltése',
     'add_step' => 'Lépés hozzáadása',
     'steps' => 'Lépések',
-    'steps_order_help' =>  'Fontos a lépések sorrendje. Az első lépés nem függhet más lépéstől. A második lépésnek az első lépéstől kell függnie, és így tovább.',
+    'steps_order_help' => 'Fontos a lépések sorrendje. Az első lépés nem függhet más lépéstől. A második lépésnek az első lépéstől kell függnie, és így tovább.',
     'other_steps' => 'Egyéb lépések',
     'use_available_payments' => 'Használja az Elérhető fizetéseket',
     'test_email_sent' => 'E-mail sikeresen elküldve',
@@ -5284,6 +5282,6 @@ adva :date',
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

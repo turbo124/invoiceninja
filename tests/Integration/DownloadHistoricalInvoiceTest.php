@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,15 +19,16 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\ActivityController
-*/
+ */
 class DownloadHistoricalInvoiceTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
     use MakesHash;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -75,7 +75,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/invoices/bulk", $data);
+        ])->post('/api/v1/invoices/bulk', $data);
 
         $response->assertStatus(200);
         $response->assertDownload();
@@ -105,7 +105,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/quotes/bulk", $data);
+        ])->post('/api/v1/quotes/bulk', $data);
 
         $response->assertStatus(200);
 

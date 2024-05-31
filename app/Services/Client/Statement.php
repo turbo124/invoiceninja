@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,9 +34,9 @@ use Illuminate\Support\Facades\DB;
 
 class Statement
 {
-    use PdfMakerTrait;
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
+    use PdfMakerTrait;
 
     /**
      * @var Invoice|Payment|null
@@ -63,12 +62,12 @@ class Statement
 
         $variables = [];
         $variables = $html->generateLabelsAndValues();
-        
+
         $option_template = &$this->options['template'];
 
-        $custom_statement_template = \App\Models\Design::where('id', $this->decodePrimaryKey($this->client->getSetting('statement_design_id')))->where('is_template',true)->first();
+        $custom_statement_template = \App\Models\Design::where('id', $this->decodePrimaryKey($this->client->getSetting('statement_design_id')))->where('is_template', true)->first();
 
-        if($custom_statement_template || $option_template && $option_template != '') {
+        if ($custom_statement_template || $option_template && $option_template != '') {
 
             $variables['values']['$start_date'] = $this->translateDate($this->options['start_date'], $this->client->date_format(), $this->client->locale());
             $variables['values']['$end_date'] = $this->translateDate($this->options['end_date'], $this->client->date_format(), $this->client->locale());
@@ -144,16 +143,16 @@ class Statement
 
     private function templateStatement($variables)
     {
-        if(isset($this->options['template'])) {
+        if (isset($this->options['template'])) {
             $statement_design_id = $this->options['template'];
         } else {
             $statement_design_id = $this->client->getSetting('statement_design_id');
         }
 
         $template = Design::query()
-                            ->where('id', $this->decodePrimaryKey($statement_design_id))
-                            ->where('company_id', $this->client->company_id)
-                            ->first();
+            ->where('id', $this->decodePrimaryKey($statement_design_id))
+            ->where('company_id', $this->client->company_id)
+            ->first();
 
         $ts = $template->service();
         $ts->addGlobal(['show_credits' => $this->options['show_credits_table']]);
@@ -190,13 +189,11 @@ class Statement
             nlog(print_r($e->getMessage(), 1));
         }
 
-
         return $pdf;
     }
+
     /**
      * Setup correct entity instance.
-     *
-     * @return Statement
      */
     protected function setupEntity(): self
     {
@@ -269,8 +266,6 @@ class Statement
 
     /**
      * Setup & prepare options.
-     *
-     * @return Statement
      */
     protected function setupOptions(): self
     {
@@ -294,7 +289,7 @@ class Statement
             $this->options['show_credits_table'] = false;
         }
 
-        if (!\array_key_exists('only_clients_with_invoices', $this->options)) {
+        if (! \array_key_exists('only_clients_with_invoices', $this->options)) {
             $this->options['only_clients_with_invoices'] = false;
         }
 
@@ -303,8 +298,6 @@ class Statement
 
     /**
      * The collection of invoices for the statement.
-     *
-     * @return Builder
      */
     public function getInvoices(): Builder
     {
@@ -345,8 +338,6 @@ class Statement
 
     /**
      * The collection of payments for the statement.
-     *
-     * @return Builder
      */
     protected function getPayments(): Builder
     {
@@ -362,8 +353,6 @@ class Statement
 
     /**
      * The collection of credits for the statement.
-     *
-     * @return Builder
      */
     protected function getCredits(): Builder
     {
@@ -377,7 +366,7 @@ class Statement
             ->where(function ($query) {
                 // $query->whereDate('due_date', '>=', $this->options['end_date'])
                 $query->whereDate('due_date', '>=', now())
-                      ->orWhereNull('due_date');
+                    ->orWhereNull('due_date');
             })
             ->orderBy('date', 'ASC');
     }
@@ -398,8 +387,6 @@ class Statement
 
     /**
      * Get the array of aging data.
-     *
-     * @return array
      */
     protected function getAging(): array
     {
@@ -416,8 +403,7 @@ class Statement
     /**
      * Generate aging amount.
      *
-     * @param mixed $range
-     * @return string
+     * @param  mixed  $range
      */
     private function getAgingAmount($range): string
     {
@@ -433,7 +419,7 @@ class Statement
             ->where('balance', '>', 0)
             ->where('is_deleted', 0);
 
-        if($range == '0') {
+        if ($range == '0') {
             $query->where(function ($q) use ($to, $from) {
                 $q->whereBetween('due_date', [$to, $from])->orWhereNull('due_date');
             });
@@ -449,7 +435,7 @@ class Statement
     /**
      * Calculate date ranges for aging.
      *
-     * @param mixed $range
+     * @param  mixed  $range
      * @return array
      */
     private function calculateDateRanges($range)
@@ -460,6 +446,7 @@ class Statement
             case '0':
                 $ranges[0] = now()->subYears(50);
                 $ranges[1] = now()->startOfDay()->subMinute();
+
                 return $ranges;
             case '30':
                 $ranges[0] = now()->startOfDay();
@@ -496,8 +483,6 @@ class Statement
 
     /**
      * Get correct design for statement.
-     *
-     * @return \App\Models\Design
      */
     protected function getDesign(): Design
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,9 +23,9 @@ class MarkOpened implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use NumberFormatter;
     use Queueable;
     use SerializesModels;
-    use NumberFormatter;
 
     public $message_id;
 
@@ -34,9 +33,6 @@ class MarkOpened implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param string $message_id
-     * @param string $entity
      */
     public function __construct(string $message_id, string $entity)
     {
@@ -54,8 +50,8 @@ class MarkOpened implements ShouldQueue
     public function handle()
     {
         $invitation = $this->entity::with('user', 'contact')
-                        ->whereMessageId($this->message_id)
-                        ->first();
+            ->whereMessageId($this->message_id)
+            ->first();
 
         if (! $invitation) {
             return false;

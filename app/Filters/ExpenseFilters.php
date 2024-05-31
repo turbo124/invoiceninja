@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,6 @@ class ExpenseFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -31,7 +28,7 @@ class ExpenseFilters extends QueryFilters
             return $this->builder;
         }
 
-        return  $this->builder->where(function ($query) use ($filter) {
+        return $this->builder->where(function ($query) use ($filter) {
             $query->where('number', 'like', '%'.$filter.'%')
                 ->orWhere('amount', 'like', '%'.$filter.'%')
                 ->orWhere('public_notes', 'like', '%'.$filter.'%')
@@ -58,8 +55,6 @@ class ExpenseFilters extends QueryFilters
      * - invoiced
      * - paid
      * - unpaid
-     *
-     * @return Builder
      */
     public function client_status(string $value = ''): Builder
     {
@@ -77,16 +72,16 @@ class ExpenseFilters extends QueryFilters
             if (in_array('logged', $status_parameters)) {
                 $query->orWhere(function ($query) {
                     $query->where('amount', '>', 0)
-                          ->whereNull('invoice_id')
-                          ->whereNull('payment_date')
-                          ->where('should_be_invoiced', false);
+                        ->whereNull('invoice_id')
+                        ->whereNull('payment_date')
+                        ->where('should_be_invoiced', false);
                 });
             }
 
             if (in_array('pending', $status_parameters)) {
                 $query->orWhere(function ($query) {
                     $query->where('should_be_invoiced', true)
-                          ->whereNull('invoice_id');
+                        ->whereNull('invoice_id');
                 });
             }
 
@@ -108,8 +103,8 @@ class ExpenseFilters extends QueryFilters
                 });
             }
 
-            if(in_array('uncategorized', $status_parameters)){
-                $query->orWhere(function ($query){
+            if (in_array('uncategorized', $status_parameters)) {
+                $query->orWhere(function ($query) {
                     $query->whereNull('category_id');
                 });
             }
@@ -122,13 +117,10 @@ class ExpenseFilters extends QueryFilters
 
     /**
      * Filter expenses that only have invoices
-     *
-     * @param string $value
-     * @return Builder
      */
     public function has_invoices(string $value = ''): Builder
     {
-        $split = explode(",", $value);
+        $split = explode(',', $value);
 
         if (is_array($split) && in_array($split[0], ['client', 'project'])) {
 
@@ -136,7 +128,7 @@ class ExpenseFilters extends QueryFilters
 
             return $this->builder->whereHas('invoice', function ($query) use ($search_key, $split) {
                 $query->where($search_key, $this->decodePrimaryKey($split[1]))
-                      ->whereIn('status_id', [\App\Models\Invoice::STATUS_DRAFT, \App\Models\Invoice::STATUS_SENT, \App\Models\Invoice::STATUS_PARTIAL]);
+                    ->whereIn('status_id', [\App\Models\Invoice::STATUS_DRAFT, \App\Models\Invoice::STATUS_SENT, \App\Models\Invoice::STATUS_PARTIAL]);
             });
         }
 
@@ -167,14 +159,13 @@ class ExpenseFilters extends QueryFilters
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
@@ -182,28 +173,28 @@ class ExpenseFilters extends QueryFilters
 
         if ($sort_col[0] == 'client_id' && in_array($sort_col[1], ['asc', 'desc'])) {
             return $this->builder
-                    ->orderByRaw('ISNULL(client_id), client_id '. $sort_col[1])
-                    ->orderBy(\App\Models\Client::select('name')
+                ->orderByRaw('ISNULL(client_id), client_id '.$sort_col[1])
+                ->orderBy(\App\Models\Client::select('name')
                     ->whereColumn('clients.id', 'expenses.client_id'), $sort_col[1]);
         }
 
         if ($sort_col[0] == 'vendor_id' && in_array($sort_col[1], ['asc', 'desc'])) {
             return $this->builder
-                    ->orderByRaw('ISNULL(vendor_id), vendor_id '. $sort_col[1])
-                    ->orderBy(\App\Models\Vendor::select('name')
+                ->orderByRaw('ISNULL(vendor_id), vendor_id '.$sort_col[1])
+                ->orderBy(\App\Models\Vendor::select('name')
                     ->whereColumn('vendors.id', 'expenses.vendor_id'), $sort_col[1]);
 
         }
 
         if ($sort_col[0] == 'category_id' && in_array($sort_col[1], ['asc', 'desc'])) {
             return $this->builder
-                    ->orderByRaw('ISNULL(category_id), category_id '. $sort_col[1])
-                    ->orderBy(\App\Models\ExpenseCategory::select('name')
+                ->orderByRaw('ISNULL(category_id), category_id '.$sort_col[1])
+                ->orderBy(\App\Models\ExpenseCategory::select('name')
                     ->whereColumn('expense_categories.id', 'expenses.category_id'), $sort_col[1]);
         }
 
-        if($sort_col[0] == 'number') {
-            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
+        if ($sort_col[0] == 'number') {
+            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 ".$dir);
         }
 
         if (is_array($sort_col) && in_array($sort_col[1], ['asc', 'desc']) && in_array($sort_col[0], ['amount', 'public_notes', 'date', 'id_number', 'custom_value1', 'custom_value2', 'custom_value3', 'custom_value4'])) {
@@ -215,8 +206,6 @@ class ExpenseFilters extends QueryFilters
 
     /**
      * Filters the query by the users company ID.
-     *
-     * @return Builder
      */
     public function entityFilter(): Builder
     {

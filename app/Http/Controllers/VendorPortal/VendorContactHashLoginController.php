@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,7 +17,8 @@ class VendorContactHashLoginController extends Controller
 {
     /**
      * Logs a user into the client portal using their contact_key
-     * @param  string $contact_key  The contact key
+     *
+     * @param  string  $contact_key  The contact key
      * @return Auth|\Illuminate\Support\Facades\Redirect
      */
     public function login(string $contact_key)
@@ -27,9 +27,8 @@ class VendorContactHashLoginController extends Controller
     }
 
     /**
-    * @return \Illuminate\Support\Facades\Redirect
-    */
-
+     * @return \Illuminate\Support\Facades\Redirect
+     */
     public function magicLink(string $magic_link)
     {
         return redirect($this->setRedirectPath());

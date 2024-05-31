@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,9 +27,6 @@ class MigrationFailed extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param $content
-     * @param $exception
      */
     public function __construct($exception, Company $company, $content = null)
     {

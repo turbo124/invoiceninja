@@ -3,16 +3,19 @@
  * @OA\Schema(
  *   schema="Client",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed id of the client"),
  *       @OA\Property(property="user_id", type="string", example="", description="The hashed id of the user"),
  *       @OA\Property(property="company_id", type="string", example="", description="The hashed id of the company"),
  *       @OA\Property(
  *       	property="contacts",
  *        	type="array",
+ *
  *        	@OA\Items(
  *           	ref="#/components/schemas/ClientContact",
  *          ),
  *       ),
+ *
  *       @OA\Property(property="name", type="string", example="Jims housekeeping", description="The client name"),
  *       @OA\Property(property="website", type="string", example="www.jims.com", description="The client website"),
  *       @OA\Property(property="private_notes", type="string", example="These are very private notes", description="Private notes on the client"),

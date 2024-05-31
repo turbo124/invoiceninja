@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -134,24 +133,24 @@ class EntityFailedSendObject
         $content = ctrans(
             $this->template_body,
             [
-                    'amount' => $this->getAmount(),
-                    'client' => $this->contact->present()->name(),
-                    'invoice' => $this->entity->number,
-                    'error' => $this->message_content ?? '',
-                    'contact' => $this->contact->present()->name(),
-                ]
+                'amount' => $this->getAmount(),
+                'client' => $this->contact->present()->name(),
+                'invoice' => $this->entity->number,
+                'error' => $this->message_content ?? '',
+                'contact' => $this->contact->present()->name(),
+            ]
         );
 
         $data = [
-            "title" => $this->getSubject(),
-            "content" => $content,
-            "url" => $this->invitation->getAdminLink($this->use_react_url),
-            "button" => ctrans("texts.view_{$this->entity_type}"),
-            "signature" => $signature,
-            "logo" => $this->company->present()->logo(),
-            "settings" => $settings,
-            "whitelabel" => $this->company->account->isPaid() ? true : false,
-            "text_body" => str_replace("<br>", "\n", $content),
+            'title' => $this->getSubject(),
+            'content' => $content,
+            'url' => $this->invitation->getAdminLink($this->use_react_url),
+            'button' => ctrans("texts.view_{$this->entity_type}"),
+            'signature' => $signature,
+            'logo' => $this->company->present()->logo(),
+            'settings' => $settings,
+            'whitelabel' => $this->company->account->isPaid() ? true : false,
+            'text_body' => str_replace('<br>', "\n", $content),
             'template' => $this->company->account->isPremium() ? 'email.template.admin_premium' : 'email.template.admin',
         ];
 

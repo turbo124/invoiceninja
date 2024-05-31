@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -63,7 +62,6 @@ class SwissQrGenerator
         // Create a new instance of QrBill, containing default headers with fixed values
         $qrBill = QrBill\QrBill::create();
 
-
         // Add creditor information
         // Who will receive the payment and to which bank account?
         $qrBill->setCreditor(
@@ -109,15 +107,15 @@ class SwissQrGenerator
         // Add payment reference
         // This is what you will need to identify incoming payments.
 
-        if (stripos($this->invoice->number, "Live") === 0) {
+        if (stripos($this->invoice->number, 'Live') === 0) {
             // we're currently in preview status. Let's give a dummy reference for now
-            $invoice_number = "123456789";
+            $invoice_number = '123456789';
         } else {
             $tempInvoiceNumber = $this->invoice->number;
             $tempInvoiceNumber = preg_replace('/[^A-Za-z0-9]/', '', $tempInvoiceNumber);
             // $tempInvoiceNumber = substr($tempInvoiceNumber, 1);
 
-            $calcInvoiceNumber = "";
+            $calcInvoiceNumber = '';
             $array = str_split($tempInvoiceNumber);
             foreach ($array as $char) {
                 if (is_numeric($char)) {
@@ -163,7 +161,6 @@ class SwissQrGenerator
             )
         );
 
-
         // Now get the QR code image and save it as a file.
         try {
             $output = new QrBill\PaymentPart\Output\HtmlOutput\HtmlOutput($qrBill, $this->resolveLanguage());
@@ -175,7 +172,7 @@ class SwissQrGenerator
             return $html;
         } catch (\Exception $e) {
 
-            if(is_iterable($qrBill->getViolations())) {
+            if (is_iterable($qrBill->getViolations())) {
 
                 foreach ($qrBill->getViolations() as $key => $violation) {
                     // nlog("qr");
@@ -213,5 +210,4 @@ class SwissQrGenerator
         }
 
     }
-
 }

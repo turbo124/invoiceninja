@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,7 +20,6 @@ class EmailBounceNotification extends Notification
      *
      * @return void
      */
-
     public function __construct(private string $email_address)
     {
     }
@@ -41,7 +39,6 @@ class EmailBounceNotification extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     *
      */
     public function toMail($notifiable)
     {
@@ -65,9 +62,9 @@ class EmailBounceNotification extends Notification
         $content = "Email bounce notification for {$this->email_address} \n";
 
         return (new SlackMessage())
-                ->success()
-                ->from(ctrans('texts.notification_bot'))
-                ->image('https://app.invoiceninja.com/favicon.png')
-                ->content($content);
+            ->success()
+            ->from(ctrans('texts.notification_bot'))
+            ->image('https://app.invoiceninja.com/favicon.png')
+            ->content($content);
     }
 }

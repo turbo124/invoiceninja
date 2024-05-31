@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Task",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed id of the task"),
  *       @OA\Property(property="user_id", type="string", example="Opnel5aKBz", description="The hashed id of the user who created the task"),
  *       @OA\Property(property="assigned_user_id", type="string", example="Opnel5aKBz", description="The assigned user of the task"),

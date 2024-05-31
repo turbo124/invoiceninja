@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,8 +22,6 @@ class StoreGroupSettingRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -53,7 +50,7 @@ class StoreGroupSettingRequest extends Request
         if (array_key_exists('settings', $input)) {
             $input['settings'] = $this->filterSaveableSettings($input['settings']);
         } else {
-            $input['settings'] = (array)ClientSettings::defaults();
+            $input['settings'] = (array) ClientSettings::defaults();
         }
 
         $this->replace($input);
@@ -73,7 +70,7 @@ class StoreGroupSettingRequest extends Request
      * down to the free plan setting properties which
      * are saveable
      *
-     * @param  object $settings
+     * @param  object  $settings
      * @return array $settings
      */
     private function filterSaveableSettings($settings)
@@ -85,7 +82,7 @@ class StoreGroupSettingRequest extends Request
         $settings = $settings_data->cast($settings)->toObject();
 
         if (! $user->account->isFreeHostedClient()) {
-            return (array)$settings;
+            return (array) $settings;
         }
 
         $saveable_casts = CompanySettings::$free_plan_casts;
@@ -96,7 +93,6 @@ class StoreGroupSettingRequest extends Request
             }
         }
 
-        return (array)$settings;
+        return (array) $settings;
     }
-
 }

@@ -218,7 +218,7 @@ return [
         'Collector' => Turbo124\Collector\CollectorFacade::class,
         'Countries' => 'Webpatser\Countries\CountriesFacade',
         'CustomMessage' => App\Utils\ClientPortal\CustomMessage\CustomMessageFacade::class,
-        'Redis'        => Illuminate\Support\Facades\Redis::class,
+        'Redis' => Illuminate\Support\Facades\Redis::class,
     ])->toArray(),
 
 ];

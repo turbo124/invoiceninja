@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $deleted_at
  * @property-read \App\Models\Payment $payment
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $paymentable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Paymentable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Paymentable newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Paymentable onlyTrashed()
@@ -43,6 +43,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Paymentable whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Paymentable withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Paymentable withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Paymentable extends Pivot

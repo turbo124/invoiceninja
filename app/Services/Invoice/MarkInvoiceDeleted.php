@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,11 +40,11 @@ class MarkInvoiceDeleted extends AbstractService
         }
 
         $this->cleanup()
-             ->setAdjustmentAmount()
-             ->deletePaymentables()
-             ->adjustPayments()
-             ->adjustPaidToDateAndBalance()
-             ->adjustLedger();
+            ->setAdjustmentAmount()
+            ->deletePaymentables()
+            ->adjustPayments()
+            ->adjustPaidToDateAndBalance()
+            ->adjustLedger();
 
         return $this->invoice;
     }
@@ -62,10 +61,10 @@ class MarkInvoiceDeleted extends AbstractService
     {
         // 06-09-2022
         $this->invoice
-             ->client
-             ->service()
-             ->updateBalanceAndPaidToDate($this->balance_adjustment * -1, $this->adjustment_amount * -1)
-             ->save(); //reduces the paid to date by the payment totals
+            ->client
+            ->service()
+            ->updateBalanceAndPaidToDate($this->balance_adjustment * -1, $this->adjustment_amount * -1)
+            ->save(); //reduces the paid to date by the payment totals
 
         return $this;
     }
@@ -78,29 +77,27 @@ class MarkInvoiceDeleted extends AbstractService
             $this->invoice->payments()->update(['payments.deleted_at' => now(), 'payments.is_deleted' => true]);
         }
 
-
         //adjust payments down by the amount applied to the invoice payment.
         $this->invoice->payments->each(function ($payment) {
             $payment_adjustment = $payment->paymentables
-                                            ->where('paymentable_type', '=', 'invoices')
-                                            ->where('paymentable_id', $this->invoice->id)
-                                            ->sum('amount');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('amount');
 
             $payment_adjustment -= $payment->paymentables
-                                            ->where('paymentable_type', '=', 'invoices')
-                                            ->where('paymentable_id', $this->invoice->id)
-                                            ->sum('refunded');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('refunded');
 
             //14-07-2023 - Do not include credits in the payment adjustment.
             $payment_adjustment -= $payment->paymentables
-                                            ->where('paymentable_type', '=', 'App\Models\Credit')
-                                            ->sum('amount');
+                ->where('paymentable_type', '=', 'App\Models\Credit')
+                ->sum('amount');
 
             $payment->amount -= $payment_adjustment;
             $payment->applied -= $payment_adjustment;
             $payment->save();
         });
-
 
         return $this;
     }
@@ -115,14 +112,14 @@ class MarkInvoiceDeleted extends AbstractService
     {
         foreach ($this->invoice->payments as $payment) {
             $this->adjustment_amount += $payment->paymentables
-                                                ->where('paymentable_type', '=', 'invoices')
-                                                ->where('paymentable_id', $this->invoice->id)
-                                                ->sum('amount');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('amount');
 
             $this->adjustment_amount -= $payment->paymentables
-                                                ->where('paymentable_type', '=', 'invoices')
-                                                ->where('paymentable_id', $this->invoice->id)
-                                                ->sum('refunded');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('refunded');
         }
 
         $this->total_payments = $this->invoice->payments->sum('amount') - $this->invoice->payments->sum('refunded');
@@ -175,9 +172,9 @@ class MarkInvoiceDeleted extends AbstractService
     {
         $this->invoice->payments->each(function ($payment) {
             $payment->paymentables()
-                    ->where('paymentable_type', '=', 'invoices')
-                    ->where('paymentable_id', $this->invoice->id)
-                    ->update(['deleted_at' => now()]);
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->update(['deleted_at' => now()]);
         });
 
         return $this;

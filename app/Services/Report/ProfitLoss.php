@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,8 +23,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use League\Csv\Writer;
-
-use function Sentry\continueTrace;
 
 class ProfitLoss
 {
@@ -262,71 +259,72 @@ class ProfitLoss
         $this->invoice_payment_map = [];
 
         Payment::query()->where('company_id', $this->company->id)
-                        ->whereIn('status_id', [1, 4, 5])
-                        ->where('is_deleted', 0)
-                        ->whereBetween('date', [$this->start_date, $this->end_date])
-                        ->whereHas('client', function ($query) {
-                            $query->where('is_deleted', 0);
-                        })
-                        ->with(['company', 'client'])
-                        ->cursor()
-                        ->each(function ($payment) {
+            ->whereIn('status_id', [1, 4, 5])
+            ->where('is_deleted', 0)
+            ->whereBetween('date', [$this->start_date, $this->end_date])
+            ->whereHas('client', function ($query) {
+                $query->where('is_deleted', 0);
+            })
+            ->with(['company', 'client'])
+            ->cursor()
+            ->each(function ($payment) {
 
-                            $map = new \stdClass();
-                            $amount_payment_paid = 0;
-                            $amount_credit_paid = 0;
-                            $amount_payment_paid_converted = 0;
-                            $amount_credit_paid_converted = 0;
-                            $tax_amount = 0;
-                            $tax_amount_converted = 0;
-                            $tax_amount_credit = 0;
-                            $tax_amount_credit_converted = $tax_amount_credit_converted = 0;
+                $map = new \stdClass();
+                $amount_payment_paid = 0;
+                $amount_credit_paid = 0;
+                $amount_payment_paid_converted = 0;
+                $amount_credit_paid_converted = 0;
+                $tax_amount = 0;
+                $tax_amount_converted = 0;
+                $tax_amount_credit = 0;
+                $tax_amount_credit_converted = $tax_amount_credit_converted = 0;
 
-                            $invoice = false;
+                $invoice = false;
 
-                            foreach ($payment->paymentables as $pivot) {
-                                if ($pivot->paymentable_type == 'invoices') {
-                                    $invoice = Invoice::query()->withTrashed()->find($pivot->paymentable_id);
+                foreach ($payment->paymentables as $pivot) {
+                    if ($pivot->paymentable_type == 'invoices') {
+                        $invoice = Invoice::query()->withTrashed()->find($pivot->paymentable_id);
 
-                                    if(!$invoice)
-                                        continue;
+                        if (! $invoice) {
+                            continue;
+                        }
 
-                                    $pivot_diff = $pivot->amount - $pivot->refunded;
-                                    $amount_payment_paid += $pivot_diff;
-                                    $amount_payment_paid_converted += $pivot_diff * ($payment->exchange_rate ?: 1);
+                        $pivot_diff = $pivot->amount - $pivot->refunded;
+                        $amount_payment_paid += $pivot_diff;
+                        $amount_payment_paid_converted += $pivot_diff * ($payment->exchange_rate ?: 1);
 
-                                    if ($invoice->amount > 0) {
-                                        $tax_amount += ($pivot_diff / $invoice->amount) * $invoice->total_taxes;
-                                        $tax_amount_converted += (($pivot_diff / $invoice->amount) * $invoice->total_taxes) / $invoice->exchange_rate;
-                                    }
+                        if ($invoice->amount > 0) {
+                            $tax_amount += ($pivot_diff / $invoice->amount) * $invoice->total_taxes;
+                            $tax_amount_converted += (($pivot_diff / $invoice->amount) * $invoice->total_taxes) / $invoice->exchange_rate;
+                        }
 
-                                }
-                                
-                                    if(!$invoice) {
-                                        continue;
-                                    }
+                    }
 
-                                if ($pivot->paymentable_type == 'credits') {
-                                    $amount_credit_paid += $pivot->amount - $pivot->refunded;
-                                    $amount_credit_paid_converted += $pivot_diff * ($payment->exchange_rate ?: 1);
+                    if (! $invoice) {
+                        continue;
+                    }
 
-                                    $tax_amount_credit += ($pivot_diff / $invoice->amount) * $invoice->total_taxes;
-                                    $tax_amount_credit_converted += (($pivot_diff / $invoice->amount) * $invoice->total_taxes) / $invoice->exchange_rate;
-                                }
-                            }
+                    if ($pivot->paymentable_type == 'credits') {
+                        $amount_credit_paid += $pivot->amount - $pivot->refunded;
+                        $amount_credit_paid_converted += $pivot_diff * ($payment->exchange_rate ?: 1);
 
-                            $map->amount_payment_paid = $amount_payment_paid;
-                            $map->amount_payment_paid_converted = $amount_payment_paid_converted;
-                            $map->tax_amount = $tax_amount;
-                            $map->tax_amount_converted = $tax_amount_converted;
-                            $map->amount_credit_paid = $amount_credit_paid;
-                            $map->amount_credit_paid_converted = $amount_credit_paid_converted;
-                            $map->tax_amount_credit = $tax_amount_credit;
-                            $map->tax_amount_credit_converted = $tax_amount_credit_converted;
-                            $map->currency_id = $payment->currency_id;
+                        $tax_amount_credit += ($pivot_diff / $invoice->amount) * $invoice->total_taxes;
+                        $tax_amount_credit_converted += (($pivot_diff / $invoice->amount) * $invoice->total_taxes) / $invoice->exchange_rate;
+                    }
+                }
 
-                            $this->invoice_payment_map[] = $map;
-                        });
+                $map->amount_payment_paid = $amount_payment_paid;
+                $map->amount_payment_paid_converted = $amount_payment_paid_converted;
+                $map->tax_amount = $tax_amount;
+                $map->tax_amount_converted = $tax_amount_converted;
+                $map->amount_credit_paid = $amount_credit_paid;
+                $map->amount_credit_paid_converted = $amount_credit_paid_converted;
+                $map->tax_amount_credit = $tax_amount_credit;
+                $map->tax_amount_credit_converted = $tax_amount_credit_converted;
+                $map->currency_id = $payment->currency_id;
+
+                $this->invoice_payment_map[] = $map;
+            });
 
         return $this;
     }
@@ -371,7 +369,7 @@ class ProfitLoss
 
         $csv->insertOne(['--------------------']);
 
-        $csv->insertOne([ctrans('texts.total_revenue'). "[".ctrans('texts.tax')." " .ctrans('texts.exclusive'). "]", Number::formatMoney($this->income, $this->company)]);
+        $csv->insertOne([ctrans('texts.total_revenue').'['.ctrans('texts.tax').' '.ctrans('texts.exclusive').']', Number::formatMoney($this->income, $this->company)]);
 
         //total taxes
 
@@ -386,7 +384,7 @@ class ProfitLoss
         //total expense taxes
 
         $csv->insertOne(['--------------------']);
-        $csv->insertOne([ctrans('texts.total_expenses'). "[".ctrans('texts.tax')." " .ctrans('texts.exclusive'). "]", Number::formatMoney(array_sum(array_column($this->expense_break_down, 'total')), $this->company)]);
+        $csv->insertOne([ctrans('texts.total_expenses').'['.ctrans('texts.tax').' '.ctrans('texts.exclusive').']', Number::formatMoney(array_sum(array_column($this->expense_break_down, 'total')), $this->company)]);
 
         $csv->insertOne([ctrans('texts.total_taxes'), Number::formatMoney(array_sum(array_column($this->expense_break_down, 'tax')), $this->company)]);
 
@@ -399,7 +397,6 @@ class ProfitLoss
         $csv->insertOne(['']);
         $csv->insertOne(['']);
 
-        
         $csv->insertOne(['--------------------']);
         $csv->insertOne([ctrans('texts.revenue')]);
         $csv->insertOne(['--------------------']);
@@ -414,11 +411,11 @@ class ProfitLoss
         $csv->insertOne(['--------------------']);
         $csv->insertOne([ctrans('texts.expenses')]);
         $csv->insertOne(['--------------------']);
-        foreach($this->expenses as $expense){
+        foreach ($this->expenses as $expense) {
             $csv->insertOne([$expense->currency, ($expense->total - $expense->foreign_tax_amount), $expense->foreign_tax_amount]);
         }
 
-        return  $csv->toString();
+        return $csv->toString();
     }
 
     /**
@@ -450,15 +447,15 @@ class ProfitLoss
     private function expenseData()
     {
         $expenses = Expense::query()->where('company_id', $this->company->id)
-                           ->where(function ($query){
-                                $query->whereNull('client_id')->orWhereHas('client', function ($q){
-                                    $q->where('is_deleted', 0);
-                                });
-                           })
-                           ->where('is_deleted', 0)
-                           ->withTrashed()
-                           ->whereBetween('date', [$this->start_date, $this->end_date])
-                           ->cursor();
+            ->where(function ($query) {
+                $query->whereNull('client_id')->orWhereHas('client', function ($q) {
+                    $q->where('is_deleted', 0);
+                });
+            })
+            ->where('is_deleted', 0)
+            ->withTrashed()
+            ->whereBetween('date', [$this->start_date, $this->end_date])
+            ->cursor();
 
         $this->expenses = [];
 

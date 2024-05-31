@@ -11,8 +11,7 @@ class VerifyHash
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
+     * @param  Request  $request
      * @return mixed
      */
     public function handle($request, Closure $next)

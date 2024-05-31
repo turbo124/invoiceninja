@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -101,15 +100,14 @@ class ClientExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($client) {
-                    $row = $this->buildRow($client);
-                    return $this->processMetaData($row, $client);
-                })->toArray();
+            ->map(function ($client) {
+                $row = $this->buildRow($client);
+
+                return $this->processMetaData($row, $client);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
-
-
 
     public function init(): Builder
     {
@@ -124,15 +122,16 @@ class ClientExport extends BaseExport
         }
 
         $query = Client::query()->with('contacts')
-                                ->withTrashed()
-                                ->where('company_id', $this->company->id);
+            ->withTrashed()
+            ->where('company_id', $this->company->id);
 
-        if(!$this->input['include_deleted'] ?? false)
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
+        }
 
         $query = $this->addDateRange($query);
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -152,9 +151,9 @@ class ClientExport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query->cursor()
-              ->each(function ($client) {
-                  $this->csv->insertOne($this->buildRow($client));
-              });
+            ->each(function ($client) {
+                $this->csv->insertOne($this->buildRow($client));
+            });
 
         return $this->csv->toString();
     }
@@ -193,7 +192,7 @@ class ClientExport extends BaseExport
         $clean_row = [];
         foreach (array_values($this->input['report_keys']) as $key => $value) {
 
-            $report_keys = explode(".", $value);
+            $report_keys = explode('.', $value);
 
             $column_key = $value;
             $clean_row[$key]['entity'] = $report_keys[0];
@@ -202,7 +201,7 @@ class ClientExport extends BaseExport
             $clean_row[$key]['value'] = $row[$column_key];
             $clean_row[$key]['identifier'] = $value;
 
-            if(in_array($clean_row[$key]['id'], ['paid_to_date', 'balance', 'credit_balance','payment_balance'])) {
+            if (in_array($clean_row[$key]['id'], ['paid_to_date', 'balance', 'credit_balance', 'payment_balance'])) {
                 $clean_row[$key]['display_value'] = Number::formatMoney($row[$column_key], $resource);
             } else {
                 $clean_row[$key]['display_value'] = $row[$column_key];

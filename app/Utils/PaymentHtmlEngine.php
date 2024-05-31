@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -72,7 +71,7 @@ class PaymentHtmlEngine
         $data['$payment.date'] = ['value' => $this->translateDate($this->payment->date, $this->client->date_format(), $this->client->locale()), 'label' => ctrans('texts.payment_date')];
         $data['$transaction_reference'] = ['value' => $this->payment->transaction_reference, 'label' => ctrans('texts.transaction_reference')];
 
-        $data['$font_size'] = ['value' => $this->settings->font_size . 'px !important;', 'label' => ''];
+        $data['$font_size'] = ['value' => $this->settings->font_size.'px !important;', 'label' => ''];
         $data['$font_name'] = ['value' => Helpers::resolveFont($this->settings->primary_font)['name'], 'label' => ''];
         $data['$font_url'] = ['value' => Helpers::resolveFont($this->settings->primary_font)['url'], 'label' => ''];
         $data['$secondary_font_name'] = ['value' => Helpers::resolveFont($this->settings->secondary_font)['name'], 'label' => ''];
@@ -173,7 +172,7 @@ class PaymentHtmlEngine
         $data['$viewButton'] = &$data['$view_link'];
         $data['$viewLink'] = &$data['$view_link'];
         $data['$paymentLink'] = &$data['$view_link'];
-        $data['$portalButton'] = ['value' =>  $this->buildViewButton($this->payment->getPortalLink(), ctrans('texts.login')), 'label' => ''];
+        $data['$portalButton'] = ['value' => $this->buildViewButton($this->payment->getPortalLink(), ctrans('texts.login')), 'label' => ''];
         $data['$portal_url'] = &$data['$portalButton'];
 
         $data['$view_url'] = ['value' => $this->payment->getLink(), 'label' => ctrans('texts.view_payment')];
@@ -205,7 +204,7 @@ class PaymentHtmlEngine
         $data['$history'] = ['value' => '', 'label' => ctrans('texts.history')];
 
         if ($this->payment->status_id == 4) {
-            $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> ' . ctrans('texts.paid') .'</div>', 'label' => ''];
+            $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> '.ctrans('texts.paid').'</div>', 'label' => ''];
         } else {
             $data['$status_logo'] = ['value' => '', 'label' => ''];
         }
@@ -231,7 +230,7 @@ class PaymentHtmlEngine
                 $invoice_field = $this->translateDate($invoice_field, $this->client->date_format(), $this->client->locale());
             }
 
-            $invoicex .= ctrans('texts.invoice_number_short') . "{$invoice->number} {$invoice_field}";
+            $invoicex .= ctrans('texts.invoice_number_short')."{$invoice->number} {$invoice_field}";
         }
 
         return $invoicex;
@@ -303,8 +302,6 @@ class PaymentHtmlEngine
 
     /**
      * generateLabelsAndValues
-     *
-     * @return array
      */
     public function generateLabelsAndValues(): array
     {
@@ -322,10 +319,6 @@ class PaymentHtmlEngine
 
     /**
      * buildViewButton
-     *
-     * @param  string $link
-     * @param  string $text
-     * @return string
      */
     private function buildViewButton(string $link, string $text): string
     {
@@ -339,8 +332,8 @@ class PaymentHtmlEngine
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" >
         <tbody><tr>
         <td align="center" class="new_button" style="border-radius: 2px; background-color: '.$this->settings->primary_color.'">
-            <a href="'. $link . '" target="_blank" class="new_button" style="text-decoration: none; border: 1px solid '.$this->settings->primary_color.'; display: inline-block; border-radius: 2px; padding-top: 15px; padding-bottom: 15px; padding-left: 25px; padding-right: 25px; font-size: 20px; color: #fff">
-            <singleline label="cta button">'. $text .'</singleline>
+            <a href="'.$link.'" target="_blank" class="new_button" style="text-decoration: none; border: 1px solid '.$this->settings->primary_color.'; display: inline-block; border-radius: 2px; padding-top: 15px; padding-bottom: 15px; padding-left: 25px; padding-right: 25px; font-size: 20px; color: #fff">
+            <singleline label="cta button">'.$text.'</singleline>
             </a>
         </td>
         </tr>
@@ -354,12 +347,11 @@ class PaymentHtmlEngine
 </div>
         ';
 
-
         return '
             <table border="0" cellspacing="0" cellpadding="0" align="center">
                 <tr style="border: 0 !important; ">
                     <td class="new_button" style="padding: 12px 18px 12px 18px; border-radius:5px;" align="center"> 
-                    <a href="'. $link .'" target="_blank" style="border: 0 !important;font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; display: inline-block;">'. $text .'</a>
+                    <a href="'.$link.'" target="_blank" style="border: 0 !important;font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; display: inline-block;">'.$text.'</a>
                     </td>
                 </tr>
             </table>

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,6 +51,7 @@ class CreateUbl implements ShouldQueue
 
     /**
      * Execute the job
+     *
      * @return ?string
      */
     public function handle()
@@ -179,20 +179,18 @@ class CreateUbl implements ShouldQueue
         $taxScheme = ((new TaxScheme()))->setId($taxName);
 
         $taxtotal->addTaxSubTotal((new TaxSubTotal())
-                ->setTaxAmount($taxAmount)
-                ->setTaxableAmount($taxable)
-                ->setTaxCategory((new TaxCategory())
-                    ->setId($taxName)
-                    ->setName($taxName)
-                    ->setTaxScheme($taxScheme)
-                    ->setPercent($taxRate)));
+            ->setTaxAmount($taxAmount)
+            ->setTaxableAmount($taxable)
+            ->setTaxCategory((new TaxCategory())
+                ->setId($taxName)
+                ->setName($taxName)
+                ->setTaxScheme($taxScheme)
+                ->setPercent($taxRate)));
 
         return $taxAmount;
     }
 
     /**
-     * @param $item
-     * @param $invoice_total
      * @return float|int
      */
     private function getItemTaxable($item, $invoice_total)

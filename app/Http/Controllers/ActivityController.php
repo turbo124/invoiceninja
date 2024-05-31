@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,9 +26,9 @@ use stdClass;
 
 class ActivityController extends BaseController
 {
-    use PdfMaker;
-    use PageNumbering;
     use MakesHash;
+    use PageNumbering;
+    use PdfMaker;
 
     protected $entity_type = Activity::class;
 
@@ -46,16 +45,16 @@ class ActivityController extends BaseController
 
         /* @var App\Models\Activity[] $activities */
         $activities = Activity::with('user')
-                                ->orderBy('created_at', 'DESC')
-                                ->company()
-                                ->take($default_activities);
+            ->orderBy('created_at', 'DESC')
+            ->company()
+            ->take($default_activities);
 
-        if($request->has('reactv2')) {
+        if ($request->has('reactv2')) {
 
             /** @var \App\Models\User auth()->user() */
             $user = auth()->user();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 $activities->where('user_id', auth()->user()->id);
             }
 
@@ -80,15 +79,15 @@ class ActivityController extends BaseController
         $default_activities = request()->has('rows') ? request()->input('rows') : 75;
 
         $activities = Activity::with('user')
-                                ->orderBy('created_at', 'DESC')
-                                ->company()
-                                ->where("{$request->entity}_id", $request->entity_id)
-                                ->take($default_activities);
+            ->orderBy('created_at', 'DESC')
+            ->company()
+            ->where("{$request->entity}_id", $request->entity_id)
+            ->take($default_activities);
 
         /** @var \App\Models\User auth()->user() */
         $user = auth()->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             $activities->where('user_id', auth()->user()->id);
         }
 

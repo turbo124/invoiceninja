@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,7 @@ class InvoiceController extends BaseController
     /**
      * InvoiceController constructor.
      *
-     * @param InvoiceRepository $invoice_repo  The invoice repo
+     * @param  InvoiceRepository  $invoice_repo  The invoice repo
      */
     public function __construct(InvoiceRepository $invoice_repo)
     {
@@ -61,9 +60,9 @@ class InvoiceController extends BaseController
         }
 
         $invitation = InvoiceInvitation::with(['invoice'])
-                                        ->where('company_id', $company->id)
-                                        ->where('key', $invitation_key)
-                                        ->firstOrFail();
+            ->where('company_id', $company->id)
+            ->where('key', $invitation_key)
+            ->firstOrFail();
 
         return $this->itemResponse($invitation->invoice);
     }

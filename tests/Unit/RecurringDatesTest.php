@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,21 +27,21 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers \App\Models\RecurringInvoice
  */
 class RecurringDatesTest extends TestCase
 {
+    use DatabaseTransactions;
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
     }
-
 
     public function testDailyFrequencyCalc6()
     {
@@ -92,11 +91,11 @@ class RecurringDatesTest extends TestCase
         $client = Client::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
         ClientContact::factory()->create([
-                'user_id' => $user->id,
-                'client_id' => $client->id,
-                'company_id' => $company->id,
-                'is_primary' => 1,
-            ]);
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'is_primary' => 1,
+        ]);
 
         $recurring_invoice = RecurringInvoice::factory()->create([
             'user_id' => $user->id,
@@ -136,12 +135,9 @@ class RecurringDatesTest extends TestCase
 
     }
 
-
-
-
     public function testDailyFrequencyCalc5()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -186,13 +182,11 @@ class RecurringDatesTest extends TestCase
         $client = Client::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
         ClientContact::factory()->create([
-                'user_id' => $user->id,
-                'client_id' => $client->id,
-                'company_id' => $company->id,
-                'is_primary' => 1,
-            ]);
-
-
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'is_primary' => 1,
+        ]);
 
         $recurring_invoice = RecurringInvoice::factory()->create([
             'user_id' => $user->id,
@@ -223,10 +217,9 @@ class RecurringDatesTest extends TestCase
 
     }
 
-
     public function testDailyFrequencyCalc4()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -271,13 +264,11 @@ class RecurringDatesTest extends TestCase
         $client = Client::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
         ClientContact::factory()->create([
-                'user_id' => $user->id,
-                'client_id' => $client->id,
-                'company_id' => $company->id,
-                'is_primary' => 1,
-            ]);
-
-
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'is_primary' => 1,
+        ]);
 
         $recurring_invoice = RecurringInvoice::factory()->create([
             'user_id' => $user->id,
@@ -310,7 +301,7 @@ class RecurringDatesTest extends TestCase
 
     public function testDailyFrequencyCalc3()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -355,11 +346,11 @@ class RecurringDatesTest extends TestCase
         $client = Client::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
         ClientContact::factory()->create([
-                'user_id' => $user->id,
-                'client_id' => $client->id,
-                'company_id' => $company->id,
-                'is_primary' => 1,
-            ]);
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'is_primary' => 1,
+        ]);
 
         $this->assertEquals('1', $client->getSetting('entity_send_time'));
         $this->assertEquals('1', $client->getSetting('timezone_id'));
@@ -387,7 +378,6 @@ class RecurringDatesTest extends TestCase
 
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
-
 
     }
 
@@ -437,11 +427,11 @@ class RecurringDatesTest extends TestCase
         $client = Client::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
         ClientContact::factory()->create([
-                'user_id' => $user->id,
-                'client_id' => $client->id,
-                'company_id' => $company->id,
-                'is_primary' => 1,
-            ]);
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'is_primary' => 1,
+        ]);
 
         $this->assertEquals('23', $client->getSetting('entity_send_time'));
         $this->assertEquals('113', $client->getSetting('timezone_id'));
@@ -518,11 +508,11 @@ class RecurringDatesTest extends TestCase
         $client = Client::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
 
         ClientContact::factory()->create([
-                'user_id' => $user->id,
-                'client_id' => $client->id,
-                'company_id' => $company->id,
-                'is_primary' => 1,
-            ]);
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'is_primary' => 1,
+        ]);
 
         $this->assertEquals('1', $client->getSetting('entity_send_time'));
         $this->assertEquals('113', $client->getSetting('timezone_id'));
@@ -550,8 +540,6 @@ class RecurringDatesTest extends TestCase
 
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
-
-
 
     }
 

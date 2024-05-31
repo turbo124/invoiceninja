@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,8 +17,6 @@ class UserPresenter extends EntityPresenter
 {
     /**
      * Returns the first and last names concatenated.
-     *
-     * @return string
      */
     public function name(): string
     {
@@ -35,8 +32,6 @@ class UserPresenter extends EntityPresenter
 
     /**
      * Returns a full name (with fallback) of the user
-     *
-     * @return string
      */
     public function getDisplayName(): string
     {
@@ -51,6 +46,7 @@ class UserPresenter extends EntityPresenter
 
     /**
      * Returns the full name of the user
+     *
      * @return string
      */
     public function getFullName()
@@ -64,8 +60,6 @@ class UserPresenter extends EntityPresenter
 
     /**
      * Returns the first name of the user
-     *
-     * @return string
      */
     public function firstName(): string
     {
@@ -79,8 +73,6 @@ class UserPresenter extends EntityPresenter
 
     /**
      * Returns the last name of the user
-     *
-     * @return string
      */
     public function lastName(): string
     {

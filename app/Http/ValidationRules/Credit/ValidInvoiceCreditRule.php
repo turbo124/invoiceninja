@@ -5,7 +5,6 @@
  * @link https://github.com/creditninja/creditninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://creditninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,8 +25,8 @@ class ValidInvoiceCreditRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -43,9 +42,6 @@ class ValidInvoiceCreditRule implements Rule
         return $this->error_message;
     }
 
-    /**
-     * @return bool
-     */
     private function checkIfCreditInvoiceValid($value): bool
     {
         $invoice = Invoice::withTrashed()->find($value);

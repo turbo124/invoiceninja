@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. payment Ninja LLC (https://paymentninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -60,16 +59,16 @@ class PaymentService
         $invoices->each(function ($invoice) {
             if ($invoice->pivot->amount > 0) {
                 $invoice->service()
-                        ->updateBalance($invoice->pivot->amount)
-                        ->updatePaidToDate($invoice->pivot->amount * -1)
-                        ->setStatus(Invoice::STATUS_SENT)
-                        ->save();
+                    ->updateBalance($invoice->pivot->amount)
+                    ->updatePaidToDate($invoice->pivot->amount * -1)
+                    ->setStatus(Invoice::STATUS_SENT)
+                    ->save();
             }
         });
 
         $this->payment
-             ->ledger()
-             ->updatePaymentBalance($this->payment->amount, "PaymentService");
+            ->ledger()
+            ->updatePaymentBalance($this->payment->amount, 'PaymentService');
 
         $client->service()
             ->updateBalance($this->payment->amount)
@@ -81,7 +80,7 @@ class PaymentService
 
     public function refundPayment(array $data): ?Payment
     {
-        return ((new RefundPayment($this->payment, $data)))->run();
+        return (new RefundPayment($this->payment, $data))->run();
     }
 
     public function deletePayment($update_client_paid_to_date = true): ?Payment
@@ -91,7 +90,7 @@ class PaymentService
 
     public function updateInvoicePayment(PaymentHash $payment_hash): ?Payment
     {
-        return ((new UpdateInvoicePayment($this->payment, $payment_hash)))->run();
+        return (new UpdateInvoicePayment($this->payment, $payment_hash))->run();
     }
 
     public function applyNumber()
@@ -110,9 +109,9 @@ class PaymentService
             $amount = $payable_invoice->amount;
 
             $credits = $payment_hash->fee_invoice
-                                    ->client
-                                    ->service()
-                                    ->getCredits();
+                ->client
+                ->service()
+                ->getCredits();
 
             foreach ($credits as $credit) {
                 //starting invoice balance
@@ -142,8 +141,8 @@ class PaymentService
         $amount = $invoice->amount;
 
         $credits = $invoice->client
-                            ->service()
-                            ->getCredits();
+            ->service()
+            ->getCredits();
 
         foreach ($credits as $credit) {
             //starting invoice balance
@@ -164,10 +163,8 @@ class PaymentService
             }
         }
 
-
         return $this;
     }
-
 
     public function save()
     {

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -67,7 +66,7 @@ class InvoiceController extends BaseController
     /**
      * InvoiceController constructor.
      *
-     * @param InvoiceRepository $invoice_repo  The invoice repo
+     * @param  InvoiceRepository  $invoice_repo  The invoice repo
      */
     public function __construct(InvoiceRepository $invoice_repo)
     {
@@ -79,8 +78,7 @@ class InvoiceController extends BaseController
     /**
      * Show the list of Invoices.
      *
-     * @param InvoiceFilters $filters  The filters
-     *
+     * @param  InvoiceFilters  $filters  The filters
      * @return Response
      *
      * @OA\Get(
@@ -91,25 +89,33 @@ class InvoiceController extends BaseController
      *      description="Lists invoices, search and filters allow fine grained lists to be generated.
      *
      *		Query parameters can be added to performed more fine grained filtering of the invoices, these are handled by the InvoiceFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of invoices",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -126,10 +132,8 @@ class InvoiceController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateInvoiceRequest $request  The request
-     *
+     * @param  CreateInvoiceRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/invoices/create",
@@ -137,26 +141,34 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Gets a new blank invoice object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -174,10 +186,8 @@ class InvoiceController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreInvoiceRequest $request  The request
-     *
+     * @param  StoreInvoiceRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Post(
      *      path="/api/v1/invoices",
@@ -185,30 +195,40 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Adds a invoice",
      *      description="Adds an invoice to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\RequestBody(
      *          required=true,
+     *
      *          @OA\JsonContent(ref="#/components/schemas/FillableInvoice")
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -222,10 +242,10 @@ class InvoiceController extends BaseController
         $invoice = $this->invoice_repo->save($request->all(), InvoiceFactory::create($user->company()->id, $user->id));
 
         $invoice = $invoice->service()
-                           ->fillDefaults()
-                           ->triggeredActions($request)
-                           ->adjustInventory()
-                           ->save();
+            ->fillDefaults()
+            ->triggeredActions($request)
+            ->adjustInventory()
+            ->save();
 
         event(new InvoiceWasCreated($invoice, $invoice->company, Ninja::eventVars($user ? $user->id : null)));
 
@@ -245,11 +265,9 @@ class InvoiceController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowInvoiceRequest $request  The request
-     * @param Invoice $invoice  The invoice
-     *
+     * @param  ShowInvoiceRequest  $request  The request
+     * @param  Invoice  $invoice  The invoice
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/invoices/{id}",
@@ -257,6 +275,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Shows an invoice",
      *      description="Displays an invoice by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -266,28 +285,36 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -300,9 +327,8 @@ class InvoiceController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditInvoiceRequest $request  The request
-     * @param Invoice $invoice  The invoice
-     *
+     * @param  EditInvoiceRequest  $request  The request
+     * @param  Invoice  $invoice  The invoice
      * @return Response
      *
      * @OA\Get(
@@ -311,6 +337,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Shows an invoice for editting",
      *      description="Displays an invoice by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -320,28 +347,36 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -354,11 +389,9 @@ class InvoiceController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateInvoiceRequest $request  The request
-     * @param Invoice $invoice  The invoice
-     *
+     * @param  UpdateInvoiceRequest  $request  The request
+     * @param  Invoice  $invoice  The invoice
      * @return Response
-     *
      *
      * @OA\Put(
      *      path="/api/v1/invoices/{id}",
@@ -366,6 +399,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Updates an invoice",
      *      description="Handles the updating of an invoice by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -375,28 +409,36 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -416,8 +458,8 @@ class InvoiceController extends BaseController
         $invoice = $this->invoice_repo->save($request->all(), $invoice);
 
         $invoice->service()
-                ->triggeredActions($request)
-                ->adjustInventory($old_invoice);
+            ->triggeredActions($request)
+            ->adjustInventory($old_invoice);
 
         event(new InvoiceWasUpdated($invoice, $invoice->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
 
@@ -427,18 +469,18 @@ class InvoiceController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyInvoiceRequest $request
-     * @param Invoice $invoice
      *
-     * @return     Response
+     * @return Response
      *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/invoices/{id}",
      *      operationId="deleteInvoice",
      *      tags={"invoices"},
      *      summary="Deletes a invoice",
      *      description="Handles the deletion of an invoice by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -448,27 +490,34 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -489,7 +538,7 @@ class InvoiceController extends BaseController
         $action = $request->input('action');
         $ids = $request->input('ids');
 
-        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && !$user->company()->account->account_sms_verified) {
+        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && ! $user->company()->account->account_sms_verified) {
             return response(['message' => 'Please verify your account to send emails.'], 400);
         }
 
@@ -497,7 +546,7 @@ class InvoiceController extends BaseController
             return response(['message' => ctrans('texts.email_quota_exceeded_subject')], 400);
         }
 
-        if(in_array($request->action, ['auto_bill', 'mark_paid']) && $user->cannot('create', \App\Models\Payment::class)) {
+        if (in_array($request->action, ['auto_bill', 'mark_paid']) && $user->cannot('create', \App\Models\Payment::class)) {
             return response(['message' => ctrans('texts.not_authorized'), 'errors' => ['ids' => [ctrans('texts.not_authorized')]]], 422);
         }
 
@@ -542,7 +591,7 @@ class InvoiceController extends BaseController
             }, 'print.pdf', ['Content-Type' => 'application/pdf']);
         }
 
-        if($action == 'template' && $user->can('view', $invoices->first())) {
+        if ($action == 'template' && $user->can('view', $invoices->first())) {
 
             $hash_or_response = $request->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 
@@ -560,10 +609,10 @@ class InvoiceController extends BaseController
             return response()->json(['message' => $hash_or_response], 200);
         }
 
-        if($action == 'set_payment_link' && $request->has('subscription_id')) {
+        if ($action == 'set_payment_link' && $request->has('subscription_id')) {
 
             $invoices->each(function ($invoice) use ($user, $request) {
-                if($user->can('edit', $invoice)) {
+                if ($user->can('edit', $invoice)) {
                     $invoice->service()->setPaymentLink($request->subscription_id)->save();
                 }
             });
@@ -603,6 +652,7 @@ class InvoiceController extends BaseController
      *        - archive
      *        - delete
      *        - email",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -612,45 +662,53 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Parameter(
      *          name="action",
      *          in="path",
      *          description="The action string to be performed",
      *          example="clone_to_quote",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param ActionInvoiceRequest $request
-     * @param Invoice $invoice
-     * @param $action
+     *
      * @return \App\Http\Controllers\Response|\Illuminate\Http\JsonResponse|Response|mixed|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function action(ActionInvoiceRequest $request, Invoice $invoice, $action)
@@ -668,10 +726,12 @@ class InvoiceController extends BaseController
             case 'auto_bill':
 
                 AutoBill::dispatch($invoice->id, $invoice->company->db);
+
                 return $this->itemResponse($invoice);
 
             case 'clone_to_invoice':
                 $invoice = CloneInvoiceFactory::create($invoice, auth()->user()->id);
+
                 return $this->itemResponse($invoice);
 
             case 'clone_to_quote':
@@ -766,6 +826,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Download a specific invoice by invitation key",
      *      description="Downloads a specific invoice",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -775,31 +836,38 @@ class InvoiceController extends BaseController
      *          description="The Invoice Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadPdf($invitation_key)
@@ -836,6 +904,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Download a specific x-invoice by invitation key",
      *      description="Downloads a specific x-invoice",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -845,31 +914,38 @@ class InvoiceController extends BaseController
      *          description="The Invoice Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the x-invoice pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadEInvoice($invitation_key)
@@ -884,7 +960,7 @@ class InvoiceController extends BaseController
         $invoice = $invitation->invoice;
 
         $file = $invoice->service()->getEInvoice($contact);
-        $file_name = $invoice->getFileName("xml");
+        $file_name = $invoice->getFileName('xml');
 
         $headers = ['Content-Type' => 'application/xml'];
 
@@ -904,6 +980,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Download a specific invoice delivery notes",
      *      description="Downloads a specific invoice delivery notes",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -913,31 +990,38 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hahsed Id",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the invoice delivery note pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invoice
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function deliveryNote(ShowInvoiceRequest $request, Invoice $invoice)
@@ -952,11 +1036,7 @@ class InvoiceController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadInvoiceRequest $request
-     * @param Invoice $invoice
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/invoices/{id}/upload",
@@ -964,6 +1044,7 @@ class InvoiceController extends BaseController
      *      tags={"invoices"},
      *      summary="Uploads a document to a invoice",
      *      description="Handles the uploading of a document to a invoice",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -973,28 +1054,36 @@ class InvoiceController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

@@ -5,14 +5,13 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Requests\Report;
 
-use App\Utils\Ninja;
 use App\Http\Requests\Request;
+use App\Utils\Ninja;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class ReportPreviewRequest extends Request
@@ -21,8 +20,6 @@ class ReportPreviewRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -45,9 +42,10 @@ class ReportPreviewRequest extends Request
 
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        
-        if(Ninja::isHosted() && $user->account->isFreeHostedClient()){
+
+        if (Ninja::isHosted() && $user->account->isFreeHostedClient()) {
             $this->error_message = ctrans('texts.upgrade_to_view_reports');
+
             return false;
         }
 
@@ -59,5 +57,4 @@ class ReportPreviewRequest extends Request
     {
         throw new AuthorizationException($this->error_message);
     }
-
 }

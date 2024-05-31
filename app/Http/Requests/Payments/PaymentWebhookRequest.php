@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -66,8 +65,6 @@ class PaymentWebhookRequest extends Request
 
     /**
      * Resolve company from company_key parameter.
-     *
-     * @return null|\App\Models\Company
      */
     public function getCompany(): ?Company
     {

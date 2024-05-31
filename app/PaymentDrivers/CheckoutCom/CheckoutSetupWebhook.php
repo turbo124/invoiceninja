@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -65,7 +64,7 @@ class CheckoutSetupWebhook implements ShouldQueue
             return $workflow['name'] == $this->authentication_webhook_name;
         });
 
-        if($wf) {
+        if ($wf) {
             return;
         }
 
@@ -83,7 +82,7 @@ class CheckoutSetupWebhook implements ShouldQueue
 
         $signature = new WebhookSignature();
         $signature->key = $this->checkout->company_gateway->company->company_key;
-        $signature->method = "HMACSHA256";
+        $signature->method = 'HMACSHA256';
 
         $actionRequest = new WebhookWorkflowActionRequest();
         $actionRequest->url = $this->checkout->company_gateway->webhookUrl();
@@ -91,8 +90,8 @@ class CheckoutSetupWebhook implements ShouldQueue
 
         $eventWorkflowConditionRequest = new EventWorkflowConditionRequest();
         $eventWorkflowConditionRequest->events = [
-            "gateway" => ["payment_approved"],
-            "issuing" => ["authorization_approved","authorization_declined"],
+            'gateway' => ['payment_approved'],
+            'issuing' => ['authorization_approved', 'authorization_declined'],
         ];
 
         $request = new CreateWorkflowRequest();
@@ -108,14 +107,11 @@ class CheckoutSetupWebhook implements ShouldQueue
             // API error
             $error_details = $e->error_details;
             $http_status_code = isset($e->http_metadata) ? $e->http_metadata->getStatusCode() : null;
-            nlog("Checkout WEBHOOK creation error");
+            nlog('Checkout WEBHOOK creation error');
             nlog($error_details);
         } catch (CheckoutAuthorizationException $e) {
             // Bad Invalid authorization
         }
 
     }
-
-
-
 }

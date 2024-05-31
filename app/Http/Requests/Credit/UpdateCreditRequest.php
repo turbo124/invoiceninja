@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,14 +18,12 @@ use Illuminate\Validation\Rule;
 
 class UpdateCreditRequest extends Request
 {
-    use MakesHash;
-    use CleanLineItems;
     use ChecksEntityStatus;
+    use CleanLineItems;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -52,7 +49,7 @@ class UpdateCreditRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -64,7 +61,7 @@ class UpdateCreditRequest extends Request
 
         $rules['number'] = ['bail', 'sometimes', 'nullable', Rule::unique('credits')->where('company_id', $user->company()->id)->ignore($this->credit->id)];
 
-        $rules['client_id'] = ['bail', 'sometimes',Rule::in([$this->credit->client_id])];
+        $rules['client_id'] = ['bail', 'sometimes', Rule::in([$this->credit->client_id])];
 
         $rules['line_items'] = 'array';
 
@@ -90,7 +87,7 @@ class UpdateCreditRequest extends Request
 
         $input = $this->decodePrimaryKeys($input);
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 

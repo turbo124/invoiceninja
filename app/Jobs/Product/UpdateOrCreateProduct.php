@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,10 +35,6 @@ class UpdateOrCreateProduct implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param $products
-     * @param $invoice
-     * @param $company
      */
     public function __construct($products, $invoice, $company)
     {
@@ -72,8 +67,8 @@ class UpdateOrCreateProduct implements ShouldQueue
         // $expense_count = count(array_column((array) $this->products, 'expense_id'));
         // $task_count = count(array_column((array) $this->products, 'task_id'));
 
-        $task_count = implode("", array_column((array) $this->products, 'task_id'));
-        $expense_count = implode("", array_column((array) $this->products, 'expense_id'));
+        $task_count = implode('', array_column((array) $this->products, 'task_id'));
+        $expense_count = implode('', array_column((array) $this->products, 'expense_id'));
 
         if ($task_count >= 1 || $expense_count >= 1) {
             return;
@@ -95,7 +90,7 @@ class UpdateOrCreateProduct implements ShouldQueue
             /* If a user is using placeholders in their descriptions, do not update the products */
             $string_hit = false;
 
-            foreach ([':MONTH',':YEAR',':QUARTER',':WEEK'] as $string) {
+            foreach ([':MONTH', ':YEAR', ':QUARTER', ':WEEK'] as $string) {
                 if (stripos($product->notes, $string) !== false) {
                     $string_hit = true;
                 }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -75,29 +74,29 @@ class PdfMaker
             $this->updateElementProperties($this->data['template']);
         }
 
-        if(isset($this->options)) {
+        if (isset($this->options)) {
 
             $replacements = [];
             $contents = $this->document->getElementsByTagName('ninja');
 
-            $ts = new TemplateService();    
+            $ts = new TemplateService();
 
-            if(isset($this->options['client'])) {
+            if (isset($this->options['client'])) {
                 $client = $this->options['client'];
                 try {
                     $ts->setCompany($client->company);
                     $ts->addGlobal(['currency_code' => $client->company->currency()->code]);
-                } catch(\Exception $e) {
-                        nlog($e->getMessage());
+                } catch (\Exception $e) {
+                    nlog($e->getMessage());
                 }
             }
-            
-            if(isset($this->options['vendor'])) {
+
+            if (isset($this->options['vendor'])) {
                 $vendor = $this->options['vendor'];
                 try {
                     $ts->setCompany($vendor->company);
                     $ts->addGlobal(['currency_code' => $vendor->company->currency()->code]);
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     nlog($e->getMessage());
                 }
             }
@@ -118,7 +117,7 @@ class PdfMaker
 
             }
 
-            foreach($contents as $key => $content) {
+            foreach ($contents as $key => $content) {
                 $content->parentNode->replaceChild($replacements[$key], $content);
             }
 
@@ -134,13 +133,14 @@ class PdfMaker
     /**
      * Final method to get compiled HTML.
      *
-     * @param bool $final
+     * @param  bool  $final
      * @return mixed
      */
     public function getCompiledHTML($final = false)
     {
 
         $html = $this->document->saveHTML();
+
         return str_replace('%24', '$', $html);
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,8 +43,8 @@ class PaymentRepository extends BaseRepository
     /**
      * Saves and updates a payment. //todo refactor to handle refunds and payments.
      *
-     * @param array   $data the request object
-     * @param Payment $payment The Payment object
+     * @param  array  $data  the request object
+     * @param  Payment  $payment  The Payment object
      * @return Payment|null Payment $payment
      */
     public function save(array $data, Payment $payment): ?Payment
@@ -55,9 +54,10 @@ class PaymentRepository extends BaseRepository
 
     /**
      * Handles a positive payment request.
-     * @param  array $data      The data object
-     * @param  Payment $payment The $payment entity
-     * @return Payment          The updated/created payment object
+     *
+     * @param  array  $data  The data object
+     * @param  Payment  $payment  The $payment entity
+     * @return Payment The updated/created payment object
      */
     private function applyPayment(array $data, Payment $payment): ?Payment
     {
@@ -109,7 +109,7 @@ class PaymentRepository extends BaseRepository
         /*Fill the payment*/
         $fill_data = $data;
 
-        if($this->import_mode && isset($fill_data['invoices'])) {
+        if ($this->import_mode && isset($fill_data['invoices'])) {
             unset($fill_data['invoices']);
         }
 
@@ -117,7 +117,7 @@ class PaymentRepository extends BaseRepository
         $payment->is_manual = true;
         $payment->status_id = Payment::STATUS_COMPLETED;
 
-        if ((!$payment->currency_id || $payment->currency_id == 0) && $client) {
+        if ((! $payment->currency_id || $payment->currency_id == 0) && $client) {
             if (property_exists($client->settings, 'currency_id')) {
                 $payment->currency_id = $client->settings->currency_id;
             } else {
@@ -163,9 +163,9 @@ class PaymentRepository extends BaseRepository
                     $paymentable->save();
 
                     $invoice = $invoice->service()
-                                       ->markSent()
-                                       ->applyPayment($payment, $paid_invoice['amount'])
-                                       ->save();
+                        ->markSent()
+                        ->applyPayment($payment, $paid_invoice['amount'])
+                        ->save();
                 }
             }
         } else {
@@ -180,7 +180,7 @@ class PaymentRepository extends BaseRepository
             //todo optimize into a single query
             foreach ($data['credits'] as $paid_credit) {
 
-                /** @var \App\Models\Credit $credit **/
+                /** @var \App\Models\Credit $credit * */
                 $credit = $credits->firstWhere('id', $paid_credit['credit_id']);
 
                 if ($credit) {
@@ -201,7 +201,7 @@ class PaymentRepository extends BaseRepository
         if (! $is_existing_payment && ! $this->import_mode) {
             if (array_key_exists('email_receipt', $data) && $data['email_receipt'] == 'true') {
                 $payment->service()->sendEmail();
-            } elseif (!array_key_exists('email_receipt', $data) && $payment->client->getSetting('client_manual_payment_notification')) {
+            } elseif (! array_key_exists('email_receipt', $data) && $payment->client->getSetting('client_manual_payment_notification')) {
                 $payment->service()->sendEmail();
             }
 
@@ -218,8 +218,7 @@ class PaymentRepository extends BaseRepository
     /**
      * If the client is paying in a currency other than
      * the company currency, we need to set a record.
-     * @param $data
-     * @param $payment
+     *
      * @return Payment $payment
      */
     public function processExchangeRates($data, $payment)

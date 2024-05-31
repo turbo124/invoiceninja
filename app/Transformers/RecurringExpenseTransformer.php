@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,9 +30,6 @@ class RecurringExpenseTransformer extends EntityTransformer
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'documents',
         'client',
@@ -51,7 +47,7 @@ class RecurringExpenseTransformer extends EntityTransformer
     {
         $transformer = new ClientTransformer($this->serializer);
 
-        if (!$recurring_expense->client) {
+        if (! $recurring_expense->client) {
             return null;
         }
 
@@ -62,7 +58,7 @@ class RecurringExpenseTransformer extends EntityTransformer
     {
         $transformer = new VendorTransformer($this->serializer);
 
-        if (!$recurring_expense->vendor) {
+        if (! $recurring_expense->vendor) {
             return null;
         }
 
@@ -70,8 +66,6 @@ class RecurringExpenseTransformer extends EntityTransformer
     }
 
     /**
-     * @param RecurringExpense $recurring_expense
-     *
      * @return array
      */
     public function transform(RecurringExpense $recurring_expense)

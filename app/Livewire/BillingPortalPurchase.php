@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,7 +44,6 @@ class BillingPortalPurchase extends Component
      */
     public $heading_text;
 
-
     /**
      * E-mail address model for user input.
      *
@@ -76,7 +74,6 @@ class BillingPortalPurchase extends Component
 
     /**
      * Rules for validating the form.
-     *
      */
     protected $rules = [
         'email' => ['required', 'email'],
@@ -85,14 +82,14 @@ class BillingPortalPurchase extends Component
     /**
      * Id for CompanyGateway record.
      *
-     * @var string|integer
+     * @var string|int
      */
     public $company_gateway_id;
 
     /**
      * Id for GatewayType.
      *
-     * @var string|integer
+     * @var string|int
      */
     public $payment_method_id;
 
@@ -251,6 +248,7 @@ class BillingPortalPurchase extends Component
      * Create a blank client. Used for new customers purchasing.
      *
      * @return mixed
+     *
      * @throws \Laracasts\Presenter\Exceptions\PresenterException
      */
     protected function createBlankClient()
@@ -306,7 +304,7 @@ class BillingPortalPurchase extends Component
             })->first();
 
             if ($record) {
-                $data['settings']['language_id'] = (string)$record->id;
+                $data['settings']['language_id'] = (string) $record->id;
             }
         }
 
@@ -318,7 +316,6 @@ class BillingPortalPurchase extends Component
     /**
      * Fetching payment methods from the client.
      *
-     * @param ClientContact $contact
      * @return $this
      */
     protected function getPaymentMethods(ClientContact $contact): self
@@ -338,7 +335,7 @@ class BillingPortalPurchase extends Component
             return $this;
         }
 
-        if ((int)$this->price == 0) {
+        if ((int) $this->price == 0) {
             $this->steps['payment_required'] = false;
         } else {
             $this->steps['fetched_payment_methods'] = true;
@@ -381,9 +378,6 @@ class BillingPortalPurchase extends Component
     /**
      * Middle method between selecting payment method &
      * submitting the from to the backend.
-     *
-     * @param $company_gateway_id
-     * @param $gateway_type_id
      */
     public function handleMethodSelectingEvent($company_gateway_id, $gateway_type_id)
     {
@@ -492,9 +486,6 @@ class BillingPortalPurchase extends Component
 
     /**
      * Update quantity property.
-     *
-     * @param string $option
-     * @return int
      */
     public function updateQuantity(string $option): int
     {
@@ -502,17 +493,20 @@ class BillingPortalPurchase extends Component
 
         if ($this->quantity == 1 && $option == 'decrement') {
             $this->price = $this->price * 1;
+
             return $this->quantity;
         }
 
         if ($this->quantity > $this->subscription->max_seats_limit && $option == 'increment') {
             $this->price = $this->price * $this->subscription->max_seats_limit;
+
             return $this->quantity;
         }
 
         if ($option == 'increment') {
             $this->quantity++;
             $this->price = $this->price * $this->quantity;
+
             return $this->quantity;
         }
 
@@ -526,6 +520,7 @@ class BillingPortalPurchase extends Component
     {
         if ($this->steps['discount_applied']) {
             $this->price = $this->subscription->promo_price;
+
             return;
         }
 
@@ -548,7 +543,7 @@ class BillingPortalPurchase extends Component
             ->first();
 
         $mailer = new NinjaMailerObject();
-        $mailer->mailable = new ContactPasswordlessLogin($this->email, $this->subscription->company, (string)route('client.subscription.purchase', $this->subscription->hashed_id) . '?coupon=' . $this->coupon);
+        $mailer->mailable = new ContactPasswordlessLogin($this->email, $this->subscription->company, (string) route('client.subscription.purchase', $this->subscription->hashed_id).'?coupon='.$this->coupon);
         $mailer->company = $this->subscription->company;
         $mailer->settings = $this->subscription->company->settings;
         $mailer->to_user = $contact;

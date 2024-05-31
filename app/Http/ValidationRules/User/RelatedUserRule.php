@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ class RelatedUserRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,10 +43,6 @@ class RelatedUserRule implements Rule
         return ctrans('texts.user_not_associated_with_account');
     }
 
-    /**
-     * @param $user_id
-     * @return bool
-     */
     private function checkUserIsRelated($user_id): bool
     {
         if (empty($user_id)) {
@@ -55,8 +50,8 @@ class RelatedUserRule implements Rule
         }
 
         return User::query()
-                    ->where('id', $user_id)
-                    ->where('account_id', auth()->user()->company()->account_id)
-                    ->exists();
+            ->where('id', $user_id)
+            ->where('account_id', auth()->user()->company()->account_id)
+            ->exists();
     }
 }

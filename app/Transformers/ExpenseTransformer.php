@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,9 +32,6 @@ class ExpenseTransformer extends EntityTransformer
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'client',
         'vendor',
@@ -54,7 +50,7 @@ class ExpenseTransformer extends EntityTransformer
     {
         $transformer = new ClientTransformer($this->serializer);
 
-        if (!$expense->client) {
+        if (! $expense->client) {
             return null;
         }
 
@@ -65,7 +61,7 @@ class ExpenseTransformer extends EntityTransformer
     {
         $transformer = new InvoiceTransformer($this->serializer);
 
-        if (!$expense->invoice) {
+        if (! $expense->invoice) {
             return null;
         }
 
@@ -76,7 +72,7 @@ class ExpenseTransformer extends EntityTransformer
     {
         $transformer = new ExpenseCategoryTransformer($this->serializer);
 
-        if (!$expense->category) {
+        if (! $expense->category) {
             return null;
         }
 
@@ -87,7 +83,7 @@ class ExpenseTransformer extends EntityTransformer
     {
         $transformer = new VendorTransformer($this->serializer);
 
-        if (!$expense->vendor) {
+        if (! $expense->vendor) {
             return null;
         }
 
@@ -95,8 +91,6 @@ class ExpenseTransformer extends EntityTransformer
     }
 
     /**
-     * @param Expense $expense
-     *
      * @return array
      */
     public function transform(Expense $expense)
@@ -132,7 +126,7 @@ class ExpenseTransformer extends EntityTransformer
             'transaction_reference' => (string) $expense->transaction_reference ?: '',
             'transaction_id' => (string) $this->encodePrimaryKey($expense->transaction_id) ?: '',
             'date' => $expense->date ?: '',
-            'number' => (string)$expense->number ?: '',
+            'number' => (string) $expense->number ?: '',
             'payment_date' => $expense->payment_date ?: '',
             'custom_value1' => $expense->custom_value1 ?: '',
             'custom_value2' => $expense->custom_value2 ?: '',

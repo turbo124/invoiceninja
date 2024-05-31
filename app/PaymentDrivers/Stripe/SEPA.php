@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,7 +22,6 @@ use App\PaymentDrivers\StripePaymentDriver;
 
 class SEPA
 {
-    /** @var StripePaymentDriver */
     public StripePaymentDriver $stripe;
 
     public function __construct(StripePaymentDriver $stripe)
@@ -68,7 +66,7 @@ class SEPA
             ],
         ];
 
-        $intent = \Stripe\PaymentIntent::create($intent_data, array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid("st", true)]));
+        $intent = \Stripe\PaymentIntent::create($intent_data, array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid('st', true)]));
 
         $data['pi_client_secret'] = $intent->client_secret;
 
@@ -167,7 +165,7 @@ class SEPA
                 'company_id' => $this->stripe->client->company_id,
             ])->first();
 
-            if($token) {
+            if ($token) {
                 return $token;
             }
 

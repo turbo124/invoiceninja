@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ class UniqueInvoiceNumberRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,9 +43,6 @@ class UniqueInvoiceNumberRule implements Rule
         return ctrans('texts.invoice_number_taken');
     }
 
-    /**
-     * @return bool
-     */
     private function checkIfInvoiceNumberUnique(): bool
     {
         if (empty($this->input['number'])) {
@@ -54,9 +50,9 @@ class UniqueInvoiceNumberRule implements Rule
         }
 
         $invoice = Invoice::query()->where('client_id', $this->input['client_id'])
-                        ->where('number', $this->input['number'])
-                        ->withTrashed()
-                        ->exists();
+            ->where('number', $this->input['number'])
+            ->withTrashed()
+            ->exists();
 
         if ($invoice) {
             return false;

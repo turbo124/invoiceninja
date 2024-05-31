@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,10 +34,8 @@ class ClientPaymentFailureObject
     /**
      * Create a new job instance.
      *
-     * @param $client
-     * @param $message
-     * @param $company
-     * @param $amount
+     * @param  $message
+     * @param  $amount
      */
     public function __construct($client, $error, $company, $payment_hash)
     {

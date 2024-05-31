@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,7 +28,7 @@ class HostedMigrationController extends Controller
         MultiDB::findAndSetDbByCompanyKey($request->company_key);
         $c = Company::where('company_key', $request->company_key)->first();
 
-        if(!$c || $c->is_disabled) {
+        if (! $c || $c->is_disabled) {
             return response()->json(['message' => 'ok'], 200);
         }
 
@@ -73,8 +72,7 @@ class HostedMigrationController extends Controller
 
         $company = $account->companies->first();
 
-        /** @var \App\Models\CompanyToken $company_token **/
-
+        /** @var \App\Models\CompanyToken $company_token * */
         $company_token = CompanyToken::where('user_id', auth()->user()->id)
             ->where('company_id', $company->id)
             ->first();
@@ -92,7 +90,7 @@ class HostedMigrationController extends Controller
 
         MultiDB::findAndSetDbByCompanyKey($input['account_key']);
 
-        /** @var \App\Models\Company $company **/
+        /** @var \App\Models\Company $company * */
         $company = Company::with('account')->where('company_key', $input['account_key'])->first();
 
         $forward_url = $company->domain();

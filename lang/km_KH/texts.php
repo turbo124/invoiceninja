@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'អង្គការ',
     'name' => 'ឈ្មោះ',
     'website' => 'គេហទំព័រ',
@@ -1157,7 +1157,6 @@ $lang = array(
     'enterprise_plan_features' => 'ផែនការសហគ្រាសបន្ថែមការគាំទ្រសម្រាប់អ្នកប្រើប្រាស់ច្រើននាក់ និងឯកសារភ្ជាប់ :link ដើម្បីមើលបញ្ជីមុខងារពេញលេញ។',
     'return_to_app' => 'ត្រឡប់ទៅកម្មវិធី',
 
-
     // Payment updates
     'refund_payment' => 'ការទូទាត់សងប្រាក់វិញ។',
     'refund_max' => 'អតិបរមា៖',
@@ -1685,7 +1684,6 @@ $lang = array(
     'lang_Serbian' => 'ស៊ែប៊ី',
     'lang_Bulgarian' => 'ប៊ុលហ្គារី',
     'lang_Russian (Russia)' => 'រុស្ស៊ី (រុស្ស៊ី)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'គណនេយ្យ និងច្បាប់',
@@ -2344,7 +2342,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'មាស Troy អោន',
     'currency_nicaraguan_córdoba' => 'នីការ៉ាហ្គ័រ Córdoba',
     'currency_malagasy_ariary' => 'អារីរីម៉ាឡាហ្គាស៊ី',
-    "currency_tongan_pa_anga" => "តុងហ្គាន ប៉ាអង់ហ្គា",
+    'currency_tongan_pa_anga' => 'តុងហ្គាន ប៉ាអង់ហ្គា',
 
     'review_app_help' => 'យើងសង្ឃឹមថាអ្នករីករាយនឹងការប្រើប្រាស់កម្មវិធី។<br/> ប្រសិនបើអ្នកនឹងពិចារណា :link យើងនឹងកោតសរសើរវាយ៉ាងខ្លាំង!',
     'writing_a_review' => 'សរសេរការពិនិត្យឡើងវិញ',
@@ -4406,7 +4404,7 @@ $lang = array(
     'activity_122' => ':user ដែលបានរក្សាទុកក្នុងប័ណ្ណសារ ការចំណាយកើតឡើងដដែលៗ :recurring_expense',
     'activity_123' => ':user បានលុបការចំណាយដែលកើតឡើងដដែលៗ :recurring_expense',
     'activity_124' => ':user បានស្ដារការចំណាយដែលកើតឡើងដដែលៗ :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'ដើម្បីមើល :entity អ្នកត្រូវកំណត់ពាក្យសម្ងាត់។',
     'unsubscribe' => 'ឈប់ជាវ',
     'unsubscribed' => 'ឈប់ជាវ',
@@ -4910,7 +4908,7 @@ $lang = array(
     'payment_type_Klarna' => 'ក្លាណា',
     'payment_type_Interac E Transfer' => 'ការផ្ទេរ Interac E',
     'xinvoice_payable' => 'អាចបង់បានក្នុងរយៈពេល :payeddue ថ្ងៃសុទ្ធរហូតដល់ :paydate',
-    'xinvoice_no_buyers_reference' => "មិនមានឯកសារយោងរបស់អ្នកទិញទេ។",
+    'xinvoice_no_buyers_reference' => 'មិនមានឯកសារយោងរបស់អ្នកទិញទេ។',
     'xinvoice_online_payment' => 'វិក្កយបត្រត្រូវបង់តាមអ៊ីនធឺណិតតាមរយៈតំណដែលបានផ្តល់',
     'pre_payment' => 'ការទូទាត់ជាមុន',
     'number_of_payments' => 'ចំនួននៃការបង់ប្រាក់',
@@ -5015,8 +5013,8 @@ $lang = array(
     'e_invoice' => 'វិក័យប័ត្រអេឡិចត្រូនិច',
     'light_dark_mode' => 'របៀបពន្លឺ/ងងឹត',
     'activities' => 'សកម្មភាព',
-    'recent_transactions' => "នេះគឺជាប្រតិបត្តិការថ្មីៗបំផុតរបស់ក្រុមហ៊ុនអ្នក៖",
-    'country_Palestine' => "ប៉ាឡេស្ទីន",
+    'recent_transactions' => 'នេះគឺជាប្រតិបត្តិការថ្មីៗបំផុតរបស់ក្រុមហ៊ុនអ្នក៖',
+    'country_Palestine' => 'ប៉ាឡេស្ទីន',
     'country_Taiwan' => 'តៃវ៉ាន់',
     'duties' => 'កាតព្វកិច្ច',
     'order_number' => 'លេខ​លំដាប់',
@@ -5231,7 +5229,7 @@ $lang = array(
     'rff' => 'ទម្រង់វាលដែលត្រូវការ',
     'add_step' => 'បន្ថែមជំហាន',
     'steps' => 'ជំហាន',
-    'steps_order_help' =>  'លំដាប់នៃជំហានគឺសំខាន់។ ជំហានដំបូងមិនគួរពឹងផ្អែកលើជំហានផ្សេងទៀតទេ។ ជំហានទីពីរគួរតែអាស្រ័យលើជំហានដំបូងហើយដូច្នេះនៅលើ។',
+    'steps_order_help' => 'លំដាប់នៃជំហានគឺសំខាន់។ ជំហានដំបូងមិនគួរពឹងផ្អែកលើជំហានផ្សេងទៀតទេ។ ជំហានទីពីរគួរតែអាស្រ័យលើជំហានដំបូងហើយដូច្នេះនៅលើ។',
     'other_steps' => 'ជំហានផ្សេងទៀត។',
     'use_available_payments' => 'ប្រើការទូទាត់ដែលមាន',
     'test_email_sent' => 'បានផ្ញើអ៊ីមែលដោយជោគជ័យ',
@@ -5280,6 +5278,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

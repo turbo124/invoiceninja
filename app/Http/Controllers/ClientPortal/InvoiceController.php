@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,8 +34,8 @@ use Illuminate\View\View;
 
 class InvoiceController extends Controller
 {
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
 
     /**
      * Display list of invoices.
@@ -51,8 +50,6 @@ class InvoiceController extends Controller
     /**
      * Show specific invoice.
      *
-     * @param ShowInvoiceRequest $request
-     * @param Invoice $invoice
      *
      * @return Factory|View
      */
@@ -90,14 +87,14 @@ class InvoiceController extends Controller
     {
         $data = Cache::get($hash);
 
-        if(!$data) {
+        if (! $data) {
             usleep(200000);
             $data = Cache::get($hash);
         }
 
         $invitation = false;
 
-        match($data['entity_type'] ?? false) {
+        match ($data['entity_type'] ?? false) {
             'invoice' => $invitation = InvoiceInvitation::withTrashed()->find($data['invitation_id']),
             'quote' => $invitation = QuoteInvitation::withTrashed()->find($data['invitation_id']),
             'credit' => $invitation = CreditInvitation::withTrashed()->find($data['invitation_id']),
@@ -112,13 +109,13 @@ class InvoiceController extends Controller
         $file = (new \App\Jobs\Entity\CreateRawPdf($invitation))->handle();
 
         $headers = ['Content-Type' => 'application/pdf'];
+
         return response()->make($file, 200, $headers);
 
     }
 
     /**
      * Pay one or more invoices.
-     *
      */
     public function catch_bulk()
     {
@@ -143,10 +140,10 @@ class InvoiceController extends Controller
     public function downloadInvoices($ids)
     {
         $data['invoices'] = Invoice::query()
-                            ->whereIn('id', $ids)
-                            ->whereClientId(auth()->guard('contact')->user()->client->id)
-                            ->withTrashed()
-                            ->get();
+            ->whereIn('id', $ids)
+            ->whereClientId(auth()->guard('contact')->user()->client->id)
+            ->withTrashed()
+            ->get();
 
         if (count($data['invoices']) == 0) {
             return back()->with(['message' => ctrans('texts.no_items_selected')]);
@@ -163,16 +160,15 @@ class InvoiceController extends Controller
     }
 
     /**
-     * @param array $ids
      * @return Factory|View|RedirectResponse
      */
     private function makePayment(array $ids)
     {
         $invoices = Invoice::query()
-                            ->whereIn('id', $ids)
-                            ->whereClientId(auth()->guard('contact')->user()->client->id)
-                            ->withTrashed()
-                            ->get();
+            ->whereIn('id', $ids)
+            ->whereClientId(auth()->guard('contact')->user()->client->id)
+            ->withTrashed()
+            ->get();
 
         //filter invoices which are payable
         $invoices = $invoices->filter(function ($invoice) {
@@ -188,9 +184,9 @@ class InvoiceController extends Controller
         //ensure all stale fees are removed.
         $invoices->each(function ($invoice) {
             $invoice->service()
-                    ->markSent()
-                    ->removeUnpaidGatewayFees()
-                    ->save();
+                ->markSent()
+                ->removeUnpaidGatewayFees()
+                ->save();
         });
 
         $invoices = $invoices->fresh();
@@ -223,7 +219,7 @@ class InvoiceController extends Controller
         $settings = auth()->guard('contact')->user()->client->getMergedSettings();
         $variables = false;
 
-        if(($invitation = $invoices->first()->invitations()->first() ?? false) && $settings->show_accept_invoice_terms) {
+        if (($invitation = $invoices->first()->invitations()->first() ?? false) && $settings->show_accept_invoice_terms) {
             $variables = (new HtmlEngine($invitation))->generateLabelsAndValues();
         }
 
@@ -233,7 +229,7 @@ class InvoiceController extends Controller
             'formatted_total' => $formatted_total,
             'payment_methods' => $payment_methods,
             'hashed_ids' => $invoices->pluck('hashed_id'),
-            'total' =>  $total,
+            'total' => $total,
             'variables' => $variables,
         ];
 
@@ -242,17 +238,14 @@ class InvoiceController extends Controller
 
     /**
      * Helper function to download invoice PDFs.
-     *
-     * @param array $ids
-     *
      */
     private function downloadInvoicePDF(array $ids)
     {
         $invoices = Invoice::query()
-                            ->whereIn('id', $ids)
-                            ->withTrashed()
-                            ->whereClientId(auth()->guard('contact')->user()->client->id)
-                            ->get();
+            ->whereIn('id', $ids)
+            ->withTrashed()
+            ->whereClientId(auth()->guard('contact')->user()->client->id)
+            ->get();
 
         //generate pdf's of invoices locally
         if (! $invoices || $invoices->count() == 0) {
@@ -281,7 +274,7 @@ class InvoiceController extends Controller
 
                 if ($invoice->client->getSetting('enable_e_invoice')) {
                     $xml = $invoice->service()->getEInvoice();
-                    $zipFile->addFromString($invoice->getFileName("xml"), $xml);
+                    $zipFile->addFromString($invoice->getFileName('xml'), $xml);
                 }
 
                 $file = $invoice->service()->getRawInvoicePdf();
@@ -289,12 +282,11 @@ class InvoiceController extends Controller
                 $zipFile->addFromString($zip_file_name, $file);
             }
 
-
             $filename = date('Y-m-d').'_'.str_replace(' ', '_', trans('texts.invoices')).'.zip';
             $filepath = sys_get_temp_dir().'/'.$filename;
 
             $zipFile->saveAsFile($filepath) // save the archive to a file
-                   ->close(); // close archive
+                ->close(); // close archive
 
             return response()->download($filepath, $filename)->deleteFileAfterSend(true);
         } catch (\PhpZip\Exception\ZipException $e) {

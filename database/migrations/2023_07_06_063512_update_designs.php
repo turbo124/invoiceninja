@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,8 +14,8 @@ return new class extends Migration {
         \Illuminate\Support\Facades\Artisan::call('ninja:design-update');
 
         $t = \App\Models\Country::find(158);
-        
-        if($t) {
+
+        if ($t) {
             $t->full_name = 'Taiwan';
             $t->name = 'Taiwan';
             $t->save();
@@ -22,13 +23,11 @@ return new class extends Migration {
 
         $m = \App\Models\Country::find(807);
 
-        if($m) {
+        if ($m) {
             $m->full_name = 'Macedonia';
             $m->name = 'Macedonia';
             $m->save();
         }
-
-
 
     }
 

@@ -5,19 +5,18 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Invoice;
 
-use App\Utils\Ninja;
+use App\Events\Invoice\InvoiceWasEmailed;
+use App\Jobs\Entity\EmailEntity;
+use App\Models\ClientContact;
 use App\Models\Invoice;
 use App\Models\Webhook;
-use App\Models\ClientContact;
-use App\Jobs\Entity\EmailEntity;
 use App\Services\AbstractService;
-use App\Events\Invoice\InvoiceWasEmailed;
+use App\Utils\Ninja;
 
 class SendEmail extends AbstractService
 {
@@ -42,7 +41,7 @@ class SendEmail extends AbstractService
 
         if ($this->invoice->invitations->count() >= 1) {
             event(new InvoiceWasEmailed($this->invoice->invitations->first(), $this->invoice->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $this->reminder_template ?? 'invoice'));
-            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
+            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, 'client');
 
         }
 

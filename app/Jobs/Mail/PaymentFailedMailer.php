@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,10 +33,10 @@ class PaymentFailedMailer implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use MakesHash;
     use Queueable;
     use SerializesModels;
     use UserNotifies;
-    use MakesHash;
 
     public ?PaymentHash $payment_hash;
 
@@ -50,10 +49,8 @@ class PaymentFailedMailer implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $client
-     * @param $message
-     * @param $company
-     * @param $amount
+     * @param  $message
+     * @param  $amount
      */
     public function __construct(?PaymentHash $payment_hash, Company $company, Client $client, $error)
     {
@@ -70,8 +67,8 @@ class PaymentFailedMailer implements ShouldQueue
      */
     public function handle()
     {
-        if (!is_string($this->error) || strlen($this->error) <= 1) {
-            $this->error = "";
+        if (! is_string($this->error) || strlen($this->error) <= 1) {
+            $this->error = '';
         }
 
         //Set DB

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,15 +26,18 @@ use Illuminate\Support\Str;
  *
  * @method scope() static
  * @method company() static
- * @package App\Models
+ *
  * @property-read mixed $hashed_id
  * @property string $number
  * @property int $company_id
  * @property int $id
  * @property int $user_id
  * @property int $assigned_user_id
+ *
  * @method BaseModel service()
+ *
  * @property \App\Models\Company $company
+ *
  * @method static BaseModel find($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel<static> company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|Illuminate\Database\Eloquent\Relations\BelongsTo|\Awobaz\Compoships\Database\Eloquent\Relations\BelongsTo|\App\Models\Company company()
@@ -56,8 +58,10 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel invitations()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel whereHas($query)
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel without($query)
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\InvoiceInvitation | \App\Models\CreditInvitation | \App\Models\QuoteInvitation | \App\Models\RecurringInvoiceInvitation> $invitations
  * @property-read int|null $invitations_count
+ *
  * @method int companyId()
  * @method createInvitations()
  * @method Builder scopeCompany(Builder $builder)
@@ -65,6 +69,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|\Illuminate\Database\Query\Builder withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|\Illuminate\Database\Query\Builder onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel|\Illuminate\Database\Query\Builder withoutTrashed()
+ *
  * @mixin \Eloquent
  * @mixin \Illuminate\Database\Eloquent\Builder
  *
@@ -73,10 +78,10 @@ use Illuminate\Support\Str;
  */
 class BaseModel extends Model
 {
+    use Excludable;
+    use HasFactory;
     use MakesHash;
     use UserSessionAttributes;
-    use HasFactory;
-    use Excludable;
 
     protected $appends = [
         'hashed_id',
@@ -118,9 +123,8 @@ class BaseModel extends Model
     // }
 
     /**
-    * @param  \Illuminate\Database\Eloquent\Builder  $query
-    * @return \Illuminate\Database\Eloquent\Builder
-    */
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     */
     public function scopeCompany($query): \Illuminate\Database\Eloquent\Builder
     {
         /** @var \App\Models\User $user */
@@ -158,7 +162,8 @@ class BaseModel extends Model
      * to persist the new settings we will also need to pass back a
      * reference to the parent class.
      *
-     * @param $key The key of property
+     * @param  $key  The key of property
+     *
      * @deprecated
      */
     // public function getSettingsByKey($key)
@@ -208,8 +213,8 @@ class BaseModel extends Model
     /**
      * Retrieve the model for a bound value.
      *
-     * @param mixed $value
-     * @param mixed $field
+     * @param  mixed  $value
+     * @param  mixed  $field
      * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
@@ -224,7 +229,7 @@ class BaseModel extends Model
     }
 
     /**
-     * @param string $extension
+     * @param  string  $extension
      * @return string
      */
     public function getFileName($extension = 'pdf')
@@ -235,9 +240,9 @@ class BaseModel extends Model
     public function getDeliveryNoteName($extension = 'pdf')
     {
 
-        $number =  ctrans("texts.delivery_note"). "_" . $this->numberFormatter().'.'.$extension;
+        $number = ctrans('texts.delivery_note').'_'.$this->numberFormatter().'.'.$extension;
 
-        $formatted_number =  mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $number);
+        $formatted_number = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $number);
 
         $formatted_number = mb_ereg_replace("([\.]{2,})", '', $formatted_number);
 
@@ -248,19 +253,19 @@ class BaseModel extends Model
     }
 
     /**
-    * @param string $extension
-    * @return string
-    */
+     * @param  string  $extension
+     * @return string
+     */
     public function getEFileName($extension = 'pdf')
     {
-        return ctrans("texts.e_invoice"). "_" . $this->numberFormatter().'.'.$extension;
+        return ctrans('texts.e_invoice').'_'.$this->numberFormatter().'.'.$extension;
     }
 
     public function numberFormatter()
     {
-        $number = strlen($this->number) >= 1 ? $this->translate_entity() . "_" . $this->number : class_basename($this) . "_" . Str::random(5);
+        $number = strlen($this->number) >= 1 ? $this->translate_entity().'_'.$this->number : class_basename($this).'_'.Str::random(5);
 
-        $formatted_number =  mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $number);
+        $formatted_number = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $number);
 
         $formatted_number = mb_ereg_replace("([\.]{2,})", '', $formatted_number);
 
@@ -277,16 +282,13 @@ class BaseModel extends Model
     /**
      * Model helper to send events for webhooks
      *
-     * @param  int    $event_id
-     * @param  string $additional_data optional includes
-     *
-     * @return void
+     * @param  string  $additional_data  optional includes
      */
-    public function sendEvent(int $event_id, string $additional_data = ""): void
+    public function sendEvent(int $event_id, string $additional_data = ''): void
     {
         $subscriptions = Webhook::where('company_id', $this->company_id)
-                                 ->where('event_id', $event_id)
-                                 ->exists();
+            ->where('event_id', $event_id)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch($event_id, $this->withoutRelations(), $this->company, $additional_data);
@@ -295,6 +297,7 @@ class BaseModel extends Model
 
     /**
      * Returns the base64 encoded PDF string of the entity
+     *
      * @deprecated - unused implementation
      */
     public function fullscreenPdfViewer($invitation = null): string
@@ -313,7 +316,7 @@ class BaseModel extends Model
             throw new \Exception('Hard fail, could not create an invitation.');
         }
 
-        return "data:application/pdf;base64,".base64_encode((new CreateRawPdf($invitation))->handle());
+        return 'data:application/pdf;base64,'.base64_encode((new CreateRawPdf($invitation))->handle());
 
     }
 
@@ -321,14 +324,10 @@ class BaseModel extends Model
      * Takes a entity prop as first argument
      * along with an array of variables and performs
      * a string replace on the prop.
-     *
-     * @param string $field
-     * @param array $variables
-     * @return string
      */
     public function parseHtmlVariables(string $field, array $variables): string
     {
-        if(!$this->{$field}) {
+        if (! $this->{$field}) {
             return '';
         }
 

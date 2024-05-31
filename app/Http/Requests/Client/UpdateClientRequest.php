@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,13 +20,11 @@ use Illuminate\Validation\Rule;
 
 class UpdateClientRequest extends Request
 {
-    use MakesHash;
     use ChecksEntityStatus;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -40,7 +37,7 @@ class UpdateClientRequest extends Request
     public function rules()
     {
         /* Ensure we have a client name, and that all emails are unique*/
-        /** @var  \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         if ($this->file('documents') && is_array($this->file('documents'))) {
@@ -99,14 +96,13 @@ class UpdateClientRequest extends Request
     {
         $input = $this->all();
 
-        /** @var  \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         /* If the user removes the currency we must always set the default */
         if (array_key_exists('settings', $input) && ! array_key_exists('currency_id', $input['settings'])) {
             $input['settings']['currency_id'] = (string) $user->company()->settings->currency_id;
-        }
-        elseif (empty($input['settings']['currency_id']) ?? true) {
+        } elseif (empty($input['settings']['currency_id']) ?? true) {
             $input['settings']['currency_id'] = (string) $user->company()->settings->currency_id;
         }
 
@@ -133,7 +129,6 @@ class UpdateClientRequest extends Request
         if (isset($input['shipping_country_code'])) {
             $input['shipping_country_id'] = $this->getCountryCode($input['shipping_country_code']);
         }
-
 
         $this->replace($input);
     }
@@ -175,7 +170,7 @@ class UpdateClientRequest extends Request
      * down to the free plan setting properties which
      * are saveable
      *
-     * @param  \stdClass $settings
+     * @param  \stdClass  $settings
      * @return \stdClass $settings
      */
     private function filterSaveableSettings($settings)

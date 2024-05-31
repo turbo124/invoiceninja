@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organización',
     'name' => 'Nombre',
     'website' => 'Página Web',
@@ -1172,7 +1172,6 @@ $lang = array(
     'enterprise_plan_features' => 'El plan Enterprise agrega soporte para múltiples usuarios y archivos adjuntos, :link para ver la lista completa de funciones.',
     'return_to_app' => 'Regresar a la Applicacion',
 
-
     // Payment updates
     'refund_payment' => 'Reembolsar Pago',
     'refund_max' => 'Max:',
@@ -1701,7 +1700,6 @@ Una vez que tenga los montos, vuelva a esta página de métodos de pago y haga c
     'lang_Serbian' => 'Serbio',
     'lang_Bulgarian' => 'Búlgaro',
     'lang_Russian (Russia)' => 'Ruso (Rusia)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Contabilidad y legal',
@@ -2360,7 +2358,7 @@ Una vez que tenga los montos, vuelva a esta página de métodos de pago y haga c
     'currency_gold_troy_ounce' => 'Onza troy de oro',
     'currency_nicaraguan_córdoba' => 'Córdoba nicaragüense',
     'currency_malagasy_ariary' => 'Ariary malgache',
-    "currency_tongan_pa_anga" => "Pa'anga tongano",
+    'currency_tongan_pa_anga' => "Pa'anga tongano",
 
     'review_app_help' => 'Esperamos que estés disfrutando con la app. <br/>Si consideras :link ¡te lo agraderemos enormemente!',
     'writing_a_review' => 'escribir una reseña',
@@ -4422,7 +4420,7 @@ Una vez que tenga los montos, vuelva a esta página de métodos de pago y haga c
     'activity_122' => ':user archivó el gasto recurrente :recurring_expense',
     'activity_123' => ':user eliminó el gasto recurrente :recurring_expense',
     'activity_124' => ':user restauró el gasto recurrente :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Para ver el :entity necesita establecer una contraseña.',
     'unsubscribe' => 'Darse de baja',
     'unsubscribed' => 'Dado de baja',
@@ -4926,7 +4924,7 @@ Una vez que tenga los montos, vuelva a esta página de métodos de pago y haga c
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'Pagadero dentro de :payeddue días de pago vencido neto hasta  :paydate',
-    'xinvoice_no_buyers_reference' => "No se da la referencia del comprador",
+    'xinvoice_no_buyers_reference' => 'No se da la referencia del comprador',
     'xinvoice_online_payment' => 'La factura debe pagarse en línea a través del enlace proporcionado.',
     'pre_payment' => 'Prepago',
     'number_of_payments' => 'Numero de pagos',
@@ -5031,8 +5029,8 @@ Una vez que tenga los montos, vuelva a esta página de métodos de pago y haga c
     'e_invoice' => 'E-Factura',
     'light_dark_mode' => 'Modo claro/oscuro',
     'activities' => 'Actividades',
-    'recent_transactions' => "Estas son las transacciones más recientes de su empresa:",
-    'country_Palestine' => "Palestina",
+    'recent_transactions' => 'Estas son las transacciones más recientes de su empresa:',
+    'country_Palestine' => 'Palestina',
     'country_Taiwan' => 'Taiwán',
     'duties' => 'Obligaciones',
     'order_number' => 'Número de orden',
@@ -5248,7 +5246,7 @@ De lo contrario, este campo deberá dejarse en blanco.',
     'rff' => 'Formulario de campos obligatorios',
     'add_step' => 'Agregar paso',
     'steps' => 'Pasos',
-    'steps_order_help' =>  'El orden de los pasos es importante. El primer paso no debe depender de ningún otro paso. El segundo paso debería depender del primero, y así sucesivamente.',
+    'steps_order_help' => 'El orden de los pasos es importante. El primer paso no debe depender de ningún otro paso. El segundo paso debería depender del primero, y así sucesivamente.',
     'other_steps' => 'Otros pasos',
     'use_available_payments' => 'Usar pagos disponibles',
     'test_email_sent' => 'Correo electrónico enviado correctamente',
@@ -5297,6 +5295,6 @@ De lo contrario, este campo deberá dejarse en blanco.',
     'local_domain_help' => 'Dominio EHLO (opcional)',
     'port_help' => 'Ej. 25.587.465',
     'host_help' => 'Ej. smtp.gmail.com',
-);
+];
 
 return $lang;

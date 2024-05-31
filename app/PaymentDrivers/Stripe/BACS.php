@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,16 +40,18 @@ class BACS
             'payment_method_types' => ['bacs_debit'],
             'mode' => 'setup',
             'customer' => $customer->id,
-            'success_url' => str_replace("%7B", "{", str_replace("%7D", "}", $this->buildAuthorizeUrl())),
+            'success_url' => str_replace('%7B', '{', str_replace('%7D', '}', $this->buildAuthorizeUrl())),
             'cancel_url' => route('client.payment_methods.index'),
         ]);
+
         return render('gateways.stripe.bacs.authorize', $data);
     }
+
     private function buildAuthorizeUrl(): string
     {
         return route('client.payment_methods.confirm', [
             'method' => GatewayType::BACS,
-            'session_id' => "{CHECKOUT_SESSION_ID}",
+            'session_id' => '{CHECKOUT_SESSION_ID}',
         ]);
     }
 
@@ -62,11 +63,13 @@ class BACS
 
             $customer = $this->stripe->findOrCreateCustomer();
             $this->stripe->attach($session->setup_intent->payment_method, $customer);
-            $payment_method =  $this->stripe->getStripePaymentMethod($session->setup_intent->payment_method);
+            $payment_method = $this->stripe->getStripePaymentMethod($session->setup_intent->payment_method);
             $this->storePaymentMethod($payment_method, $customer);
         }
+
         return redirect()->route('client.payment_methods.index');
     }
+
     public function paymentView(array $data)
     {
         $data['gateway'] = $this->stripe;
@@ -75,6 +78,7 @@ class BACS
 
         return render('gateways.stripe.bacs.pay', $data);
     }
+
     public function paymentResponse(PaymentResponseRequest $request)
     {
         $this->stripe->init();
@@ -112,7 +116,7 @@ class BACS
             return $this->processSuccessfulPayment($state['payment_intent']);
         }
 
-        return $this->processUnsuccessfulPayment("An unknown error occured.");
+        return $this->processUnsuccessfulPayment('An unknown error occured.');
     }
 
     public function processSuccessfulPayment($payment_intent)
@@ -137,7 +141,6 @@ class BACS
             $this->stripe->client,
             $this->stripe->client->company,
         ))->handle();
-
 
         return redirect()->route('client.payments.show', ['payment' => $this->stripe->encodePrimaryKey($payment->id)]);
     }
@@ -180,7 +183,7 @@ class BACS
             $clientgateway = ClientGatewayToken::query()
                 ->where('token', $method->id)
                 ->first();
-            if (!$clientgateway) {
+            if (! $clientgateway) {
                 $this->stripe->storeGatewayToken($data, ['gateway_customer_reference' => $customer->id]);
             }
         } catch (\Exception $e) {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,6 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read mixed $hashed_id
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor|null $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\BankTransactionRuleFactory factory($count = null, $state = [])
@@ -63,12 +63,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BankTransactionRule whereVendorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BankTransactionRule withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BankTransactionRule withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class BankTransactionRule extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -99,7 +100,7 @@ class BankTransactionRule extends BaseModel
         '>',
         '>=',
         '<',
-        '<='
+        '<=',
     ];
 
     /* Description, Client, Vendor, Reference Number */
@@ -141,7 +142,6 @@ class BankTransactionRule extends BaseModel
     {
         return $this->belongsTo(ExpenseCategory::class, 'category_id')->withTrashed();
     }
-
 
     // rule object looks like this:
     //[
@@ -196,7 +196,6 @@ class BankTransactionRule extends BaseModel
     // private function searchVendor($rule, $bank_transaction)
     // {
     //     //search expenses
-
 
     // }
 

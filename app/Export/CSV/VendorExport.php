@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,16 +60,16 @@ class VendorExport extends BaseExport
         }
 
         $query = Vendor::query()->with('contacts')
-                        ->withTrashed()
-                        ->where('company_id', $this->company->id);
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
         $query = $this->addDateRange($query);
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -89,10 +88,11 @@ class VendorExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
@@ -106,9 +106,9 @@ class VendorExport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query->cursor()
-              ->each(function ($vendor) {
-                  $this->csv->insertOne($this->buildRow($vendor));
-              });
+            ->each(function ($vendor) {
+                $this->csv->insertOne($this->buildRow($vendor));
+            });
 
         return $this->csv->toString();
     }
@@ -164,7 +164,6 @@ class VendorExport extends BaseExport
         if (in_array('vendor.assigned_user_id', $this->input['report_keys'])) {
             $entity['vendor.assigned_user_id'] = $vendor->assigned_user ? $vendor->assigned_user->present()->name() : '';
         }
-
 
         // $entity['status'] = $this->calculateStatus($vendor);
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,6 +20,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\PreviewController
  */
 class LiveDesignTest extends TestCase
@@ -28,7 +28,7 @@ class LiveDesignTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class LiveDesignTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-        
+
         if (config('ninja.testvars.travis') !== false) {
             $this->markTestSkipped('Skip test for Travis');
         }
@@ -48,18 +48,18 @@ class LiveDesignTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $this->client->contacts->count());
 
         $ii = InvoiceInvitation::factory()
-        ->for($this->invoice)
-        ->for($this->client->contacts->first(), 'contact')
-        ->for($this->company)
-        ->for($this->user)
-        ->make();
+            ->for($this->invoice)
+            ->for($this->client->contacts->first(), 'contact')
+            ->for($this->company)
+            ->for($this->user)
+            ->make();
 
         $this->assertInstanceOf(InvoiceInvitation::class, $ii);
 
         $engine = new HtmlEngine($ii);
 
         $this->assertNotNull($engine);
-        
+
         $data = $engine->generateLabelsAndValues();
 
         $this->assertIsArray($data);
@@ -72,7 +72,7 @@ class LiveDesignTest extends TestCase
         $data = [
             'entity_type' => 'invoice',
             'settings_type' => 'company',
-            'settings' => (array)$this->company->settings,
+            'settings' => (array) $this->company->settings,
         ];
 
         $response = $this->withHeaders([
@@ -88,19 +88,18 @@ class LiveDesignTest extends TestCase
 
         $d = Design::find(1);
 
-        
         $data = [
             'entity_type' => 'invoice',
             'settings_type' => 'company',
-            'settings' => (array)$this->company->settings,
-            'design' => (array)$d->design,
+            'settings' => (array) $this->company->settings,
+            'design' => (array) $d->design,
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/live_design/', $data);
-        
+
         $response->assertStatus(200);
 
     }

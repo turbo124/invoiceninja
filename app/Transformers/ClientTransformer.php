@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,9 +34,6 @@ class ClientTransformer extends EntityTransformer
         'gateway_tokens',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'activities',
         'ledger',
@@ -46,8 +42,6 @@ class ClientTransformer extends EntityTransformer
     ];
 
     /**
-     * @param Client $client
-     *
      * @return \Illuminate\Support\Collection
      */
     public function includeActivities(Client $client)
@@ -65,8 +59,6 @@ class ClientTransformer extends EntityTransformer
     }
 
     /**
-     * @param Client $client
-     *
      * @return \Illuminate\Support\Collection
      */
     public function includeContacts(Client $client)
@@ -99,7 +91,7 @@ class ClientTransformer extends EntityTransformer
 
     public function includeGroupSettings(Client $client)
     {
-        if (!$client->group_settings) {
+        if (! $client->group_settings) {
             return null;
         }
 
@@ -109,9 +101,8 @@ class ClientTransformer extends EntityTransformer
     }
 
     /**
-     * @param Client $client
-     *
      * @return array
+     *
      * @throws \Laracasts\Presenter\Exceptions\PresenterException
      */
     public function transform(Client $client)

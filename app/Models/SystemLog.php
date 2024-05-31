@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $created_at
  * @property int|null $updated_at
  * @property int|null $deleted_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|SystemLog company()
  * @method static \Illuminate\Database\Eloquent\Builder|SystemLog filter(\App\Filters\QueryFilters $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|SystemLog newModelQuery()
@@ -48,13 +48,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|SystemLog whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SystemLog withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|SystemLog withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class SystemLog extends Model
 {
     use Filterable;
-    use SoftDeletes;
     use MakesHash;
+    use SoftDeletes;
 
     protected $casts = [
         'updated_at' => 'timestamp',
@@ -151,7 +152,7 @@ class SystemLog extends Model
     public const TYPE_PAYPAL_PPCP = 323;
 
     public const TYPE_BTC_PAY = 324;
-    
+
     public const TYPE_QUOTA_EXCEEDED = 400;
 
     public const TYPE_UPSTREAM_FAILURE = 401;
@@ -302,9 +303,9 @@ class SystemLog extends Model
             case self::TYPE_WEPAY:
                 return 'WePay';
             case self::TYPE_PAYFAST:
-                return "Payfast";
+                return 'Payfast';
             case self::TYPE_FORTE:
-                return "Forte";
+                return 'Forte';
             default:
                 return 'undefined';
         }

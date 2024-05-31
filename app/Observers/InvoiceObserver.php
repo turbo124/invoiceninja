@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,14 +21,13 @@ class InvoiceObserver
     /**
      * Handle the client "created" event.
      *
-     * @param Invoice $invoice
      * @return void
      */
     public function created(Invoice $invoice)
     {
         $subscriptions = Webhook::where('company_id', $invoice->company_id)
-                            ->where('event_id', Webhook::EVENT_CREATE_INVOICE)
-                            ->exists();
+            ->where('event_id', Webhook::EVENT_CREATE_INVOICE)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_CREATE_INVOICE, $invoice, $invoice->company, 'client')->delay(0);
@@ -39,14 +37,13 @@ class InvoiceObserver
     /**
      * Handle the client "updated" event.
      *
-     * @param Invoice $invoice
      * @return void
      */
     public function updated(Invoice $invoice)
     {
         $event = Webhook::EVENT_UPDATE_INVOICE;
 
-        if ($invoice->getOriginal('deleted_at') && !$invoice->deleted_at) {
+        if ($invoice->getOriginal('deleted_at') && ! $invoice->deleted_at) {
             $event = Webhook::EVENT_RESTORE_INVOICE;
         }
 
@@ -54,10 +51,9 @@ class InvoiceObserver
             $event = Webhook::EVENT_DELETE_INVOICE;
         }
 
-
         $subscriptions = Webhook::where('company_id', $invoice->company->id)
-                                    ->where('event_id', $event)
-                                    ->exists();
+            ->where('event_id', $event)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch($event, $invoice, $invoice->company, 'client')->delay(0);
@@ -67,7 +63,6 @@ class InvoiceObserver
     /**
      * Handle the client "deleted" event.
      *
-     * @param Invoice $invoice
      * @return void
      */
     public function deleted(Invoice $invoice)
@@ -77,8 +72,8 @@ class InvoiceObserver
         }
 
         $subscriptions = Webhook::where('company_id', $invoice->company_id)
-                            ->where('event_id', Webhook::EVENT_ARCHIVE_INVOICE)
-                            ->exists();
+            ->where('event_id', Webhook::EVENT_ARCHIVE_INVOICE)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_ARCHIVE_INVOICE, $invoice, $invoice->company, 'client')->delay(0);
@@ -88,7 +83,6 @@ class InvoiceObserver
     /**
      * Handle the client "restored" event.
      *
-     * @param Invoice $invoice
      * @return void
      */
     public function restored(Invoice $invoice)
@@ -99,7 +93,6 @@ class InvoiceObserver
     /**
      * Handle the client "force deleted" event.
      *
-     * @param Invoice $invoice
      * @return void
      */
     public function forceDeleted(Invoice $invoice)

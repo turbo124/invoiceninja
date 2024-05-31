@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,7 +19,8 @@ trait MakesMenu
 {
     /**
      * Builds an array of available modules for this view.
-     * @param  string $entity Class name
+     *
+     * @param  string  $entity  Class name
      * @return array of modules
      */
     public function makeEntityTabMenu(string $entity): array
@@ -40,6 +40,7 @@ trait MakesMenu
 
     /**
      * Builds an array items to be presented on the sidebar.
+     *
      * @return void menu items
      */
     public function makeSideBarMenu()

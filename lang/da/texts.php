@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organisation',
     'name' => 'Navn',
     'website' => 'Hjemmeside',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'Enterprise Planen tilføjer understøttelse af flere brugere og vedhæftede filer, :link for at se den fulde liste over funktioner.',
     'return_to_app' => 'Vend tilbage til appen',
 
-
     // Payment updates
     'refund_payment' => 'Refunder betaling',
     'refund_max' => 'Max:',
@@ -1704,7 +1703,6 @@ $lang = array(
     'lang_Serbian' => 'Serbisk',
     'lang_Bulgarian' => 'Bulgarsk',
     'lang_Russian (Russia)' => 'Russisk (Rusland)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Regnskab og jura',
@@ -2363,7 +2361,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'Guld Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguanske Córdoba',
     'currency_malagasy_ariary' => 'Madagaskars ariary',
-    "currency_tongan_pa_anga" => "tonganske paanga",
+    'currency_tongan_pa_anga' => 'tonganske paanga',
 
     'review_app_help' => 'Vi håber, du nyder at bruge appen.<br/> Hvis du ville overveje :link ville vi sætte stor pris på det!',
     'writing_a_review' => 'skrive en anmeldelse',
@@ -4425,7 +4423,7 @@ $lang = array(
     'activity_122' => ':user arkiveret Gentagen Udgift :recurring_expense',
     'activity_123' => ':user slettet Gentagen Udgift :recurring_expense',
     'activity_124' => ':user genskabt Gentagen Udgift :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'For at Vis :entity skal du angive en adgangskode.',
     'unsubscribe' => 'Opsige abonnement',
     'unsubscribed' => 'Afmeldt',
@@ -4929,7 +4927,7 @@ $lang = array(
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'Betales inden for :payeddue dage netto indtil :paydate',
-    'xinvoice_no_buyers_reference' => "Ingen købers reference angivet",
+    'xinvoice_no_buyers_reference' => 'Ingen købers reference angivet',
     'xinvoice_online_payment' => 'Faktura skal betales online via det angivne link',
     'pre_payment' => 'Forudbetaling',
     'number_of_payments' => 'Antal Betalinger',
@@ -5034,8 +5032,8 @@ $lang = array(
     'e_invoice' => 'E- Faktura',
     'light_dark_mode' => 'Lys/Mørk tilstand',
     'activities' => 'Aktiviteter',
-    'recent_transactions' => "Her er din virksomheds seneste transaktioner:",
-    'country_Palestine' => "Palæstina",
+    'recent_transactions' => 'Her er din virksomheds seneste transaktioner:',
+    'country_Palestine' => 'Palæstina',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Pligter',
     'order_number' => 'Ordrenummer',
@@ -5250,7 +5248,7 @@ $lang = array(
     'rff' => 'Formular med obligatoriske felter',
     'add_step' => 'Tilføj trin',
     'steps' => 'Trin',
-    'steps_order_help' =>  'Rækkefølgen af trinene er vigtig. Det første trin bør ikke afhænge af noget andet trin. Det andet trin skal afhænge af det første trin og så videre.',
+    'steps_order_help' => 'Rækkefølgen af trinene er vigtig. Det første trin bør ikke afhænge af noget andet trin. Det andet trin skal afhænge af det første trin og så videre.',
     'other_steps' => 'Andre trin',
     'use_available_payments' => 'Brug tilgængelig Betalinger',
     'test_email_sent' => 'Succesfuldt sendt e-mail',
@@ -5299,6 +5297,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

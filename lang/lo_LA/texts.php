@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'ອົງການ',
     'name' => 'ຊື່',
     'website' => 'ເວັບໄຊ',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'ແຜນການວິສາຫະກິດເພີ່ມການສະຫນັບສະຫນູນຜູ້ໃຊ້ຫຼາຍແລະໄຟລ໌ແນບ, :link ເພື່ອເບິ່ງລາຍຊື່ເຕັມຂອງຄຸນສົມບັດ.',
     'return_to_app' => 'ກັບຄືນຫາແອັບ',
 
-
     // Payment updates
     'refund_payment' => 'ການຈ່າຍເງິນຄືນ',
     'refund_max' => 'ສູງສຸດ:',
@@ -1705,7 +1704,6 @@ $lang = array(
     'lang_Serbian' => 'ເຊີເບຍ',
     'lang_Bulgarian' => 'ບຸນກາຣີ',
     'lang_Russian (Russia)' => 'ລັດເຊຍ (ຣັດເຊຍ)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'ການບັນຊີ ແລະກົດໝາຍ',
@@ -2364,7 +2362,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'ທອງຄຳ Troy ອອນສ໌',
     'currency_nicaraguan_córdoba' => 'ນິກາຣາກົວ ໂກໂດບາ',
     'currency_malagasy_ariary' => 'ມາລາກາຊີ ariary',
-    "currency_tongan_pa_anga" => "ຕົງກັນປາອາງາ",
+    'currency_tongan_pa_anga' => 'ຕົງກັນປາອາງາ',
 
     'review_app_help' => 'ພວກ​ເຮົາ​ຫວັງ​ວ່າ​ທ່ານ​ຈະ​ມີ​ຄວາມ​ສຸກ​ກັບ​ການ​ນໍາ​ໃຊ້ app ໄດ້.<br/>ຖ້າ​ຫາກ​ວ່າ​ທ່ານ \'ພິ​ຈາ​ລະ​ນາ :link ພວກ​ເຮົາ​ຈະ​ຂໍ​ຂອບ​ໃຈ​ເປັນ​ຢ່າງ​ຍິ່ງ​!',
     'writing_a_review' => 'ຂຽນບົດວິຈານ',
@@ -4426,7 +4424,7 @@ $lang = array(
     'activity_122' => ': ຜູ້ໃຊ້ເກັບຄ່າໃຊ້ຈ່າຍທີ່ເກີດຂຶ້ນຊ້ຳໆ :recurring_expense',
     'activity_123' => ':ຜູ້ໃຊ້ລຶບຄ່າໃຊ້ຈ່າຍທີ່ເກີດຂຶ້ນຊ້ຳໆ :recurring_expense',
     'activity_124' => ': ຜູ້ໃຊ້ໄດ້ຟື້ນຟູຄ່າໃຊ້ຈ່າຍທີ່ເກີດຂື້ນ :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'ເພື່ອເບິ່ງ :entity ທ່ານຕ້ອງຕັ້ງລະຫັດຜ່ານ.',
     'unsubscribe' => 'ເຊົາຕິດຕາມ',
     'unsubscribed' => 'ເຊົາສະໝັກແລ້ວ',
@@ -4930,7 +4928,7 @@ $lang = array(
     'payment_type_Klarna' => 'ຄລານາ',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'ຊໍາລະພາຍໃນ: payeddue ວັນສຸດທິຈົນກ່ວາ: paydate',
-    'xinvoice_no_buyers_reference' => "ບໍ່ມີການອ້າງອີງຂອງຜູ້ຊື້",
+    'xinvoice_no_buyers_reference' => 'ບໍ່ມີການອ້າງອີງຂອງຜູ້ຊື້',
     'xinvoice_online_payment' => 'ໃບແຈ້ງໜີ້ຕ້ອງຈ່າຍອອນໄລນ໌ຜ່ານລິ້ງທີ່ສະໜອງໃຫ້',
     'pre_payment' => 'ການຈ່າຍເງິນລ່ວງໜ້າ',
     'number_of_payments' => 'ຈໍານວນການຈ່າຍເງິນ',
@@ -5035,8 +5033,8 @@ $lang = array(
     'e_invoice' => 'ໃບເກັບເງິນອີເມລ໌',
     'light_dark_mode' => 'ໂໝດແສງສະຫວ່າງ/ມືດ',
     'activities' => 'ກິດຈະກຳ',
-    'recent_transactions' => "ນີ້ແມ່ນທຸລະກຳຫຼ້າສຸດຂອງບໍລິສັດເຈົ້າ:",
-    'country_Palestine' => "ປາແລັດສະໄຕ",
+    'recent_transactions' => 'ນີ້ແມ່ນທຸລະກຳຫຼ້າສຸດຂອງບໍລິສັດເຈົ້າ:',
+    'country_Palestine' => 'ປາແລັດສະໄຕ',
     'country_Taiwan' => 'ໄຕ້ຫວັນ',
     'duties' => 'ໜ້າທີ່',
     'order_number' => 'ເລກສັ່ງຊື້',
@@ -5251,7 +5249,7 @@ $lang = array(
     'rff' => 'ແບບຟອມຊ່ອງຂໍ້ມູນທີ່ຕ້ອງການ',
     'add_step' => 'ເພີ່ມຂັ້ນຕອນ',
     'steps' => 'ຂັ້ນຕອນ',
-    'steps_order_help' =>  'ລໍາດັບຂອງຂັ້ນຕອນແມ່ນສໍາຄັນ. ຂັ້ນຕອນທໍາອິດບໍ່ຄວນຂຶ້ນກັບຂັ້ນຕອນອື່ນ. ຂັ້ນຕອນທີສອງຄວນຂຶ້ນກັບຂັ້ນຕອນທໍາອິດ, ແລະອື່ນໆ.',
+    'steps_order_help' => 'ລໍາດັບຂອງຂັ້ນຕອນແມ່ນສໍາຄັນ. ຂັ້ນຕອນທໍາອິດບໍ່ຄວນຂຶ້ນກັບຂັ້ນຕອນອື່ນ. ຂັ້ນຕອນທີສອງຄວນຂຶ້ນກັບຂັ້ນຕອນທໍາອິດ, ແລະອື່ນໆ.',
     'other_steps' => 'ຂັ້ນຕອນອື່ນໆ',
     'use_available_payments' => 'ໃຊ້ການຈ່າຍເງິນທີ່ມີຢູ່',
     'test_email_sent' => 'ສົ່ງອີເມວສຳເລັດແລ້ວ',
@@ -5300,6 +5298,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

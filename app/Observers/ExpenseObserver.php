@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,14 +21,13 @@ class ExpenseObserver
     /**
      * Handle the expense "created" event.
      *
-     * @param Expense $expense
      * @return void
      */
     public function created(Expense $expense)
     {
         $subscriptions = Webhook::where('company_id', $expense->company_id)
-                            ->where('event_id', Webhook::EVENT_CREATE_EXPENSE)
-                            ->exists();
+            ->where('event_id', Webhook::EVENT_CREATE_EXPENSE)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_CREATE_EXPENSE, $expense, $expense->company)->delay(0);
@@ -39,14 +37,13 @@ class ExpenseObserver
     /**
      * Handle the expense "updated" event.
      *
-     * @param Expense $expense
      * @return void
      */
     public function updated(Expense $expense)
     {
         $event = Webhook::EVENT_UPDATE_EXPENSE;
 
-        if ($expense->getOriginal('deleted_at') && !$expense->deleted_at) {
+        if ($expense->getOriginal('deleted_at') && ! $expense->deleted_at) {
             $event = Webhook::EVENT_RESTORE_EXPENSE;
         }
 
@@ -54,10 +51,9 @@ class ExpenseObserver
             $event = Webhook::EVENT_DELETE_EXPENSE;
         }
 
-
         $subscriptions = Webhook::where('company_id', $expense->company_id)
-                                    ->where('event_id', $event)
-                                    ->exists();
+            ->where('event_id', $event)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch($event, $expense, $expense->company)->delay(0);
@@ -67,7 +63,6 @@ class ExpenseObserver
     /**
      * Handle the expense "deleted" event.
      *
-     * @param Expense $expense
      * @return void
      */
     public function deleted(Expense $expense)
@@ -77,8 +72,8 @@ class ExpenseObserver
         }
 
         $subscriptions = Webhook::where('company_id', $expense->company_id)
-                            ->where('event_id', Webhook::EVENT_ARCHIVE_EXPENSE)
-                            ->exists();
+            ->where('event_id', Webhook::EVENT_ARCHIVE_EXPENSE)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_ARCHIVE_EXPENSE, $expense, $expense->company)->delay(0);
@@ -88,7 +83,6 @@ class ExpenseObserver
     /**
      * Handle the expense "restored" event.
      *
-     * @param Expense $expense
      * @return void
      */
     public function restored(Expense $expense)
@@ -99,7 +93,6 @@ class ExpenseObserver
     /**
      * Handle the expense "force deleted" event.
      *
-     * @param Expense $expense
      * @return void
      */
     public function forceDeleted(Expense $expense)
@@ -109,7 +102,7 @@ class ExpenseObserver
     /**
      * Handle the expense "archive" event.
      *
-     * @param Expense $expense
+     * @param  Expense  $expense
      * @return void
      */
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Company|null $company
  * @property-read mixed $hashed_id
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|Webhook filter(\App\Filters\QueryFilters $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Webhook newModelQuery()
@@ -41,12 +41,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Webhook withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Webhook withoutTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Webhook where()
+ *
  * @mixin \Eloquent
  */
 class Webhook extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     public const EVENT_CREATE_CLIENT = 1; //tested
 
@@ -237,7 +238,7 @@ class Webhook extends BaseModel
         self::EVENT_SENT_INVOICE,
         self::EVENT_SENT_QUOTE,
         self::EVENT_SENT_CREDIT,
-        self::EVENT_SENT_PURCHASE_ORDER
+        self::EVENT_SENT_PURCHASE_ORDER,
 
     ];
 

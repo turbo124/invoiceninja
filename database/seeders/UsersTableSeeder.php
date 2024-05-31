@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -83,7 +82,7 @@ class UsersTableSeeder extends Seeder
             'company_id' => $company->id,
             'password' => Hash::make(config('ninja.testvars.password')),
             'email_verified_at' => now(),
-            'client_id' =>$client->id,
+            'client_id' => $client->id,
         ]);
 
         Client::factory()->count(20)->create(['user_id' => $user->id, 'company_id' => $company->id])->each(function ($c) use ($user, $company) {

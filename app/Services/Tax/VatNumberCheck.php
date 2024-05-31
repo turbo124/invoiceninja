@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,13 +25,13 @@ class VatNumberCheck
 
     private function checkvat_number(): self
     {
-        $wsdl = "https://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl";
+        $wsdl = 'https://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl';
 
         try {
             $client = new \SoapClient($wsdl);
             $params = [
                 'countryCode' => $this->country_code,
-                'vatNumber' => $this->vat_number ?? ''
+                'vatNumber' => $this->vat_number ?? '',
             ];
             $response = $client->checkVat($params);
 
@@ -41,7 +40,7 @@ class VatNumberCheck
                 $this->response = [
                     'valid' => true,
                     'name' => $response->name,
-                    'address' => $response->address
+                    'address' => $response->address,
                 ];
             } else {
                 $this->response = ['valid' => false];

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -47,7 +46,6 @@ class PaymentMethodController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreatePaymentMethodRequest $request
      * @return \Illuminate\View\View
      */
     public function create(CreatePaymentMethodRequest $request)
@@ -56,7 +54,7 @@ class PaymentMethodController extends Controller
 
         $data['gateway'] = $gateway;
 
-        /** @var \App\Models\ClientContact auth()->user() **/
+        /** @var \App\Models\ClientContact auth()->user() * */
         $client_contact = auth()->user();
         $data['client'] = $client_contact->client;
 
@@ -70,14 +68,13 @@ class PaymentMethodController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return \Illuminate\View\View
      */
     public function store(Request $request)
     {
         $gateway = $this->getClientGateway();
 
-        /** @var \App\Models\ClientContact auth()->user() **/
+        /** @var \App\Models\ClientContact auth()->user() * */
         $client_contact = auth()->user();
 
         return $gateway
@@ -90,7 +87,6 @@ class PaymentMethodController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param ClientGatewayToken $payment_method
      * @return Factory|View
      */
     public function show(ClientGatewayToken $payment_method)
@@ -103,7 +99,7 @@ class PaymentMethodController extends Controller
     public function verify(ClientGatewayToken $payment_method)
     {
 
-        /** @var \App\Models\ClientContact auth()->user() **/
+        /** @var \App\Models\ClientContact auth()->user() * */
         $client_contact = auth()->user();
 
         return $payment_method->gateway
@@ -114,7 +110,7 @@ class PaymentMethodController extends Controller
 
     public function processVerification(Request $request, ClientGatewaytoken $payment_method)
     {
-        /** @var \App\Models\ClientContact auth()->user() **/
+        /** @var \App\Models\ClientContact auth()->user() * */
         $client_contact = auth()->user();
 
         return $payment_method->gateway
@@ -126,12 +122,11 @@ class PaymentMethodController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param ClientGatewayToken $payment_method
      * @return RedirectResponse
      */
     public function destroy(ClientGatewayToken $payment_method)
     {
-        /** @var \App\Models\ClientContact auth()->user() **/
+        /** @var \App\Models\ClientContact auth()->user() * */
         $client_contact = auth()->user();
 
         if ($payment_method->gateway()->exists()) {
@@ -161,7 +156,7 @@ class PaymentMethodController extends Controller
 
     private function getClientGateway()
     {
-        /** @var \App\Models\ClientContact auth()->user() **/
+        /** @var \App\Models\ClientContact auth()->user() * */
         $client_contact = auth()->user();
 
         if (request()->query('method') == GatewayType::CREDIT_CARD) {

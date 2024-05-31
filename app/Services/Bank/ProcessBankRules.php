@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,9 +32,6 @@ class ProcessBankRules extends AbstractService
 
     protected $invoices;
 
-    /**
-     * @param \App\Models\BankTransaction $bank_transaction
-     */
     public function __construct(public BankTransaction $bank_transaction)
     {
     }
@@ -52,18 +48,19 @@ class ProcessBankRules extends AbstractService
     private function matchCredit()
     {
         $this->invoices = Invoice::query()->where('company_id', $this->bank_transaction->company_id)
-                                ->whereIn('status_id', [1,2,3])
-                                ->where('is_deleted', 0)
-                                ->get();
+            ->whereIn('status_id', [1, 2, 3])
+            ->where('is_deleted', 0)
+            ->get();
 
         $invoice = $this->invoices->first(function ($value, $key) {
-            return str_contains($this->bank_transaction->description, $value->number) || str_contains(str_replace("\n", "", $this->bank_transaction->description), $value->number);
+            return str_contains($this->bank_transaction->description, $value->number) || str_contains(str_replace("\n", '', $this->bank_transaction->description), $value->number);
         });
 
         if ($invoice) {
             $this->bank_transaction->invoice_ids = $invoice->hashed_id;
             $this->bank_transaction->status_id = BankTransaction::STATUS_MATCHED;
             $this->bank_transaction->save();
+
             return;
         }
 
@@ -81,12 +78,10 @@ class ProcessBankRules extends AbstractService
 
         $this->categories = collect(Cache::get('bank_categories'));
 
-
-
         foreach ($this->debit_rules as $bank_transaction_rule) {
             $matches = 0;
 
-            if (!is_array($bank_transaction_rule['rules'])) {
+            if (! is_array($bank_transaction_rule['rules'])) {
                 continue;
             }
 
@@ -105,7 +100,7 @@ class ProcessBankRules extends AbstractService
                     }
                 }
 
-                if (($bank_transaction_rule['matches_on_all'] && ($matches == $rule_count)) || (!$bank_transaction_rule['matches_on_all'] && $matches > 0)) {
+                if (($bank_transaction_rule['matches_on_all'] && ($matches == $rule_count)) || (! $bank_transaction_rule['matches_on_all'] && $matches > 0)) {
                     // $this->bank_transaction->client_id = empty($rule['client_id']) ? null : $rule['client_id'];
                     $this->bank_transaction->vendor_id = $bank_transaction_rule->vendor_id;
                     $this->bank_transaction->ninja_category_id = $bank_transaction_rule->category_id;
@@ -142,11 +137,11 @@ class ProcessBankRules extends AbstractService
     private function coalesceExpenses($expense): string
     {
 
-        if (!$this->bank_transaction->expense_id || strlen($this->bank_transaction->expense_id) < 1) {
+        if (! $this->bank_transaction->expense_id || strlen($this->bank_transaction->expense_id) < 1) {
             return $expense;
         }
 
-        return collect(explode(",", $this->bank_transaction->expense_id))->push($expense)->implode(",");
+        return collect(explode(',', $this->bank_transaction->expense_id))->push($expense)->implode(',');
 
     }
 
@@ -184,12 +179,12 @@ class ProcessBankRules extends AbstractService
 
     private function matchStringOperator($bt_value, $rule_value, $operator): bool
     {
-        $bt_value = strtolower(str_replace(" ", "", $bt_value));
-        $rule_value = strtolower(str_replace(" ", "", $rule_value));
+        $bt_value = strtolower(str_replace(' ', '', $bt_value));
+        $rule_value = strtolower(str_replace(' ', '', $rule_value));
         $rule_length = iconv_strlen($rule_value);
 
         return match ($operator) {
-            'is' =>  $bt_value == $rule_value,
+            'is' => $bt_value == $rule_value,
             'contains' => stripos($bt_value, $rule_value) !== false,
             'starts_with' => substr($bt_value, 0, $rule_length) == $rule_value,
             'is_empty' => empty($bt_value),

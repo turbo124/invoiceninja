@@ -3,7 +3,8 @@
 use App\Models\Gateway;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,11 +13,11 @@ return new class extends Migration {
     public function up()
     {
 
-        if(!Gateway::find(60)) {
+        if (! Gateway::find(60)) {
 
             $fields = new \stdClass;
-            $fields->clientId = "";
-            $fields->secret = "";
+            $fields->clientId = '';
+            $fields->secret = '';
             $fields->testMode = false;
 
             $paypal = new Gateway;

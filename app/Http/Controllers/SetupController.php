@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -145,7 +144,6 @@ class SetupController extends Controller
 
             Artisan::call('config:clear');
 
-
             Artisan::call('migrate', ['--force' => true]);
             Artisan::call('db:seed', ['--force' => true]);
             Artisan::call('config:clear');
@@ -177,7 +175,6 @@ class SetupController extends Controller
     /**
      * Return status based on database check.
      *
-     * @param CheckDatabaseRequest $request
      * @return Application|ResponseFactory|JsonResponse|Response
      */
     public function checkDB(CheckDatabaseRequest $request)
@@ -192,7 +189,7 @@ class SetupController extends Controller
 
             return response($status, 400);
         } catch (Exception $e) {
-            nlog("failed?");
+            nlog('failed?');
             nlog($e->getMessage());
             nlog(['message' => $e->getMessage(), 'action' => 'SetupController::checkDB()']);
 
@@ -203,7 +200,6 @@ class SetupController extends Controller
     /**
      * Return status based on check of SMTP connection.
      *
-     * @param CheckMailRequest $request
      * @return Application|ResponseFactory|JsonResponse|Response
      */
     public function checkMail(CheckMailRequest $request)

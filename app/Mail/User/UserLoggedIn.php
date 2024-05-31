@@ -6,14 +6,13 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Mail\User;
 
-use App\Models\User;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\App;
 

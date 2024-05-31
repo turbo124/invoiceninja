@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,9 +37,9 @@ class UpdateSubscriptionRequest extends Request
     public function rules()
     {
         $rules = [
-            'name' => ['bail','sometimes', Rule::unique('subscriptions')->where('company_id', auth()->user()->company()->id)->ignore($this->subscription->id)],
-            'group_id' => ['bail','sometimes', 'nullable', Rule::exists('group_settings', 'id')->where('company_id', auth()->user()->company()->id)],
-            'assigned_user_id' => ['bail','sometimes', 'nullable', Rule::exists('users', 'id')->where('account_id', auth()->user()->account_id)],
+            'name' => ['bail', 'sometimes', Rule::unique('subscriptions')->where('company_id', auth()->user()->company()->id)->ignore($this->subscription->id)],
+            'group_id' => ['bail', 'sometimes', 'nullable', Rule::exists('group_settings', 'id')->where('company_id', auth()->user()->company()->id)],
+            'assigned_user_id' => ['bail', 'sometimes', 'nullable', Rule::exists('users', 'id')->where('account_id', auth()->user()->account_id)],
             'product_ids' => 'bail|sometimes|nullable|string',
             'recurring_product_ids' => 'bail|sometimes|nullable|string',
             'is_recurring' => 'bail|sometimes|bool',

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -32,6 +31,7 @@ namespace App\Models;
  * @property bool $swap_currency_symbol
  * @property string|null $thousand_separator
  * @property string|null $decimal_separator
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|Country newModelQuery()
@@ -55,6 +55,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereSwapCurrencySymbol($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereSwapPostalCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Country whereThousandSeparator($value)
+ *
  * @mixin \Eloquent
  */
 class Country extends StaticModel
@@ -81,6 +82,7 @@ class Country extends StaticModel
     {
         return trans('texts.country_'.$this->name);
     }
+
     public function getID(): string
     {
         return $this->id;

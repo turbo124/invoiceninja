@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'ארגון ',
     'name' => 'שם',
     'website' => 'אתר אינטרנט',
@@ -1174,7 +1174,6 @@ $lang = array(
     'enterprise_plan_features' => 'התוכנית הארגונית מוסיפה תמיכה עבור משתמשים מרובים וקבצים מצורפים, :link כדי לראות את רשימת התכונות המלאה.',
     'return_to_app' => 'Return To App',
 
-
     // Payment updates
     'refund_payment' => 'החזר כספי',
     'refund_max' => 'Max:',
@@ -1703,7 +1702,6 @@ $lang = array(
     'lang_Serbian' => 'סרבית',
     'lang_Bulgarian' => 'בולגרית',
     'lang_Russian (Russia)' => 'Russian (Russia)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'ראיית חשבון',
@@ -2362,7 +2360,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'זהב טרוי אונקה',
     'currency_nicaraguan_córdoba' => 'קורדובה ניקרגואה',
     'currency_malagasy_ariary' => 'ארית מלגזית',
-    "currency_tongan_pa_anga" => "פאאנגה טונגנית",
+    'currency_tongan_pa_anga' => 'פאאנגה טונגנית',
 
     'review_app_help' => 'We hope you\'re enjoying using the app.<br/>If you\'d consider :link we\'d greatly appreciate it!',
     'writing_a_review' => 'writing a review',
@@ -4424,7 +4422,7 @@ $lang = array(
     'activity_122' => ':user archived recurring expense :recurring_expense',
     'activity_123' => ':user deleted recurring expense :recurring_expense',
     'activity_124' => ':user restored recurring expense :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'כדי לצפות ב-:entity עליך להגדיר סיסמה.',
     'unsubscribe' => 'בטל את המנוי',
     'unsubscribed' => 'בוטל מנוי',
@@ -4928,7 +4926,7 @@ $lang = array(
     'payment_type_Klarna' => 'קלרנה',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'ניתן לשלם תוך :payeddue ימים נטו עד :paydate',
-    'xinvoice_no_buyers_reference' => "לא ניתנה התייחסות של קונה",
+    'xinvoice_no_buyers_reference' => 'לא ניתנה התייחסות של קונה',
     'xinvoice_online_payment' => 'יש לשלם את החשבונית באופן מקוון באמצעות הקישור המצורף',
     'pre_payment' => 'תשלום מראש',
     'number_of_payments' => 'מספר תשלומים',
@@ -5033,8 +5031,8 @@ $lang = array(
     'e_invoice' => 'חשבונית אלקטרונית',
     'light_dark_mode' => 'מצב אור/כהה',
     'activities' => 'פעילויות',
-    'recent_transactions' => "להלן העסקאות האחרונות של החברה שלך:",
-    'country_Palestine' => "פלשתינה",
+    'recent_transactions' => 'להלן העסקאות האחרונות של החברה שלך:',
+    'country_Palestine' => 'פלשתינה',
     'country_Taiwan' => 'טייוואן',
     'duties' => 'חובות',
     'order_number' => 'מספר הזמנה',
@@ -5249,7 +5247,7 @@ $lang = array(
     'rff' => 'טופס שדות חובה',
     'add_step' => 'הוסף שלב',
     'steps' => 'שלבים',
-    'steps_order_help' =>  'סדר השלבים חשוב. הצעד הראשון לא צריך להיות תלוי באף שלב אחר. השלב השני צריך להיות תלוי בצעד הראשון, וכן הלאה.',
+    'steps_order_help' => 'סדר השלבים חשוב. הצעד הראשון לא צריך להיות תלוי באף שלב אחר. השלב השני צריך להיות תלוי בצעד הראשון, וכן הלאה.',
     'other_steps' => 'שלבים אחרים',
     'use_available_payments' => 'השתמש בתשלומים זמינים',
     'test_email_sent' => 'דוא&quot;ל נשלח בהצלחה',
@@ -5298,6 +5296,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

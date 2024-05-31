@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,15 +24,9 @@ class BankTransactionTransformer extends EntityTransformer
 {
     use MakesHash;
 
-    /**
-     * @var array
-     */
     protected array $defaultIncludes = [
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'company',
         // 'expense',
@@ -43,7 +36,6 @@ class BankTransactionTransformer extends EntityTransformer
     ];
 
     /**
-     * @param BankTransaction $bank_transaction
      * @return array
      */
     public function transform(BankTransaction $bank_transaction)

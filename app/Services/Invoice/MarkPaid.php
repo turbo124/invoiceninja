@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -101,25 +100,25 @@ class MarkPaid extends AbstractService
         $this->invoice->next_send_date = null;
 
         $this->invoice
-                ->service()
-                ->applyNumber()
+            ->service()
+            ->applyNumber()
                 // ->deletePdf()
-                ->save();
+            ->save();
 
         $payment->ledger()
-                ->updatePaymentBalance($this->payable_balance * -1, "Marked Paid Activity");
+            ->updatePaymentBalance($this->payable_balance * -1, 'Marked Paid Activity');
 
         //06-09-2022
         $this->invoice
-             ->client
-             ->service()
-             ->updateBalanceAndPaidToDate($payment->amount * -1, $payment->amount)
-             ->save();
+            ->client
+            ->service()
+            ->updateBalanceAndPaidToDate($payment->amount * -1, $payment->amount)
+            ->save();
 
         $this->invoice = $this->invoice
-                             ->service()
-                             ->workFlow()
-                             ->save();
+            ->service()
+            ->workFlow()
+            ->save();
 
         /* Update Invoice balance */
         event(new PaymentWasCreated($payment, $payment->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));

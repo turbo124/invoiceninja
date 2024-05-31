@@ -6,30 +6,29 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Feature\Bank;
 
-use Tests\TestCase;
-use App\Models\Expense;
-use App\Models\Invoice;
-use Tests\MockAccountData;
-use App\Factory\InvoiceFactory;
-use App\Models\BankTransaction;
-use App\Factory\InvoiceItemFactory;
 use App\Factory\BankIntegrationFactory;
 use App\Factory\BankTransactionFactory;
-use Illuminate\Routing\Middleware\ThrottleRequests;
+use App\Factory\InvoiceFactory;
+use App\Factory\InvoiceItemFactory;
+use App\Models\BankTransaction;
+use App\Models\Expense;
+use App\Models\Invoice;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 class BankTransactionTest extends TestCase
 {
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -66,7 +65,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'expense_id' => $this->expense->hashed_id
+            'expense_id' => $this->expense->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -82,7 +81,6 @@ class BankTransactionTest extends TestCase
         $this->assertEquals($this->vendor->id, $bt->vendor_id);
         $this->assertEquals(BankTransaction::STATUS_CONVERTED, $bt->status_id);
 
-
         $e = Expense::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -92,7 +90,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'expense_id' => $e->hashed_id
+            'expense_id' => $e->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -113,7 +111,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'expense_id' => $e2->hashed_id
+            'expense_id' => $e2->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -124,7 +122,7 @@ class BankTransactionTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertNotNull($e2->refresh()->transaction_id);
-        
+
         $this->assertEquals("{$this->expense->hashed_id},{$e->hashed_id},{$e2->hashed_id}", $bt->fresh()->expense_id);
 
         $expense_repo = app('App\Repositories\ExpenseRepository');
@@ -134,8 +132,6 @@ class BankTransactionTest extends TestCase
         $this->assertEquals("{$this->expense->hashed_id},{$e->hashed_id}", $bt->fresh()->expense_id);
 
     }
-
-
 
     public function testLinkMultipleExpensesToTransaction()
     {
@@ -163,7 +159,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'expense_id' => $this->expense->hashed_id
+            'expense_id' => $this->expense->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -178,7 +174,6 @@ class BankTransactionTest extends TestCase
         $this->assertEquals($this->vendor->id, $bt->vendor_id);
         $this->assertEquals(BankTransaction::STATUS_CONVERTED, $bt->status_id);
 
-
         $e = Expense::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -188,7 +183,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'expense_id' => $e->hashed_id
+            'expense_id' => $e->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -202,41 +197,40 @@ class BankTransactionTest extends TestCase
 
     }
 
-
     public function testBankTransactionBulkActions()
     {
         $data = [
             'ids' => [$this->bank_integration->hashed_id],
-            'action' => 'archive'
+            'action' => 'archive',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/bank_transactions/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
 
         $data = [
             'ids' => [$this->bank_integration->hashed_id],
-            'action' => 'restore'
+            'action' => 'restore',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/bank_transactions/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
 
         $data = [
             'ids' => [$this->bank_integration->hashed_id],
-            'action' => 'delete'
+            'action' => 'delete',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/bank_transactions/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
     }
 
     public function testLinkExpenseToTransaction()
@@ -265,7 +259,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'expense_id' => $this->expense->hashed_id
+            'expense_id' => $this->expense->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -286,7 +280,7 @@ class BankTransactionTest extends TestCase
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
         $invoice->status_id = Invoice::STATUS_SENT;
-        $invoice->number = "InvoiceMatchingNumber123";
+        $invoice->number = 'InvoiceMatchingNumber123';
         $line_items = [];
 
         $item = InvoiceItemFactory::create();
@@ -303,7 +297,6 @@ class BankTransactionTest extends TestCase
         $invoice->service()->markPaid();
 
         $p = $invoice->payments->first();
-
 
         $bi = BankIntegrationFactory::create($this->company->id, $this->user->id, $this->account->id);
         $bi->save();
@@ -324,7 +317,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'payment_id' => $p->hashed_id
+            'payment_id' => $p->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -339,7 +332,6 @@ class BankTransactionTest extends TestCase
         $this->assertEquals(BankTransaction::STATUS_CONVERTED, $bt->status_id);
         $this->assertEquals($invoice->hashed_id, $bt->invoice_ids);
     }
-
 
     public function testLinkPaymentToTransaction()
     {
@@ -364,7 +356,7 @@ class BankTransactionTest extends TestCase
 
         $data['transactions'][] = [
             'id' => $bt->hashed_id,
-            'payment_id' => $this->payment->hashed_id
+            'payment_id' => $this->payment->hashed_id,
         ];
 
         $response = $this->withHeaders([
@@ -379,11 +371,10 @@ class BankTransactionTest extends TestCase
         $this->assertEquals(BankTransaction::STATUS_CONVERTED, $bt->status_id);
     }
 
-
     public function testMatchBankTransactionsValidationShouldFail()
     {
         $data = [];
-        
+
         $data['transactions'][] = [
             'bad_key' => 10,
         ];
@@ -395,7 +386,6 @@ class BankTransactionTest extends TestCase
 
         $response->assertStatus(422);
     }
-
 
     public function testMatchBankTransactionValidationShouldPass()
     {

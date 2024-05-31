@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -75,10 +74,10 @@ class QuoteExpiredObject
         $content = ctrans(
             'texts.notification_quote_expired',
             [
-                    'amount' => $this->getAmount(),
-                    'client' => $this->quote->client->present()->name(),
-                    'invoice' => $this->quote->number,
-                ]
+                'amount' => $this->getAmount(),
+                'client' => $this->quote->client->present()->name(),
+                'invoice' => $this->quote->number,
+            ]
         );
 
         $data = [

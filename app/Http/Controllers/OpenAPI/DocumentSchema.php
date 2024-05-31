@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Document",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="AS3df3A", description="The document hashed id"),
  *       @OA\Property(property="user_id", type="string", example="", description="The user hashed id"),
  *       @OA\Property(property="assigned_user_id", type="string", example="", description="The assigned user hashed id"),

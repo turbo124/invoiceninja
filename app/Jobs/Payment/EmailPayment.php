@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,10 +40,7 @@ class EmailPayment implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param Payment $payment
-     * @param $email_builder
-     * @param $contact
-     * @param $company
+     * @param  $email_builder
      */
     public function __construct(public Payment $payment, private Company $company, private ?ClientContact $contact)
     {
@@ -58,8 +54,9 @@ class EmailPayment implements ShouldQueue
      */
     public function handle()
     {
-        if ($this->company->is_disabled || (!$this->contact?->email ?? false)) {
-            nlog("company disabled - or - contact email not found");
+        if ($this->company->is_disabled || (! $this->contact?->email ?? false)) {
+            nlog('company disabled - or - contact email not found');
+
             return;
         }
 
@@ -67,7 +64,7 @@ class EmailPayment implements ShouldQueue
 
         $this->payment->load('invoices');
 
-        if (!$this->contact) {
+        if (! $this->contact) {
             $this->contact = $this->payment->client->contacts()->orderBy('is_primary', 'desc')->first();
         }
 
@@ -75,8 +72,9 @@ class EmailPayment implements ShouldQueue
 
         $email_builder = (new PaymentEmailEngine($this->payment, $this->contact))->build();
 
-        if($this->payment->client->getSetting('payment_email_all_contacts') && $this->payment->invoices && $this->payment->invoices->count() >= 1) {
+        if ($this->payment->client->getSetting('payment_email_all_contacts') && $this->payment->invoices && $this->payment->invoices->count() >= 1) {
             $this->emailAllContacts($email_builder);
+
             return;
         }
 
@@ -86,13 +84,13 @@ class EmailPayment implements ShouldQueue
 
         if ($this->payment->invoices && $this->payment->invoices->count() >= 1) {
 
-            if($this->contact) {
+            if ($this->contact) {
                 $invitation = $this->payment->invoices->first()->invitations()->where('client_contact_id', $this->contact->id)->first();
             } else {
                 $invitation = $this->payment->invoices->first()->invitations()->first();
             }
 
-            if($invitation) {
+            if ($invitation) {
                 $nmo->invitation = $invitation;
             }
         }
@@ -116,7 +114,6 @@ class EmailPayment implements ShouldQueue
 
         $invoice->invitations->each(function ($invite) use ($email_builder) {
 
-            
             $cloned_mailable = unserialize(serialize($email_builder));
 
             $nmo = new NinjaMailerObject();

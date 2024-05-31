@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,6 @@ class DesignController extends BaseController
 
     /**
      * DesignController constructor.
-     * @param DesignRepository $design_repo
      */
     public function __construct(DesignRepository $design_repo)
     {
@@ -58,30 +56,38 @@ class DesignController extends BaseController
      *      tags={"designs"},
      *      summary="Gets a list of designs",
      *      description="Lists designs",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of designs",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param DesignFilters $filters
+     *
      * @return Response|mixed
      */
     public function index(DesignFilters $filters)
@@ -94,10 +100,7 @@ class DesignController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowDesignRequest $request
-     * @param Design $design
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/designs/{id}",
@@ -105,6 +108,7 @@ class DesignController extends BaseController
      *      tags={"designs"},
      *      summary="Shows a design",
      *      description="Displays a design by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -114,28 +118,36 @@ class DesignController extends BaseController
      *          description="The Design Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the expense object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -148,10 +160,7 @@ class DesignController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditDesignRequest $request
-     * @param Design $design
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/designs/{id}/edit",
@@ -159,6 +168,7 @@ class DesignController extends BaseController
      *      tags={"designs"},
      *      summary="Shows a design for editting",
      *      description="Displays a design by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -168,28 +178,36 @@ class DesignController extends BaseController
      *          description="The Design Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the design object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -202,11 +220,7 @@ class DesignController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateDesignRequest $request
-     * @param Design $design
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/designs/{id}",
@@ -214,6 +228,7 @@ class DesignController extends BaseController
      *      tags={"designs"},
      *      summary="Updates a design",
      *      description="Handles the updating of a design by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -223,28 +238,36 @@ class DesignController extends BaseController
      *          description="The Design Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the design object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -264,10 +287,7 @@ class DesignController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateDesignRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/designs/create",
@@ -275,26 +295,34 @@ class DesignController extends BaseController
      *      tags={"designs"},
      *      summary="Gets a new blank design object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank design object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -312,10 +340,7 @@ class DesignController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreDesignRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/designs",
@@ -323,26 +348,34 @@ class DesignController extends BaseController
      *      tags={"designs"},
      *      summary="Adds a design",
      *      description="Adds an design to a company",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved design object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -413,18 +446,17 @@ class DesignController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyDesignRequest $request
-     * @param Design $design
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/designs/{id}",
      *      operationId="deleteDesign",
      *      tags={"designs"},
      *      summary="Deletes a design",
      *      description="Handles the deletion of a design by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -434,27 +466,34 @@ class DesignController extends BaseController
      *          description="The Design Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -475,23 +514,27 @@ class DesignController extends BaseController
      *
      * @return Response
      *
-     *
      * @OA\Post(
      *      path="/api/v1/designs/bulk",
      *      operationId="bulkDesigns",
      *      tags={"designs"},
      *      summary="Performs bulk actions on an array of designs",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="User credentials",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -500,22 +543,29 @@ class DesignController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Design User response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Design"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -551,9 +601,9 @@ class DesignController extends BaseController
         $company = $user->getCompany();
 
         $design = Design::where('company_id', $company->id)
-                        ->orWhereNull('company_id')
-                        ->where('id', $design_id)
-                        ->exists();
+            ->orWhereNull('company_id')
+            ->where('id', $design_id)
+            ->exists();
 
         if (! $design) {
             return response()->json(['message' => 'Design does not exist.'], 400);

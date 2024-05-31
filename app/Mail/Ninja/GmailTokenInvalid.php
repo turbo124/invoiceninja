@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -55,7 +54,7 @@ class GmailTokenInvalid extends Mailable
         $this->replyTo('contact@invoiceninja.com', 'Contact');
 
         return $this->from(config('mail.from.address'), config('mail.from.name'))
-                    ->subject(ctrans('texts.gmail_credentials_invalid_subject'))
-                    ->view('email.admin.email_quota_exceeded');
+            ->subject(ctrans('texts.gmail_credentials_invalid_subject'))
+            ->view('email.admin.email_quota_exceeded');
     }
 }

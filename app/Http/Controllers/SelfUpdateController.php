@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,9 +21,9 @@ use Illuminate\Support\Facades\Storage;
 
 class SelfUpdateController extends BaseController
 {
-    use DispatchesJobs;
-    use ClientGroupSettingsSaver;
     use AppSetup;
+    use ClientGroupSettingsSaver;
+    use DispatchesJobs;
 
     private string $filename = 'invoiceninja.tar';
 
@@ -62,10 +61,11 @@ class SelfUpdateController extends BaseController
 
         $file_headers = @get_headers($this->getDownloadUrl());
 
-        if(!is_array($file_headers))
+        if (! is_array($file_headers)) {
             return response()->json(['message' => 'There was a problem reaching the update server, please try again in a little while.'], 410);
+        }
 
-        if (stripos($file_headers[0], "404 Not Found") > 0  || (stripos($file_headers[0], "302 Found") > 0 && stripos($file_headers[7], "404 Not Found") > 0)) {
+        if (stripos($file_headers[0], '404 Not Found') > 0 || (stripos($file_headers[0], '302 Found') > 0 && stripos($file_headers[7], '404 Not Found') > 0)) {
             return response()->json(['message' => 'Download not yet available. Please try again shortly.'], 410);
         }
 
@@ -73,8 +73,9 @@ class SelfUpdateController extends BaseController
             if (copy($this->getDownloadUrl(), storage_path("app/{$this->filename}"))) {
                 nlog('Copied file from URL');
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog($e->getMessage());
+
             return response()->json(['message' => 'File exists on the server, however there was a problem downloading and copying to the local filesystem'], 500);
         }
 
@@ -100,8 +101,9 @@ class SelfUpdateController extends BaseController
             }
         }
 
-        if(Storage::disk('base')->directoryExists('resources/lang'))
+        if (Storage::disk('base')->directoryExists('resources/lang')) {
             Storage::disk('base')->deleteDirectory('resources/lang');
+        }
 
         nlog('Removing cache files');
 
@@ -123,22 +125,22 @@ class SelfUpdateController extends BaseController
     private function runModelChecks()
     {
         Company::query()
-               ->cursor()
-               ->each(function ($company) {
+            ->cursor()
+            ->each(function ($company) {
 
-                   $settings = $company->settings;
+                $settings = $company->settings;
 
-                   if(property_exists($settings->pdf_variables, 'purchase_order_details')) {
-                       return;
-                   }
+                if (property_exists($settings->pdf_variables, 'purchase_order_details')) {
+                    return;
+                }
 
-                   $pdf_variables = $settings->pdf_variables;
-                   $pdf_variables->purchase_order_details = [];
-                   $settings->pdf_variables = $pdf_variables;
-                   $company->settings = $settings;
-                   $company->save();
+                $pdf_variables = $settings->pdf_variables;
+                $pdf_variables->purchase_order_details = [];
+                $settings->pdf_variables = $pdf_variables;
+                $company->settings = $settings;
+                $company->save();
 
-               });
+            });
     }
 
     private function clearCacheDir()
@@ -166,7 +168,6 @@ class SelfUpdateController extends BaseController
 
                 nlog("Cannot update system because {$file->getFileName()} is not writable");
                 throw new FilePermissionsFailure("Cannot update system because {$file->getFileName()} is not writable");
-
             }
 
             $file = null;

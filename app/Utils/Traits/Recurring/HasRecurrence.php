@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,8 @@ trait HasRecurrence
      * Calculates the first day of the month, this will ALWAYS
      * be the first of NEXT month
      *
-     * @param  Carbon $date The given date
-     * @return Carbon       The first of NEXT month
+     * @param  Carbon  $date  The given date
+     * @return Carbon The first of NEXT month
      */
     public function calculateFirstDayOfMonth($date)
     {
@@ -32,8 +31,8 @@ trait HasRecurrence
      *
      * If it is the last day of the month - we add a month on.
      *
-     * @param  Carbon $date The start date
-     * @return Carbon       The last day of month
+     * @param  Carbon  $date  The start date
+     * @return Carbon The last day of month
      */
     public function calculateLastDayOfMonth($date)
     {
@@ -47,8 +46,8 @@ trait HasRecurrence
     /**
      * Sets the day of the month, if in the past we ADD a month
      *
-     * @param Carbon $date              The start date
-     * @param string|int $day_of_month  The day of the month
+     * @param  Carbon  $date  The start date
+     * @param  string|int  $day_of_month  The day of the month
      */
     public function setDayOfMonth($date, $day_of_month)
     {

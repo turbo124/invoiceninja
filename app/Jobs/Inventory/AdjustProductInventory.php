@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -140,7 +139,6 @@ class AdjustProductInventory implements ShouldQueue
         $nmo = new NinjaMailerObject();
         $nmo->company = $this->company;
         $nmo->settings = $this->company->settings;
-
 
         $this->company->company_users->each(function ($cu) use ($product, $nmo, $notification_level) {
 

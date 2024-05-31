@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,9 +19,6 @@ class ClientFilters extends QueryFilters
 {
     /**
      * Filter by name.
-     *
-     * @param string $name
-     * @return Builder
      */
     public function name(string $name = ''): Builder
     {
@@ -35,9 +31,6 @@ class ClientFilters extends QueryFilters
 
     /**
      * Filter by balance.
-     *
-     * @param string $balance
-     * @return Builder
      */
     public function balance(string $balance = ''): Builder
     {
@@ -52,15 +45,12 @@ class ClientFilters extends QueryFilters
 
     /**
      * Filter between balances.
-     *
-     * @param string $balance
-     * @return Builder
      */
     public function between_balance(string $balance = ''): Builder
     {
         $parts = explode(':', $balance);
 
-        if (!is_array($parts) || count($parts) != 2) {
+        if (! is_array($parts) || count($parts) != 2) {
             return $this->builder;
         }
 
@@ -118,8 +108,6 @@ class ClientFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -128,40 +116,39 @@ class ClientFilters extends QueryFilters
             return $this->builder;
         }
 
-        return  $this->builder->where(function ($query) use ($filter) {
+        return $this->builder->where(function ($query) use ($filter) {
             $query->where('name', 'like', '%'.$filter.'%')
-                          ->orWhere('id_number', 'like', '%'.$filter.'%')
-                          ->orWhere('number', 'like', '%'.$filter.'%')
-
-                          ->orWhereHas('contacts', function ($query) use ($filter) {
-                              $query->where('first_name', 'like', '%'.$filter.'%');
-                              $query->orWhere('last_name', 'like', '%'.$filter.'%');
-                              $query->orWhere('email', 'like', '%'.$filter.'%');
-                              $query->orWhere('phone', 'like', '%'.$filter.'%');
-                          })
-                          ->orWhere('custom_value1', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value2', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value3', 'like', '%'.$filter.'%')
-                          ->orWhere('custom_value4', 'like', '%'.$filter.'%');
+                ->orWhere('id_number', 'like', '%'.$filter.'%')
+                ->orWhere('number', 'like', '%'.$filter.'%')
+                ->orWhereHas('contacts', function ($query) use ($filter) {
+                    $query->where('first_name', 'like', '%'.$filter.'%');
+                    $query->orWhere('last_name', 'like', '%'.$filter.'%');
+                    $query->orWhere('email', 'like', '%'.$filter.'%');
+                    $query->orWhere('phone', 'like', '%'.$filter.'%');
+                })
+                ->orWhere('custom_value1', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value2', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value3', 'like', '%'.$filter.'%')
+                ->orWhere('custom_value4', 'like', '%'.$filter.'%');
         });
     }
 
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
-        if($sort_col[0] == 'documents')
+        if ($sort_col[0] == 'documents') {
             return $this->builder;
+        }
 
         if ($sort_col[0] == 'display_name') {
             $sort_col[0] = 'name';
@@ -169,8 +156,8 @@ class ClientFilters extends QueryFilters
 
         $dir = ($sort_col[1] == 'asc') ? 'asc' : 'desc';
 
-        if($sort_col[0] == 'number') {
-            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
+        if ($sort_col[0] == 'number') {
+            return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 ".$dir);
         }
 
         return $this->builder->orderBy($sort_col[0], $dir);
@@ -178,8 +165,6 @@ class ClientFilters extends QueryFilters
 
     /**
      * Filters the query by the users company ID.
-     *
-     * @return Builder
      */
     public function entityFilter(): Builder
     {

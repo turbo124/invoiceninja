@@ -5,39 +5,38 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Integration;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Client;
+use App\DataMapper\CompanySettings;
+use App\DataMapper\InvoiceItem;
+use App\Factory\CompanyUserFactory;
+use App\Jobs\Ledger\UpdateLedger;
 use App\Models\Account;
+use App\Models\Client;
+use App\Models\ClientContact;
 use App\Models\Company;
+use App\Models\CompanyLedger;
+use App\Models\CompanyToken;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\CompanyToken;
-use App\Models\ClientContact;
-use App\Models\CompanyLedger;
+use App\Models\User;
 use App\Utils\Traits\AppSetup;
-use App\DataMapper\InvoiceItem;
 use App\Utils\Traits\MakesHash;
-use App\Jobs\Ledger\UpdateLedger;
-use App\DataMapper\CompanySettings;
-use App\Factory\CompanyUserFactory;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 /** @test*/
 class CompanyLedgerTest extends TestCase
 {
+    use AppSetup;
     use DatabaseTransactions;
     use MakesHash;
-    use AppSetup;
-    
+
     public $company;
 
     public $client;
@@ -49,8 +48,8 @@ class CompanyLedgerTest extends TestCase
     public $account;
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +57,7 @@ class CompanyLedgerTest extends TestCase
 
         $this->artisan('db:seed --force');
         $this->buildCache(true);
-        
+
         $this->faker = \Faker\Factory::create();
         $fake_email = $this->faker->email();
 
@@ -90,9 +89,8 @@ class CompanyLedgerTest extends TestCase
         $this->account->default_company_id = $this->company->id;
         $this->account->save();
 
-
         $user = User::whereEmail($fake_email)->first();
-        
+
         if (! $user) {
             $user = User::factory()->create([
                 'email' => $fake_email,
@@ -139,7 +137,7 @@ class CompanyLedgerTest extends TestCase
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
             'balance' => 0,
-            'paid_to_date' => 0
+            'paid_to_date' => 0,
         ]);
 
         $i = Invoice::factory()->create([
@@ -171,7 +169,7 @@ class CompanyLedgerTest extends TestCase
 
         // $i->service()->markSent()->save();
         // $i = $i->fresh();
-                
+
         // // \Illuminate\Support\Facades\Bus::fake();
         // // \Illuminate\Support\Facades\Bus::assertDispatched(UpdateLedger::class);
 
@@ -191,7 +189,7 @@ class CompanyLedgerTest extends TestCase
         // $cl = CompanyLedger::where('client_id', $i->client_id)
         //                    ->orderBy('id', 'desc')
         //                    ->first();
-                           
+
         // $cl = $i->company_ledger()->orderBy('id','desc')->first();
         // (new UpdateLedger($cl->id, $i->amount, $i->company->company_key, $i->company->db))->handle();
         // $cl = $cl->fresh();
@@ -200,8 +198,6 @@ class CompanyLedgerTest extends TestCase
 
         // $this->assertEquals(-40, $cl->adjustment);
         // $this->assertEquals(60, $cl->balance);
-
-
 
     }
 
@@ -235,7 +231,7 @@ class CompanyLedgerTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/invoices/', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
         $acc = $response->json();
 
@@ -257,7 +253,7 @@ class CompanyLedgerTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/invoices/', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
         $acc = $response->json();
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -126,13 +125,13 @@ use Laracasts\Presenter\PresentableTrait;
  */
 class Credit extends BaseModel
 {
-    use MakesHash;
     use Filterable;
     use MakesDates;
-    use SoftDeletes;
-    use PresentableTrait;
+    use MakesHash;
     use MakesInvoiceValues;
     use MakesReminders;
+    use PresentableTrait;
+    use SoftDeletes;
 
     protected $presenter = CreditPresenter::class;
 
@@ -310,7 +309,7 @@ class Credit extends BaseModel
      *
      * @return InvoiceSumInclusive | InvoiceSum The invoice calculator object getters
      */
-    public function calc(): InvoiceSumInclusive | InvoiceSum
+    public function calc(): InvoiceSumInclusive|InvoiceSum
     {
         $credit_calc = null;
 
@@ -329,7 +328,7 @@ class Credit extends BaseModel
     }
 
     /**
-     * @param float $balance_adjustment
+     * @param  float  $balance_adjustment
      */
     public function updateBalance($balance_adjustment)
     {

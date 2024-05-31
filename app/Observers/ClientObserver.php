@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -54,24 +53,23 @@ class ClientObserver
     /**
      * Handle the client "created" event.
      *
-     * @param Client $client
      * @return void
      */
     public function created(Client $client)
     {
         /** Fix Tax Data for Clients */
-        if ($client->country_id == 840 && $client->company->calculate_taxes && !$client->company->account->isFreeHostedClient()) {
+        if ($client->country_id == 840 && $client->company->calculate_taxes && ! $client->company->account->isFreeHostedClient()) {
             UpdateTaxData::dispatch($client, $client->company);
         }
 
         /** Check VAT records for client */
-        if(in_array($client->country_id, $this->eu_country_codes) && $client->company->calculate_taxes) {
+        if (in_array($client->country_id, $this->eu_country_codes) && $client->company->calculate_taxes) {
             CheckVat::dispatch($client, $client->company);
         }
 
         $subscriptions = Webhook::where('company_id', $client->company_id)
-                                    ->where('event_id', Webhook::EVENT_CREATE_CLIENT)
-                                    ->exists();
+            ->where('event_id', Webhook::EVENT_CREATE_CLIENT)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_CREATE_CLIENT, $client, $client->company)->delay(0);
@@ -81,25 +79,24 @@ class ClientObserver
     /**
      * Handle the client "updated" event.
      *
-     * @param Client $client
      * @return void
      */
     public function updated(Client $client)
     {
 
         /** Monitor postal code changes for US based clients for tax calculations */
-        if(($client->getOriginal('shipping_postal_code') != $client->shipping_postal_code || $client->getOriginal('postal_code') != $client->postal_code) && $client->country_id == 840 && $client->company->calculate_taxes && !$client->company->account->isFreeHostedClient()) {
+        if (($client->getOriginal('shipping_postal_code') != $client->shipping_postal_code || $client->getOriginal('postal_code') != $client->postal_code) && $client->country_id == 840 && $client->company->calculate_taxes && ! $client->company->account->isFreeHostedClient()) {
             UpdateTaxData::dispatch($client, $client->company);
         }
 
         /** Monitor vat numbers for EU based clients for tax calculations */
-        if($client->getOriginal('vat_number') != $client->vat_number && in_array($client->country_id, $this->eu_country_codes) && $client->company->calculate_taxes) {
+        if ($client->getOriginal('vat_number') != $client->vat_number && in_array($client->country_id, $this->eu_country_codes) && $client->company->calculate_taxes) {
             CheckVat::dispatch($client, $client->company);
         }
 
         $event = Webhook::EVENT_UPDATE_CLIENT;
 
-        if ($client->getOriginal('deleted_at') && !$client->deleted_at) {
+        if ($client->getOriginal('deleted_at') && ! $client->deleted_at) {
             $event = Webhook::EVENT_RESTORE_CLIENT;
         }
 
@@ -108,8 +105,8 @@ class ClientObserver
         }
 
         $subscriptions = Webhook::where('company_id', $client->company_id)
-                                    ->where('event_id', $event)
-                                    ->exists();
+            ->where('event_id', $event)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch($event, $client, $client->company, 'client')->delay(0);
@@ -119,7 +116,6 @@ class ClientObserver
     /**
      * Handle the client "archived" event.
      *
-     * @param Client $client
      * @return void
      */
     public function deleted(Client $client)
@@ -129,8 +125,8 @@ class ClientObserver
         }
 
         $subscriptions = Webhook::where('company_id', $client->company_id)
-                                    ->where('event_id', Webhook::EVENT_ARCHIVE_CLIENT)
-                                    ->exists();
+            ->where('event_id', Webhook::EVENT_ARCHIVE_CLIENT)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_ARCHIVE_CLIENT, $client, $client->company)->delay(0);

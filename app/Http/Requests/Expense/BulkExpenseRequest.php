@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,11 +36,10 @@ class BulkExpenseRequest extends Request
         $user = auth()->user();
 
         return [
-            'ids' => ['required','bail','array', Rule::exists('expenses', 'id')->where('company_id', $user->company()->id)],
+            'ids' => ['required', 'bail', 'array', Rule::exists('expenses', 'id')->where('company_id', $user->company()->id)],
             'category_id' => ['sometimes', 'bail', Rule::exists('expense_categories', 'id')->where('company_id', $user->company()->id)],
             'action' => 'in:archive,restore,delete,bulk_categorize',
         ];
-
 
     }
 

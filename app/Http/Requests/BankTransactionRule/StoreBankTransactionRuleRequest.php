@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,8 +21,6 @@ class StoreBankTransactionRuleRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -31,7 +28,7 @@ class StoreBankTransactionRuleRequest extends Request
         $user = auth()->user();
 
         return $user->can('create', BankTransactionRule::class) && $user->account->hasFeature(Account::FEATURE_API);
-        ;
+
     }
 
     public function rules()

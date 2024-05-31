@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,17 +23,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\VendorController
  */
 class VendorApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,6 @@ class VendorApiTest extends TestCase
 
         Model::reguard();
     }
-
 
     public function testVendorContactCreation()
     {
@@ -69,31 +68,30 @@ class VendorApiTest extends TestCase
     {
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
         $vc = \App\Models\VendorContact::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
-            'vendor_id' => $v->id
+            'vendor_id' => $v->id,
         ]);
 
         $this->assertNull($v->last_login);
         $this->assertNull($vc->last_login);
-        
+
         Event::fake();
         event(new VendorContactLoggedIn($vc, $this->company, Ninja::eventVars()));
 
-
         Event::assertDispatched(VendorContactLoggedIn::class);
-        
+
     }
 
     public function testVendorLocale()
     {
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
         $this->assertNotNull($v->locale());
@@ -104,7 +102,7 @@ class VendorApiTest extends TestCase
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
-            'language_id' => '1'
+            'language_id' => '1',
         ]);
 
         $this->assertEquals('en', $v->locale());
@@ -122,7 +120,7 @@ class VendorApiTest extends TestCase
 
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $c->id
+            'company_id' => $c->id,
         ]);
 
         $this->assertEquals('it', $v->locale());
@@ -137,7 +135,6 @@ class VendorApiTest extends TestCase
 
         $response->assertStatus(200);
     }
-
 
     public function testAddVendorLanguage200()
     {
@@ -164,12 +161,12 @@ class VendorApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->putJson("/api/v1/vendors/{$id}", $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
         $this->assertEquals('3', $arr['data']['language_id']);
-        
+
     }
 
     public function testAddVendorLanguage422()
@@ -183,9 +180,8 @@ class VendorApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/vendors', $data)->assertStatus(422);
-        
-    }
 
+    }
 
     public function testAddVendorLanguage()
     {
@@ -201,10 +197,9 @@ class VendorApiTest extends TestCase
 
         $response->assertStatus(200);
         $arr = $response->json();
-        
+
         $this->assertEquals('1', $arr['data']['language_id']);
     }
-
 
     public function testAddVendorToInvoice()
     {

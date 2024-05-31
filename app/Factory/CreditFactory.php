@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -16,7 +15,7 @@ use App\Models\Credit;
 
 class CreditFactory
 {
-    public static function create(int $company_id, int $user_id, object $settings = null, Client $client = null): Credit
+    public static function create(int $company_id, int $user_id, ?object $settings = null, ?Client $client = null): Credit
     {
         $credit = new Credit();
         $credit->status_id = Credit::STATUS_DRAFT;
@@ -50,6 +49,7 @@ class CreditFactory
         $credit->company_id = $company_id;
         $credit->recurring_id = null;
         $credit->exchange_rate = 1;
+
         return $credit;
     }
 }

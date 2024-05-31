@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="BankIntegration",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="AS3df3A", description="The bank integration hashed id"),
  *       @OA\Property(property="company_id", type="string", example="AS3df3A", description="The company hashed id"),
  *       @OA\Property(property="user_id", type="string", example="AS3df3A", description="The user hashed id"),

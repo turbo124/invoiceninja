@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -17,8 +16,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 class CreateCompanyPaymentTerms
 {
-    use MakesHash;
     use Dispatchable;
+    use MakesHash;
 
     protected $company;
 
@@ -26,9 +25,6 @@ class CreateCompanyPaymentTerms
 
     /**
      * Create a new job instance.
-     *
-     * @param $company
-     * @param $user
      */
     public function __construct($company, $user)
     {
@@ -46,7 +42,7 @@ class CreateCompanyPaymentTerms
     {
         $paymentTerms = [
             ['num_days' => 0, 'name' => 'Net 0', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],
-            ['num_days' => 7,  'name'  => '', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],
+            ['num_days' => 7,  'name' => '', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],
             ['num_days' => 10, 'name' => '', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],
             ['num_days' => 14, 'name' => '', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],
             ['num_days' => 15, 'name' => '', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],

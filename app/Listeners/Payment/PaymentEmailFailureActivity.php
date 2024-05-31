@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,7 +30,7 @@ class PaymentEmailFailureActivity implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param object $event
+     * @param  object  $event
      * @return void
      */
     public function handle($event)

@@ -5,13 +5,11 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Unit;
 
-use App\DataProviders\Domains;
 use Tests\TestCase;
 
 /**
@@ -19,8 +17,7 @@ use Tests\TestCase;
  */
 class DomainCheckTest extends TestCase
 {
-
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -42,6 +39,6 @@ class DomainCheckTest extends TestCase
 
     public function checker($subdomain)
     {
-        return (!preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/', $subdomain));
+        return ! preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/', $subdomain);
     }
 }

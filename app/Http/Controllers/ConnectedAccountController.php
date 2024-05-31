@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,9 +36,7 @@ class ConnectedAccountController extends BaseController
     /**
      * Connect an OAuth account to a regular email/password combination account
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     *
      *
      * @OA\Post(
      *      path="/api/v1/connected_account",
@@ -47,27 +44,35 @@ class ConnectedAccountController extends BaseController
      *      tags={"connected_account"},
      *      summary="Connect an oauth user to an existing user",
      *      description="Refreshes the dataset",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
      *      @OA\Parameter(ref="#/components/parameters/include_static"),
      *      @OA\Parameter(ref="#/components/parameters/clear_cache"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Company User response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/User"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -83,9 +88,9 @@ class ConnectedAccountController extends BaseController
         }
 
         return response()
-        ->json(['message' => 'Provider not supported'], 400)
-        ->header('X-App-Version', config('ninja.app_version'))
-        ->header('X-Api-Version', config('ninja.minimum_client_version'));
+            ->json(['message' => 'Provider not supported'], 400)
+            ->header('X-App-Version', config('ninja.app_version'))
+            ->header('X-Api-Version', config('ninja.minimum_client_version'));
     }
 
     private function handleMicrosoftOauth($request)
@@ -93,21 +98,21 @@ class ConnectedAccountController extends BaseController
         $access_token = false;
         $access_token = $request->has('access_token') ? $request->input('access_token') : $request->input('accessToken');
 
-        if (!$access_token) {
+        if (! $access_token) {
             return response()->json(['message' => 'No access_token parameter found!'], 400);
         }
 
         $graph = new \Microsoft\Graph\Graph();
         $graph->setAccessToken($access_token);
 
-        $user = $graph->createRequest("GET", "/me")
-                      ->setReturnType(Model\User::class)
-                      ->execute();
+        $user = $graph->createRequest('GET', '/me')
+            ->setReturnType(Model\User::class)
+            ->execute();
 
         if ($user) {
             $email = $user->getUserPrincipalName() ?? false;
 
-            nlog("microsoft");
+            nlog('microsoft');
             nlog($email);
 
             if (auth()->user()->email != $email && MultiDB::checkUserEmailExists($email)) {
@@ -118,9 +123,8 @@ class ConnectedAccountController extends BaseController
                 'email' => $email,
                 'oauth_user_id' => $user->getId(),
                 'oauth_provider_id' => 'microsoft',
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
             ];
-
 
             /** @var \App\Models\User $user */
             $user = auth()->user();
@@ -135,9 +139,9 @@ class ConnectedAccountController extends BaseController
         }
 
         return response()
-        ->json(['message' => ctrans('texts.invalid_credentials')], 401)
-        ->header('X-App-Version', config('ninja.app_version'))
-        ->header('X-Api-Version', config('ninja.minimum_client_version'));
+            ->json(['message' => ctrans('texts.invalid_credentials')], 401)
+            ->header('X-App-Version', config('ninja.app_version'))
+            ->header('X-Api-Version', config('ninja.minimum_client_version'));
     }
 
     private function handleGoogleOauth()
@@ -182,9 +186,9 @@ class ConnectedAccountController extends BaseController
         }
 
         return response()
-        ->json(['message' => ctrans('texts.invalid_credentials')], 401)
-        ->header('X-App-Version', config('ninja.app_version'))
-        ->header('X-Api-Version', config('ninja.minimum_client_version'));
+            ->json(['message' => ctrans('texts.invalid_credentials')], 401)
+            ->header('X-App-Version', config('ninja.app_version'))
+            ->header('X-Api-Version', config('ninja.minimum_client_version'));
     }
 
     public function handleGmailOauth(Request $request)
@@ -236,9 +240,9 @@ class ConnectedAccountController extends BaseController
         }
 
         return response()
-        ->json(['message' => ctrans('texts.invalid_credentials')], 401)
-        ->header('X-App-Version', config('ninja.app_version'))
-        ->header('X-Api-Version', config('ninja.minimum_client_version'));
+            ->json(['message' => ctrans('texts.invalid_credentials')], 401)
+            ->header('X-App-Version', config('ninja.app_version'))
+            ->header('X-Api-Version', config('ninja.minimum_client_version'));
     }
 
     private function activateGmail(User $user)

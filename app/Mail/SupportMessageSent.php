@@ -84,14 +84,14 @@ class SupportMessageSent extends Mailable
         }
 
         return $this->from(config('mail.from.address'), $user->present()->name())
-                ->replyTo($user->email, $user->present()->name())
-                ->subject($subject)
-                ->view('email.support.message', [
-                    'support_message' => nl2br($this->data['message']),
-                    'system_info' => $system_info,
-                    'laravel_log' => $log_lines,
-                    'logo' => $company->present()->logo(),
-                    'settings' => $company->settings,
-                ]);
+            ->replyTo($user->email, $user->present()->name())
+            ->subject($subject)
+            ->view('email.support.message', [
+                'support_message' => nl2br($this->data['message']),
+                'system_info' => $system_info,
+                'laravel_log' => $log_lines,
+                'logo' => $company->present()->logo(),
+                'settings' => $company->settings,
+            ]);
     }
 }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,11 +26,11 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Services\Pdf\PdfService
  */
 class PdfmockTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -62,7 +61,6 @@ class PdfmockTest extends TestCase
         $pdf_config = (new PdfConfiguration($pdf_service));
 
         $this->assertNotNull($pdf_config);
-
 
     }
 
@@ -98,7 +96,7 @@ class PdfmockTest extends TestCase
         $pdf_config->setPdfVariables();
         $pdf_config->design = Design::find(2);
         $pdf_config->currency_entity = $mock->client;
-        
+
         $pdf_service->config = $pdf_config;
 
         $pdf_designer = (new \App\Services\Pdf\PdfDesigner($pdf_service))->build();
@@ -114,5 +112,4 @@ class PdfmockTest extends TestCase
 
         $this->assertNotNull($html);
     }
-
 }

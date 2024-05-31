@@ -5,25 +5,21 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Requests\Report;
 
-use App\Utils\Ninja;
 use App\Http\Requests\Request;
+use App\Utils\Ninja;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class ProfitLossRequest extends Request
 {
-
     private string $error_message = '';
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -54,15 +50,16 @@ class ProfitLossRequest extends Request
         $this->replace($input);
     }
 
-        private function checkAuthority()
+    private function checkAuthority()
     {
         $this->error_message = ctrans('texts.authorization_failure');
 
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        
-        if(Ninja::isHosted() && $user->account->isFreeHostedClient()){
+
+        if (Ninja::isHosted() && $user->account->isFreeHostedClient()) {
             $this->error_message = ctrans('texts.upgrade_to_view_reports');
+
             return false;
         }
 
@@ -74,5 +71,4 @@ class ProfitLossRequest extends Request
     {
         throw new AuthorizationException($this->error_message);
     }
-
 }

@@ -5,13 +5,11 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Mail\Admin;
 
-use App\Mail\Engine\PaymentEmailEngine;
 use App\Models\Payment;
 use App\Utils\Ninja;
 use App\Utils\Number;
@@ -87,9 +85,9 @@ class EntityPaidObject
         $content = ctrans(
             'texts.notification_payment_paid',
             ['amount' => $amount,
-                    'client' => $this->payment->client->present()->name(),
-                    'invoice' => $invoice_texts,
-                ]
+                'client' => $this->payment->client->present()->name(),
+                'invoice' => $invoice_texts,
+            ]
         );
 
         $data = [
@@ -110,5 +108,4 @@ class EntityPaidObject
 
         return $data;
     }
-
 }

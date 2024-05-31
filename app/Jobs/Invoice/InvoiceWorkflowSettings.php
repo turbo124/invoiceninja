@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,8 +32,6 @@ class InvoiceWorkflowSettings implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param Invoice $invoice
      */
     public function __construct(public Invoice $invoice)
     {

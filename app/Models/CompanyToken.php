@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\CompanyUser|null $cu
  * @property-read mixed $hashed_id
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyToken filter(\App\Filters\QueryFilters $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyToken newModelQuery()
@@ -42,13 +42,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyToken withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyToken withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class CompanyToken extends BaseModel
 {
-    use SoftDeletes;
-    use Filterable;
     use \Awobaz\Compoships\Compoships;
+    use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -84,8 +85,8 @@ class CompanyToken extends BaseModel
     public function company_user(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(CompanyUser::class, 'user_id', 'user_id')
-                    ->where('company_id', $this->company_id)
-                    ->where('user_id', $this->user_id);
+            ->where('company_id', $this->company_id)
+            ->where('user_id', $this->user_id);
     }
 
     /**

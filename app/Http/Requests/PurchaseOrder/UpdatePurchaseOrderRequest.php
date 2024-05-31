@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,13 +19,11 @@ use Illuminate\Validation\Rule;
 class UpdatePurchaseOrderRequest extends Request
 {
     use ChecksEntityStatus;
-    use MakesHash;
     use CleanLineItems;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -53,14 +50,14 @@ class UpdatePurchaseOrderRequest extends Request
 
         $rules['line_items'] = 'array';
 
-$rules['discount'] = 'sometimes|numeric|max:99999999999999';
+        $rules['discount'] = 'sometimes|numeric|max:99999999999999';
         $rules['is_amount_discount'] = ['boolean'];
 
         if ($this->file('documents') && is_array($this->file('documents'))) {
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -85,7 +82,7 @@ $rules['discount'] = 'sometimes|numeric|max:99999999999999';
 
         $input['id'] = $this->purchase_order->id;
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 

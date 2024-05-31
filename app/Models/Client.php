@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -100,29 +99,32 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SystemLog> $system_logs
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Task> $tasks
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringInvoice> $recurring_invoices
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Client exclude($columns)
  * @method static \Database\Factories\ClientFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Client filter(\App\Filters\QueryFilters $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Client without()
  * @method static \Illuminate\Database\Eloquent\Builder|Client find()
  * @method static \Illuminate\Database\Eloquent\Builder|Client select()
+ *
  * @property string $payment_balance
  * @property mixed $tax_data
  * @property int $is_tax_exempt
  * @property int $has_valid_vat_number
+ *
  * @mixin \Eloquent
  */
 class Client extends BaseModel implements HasLocalePreference
 {
-    use PresentableTrait;
-    use MakesHash;
-    use MakesDates;
-    use SoftDeletes;
-    use Filterable;
-    use GeneratesCounter;
     use AppSetup;
     use ClientGroupSettingsSaver;
     use Excludable;
+    use Filterable;
+    use GeneratesCounter;
+    use MakesDates;
+    use MakesHash;
+    use PresentableTrait;
+    use SoftDeletes;
 
     protected $presenter = ClientPresenter::class;
 
@@ -231,7 +233,6 @@ class Client extends BaseModel implements HasLocalePreference
         'custom_value4',
     ];
 
-
     public function getEntityType()
     {
         return self::class;
@@ -272,16 +273,16 @@ class Client extends BaseModel implements HasLocalePreference
      * Allows the storage of multiple tokens
      * per client per gateway per payment_method
      *
-     * @param  int $company_gateway_id  The company gateway ID
-     * @param  int $payment_method_id   The payment method ID
-     * @return ClientGatewayToken       The client token record
+     * @param  int  $company_gateway_id  The company gateway ID
+     * @param  int  $payment_method_id  The payment method ID
+     * @return ClientGatewayToken The client token record
      */
     public function gateway_token($company_gateway_id, $payment_method_id)
     {
         return $this->gateway_tokens()
-                    ->whereCompanyGatewayId($company_gateway_id)
-                    ->whereGatewayTypeId($payment_method_id)
-                    ->first();
+            ->whereCompanyGatewayId($company_gateway_id)
+            ->whereGatewayTypeId($payment_method_id)
+            ->first();
     }
 
     public function credits(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -465,8 +466,8 @@ class Client extends BaseModel implements HasLocalePreference
      * which cascades from
      * Client > Group > Company.
      *
-     * @param  string $setting The Setting parameter
-     * @return mixed          The setting requested
+     * @param  string  $setting  The Setting parameter
+     * @return mixed The setting requested
      */
     public function getSetting($setting): mixed
     {
@@ -479,7 +480,7 @@ class Client extends BaseModel implements HasLocalePreference
                 return $this->settings->{$setting};
             } elseif (is_int($this->settings->{$setting})) {
                 return $this->settings->{$setting};
-            } elseif(is_float($this->settings->{$setting})) {
+            } elseif (is_float($this->settings->{$setting})) {
                 return $this->settings->{$setting};
             }
         }
@@ -550,7 +551,7 @@ class Client extends BaseModel implements HasLocalePreference
 
                 $cg = CompanyGateway::query()->find($pm['company_gateway_id']);
 
-                if($cg->gateway_key == '80af24a6a691230bbec33e930ab40666') { //ensure we don't attempt to authorize paypal platform - yet.
+                if ($cg->gateway_key == '80af24a6a691230bbec33e930ab40666') { //ensure we don't attempt to authorize paypal platform - yet.
                     continue;
                 }
 
@@ -618,7 +619,6 @@ class Client extends BaseModel implements HasLocalePreference
         return null;
     }
 
-
     //todo refactor this  - it is only searching for existing tokens
     public function getBankTransferGateway(): ?CompanyGateway
     {
@@ -679,7 +679,6 @@ class Client extends BaseModel implements HasLocalePreference
             }
         }
 
-
         return null;
     }
 
@@ -694,15 +693,15 @@ class Client extends BaseModel implements HasLocalePreference
         }
 
         //Special handler for GoCardless
-        if($this->currency()->code == 'CAD' && ($this->getBankTransferGateway()->gateway_key == 'b9886f9257f0c6ee7c302f1c74475f6c') ?? false) {
+        if ($this->currency()->code == 'CAD' && ($this->getBankTransferGateway()->gateway_key == 'b9886f9257f0c6ee7c302f1c74475f6c') ?? false) {
             return GatewayType::DIRECT_DEBIT;
         }
 
-        if (in_array($this->currency()->code, ['EUR', 'GBP','DKK','SEK','AUD','NZD','USD'])) {
+        if (in_array($this->currency()->code, ['EUR', 'GBP', 'DKK', 'SEK', 'AUD', 'NZD', 'USD'])) {
             return GatewayType::DIRECT_DEBIT;
         }
 
-        if(in_array($this->currency()->code, ['CAD'])) {
+        if (in_array($this->currency()->code, ['CAD'])) {
             return GatewayType::ACSS;
         }
     }
@@ -759,6 +758,7 @@ class Client extends BaseModel implements HasLocalePreference
 
         return $this->company->company_key.'/'.$this->client_hash.'/'.$contact_key.'/invoices/';
     }
+
     public function e_document_filepath($invitation): string
     {
         $contact_key = $invitation->contact->contact_key;
@@ -804,13 +804,13 @@ class Client extends BaseModel implements HasLocalePreference
         $terms = &$data['terms'];
         $footer = &$data['footer'];
 
-        if (!$terms || ($terms && strlen((string)$terms) == 0)) {
+        if (! $terms || ($terms && strlen((string) $terms) == 0)) {
             $defaults['terms'] = $this->getSetting($entity_name.'_terms');
         } elseif ($terms) {
             $defaults['terms'] = $data['terms'];
         }
 
-        if (!$footer || ($footer && strlen((string)$footer) == 0)) {
+        if (! $footer || ($footer && strlen((string) $footer) == 0)) {
             $defaults['footer'] = $this->getSetting($entity_name.'_footer');
         } elseif ($footer) {
             $defaults['footer'] = $data['footer'];
@@ -871,6 +871,6 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function portalUrl(bool $use_react_url): string
     {
-        return $use_react_url ? config('ninja.react_url'). "/#/clients/{$this->hashed_id}" : config('ninja.app_url');
+        return $use_react_url ? config('ninja.react_url')."/#/clients/{$this->hashed_id}" : config('ninja.app_url');
     }
 }

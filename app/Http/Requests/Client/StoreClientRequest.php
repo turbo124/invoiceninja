@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -13,7 +12,6 @@ namespace App\Http\Requests\Client;
 
 use App\DataMapper\ClientSettings;
 use App\Http\Requests\Request;
-use App\Http\ValidationRules\Client\CountryCodeExistsRule;
 use App\Http\ValidationRules\Ninja\CanStoreClientsRule;
 use App\Http\ValidationRules\ValidClientGroupSettingsRule;
 use App\Models\Client;
@@ -28,12 +26,10 @@ class StoreClientRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
-        /** @var  \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         return $user->can('create', Client::class);
@@ -41,15 +37,14 @@ class StoreClientRequest extends Request
 
     public function rules()
     {
-        /** @var  \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         if ($this->file('documents') && is_array($this->file('documents'))) {
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }
-        else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -97,13 +92,13 @@ class StoreClientRequest extends Request
         $user = auth()->user();
 
         /* Default settings */
-        $settings = (array)ClientSettings::defaults();
+        $settings = (array) ClientSettings::defaults();
 
         /* Stub settings if they don't exist */
-        if (!array_key_exists('settings', $input)) {
+        if (! array_key_exists('settings', $input)) {
             $input['settings'] = [];
         } elseif (is_object($input['settings'])) {
-            $input['settings'] = (array)$input['settings'];
+            $input['settings'] = (array) $input['settings'];
         }
 
         /* Merge default into base settings */
@@ -133,11 +128,9 @@ class StoreClientRequest extends Request
             } else {
                 $input['settings']['currency_id'] = (string) $user->company()->settings->currency_id;
             }
-        } 
-        elseif (! array_key_exists('currency_id', $input['settings'])) {
+        } elseif (! array_key_exists('currency_id', $input['settings'])) {
             $input['settings']['currency_id'] = (string) $user->company()->settings->currency_id;
-        }
-        elseif (empty($input['settings']['currency_id']) ?? true) {
+        } elseif (empty($input['settings']['currency_id']) ?? true) {
             $input['settings']['currency_id'] = (string) $user->company()->settings->currency_id;
         }
 
@@ -152,7 +145,6 @@ class StoreClientRequest extends Request
                 unset($input['settings']['language_id']);
             }
         }
-
 
         // allow setting country_id by iso code
         if (isset($input['country_code'])) {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,17 +23,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Jobs\Invoice\EmailInvoice
  */
 class InvoiceEmailTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
     use GeneratesCounter;
+    use MockAccountData;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +56,6 @@ class InvoiceEmailTest extends TestCase
 
         $this->assertTrue(strpos($email, '@example.com') !== false);
     }
-    
 
     public function testClientEmailHistory()
     {
@@ -81,11 +80,10 @@ class InvoiceEmailTest extends TestCase
                         'date' => \Carbon\Carbon::parse('2023-10-10')->format('Y-m-d H:m:s') ?? '',
                     ],
                 ],
-            ]
+            ],
         ];
-                
-        $system_log->save();
 
+        $system_log->save();
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -99,9 +97,9 @@ class InvoiceEmailTest extends TestCase
         $this->assertEquals('invoice', $arr[0]['entity_type']);
 
         $count = SystemLog::where('client_id', $this->client->id)
-                ->where('category_id', SystemLog::CATEGORY_MAIL)
-                ->orderBy('id', 'DESC')
-                ->count();
+            ->where('category_id', SystemLog::CATEGORY_MAIL)
+            ->orderBy('id', 'DESC')
+            ->count();
 
         $this->assertEquals(1, $count);
     }
@@ -129,9 +127,9 @@ class InvoiceEmailTest extends TestCase
                         'date' => \Carbon\Carbon::parse('2023-10-10')->format('Y-m-d H:m:s') ?? '',
                     ],
                 ],
-            ]
+            ],
         ];
-                
+
         $system_log->save();
 
         $data = [
@@ -152,23 +150,22 @@ class InvoiceEmailTest extends TestCase
         $this->assertEquals($this->invoice->hashed_id, $arr[0]['entity_id']);
 
         $count = SystemLog::where('company_id', $this->company->id)
-                ->where('category_id', SystemLog::CATEGORY_MAIL)
-                ->whereJsonContains('log->history->entity_id', $this->invoice->hashed_id)
-                ->count();
+            ->where('category_id', SystemLog::CATEGORY_MAIL)
+            ->whereJsonContains('log->history->entity_id', $this->invoice->hashed_id)
+            ->count();
 
         $this->assertEquals(1, $count);
 
     }
 
-
     public function testTemplateValidation()
     {
         $data = [
-            "body" => "hey what's up",
-            "entity" => 'invoice',
-            "entity_id"=> $this->invoice->hashed_id,
-            "subject"=> 'Reminder $number',
-            "template"=> "first_custom"
+            'body' => "hey what's up",
+            'entity' => 'invoice',
+            'entity_id' => $this->invoice->hashed_id,
+            'subject' => 'Reminder $number',
+            'template' => 'first_custom',
         ];
 
         $response = false;
@@ -193,7 +190,7 @@ class InvoiceEmailTest extends TestCase
             'template' => 'email_template_invoice',
             'entity' => 'invoice',
             'entity_id' => $this->invoice->hashed_id,
-            'cc_email' => 'jj@gmail.com'
+            'cc_email' => 'jj@gmail.com',
         ];
 
         $response = false;
@@ -231,7 +228,6 @@ class InvoiceEmailTest extends TestCase
 
         Bus::fake();
 
-
         $this->invoice->invitations->each(function ($invitation) {
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
@@ -264,7 +260,6 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
                 Bus::assertDispatched(EmailEntity::class);
 
             }
@@ -295,7 +290,6 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
                 Bus::assertDispatched(EmailEntity::class);
 
             }
@@ -321,7 +315,6 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
                 Bus::assertDispatched(EmailEntity::class);
 
             }

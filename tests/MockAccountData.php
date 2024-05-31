@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -69,47 +68,23 @@ use Illuminate\Support\Facades\Storage;
  */
 trait MockAccountData
 {
-    use MakesHash;
     use GeneratesCounter;
+    use MakesHash;
 
-    /**
-     * @var
-     */
     public $project;
 
-    /**
-     * @var
-     */
     public $account;
 
-    /**
-     * @var
-     */
     public $company;
 
-    /**
-     * @var
-     */
     public $user;
 
-    /**
-     * @var
-     */
     public $client;
 
-    /**
-     * @var
-     */
     public $token;
 
-    /**
-     * @var
-     */
     public $recurring_expense;
 
-    /**
-     * @var
-     */
     public $recurring_quote;
 
     /**
@@ -122,79 +97,36 @@ trait MockAccountData
      */
     public $invoice;
 
-    /**
-     * @var
-     */
     public $quote;
 
-    /**
-     * @var
-     */
     public $vendor;
 
-    /**
-     * @var
-     */
     public $expense;
 
-    /**
-     * @var
-     */
     public $task;
 
-    /**
-     * @var
-     */
     public $task_status;
 
-    /**
-     * @var
-     */
     public $expense_category;
 
-    /**
-     * @var
-     */
     public $cu;
 
-    /**
-     * @var
-     */
     public $bank_integration;
 
-    /**
-     * @var
-     */
     public $bank_transaction;
-    
-    /**
-     * @var
-     */
+
     public $bank_transaction_rule;
 
-
-    /**
-     * @var
-     */
     public $payment;
 
-    /**
-     * @var
-     */
     public $tax_rate;
 
-    /**
-     * @var
-     */
     public $scheduler;
 
-    /**
-     * @var
-     */
     public $purchase_order;
 
     public $contact;
-    
+
     public $product;
 
     public $recurring_invoice;
@@ -207,7 +139,7 @@ trait MockAccountData
         $cached_tables = config('ninja.cached_tables');
 
         Artisan::call('db:seed', [
-        '--force' => true
+            '--force' => true,
         ]);
 
         foreach ($cached_tables as $name => $class) {
@@ -276,7 +208,7 @@ trait MockAccountData
         $this->account->default_company_id = $this->company->id;
         $this->account->plan = 'pro';
         $this->account->plan_expires = now()->addMonth();
-        $this->account->plan_term = "month";
+        $this->account->plan_term = 'month';
         $this->account->save();
 
         $user = User::whereEmail($fake_email)->first();
@@ -285,7 +217,7 @@ trait MockAccountData
             $user = User::factory()->create([
                 'account_id' => $this->account->id,
                 'confirmation_code' => $this->createDbHash(config('database.default')),
-                'email' =>  $fake_email,
+                'email' => $fake_email,
             ]);
         }
 
@@ -321,7 +253,7 @@ trait MockAccountData
         $truth->setCompanyUser($company_token->first());
         $truth->setUser($this->user);
         $truth->setCompany($this->company);
-        
+
         //todo create one token with token name TOKEN - use firstOrCreate
 
         Product::factory()->create([
@@ -531,7 +463,6 @@ trait MockAccountData
 
         $this->quote->save();
 
-
         $this->credit = Credit::factory()->create([
             'user_id' => $user_id,
             'client_id' => $this->client->id,
@@ -550,7 +481,6 @@ trait MockAccountData
 
         $this->credit->status_id = Quote::STATUS_SENT;
         $this->credit->number = $this->getNextCreditNumber($this->client, $this->credit);
-
 
         CreditInvitation::factory()->create([
             'user_id' => $user_id,
@@ -572,7 +502,6 @@ trait MockAccountData
         $this->credit->save();
 
         $this->credit->service()->createInvitations()->markSent();
-
 
         $this->purchase_order = PurchaseOrderFactory::create($this->company->id, $user_id);
         $this->purchase_order->vendor_id = $this->vendor->id;
@@ -697,7 +626,7 @@ trait MockAccountData
         ]);
 
         $invitations = CreditInvitation::whereCompanyId($this->credit->company_id)
-                                        ->whereCreditId($this->credit->id);
+            ->whereCreditId($this->credit->id);
 
         $this->credit->setRelation('invitations', $invitations);
 
@@ -712,9 +641,9 @@ trait MockAccountData
 
         $contacts->each(function ($contact) {
             $invitation = InvoiceInvitation::whereCompanyId($this->invoice->company_id)
-                                        ->whereClientContactId($contact->id)
-                                        ->whereInvoiceId($this->invoice->id)
-                                        ->first();
+                ->whereClientContactId($contact->id)
+                ->whereInvoiceId($this->invoice->id)
+                ->first();
 
             if (! $invitation && $contact->send_email) {
                 $ii = InvoiceInvitationFactory::create($this->invoice->company_id, $this->invoice->user_id);
@@ -728,7 +657,7 @@ trait MockAccountData
         });
 
         $invitations = InvoiceInvitation::whereCompanyId($this->invoice->company_id)
-                                        ->whereInvoiceId($this->invoice->id);
+            ->whereInvoiceId($this->invoice->id);
 
         $this->invoice->setRelation('invitations', $invitations);
 
@@ -838,7 +767,6 @@ trait MockAccountData
             $cg->fees_and_limits = $data;
             $cg->save();
 
-            
             $cg = new CompanyGateway;
             $cg->company_id = $this->company->id;
             $cg->user_id = $user_id;

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,7 +24,7 @@ class PaymentMethod
 
     private $amount;
 
-    /** @var \Illuminate\Support\Collection<CompanyGateway> $gateways **/
+    /** @var \Illuminate\Support\Collection<CompanyGateway> * */
     private $gateways;
 
     private $payment_methods;
@@ -41,8 +40,8 @@ class PaymentMethod
     public function run()
     {
         $this->getGateways()
-             ->getMethods()
-             ->buildUrls();
+            ->getMethods()
+            ->buildUrls();
 
         return $this->getPaymentUrls();
     }
@@ -65,20 +64,20 @@ class PaymentMethod
         if ($company_gateways || $company_gateways == '0') {
             $transformed_ids = $this->transformKeys(explode(',', $company_gateways));
 
-            if($company_gateways == '0') {
+            if ($company_gateways == '0') {
                 $transformed_ids = [];
             }
 
             $this->gateways = $this->client
-                             ->company
-                             ->company_gateways
-                             ->whereIn('id', $transformed_ids)
-                             ->where('is_deleted', false)
-                             ->whereNull('deleted_at')
-                             ->where('gateway_key', '!=', '54faab2ab6e3223dbe848b1686490baa')
-                             ->sortby(function ($model) use ($transformed_ids) { //company gateways are sorted in order of priority
-                                 return array_search($model->id, $transformed_ids); // this closure sorts for us
-                             });
+                ->company
+                ->company_gateways
+                ->whereIn('id', $transformed_ids)
+                ->where('is_deleted', false)
+                ->whereNull('deleted_at')
+                ->where('gateway_key', '!=', '54faab2ab6e3223dbe848b1686490baa')
+                ->sortby(function ($model) use ($transformed_ids) { //company gateways are sorted in order of priority
+                    return array_search($model->id, $transformed_ids); // this closure sorts for us
+                });
 
             //2023-10-11 - Roll back, do not show any gateways, if they have been archived upstream.
             //removing this logic now to prevent any
@@ -102,11 +101,11 @@ class PaymentMethod
 
         } else {
             $this->gateways = CompanyGateway::query()
-                             ->with('gateway')
-                             ->where('company_id', $this->client->company_id)
-                             ->where('gateway_key', '!=', '54faab2ab6e3223dbe848b1686490baa')
-                             ->whereNull('deleted_at')
-                             ->where('is_deleted', false)->get();
+                ->with('gateway')
+                ->where('company_id', $this->client->company_id)
+                ->where('gateway_key', '!=', '54faab2ab6e3223dbe848b1686490baa')
+                ->whereNull('deleted_at')
+                ->where('is_deleted', false)->get();
         }
 
         return $this;
@@ -120,28 +119,27 @@ class PaymentMethod
         if ($company_gateways || $company_gateways == '0') {
             $transformed_ids = $this->transformKeys(explode(',', $company_gateways));
 
-            if($company_gateways == '0') {
+            if ($company_gateways == '0') {
                 $transformed_ids = [];
             }
 
-
             $this->gateways = $this->client
-                             ->company
-                             ->company_gateways
-                             ->whereIn('id', $transformed_ids)
-                             ->where('is_deleted', false)
-                             ->whereNull('deleted_at')
-                             ->where('gateway_key', '54faab2ab6e3223dbe848b1686490baa')
-                             ->sortby(function ($model) use ($transformed_ids) { //company gateways are sorted in order of priority
-                                 return array_search($model->id, $transformed_ids); // this closure sorts for us
-                             });
+                ->company
+                ->company_gateways
+                ->whereIn('id', $transformed_ids)
+                ->where('is_deleted', false)
+                ->whereNull('deleted_at')
+                ->where('gateway_key', '54faab2ab6e3223dbe848b1686490baa')
+                ->sortby(function ($model) use ($transformed_ids) { //company gateways are sorted in order of priority
+                    return array_search($model->id, $transformed_ids); // this closure sorts for us
+                });
         } else {
             $this->gateways = CompanyGateway::query()
-                             ->with('gateway')
-                             ->where('company_id', $this->client->company_id)
-                             ->where('gateway_key', '54faab2ab6e3223dbe848b1686490baa')
-                             ->whereNull('deleted_at')
-                             ->where('is_deleted', false)->get();
+                ->with('gateway')
+                ->where('company_id', $this->client->company_id)
+                ->where('gateway_key', '54faab2ab6e3223dbe848b1686490baa')
+                ->whereNull('deleted_at')
+                ->where('is_deleted', false)->get();
         }
 
         return $this;
@@ -200,16 +198,16 @@ class PaymentMethod
 
                 $fee_label = $gateway->calcGatewayFeeLabel($this->amount, $this->client, $gateway_type_id);
 
-                if (! $gateway_type_id || (GatewayType::CUSTOM == $gateway_type_id)) {
+                if (! $gateway_type_id || ($gateway_type_id == GatewayType::CUSTOM)) {
                     $this->payment_urls[] = [
                         'label' => $gateway->getConfigField('name').$fee_label,
-                        'company_gateway_id'  => $gateway_id,
+                        'company_gateway_id' => $gateway_id,
                         'gateway_type_id' => GatewayType::CREDIT_CARD,
                     ];
                 } else {
                     $this->payment_urls[] = [
                         'label' => $gateway->getTypeAlias($gateway_type_id).$fee_label,
-                        'company_gateway_id'  => $gateway_id,
+                        'company_gateway_id' => $gateway_id,
                         'gateway_type_id' => $gateway_type_id,
                     ];
                 }
@@ -226,7 +224,7 @@ class PaymentMethod
 
             $this->payment_urls[] = [
                 'label' => ctrans('texts.apply_credit'),
-                'company_gateway_id'  => CompanyGateway::GATEWAY_CREDIT,
+                'company_gateway_id' => CompanyGateway::GATEWAY_CREDIT,
                 'gateway_type_id' => GatewayType::CREDIT,
             ];
         }

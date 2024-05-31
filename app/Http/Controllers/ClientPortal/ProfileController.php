@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,7 +24,6 @@ class ProfileController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param ClientContact $client_contact
      * @return Factory|View
      */
     public function edit(ClientContact $client_contact)
@@ -36,8 +34,6 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateContactRequest $request
-     * @param ClientContact $client_contact
      * @return RedirectResponse
      */
     public function update(UpdateContactRequest $request, ClientContact $client_contact)

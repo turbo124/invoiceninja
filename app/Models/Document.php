@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -46,6 +45,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $documentable
  * @property-read mixed $hashed_id
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\DocumentFactory factory($count = null, $state = [])
@@ -57,12 +57,13 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|Document withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Document withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Document extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     public const DOCUMENT_PREVIEW_SIZE = 300; // pixels
 
@@ -176,9 +177,9 @@ class Document extends BaseModel
 
     public function generateRoute($absolute = false)
     {
-        try{
-        return route('api.documents.show', ['document' => $this->hashed_id]).'/download';
-        }catch(\Exception $e){
+        try {
+            return route('api.documents.show', ['document' => $this->hashed_id]).'/download';
+        } catch (\Exception $e) {
             return '';
         }
     }
@@ -213,7 +214,7 @@ class Document extends BaseModel
         $entity_id = $this->encodePrimaryKey($this->documentable_id);
         $link = '';
 
-        match($this->documentable_type) {
+        match ($this->documentable_type) {
             'App\Models\Vendor' => $link = "/vendors/{$entity_id}",
             'App\Models\Project' => $link = "/projects/{$entity_id}",
             'invoices' => $link = "/invoices/{$entity_id}/edit",
@@ -237,7 +238,7 @@ class Document extends BaseModel
         $image = $this->getFile();
         $catch_image = $image;
 
-        if(!extension_loaded('imagick')) {
+        if (! extension_loaded('imagick')) {
             return $catch_image;
         }
 
@@ -251,9 +252,10 @@ class Document extends BaseModel
 
             return $img->getImageBlob();
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
             nlog($e->getMessage());
+
             return $catch_image;
         }
 
@@ -261,8 +263,6 @@ class Document extends BaseModel
 
     /**
      * Returns boolean based on checks for image.
-     *
-     * @return bool
      */
     public function isImage(): bool
     {
@@ -272,5 +272,4 @@ class Document extends BaseModel
 
         return false;
     }
-
 }

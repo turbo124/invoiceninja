@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 class Preloader
 {
@@ -21,7 +21,7 @@ class Preloader
         // We'll use composer's classmap
         // to easily find which classes to autoload,
         // based on their filename
-        $classMap = require __DIR__ . '/vendor/composer/autoload_classmap.php';
+        $classMap = require __DIR__.'/vendor/composer/autoload_classmap.php';
 
         $this->fileMap = array_flip($classMap);
     }
@@ -56,7 +56,7 @@ class Preloader
 
         $count = self::$count;
 
-        echo "[Preloader] Preloaded {$count} classes" . PHP_EOL;
+        echo "[Preloader] Preloaded {$count} classes".PHP_EOL;
     }
 
     private function loadPath(string $path): void
@@ -107,7 +107,7 @@ class Preloader
 
         // Finally we require the path,
         // causing all its dependencies to be loaded as well
-        require_once($path);
+        require_once $path;
 
         self::$count++;
 
@@ -138,12 +138,12 @@ class Preloader
 }
 
 (new Preloader())
-    ->paths(__DIR__ . '/vendor/laravel')
+    ->paths(__DIR__.'/vendor/laravel')
     ->excludePaths([
-        __DIR__ . '/vendor/laravel/framework/src/Illuminate/Support/Testing',
-        __DIR__ . '/vendor/laravel/framework/src/Illuminate/Http/Testing',
-        __DIR__ . '/vendor/laravel/framework/src/Illuminate/Testing',
-        __DIR__ . '/vendor/laravel/framework/src/Illuminate/Foundation/Testing',
+        __DIR__.'/vendor/laravel/framework/src/Illuminate/Support/Testing',
+        __DIR__.'/vendor/laravel/framework/src/Illuminate/Http/Testing',
+        __DIR__.'/vendor/laravel/framework/src/Illuminate/Testing',
+        __DIR__.'/vendor/laravel/framework/src/Illuminate/Foundation/Testing',
     ])
     ->ignore(
         \Illuminate\Filesystem\Cache::class,

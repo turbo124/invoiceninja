@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -106,6 +105,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \App\Models\Subscription|null $subscription
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor|null $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\RecurringInvoiceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringInvoice filter(\App\Filters\QueryFilters $filters)
@@ -116,22 +116,24 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringInvoice withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringInvoice withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Backup> $history
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringInvoiceInvitation> $invitations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invoice> $invoices
  * @property bool $is_proforma
+ *
  * @mixin \Eloquent
  */
 class RecurringInvoice extends BaseModel
 {
-    use MakesHash;
-    use SoftDeletes;
     use Filterable;
-    use MakesDates;
     use HasRecurrence;
+    use MakesDates;
+    use MakesHash;
     use PresentableTrait;
+    use SoftDeletes;
 
     protected $presenter = RecurringInvoicePresenter::class;
 
@@ -341,29 +343,30 @@ class RecurringInvoice extends BaseModel
             return $this->status_id;
         }
     }
-    
+
     /**
      * CalculateStatus
      *
      * Calculates the status of the Recurring Invoice.
-     * 
+     *
      * We only apply the pending status on new models, we never revert an invoice back to
      * pending.
-     * @param  bool $new_model
+     *
      * @return int
      */
     public function calculateStatus(bool $new_model = false) //15-02-2024 - $new_model needed
     {
 
-        if($this->remaining_cycles == 0) 
+        if ($this->remaining_cycles == 0) {
             return self::STATUS_COMPLETED;
-        elseif ($new_model && $this->status_id == self::STATUS_ACTIVE && Carbon::parse($this->next_send_date)->isFuture()) 
+        } elseif ($new_model && $this->status_id == self::STATUS_ACTIVE && Carbon::parse($this->next_send_date)->isFuture()) {
             return self::STATUS_PENDING;
-        elseif($this->remaining_cycles != 0 && ($this->status_id == self::STATUS_COMPLETED))
+        } elseif ($this->remaining_cycles != 0 && ($this->status_id == self::STATUS_COMPLETED)) {
             return self::STATUS_ACTIVE;
+        }
 
         return $this->status_id;
-        
+
     }
 
     public function nextSendDate(): ?Carbon
@@ -586,7 +589,7 @@ class RecurringInvoice extends BaseModel
      *
      * @return InvoiceSumInclusive | InvoiceSum The invoice calculator object getters
      */
-    public function calc(): InvoiceSumInclusive | InvoiceSum
+    public function calc(): InvoiceSumInclusive|InvoiceSum
     {
         $invoice_calc = null;
 
@@ -670,8 +673,8 @@ class RecurringInvoice extends BaseModel
     /**
      * Calculates a date based on the client payment terms.
      *
-     * @param  Carbon $date A given date
-     * @return null|Carbon  The date
+     * @param  Carbon  $date  A given date
+     * @return null|Carbon The date
      */
     public function calculateDateFromTerms($date)
     {
@@ -688,8 +691,6 @@ class RecurringInvoice extends BaseModel
 
     /**
      * service
-     *
-     * @return RecurringService
      */
     public function service(): RecurringService
     {

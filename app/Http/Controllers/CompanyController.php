@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -51,8 +50,8 @@ class CompanyController extends BaseController
 {
     use DispatchesJobs;
     use MakesHash;
-    use Uploadable;
     use SavesDocuments;
+    use Uploadable;
 
     protected $entity_type = Company::class;
 
@@ -64,7 +63,6 @@ class CompanyController extends BaseController
 
     /**
      * CompanyController constructor.
-     * @param CompanyRepository $company_repo
      */
     public function __construct(CompanyRepository $company_repo)
     {
@@ -88,26 +86,34 @@ class CompanyController extends BaseController
      *      description="Lists companies, search and filters allow fine grained lists to be generated.
 
      *   Query parameters can be added to performed more fine grained filtering of the companies, these are handled by the CompanyFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of companies",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -125,10 +131,7 @@ class CompanyController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateCompanyRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/companies/create",
@@ -136,26 +139,34 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Gets a new blank company object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank company object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -175,9 +186,7 @@ class CompanyController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreCompanyRequest $request
      * @return Response
-     *
      *
      * @OA\Post(
      *      path="/api/v1/companies",
@@ -185,26 +194,34 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Adds a company",
      *      description="Adds an company to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved company object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -260,10 +277,7 @@ class CompanyController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowCompanyRequest $request
-     * @param Company $company
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/companies/{id}",
@@ -271,6 +285,7 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Shows an company",
      *      description="Displays an company by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -280,28 +295,36 @@ class CompanyController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the company object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -314,10 +337,7 @@ class CompanyController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditCompanyRequest $request
-     * @param Company $company
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/companies/{id}/edit",
@@ -325,6 +345,7 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Shows an company for editting",
      *      description="Displays an company by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -334,28 +355,36 @@ class CompanyController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the company object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -368,10 +397,7 @@ class CompanyController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateCompanyRequest $request
-     * @param Company $company
      * @return Response
-     *
      *
      * @OA\Put(
      *      path="/api/v1/companies/{id}",
@@ -379,6 +405,7 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Updates an company",
      *      description="Handles the updating of an company by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -388,28 +415,36 @@ class CompanyController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the company object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -426,9 +461,9 @@ class CompanyController extends BaseController
             $this->saveDocuments($request->input('documents'), $company, $request->input('is_public', true));
         }
 
-        if($request->has('e_invoice_certificate') && !is_null($request->file("e_invoice_certificate"))) {
+        if ($request->has('e_invoice_certificate') && ! is_null($request->file('e_invoice_certificate'))) {
 
-            $company->e_invoice_certificate = base64_encode($request->file("e_invoice_certificate")->get());
+            $company->e_invoice_certificate = base64_encode($request->file('e_invoice_certificate')->get());
 
             $settings = $company->settings;
             $settings->enable_e_invoice = true;
@@ -445,18 +480,17 @@ class CompanyController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyCompanyRequest $request
-     * @param Company $company
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/companies/{id}",
      *      operationId="deleteCompany",
      *      tags={"companies"},
      *      summary="Deletes a company",
      *      description="Handles the deletion of an company by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -466,27 +500,34 @@ class CompanyController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -509,7 +550,7 @@ class CompanyController extends BaseController
 
             try {
                 Storage::disk(config('filesystems.default'))->deleteDirectory($company->company_key);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
             }
 
             $account->delete();
@@ -519,8 +560,8 @@ class CompanyController extends BaseController
             }
 
             LightLogs::create(new AccountDeleted())
-                     ->increment()
-                     ->batch();
+                ->increment()
+                ->batch();
         } else {
             $company_id = $company->id;
 
@@ -539,16 +580,15 @@ class CompanyController extends BaseController
 
             try {
                 Storage::disk(config('filesystems.default'))->deleteDirectory($company->company_key);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
             }
-
 
             $company->delete();
 
             //If we are deleting the default companies, we'll need to make a new company the default.
             if ($account->default_company_id == $company_id) {
 
-                /** @var \App\Models\Company $new_default_company **/
+                /** @var \App\Models\Company $new_default_company * */
                 $new_default_company = Company::whereAccountId($account->id)->first();
                 $account->default_company_id = $new_default_company->id;
                 $account->save();
@@ -561,11 +601,7 @@ class CompanyController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadCompanyRequest $request
-     * @param Company $company
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/companies/{id}/upload",
@@ -573,6 +609,7 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Uploads a document to a company",
      *      description="Handles the uploading of a document to a company",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -582,28 +619,36 @@ class CompanyController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the client object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -624,11 +669,7 @@ class CompanyController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param DefaultCompanyRequest $request
-     * @param Company $company
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/companies/{company}/default",
@@ -636,6 +677,7 @@ class CompanyController extends BaseController
      *      tags={"companies"},
      *      summary="Sets the company as the default company.",
      *      description="Sets the company as the default company.",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -645,28 +687,36 @@ class CompanyController extends BaseController
      *          description="The Company Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the company object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Company"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -683,10 +733,10 @@ class CompanyController extends BaseController
     public function updateOriginTaxData(DefaultCompanyRequest $request, Company $company)
     {
 
-        if($company->settings->country_id == "840" && !$company?->account->isFreeHostedClient()) {
+        if ($company->settings->country_id == '840' && ! $company?->account->isFreeHostedClient()) {
             try {
                 (new CompanyTaxRate($company))->handle();
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 return response()->json(['message' => 'There was a problem updating the tax rates. Please try again.'], 400);
             }
         } else {
@@ -705,18 +755,16 @@ class CompanyController extends BaseController
         $logo = strlen($company->settings->company_logo) > 5 ? $company->settings->company_logo : 'https://pdf.invoicing.co/favicon-v2.png';
         $headers = ['Content-Disposition' => 'inline'];
 
-        try{
+        try {
             $response = \Illuminate\Support\Facades\Http::get($logo);
 
             if ($response->successful()) {
                 $logo = $response->body();
-            }
-            else {
+            } else {
                 $logo = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
             }
 
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
 
             $logo = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 

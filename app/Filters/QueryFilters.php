@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,8 +60,6 @@ abstract class QueryFilters
 
     /**
      * Create a new QueryFilters instance.
-     *
-     * @param Request $request
      */
     public function __construct(Request $request)
     {
@@ -72,7 +69,6 @@ abstract class QueryFilters
     /**
      * Apply the filters to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function apply(Builder $builder)
@@ -113,8 +109,7 @@ abstract class QueryFilters
     /**
      * Explodes the value by delimiter.
      *
-     * @param  string $value
-     * @return \stdClass
+     * @param  string  $value
      */
     public function split($value): \stdClass
     {
@@ -131,9 +126,6 @@ abstract class QueryFilters
     /**
      * Filters the list based on the status
      * archived, active, deleted.
-     *
-     * @param string $filter
-     * @return Builder
      */
     public function status(string $filter = ''): Builder
     {
@@ -163,9 +155,6 @@ abstract class QueryFilters
 
     /**
      * String to operator convertor.
-     *
-     * @param string $operator
-     * @return string
      */
     private function operatorConvertor(string $operator): string
     {
@@ -189,8 +178,6 @@ abstract class QueryFilters
      * Filters the query by the contact's client_id.
      *
      * -Can only be used on contact routes
-     *
-     * @return Builder
      */
     public function clientFilter(): Builder
     {
@@ -209,13 +196,13 @@ abstract class QueryFilters
 
         try {
             if (is_numeric($value)) {
-                $created_at = Carbon::createFromTimestamp((int)$value);
+                $created_at = Carbon::createFromTimestamp((int) $value);
             } else {
                 $created_at = Carbon::parse($value);
             }
 
             return $this->builder->where('created_at', '>=', $created_at);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $this->builder;
         }
     }
@@ -228,7 +215,7 @@ abstract class QueryFilters
 
         try {
             if (is_numeric($value)) {
-                $created_at = Carbon::createFromTimestamp((int)$value);
+                $created_at = Carbon::createFromTimestamp((int) $value);
             } else {
                 $created_at = Carbon::parse($value);
             }
@@ -240,8 +227,7 @@ abstract class QueryFilters
     }
 
     /**
-     *
-     * @param string $value
+     * @param  string  $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function is_deleted($value = 'true')
@@ -291,9 +277,6 @@ abstract class QueryFilters
         return $this->builder;
     }
 
-    /**
-     * @return Builder
-     */
     public function without_deleted_clients(): Builder
     {
         return $this->builder->where(function ($query) {
@@ -303,9 +286,6 @@ abstract class QueryFilters
         });
     }
 
-    /**
-     * @return Builder
-     */
     public function without_deleted_vendors(): Builder
     {
         return $this->builder->where(function ($query) {
@@ -315,14 +295,13 @@ abstract class QueryFilters
         });
     }
 
-
     public function with(string $value = ''): Builder
     {
         if (strlen($value) == 0) {
             return $this->builder;
         }
 
-        if($this->with_property == 'id') {
+        if ($this->with_property == 'id') {
             $value = $this->decodePrimaryKey($value);
         }
 

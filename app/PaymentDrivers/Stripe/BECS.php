@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,7 +22,6 @@ use App\PaymentDrivers\StripePaymentDriver;
 
 class BECS
 {
-    /** @var StripePaymentDriver */
     public StripePaymentDriver $stripe;
 
     public function __construct(StripePaymentDriver $stripe)
@@ -60,7 +58,7 @@ class BECS
                 'payment_hash' => $this->stripe->payment_hash->hash,
                 'gateway_type_id' => GatewayType::BECS,
             ],
-        ], array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid("st", true)]));
+        ], array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid('st', true)]));
 
         $data['pi_client_secret'] = $intent->client_secret;
 

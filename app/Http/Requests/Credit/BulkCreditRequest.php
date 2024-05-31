@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,10 +17,9 @@ use Illuminate\Validation\Rule;
 class BulkCreditRequest extends FormRequest
 {
     use MakesHash;
+
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -39,11 +37,11 @@ class BulkCreditRequest extends FormRequest
         $user = auth()->user();
 
         return [
-            'ids' => ['required','bail','array',Rule::exists('credits', 'id')->where('company_id', $user->company()->id)],
+            'ids' => ['required', 'bail', 'array', Rule::exists('credits', 'id')->where('company_id', $user->company()->id)],
             'action' => 'required|bail|in:archive,restore,delete,email,bulk_download,bulk_print,mark_paid,clone_to_credit,history,mark_sent,download,send_email,template',
             'template' => 'sometimes|string',
             'template_id' => 'sometimes|string',
-            'send_email' => 'sometimes|bool'
+            'send_email' => 'sometimes|bool',
         ];
     }
 

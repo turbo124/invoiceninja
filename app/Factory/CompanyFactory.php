@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,10 +22,6 @@ class CompanyFactory
 {
     use MakesHash;
 
-    /**
-     * @param int $account_id
-     * @return Company
-     */
     public function create(int $account_id): Company
     {
         $company = new Company();
@@ -56,7 +51,7 @@ class CompanyFactory
         $company->smtp_port = '';
         $company->smtp_username = '';
         $company->smtp_verify_peer = true;
-        
+
         return $company;
     }
 }

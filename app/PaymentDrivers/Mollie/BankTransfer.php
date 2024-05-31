@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,9 +40,6 @@ class BankTransfer implements MethodInterface
 
     /**
      * Show the authorization page for bank transfer.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function authorizeView(array $data): View
     {
@@ -52,9 +48,6 @@ class BankTransfer implements MethodInterface
 
     /**
      * Handle the authorization for bank transfer.
-     *
-     * @param Request $request
-     * @return RedirectResponse
      */
     public function authorizeResponse(Request $request): RedirectResponse
     {
@@ -64,7 +57,6 @@ class BankTransfer implements MethodInterface
     /**
      * Show the payment page for bank transfer.
      *
-     * @param array $data
      * @return Redirector|RedirectResponse
      */
     public function paymentView(array $data)
@@ -100,7 +92,7 @@ class BankTransfer implements MethodInterface
             return redirect(
                 $payment->getCheckoutUrl()
             );
-        } catch (\Mollie\Api\Exceptions\ApiException | \Exception $exception) {
+        } catch (\Mollie\Api\Exceptions\ApiException|\Exception $exception) {
             return $this->processUnsuccessfulPayment($exception);
         }
     }
@@ -108,9 +100,7 @@ class BankTransfer implements MethodInterface
     /**
      * Handle unsuccessful payment.
      *
-     * @param Exception $e
      * @throws PaymentFailed
-     * @return void
      */
     public function processUnsuccessfulPayment(Exception $e): void
     {
@@ -131,7 +121,6 @@ class BankTransfer implements MethodInterface
     /**
      * Handle the payments for the bank transfer.
      *
-     * @param PaymentResponseRequest $request
      * @return mixed
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -158,7 +147,7 @@ class BankTransfer implements MethodInterface
             return $this->processUnsuccessfulPayment(
                 new PaymentFailed(ctrans('texts.status_voided'))
             );
-        } catch (\Mollie\Api\Exceptions\ApiException | \Exception $exception) {
+        } catch (\Mollie\Api\Exceptions\ApiException|\Exception $exception) {
             return $this->processUnsuccessfulPayment($exception);
         }
     }
@@ -166,9 +155,7 @@ class BankTransfer implements MethodInterface
     /**
      * Handle the successful payment for bank transfer.
      *
-     * @param ResourcesPayment $payment
-     * @param string $status
-     * @return RedirectResponse
+     * @param  string  $status
      */
     public function processSuccessfulPayment(ResourcesPayment $payment, $status = 'paid'): RedirectResponse
     {
@@ -198,9 +185,6 @@ class BankTransfer implements MethodInterface
 
     /**
      * Handle 'open' payment status for bank transfer.
-     *
-     * @param ResourcesPayment $payment
-     * @return RedirectResponse
      */
     public function processOpenPayment(ResourcesPayment $payment): RedirectResponse
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,12 +41,12 @@ class UpdateReminders implements ShouldQueue
         MultiDB::setDb($this->company->db);
 
         $this->company
-             ->invoices()
-             ->where('is_deleted', 0)
-             ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-             ->cursor()
-             ->each(function ($invoice) {
-                 $invoice->service()->setReminder()->save();
-             });
+            ->invoices()
+            ->where('is_deleted', 0)
+            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
+            ->cursor()
+            ->each(function ($invoice) {
+                $invoice->service()->setReminder()->save();
+            });
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,8 +44,8 @@ class ForgotPasswordController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function sendResetLinkEmail(Request $request)
@@ -82,7 +81,7 @@ class ForgotPasswordController extends Controller
     {
         if ($request->has('company_key')) {
             MultiDB::findAndSetDbByCompanyKey($request->input('company_key'));
-            /** @var \App\Models\Company $company **/
+            /** @var \App\Models\Company $company * */
             $company = Company::where('company_key', $request->input('company_key'))->first();
             $account = $company->account;
         } else {

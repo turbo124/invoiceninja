@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -15,7 +14,6 @@ use App\DataMapper\InvoiceItem;
 
 class PayPalBalanceAffecting
 {
-
     private array $key_map = [
         'Date' => 'date',
         'Time' => 'time',
@@ -63,59 +61,104 @@ class PayPalBalanceAffecting
     ];
 
     public $date;
+
     public $time;
+
     public $timezone;
+
     public $name;
+
     public $type;
+
     public $status;
+
     public $currency;
+
     public $gross;
+
     public $fee;
+
     public $net;
+
     public $fromEmailAddress;
+
     public $toEmailAddress;
+
     public $transactionId;
+
     public $shippingAddress;
+
     public $itemTitle;
+
     public $itemId;
+
     public $option1Name;
+
     public $option1Value;
+
     public $option2Name;
+
     public $option2Value;
+
     public $referenceTxnId;
+
     public $invoiceNumber;
+
     public $customNumber;
+
     public $quantity;
+
     public $receiptId;
+
     public $addressLine1;
+
     public $addressLine2DistrictNeighborhood;
+
     public $townCity;
+
     public $stateProvinceRegionCountyTerritoryPrefectureRepublic;
+
     public $zipPostalCode;
+
     public $country;
+
     public $contactPhoneNumber;
+
     public $subject;
+
     public $note;
+
     public $transactionEventCode;
+
     public $paymentTrackingId;
+
     public $itemDetails;
+
     public $authorizationReviewStatus;
+
     public $countryCode;
+
     public $tip;
+
     public $discount;
+
     public $creditTransactionalFee;
+
     public $originalInvoiceId;
 
-    public function __construct(private array $import_row){}
+    public function __construct(private array $import_row)
+    {
+    }
 
     public function run(): self
     {
-        foreach($this->import_row as $key => $value) {
+        foreach ($this->import_row as $key => $value) {
 
             $prop = $this->key_map[$key] ?? false;
 
-            if($prop)
+            if ($prop) {
                 $this->{$prop} = $value;
+            }
         }
 
         return $this;
@@ -145,7 +188,7 @@ class PayPalBalanceAffecting
 
         return [
             'number' => trim($this->invoiceNumber ?? $this->transactionId),
-            'date' => str_replace('/','-', $this->date ?? ''),
+            'date' => str_replace('/', '-', $this->date ?? ''),
             'line_items' => [$item],
             'name' => $this->name ?? '',
             'email' => $this->fromEmailAddress ?? '',
@@ -154,14 +197,12 @@ class PayPalBalanceAffecting
 
     public function getContact(): array
     {
-        $name_parts = explode(" ", $this->name ?? '');
+        $name_parts = explode(' ', $this->name ?? '');
 
-        if(count($name_parts) == 2)
-        {
+        if (count($name_parts) == 2) {
             $contact['first_name'] = $name_parts[0];
             $contact['last_name'] = $name_parts[1];
-        }
-        else {
+        } else {
             $contact['first_name'] = $this->name ?? '';
         }
 
@@ -170,7 +211,7 @@ class PayPalBalanceAffecting
 
         return $contact;
     }
-    
+
     private function returnAddress(): array
     {
         return [
@@ -185,13 +226,15 @@ class PayPalBalanceAffecting
 
     private function returnShippingAddress(): array
     {
-        if(strlen($this->shippingAddress ?? '') <3)
+        if (strlen($this->shippingAddress ?? '') < 3) {
             return [];
+        }
 
-        $ship_parts = explode(",", $this->shippingAddress);
+        $ship_parts = explode(',', $this->shippingAddress);
 
-        if(count($ship_parts) != 7)
+        if (count($ship_parts) != 7) {
             return [];
+        }
 
         return [
             'shipping_address1' => $ship_parts[2],
@@ -214,8 +257,6 @@ class PayPalBalanceAffecting
     }
 }
 
-
-
 // $csv = Reader::createFromString($csvFile);
 // // $csvdelimiter = self::detectDelimiter($csvfile);
 // $csv->setDelimiter(",");
@@ -226,7 +267,6 @@ class PayPalBalanceAffecting
 // $arr = [];
 
 // foreach($data as $key => $value) {
-
 
 //     if($key == 0) {
 //         continue;
@@ -248,7 +288,6 @@ class PayPalBalanceAffecting
 //     $p = new PayPalBalanceAffecting($pp);
 //     $p->run();
 
-
 //     if(!$p->isInvoiceType()) {
 //         continue;
 //     }
@@ -256,9 +295,7 @@ class PayPalBalanceAffecting
 //     $import_c = $p->getClient();
 //     $import_i = $p->getInvoice();
 
-
 //     $contact = ClientContact::where('company_id', 3358)->where('email', $import_c['email'])->first();
-
 
 //     if(!$contact) {
 
@@ -273,6 +310,5 @@ class PayPalBalanceAffecting
 //     $i = InvoiceFactory::create($company->id, $owner->id);
 //     $i->client_id = $client->id;
 //     $invoice_repo->save($import_i, $i);
-
 
 // }

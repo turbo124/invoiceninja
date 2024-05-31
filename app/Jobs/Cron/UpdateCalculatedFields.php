@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,12 +30,10 @@ class UpdateCalculatedFields
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {
-        nlog("Updating calculated fields");
+        nlog('Updating calculated fields');
 
         Auth::logout();
 
@@ -52,23 +49,20 @@ class UpdateCalculatedFields
                     $project->save();
                 });
 
-
-
         } else {
             //multiDB environment, need to
             foreach (MultiDB::$dbs as $db) {
                 MultiDB::setDB($db);
 
-
                 Project::query()->with('tasks')->whereHas('tasks', function ($query) {
                     $query->where('updated_at', '>', now()->subHours(2));
                 })
-                ->cursor()
-                ->each(function ($project) {
-                    $project->current_hours = $this->calculateDuration($project);
-                    $project->save();
-                });
-                
+                    ->cursor()
+                    ->each(function ($project) {
+                        $project->current_hours = $this->calculateDuration($project);
+                        $project->save();
+                    });
+
                 //Clean password resets table
                 \DB::connection($db)->table('password_resets')->where('created_at', '<', now()->subHour())->delete();
 
@@ -82,9 +76,9 @@ class UpdateCalculatedFields
 
         $project->tasks->each(function ($task) use (&$duration) {
 
-            if(is_iterable(json_decode($task->time_log))) {
+            if (is_iterable(json_decode($task->time_log))) {
 
-                foreach(json_decode($task->time_log) as $log) {
+                foreach (json_decode($task->time_log) as $log) {
 
                     $start_time = $log[0];
                     $end_time = $log[1] == 0 ? time() : $log[1];

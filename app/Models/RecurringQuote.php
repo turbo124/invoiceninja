@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -102,6 +101,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Quote> $quotes
  * @property-read int|null $quotes_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\RecurringQuoteFactory factory($count = null, $state = [])
@@ -113,21 +113,23 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringQuote withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringQuote withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Backup> $history
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringQuoteInvitation> $invitations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Quote> $quotes
+ *
  * @mixin \Eloquent
  */
 class RecurringQuote extends BaseModel
 {
-    use MakesHash;
-    use SoftDeletes;
     use Filterable;
-    use MakesDates;
     use HasRecurrence;
+    use MakesDates;
+    use MakesHash;
     use PresentableTrait;
+    use SoftDeletes;
 
     protected $presenter = RecurringQuotePresenter::class;
 
@@ -476,9 +478,10 @@ class RecurringQuote extends BaseModel
 
     /**
      * Access the invoice calculator object.
+     *
      * @return InvoiceSumInclusive | InvoiceSum The invoice calculator object getters
      */
-    public function calc(): InvoiceSumInclusive | InvoiceSum
+    public function calc(): InvoiceSumInclusive|InvoiceSum
     {
         $invoice_calc = null;
 
@@ -556,8 +559,8 @@ class RecurringQuote extends BaseModel
     /**
      * Calculates a date based on the client payment terms.
      *
-     * @param  Carbon $date A given date
-     * @return null|Carbon  The date
+     * @param  Carbon  $date  A given date
+     * @return null|Carbon The date
      */
     public function calculateDateFromTerms($date)
     {
@@ -574,7 +577,6 @@ class RecurringQuote extends BaseModel
 
     /**
      * Service entry points.
-     * @return RecurringService
      */
     public function service(): RecurringService
     {

@@ -6,19 +6,18 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Transformers;
 
-use App\Models\Task;
-use App\Models\Quote;
 use App\Models\Client;
-use App\Models\Project;
 use App\Models\Document;
 use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\Project;
+use App\Models\Quote;
+use App\Models\Task;
 use App\Utils\Traits\MakesHash;
 
 /**
@@ -32,9 +31,6 @@ class ProjectTransformer extends EntityTransformer
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'client',
         'tasks',
@@ -47,17 +43,19 @@ class ProjectTransformer extends EntityTransformer
     {
         $transformer = new DocumentTransformer($this->serializer);
 
-        if($project->documents)
+        if ($project->documents) {
             return $this->includeCollection($project->documents, $transformer, Document::class);
-    
+        }
+
         return null;
     }
 
     public function includeClient(Project $project): \League\Fractal\Resource\Item
     {
 
-        if (!$project->client) {
+        if (! $project->client) {
             nlog("Project {$project->hashed_id} does not have a client attached - this project is in a bad state");
+
             return null;
         }
 
@@ -83,14 +81,14 @@ class ProjectTransformer extends EntityTransformer
     public function includeExpenses(Project $project): \League\Fractal\Resource\Collection
     {
         $transformer = new ExpenseTransformer($this->serializer);
-                
+
         return $this->includeCollection($project->expenses, $transformer, Expense::class);
     }
 
     public function includeQuotes(Project $project): \League\Fractal\Resource\Collection
     {
         $transformer = new QuoteTransformer($this->serializer);
-        
+
         return $this->includeCollection($project->quotes, $transformer, Quote::class);
     }
 

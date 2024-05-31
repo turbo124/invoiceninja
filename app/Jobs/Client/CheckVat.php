@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,17 +26,14 @@ class CheckVat implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use MakesHash;
     use Queueable;
     use SerializesModels;
-    use MakesHash;
 
     public $tries = 1;
 
     /**
      * Create a new job instance.
-     *
-     * @param Client $client
-     * @param Company $company
      */
     public function __construct(public Client $client, protected Company $company)
     {
@@ -45,7 +41,6 @@ class CheckVat implements ShouldQueue
 
     /**
      * Execute the job.
-     *
      */
     public function handle()
     {
@@ -60,5 +55,4 @@ class CheckVat implements ShouldQueue
     {
         return [new WithoutOverlapping($this->client->id)];
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,8 +23,6 @@ class InvoiceReminderEmailActivity implements ShouldQueue
 
     /**
      * Create the event listener.
-     *
-     * @param ActivityRepository $activity_repo
      */
     public function __construct(ActivityRepository $activity_repo)
     {
@@ -46,7 +43,7 @@ class InvoiceReminderEmailActivity implements ShouldQueue
 
         $user_id = isset($event->event_vars['user_id']) ? $event->event_vars['user_id'] : $event->invitation->invoice->user_id;
 
-        $reminder = match($event->template) {
+        $reminder = match ($event->template) {
             'reminder1' => 63,
             'reminder2' => 64,
             'reminder3' => 65,

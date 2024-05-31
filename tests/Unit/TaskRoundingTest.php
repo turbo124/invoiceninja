@@ -5,39 +5,37 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Models\Task;
-use App\Models\Client;
-use Tests\MockAccountData;
-use App\Utils\Traits\MakesHash;
 use App\DataMapper\ClientSettings;
+use App\Models\Client;
+use App\Models\Task;
+use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Session;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 /**
  * @test
  */
 class TaskRoundingTest extends TestCase
 {
-
     public int $task_round_to_nearest = 1;
 
     public bool $task_round_up = true;
 
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     private $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -65,29 +63,25 @@ class TaskRoundingTest extends TestCase
 
     public function testRoundUp2()
     {
-        
-
 
         $start_time = 1715237056;
-        $end_time = $start_time + 60*7; 
+        $end_time = $start_time + 60 * 7;
         $this->task_round_to_nearest = 600;
 
-        $rounded = $start_time + 60*10;
+        $rounded = $start_time + 60 * 10;
 
         $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
-
 
     }
 
     public function testRoundUp3()
     {
-        
 
         $start_time = 1715213100;
-        $end_time = $start_time + 60*15; 
+        $end_time = $start_time + 60 * 15;
         $this->task_round_to_nearest = 900;
 
-        $rounded = $start_time + 60*15;
+        $rounded = $start_time + 60 * 15;
 
         $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
 
@@ -102,13 +96,13 @@ class TaskRoundingTest extends TestCase
 
     public function testRoundUp4()
     {
-        
+
         $start_time = 1715238000;
         $end_time = 1715238900;
 
         $this->task_round_to_nearest = 900;
 
-        $rounded = $start_time + 60*15;
+        $rounded = $start_time + 60 * 15;
 
         // $s = \Carbon\Carbon::createFromTimestamp($start_time);
         // $e = \Carbon\Carbon::createFromTimestamp($end_time);
@@ -117,9 +111,7 @@ class TaskRoundingTest extends TestCase
         // echo $e->format('Y-m-d H:i:s').PHP_EOL;
         // echo $x->format('Y-m-d H:i:s').PHP_EOL;
 
-
-$this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
-
+        $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
 
     }
 
@@ -142,8 +134,7 @@ $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
             // 'settings' => $settings,
         ]);
 
-
-        $var = time()-800;
+        $var = time() - 800;
 
         $data = [
             'client_id' => $c->hashed_id,
@@ -157,7 +148,7 @@ $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->postJson("/api/v1/tasks/", $data);
+        ])->postJson('/api/v1/tasks/', $data);
 
         $response->assertStatus(200);
         $arr = $response->json();
@@ -166,13 +157,13 @@ $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
 
         $data = [
             'ids' => [$i],
-            'action' => 'stop'
+            'action' => 'stop',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->postJson("/api/v1/tasks/bulk", $data);
+        ])->postJson('/api/v1/tasks/bulk', $data);
 
         $response->assertStatus(200);
         $arr = $response->json();
@@ -196,16 +187,17 @@ $this->assertEquals($rounded, $this->roundTimeLog($start_time, $end_time));
 
     public function roundTimeLog(int $start_time, int $end_time): int
     {
-        if($this->task_round_to_nearest == 1)
+        if ($this->task_round_to_nearest == 1) {
             return $end_time;
+        }
 
         $interval = $end_time - $start_time;
 
-        if($this->task_round_up)
-            return $start_time + (int)ceil($interval/$this->task_round_to_nearest)*$this->task_round_to_nearest;
+        if ($this->task_round_up) {
+            return $start_time + (int) ceil($interval / $this->task_round_to_nearest) * $this->task_round_to_nearest;
+        }
 
-        return $start_time - (int)floor($interval/$this->task_round_to_nearest) * $this->task_round_to_nearest;
+        return $start_time - (int) floor($interval / $this->task_round_to_nearest) * $this->task_round_to_nearest;
 
     }
-
 }

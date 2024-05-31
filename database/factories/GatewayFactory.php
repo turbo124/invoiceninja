@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,9 +24,9 @@ class GatewayFactory extends Factory
         return [
             'key' => '3b6621f970ab18887c4f6dca78d3f8bb',
             'visible' => true,
-            'sort_order' =>1,
+            'sort_order' => 1,
             'name' => 'demo',
-            'provider' =>  'test',
+            'provider' => 'test',
             'is_offsite' => true,
             'is_secure' => true,
             'fields' => '',

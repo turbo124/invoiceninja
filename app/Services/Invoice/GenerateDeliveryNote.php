@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,7 +22,6 @@ use App\Utils\HtmlEngine;
 use App\Utils\PhantomJS\Phantom;
 use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\Pdf\PdfMaker;
-use Illuminate\Support\Facades\Storage;
 
 class GenerateDeliveryNote
 {
@@ -46,14 +44,14 @@ class GenerateDeliveryNote
         $delivery_note_design_id = $this->invoice->client->getSetting('delivery_note_design_id');
         $design = Design::withTrashed()->find($this->decodePrimaryKey($delivery_note_design_id));
 
-        if($design && $design->is_template) {
+        if ($design && $design->is_template) {
 
             $ts = new TemplateService($design);
-            
+
             $pdf = $ts->setCompany($this->invoice->company)
-            ->build([
-                'invoices' => collect([$this->invoice]),
-            ])->getPdf();
+                ->build([
+                    'invoices' => collect([$this->invoice]),
+                ])->getPdf();
 
             return $pdf;
 
@@ -82,8 +80,8 @@ class GenerateDeliveryNote
         }
 
         $variables = $html->generateLabelsAndValues();
-        $variables['labels']['$entity_label']= ctrans('texts.delivery_note');
-        
+        $variables['labels']['$entity_label'] = ctrans('texts.delivery_note');
+
         $state = [
             'template' => $template->elements([
                 'client' => $this->invoice->client,

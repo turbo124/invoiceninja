@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,9 +35,13 @@ class ProcessBankTransactionsNordigen implements ShouldQueue
     private ?string $from_date;
 
     public Company $company;
+
     public Nordigen $nordigen;
+
     public $nordigen_account;
+
     private bool $stop_loop = false;
+
     /**
      * Create a new job instance.
      */
@@ -58,11 +61,11 @@ class ProcessBankTransactionsNordigen implements ShouldQueue
     public function handle()
     {
         if ($this->bank_integration->integration_type != BankIntegration::INTEGRATION_TYPE_NORDIGEN) {
-            throw new \Exception("Invalid BankIntegration Type");
+            throw new \Exception('Invalid BankIntegration Type');
         }
 
-        if (!(config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key'))) {
-            throw new \Exception("Missing credentials for bank_integration service nordigen");
+        if (! (config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key'))) {
+            throw new \Exception('Missing credentials for bank_integration service nordigen');
         }
 
         $this->nordigen = new Nordigen();
@@ -75,21 +78,21 @@ class ProcessBankTransactionsNordigen implements ShouldQueue
         try {
             $this->updateAccount();
         } catch (\Exception $e) {
-            nlog("Nordigen: {$this->bank_integration->nordigen_account_id} - exited abnormally => " . $e->getMessage());
+            nlog("Nordigen: {$this->bank_integration->nordigen_account_id} - exited abnormally => ".$e->getMessage());
 
             $content = [
                 "Processing transactions for account: {$this->bank_integration->nordigen_account_id} failed",
-                "Exception Details => ",
+                'Exception Details => ',
                 $e->getMessage(),
             ];
 
             $this->bank_integration->company->notification(new GenericNinjaAdminNotification($content))->ninja();
 
             sleep(5);
-            
+
             throw $e;
         }
-        if (!$this->nordigen_account) {
+        if (! $this->nordigen_account) {
             return;
         }
 
@@ -97,11 +100,11 @@ class ProcessBankTransactionsNordigen implements ShouldQueue
         try {
             $this->processTransactions();
         } catch (\Exception $e) {
-            nlog("Nordigen: {$this->bank_integration->nordigen_account_id} - exited abnormally => " . $e->getMessage());
+            nlog("Nordigen: {$this->bank_integration->nordigen_account_id} - exited abnormally => ".$e->getMessage());
 
             $content = [
                 "Processing transactions for account: {$this->bank_integration->nordigen_account_id} failed",
-                "Exception Details => ",
+                'Exception Details => ',
                 $e->getMessage(),
             ];
 
@@ -119,12 +122,12 @@ class ProcessBankTransactionsNordigen implements ShouldQueue
         $is_account_active = $this->nordigen->isAccountActive($this->bank_integration->nordigen_account_id);
         $account = $this->nordigen->getAccount($this->bank_integration->nordigen_account_id);
 
-        if (!$is_account_active || !$account) {
+        if (! $is_account_active || ! $account) {
             $this->bank_integration->disabled_upstream = true;
             $this->bank_integration->save();
             $this->stop_loop = false;
 
-            nlog("Nordigen: account inactive: " . $this->bank_integration->nordigen_account_id);
+            nlog('Nordigen: account inactive: '.$this->bank_integration->nordigen_account_id);
 
             $this->nordigen->disabledAccountEmail($this->bank_integration);
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,6 @@ class UpdateProjectRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -51,7 +48,7 @@ class UpdateProjectRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -75,8 +72,8 @@ class UpdateProjectRequest extends Request
         if (array_key_exists('color', $input) && is_null($input['color'])) {
             $input['color'] = '';
         }
-        
-        if(array_key_exists('budgeted_hours', $input) && empty($input['budgeted_hours'])) {
+
+        if (array_key_exists('budgeted_hours', $input) && empty($input['budgeted_hours'])) {
             $input['budgeted_hours'] = 0;
         }
 

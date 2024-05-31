@@ -5,32 +5,29 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Jobs\Mailgun;
 
-use App\Utils\Ninja;
-use App\Models\Company;
-use App\Models\SystemLog;
-use App\Libraries\MultiDB;
-use Illuminate\Bus\Queueable;
+use App\DataMapper\Analytics\Mail\EmailBounce;
+use App\DataMapper\Analytics\Mail\EmailSpam;
 use App\Jobs\Util\SystemLogger;
-use App\Models\QuoteInvitation;
+use App\Libraries\MultiDB;
+use App\Models\Company;
 use App\Models\CreditInvitation;
 use App\Models\InvoiceInvitation;
-use Illuminate\Queue\SerializesModels;
-use Turbo124\Beacon\Facades\LightLogs;
 use App\Models\PurchaseOrderInvitation;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Models\QuoteInvitation;
 use App\Models\RecurringInvoiceInvitation;
+use App\Models\SystemLog;
+use App\Notifications\Ninja\EmailSpamNotification;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\DataMapper\Analytics\Mail\EmailSpam;
-use App\DataMapper\Analytics\Mail\EmailBounce;
-use App\Notifications\Ninja\EmailSpamNotification;
-use App\Notifications\Ninja\EmailBounceNotification;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Turbo124\Beacon\Facades\LightLogs;
 
 class ProcessMailgunWebhook implements ShouldQueue
 {
@@ -47,7 +44,7 @@ class ProcessMailgunWebhook implements ShouldQueue
 
     private string $message_id = '';
 
-    private array $default_response =  [
+    private array $default_response = [
         'recipients' => '',
         'subject' => 'Message not found.',
         'entity' => '',
@@ -57,7 +54,6 @@ class ProcessMailgunWebhook implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
      */
     public function __construct(private array $request)
     {
@@ -66,11 +62,11 @@ class ProcessMailgunWebhook implements ShouldQueue
     private function getSystemLog(string $message_id): ?SystemLog
     {
         return SystemLog::query()
-                ->where('company_id', $this->invitation->company_id)
-                ->where('type_id', SystemLog::TYPE_WEBHOOK_RESPONSE)
-                ->whereJsonContains('log', ['MessageID' => $this->message_id])
-                ->orderBy('id', 'desc')
-                ->first();
+            ->where('company_id', $this->invitation->company_id)
+            ->where('type_id', SystemLog::TYPE_WEBHOOK_RESPONSE)
+            ->whereJsonContains('log', ['MessageID' => $this->message_id])
+            ->orderBy('id', 'desc')
+            ->first();
 
     }
 
@@ -79,8 +75,6 @@ class ProcessMailgunWebhook implements ShouldQueue
         $system_log->log = $data;
         $system_log->save();
     }
-
-
 
     /**
      * Execute the job.
@@ -92,7 +86,7 @@ class ProcessMailgunWebhook implements ShouldQueue
     {
         nlog($this->request);
 
-        if(!$this->request['event-data']['tags'][0]) {
+        if (! $this->request['event-data']['tags'][0]) {
             return;
         }
 
@@ -109,7 +103,7 @@ class ProcessMailgunWebhook implements ShouldQueue
 
         $this->invitation = $this->discoverInvitation($this->message_id);
 
-        if (!$this->invitation) {
+        if (! $this->invitation) {
             return;
         }
 
@@ -127,7 +121,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             case 'opened':
                 return $this->processOpen();
             default:
-                # code...
+                // code...
                 break;
         }
     }
@@ -184,7 +178,7 @@ class ProcessMailgunWebhook implements ShouldQueue
         $sl = $this->getSystemLog($this->request['MessageID']);
 
         /** Prevents Gmail tracking from firing inappropriately */
-        if($this->request['signature']['timestamp'] < $sl->log['signature']['timestamp'] + 3) {
+        if ($this->request['signature']['timestamp'] < $sl->log['signature']['timestamp'] + 3) {
             return;
         }
 
@@ -192,13 +186,13 @@ class ProcessMailgunWebhook implements ShouldQueue
             'bounce_id' => '',
             'recipient' => $this->request['event-data']['recipient'] ?? '',
             'status' => $this->request['event-data']['event'] ?? '',
-            'delivery_message' => collect($this->request['event-data']['client-info'])->implode(" ") ?? '',
-            'server' => collect($this->request['event-data']['geolocation'])->implode(" - ") ??  '',
+            'delivery_message' => collect($this->request['event-data']['client-info'])->implode(' ') ?? '',
+            'server' => collect($this->request['event-data']['geolocation'])->implode(' - ') ?? '',
             'server_ip' => $this->request['event-data']['ip'] ?? '',
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -276,10 +270,11 @@ class ProcessMailgunWebhook implements ShouldQueue
 
         $sl = $this->getSystemLog($this->request['MessageID']);
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $this->getEvent();
             $this->updateSystemLog($sl, $data);
+
             return;
         }
 
@@ -376,12 +371,12 @@ class ProcessMailgunWebhook implements ShouldQueue
             'recipient' => $this->request['event-data']['recipient'] ?? '',
             'status' => $this->request['event-data']['event'] ?? '',
             'delivery_message' => $this->request['event-data']['delivery-status']['description'] ?? $this->request['event-data']['delivery-status']['message'] ?? '',
-            'server' => $this->request['event-data']['delivery-status']['mx-host'] ??  '',
+            'server' => $this->request['event-data']['delivery-status']['mx-host'] ?? '',
             'server_ip' => $this->request['event-data']['envelope']['sending-ip'] ?? '',
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -455,7 +450,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -469,18 +464,23 @@ class ProcessMailgunWebhook implements ShouldQueue
 
         if ($invitation = InvoiceInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'invoice';
+
             return $invitation;
         } elseif ($invitation = QuoteInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'quote';
+
             return $invitation;
         } elseif ($invitation = RecurringInvoiceInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'recurring_invoice';
+
             return $invitation;
         } elseif ($invitation = CreditInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'credit';
+
             return $invitation;
         } elseif ($invitation = PurchaseOrderInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'purchase_order';
+
             return $invitation;
         } else {
             return $invitation;
@@ -489,7 +489,7 @@ class ProcessMailgunWebhook implements ShouldQueue
 
     private function fetchMessage(): array
     {
-        if(strlen($this->message_id) < 2) {
+        if (strlen($this->message_id) < 2) {
             return $this->default_response;
         }
 
@@ -522,11 +522,10 @@ class ProcessMailgunWebhook implements ShouldQueue
             'recipient' => $recipients,
             'status' => $this->request['event-data']['event'] ?? '',
             'delivery_message' => $this->request['event-details']['delivery-status']['description'] ?? $this->request['event-details']['delivery-status']['message'] ?? '',
-            'server' => $this->request['event-data']['recipient-domain'] ??  '',
+            'server' => $this->request['event-data']['recipient-domain'] ?? '',
             'server_ip' => $this->request['event-data']['envelope']['sending-ip'] ?? '',
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
     }
-
 }

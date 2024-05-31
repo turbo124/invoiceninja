@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -48,7 +47,7 @@ class CreditsTable extends Component
             ->where('is_deleted', 0)
             ->where(function ($query) {
                 $query->whereDate('due_date', '>=', now())
-                      ->orWhereNull('due_date');
+                    ->orWhereNull('due_date');
             })
             ->orderBy($this->sort_field, $this->sort_asc ? 'asc' : 'desc')
             ->withTrashed()

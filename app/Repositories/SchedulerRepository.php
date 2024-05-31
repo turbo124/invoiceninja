@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,10 +17,8 @@ class SchedulerRepository extends BaseRepository
     /**
      * Saves the scheduler.
      *
-     * @param      array                     $data     The data
-     * @param      \App\Models\Scheduler     $scheduler  The scheduler
-     *
-     * @return     \App\Models\Scheduler
+     * @param  array  $data  The data
+     * @param  \App\Models\Scheduler  $scheduler  The scheduler
      */
     public function save(array $data, Scheduler $scheduler): Scheduler
     {

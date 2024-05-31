@@ -5,21 +5,20 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. PurchaseOrder Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Export\CSV;
 
-use App\Utils\Ninja;
-use League\Csv\Writer;
-use App\Models\Company;
-use App\Libraries\MultiDB;
-use App\Models\PurchaseOrder;
-use Illuminate\Support\Facades\App;
 use App\Export\Decorators\Decorator;
-use Illuminate\Database\Eloquent\Builder;
+use App\Libraries\MultiDB;
+use App\Models\Company;
+use App\Models\PurchaseOrder;
 use App\Transformers\PurchaseOrderTransformer;
+use App\Utils\Ninja;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\App;
+use League\Csv\Writer;
 
 class PurchaseOrderExport extends BaseExport
 {
@@ -39,7 +38,6 @@ class PurchaseOrderExport extends BaseExport
         $this->decorator = new Decorator();
     }
 
-
     public function init(): Builder
     {
 
@@ -56,28 +54,28 @@ class PurchaseOrderExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_vendor_fields, $this->input['report_keys']));
 
         $query = PurchaseOrder::query()
-                        ->withTrashed()
-                        ->with('vendor')
-                        ->whereHas('vendor', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->where('company_id', $this->company->id);
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->with('vendor')
+            ->whereHas('vendor', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
         $query = $this->addDateRange($query);
 
-
         $clients = &$this->input['client_id'];
 
-        if($clients)
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
+        }
 
         $query = $this->addPurchaseOrderStatusFilter($query, $this->input['status'] ?? '');
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -96,14 +94,14 @@ class PurchaseOrderExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
-
 
     public function run()
     {
@@ -144,8 +142,8 @@ class PurchaseOrderExport extends BaseExport
                 // $entity[$key] = $this->resolveKey($key, $purchase_order, $this->purchase_order_transformer);
             }
 
-
         }
+
         // return $entity;
         return $this->decorateAdvancedFields($purchase_order, $entity);
     }
@@ -172,7 +170,6 @@ class PurchaseOrderExport extends BaseExport
         if (in_array('purchase_order.assigned_user_id', $this->input['report_keys'])) {
             $entity['purchase_order.assigned_user_id'] = $purchase_order->assigned_user ? $purchase_order->assigned_user->present()->name() : '';
         }
-
 
         return $entity;
     }

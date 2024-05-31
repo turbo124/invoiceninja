@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,7 @@ use App\Import\Transformer\BaseTransformer;
 class BankTransformer extends BaseTransformer
 {
     /**
-     * @param $line_items_data
-     *
+     * @param  $line_items_data
      * @return bool|array
      */
     public function transform($transaction)

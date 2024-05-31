@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,17 +22,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\BankTransactionController
  */
 class BankTransactionApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,8 +48,8 @@ class BankTransactionApiTest extends TestCase
 
     public function testBankTransactionCreate()
     {
-        nlog("creeeeate");
-        
+        nlog('creeeeate');
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
@@ -57,7 +57,6 @@ class BankTransactionApiTest extends TestCase
 
         $response->assertStatus(200);
     }
-
 
     public function testBankTransactionGetClientStatus()
     {
@@ -130,7 +129,7 @@ class BankTransactionApiTest extends TestCase
     public function testBankTransactionUnlink()
     {
         BankTransaction::truncate();
-        
+
         $bi = BankIntegration::factory()->create([
             'account_id' => $this->account->id,
             'company_id' => $this->company->id,
@@ -150,7 +149,7 @@ class BankTransactionApiTest extends TestCase
             'expense_id' => "{$this->expense->hashed_id},{$e->hashed_id}",
             'invoice_ids' => $this->invoice->hashed_id,
         ]);
-        
+
         $e->transaction_id = $bank_transaction->id;
         $e->save();
 
@@ -170,12 +169,11 @@ class BankTransactionApiTest extends TestCase
         $arr = $response->json();
 
         $this->assertEquals(1, $arr['data'][0]['status_id']);
-        $this->assertEquals("", $arr['data'][0]['payment_id']);
-        $this->assertEquals("", $arr['data'][0]['invoice_ids']);
-        $this->assertEquals("", $arr['data'][0]['expense_id']);
+        $this->assertEquals('', $arr['data'][0]['payment_id']);
+        $this->assertEquals('', $arr['data'][0]['invoice_ids']);
+        $this->assertEquals('', $arr['data'][0]['expense_id']);
 
         $this->assertNull($e->fresh()->transaction_id);
         $this->assertNull($this->expense->fresh()->transaction_id);
     }
-
 }

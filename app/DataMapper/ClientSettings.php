@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,8 +60,6 @@ class ClientSettings extends BaseSettings
 
     /**
      * Default Client Settings scaffold.
-     *
-     * @return stdClass
      */
     public static function defaults(): stdClass
     {
@@ -78,8 +75,6 @@ class ClientSettings extends BaseSettings
     /**
      * Merges settings from Company to Client.
      *
-     * @param  $company_settings
-     * @param  $client_settings
      * @return stdClass of merged settings
      */
     public static function buildClientSettings($company_settings, $client_settings)
@@ -89,7 +84,7 @@ class ClientSettings extends BaseSettings
         }
 
         if (is_array($client_settings)) {
-            $client_settings = (object)$client_settings;
+            $client_settings = (object) $client_settings;
         }
 
         foreach ($company_settings as $key => $value) {

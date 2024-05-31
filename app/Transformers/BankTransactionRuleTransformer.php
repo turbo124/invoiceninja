@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,15 +24,9 @@ class BankTransactionRuleTransformer extends EntityTransformer
 {
     use MakesHash;
 
-    /**
-     * @var array
-     */
     protected array $defaultIncludes = [
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'company',
         'vendor',
@@ -42,7 +35,6 @@ class BankTransactionRuleTransformer extends EntityTransformer
     ];
 
     /**
-     * @param BankTransactionRule $bank_transaction_rule
      * @return array
      */
     public function transform(BankTransactionRule $bank_transaction_rule)
@@ -73,7 +65,7 @@ class BankTransactionRuleTransformer extends EntityTransformer
 
     public function includeClient(BankTransactionRule $bank_transaction_rule)
     {
-        if (!$bank_transaction_rule->client) {
+        if (! $bank_transaction_rule->client) {
             return null;
         }
 
@@ -84,7 +76,7 @@ class BankTransactionRuleTransformer extends EntityTransformer
 
     public function includeVendor(BankTransactionRule $bank_transaction_rule)
     {
-        if (!$bank_transaction_rule->vendor) {
+        if (! $bank_transaction_rule->vendor) {
             return null;
         }
 
@@ -95,7 +87,7 @@ class BankTransactionRuleTransformer extends EntityTransformer
 
     public function includeExpenseCategory(BankTransactionRule $bank_transaction_rule)
     {
-        if (!$bank_transaction_rule->expense_category) {
+        if (! $bank_transaction_rule->expense_category) {
             return null;
         }
 

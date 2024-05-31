@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,9 +19,6 @@ class BankIntegrationFilters extends QueryFilters
 {
     /**
      * Filter by name.
-     *
-     * @param string $name
-     * @return Builder
      */
     public function name(string $name = ''): Builder
     {
@@ -36,8 +32,6 @@ class BankIntegrationFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -46,7 +40,7 @@ class BankIntegrationFilters extends QueryFilters
             return $this->builder;
         }
 
-        return  $this->builder->where(function ($query) use ($filter) {
+        return $this->builder->where(function ($query) use ($filter) {
             $query->where('bank_account_name', 'like', '%'.$filter.'%');
         });
     }
@@ -54,9 +48,6 @@ class BankIntegrationFilters extends QueryFilters
     /**
      * Filters the list based on the status
      * archived, active, deleted.
-     *
-     * @param string $filter
-     * @return Builder
      */
     public function status(string $filter = ''): Builder
     {
@@ -86,14 +77,13 @@ class BankIntegrationFilters extends QueryFilters
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
@@ -104,8 +94,6 @@ class BankIntegrationFilters extends QueryFilters
 
     /**
      * Filters the query by the users company ID.
-     *
-     * @return Builder
      */
     public function entityFilter(): Builder
     {

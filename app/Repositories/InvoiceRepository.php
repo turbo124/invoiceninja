@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,10 +24,9 @@ class InvoiceRepository extends BaseRepository
     /**
      * Saves the invoices.
      *
-     * @param      array $data       The invoice data
-     * @param      Invoice $invoice  The invoice
-     *
-     * @return     Invoice|null  Returns the invoice object
+     * @param  array  $data  The invoice data
+     * @param  Invoice  $invoice  The invoice
+     * @return Invoice|null Returns the invoice object
      */
     public function save($data, Invoice $invoice): ?Invoice
     {
@@ -38,9 +36,8 @@ class InvoiceRepository extends BaseRepository
     /**
      * Mark the invoice as sent.
      *
-     * @param Invoice $invoice  The invoice
-     *
-     * @return     Invoice|null  Return the invoice object
+     * @param  Invoice  $invoice  The invoice
+     * @return Invoice|null Return the invoice object
      */
     public function markSent(Invoice $invoice): ?Invoice
     {
@@ -59,7 +56,7 @@ class InvoiceRepository extends BaseRepository
      *
      * ie. invoice can be deleted from a business logic perspective.
      *
-     * @param Invoice $invoice
+     * @param  Invoice  $invoice
      * @return Invoice $invoice
      */
     public function delete($invoice): Invoice
@@ -78,8 +75,7 @@ class InvoiceRepository extends BaseRepository
     /**
      * Handles the restoration on a deleted invoice.
      *
-     * @param  Invoice $invoice
-     * @return Invoice
+     * @param  Invoice  $invoice
      */
     public function restore($invoice): Invoice
     {
@@ -98,7 +94,7 @@ class InvoiceRepository extends BaseRepository
         $invoice = $invoice->service()->handleRestore()->save();
 
         /* If the reverse did not succeed due to rules, then do not restore / unarchive */
-        if($invoice->is_deleted) {
+        if ($invoice->is_deleted) {
             return $invoice;
         }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,7 +22,7 @@ class ProtectedDownloadController extends BaseController
         /** @var string $hashed_path */
         $hashed_path = Cache::get($hash);
 
-        if (!$hashed_path) {
+        if (! $hashed_path) {
             throw new SystemError('File no longer available', 404);
             abort(404, 'File no longer available');
         }
@@ -33,5 +32,4 @@ class ProtectedDownloadController extends BaseController
         }, basename($hashed_path), []);
 
     }
-
 }

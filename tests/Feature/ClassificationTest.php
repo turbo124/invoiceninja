@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,11 +20,11 @@ use Tests\TestCase;
  */
 class ClassificationTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockUnitData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,14 +32,13 @@ class ClassificationTest extends TestCase
 
         $this->makeTestData();
 
-
     }
 
     public function testClientClassification()
     {
         $data = [
             'name' => 'Personal Company',
-            'classification' => 'individual'
+            'classification' => 'individual',
         ];
 
         $response = $this->withHeaders([
@@ -59,7 +57,7 @@ class ClassificationTest extends TestCase
     {
         $data = [
             'name' => 'Personal Company',
-            'classification' => 'this_is_not_validated'
+            'classification' => 'this_is_not_validated',
         ];
 
         $response = $this->withHeaders([
@@ -104,7 +102,7 @@ class ClassificationTest extends TestCase
     {
         $data = [
             'name' => 'Personal Company',
-            'classification' => 'individual'
+            'classification' => 'individual',
         ];
 
         $response = $this->withHeaders([
@@ -123,7 +121,7 @@ class ClassificationTest extends TestCase
     {
         $data = [
             'name' => 'Personal Company',
-            'classification' => 'this_is_not_validated'
+            'classification' => 'this_is_not_validated',
         ];
 
         $response = $this->withHeaders([

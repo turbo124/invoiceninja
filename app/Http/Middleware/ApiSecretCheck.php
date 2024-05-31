@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class ApiSecretCheck
      * Handle an incoming request.
      *
      * @param  Request  $request
-     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -40,9 +38,9 @@ class ApiSecretCheck
             ];
 
             return response()
-                    ->json($error, 403)
-                    ->header('X-App-Version', config('ninja.app_version'))
-                    ->header('X-Minimum-Client-Version', config('ninja.minimum_client_version'));
+                ->json($error, 403)
+                ->header('X-App-Version', config('ninja.app_version'))
+                ->header('X-Minimum-Client-Version', config('ninja.minimum_client_version'));
         }
     }
 }

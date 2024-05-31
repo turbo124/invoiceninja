@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,16 +19,15 @@ use App\Utils\Traits\MakesHash;
 
 class PreviewPurchaseOrderRequest extends Request
 {
-    use MakesHash;
     use CleanLineItems;
+    use MakesHash;
 
     private ?Vendor $vendor = null;
+
     private string $entity_plural = '';
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -59,37 +57,34 @@ class PreviewPurchaseOrderRequest extends Request
         $input['balance'] = 0;
         $input['number'] = isset($input['number']) ? $input['number'] : ctrans('texts.live_preview').' #'.rand(0, 1000); //30-06-2023
 
-        if($input['entity_id'] ?? false) {
+        if ($input['entity_id'] ?? false) {
             $input['entity_id'] = $this->decodePrimaryKey($input['entity_id'], true);
         }
 
         $this->replace($input);
     }
 
-
-
     public function resolveInvitation()
     {
         $invitation = false;
 
-        if(! $this->entity_id ?? false) {
+        if (! $this->entity_id ?? false) {
             return $this->stubInvitation();
         }
 
         $invitation = PurchaseOrderInvitation::withTrashed()->where('purchase_order_id', $this->entity_id)->first();
 
-        if($invitation) {
+        if ($invitation) {
             return $invitation;
         }
 
         return $this->stubInvitation();
 
-
     }
 
     public function getVendor(): ?Vendor
     {
-        if(!$this->vendor) {
+        if (! $this->vendor) {
             $this->vendor = Vendor::query()->with('contacts', 'company', 'user')->withTrashed()->find($this->vendor_id);
         }
 
@@ -120,7 +115,7 @@ class PreviewPurchaseOrderRequest extends Request
 
     private function stubEntity(Vendor $vendor)
     {
-        $entity = PurchaseOrder::factory()->make(['vendor_id' => $vendor->id,'user_id' => $vendor->user_id, 'company_id' => $vendor->company_id]);
+        $entity = PurchaseOrder::factory()->make(['vendor_id' => $vendor->id, 'user_id' => $vendor->user_id, 'company_id' => $vendor->company_id]);
 
         $entity->setRelation('vendor', $vendor);
         $entity->setRelation('company', $vendor->company);
@@ -137,5 +132,4 @@ class PreviewPurchaseOrderRequest extends Request
 
         return $this;
     }
-
 }

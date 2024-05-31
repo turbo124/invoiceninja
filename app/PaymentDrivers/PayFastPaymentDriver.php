@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -195,7 +194,7 @@ class PayFastPaymentDriver extends BaseDriver
         return md5(http_build_query($fields));
     }
 
-    public function processWebhookRequest(Request $request, Payment $payment = null)
+    public function processWebhookRequest(Request $request, ?Payment $payment = null)
     {
         $data = $request->all();
         // nlog("payfast");
@@ -207,18 +206,17 @@ class PayFastPaymentDriver extends BaseDriver
             switch ($hash) {
                 case 'cc_auth':
                     $this->setPaymentMethod(GatewayType::CREDIT_CARD)
-                         ->authorizeResponse($request);
+                        ->authorizeResponse($request);
 
                     return response()->json([], 200);
-
 
                 default:
 
                     $payment_hash = PaymentHash::where('hash', $data['m_payment_id'])->first();
 
                     $this->setPaymentMethod(GatewayType::CREDIT_CARD)
-                         ->setPaymentHash($payment_hash)
-                         ->processPaymentResponse($request);
+                        ->setPaymentHash($payment_hash)
+                        ->processPaymentResponse($request);
 
                     return response()->json([], 200);
 

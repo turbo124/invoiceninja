@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,10 +28,6 @@ class CheckGatewayFee implements ShouldQueue
 
     public $tries = 1;
 
-    /**
-     * @param $invoice_id
-     * @param string $db
-     */
     public function __construct(public int $invoice_id, public string $db)
     {
     }
@@ -49,7 +44,7 @@ class CheckGatewayFee implements ShouldQueue
 
         $i = Invoice::withTrashed()->find($this->invoice_id);
 
-        if (!$i) {
+        if (! $i) {
             return;
         }
 

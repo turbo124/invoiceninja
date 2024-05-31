@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,6 +37,7 @@ class PostUpdate extends Command
      * Execute the console command.
      *
      * @return mixed
+     *
      * @throws \Exception
      */
     public function handle()

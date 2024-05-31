@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,7 +36,7 @@ class StripeConnectFailed extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: "Stripe Connect not configured, please login and connect.",
+            subject: 'Stripe Connect not configured, please login and connect.',
             from: config('ninja.contact.email'),
             to: $this->user->email,
         );
@@ -65,7 +64,7 @@ class StripeConnectFailed extends Mailable
                 'greeting' => '',
                 'links' => [],
                 'url' => 'https://www.loom.com/share/a3dc3131cc924e14a34634d5d48065c8?sid=b1971aa2-9deb-4339-8ebd-53f9947ef633',
-                'button' => "texts.view"
+                'button' => 'texts.view',
             ]
         );
     }
@@ -80,13 +79,14 @@ class StripeConnectFailed extends Mailable
 
     private function htmlBody()
     {
-        return "
+        return '
         We note you are yet to connect your Stripe account to Invoice Ninja. Please log in to Invoice Ninja and connect your Stripe account.<br><br>
 
         Once logged in you can use the following resource to connect your Stripe account: <br><br>
 
-        ";
+        ';
     }
+
     /**
      * Get the attachments for the message.
      *
@@ -107,7 +107,7 @@ class StripeConnectFailed extends Mailable
         return new Headers(
             messageId: null,
             references: [],
-            text:['' => ''],
+            text: ['' => ''],
         );
     }
 }

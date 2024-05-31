@@ -5,35 +5,36 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use Tests\MockAccountData;
-use App\Models\GatewayType;
 use App\Models\CompanyGateway;
+use App\Models\GatewayType;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\ClientGatewayTokenController
  */
 class ClientGatewayTokenApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     protected $faker;
+
     protected CompanyGateway $cg;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class ProductObserver
     /**
      * Handle the product "created" event.
      *
-     * @param Product $product
      * @return void
      */
     public function created(Product $product)
@@ -39,21 +37,19 @@ class ProductObserver
     /**
      * Handle the product "updated" event.
      *
-     * @param Product $product
      * @return void
      */
     public function updated(Product $product)
     {
         $event = Webhook::EVENT_UPDATE_PRODUCT;
 
-        if ($product->getOriginal('deleted_at') && !$product->deleted_at) {
+        if ($product->getOriginal('deleted_at') && ! $product->deleted_at) {
             $event = Webhook::EVENT_RESTORE_PRODUCT;
         }
 
         if ($product->is_deleted) {
             $event = Webhook::EVENT_DELETE_PRODUCT;
         }
-
 
         $subscriptions = Webhook::where('company_id', $product->company_id)
             ->where('event_id', $event)
@@ -67,7 +63,6 @@ class ProductObserver
     /**
      * Handle the product "deleted" event.
      *
-     * @param Product $product
      * @return void
      */
     public function deleted(Product $product)
@@ -88,7 +83,6 @@ class ProductObserver
     /**
      * Handle the product "restored" event.
      *
-     * @param Product $product
      * @return void
      */
     public function restored(Product $product)
@@ -99,7 +93,6 @@ class ProductObserver
     /**
      * Handle the product "force deleted" event.
      *
-     * @param Product $product
      * @return void
      */
     public function forceDeleted(Product $product)

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,13 +24,14 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Libraries\MultiDB
  *
  * Proves that we can reliably switch database connections at runtime
  */
 class MultiDBUserTest extends TestCase
 {
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -80,14 +80,14 @@ class MultiDBUserTest extends TestCase
 
         $user2 = [
             'account_id' => $account2->id,
-            'first_name'        => 'user_db_2',
-            'last_name'         => 'user_db_2-s',
-            'phone'             => '55555',
+            'first_name' => 'user_db_2',
+            'last_name' => 'user_db_2-s',
+            'phone' => '55555',
             'email_verified_at' => now(),
             'password' => 'ALongAndBriliantPassword', // secret
-            'remember_token'    => \Illuminate\Support\Str::random(10),
-            'email'             => 'db2@example.com',
-            'oauth_user_id'     => 'abc',
+            'remember_token' => \Illuminate\Support\Str::random(10),
+            'email' => 'db2@example.com',
+            'oauth_user_id' => 'abc',
             //      'account_id' => $account2->id,
 
         ];
@@ -243,7 +243,7 @@ class MultiDBUserTest extends TestCase
     //     }
     // }
 
-    protected function tearDown() :void
+    protected function tearDown(): void
     {
         DB::connection('db-ninja-01')->table('users')->delete();
         DB::connection('db-ninja-02')->table('users')->delete();

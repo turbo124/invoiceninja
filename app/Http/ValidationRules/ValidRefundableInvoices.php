@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,8 +23,8 @@ class ValidRefundableInvoices implements Rule
     use MakesHash;
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     private $error_msg;
@@ -45,7 +44,7 @@ class ValidRefundableInvoices implements Rule
             return false;
         }
 
-        /**@var \App\Models\Payment $payment **/
+        /** @var \App\Models\Payment $payment * */
         $payment = Payment::whereId($this->input['id'])->first();
 
         if (! $payment) {

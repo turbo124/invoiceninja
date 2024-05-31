@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -132,7 +131,7 @@ class InvoiceTransformer extends EntityTransformer
             'is_amount_discount' => (bool) ($invoice->is_amount_discount ?: false),
             'footer' => $invoice->footer ?: '',
             'partial' => (float) ($invoice->partial ?: 0.0),
-            'partial_due_date' => ($invoice->partial_due_date && $invoice->partial_due_date != "-0001-11-30") ? $invoice->partial_due_date->format('Y-m-d') : '',
+            'partial_due_date' => ($invoice->partial_due_date && $invoice->partial_due_date != '-0001-11-30') ? $invoice->partial_due_date->format('Y-m-d') : '',
             'custom_value1' => (string) $invoice->custom_value1 ?: '',
             'custom_value2' => (string) $invoice->custom_value2 ?: '',
             'custom_value3' => (string) $invoice->custom_value3 ?: '',

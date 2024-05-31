@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,6 +21,7 @@ class Statics
 {
     /**
      * Date format types.
+     *
      * @var array
      */
     public static $date = [
@@ -42,6 +42,7 @@ class Statics
 
     /**
      * Date Time Format types.
+     *
      * @var array
      */
     public static $date_time = [
@@ -62,8 +63,9 @@ class Statics
 
     /**
      * Company statics.
-     * @param  string|bool $locale The user locale
-     * @return array          Array of statics
+     *
+     * @param  string|bool  $locale  The user locale
+     * @return array Array of statics
      */
     public static function company($locale = false): array
     {
@@ -130,7 +132,7 @@ class Statics
         $data['bulk_updates'] = [
             'client' => \App\Models\Client::$bulk_update_columns,
         ];
-        
+
         return $data;
     }
 }

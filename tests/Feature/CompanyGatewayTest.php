@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,15 +21,16 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Models\CompanyGateway
  */
 class CompanyGatewayTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
     // use RefreshDatabase;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,7 +50,7 @@ class CompanyGatewayTest extends TestCase
     public function testSetConfigFields()
     {
         $company_gateway = CompanyGateway::first();
-        
+
         $this->assertNotNull($company_gateway->getConfig());
 
         $company_gateway->setConfigField('test', 'test');
@@ -265,8 +265,6 @@ class CompanyGatewayTest extends TestCase
 
         $this->assertEquals($wiped_balance, $i->amount);
     }
-
-
 
     public function testProRataGatewayFees()
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,10 +22,9 @@ use App\Utils\Traits\NumberFormatter;
 
 class InvoiceItemSumInclusive
 {
-    use NumberFormatter;
     use Discounter;
+    use NumberFormatter;
     use Taxer;
-
 
     private array $eu_tax_jurisdictions = [
         'AT', // Austria
@@ -92,7 +90,7 @@ class InvoiceItemSumInclusive
         'AU', // Australia
     ];
 
-    protected RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice;
+    protected RecurringInvoice|Invoice|Quote|Credit|PurchaseOrder|RecurringQuote $invoice;
 
     private \App\Models\Currency $currency;
 
@@ -112,7 +110,7 @@ class InvoiceItemSumInclusive
 
     private RuleInterface $rule;
 
-    public function __construct(RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice)
+    public function __construct(RecurringInvoice|Invoice|Quote|Credit|PurchaseOrder|RecurringQuote $invoice)
     {
         $this->tax_collection = collect([]);
 
@@ -131,7 +129,7 @@ class InvoiceItemSumInclusive
 
     public function process()
     {
-        if (!$this->invoice->line_items || ! is_iterable($this->invoice->line_items) || count($this->invoice->line_items) == 0) {
+        if (! $this->invoice->line_items || ! is_iterable($this->invoice->line_items) || count($this->invoice->line_items) == 0) {
             return $this;
         }
 
@@ -181,34 +179,30 @@ class InvoiceItemSumInclusive
         return $this;
     }
 
-
     /**
      * Attempts to calculate taxes based on the clients location
-     *
-     * @return self
      */
     private function calcTaxesAutomatically(): self
     {
         $this->rule->tax($this->item);
 
-        $precision = strlen(substr(strrchr($this->rule->tax_rate1, "."), 1));
+        $precision = strlen(substr(strrchr($this->rule->tax_rate1, '.'), 1));
 
         $this->item->tax_name1 = $this->rule->tax_name1;
         $this->item->tax_rate1 = round($this->rule->tax_rate1, $precision);
 
-        $precision = strlen(substr(strrchr($this->rule->tax_rate2, "."), 1));
+        $precision = strlen(substr(strrchr($this->rule->tax_rate2, '.'), 1));
 
         $this->item->tax_name2 = $this->rule->tax_name2;
         $this->item->tax_rate2 = round($this->rule->tax_rate2, $precision);
 
-        $precision = strlen(substr(strrchr($this->rule->tax_rate3, "."), 1));
+        $precision = strlen(substr(strrchr($this->rule->tax_rate3, '.'), 1));
 
         $this->item->tax_name3 = $this->rule->tax_name3;
         $this->item->tax_rate3 = round($this->rule->tax_rate3, $precision);
 
         return $this;
     }
-
 
     /**
      * Taxes effect the line totals and item costs. we decrement both on
@@ -348,7 +342,6 @@ class InvoiceItemSumInclusive
     {
         $this->setGroupedTaxes(collect([]));
 
-
         foreach ($this->line_items as $this->item) {
             if ($this->sub_total == 0) {
                 $amount = $this->item->line_total;
@@ -395,28 +388,28 @@ class InvoiceItemSumInclusive
         // $this->setTotalTaxes($item_tax);
     }
 
-
     private function shouldCalculateTax(): self
     {
 
-        if (!$this->invoice->company?->calculate_taxes || $this->invoice->company->account->isFreeHostedClient()) {
+        if (! $this->invoice->company?->calculate_taxes || $this->invoice->company->account->isFreeHostedClient()) {
             $this->calc_tax = false;
+
             return $this;
         }
 
         if (in_array($this->client->company->country()->iso_3166_2, $this->tax_jurisdictions)) { //only calculate for supported tax jurisdictions
 
-            $class = "App\DataMapper\Tax\\".$this->client->company->country()->iso_3166_2."\\Rule";
+            $class = "App\DataMapper\Tax\\".$this->client->company->country()->iso_3166_2.'\\Rule';
 
             $this->rule = new $class();
 
-            if($this->rule->regionWithNoTaxCoverage($this->client->country->iso_3166_2)) {
+            if ($this->rule->regionWithNoTaxCoverage($this->client->country->iso_3166_2)) {
                 return $this;
             }
 
             $this->rule
-                 ->setEntity($this->invoice)
-                 ->init();
+                ->setEntity($this->invoice)
+                ->init();
 
             $this->calc_tax = $this->rule->shouldCalcTax();
 
@@ -425,6 +418,4 @@ class InvoiceItemSumInclusive
 
         return $this;
     }
-
-
 }

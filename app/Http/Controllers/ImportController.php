@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,7 +24,6 @@ class ImportController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param PreImportRequest $request
      *
      * @return \Illuminate\Http\JsonResponse
      *
@@ -35,36 +33,46 @@ class ImportController extends Controller
      *      tags={"imports"},
      *      summary="Pre Import checks - returns a reference to the job and the headers of the CSV",
      *      description="Pre Import checks - returns a reference to the job and the headers of the CSV",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\RequestBody(
      *         description="The CSV file",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
+     *
      *             @OA\Schema(
      *                 type="string",
      *                 format="binary"
      *             )
      *         )
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a reference to the file",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -75,7 +83,7 @@ class ImportController extends Controller
         $hash = Str::random(32);
 
         $data = [
-            'hash'     => $hash,
+            'hash' => $hash,
             'mappings' => [],
         ];
         /** @var UploadedFile $file */
@@ -96,7 +104,7 @@ class ImportController extends Controller
 
             $data['mappings'][$entityType] = [
                 'available' => $class_map::importable(),
-                'headers'   => array_slice($csv_array, 0, 2),
+                'headers' => array_slice($csv_array, 0, 2),
                 'hints' => $hints,
             ];
         }
@@ -110,7 +118,7 @@ class ImportController extends Controller
 
         $translated_keys = collect($available_keys)->map(function ($value, $key) {
 
-            $parts = explode(".", $value);
+            $parts = explode('.', $value);
             $index = $parts[0];
             $label = $parts[1] ?? $parts[0];
 
@@ -118,12 +126,11 @@ class ImportController extends Controller
 
         })->toArray();
 
+        foreach ($headers as $key => $value) {
 
-        foreach($headers as $key => $value) {
+            foreach ($translated_keys as $tkey => $tvalue) {
 
-            foreach($translated_keys as $tkey => $tvalue) {
-
-                if($this->testMatch($value, $tvalue['label'])) {
+                if ($this->testMatch($value, $tvalue['label'])) {
                     $hit = $tvalue['key'];
                     $hints[$key] = $hit;
                     unset($translated_keys[$tkey]);
@@ -134,17 +141,16 @@ class ImportController extends Controller
 
             }
 
-
         }
 
         //second pass using the index of the translation here
-        foreach($headers as $key => $value) {
-            if(isset($hints[$key])) {
+        foreach ($headers as $key => $value) {
+            if (isset($hints[$key])) {
                 continue;
             }
 
-            foreach($translated_keys as $tkey => $tvalue) {
-                if($this->testMatch($value, $tvalue['index'])) {
+            foreach ($translated_keys as $tkey => $tvalue) {
+                if ($this->testMatch($value, $tvalue['index'])) {
                     $hit = $tvalue['key'];
                     $hints[$key] = $hit;
                     unset($translated_keys[$tkey]);
@@ -236,8 +242,6 @@ class ImportController extends Controller
         return $this->convertData($data);
     }
 
-
-
     private function convertData(array $data): array
     {
 
@@ -258,7 +262,7 @@ class ImportController extends Controller
             'WINDOWS-1251', // CP1251
             'UTF-16',
             'UTF-32',
-            'ASCII'
+            'ASCII',
         ];
 
         foreach ($data as $key => $value) {
@@ -276,13 +280,11 @@ class ImportController extends Controller
 
         return $data;
     }
-    
 
     /**
      * Returns the best delimiter
      *
-     * @param string $csvfile
-     * @return string
+     * @param  string  $csvfile
      */
     public function detectDelimiter($csvfile): string
     {
@@ -302,7 +304,7 @@ class ImportController extends Controller
             }
 
         }
-        
+
         /** @phpstan-ignore-next-line **/
         return $bestDelimiter ?? ',';
 

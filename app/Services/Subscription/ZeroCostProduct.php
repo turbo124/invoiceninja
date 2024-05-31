@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,12 +21,12 @@ class ZeroCostProduct extends AbstractService
     private $data;
 
     /**
-    * $data = [
-    *     'email' => $this->email ?? $this->contact->email,
-    *     'quantity' => $this->quantity,
-    *     'contact_id' => $this->contact->id,
-    *     'client_id' => $this->contact->client->id,
-    * ];
+     * $data = [
+     *     'email' => $this->email ?? $this->contact->email,
+     *     'quantity' => $this->quantity,
+     *     'contact_id' => $this->contact->id,
+     *     'client_id' => $this->contact->client->id,
+     * ];
      */
     public function __construct(Subscription $subscription, array $data)
     {
@@ -43,8 +42,8 @@ class ZeroCostProduct extends AbstractService
         $invoice = $this->subscription->service()->createInvoice($this->data);
 
         $invoice = $invoice->service()
-                           ->markPaid()
-                           ->save();
+            ->markPaid()
+            ->save();
 
         $redirect_url = "/client/invoices/{$invoice->hashed_id}";
 
@@ -63,8 +62,8 @@ class ZeroCostProduct extends AbstractService
 
             /* Start the recurring service */
             $recurring_invoice->service()
-                              ->start()
-                              ->save();
+                ->start()
+                ->save();
 
             $invoice->recurring_id = $recurring_invoice->id;
             $invoice->save();
@@ -79,7 +78,7 @@ class ZeroCostProduct extends AbstractService
                 'redirect_url' => "/client/recurring_invoices/{$recurring_invoice->hashed_id}",
             ];
 
-            if(isset($this->data['campaign'])) {
+            if (isset($this->data['campaign'])) {
                 $context['campaign'] = $this->data['campaign'];
             }
 

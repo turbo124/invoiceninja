@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,9 +38,6 @@ class Hosted implements MethodInterface
 
     /**
      * Show the authorization page for Razorpay.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function authorizeView(array $data): View
     {
@@ -50,9 +46,6 @@ class Hosted implements MethodInterface
 
     /**
      * Handle the authorization page for Razorpay.
-     *
-     * @param Request $request
-     * @return RedirectResponse
      */
     public function authorizeResponse(Request $request): RedirectResponse
     {
@@ -61,9 +54,6 @@ class Hosted implements MethodInterface
 
     /**
      * Payment view for the Razorpay.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function paymentView(array $data): View
     {
@@ -91,7 +81,6 @@ class Hosted implements MethodInterface
     /**
      * Handle payments page for Razorpay.
      *
-     * @param PaymentResponseRequest $request
      * @return void
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -125,9 +114,6 @@ class Hosted implements MethodInterface
 
     /**
      * Handle the successful payment for Razorpay.
-     *
-     * @param string $payment_id
-     * @return RedirectResponse
      */
     public function processSuccessfulPayment(string $payment_id): RedirectResponse
     {
@@ -155,9 +141,9 @@ class Hosted implements MethodInterface
     /**
      * Handle unsuccessful payment for Razorpay.
      *
-     * @param Exception $exception
+     * @param  Exception  $exception
+     *
      * @throws PaymentFailed
-     * @return void
      */
     public function processUnsuccessfulPayment(\Exception $exception): void
     {

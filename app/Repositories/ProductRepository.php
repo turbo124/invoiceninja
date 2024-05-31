@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,11 +17,6 @@ class ProductRepository extends BaseRepository
 {
     use SavesDocuments;
 
-    /**
-     * @param array $data
-     * @param Product $product
-     * @return Product|null
-     */
     public function save(array $data, Product $product): ?Product
     {
         $product->fill($data);

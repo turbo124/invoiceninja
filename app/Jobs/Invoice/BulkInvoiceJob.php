@@ -5,20 +5,19 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Jobs\Invoice;
 
+use App\Jobs\Entity\EmailEntity;
 use App\Models\Invoice;
 use App\Models\Webhook;
 use Illuminate\Bus\Queueable;
-use App\Jobs\Entity\EmailEntity;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class BulkInvoiceJob implements ShouldQueue
 {
@@ -54,7 +53,7 @@ class BulkInvoiceJob implements ShouldQueue
 
         if ($this->invoice->invitations->count() >= 1) {
             $this->invoice->entityEmailEvent($this->invoice->invitations->first(), 'invoice', $this->reminder_template);
-            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
+            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, 'client');
 
         }
     }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,7 +40,6 @@ use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\UrlSetDb;
 use App\Http\Middleware\UserVerified;
-use App\Http\Middleware\ValidateSignature;
 use App\Http\Middleware\VendorContactKeyLogin;
 use App\Http\Middleware\VendorLocale;
 use App\Http\Middleware\VerifyCsrfToken;
@@ -148,7 +146,7 @@ class Kernel extends HttpKernel
         'invite_db' => SetInviteDb::class,
         'password_protected' => PasswordProtection::class,
         'portal_enabled' => ClientPortalEnabled::class,
-        'url_db' =>  UrlSetDb::class,
+        'url_db' => UrlSetDb::class,
         'web_db' => SetWebDb::class,
         'api_db' => SetDb::class,
         'company_key_db' => SetDbByCompanyKey::class,
@@ -192,5 +190,4 @@ class Kernel extends HttpKernel
         SubstituteBindings::class,
         ContactAccount::class,
     ];
-
 }

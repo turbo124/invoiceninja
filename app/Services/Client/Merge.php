@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -72,8 +71,8 @@ class Merge extends AbstractService
         $balance = 0;
 
         $company_ledger = CompanyLedger::query()->whereClientId($this->client->id)
-                                ->orderBy('id', 'DESC')
-                                ->first();
+            ->orderBy('id', 'DESC')
+            ->first();
 
         if ($company_ledger) {
             $balance = $company_ledger->balance;

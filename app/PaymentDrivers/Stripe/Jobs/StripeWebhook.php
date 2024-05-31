@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -47,7 +46,7 @@ class StripeWebhook implements ShouldQueue
         'payment_intent.payment_failed',
         'mandate.updated',
         'checkout.session.completed',
-        'payment_method.automatically_updated'
+        'payment_method.automatically_updated',
     ];
 
     public function __construct(string $company_key, int $company_gateway_id)
@@ -62,7 +61,7 @@ class StripeWebhook implements ShouldQueue
 
         $company = Company::where('company_key', $this->company_key)->first();
 
-        /** @var \App\Models\CompanyGateway $company_gateway **/
+        /** @var \App\Models\CompanyGateway $company_gateway * */
         $company_gateway = CompanyGateway::find($this->company_gateway_id);
 
         $stripe = $company_gateway->driver()->init();

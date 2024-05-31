@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Entreprise',
     'name' => 'Nom',
     'website' => 'Site web',
@@ -1173,7 +1173,6 @@ $lang = array(
     'enterprise_plan_features' => 'Le plan Entreprise ajoute la prise en charge de plusieurs utilisateurs et pièces jointes, :link pour voir la liste complète des fonctionnalités.',
     'return_to_app' => 'Retour à l\'app',
 
-
     // Payment updates
     'refund_payment' => 'Remboursement',
     'refund_max' => 'Max:',
@@ -1702,7 +1701,6 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'lang_Serbian' => 'Serbe',
     'lang_Bulgarian' => 'Bulgare',
     'lang_Russian (Russia)' => 'Russe (Russie)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Administration',
@@ -2361,7 +2359,7 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'currency_gold_troy_ounce' => 'Once troy d&#39;or',
     'currency_nicaraguan_córdoba' => 'Cordoue nicaraguayenne',
     'currency_malagasy_ariary' => 'Ariary malgache',
-    "currency_tongan_pa_anga" => "Pa&#39;anga tongien",
+    'currency_tongan_pa_anga' => 'Pa&#39;anga tongien',
 
     'review_app_help' => 'Nous espérons que votre utilisation de cette application vous est agréable.<br/>Un commentaire de votre part serait grandement apprécié!',
     'writing_a_review' => 'rédiger un commentaire',
@@ -4423,7 +4421,7 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'activity_122' => ':user archived recurring expense :recurring_expense',
     'activity_123' => ':user deleted recurring expense :recurring_expense',
     'activity_124' => ':user restored recurring expense :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Pour afficher le :entity, vous devez définir un mot de passe.',
     'unsubscribe' => 'Unsubscribe',
     'unsubscribed' => 'Unsubscribed',
@@ -4927,7 +4925,7 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'Payable sous :payeddue jours net jusqu&#39;à :paydate',
-    'xinvoice_no_buyers_reference' => "Aucune référence d&#39;acheteur donnée",
+    'xinvoice_no_buyers_reference' => 'Aucune référence d&#39;acheteur donnée',
     'xinvoice_online_payment' => 'La facture doit être payée en ligne via le lien fourni',
     'pre_payment' => 'Prépaiement',
     'number_of_payments' => 'Nombre de paiements',
@@ -5032,8 +5030,8 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'e_invoice' => 'Facture électronique',
     'light_dark_mode' => 'Mode clair/foncé',
     'activities' => 'Activités',
-    'recent_transactions' => "Voici les transactions les plus récentes de votre entreprise :",
-    'country_Palestine' => "Palestine",
+    'recent_transactions' => 'Voici les transactions les plus récentes de votre entreprise :',
+    'country_Palestine' => 'Palestine',
     'country_Taiwan' => 'Taïwan',
     'duties' => 'Devoirs',
     'order_number' => 'Numéro de commande',
@@ -5248,7 +5246,7 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'rff' => 'Formulaire de champs obligatoires',
     'add_step' => 'Ajouter une étape',
     'steps' => 'Pas',
-    'steps_order_help' =>  'L&#39;ordre des étapes est important. La première étape ne devrait dépendre d’aucune autre étape. La deuxième étape doit dépendre de la première étape, et ainsi de suite.',
+    'steps_order_help' => 'L&#39;ordre des étapes est important. La première étape ne devrait dépendre d’aucune autre étape. La deuxième étape doit dépendre de la première étape, et ainsi de suite.',
     'other_steps' => 'Autres étapes',
     'use_available_payments' => 'Utiliser les paiements disponibles',
     'test_email_sent' => 'E-mail envoyé avec succès',
@@ -5297,6 +5295,6 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

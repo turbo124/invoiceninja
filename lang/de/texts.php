@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Unternehmen',
     'name' => 'Name',
     'website' => 'Webseite',
@@ -1177,7 +1177,6 @@ $lang = array(
     'enterprise_plan_features' => 'Der Enterprise-Plan bietet Unterstützung für mehrere Benutzer und Dateianhänge. :link , um die vollständige Liste der Funktionen anzuzeigen.',
     'return_to_app' => 'Zurück zur App',
 
-
     // Payment updates
     'refund_payment' => 'Zahlung erstatten',
     'refund_max' => 'Max:',
@@ -1706,7 +1705,6 @@ Sobald Sie die Beträge erhalten haben, kommen Sie bitte wieder zurück zu diese
     'lang_Serbian' => 'Serbisch',
     'lang_Bulgarian' => 'Bulgarisch',
     'lang_Russian (Russia)' => 'Russisch (Russland)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Buchhaltung und Rechnungswesen',
@@ -2365,7 +2363,7 @@ Sobald Sie die Beträge erhalten haben, kommen Sie bitte wieder zurück zu diese
     'currency_gold_troy_ounce' => 'Goldene Feinunze',
     'currency_nicaraguan_córdoba' => 'Nicaraguanischer Córdoba',
     'currency_malagasy_ariary' => 'Madagassischer Ariary',
-    "currency_tongan_pa_anga" => "Tongaischer Paʻanga",
+    'currency_tongan_pa_anga' => 'Tongaischer Paʻanga',
 
     'review_app_help' => 'Wir hoffen, dass Ihnen die App gefällt. Wenn Sie :link in Betracht ziehen würden, wären wir Ihnen sehr dankbar!',
     'writing_a_review' => 'Schreiben einer Rezension',
@@ -4428,7 +4426,7 @@ https://invoiceninja.github.io/docs/migration/#troubleshooting',
     'activity_122' => ':user archivierte wiederkehrende Ausgabe :recurring_expense',
     'activity_123' => ':user löschte wiederkehrende Ausgabe :recurring_expense',
     'activity_124' => ':user stellte wiederkehrende Ausgabe :recurring_expense wieder her',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Um :entity anzuzeigen, müssen Sie ein Passwort festlegen.',
     'unsubscribe' => 'Deabonnieren',
     'unsubscribed' => 'Deabonniert',
@@ -4932,7 +4930,7 @@ https://invoiceninja.github.io/docs/migration/#troubleshooting',
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E-Übertragung',
     'xinvoice_payable' => 'Zahlbar innerhalb von :payeddue Tagen netto bis :paydate',
-    'xinvoice_no_buyers_reference' => "Keine Käuferreferenz angegeben",
+    'xinvoice_no_buyers_reference' => 'Keine Käuferreferenz angegeben',
     'xinvoice_online_payment' => 'Die Rechnung muss online über den bereitgestellten Link bezahlt werden',
     'pre_payment' => 'Vorauszahlung',
     'number_of_payments' => 'Anzahl der Zahlungen',
@@ -5037,8 +5035,8 @@ https://invoiceninja.github.io/docs/migration/#troubleshooting',
     'e_invoice' => 'E-Rechnung',
     'light_dark_mode' => 'Tag-/Nachtmodus',
     'activities' => 'Aktivitäten',
-    'recent_transactions' => "Hier sind die aktuellsten Transaktionen Ihrer Firma:",
-    'country_Palestine' => "Palestinensa",
+    'recent_transactions' => 'Hier sind die aktuellsten Transaktionen Ihrer Firma:',
+    'country_Palestine' => 'Palestinensa',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Aufgaben',
     'order_number' => 'Bestellnummer',
@@ -5255,7 +5253,7 @@ Leistungsempfängers',
     'rff' => 'Formular mit den erforderlichen Feldern',
     'add_step' => 'Schritt hinzufügen',
     'steps' => 'Schritte',
-    'steps_order_help' =>  'Die Reihenfolge der Schritte ist wichtig. Der erste Schritt sollte nicht von einem anderen Schritt abhängen. Der zweite Schritt sollte vom ersten Schritt abhängen und so weiter.',
+    'steps_order_help' => 'Die Reihenfolge der Schritte ist wichtig. Der erste Schritt sollte nicht von einem anderen Schritt abhängen. Der zweite Schritt sollte vom ersten Schritt abhängen und so weiter.',
     'other_steps' => 'Weitere Schritte',
     'use_available_payments' => 'Verwenden Sie verfügbare Zahlungen',
     'test_email_sent' => 'E-Mail erfolgreich gesendet',
@@ -5329,6 +5327,6 @@ Leistungsempfängers',
     'money' => 'Money',
     'web_app' => 'Webanwendung',
     'desktop_app' => 'Desktopanwendung',
-);
+];
 
 return $lang;

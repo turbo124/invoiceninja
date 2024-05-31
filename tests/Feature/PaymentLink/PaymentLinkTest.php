@@ -5,21 +5,17 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Feature\PaymentLink;
 
-use Tests\TestCase;
-use App\Models\Invoice;
-use Tests\MockUnitData;
-use App\Models\Subscription;
-use Illuminate\Support\Carbon;
-use App\Helpers\Invoice\ProRata;
-use App\Models\RecurringInvoice;
 use App\Factory\InvoiceItemFactory;
-use App\Helpers\Subscription\SubscriptionCalculator;
+use App\Models\Invoice;
+use App\Models\RecurringInvoice;
+use App\Models\Subscription;
+use Tests\MockUnitData;
+use Tests\TestCase;
 
 /**
  * @test
@@ -66,7 +62,6 @@ class PaymentLinkTest extends TestCase
             'next_send_date_client' => now(),
         ]);
 
-
         $invoice = Invoice::factory()->create([
             'line_items' => $this->buildLineItems(),
             'company_id' => $this->company->id,
@@ -95,8 +90,8 @@ class PaymentLinkTest extends TestCase
         $this->assertEquals(10, $invoice->paid_to_date);
 
         $status = $recurring_invoice
-                    ->subscription
-                    ->status($recurring_invoice);
+            ->subscription
+            ->status($recurring_invoice);
 
         $this->assertFalse($status->is_trial);
         $this->assertFalse($status->is_refundable);
@@ -110,7 +105,7 @@ class PaymentLinkTest extends TestCase
 
         $price = $target->link_service()->calculateUpgradePriceV2($recurring_invoice, $target);
 
-        $refund = round($invoice->paid_to_date*$ratio,2);
+        $refund = round($invoice->paid_to_date * $ratio, 2);
 
         $this->assertEquals(($target->price - $refund), $price);
 
@@ -165,7 +160,6 @@ class PaymentLinkTest extends TestCase
     //     $this->assertEquals(90, $invoice->amount);
     //     $this->assertEquals(90, $invoice->balance);
 
-
     //     $ratio = $subscription->service()->calculateDiscountRatio($invoice);
 
     //     $this->assertEquals(.1, $ratio);
@@ -219,7 +213,6 @@ class PaymentLinkTest extends TestCase
 
     //     $this->assertEquals(80, $invoice->amount);
     //     $this->assertEquals(80, $invoice->balance);
-
 
     //     $ratio = $subscription->service()->calculateDiscountRatio($invoice);
 

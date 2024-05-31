@@ -6,16 +6,15 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Livewire\BillingPortal\Authentication;
 
+use App\Models\ClientContact;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
-use App\Models\Subscription;
-use App\Models\ClientContact;
 
 class Register extends Component
 {
@@ -81,7 +80,7 @@ class Register extends Component
     public function registerForm()
     {
         $count = collect($this->subscription->company->client_registration_fields ?? [])
-            ->filter(fn($field) => $field['required'] === true || $field['visible'] === true)
+            ->filter(fn ($field) => $field['required'] === true || $field['visible'] === true)
             ->count();
 
         if ($count === 0) {
@@ -121,7 +120,6 @@ class Register extends Component
                 if ($i !== false) {
                     $this->register_fields[$i]['visible'] = true;
                     $this->register_fields[$i]['required'] = true;
-
 
                     $this->additional_fields[] = $this->register_fields[$i];
                 } else {

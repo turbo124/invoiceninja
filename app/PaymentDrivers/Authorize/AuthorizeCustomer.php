@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -132,9 +131,9 @@ class AuthorizeCustomer
 
                 foreach ($profile['payment_profiles'] as $payment_profile) {
                     $token_exists = ClientGatewayToken::where('company_id', $company->id)
-                                                      ->where('token', $payment_profile->getCustomerPaymentProfileId())
-                                                      ->where('gateway_customer_reference', $gateway_customer_reference)
-                                                      ->exists();
+                        ->where('token', $payment_profile->getCustomerPaymentProfileId())
+                        ->where('gateway_customer_reference', $gateway_customer_reference)
+                        ->exists();
                     if ($token_exists) {
                         continue;
                     }

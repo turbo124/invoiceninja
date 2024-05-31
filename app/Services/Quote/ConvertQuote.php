@@ -6,26 +6,24 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Quote;
 
-use App\Models\Quote;
-use App\Models\Invoice;
-use App\Jobs\Util\UploadFile;
-use App\Utils\Traits\MakesHash;
-use App\Repositories\InvoiceRepository;
-use App\Factory\InvoiceInvitationFactory;
 use App\Factory\CloneQuoteToInvoiceFactory;
+use App\Factory\InvoiceInvitationFactory;
 use App\Jobs\Document\CopyDocs;
+use App\Models\Invoice;
+use App\Models\Quote;
+use App\Repositories\InvoiceRepository;
 use App\Utils\Traits\GeneratesConvertedQuoteCounter;
+use App\Utils\Traits\MakesHash;
 
 class ConvertQuote
 {
-    use MakesHash;
     use GeneratesConvertedQuoteCounter;
+    use MakesHash;
 
     private $client;
 
@@ -38,7 +36,6 @@ class ConvertQuote
     }
 
     /**
-     * @param $quote
      * @return mixed
      */
     public function run($quote)
@@ -67,23 +64,23 @@ class ConvertQuote
         $invoice->fresh();
 
         $invoice->service()
-                ->fillDefaults()
-                ->adjustInventory()
-                ->save();
+            ->fillDefaults()
+            ->adjustInventory()
+            ->save();
 
         $quote->invoice_id = $invoice->id;
         $quote->status_id = Quote::STATUS_CONVERTED;
         $quote->save();
 
-        if($quote->documents()->count() > 0)
+        if ($quote->documents()->count() > 0) {
             CopyDocs::dispatch($quote->documents()->pluck('id'), $invoice, $invoice->company->db);
+        }
 
         return $invoice;
     }
 
     /**
      * Only create the invitations that are defined on the quote.
-     *
      */
     private function createConversionInvitations($invoice, $quote)
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -46,7 +45,6 @@ class InvoiceEmailedNotification implements ShouldQueue
         $invoice = $event->invitation->invoice->fresh();
         $invoice->last_sent_date = now();
         $invoice->saveQuietly();
-
 
         /* We loop through each user and determine whether they need to be notified */
         foreach ($event->invitation->company->company_users as $company_user) {

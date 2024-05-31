@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,6 +17,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\Auth\PasswordTimeoutController
  */
 class PasswordTimeoutTest extends TestCase
@@ -25,7 +25,7 @@ class PasswordTimeoutTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class PasswordTimeoutTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/password_timeout')
-        ->assertStatus(412);
+            ->assertStatus(412);
 
     }
 
@@ -51,7 +51,7 @@ class PasswordTimeoutTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/password_timeout')
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
 }

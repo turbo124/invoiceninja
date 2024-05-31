@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,7 +51,7 @@ class RefundTransaction
 
         $transaction_type = $transaction_status == 'capturedPendingSettlement' ? 'voidTransaction' : 'refundTransaction';
 
-        if($transaction_type == 'voidTransaction') {
+        if ($transaction_type == 'voidTransaction') {
             $amount = $transaction_details->getTransaction()->getAuthAmount();
         }
 
@@ -187,5 +186,4 @@ class RefundTransaction
 
         SystemLogger::dispatch($data, SystemLog::CATEGORY_GATEWAY_RESPONSE, SystemLog::EVENT_GATEWAY_FAILURE, SystemLog::TYPE_AUTHORIZE, $this->authorize->client, $this->authorize->client->company);
     }
-
 }

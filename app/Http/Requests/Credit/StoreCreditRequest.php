@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,8 @@ use Illuminate\Validation\Rule;
 
 class StoreCreditRequest extends Request
 {
-    use MakesHash;
     use CleanLineItems;
+    use MakesHash;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -50,7 +49,7 @@ class StoreCreditRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -78,7 +77,7 @@ class StoreCreditRequest extends Request
         $rules['exchange_rate'] = 'bail|sometimes|numeric';
         $rules['amount'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
 
-$rules['date'] = 'bail|sometimes|date:Y-m-d';
+        $rules['date'] = 'bail|sometimes|date:Y-m-d';
 
         if ($this->invoice_id) {
             $rules['invoice_id'] = new ValidInvoiceCreditRule();
@@ -97,7 +96,7 @@ $rules['date'] = 'bail|sometimes|date:Y-m-d';
             $input['design_id'] = $this->decodePrimaryKey($input['design_id']);
         }
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,17 +20,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\TaskStatusController
  */
 class TaskStatusApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,17 +48,16 @@ class TaskStatusApiTest extends TestCase
     {
         TaskStatus::factory()->count(5)->create([
             'company_id' => $this->company->id,
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
-        
-        
+
         $t = TaskStatus::where('company_id', '=', $this->company->id)->orderBy('id', 'desc');
-        
+
         $this->assertEquals(10, $t->count());
         $task_status = $t->first();
 
         $id = $task_status->id;
-        
+
         nlog("setting {$id} to index 1");
 
         $data = [
@@ -73,7 +72,7 @@ class TaskStatusApiTest extends TestCase
         $t = TaskStatus::where('company_id', '=', $this->company->id)->orderBy('status_order', 'asc')->first();
 
         $this->assertEquals($id, $t->id);
-        
+
     }
 
     public function testTaskStatusGetFilter()

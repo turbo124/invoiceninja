@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -48,8 +47,8 @@ class PaymentMigrationRepository extends BaseRepository
     /**
      * Saves and updates a payment. //todo refactor to handle refunds and payments.
      *
-     * @param array $data the request object
-     * @param Payment $payment The Payment object
+     * @param  array  $data  the request object
+     * @param  Payment  $payment  The Payment object
      * @return Payment|null Payment $payment
      */
     public function save(array $data, Payment $payment): ?Payment
@@ -63,9 +62,10 @@ class PaymentMigrationRepository extends BaseRepository
 
     /**
      * Handles a positive payment request.
-     * @param  array $data      The data object
-     * @param  Payment $payment The $payment entity
-     * @return Payment          The updated/created payment object
+     *
+     * @param  array  $data  The data object
+     * @param  Payment  $payment  The $payment entity
+     * @return Payment The updated/created payment object
      */
     private function applyPayment(array $data, Payment $payment): ?Payment
     {
@@ -99,8 +99,7 @@ class PaymentMigrationRepository extends BaseRepository
 
         $payment->deleted_at = $data['deleted_at'] ?: null;
 
-
-        if (!$payment->currency_id || $payment->currency_id == 0 || $payment->currency_id == '') {
+        if (! $payment->currency_id || $payment->currency_id == 0 || $payment->currency_id == '') {
             $payment->currency_id = $payment->client->settings->currency_id ?? $payment->company->settings->currency_id;
         }
 
@@ -147,7 +146,7 @@ class PaymentMigrationRepository extends BaseRepository
 
         if (array_key_exists('credits', $data) && is_array($data['credits']) && count($data['credits']) > 0) {
 
-            /** @var float $credit_totals **/
+            /** @var float $credit_totals * */
             $credit_totals = array_sum(array_column($data['credits'], 'amount'));
 
             $credits = Credit::query()->whereIn('id', array_column($data['credits'], 'credit_id'))->withTrashed()->get();
@@ -197,9 +196,8 @@ class PaymentMigrationRepository extends BaseRepository
      * If the client is paying in a currency other than
      * the company currency, we need to set a record.
      *
-     * @param array$data
-     * @param \App\Models\Payment $payment
-     * @return \App\Models\Payment
+     * @param  array  $data
+     * @param  \App\Models\Payment  $payment
      */
     private function processExchangeRates($data, $payment): \App\Models\Payment
     {

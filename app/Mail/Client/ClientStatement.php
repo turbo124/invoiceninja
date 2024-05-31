@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -79,7 +78,7 @@ class ClientStatement extends Mailable
         foreach ($this->data['attachments'] as $attachment) {
             $array_of_attachments[] =
                     Attachment::fromData(fn () => base64_decode($attachment['file']), $attachment['name'])
-                              ->withMime('application/pdf');
+                        ->withMime('application/pdf');
         }
 
         return $array_of_attachments;

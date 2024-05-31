@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -43,7 +42,6 @@ class QuotesTable extends Component
         $this->company = Company::find($this->company_id);
     }
 
-
     public function sortBy($field)
     {
         $this->sort === $field
@@ -64,15 +62,15 @@ class QuotesTable extends Component
             if (in_array('-1', $this->status)) {
                 $query->where(function ($query) {
                     $query->whereDate('due_date', '<=', now()->startOfDay())
-                          ->whereNotNull('due_date')
-                          ->where('status_id', '<>', Quote::STATUS_CONVERTED);
+                        ->whereNotNull('due_date')
+                        ->where('status_id', '<>', Quote::STATUS_CONVERTED);
                 });
             }
 
             if (in_array('2', $this->status)) {
                 $query->where(function ($query) {
                     $query->whereDate('due_date', '>=', now()->startOfDay())
-                          ->orWhereNull('due_date');
+                        ->orWhereNull('due_date');
                 })->where('status_id', Quote::STATUS_SENT);
             }
 

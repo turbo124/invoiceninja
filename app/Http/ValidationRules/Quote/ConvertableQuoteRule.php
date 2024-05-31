@@ -5,7 +5,6 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ class ConvertableQuoteRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,9 +43,6 @@ class ConvertableQuoteRule implements Rule
         return ctrans('texts.quote_has_expired');
     }
 
-    /**
-     * @return bool
-     */
     private function checkQuoteIsConvertable(): bool
     {
         $ids = request()->input('ids');

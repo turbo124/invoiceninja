@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -30,9 +29,6 @@ class ContactPasswordlessLogin extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param string $email
-     * @param string $redirect
      */
     public function __construct(string $email, Company $company, string $redirect = '')
     {

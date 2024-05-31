@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,6 +20,7 @@ class EntityViewedNotification extends Notification
      * Create a new notification instance.
      *
      * @return void
+     *
      * @
      */
     protected $invitation;
@@ -66,7 +66,6 @@ class EntityViewedNotification extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     *
      */
     public function toMail($notifiable)
     {
@@ -104,10 +103,10 @@ class EntityViewedNotification extends Notification
             ))
             ->attachment(function ($attachment) {
                 $attachment->title(ctrans('texts.entity_number_placeholder', ['entity' => ucfirst($this->entity_name), 'entity_number' => $this->entity->number]), $this->invitation->getAdminLink())
-                           ->fields([
-                               ctrans('texts.client') => $this->contact->present()->name(),
-                               ctrans('texts.status_viewed') => $this->invitation->viewed_date,
-                           ]);
+                    ->fields([
+                        ctrans('texts.client') => $this->contact->present()->name(),
+                        ctrans('texts.status_viewed') => $this->invitation->viewed_date,
+                    ]);
             });
     }
 

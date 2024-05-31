@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,6 +28,7 @@ namespace App\Models;
  * @property int|null $created_at
  * @property int|null $updated_at
  * @property-read mixed $options
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|Gateway newModelQuery()
@@ -47,6 +47,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Gateway whereSortOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Gateway whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Gateway whereVisible($value)
+ *
  * @mixin \Eloquent
  */
 class Gateway extends StaticModel
@@ -155,7 +156,7 @@ class Gateway extends StaticModel
                     GatewayType::BECS => ['refund' => true, 'token_billing' => true, 'webhooks' => ['source.chargeable', 'charge.succeeded', 'charge.failed', 'payment_intent.succeeded', 'payment_intent.payment_failed']],
                     GatewayType::IDEAL => ['refund' => true, 'token_billing' => true, 'webhooks' => ['source.chargeable', 'charge.succeeded', 'charge.failed', 'payment_intent.succeeded', 'payment_intent.payment_failed']],
                     GatewayType::ACSS => ['refund' => true, 'token_billing' => true, 'webhooks' => ['source.chargeable', 'charge.succeeded', 'charge.failed', 'payment_intent.succeeded', 'payment_intent.payment_failed']],
-                    GatewayType::FPX => ['refund' => true, 'token_billing' => true, 'webhooks' => ['source.chargeable', 'charge.succeeded', 'charge.failed',]],
+                    GatewayType::FPX => ['refund' => true, 'token_billing' => true, 'webhooks' => ['source.chargeable', 'charge.succeeded', 'charge.failed']],
                 ];
             case 39:
                 return [GatewayType::CREDIT_CARD => ['refund' => true, 'token_billing' => true, 'webhooks' => [' ']]]; //Checkout

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -65,10 +64,10 @@ class ZipQuotes implements ShouldQueue
             foreach ($invitations as $invitation) {
                 if ($invitation->quote->client->getSetting('enable_e_invoice')) {
                     $xml = $invitation->quote->service()->getEInvoice();
-                    $zipFile->addFromString($invitation->quote->getFileName("xml"), $xml);
+                    $zipFile->addFromString($invitation->quote->getFileName('xml'), $xml);
                 }
                 $file = (new \App\Jobs\Entity\CreateRawPdf($invitation))->handle();
-                $zipFile->addFromString($invitation->quote->numberFormatter() . '.pdf', $file);
+                $zipFile->addFromString($invitation->quote->numberFormatter().'.pdf', $file);
             }
 
             Storage::put($path.$file_name, $zipFile->outputAsString());
@@ -84,7 +83,7 @@ class ZipQuotes implements ShouldQueue
             UnlinkFile::dispatch(config('filesystems.default'), $path.$file_name)->delay(now()->addHours(1));
 
         } catch (\PhpZip\Exception\ZipException $e) {
-            nlog("zip build failed: ".$e->getMessage());
+            nlog('zip build failed: '.$e->getMessage());
         } finally {
             $zipFile->close();
         }

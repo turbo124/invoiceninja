@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -46,6 +45,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BankTransaction> $transactions
  * @property-read int|null $transactions_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\BankIntegrationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|BankIntegration filter(\App\Filters\QueryFilters $filters)
@@ -56,13 +56,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|BankIntegration withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BankIntegration withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BankTransaction> $transactions
+ *
  * @mixin \Eloquent
  */
 class BankIntegration extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'bank_account_name',

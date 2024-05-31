@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,7 @@ use App\Models\Quote;
 class QuoteTransformer extends BaseTransformer
 {
     /**
-     * @param $data
-     *
+     * @param  $data
      * @return bool|array
      */
     public function transform($line_items_data)
@@ -94,7 +92,7 @@ class QuoteTransformer extends BaseTransformer
             ),
             'footer' => $this->getString($quote_data, 'quote.footer'),
             'partial' => $this->getFloat($quote_data, 'quote.partial'),
-            'partial_due_date' =>  isset($invoice_data['quote.partial_due_date']) ? $this->parseDate($quote_data['quote.partial_due_date']) : null,
+            'partial_due_date' => isset($invoice_data['quote.partial_due_date']) ? $this->parseDate($quote_data['quote.partial_due_date']) : null,
             'custom_surcharge1' => $this->getString(
                 $quote_data,
                 'quote.custom_surcharge1'

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,12 +20,6 @@ class ProRata
     /**
      * Returns the amount to refund based on
      * the time interval and the frequency duration
-     *
-     * @param float $amount
-     * @param Carbon $from_date
-     * @param Carbon $to_date
-     * @param int $frequency
-     * @return float
      */
     public function refund(float $amount, Carbon $from_date, Carbon $to_date, int $frequency): float
     {
@@ -39,12 +32,6 @@ class ProRata
     /**
      * Returns the amount to charge based on
      * the time interval and the frequency duration
-     *
-     * @param float $amount
-     * @param Carbon $from_date
-     * @param Carbon $to_date
-     * @param int $frequency
-     * @return float
      */
     public function charge(float $amount, Carbon $from_date, Carbon $to_date, int $frequency): float
     {
@@ -58,9 +45,8 @@ class ProRata
      * Prepares the line items of an invoice
      * to be pro rata refunded.
      *
-     * @param Invoice $invoice
-     * @param bool $is_credit
-     * @return array
+     * @param  bool  $is_credit
+     *
      * @throws Exception
      */
     public function refundItems(Invoice $invoice, $is_credit = false): array
@@ -69,7 +55,7 @@ class ProRata
             return [];
         }
 
-        /** @var \App\Models\RecurringInvoice $recurring_invoice **/
+        /** @var \App\Models\RecurringInvoice $recurring_invoice * */
         $recurring_invoice = RecurringInvoice::find($invoice->recurring_id)->first();
 
         if (! $recurring_invoice) {

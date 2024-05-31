@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,11 +22,11 @@ use Tests\TestCase;
  */
 class FileUploadValidationTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
     use MakesHash;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,11 +36,11 @@ class FileUploadValidationTest extends TestCase
 
     public function testIteratingThroughAllEntities()
     {
-     
+
         Storage::fake('local');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
+
         $data = [
             'documents' => [$file],
             'is_public' => false,
@@ -63,7 +62,7 @@ class FileUploadValidationTest extends TestCase
             'recurring_expense' => 'recurring_expenses',
         ];
 
-        foreach($entities as $key => $value) {
+        foreach ($entities as $key => $value) {
 
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
@@ -76,7 +75,7 @@ class FileUploadValidationTest extends TestCase
             $this->assertCount(1, $acc['data']['documents']);
             $this->assertFalse($acc['data']['documents'][0]['is_public']);
         }
-    
+
     }
 
     public function testFileUploadIsPublicSetsAppropriately()
@@ -84,7 +83,7 @@ class FileUploadValidationTest extends TestCase
         Storage::fake('local');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
+
         $data = [
             'documents' => [$file],
             'is_public' => false,
@@ -103,10 +102,10 @@ class FileUploadValidationTest extends TestCase
         $this->assertFalse($acc['data']['documents'][0]['is_public']);
 
         $data = [
-                    'documents' => [$file],
-                    'is_public' => true,
-                    '_method' => 'PUT',
-                ];
+            'documents' => [$file],
+            'is_public' => true,
+            '_method' => 'PUT',
+        ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -126,7 +125,7 @@ class FileUploadValidationTest extends TestCase
         Storage::fake('local');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
+
         $data = [
             'documents' => [$file, $file],
             'is_public' => false,
@@ -146,5 +145,4 @@ class FileUploadValidationTest extends TestCase
         $this->assertFalse($acc['data']['documents'][1]['is_public']);
 
     }
-
 }

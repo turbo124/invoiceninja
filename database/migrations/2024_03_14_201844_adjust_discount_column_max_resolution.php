@@ -27,7 +27,7 @@ return new class extends Migration
         Schema::table('purchase_orders', function (Blueprint $table) {
             $table->decimal('discount', 20, 6)->default(0)->change();
         });
-                
+
         Schema::table('recurring_invoices', function (Blueprint $table) {
             $table->decimal('discount', 20, 6)->default(0)->change();
         });

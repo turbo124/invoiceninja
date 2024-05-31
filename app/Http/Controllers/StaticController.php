@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -32,21 +31,27 @@ class StaticController extends BaseController
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of static data",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -59,11 +64,11 @@ class StaticController extends BaseController
 
         $response_data = Statics::company($user->getLocale() ?? $user->company()->getLocale());
 
-        if(request()->has('einvoice')){
-            
+        if (request()->has('einvoice')) {
+
             $schema = new Schema();
-            $response_data['einvoice_schema'] = $schema('FACT1'); 
-        
+            $response_data['einvoice_schema'] = $schema('FACT1');
+
         }
 
         return response()->json($response_data, 200, ['Content-type' => 'application/json; charset=utf-8'], JSON_PRETTY_PRINT);

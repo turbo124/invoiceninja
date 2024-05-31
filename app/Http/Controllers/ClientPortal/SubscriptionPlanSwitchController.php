@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,16 +21,13 @@ class SubscriptionPlanSwitchController extends Controller
     /**
      * Show the page for switching between plans.
      *
-     * @param ShowPlanSwitchRequest $request
-     * @param RecurringInvoice $recurring_invoice
-     * @param Subscription $target
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(ShowPlanSwitchRequest $request, RecurringInvoice $recurring_invoice, Subscription $target)
     {
         $amount = $recurring_invoice->subscription
-                                    ->service()
-                                    ->calculateUpgradePriceV2($recurring_invoice, $target);
+            ->service()
+            ->calculateUpgradePriceV2($recurring_invoice, $target);
 
         nlog("payment amount = {$amount}");
         /**

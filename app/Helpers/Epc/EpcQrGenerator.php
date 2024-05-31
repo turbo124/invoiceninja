@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -58,13 +57,13 @@ class EpcQrGenerator
             return "<svg viewBox='0 0 200 200' width='200' height='200' x='0' y='0' xmlns='http://www.w3.org/2000/svg'>
           <rect x='0' y='0' width='100%'' height='100%' />{$qr}</svg>";
 
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             // nlog("EPC QR failure => ".$e->getMessage());
             return '';
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // nlog("EPC QR failure => ".$e->getMessage());
             return '';
-        } catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // nlog("EPC QR failure => ".$e->getMessage());
             return '';
         }
@@ -85,10 +84,9 @@ class EpcQrGenerator
             $this->sepa['purpose'],
             substr($this->invoice->number, 0, 34),
             '',
-            ' '
+            ' ',
         ]), "\n");
     }
-    
 
     //            substr("{$this->invoice->number} {$this->invoice->client->number}", 0,139),
 

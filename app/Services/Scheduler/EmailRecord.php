@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,11 +24,11 @@ class EmailRecord
 
     public function run()
     {
-        $class = 'App\\Models\\' . Str::camel($this->scheduler->parameters['entity']);
+        $class = 'App\\Models\\'.Str::camel($this->scheduler->parameters['entity']);
 
         $entity = $class::find($this->decodePrimaryKey($this->scheduler->parameters['entity_id']));
 
-        if($entity) {
+        if ($entity) {
             $entity->service()->markSent()->sendEmail();
         }
 

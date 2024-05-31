@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -57,8 +56,8 @@ use Tests\TestCase;
  */
 class ImportCompanyTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
 
     public $account;
 
@@ -68,12 +67,12 @@ class ImportCompanyTest extends TestCase
 
     public $ids;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         Artisan::call('db:seed');
-    
+
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
@@ -423,7 +422,7 @@ class ImportCompanyTest extends TestCase
         $this->genericImport(
             Vendor::class,
             ['user_id', 'assigned_user_id', 'company_id', 'id', 'hashed_id'],
-            [['users' => 'user_id'], ['users' =>'assigned_user_id']],
+            [['users' => 'user_id'], ['users' => 'assigned_user_id']],
             'vendors',
             'number'
         );
@@ -437,7 +436,7 @@ class ImportCompanyTest extends TestCase
         $this->genericImport(
             Project::class,
             ['user_id', 'assigned_user_id', 'company_id', 'id', 'hashed_id', 'client_id'],
-            [['users' => 'user_id'], ['users' =>'assigned_user_id'], ['clients' => 'client_id']],
+            [['users' => 'user_id'], ['users' => 'assigned_user_id'], ['clients' => 'client_id']],
             'projects',
             'number'
         );
@@ -453,7 +452,7 @@ class ImportCompanyTest extends TestCase
         $this->genericNewClassImport(
             Product::class,
             ['user_id', 'company_id', 'hashed_id', 'id'],
-            [['users' => 'user_id'], ['users' =>'assigned_user_id'], ['vendors' => 'vendor_id'], ['projects' => 'project_id']],
+            [['users' => 'user_id'], ['users' => 'assigned_user_id'], ['vendors' => 'vendor_id'], ['projects' => 'project_id']],
             'products'
         );
         $this->assertEquals(1, Product::count());
@@ -1149,7 +1148,7 @@ class ImportCompanyTest extends TestCase
         return $this->ids[$resource]["{$old}"];
     }
 
-    protected function tearDown() :void
+    protected function tearDown(): void
     {
         $backup_json_file = sys_get_temp_dir().'/backup/backup.json';
 

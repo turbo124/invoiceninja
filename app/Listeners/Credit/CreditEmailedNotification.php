@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -16,7 +15,6 @@ use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
 use App\Libraries\MultiDB;
 use App\Mail\Admin\EntitySentObject;
-use App\Notifications\Admin\EntitySentNotification;
 use App\Utils\Traits\Notifications\UserNotifies;
 use Illuminate\Contracts\Queue\ShouldQueue;
 

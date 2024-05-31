@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -13,25 +12,21 @@ namespace App\DataMapper\Tax;
 
 class TaxModel
 {
-    /** @var string $seller_subregion */
     public string $seller_subregion = 'CA';
 
-    /** @var string $version */
     public string $version = 'alpha';
 
-    /** @var object $regions */
     public object $regions;
 
     /**
      * __construct
      *
-     * @param  TaxModel $model
      * @return void
      */
     public function __construct(public ?TaxModel $model = null)
     {
 
-        if(!$this->model) {
+        if (! $this->model) {
             $this->regions = $this->init();
         } else {
             $this->regions = $model;
@@ -41,8 +36,6 @@ class TaxModel
 
     /**
      * Initializes the rules and builds any required data.
-     *
-     * @return object
      */
     public function init(): object
     {
@@ -51,17 +44,14 @@ class TaxModel
         $this->regions->EU = new \stdClass();
 
         $this->usRegion()
-             ->euRegion()
-             ->auRegion();
-
+            ->euRegion()
+            ->auRegion();
 
         return $this->regions;
     }
 
     /**
      * Builds the model for Australian Taxes
-     *
-     * @return self
      */
     private function auRegion(): self
     {
@@ -76,8 +66,6 @@ class TaxModel
 
     /**
      * Builds the model for Australian Subregions
-     *
-     * @return self
      */
     private function auSubRegions(): self
     {
@@ -93,8 +81,6 @@ class TaxModel
 
     /**
      * Builds the model for US Taxes
-     *
-     * @return self
      */
     private function usRegion(): self
     {
@@ -107,8 +93,6 @@ class TaxModel
 
     /**
      * Builds the model for EU Taxes
-     *
-     * @return self
      */
     private function euRegion(): self
     {
@@ -123,8 +107,6 @@ class TaxModel
 
     /**
      * Builds the model for US States
-     *
-     * @return self
      */
     private function usSubRegions(): self
     {
@@ -335,8 +317,6 @@ class TaxModel
 
     /**
      * Create the EU member countries
-     *
-     * @return self
      */
     private function euSubRegions(): self
     {
@@ -507,5 +487,4 @@ class TaxModel
         return $this;
 
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property-read \App\Models\BankAccount|null $bank_account
  * @property-read mixed $hashed_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|BankSubaccount newModelQuery()
@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|BankSubaccount withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BankSubaccount withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class BankSubaccount extends BaseModel

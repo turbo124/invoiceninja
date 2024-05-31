@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,6 +23,7 @@ use League\Csv\Writer;
 class UserSalesReport extends BaseExport
 {
     use MakesDates;
+
     //Name
     //Invoice count
     //Amount
@@ -38,6 +38,7 @@ class UserSalesReport extends BaseExport
         'invoice_amount',
         'total_taxes',
     ];
+
     /**
         @param array $input
         [
@@ -47,7 +48,7 @@ class UserSalesReport extends BaseExport
             'clients',
             'client_id',
         ]
-    */
+     */
     public function __construct(public Company $company, public array $input)
     {
     }
@@ -64,10 +65,10 @@ class UserSalesReport extends BaseExport
         \League\Csv\CharsetConverter::addTo($this->csv, 'UTF-8', 'UTF-8');
 
         $query = Invoice::query()
-                        ->withTrashed()
-                        ->where('company_id', $this->company->id)
-                        ->where('is_deleted', 0)
-                        ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL, Invoice::STATUS_PAID]);
+            ->withTrashed()
+            ->where('company_id', $this->company->id)
+            ->where('is_deleted', 0)
+            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL, Invoice::STATUS_PAID]);
 
         $query = $this->addDateRange($query);
 

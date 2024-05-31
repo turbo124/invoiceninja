@@ -5,23 +5,22 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Export\CSV;
 
-use App\Utils\Ninja;
-use App\Models\Client;
-use League\Csv\Writer;
-use App\Models\Company;
-use App\Libraries\MultiDB;
-use App\Models\ClientContact;
-use Illuminate\Support\Facades\App;
 use App\Export\Decorators\Decorator;
-use App\Transformers\ClientTransformer;
+use App\Libraries\MultiDB;
+use App\Models\Client;
+use App\Models\ClientContact;
+use App\Models\Company;
 use App\Transformers\ClientContactTransformer;
+use App\Transformers\ClientTransformer;
+use App\Utils\Ninja;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\App;
+use League\Csv\Writer;
 
 class ContactExport extends BaseExport
 {
@@ -58,10 +57,10 @@ class ContactExport extends BaseExport
         }
 
         $query = ClientContact::query()
-                        ->where('company_id', $this->company->id)
-                        ->whereHas('client', function ($q){
-                            $q->where('is_deleted', false);
-                        });
+            ->where('company_id', $this->company->id)
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            });
 
         $query = $this->addDateRange($query);
 
@@ -88,7 +87,6 @@ class ContactExport extends BaseExport
         return $this->csv->toString();
     }
 
-
     public function returnJson()
     {
         $query = $this->init();
@@ -100,14 +98,14 @@ class ContactExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($contact) {
-                    $row = $this->buildRow($contact);
-                    return $this->processMetaData($row, $contact);
-                })->toArray();
+            ->map(function ($contact) {
+                $row = $this->buildRow($contact);
+
+                return $this->processMetaData($row, $contact);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
-
 
     private function buildRow(ClientContact $contact): array
     {
@@ -132,6 +130,7 @@ class ContactExport extends BaseExport
 
             }
         }
+
         // return $entity;
         return $this->decorateAdvancedFields($contact->client, $entity);
     }
@@ -161,7 +160,6 @@ class ContactExport extends BaseExport
         if (in_array('client.assigned_user_id', $this->input['report_keys'])) {
             $entity['client.assigned_user_id'] = $client->assigned_user ? $client->assigned_user->present()->name() : '';
         }
-
 
         return $entity;
     }

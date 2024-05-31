@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,10 +36,6 @@ class UserEmailChanged implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param \App\Models\User $new_user
-     * @param \stdClass $old_user
-     * @param \App\Models\Company $company
      */
     public function __construct(protected User $new_user, protected \stdClass $old_user, protected Company $company, protected bool $is_react = false)
     {

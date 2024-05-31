@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,25 +41,25 @@ class BankTransactionRepository extends BaseRepository
         $data['transactions'] = $bank_transactions->map(function ($bt) {
             return ['id' => $bt->id, 'invoice_ids' => $bt->invoice_ids, 'ninja_category_id' => $bt->ninja_category_id];
         })->toArray();
-        
+
         $bts = (new MatchBankTransactions($user->company()->id, $user->company()->db, $data))->handle();
     }
 
     public function unlink($bt)
     {
-        if($bt->payment()->exists()) {
+        if ($bt->payment()->exists()) {
             $bt->payment->transaction_id = null;
             $bt->payment_id = null;
         }
 
-        $e = Expense::query()->whereIn('id', $this->transformKeys(explode(",", $bt->expense_id)))
-        ->cursor()
-        ->each(function ($expense) {
+        $e = Expense::query()->whereIn('id', $this->transformKeys(explode(',', $bt->expense_id)))
+            ->cursor()
+            ->each(function ($expense) {
 
-            $expense->transaction_id = null;
-            $expense->saveQuietly();
+                $expense->transaction_id = null;
+                $expense->saveQuietly();
 
-        });
+            });
 
         $bt->expense_id = null;
         $bt->vendor_id = null;

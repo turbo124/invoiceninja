@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -53,10 +52,11 @@ class DocumentExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($document) {
-                    $row = $this->buildRow($document);
-                    return $this->processMetaData($row, $document);
-                })->toArray();
+            ->map(function ($document) {
+                $row = $this->buildRow($document);
+
+                return $this->processMetaData($row, $document);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
@@ -78,7 +78,7 @@ class DocumentExport extends BaseExport
 
         $query = $this->addDateRange($query);
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -98,9 +98,9 @@ class DocumentExport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query->cursor()
-              ->each(function ($entity) {
-                  $this->csv->insertOne($this->buildRow($entity));
-              });
+            ->each(function ($entity) {
+                $this->csv->insertOne($this->buildRow($entity));
+            });
 
         return $this->csv->toString();
     }

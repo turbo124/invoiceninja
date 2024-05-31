@@ -5,15 +5,14 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Quote;
 
-use App\Models\Webhook;
-use App\Models\ClientContact;
 use App\Jobs\Entity\EmailEntity;
+use App\Models\ClientContact;
+use App\Models\Webhook;
 
 class SendEmail
 {
@@ -23,7 +22,7 @@ class SendEmail
 
     protected $contact;
 
-    public function __construct($quote, $reminder_template = null, ClientContact $contact = null)
+    public function __construct($quote, $reminder_template = null, ?ClientContact $contact = null)
     {
         $this->quote = $quote;
 
@@ -34,6 +33,7 @@ class SendEmail
 
     /**
      * Builds the correct template to send.
+     *
      * @return void
      */
     public function run()
@@ -51,7 +51,7 @@ class SendEmail
             }
         });
 
-        $this->quote->sendEvent(Webhook::EVENT_SENT_QUOTE, "client");
+        $this->quote->sendEvent(Webhook::EVENT_SENT_QUOTE, 'client');
 
     }
 }

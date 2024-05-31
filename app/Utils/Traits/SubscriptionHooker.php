@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,7 +25,7 @@ trait SubscriptionHooker
             'X-Requested-With' => 'XMLHttpRequest',
         ];
 
-        if (!isset($subscription->webhook_configuration['post_purchase_url']) && !isset($subscription->webhook_configuration['post_purchase_rest_method'])) {
+        if (! isset($subscription->webhook_configuration['post_purchase_url']) && ! isset($subscription->webhook_configuration['post_purchase_rest_method'])) {
             return [];
         }
 
@@ -48,8 +47,9 @@ trait SubscriptionHooker
                 RequestOptions::JSON => ['body' => $body], RequestOptions::ALLOW_REDIRECTS => false,
             ]);
 
-            if($response_body = json_decode($response->getBody(), true))
+            if ($response_body = json_decode($response->getBody(), true)) {
                 return array_merge($body, $response_body);
+            }
 
             return array_merge($body, ['message' => 'Success', 'status_code' => 200]);
 
@@ -59,7 +59,7 @@ trait SubscriptionHooker
             $error = json_decode($e->getResponse()->getBody()->getContents());
 
             if (is_null($error)) {
-                nlog("empty response");
+                nlog('empty response');
                 nlog($e->getMessage());
             }
 

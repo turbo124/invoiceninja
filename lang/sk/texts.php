@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organizácia',
     'name' => 'Meno',
     'website' => 'Web',
@@ -1164,7 +1164,6 @@ $lang = array(
     'enterprise_plan_features' => 'Enterprise Plan pridáva podporu pre viacerých používateľov a súborové prílohy, :link , aby ste videli úplný zoznam funkcií.',
     'return_to_app' => 'Návrat do aplikácie',
 
-
     // Payment updates
     'refund_payment' => 'Vrátiť platbu',
     'refund_max' => 'Max:',
@@ -1692,7 +1691,6 @@ $lang = array(
     'lang_Serbian' => 'Srbština',
     'lang_Bulgarian' => 'Bulharčina',
     'lang_Russian (Russia)' => 'Ruština (Rusko)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Účtovníctvo a právo',
@@ -2351,7 +2349,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'Zlatá trójska unca',
     'currency_nicaraguan_córdoba' => 'Nikaragujská Córdoba',
     'currency_malagasy_ariary' => 'Madagaskarský ariár',
-    "currency_tongan_pa_anga" => "Tongan Pa&#39;anga",
+    'currency_tongan_pa_anga' => 'Tongan Pa&#39;anga',
 
     'review_app_help' => 'Dúfame, že sa vám používanie aplikácie páči.<br/> Ak by ste zvážili :link, veľmi by sme to ocenili!',
     'writing_a_review' => 'písanie recenzie',
@@ -4413,7 +4411,7 @@ $lang = array(
     'activity_122' => ':user archivovaný opakujúci sa výdavok :recurring_expense',
     'activity_123' => ':user vymazaný opakujúci sa výdavok :recurring_expense',
     'activity_124' => ':user obnovený opakujúci sa výdavok :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Ak chcete zobraziť :entity, musíte si nastaviť heslo.',
     'unsubscribe' => 'Zrušte odber',
     'unsubscribed' => 'Zrušený odber',
@@ -4917,7 +4915,7 @@ $lang = array(
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'Splatné do :payeddue dní netto do :paydate',
-    'xinvoice_no_buyers_reference' => "Nebola uvedená žiadna referencia kupujúceho",
+    'xinvoice_no_buyers_reference' => 'Nebola uvedená žiadna referencia kupujúceho',
     'xinvoice_online_payment' => 'Faktúru je potrebné uhradiť online cez uvedený odkaz',
     'pre_payment' => 'Platba vopred',
     'number_of_payments' => 'Počet platieb',
@@ -5022,8 +5020,8 @@ $lang = array(
     'e_invoice' => 'Elektronická faktúra',
     'light_dark_mode' => 'Svetlý/Tmavý režim',
     'activities' => 'Aktivity',
-    'recent_transactions' => "Tu sú posledné transakcie vašej spoločnosti:",
-    'country_Palestine' => "Palestíne",
+    'recent_transactions' => 'Tu sú posledné transakcie vašej spoločnosti:',
+    'country_Palestine' => 'Palestíne',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Povinnosti',
     'order_number' => 'Číslo objednávky',
@@ -5238,7 +5236,7 @@ $lang = array(
     'rff' => 'Formulár povinných polí',
     'add_step' => 'Pridať krok',
     'steps' => 'Kroky',
-    'steps_order_help' =>  'Dôležité je poradie krokov. Prvý krok by nemal závisieť od žiadneho iného kroku. Druhý krok by mal závisieť od prvého kroku atď.',
+    'steps_order_help' => 'Dôležité je poradie krokov. Prvý krok by nemal závisieť od žiadneho iného kroku. Druhý krok by mal závisieť od prvého kroku atď.',
     'other_steps' => 'Ďalšie kroky',
     'use_available_payments' => 'Použite dostupné platby',
     'test_email_sent' => 'E-mail bol úspešne odoslaný',
@@ -5287,6 +5285,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

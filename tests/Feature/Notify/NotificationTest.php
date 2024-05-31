@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,24 +24,24 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Utils\Traits\Notifications\UserNotifies
  */
 class NotificationTest extends TestCase
 {
-    use UserNotifies;
     use MockAccountData;
+    use UserNotifies;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-    
+
         $this->makeTestData();
     }
-
 
     public function testEntityViewedNotificationWithEntityLate()
     {
@@ -50,7 +49,7 @@ class NotificationTest extends TestCase
         $u = User::factory()->create([
             'account_id' => $this->account->id,
             'email' => $this->faker->safeEmail(),
-            'confirmation_code' => uniqid("st", true),
+            'confirmation_code' => uniqid('st', true),
         ]);
 
         $company_token = new CompanyToken;
@@ -74,13 +73,13 @@ class NotificationTest extends TestCase
         $company_user = CompanyUser::where('user_id', $u->id)->where('company_id', $this->company->id)->first();
 
         $notifications = new \stdClass;
-        $notifications->email = ["invoice_late_user","quote_approved_user"];
-        $company_user->update(['notifications' => (array)$notifications]);
+        $notifications->email = ['invoice_late_user', 'quote_approved_user'];
+        $company_user->update(['notifications' => (array) $notifications]);
 
         $i = Invoice::factory()->create([
             'user_id' => $u->id,
             'company_id' => $this->company->id,
-            'number' => uniqid("st", true),
+            'number' => uniqid('st', true),
             'client_id' => $this->client->id,
         ]);
 
@@ -100,19 +99,18 @@ class NotificationTest extends TestCase
         $this->assertCount(0, $methods);
     }
 
-
     public function testNotificationFound()
     {
         $notifications = new \stdClass;
-        $notifications->email = ["inventory_all"];
+        $notifications->email = ['inventory_all'];
 
-        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array)$notifications]);
+        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array) $notifications]);
 
         $this->assertTrue(property_exists($this->cu->notifications, 'email'));
 
         $p = Product::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
         $notification_users = $this->filterUsersByPermissions($this->company->company_users, $p, ['inventory_all']);
@@ -121,21 +119,21 @@ class NotificationTest extends TestCase
         $notification_users = $this->filterUsersByPermissions($this->company->company_users, $p, ['inventory_user']);
         $this->assertCount(0, $notification_users->toArray());
 
-        $notification_users = $this->filterUsersByPermissions($this->company->company_users, $p, ['inventory_user','invalid notification']);
+        $notification_users = $this->filterUsersByPermissions($this->company->company_users, $p, ['inventory_user', 'invalid notification']);
         $this->assertCount(0, $notification_users->toArray());
     }
 
     public function testAllNotificationsFires()
     {
         $notifications = new \stdClass;
-        $notifications->email = ["all_notifications"];
+        $notifications->email = ['all_notifications'];
 
         $p = Product::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
-        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array)$notifications]);
+        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array) $notifications]);
 
         $notification_users = $this->filterUsersByPermissions($this->company->company_users, $p, ['inventory_all']);
         $this->assertCount(1, $notification_users->toArray());
@@ -144,14 +142,14 @@ class NotificationTest extends TestCase
     public function testAllNotificationsFiresForUser()
     {
         $notifications = new \stdClass;
-        $notifications->email = ["all_user_notifications"];
+        $notifications->email = ['all_user_notifications'];
 
         $p = Product::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
-        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array)$notifications]);
+        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array) $notifications]);
 
         $notification_users = $this->filterUsersByPermissions($this->company->company_users, $p, ['all_user_notifications']);
         $this->assertCount(1, $notification_users->toArray());
@@ -162,7 +160,7 @@ class NotificationTest extends TestCase
         $u = User::factory()->create([
             'account_id' => $this->account->id,
             'email' => $this->faker->safeEmail(),
-            'confirmation_code' => uniqid("st", true),
+            'confirmation_code' => uniqid('st', true),
         ]);
 
         $company_token = new CompanyToken;
@@ -185,13 +183,12 @@ class NotificationTest extends TestCase
 
         $p = Product::factory()->create([
             'user_id' => $u->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
-
         $notifications = new \stdClass;
-        $notifications->email = ["all_user_notifications"];
-        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array)$notifications]);
+        $notifications->email = ['all_user_notifications'];
+        $this->user->company_users()->where('company_id', $this->company->id)->update(['notifications' => (array) $notifications]);
 
         $methods = $this->findUserEntityNotificationType($p, $this->cu, ['all_user_notifications']);
         $this->assertCount(0, $methods);
@@ -200,29 +197,29 @@ class NotificationTest extends TestCase
         $this->assertCount(0, $methods);
 
         $notifications = [];
-        $notifications['email'] = ["all_notifications"];
+        $notifications['email'] = ['all_notifications'];
 
         $cu = CompanyUser::where('company_id', $this->company->id)->where('user_id', $this->user->id)->first();
         $cu->notifications = $notifications;
         $cu->save();
 
-        $methods = $this->findUserEntityNotificationType($p, $cu, ["all_notifications"]);
-        
+        $methods = $this->findUserEntityNotificationType($p, $cu, ['all_notifications']);
+
         $this->assertCount(1, $methods);
 
         $notifications = [];
-        $notifications['email'] = ["inventory_user"];
+        $notifications['email'] = ['inventory_user'];
 
         $cu = CompanyUser::where('company_id', $this->company->id)->where('user_id', $this->user->id)->first();
         $cu->notifications = $notifications;
         $cu->save();
 
-        $methods = $this->findUserEntityNotificationType($p, $cu, ["all_notifications"]);
+        $methods = $this->findUserEntityNotificationType($p, $cu, ['all_notifications']);
         $this->assertCount(0, $methods);
 
         $p = Product::factory()->create([
             'user_id' => $this->user->id,
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
         $methods = $this->findUserEntityNotificationType($p, $cu, ['inventory_user']);

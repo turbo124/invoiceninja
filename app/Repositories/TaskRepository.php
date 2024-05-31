@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,10 +33,9 @@ class TaskRepository extends BaseRepository
     /**
      * Saves the task and its contacts.
      *
-     * @param      array                         $data    The data
-     * @param      \App\Models\Task              $task  The task
-     *
-     * @return     task|null  task Object
+     * @param  array  $data  The data
+     * @param  \App\Models\Task  $task  The task
+     * @return task|null task Object
      */
     public function save(array $data, Task $task): ?Task
     {
@@ -54,7 +52,7 @@ class TaskRepository extends BaseRepository
             $task->status_id = $this->setDefaultStatus($task);
         }
 
-        if($this->new_task && (!$task->rate || $task->rate <= 0)) {
+        if ($this->new_task && (! $task->rate || $task->rate <= 0)) {
             $task->rate = $task->getRate();
         }
 
@@ -111,8 +109,7 @@ class TaskRepository extends BaseRepository
         $key_values = array_column($time_log, 0);
         array_multisort($key_values, SORT_ASC, $time_log);
 
-        foreach($time_log as $key => $value)
-        {
+        foreach ($time_log as $key => $value) {
             $time_log[$key][1] = $this->roundTimeLog($time_log[$key][0], $time_log[$key][1]);
         }
 
@@ -149,7 +146,7 @@ class TaskRepository extends BaseRepository
     private function harvestStartDate($time_log, $task)
     {
 
-        if(isset($time_log[0][0])) {
+        if (isset($time_log[0][0])) {
             return \Carbon\Carbon::createFromTimestamp($time_log[0][0])->addSeconds($task->company->utc_offset());
         }
 
@@ -160,12 +157,11 @@ class TaskRepository extends BaseRepository
     /**
      * Store tasks in bulk.
      *
-     * @param array $task
-     * @return Task|null
+     * @param  array  $task
      */
     public function create($task): ?Task
     {
-        /** @var \App\Models\User $user **/
+        /** @var \App\Models\User $user * */
         $user = auth()->user();
 
         return $this->save(
@@ -177,9 +173,9 @@ class TaskRepository extends BaseRepository
     private function setDefaultStatus(Task $task)
     {
         $first_status = $task->company->task_statuses()
-                              ->whereNull('deleted_at')
-                              ->orderBy('id', 'asc')
-                              ->first();
+            ->whereNull('deleted_at')
+            ->orderBy('id', 'asc')
+            ->first();
 
         if ($first_status) {
             return $first_status->id;
@@ -191,8 +187,8 @@ class TaskRepository extends BaseRepository
     /**
      * Sorts the task status order IF the old status has changed between requests
      *
-     * @param  \stdCLass $old_task The old task object
-     * @param  Task     $new_task The new Task model
+     * @param  \stdCLass  $old_task  The old task object
+     * @param  Task  $new_task  The new Task model
      * @return void
      */
     public function sortStatuses($old_task, $new_task)
@@ -254,25 +250,28 @@ class TaskRepository extends BaseRepository
 
     public function roundTimeLog(int $start_time, int $end_time): int
     {
-        if($this->task_round_to_nearest == 1 || $end_time == 0)
+        if ($this->task_round_to_nearest == 1 || $end_time == 0) {
             return $end_time;
+        }
 
         $interval = $end_time - $start_time;
-        
-        if($this->task_round_up)
-            return $start_time + (int)ceil($interval/$this->task_round_to_nearest)*$this->task_round_to_nearest;
 
-        if($interval <= $this->task_round_to_nearest)
+        if ($this->task_round_up) {
+            return $start_time + (int) ceil($interval / $this->task_round_to_nearest) * $this->task_round_to_nearest;
+        }
+
+        if ($interval <= $this->task_round_to_nearest) {
             return $start_time;
-        
-        return $start_time - (int)floor($interval/$this->task_round_to_nearest) * $this->task_round_to_nearest;
+        }
+
+        return $start_time - (int) floor($interval / $this->task_round_to_nearest) * $this->task_round_to_nearest;
 
     }
 
     public function stop(Task $task)
     {
         $this->init($task);
-        
+
         $log = json_decode($task->time_log, true);
 
         $last = end($log);
@@ -281,7 +280,7 @@ class TaskRepository extends BaseRepository
             $last[1] = $this->roundTimeLog($last[0], time());
 
             array_pop($log);
-            $log = array_merge($log, [$last]);//check at this point, it may be prepending here.
+            $log = array_merge($log, [$last]); //check at this point, it may be prepending here.
 
             $task->time_log = json_encode($log);
             $task->saveQuietly();
@@ -305,7 +304,7 @@ class TaskRepository extends BaseRepository
 
     private function init(Task $task): self
     {
-        
+
         $this->task_round_up = $task->client ? $task->client->getSetting('task_round_up') : $task->company->getSetting('task_round_up');
         $this->task_round_to_nearest = $task->client ? $task->client->getSetting('task_round_to_nearest') : $task->company->getSetting('task_round_to_nearest');
 
@@ -322,7 +321,7 @@ class TaskRepository extends BaseRepository
                 $task->number = $this->getNextTaskNumber($task);
                 $task->saveQuietly();
                 $this->completed = false;
-            } catch(QueryException $e) {
+            } catch (QueryException $e) {
                 $x++;
 
                 if ($x > 50) {

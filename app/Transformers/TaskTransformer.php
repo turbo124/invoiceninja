@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,9 +32,6 @@ class TaskTransformer extends EntityTransformer
         'project',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'client',
         'status',
@@ -56,7 +52,7 @@ class TaskTransformer extends EntityTransformer
     {
         $transformer = new InvoiceTransformer($this->serializer);
 
-        if (!$task->invoice) {
+        if (! $task->invoice) {
             return null;
         }
 
@@ -67,7 +63,7 @@ class TaskTransformer extends EntityTransformer
     {
         $transformer = new UserTransformer($this->serializer);
 
-        if (!$task->user) {
+        if (! $task->user) {
             return null;
         }
 
@@ -78,7 +74,7 @@ class TaskTransformer extends EntityTransformer
     {
         $transformer = new UserTransformer($this->serializer);
 
-        if (!$task->assigned_user) {
+        if (! $task->assigned_user) {
             return null;
         }
 
@@ -89,7 +85,7 @@ class TaskTransformer extends EntityTransformer
     {
         $transformer = new ClientTransformer($this->serializer);
 
-        if (!$task->client) {
+        if (! $task->client) {
             return null;
         }
 
@@ -100,7 +96,7 @@ class TaskTransformer extends EntityTransformer
     {
         $transformer = new TaskStatusTransformer($this->serializer);
 
-        if (!$task->status) {
+        if (! $task->status) {
             return null;
         }
 
@@ -111,8 +107,9 @@ class TaskTransformer extends EntityTransformer
     {
         $transformer = new ProjectTransformer($this->serializer);
 
-        if ($task->project) 
+        if ($task->project) {
             return $this->includeItem($task->project, $transformer, Project::class);
+        }
 
         return null;
     }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -169,7 +168,7 @@ class BaseImport
     private function groupTasks($csvData, $key)
     {
 
-        if (! $key || !is_array($csvData) || count($csvData) == 0 || !isset($csvData[0]['task.number']) || empty($csvData[0]['task.number'])) {
+        if (! $key || ! is_array($csvData) || count($csvData) == 0 || ! isset($csvData[0]['task.number']) || empty($csvData[0]['task.number'])) {
             return $csvData;
         }
 
@@ -188,7 +187,6 @@ class BaseImport
         }
 
         return $grouped;
-
 
     }
 
@@ -219,7 +217,6 @@ class BaseImport
     {
         return $this->error_array;
     }
-
 
     private function runValidation($data)
     {
@@ -255,13 +252,14 @@ class BaseImport
 
             unset($record['']);
 
-            if(!is_array($record))
+            if (! is_array($record)) {
                 continue;
+            }
 
             try {
                 $entity = $this->transformer->transform($record);
 
-                if (!$entity) {
+                if (! $entity) {
                     continue;
                 }
 
@@ -313,8 +311,8 @@ class BaseImport
         $count = 0;
 
         foreach ($data as $key => $record) {
-            
-            if(!is_array($record)) {
+
+            if (! is_array($record)) {
                 continue;
             }
 
@@ -380,8 +378,8 @@ class BaseImport
         $invoices = $this->groupInvoices($invoices, $invoice_number_key);
 
         foreach ($invoices as $raw_invoice) {
-            
-            if(!is_array($raw_invoice)) {
+
+            if (! is_array($raw_invoice)) {
                 continue;
             }
 
@@ -434,7 +432,6 @@ class BaseImport
                     // If we're doing a generic CSV import, only import payment data if we're not importing a payment CSV.
                     // If we're doing a platform-specific import, trust the platform to only return payment info if there's not a separate payment CSV.
 
-
                 }
             } catch (\Exception $ex) {
                 if (\DB::connection(config('database.default'))->transactionLevel() > 0) {
@@ -472,8 +469,8 @@ class BaseImport
 
         foreach ($tasks as $raw_task) {
             $task_data = [];
-            
-            if(!is_array($raw_task)) {
+
+            if (! is_array($raw_task)) {
                 continue;
             }
 
@@ -523,8 +520,6 @@ class BaseImport
         return $count;
     }
 
-
-
     public function ingestInvoices($invoices, $invoice_number_key)
     {
         $count = 0;
@@ -545,8 +540,8 @@ class BaseImport
         $invoices = $this->groupInvoices($invoices, $invoice_number_key);
 
         foreach ($invoices as $raw_invoice) {
-            
-            if(!is_array($raw_invoice)) {
+
+            if (! is_array($raw_invoice)) {
                 continue;
             }
 
@@ -598,7 +593,7 @@ class BaseImport
                     nlog($invoice_data);
                     $saveable_invoice_data = $invoice_data;
 
-                    if(array_key_exists('payments', $saveable_invoice_data)) {
+                    if (array_key_exists('payments', $saveable_invoice_data)) {
                         unset($saveable_invoice_data['payments']);
                     }
 
@@ -614,8 +609,7 @@ class BaseImport
                         // Check for payment columns
                         if (! empty($invoice_data['payments'])) {
                             foreach (
-                                $invoice_data['payments']
-                                as $payment_data
+                                $invoice_data['payments'] as $payment_data
                             ) {
                                 $payment_data['user_id'] = $invoice->user_id;
                                 $payment_data['client_id'] =
@@ -641,7 +635,7 @@ class BaseImport
 
                                     $payment_date = Carbon::parse($payment->date);
 
-                                    if(!$payment_date->isToday()) {
+                                    if (! $payment_date->isToday()) {
 
                                         $payment->paymentables()->update(['created_at' => $payment_date]);
 
@@ -765,8 +759,8 @@ class BaseImport
         $quotes = $this->groupInvoices($quotes, $quote_number_key);
 
         foreach ($quotes as $raw_quote) {
-            
-            if(!is_array($raw_quote)) {
+
+            if (! is_array($raw_quote)) {
                 continue;
             }
 
@@ -855,16 +849,16 @@ class BaseImport
     {
         $user = false;
 
-        if(is_numeric($user_hash)) {
+        if (is_numeric($user_hash)) {
 
             $user = User::query()
-                        ->where('account_id', $this->company->account->id)
-                        ->where('id', $user_hash)
-                        ->first();
+                ->where('account_id', $this->company->account->id)
+                ->where('id', $user_hash)
+                ->first();
 
         }
 
-        if($user) {
+        if ($user) {
             return $user->id;
         }
 
@@ -881,9 +875,9 @@ class BaseImport
     public function finalizeImport()
     {
         $data = [
-            'errors'  => $this->error_array,
+            'errors' => $this->error_array,
             'company' => $this->company,
-            'entity_count' => $this->entity_count
+            'entity_count' => $this->entity_count,
         ];
 
         $nmo = new NinjaMailerObject();
@@ -927,7 +921,7 @@ class BaseImport
 
             $diff = array_diff($key_keys, $row_keys);
 
-            if(!empty($diff)) {
+            if (! empty($diff)) {
                 return false;
             }
             /** 12-04-2024 If we do not have matching keys - then this row import is _not_ valid */
@@ -958,7 +952,7 @@ class BaseImport
             'WINDOWS-1251', // CP1251
             'UTF-16',
             'UTF-32',
-            'ASCII'
+            'ASCII',
         ];
 
         foreach ($data as $key => $value) {
@@ -976,5 +970,4 @@ class BaseImport
 
         return $data;
     }
-    
 }

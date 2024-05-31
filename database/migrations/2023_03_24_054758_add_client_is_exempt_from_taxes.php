@@ -11,8 +11,10 @@ use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     use MakesHash;
+
     /**
      * Run the migrations.
      *
@@ -40,42 +42,41 @@ return new class extends Migration {
         });
 
         BankTransaction::withTrashed()
-                       ->whereNotNull('expense_id')
-                       ->cursor()
-                       ->each(function ($transaction) {
-                           $transaction->expense_id = $this->encodePrimaryKey($transaction->expense_id);
-                           $transaction->save();
-                       });
+            ->whereNotNull('expense_id')
+            ->cursor()
+            ->each(function ($transaction) {
+                $transaction->expense_id = $this->encodePrimaryKey($transaction->expense_id);
+                $transaction->save();
+            });
 
         Company::query()
-               ->cursor()
-               ->each(function ($company) {
-                   $company->tax_data = null;
-                   $company->save();
-               });
-        
+            ->cursor()
+            ->each(function ($company) {
+                $company->tax_data = null;
+                $company->save();
+            });
+
         Client::query()
-               ->cursor()
-               ->each(function ($client) {
-                   $client->tax_data = null;
-                   $client->save();
-               });
+            ->cursor()
+            ->each(function ($client) {
+                $client->tax_data = null;
+                $client->save();
+            });
 
         Product::query()
-               ->cursor()
-               ->each(function ($product) {
-                   $product->tax_id = 1;
-                   $product->save();
-               });
-
+            ->cursor()
+            ->each(function ($product) {
+                $product->tax_id = 1;
+                $product->save();
+            });
 
         //payment types from 34
 
-        if(Ninja::isSelfHost()) {
+        if (Ninja::isSelfHost()) {
 
             $pt = PaymentType::find(34);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 34;
                 $type->name = 'Mollie Bank Transfer';
@@ -86,7 +87,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(35);
 
-            if(!$pt) {
+            if (! $pt) {
 
                 $type = new PaymentType();
                 $type->id = 35;
@@ -98,7 +99,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(36);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 36;
                 $type->name = 'Bancontact';
@@ -109,8 +110,8 @@ return new class extends Migration {
 
             $pt = PaymentType::find(37);
 
-            if(!$pt) {
-                    
+            if (! $pt) {
+
                 $type = new PaymentType();
                 $type->id = 37;
                 $type->name = 'iDEAL';
@@ -121,7 +122,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(38);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 38;
                 $type->name = 'Hosted Page';
@@ -131,7 +132,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(39);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 39;
                 $type->name = 'GiroPay';
@@ -141,7 +142,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(40);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 40;
                 $type->name = 'Przelewy24';
@@ -151,7 +152,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(41);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 41;
                 $type->name = 'EPS';
@@ -161,7 +162,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(42);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 42;
                 $type->name = 'Direct Debit';
@@ -172,7 +173,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(43);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 43;
                 $type->name = 'BECS';
@@ -182,7 +183,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(44);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 44;
                 $type->name = 'ACSS';
@@ -193,7 +194,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(45);
 
-            if(!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = PaymentType::INSTANT_BANK_PAY;
                 $type->name = 'Instant Bank Pay';
@@ -204,7 +205,7 @@ return new class extends Migration {
 
             $pt = PaymentType::find(47);
 
-            if (!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 47;
                 $type->name = 'Klarna';
@@ -212,10 +213,9 @@ return new class extends Migration {
                 $type->save();
             }
 
-
             $pt = PaymentType::find(48);
 
-            if (!$pt) {
+            if (! $pt) {
                 $type = new PaymentType();
                 $type->id = 48;
                 $type->name = 'Interac E-Transfer';
@@ -224,7 +224,7 @@ return new class extends Migration {
 
             $gt = GatewayType::find(23);
 
-            if (!$gt) {
+            if (! $gt) {
                 $type = new GatewayType();
                 $type->id = 23;
                 $type->alias = 'klarna';
@@ -243,6 +243,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        
+
     }
 };

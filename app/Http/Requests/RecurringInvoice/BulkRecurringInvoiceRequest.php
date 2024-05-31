@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,6 @@ class BulkRecurringInvoiceRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -35,10 +32,10 @@ class BulkRecurringInvoiceRequest extends Request
         $user = auth()->user();
 
         return [
-            'ids' => ['required','bail','array', Rule::exists('recurring_invoices', 'id')->where('company_id', $user->company()->id)],
+            'ids' => ['required', 'bail', 'array', Rule::exists('recurring_invoices', 'id')->where('company_id', $user->company()->id)],
             'action' => 'in:archive,restore,delete,increase_prices,update_prices,start,stop,send_now,set_payment_link',
             'percentage_increase' => 'required_if:action,increase_prices|numeric|min:0|max:100',
-            'subscription_id' => 'sometimes|string'
+            'subscription_id' => 'sometimes|string',
         ];
     }
 

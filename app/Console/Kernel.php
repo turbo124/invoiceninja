@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,7 +40,6 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -120,7 +118,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('ninja:s3-cleanup')->dailyAt('23:15')->withoutOverlapping()->name('s3-cleanup-job')->onOneServer();
         }
 
-        if (config('queue.default') == 'database' && Ninja::isSelfHost() && config('ninja.internal_queue_enabled') && !config('ninja.is_docker')) {
+        if (config('queue.default') == 'database' && Ninja::isSelfHost() && config('ninja.internal_queue_enabled') && ! config('ninja.is_docker')) {
             $schedule->command('queue:work database --stop-when-empty --memory=256')->everyMinute()->withoutOverlapping();
 
             $schedule->command('queue:restart')->everyFiveMinutes()->withoutOverlapping();
@@ -134,7 +132,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__ . '/Commands');
+        $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
     }

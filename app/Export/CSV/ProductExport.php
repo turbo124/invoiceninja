@@ -5,21 +5,20 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Export\CSV;
 
-use App\Utils\Ninja;
-use League\Csv\Writer;
+use App\Export\Decorators\Decorator;
+use App\Libraries\MultiDB;
 use App\Models\Company;
 use App\Models\Product;
-use App\Libraries\MultiDB;
-use Illuminate\Support\Facades\App;
-use App\Export\Decorators\Decorator;
 use App\Transformers\ProductTransformer;
+use App\Utils\Ninja;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\App;
+use League\Csv\Writer;
 
 class ProductExport extends BaseExport
 {
@@ -50,10 +49,11 @@ class ProductExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
     }
@@ -72,17 +72,16 @@ class ProductExport extends BaseExport
         }
 
         $query = Product::query()
-                        ->withTrashed()
-                        ->where('company_id', $this->company->id);
-                        
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
         $query = $this->addDateRange($query);
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -103,9 +102,9 @@ class ProductExport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query->cursor()
-              ->each(function ($entity) {
-                  $this->csv->insertOne($this->buildRow($entity));
-              });
+            ->each(function ($entity) {
+                $this->csv->insertOne($this->buildRow($entity));
+            });
 
         return $this->csv->toString();
     }

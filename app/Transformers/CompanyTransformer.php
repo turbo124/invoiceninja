@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -56,16 +55,10 @@ class CompanyTransformer extends EntityTransformer
 {
     use MakesHash;
 
-    /**
-     * @var array
-     */
     protected array $defaultIncludes = [
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'documents',
         'users',
@@ -110,8 +103,6 @@ class CompanyTransformer extends EntityTransformer
     ];
 
     /**
-     * @param Company $company
-     *
      * @return array
      */
     public function transform(Company $company)
@@ -133,7 +124,7 @@ class CompanyTransformer extends EntityTransformer
             'show_product_details' => (bool) $company->show_product_details,
             'enable_product_quantity' => (bool) $company->enable_product_quantity,
             'default_quantity' => (bool) $company->default_quantity,
-            'custom_fields' =>  (object) $company->custom_fields ?? $std,
+            'custom_fields' => (object) $company->custom_fields ?? $std,
             'size_id' => (string) $company->size_id ?: '',
             'industry_id' => (string) $company->industry_id ?: '',
             'first_month_of_year' => (string) $company->first_month_of_year ?: '1',
@@ -204,13 +195,13 @@ class CompanyTransformer extends EntityTransformer
             'invoice_task_project_header' => (bool) $company->invoice_task_project_header,
             'invoice_task_item_description' => (bool) $company->invoice_task_item_description,
             'origin_tax_data' => $company->origin_tax_data ?: new \stdClass(),
-            'smtp_host' => (string)$company->smtp_host ?? '',
-            'smtp_port' => (int)$company->smtp_port ?? 25,
-            'smtp_encryption' => (string)$company->smtp_encryption ?? 'tls',
+            'smtp_host' => (string) $company->smtp_host ?? '',
+            'smtp_port' => (int) $company->smtp_port ?? 25,
+            'smtp_encryption' => (string) $company->smtp_encryption ?? 'tls',
             'smtp_username' => $company->smtp_username ? '********' : '',
             'smtp_password' => $company->smtp_password ? '********' : '',
-            'smtp_local_domain' => (string)$company->smtp_local_domain ?? '',
-            'smtp_verify_peer' => (bool)$company->smtp_verify_peer,
+            'smtp_local_domain' => (string) $company->smtp_local_domain ?? '',
+            'smtp_verify_peer' => (bool) $company->smtp_verify_peer,
             'e_invoice' => $company->e_invoice ?: new \stdClass(),
         ];
     }
@@ -263,14 +254,12 @@ class CompanyTransformer extends EntityTransformer
         return $this->includeCollection($company->tokens, $transformer, CompanyToken::class);
     }
 
-
     public function includeBankTransactions(Company $company)
     {
         $transformer = new BankTransactionTransformer($this->serializer);
 
         return $this->includeCollection($company->bank_transactions, $transformer, BankTransaction::class);
     }
-
 
     public function includeTaskSchedulers(Company $company)
     {

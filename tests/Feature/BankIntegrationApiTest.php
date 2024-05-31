@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,15 +19,16 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\BankIntegrationController
  */
 class BankIntegrationApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,6 @@ class BankIntegrationApiTest extends TestCase
 
         Model::reguard();
     }
-
 
     public function testBankIntegrationPost()
     {
@@ -54,7 +53,6 @@ class BankIntegrationApiTest extends TestCase
 
         $response->assertStatus(200);
     }
-
 
     public function testBankIntegrationGet()
     {

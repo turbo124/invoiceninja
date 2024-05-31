@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,7 +60,7 @@ class CustomPaymentDriver extends BaseDriver
     /**
      * View for displaying custom content of the driver.
      *
-     * @param array $data
+     * @param  array  $data
      * @return mixed
      */
     public function processPaymentView($data)
@@ -142,14 +141,12 @@ class CustomPaymentDriver extends BaseDriver
             }
         }
 
-
         return redirect()->route('client.invoices');
     }
 
     /**
      * Detach payment method from custom payment driver.
      *
-     * @param ClientGatewayToken $token
      * @return void
      */
     public function detach(ClientGatewayToken $token)

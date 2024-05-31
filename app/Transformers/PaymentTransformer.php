@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -87,7 +86,7 @@ class PaymentTransformer extends EntityTransformer
 
     public function transform(Payment $payment)
     {
-        return  [
+        return [
             'id' => $this->encodePrimaryKey($payment->id),
             'user_id' => $this->encodePrimaryKey($payment->user_id),
             'assigned_user_id' => $this->encodePrimaryKey($payment->assigned_user_id),

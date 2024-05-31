@@ -38,6 +38,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read int|null $tasks_count
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor|null $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\ProjectFactory factory($count = null, $state = [])
@@ -49,15 +50,17 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|Project withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Project withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Task> $tasks
+ *
  * @mixin \Eloquent
  */
 class Project extends BaseModel
 {
-    use SoftDeletes;
-    use PresentableTrait;
     use Filterable;
+    use PresentableTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -136,7 +139,6 @@ class Project extends BaseModel
     {
         return $this->hasMany(Quote::class);
     }
-    
 
     public function translate_entity()
     {

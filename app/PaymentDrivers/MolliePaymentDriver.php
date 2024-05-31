@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -218,8 +217,8 @@ class MolliePaymentDriver extends BaseDriver
                 'customerId' => $cgt->gateway_customer_reference,
                 'sequenceType' => 'recurring',
                 'description' => $description,
-                'idempotencyKey' => uniqid("st", true),
-                'webhookUrl'  => $this->company_gateway->webhookUrl(),
+                'idempotencyKey' => uniqid('st', true),
+                'webhookUrl' => $this->company_gateway->webhookUrl(),
             ]);
 
             if ($payment->status === 'paid') {
@@ -413,8 +412,7 @@ class MolliePaymentDriver extends BaseDriver
     /**
      * Convert the amount to the format that Mollie supports.
      *
-     * @param mixed|float $amount
-     * @return string
+     * @param  mixed|float  $amount
      */
     public function convertToMollieAmount($amount): string
     {
@@ -427,9 +425,9 @@ class MolliePaymentDriver extends BaseDriver
 
         try {
             $p = $this->gateway->payments->page();
+
             return true;
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
 
         }
 

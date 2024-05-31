@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -53,30 +52,35 @@ class ExpenseCategoryController extends BaseController
      *      tags={"expense_categories"},
      *      summary="Gets a list of expense_categories",
      *      description="Lists tax rates",
+     *
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of expense_categories",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ExpenseCategory"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     *
-     *
-     * Display a listing of the resource.
      *
      * @return Response
      */
@@ -87,15 +91,10 @@ class ExpenseCategoryController extends BaseController
         return $this->listResponse($expense_categories);
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateExpenseCategoryRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/expense_categories/create",
@@ -103,25 +102,33 @@ class ExpenseCategoryController extends BaseController
      *      tags={"expense_categories"},
      *      summary="Gets a new blank Expens Category object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank Expens Category object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ExpenseCategory"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -137,13 +144,10 @@ class ExpenseCategoryController extends BaseController
         return $this->itemResponse($expense_category);
     }
 
-
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreExpenseCategoryRequest $request
      * @return Response
-     *
      *
      * @OA\Post(
      *      path="/api/v1/expense_categories",
@@ -151,33 +155,41 @@ class ExpenseCategoryController extends BaseController
      *      tags={"expense_categories"},
      *      summary="Adds a expense category",
      *      description="Adds an expense category to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved invoice object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ExpenseCategory"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
      */
     public function store(StoreExpenseCategoryRequest $request)
     {
-        /** @var \App\Models\User $user **/
+        /** @var \App\Models\User $user * */
         $user = auth()->user();
 
         $expense_category = ExpenseCategoryFactory::create($user->company()->id, $user->id);
@@ -190,10 +202,7 @@ class ExpenseCategoryController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowExpenseCategoryRequest $request
-     * @param ExpenseCategory $expense_category
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/expense_categories/{id}",
@@ -201,6 +210,7 @@ class ExpenseCategoryController extends BaseController
      *      tags={"expense_categories"},
      *      summary="Shows a Expens Category",
      *      description="Displays an ExpenseCategory by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -209,28 +219,36 @@ class ExpenseCategoryController extends BaseController
      *          description="The ExpenseCategory Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Expens Category object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ExpenseCategory"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -243,10 +261,7 @@ class ExpenseCategoryController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditExpenseCategoryRequest $request
-     * @param ExpenseCategory $expense_category
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/expense_categories/{id}/edit",
@@ -254,6 +269,7 @@ class ExpenseCategoryController extends BaseController
      *      tags={"expense_categories"},
      *      summary="Shows a Expens Category for editting",
      *      description="Displays a Expens Category by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -262,28 +278,36 @@ class ExpenseCategoryController extends BaseController
      *          description="The ExpenseCategory Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Expens Category object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ExpenseCategory"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -296,11 +320,7 @@ class ExpenseCategoryController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateExpenseCategoryRequest $request
-     * @param ExpenseCategory $expense_category
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/expense_categories/{id}",
@@ -308,6 +328,7 @@ class ExpenseCategoryController extends BaseController
      *      tags={"expense_categories"},
      *      summary="Updates a tax rate",
      *      description="Handles the updating of a tax rate by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -316,28 +337,36 @@ class ExpenseCategoryController extends BaseController
      *          description="The ExpenseCategory Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the ExpenseCategory object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ExpenseCategory"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -353,18 +382,17 @@ class ExpenseCategoryController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyExpenseCategoryRequest $request
-     * @param ExpenseCategory $expense_category
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/expense_categories/{id}",
      *      operationId="deleteExpenseCategory",
      *      tags={"expense_categories"},
      *      summary="Deletes a ExpenseCategory",
      *      description="Handles the deletion of an ExpenseCategory by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -373,27 +401,34 @@ class ExpenseCategoryController extends BaseController
      *          description="The ExpenseCategory Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -412,23 +447,27 @@ class ExpenseCategoryController extends BaseController
      *
      * @return Response
      *
-     *
      * @OA\Post(
      *      path="/api/v1/expense_categories/bulk",
      *      operationId="bulkExpenseCategorys",
      *      tags={"expense_categories"},
      *      summary="Performs bulk actions on an array of ExpenseCategorys",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="Expens Categorys",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -437,29 +476,36 @@ class ExpenseCategoryController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The ExpenseCategory List response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
      */
     public function bulk()
     {
-        /** @var \App\Models\User $user **/
+        /** @var \App\Models\User $user * */
         $user = auth()->user();
 
         $action = request()->input('action');

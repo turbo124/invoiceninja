@@ -5,7 +5,6 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,6 +22,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class QuoteCreatedNotification implements ShouldQueue
 {
     use UserNotifies;
+
     public $delay = 5;
 
     public function __construct()
@@ -43,7 +43,6 @@ class QuoteCreatedNotification implements ShouldQueue
 
         $quote = $event->quote;
 
-
         /* We loop through each user and determine whether they need to be notified */
         /** @var \App\Models\CompanyUser $company_user */
         foreach ($event->company->company_users as $company_user) {
@@ -56,7 +55,7 @@ class QuoteCreatedNotification implements ShouldQueue
 
             $use_react_link = false;
 
-            if(isset($company_user->react_settings->react_notification_link) && $company_user->react_settings->react_notification_link) {
+            if (isset($company_user->react_settings->react_notification_link) && $company_user->react_settings->react_notification_link) {
                 $use_react_link = true;
             }
 

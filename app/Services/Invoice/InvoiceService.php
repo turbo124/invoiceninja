@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,6 +37,7 @@ class InvoiceService
     /**
      * Marks as invoice as paid
      * and executes child sub functions.
+     *
      * @return $this InvoiceService object
      */
     public function markPaid(?string $reference = null)
@@ -52,9 +52,8 @@ class InvoiceService
     /**
      * applyPaymentAmount
      *
-     * @param  float $amount
-     * @param  ?string $reference
-     * @return self
+     * @param  float  $amount
+     * @param  ?string  $reference
      */
     public function applyPaymentAmount($amount, ?string $reference = null): self
     {
@@ -65,6 +64,7 @@ class InvoiceService
 
     /**
      * Applies the invoice number.
+     *
      * @return $this InvoiceService object
      */
     public function applyNumber()
@@ -90,7 +90,7 @@ class InvoiceService
         if ($company_currency != $client_currency) {
             $exchange_rate = new CurrencyApi();
 
-            $this->invoice->exchange_rate = 1/$exchange_rate->exchangeRate($client_currency, $company_currency, now());
+            $this->invoice->exchange_rate = 1 / $exchange_rate->exchangeRate($client_currency, $company_currency, now());
         }
 
         return $this;
@@ -98,6 +98,7 @@ class InvoiceService
 
     /**
      * Applies the recurring invoice number.
+     *
      * @return $this InvoiceService object
      */
     public function applyRecurringNumber()
@@ -109,9 +110,10 @@ class InvoiceService
 
     /**
      * Apply a payment amount to an invoice.
-     * @param  Payment $payment        The Payment
-     * @param  float   $payment_amount The Payment amount
-     * @return InvoiceService          Parent class object
+     *
+     * @param  Payment  $payment  The Payment
+     * @param  float  $payment_amount  The Payment amount
+     * @return InvoiceService Parent class object
      */
     public function applyPayment(Payment $payment, float $payment_amount)
     {
@@ -132,11 +134,10 @@ class InvoiceService
     /**
      * Update an invoice balance.
      *
-     * @param  float $balance_adjustment The amount to adjust the invoice by
-     * a negative amount will REDUCE the invoice balance, a positive amount will INCREASE
-     * the invoice balance
-     *
-     * @return InvoiceService                     Parent class object
+     * @param  float  $balance_adjustment  The amount to adjust the invoice by
+     *                                     a negative amount will REDUCE the invoice balance, a positive amount will INCREASE
+     *                                     the invoice balance
+     * @return InvoiceService Parent class object
      */
     public function updateBalance($balance_adjustment, bool $is_draft = false)
     {
@@ -194,7 +195,7 @@ class InvoiceService
         return (new CreateRawPdf($invitation))->handle();
     }
 
-    public function getInvoiceDeliveryNote(Invoice $invoice, \App\Models\ClientContact $contact = null)
+    public function getInvoiceDeliveryNote(Invoice $invoice, ?\App\Models\ClientContact $contact = null)
     {
         return (new GenerateDeliveryNote($invoice, $contact))->run();
     }
@@ -208,7 +209,7 @@ class InvoiceService
     {
         return $this->getEInvoice($contact);
     }
-    
+
     public function sendEmail($contact = null)
     {
         $send_email = new SendEmail($this->invoice, null, $contact);
@@ -286,7 +287,7 @@ class InvoiceService
         }
 
         //12-10-2022
-        if ($this->invoice->partial > 0 && !$this->invoice->partial_due_date) {
+        if ($this->invoice->partial > 0 && ! $this->invoice->partial_due_date) {
             $this->invoice->partial_due_date = Carbon::parse($this->invoice->date)->addDays($this->invoice->client->getSetting('payment_terms'));
         } else {
             $this->invoice->due_date = Carbon::parse($this->invoice->date)->addDays($this->invoice->client->getSetting('payment_terms'));
@@ -302,17 +303,15 @@ class InvoiceService
      * We can _ONLY_ call this _IF_ a partial
      * amount has been paid, otherwise we end up wiping
      * all reminders regardless
-     *
-     * @return self
      */
     public function checkReminderStatus(): self
     {
 
-        if($this->invoice->partial == 0) {
+        if ($this->invoice->partial == 0) {
             $this->invoice->partial_due_date = null;
         }
 
-        if($this->invoice->partial == 0 && $this->invoice->balance > 0) {
+        if ($this->invoice->partial == 0 && $this->invoice->balance > 0) {
             $this->invoice->reminder1_sent = null;
             $this->invoice->reminder2_sent = null;
             $this->invoice->reminder3_sent = null;
@@ -370,13 +369,13 @@ class InvoiceService
     public function toggleFeesPaid()
     {
         $this->invoice->line_items = collect($this->invoice->line_items)
-                                     ->map(function ($item) {
-                                         if ($item->type_id == '3') {
-                                             $item->type_id = '4';
-                                         }
+            ->map(function ($item) {
+                if ($item->type_id == '3') {
+                    $item->type_id = '4';
+                }
 
-                                         return $item;
-                                     })->toArray();
+                return $item;
+            })->toArray();
 
         // $this->deletePdf();
         $this->deleteEInvoice();
@@ -414,12 +413,12 @@ class InvoiceService
         $this->invoice->invitations->each(function ($invitation) {
             try {
                 // if (Storage::disk(config('filesystems.default'))->exists($this->invoice->client->e_invoice_filepath($invitation).$this->invoice->getFileName("xml"))) {
-                Storage::disk(config('filesystems.default'))->delete($this->invoice->client->e_document_filepath($invitation).$this->invoice->getFileName("xml"));
+                Storage::disk(config('filesystems.default'))->delete($this->invoice->client->e_document_filepath($invitation).$this->invoice->getFileName('xml'));
                 // }
 
                 // if (Ninja::isHosted() && Storage::disk('public')->exists($this->invoice->client->e_invoice_filepath($invitation).$this->invoice->getFileName("xml"))) {
                 if (Ninja::isHosted()) {
-                    Storage::disk('public')->delete($this->invoice->client->e_document_filepath($invitation).$this->invoice->getFileName("xml"));
+                    Storage::disk('public')->delete($this->invoice->client->e_document_filepath($invitation).$this->invoice->getFileName('xml'));
                 }
             } catch (\Exception $e) {
                 nlog($e->getMessage());
@@ -441,9 +440,9 @@ class InvoiceService
         $pre_count = count($this->invoice->line_items);
 
         $items = collect($this->invoice->line_items)
-                                     ->reject(function ($item) {
-                                         return $item->type_id == '3';
-                                     })->toArray();
+            ->reject(function ($item) {
+                return $item->type_id == '3';
+            })->toArray();
 
         $this->invoice->line_items = array_values($items);
 
@@ -459,8 +458,8 @@ class InvoiceService
             $adjustment = $balance - $new_balance;
 
             $this->invoice
-            ->ledger()
-            ->updateInvoiceBalance($adjustment * -1, 'Adjustment for removing gateway fee');
+                ->ledger()
+                ->updateInvoiceBalance($adjustment * -1, 'Adjustment for removing gateway fee');
 
             $this->invoice->client->service()->calculateBalance();
 
@@ -488,7 +487,8 @@ class InvoiceService
 
     /*When a reminder is sent we want to touch the dates they were sent*/
     public function touchReminder(string $reminder_template)
-    {   nrlog(now()->format('Y-m-d h:i:s') . " INV #{$this->invoice->number} : Touching Reminder => {$reminder_template}");
+    {
+        nrlog(now()->format('Y-m-d h:i:s')." INV #{$this->invoice->number} : Touching Reminder => {$reminder_template}");
         switch ($reminder_template) {
             case 'reminder1':
                 $this->invoice->reminder1_sent = now();
@@ -624,7 +624,7 @@ class InvoiceService
 
         $sub_id = $this->decodePrimaryKey($subscription_id);
 
-        if(Subscription::withTrashed()->where('id', $sub_id)->where('company_id', $this->invoice->company_id)->exists()) {
+        if (Subscription::withTrashed()->where('id', $sub_id)->where('company_id', $this->invoice->company_id)->exists()) {
             $this->invoice->subscription_id = $sub_id;
         }
 
@@ -634,6 +634,7 @@ class InvoiceService
 
     /**
      * Saves the invoice.
+     *
      * @return Invoice object
      */
     public function save(): ?Invoice

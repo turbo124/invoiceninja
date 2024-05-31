@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -53,7 +52,7 @@ class PaymentController extends BaseController
     /**
      * PaymentController constructor.
      *
-     * @param PaymentRepository $payment_repo  The invoice repo
+     * @param  PaymentRepository  $payment_repo  The invoice repo
      */
     public function __construct(PaymentRepository $payment_repo)
     {
@@ -65,11 +64,8 @@ class PaymentController extends BaseController
     /**
      * Show the list of Invoices.
      *
-     * @param PaymentFilters $filters  The filters
-     *
+     * @param  PaymentFilters  $filters  The filters
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/payments",
@@ -82,23 +78,30 @@ class PaymentController extends BaseController
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of payments",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -113,11 +116,8 @@ class PaymentController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreatePaymentRequest $request  The request
-     *
+     * @param  CreatePaymentRequest  $request  The request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/payments/create",
@@ -125,26 +125,34 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Gets a new blank Payment object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -163,11 +171,8 @@ class PaymentController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StorePaymentRequest $request  The request
-     *
+     * @param  StorePaymentRequest  $request  The request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/payments",
@@ -175,31 +180,41 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Adds a Payment",
      *      description="Adds an Payment to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\RequestBody(
      *         description="The payment request",
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Payment"),
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -219,11 +234,9 @@ class PaymentController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowPaymentRequest $request The request
-     * @param Payment $payment The invoice
-     *
+     * @param  ShowPaymentRequest  $request  The request
+     * @param  Payment  $payment  The invoice
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/payments/{id}",
@@ -231,6 +244,7 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Shows an Payment",
      *      description="Displays an Payment by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -240,28 +254,36 @@ class PaymentController extends BaseController
      *          description="The Payment Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -274,11 +296,9 @@ class PaymentController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditPaymentRequest $request The request
-     * @param Payment $payment The invoice
-     *
+     * @param  EditPaymentRequest  $request  The request
+     * @param  Payment  $payment  The invoice
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/payments/{id}/edit",
@@ -286,6 +306,7 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Shows an Payment for editting",
      *      description="Displays an Payment by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -295,28 +316,36 @@ class PaymentController extends BaseController
      *          description="The Payment Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -329,11 +358,9 @@ class PaymentController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdatePaymentRequest $request The request
-     * @param Payment $payment The invoice
-     *
+     * @param  UpdatePaymentRequest  $request  The request
+     * @param  Payment  $payment  The invoice
      * @return Response
-     *
      *
      * @OA\Put(
      *      path="/api/v1/payments/{id}",
@@ -341,6 +368,7 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Updates an Payment",
      *      description="Handles the updating of an Payment by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -350,28 +378,36 @@ class PaymentController extends BaseController
      *          description="The Payment Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -397,19 +433,18 @@ class PaymentController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyPaymentRequest $request
-     * @param Payment $payment
      *
-     * @return     Response
-     *
+     * @return Response
      *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/payments/{id}",
      *      operationId="deletePayment",
      *      tags={"payments"},
      *      summary="Deletes a Payment",
      *      description="Handles the deletion of an Payment by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -419,27 +454,34 @@ class PaymentController extends BaseController
      *          description="The Payment Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -456,23 +498,27 @@ class PaymentController extends BaseController
      *
      * @return \Illuminate\Support\Collection
      *
-     *
      * @OA\Post(
      *      path="/api/v1/payments/bulk",
      *      operationId="bulkPayments",
      *      tags={"payments"},
      *      summary="Performs bulk actions on an array of payments",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="User credentials",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -481,23 +527,30 @@ class PaymentController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Payment response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -513,11 +566,11 @@ class PaymentController extends BaseController
 
         $payments = Payment::withTrashed()->whereIn('id', $this->transformKeys($ids))->company()->get();
 
-        if (!$payments) {
+        if (! $payments) {
             return response()->json(['message' => ctrans('texts.record_not_found')]);
         }
 
-        if($action == 'template' && $user->can('view', $payments->first())) {
+        if ($action == 'template' && $user->can('view', $payments->first())) {
 
             $hash_or_response = request()->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 
@@ -534,7 +587,6 @@ class PaymentController extends BaseController
 
             return response()->json(['message' => $hash_or_response], 200);
         }
-
 
         $payments->each(function ($payment, $key) use ($action, $user) {
             if ($user->can('edit', $payment)) {
@@ -556,15 +608,6 @@ class PaymentController extends BaseController
      *      summary="Performs a custom action on an Payment",
      *      description="Performs a custom action on an Payment.
 
-    The current range of actions are as follows
-    - clone_to_Payment
-    - clone_to_quote
-    - history
-    - delivery_note
-    - mark_paid
-    - download
-    - archive
-    - delete
     - email",
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
@@ -575,44 +618,52 @@ class PaymentController extends BaseController
      *          description="The Payment Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Parameter(
      *          name="action",
      *          in="path",
      *          description="The action string to be performed",
      *          example="clone_to_quote",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param Payment $payment
-     * @param $action
      */
     public function performAction(Payment $payment, $action, $bulk = false)
     {
@@ -665,11 +716,8 @@ class PaymentController extends BaseController
     /**
      * Store a newly created refund.
      *
-     * @param RefundPaymentRequest $request  The request
-     *
+     * @param  RefundPaymentRequest  $request  The request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/payments/refund",
@@ -677,31 +725,41 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Adds a Refund",
      *      description="Adds an Refund to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\RequestBody(
      *         description="The refund request",
      *         required=true,
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Payment"),
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -718,11 +776,7 @@ class PaymentController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadPaymentRequest $request
-     * @param Payment $payment
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/payments/{id}/upload",
@@ -730,6 +784,7 @@ class PaymentController extends BaseController
      *      tags={"payments"},
      *      summary="Uploads a document to a payment",
      *      description="Handles the uploading of a document to a payment",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -739,28 +794,36 @@ class PaymentController extends BaseController
      *          description="The Payment Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Payment object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Payment"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

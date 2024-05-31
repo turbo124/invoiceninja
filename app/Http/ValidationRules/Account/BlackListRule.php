@@ -3659,11 +3659,10 @@ class BlackListRule implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $parts = explode("@", $value);
+        $parts = explode('@', $value);
 
         if (is_array($parts) && in_array($parts[1], $this->blacklist)) {
             $fail('This domain is blacklisted, if you think this is in error, please email contact@invoiceninja.com');
         }
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,6 +22,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Import\Providers\Csv
  */
 class TaskImportTest extends TestCase
@@ -92,10 +92,10 @@ class TaskImportTest extends TestCase
         $task = Task::where('company_id', $this->company->id)->where('number', 'x1234')->first();
         $this->assertNotNull($task);
         $this->assertEquals(1998, $task->calcDuration());
-        
+
         $time_log = json_decode($task->time_log);
 
-        foreach($time_log as $log) {
+        foreach ($time_log as $log) {
             $this->assertTrue($log[3]);
         }
 
@@ -105,21 +105,18 @@ class TaskImportTest extends TestCase
 
         $time_log = json_decode($task->time_log);
 
-        foreach($time_log as $log) {
+        foreach ($time_log as $log) {
             $this->assertTrue($log[3]);
         }
 
-    
     }
-
-
 
     public function testTaskImport()
     {
         Task::query()
             ->where('company_id', $this->company->id)
             ->forceDelete();
-            
+
         $this->assertEquals(0, Task::withTrashed()->where('company_id', $this->company->id)->count());
 
         /*Need to import clients first*/
@@ -158,6 +155,4 @@ class TaskImportTest extends TestCase
         $base_transformer = new BaseTransformer($this->company);
 
     }
-
-
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\ClientPortal\PrePayments;
 
-use App\Utils\Number;
 use App\Http\ViewComposers\PortalComposer;
+use App\Utils\Number;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePrePaymentRequest extends FormRequest

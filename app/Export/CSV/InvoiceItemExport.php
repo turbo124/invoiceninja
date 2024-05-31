@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,7 +39,7 @@ class InvoiceItemExport extends BaseExport
     private array $decorate_keys = [
         'client',
         'currency_id',
-        'status'
+        'status',
     ];
 
     public function __construct(Company $company, array $input)
@@ -68,14 +67,14 @@ class InvoiceItemExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_client_fields, $this->input['report_keys']));
 
         $query = Invoice::query()
-                        ->withTrashed()
-                        ->with('client')
-                        ->whereHas('client', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->where('company_id', $this->company->id);
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->with('client')
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
@@ -83,17 +82,17 @@ class InvoiceItemExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
-        if($this->input['status'] ?? false) {
+        if ($this->input['status'] ?? false) {
             $query = $this->addInvoiceStatusFilter($query, $this->input['status']);
         }
 
         $query = $this->applyProductFilters($query);
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -115,7 +114,7 @@ class InvoiceItemExport extends BaseExport
             ->each(function ($resource) {
                 $this->iterateItems($resource);
 
-                foreach($this->storage_array as $row) {
+                foreach ($this->storage_array as $row) {
                     $this->storage_item_array[] = $this->processItemMetaData($row, $resource);
                 }
 
@@ -126,7 +125,6 @@ class InvoiceItemExport extends BaseExport
         return array_merge(['columns' => $header], $this->storage_item_array);
 
     }
-
 
     public function run()
     {
@@ -160,15 +158,15 @@ class InvoiceItemExport extends BaseExport
 
             foreach (array_values(array_intersect($this->input['report_keys'], $this->item_report_keys)) as $key) { //items iterator produces item array
 
-                if (str_contains($key, "item.")) {
+                if (str_contains($key, 'item.')) {
 
-                    $tmp_key = str_replace("item.", "", $key);
+                    $tmp_key = str_replace('item.', '', $key);
 
-                    if($tmp_key == 'type_id') {
+                    if ($tmp_key == 'type_id') {
                         $tmp_key = 'type';
                     }
 
-                    if($tmp_key == 'tax_id') {
+                    if ($tmp_key == 'tax_id') {
                         $tmp_key = 'tax_category';
                     }
 
@@ -200,7 +198,7 @@ class InvoiceItemExport extends BaseExport
 
             $parts = explode('.', $key);
 
-            if(is_array($parts) && $parts[0] == 'item') {
+            if (is_array($parts) && $parts[0] == 'item') {
                 continue;
             }
 
@@ -215,6 +213,7 @@ class InvoiceItemExport extends BaseExport
                 // $entity[$key] = $this->resolveKey($key, $invoice, $this->invoice_transformer);
             }
         }
+
         // return $entity;
         return $this->decorateAdvancedFields($invoice, $entity);
     }
@@ -263,5 +262,4 @@ class InvoiceItemExport extends BaseExport
 
         return $entity;
     }
-
 }

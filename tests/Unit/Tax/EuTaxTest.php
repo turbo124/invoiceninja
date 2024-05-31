@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,10 +28,10 @@ use Tests\TestCase;
  */
 class EuTaxTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
-    
-    protected function setUp() :void
+    use MockAccountData;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +43,6 @@ class EuTaxTest extends TestCase
 
         $this->makeTestData();
     }
-
 
     public function testEuToUsTaxCalculation()
     {
@@ -115,7 +113,7 @@ class EuTaxTest extends TestCase
                 'taxSales' => 0.07,
             ]),
         ]);
-       
+
         $invoice = $invoice->calc()->getInvoice()->service()->markSent()->save();
 
         $this->assertEquals(107, $invoice->amount);
@@ -196,7 +194,6 @@ class EuTaxTest extends TestCase
 
     }
 
-
     public function testEuToAuTaxCalculationExemptProduct()
     {
 
@@ -270,7 +267,6 @@ class EuTaxTest extends TestCase
         $this->assertEquals(100, $invoice->amount);
 
     }
-
 
     public function testEuToAuTaxCalculationExemptClient()
     {
@@ -346,8 +342,6 @@ class EuTaxTest extends TestCase
 
     }
 
-
-
     public function testEuToAuTaxCalculation()
     {
 
@@ -422,13 +416,11 @@ class EuTaxTest extends TestCase
 
     }
 
-
-
     public function testInvoiceTaxCalcDetoBeNoVat()
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
-        
+
         $tax_data = new TaxModel();
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
@@ -447,7 +439,7 @@ class EuTaxTest extends TestCase
             'country_id' => 56,
             'shipping_country_id' => 56,
             'has_valid_vat_number' => false,
-            'vat_number' => ''
+            'vat_number' => '',
         ]);
 
         $invoice = Invoice::factory()->create([
@@ -470,7 +462,7 @@ class EuTaxTest extends TestCase
                     'tax_name3' => '',
                     'tax_rate3' => 0,
                     'type_id' => '1',
-                    'tax_id' => 1
+                    'tax_id' => 1,
                 ],
             ],
             'tax_rate1' => 0,
@@ -492,7 +484,7 @@ class EuTaxTest extends TestCase
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
-        
+
         $tax_data = new TaxModel();
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
@@ -551,12 +543,11 @@ class EuTaxTest extends TestCase
         $this->assertEquals(100, $invoice->amount);
     }
 
-
     public function testInvoiceTaxCalcDetoDe()
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
-        
+
         $tax_data = new TaxModel();
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
@@ -616,7 +607,6 @@ class EuTaxTest extends TestCase
 
     }
 
-
     public function testCorrectRuleInit()
     {
 
@@ -627,7 +617,7 @@ class EuTaxTest extends TestCase
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
         $tax_data->regions->EU->tax_all_subregions = true;
-        
+
         $company = Company::factory()->create([
             'account_id' => $this->account->id,
             'settings' => $settings,
@@ -643,13 +633,13 @@ class EuTaxTest extends TestCase
         ]);
 
         $invoice = Invoice::factory()->create([
-        'company_id' => $company->id,
-        'client_id' => $client->id,
-        'user_id' => $this->user->id,
-        'status_id' => Invoice::STATUS_SENT,
-        'tax_data' => new Response([
-                    'geoState' => 'CA',
-        ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
@@ -667,9 +657,8 @@ class EuTaxTest extends TestCase
 
         $this->assertEquals(7, $process->reduced_tax_rate);
 
-
     }
-    
+
     public function testEuCorrectRuleInit()
     {
 
@@ -687,23 +676,22 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
             'country_id' => 56,
             'shipping_country_id' => 56,
             'has_valid_vat_number' => false,
-            'vat_number' => ''
+            'vat_number' => '',
         ]);
 
         $invoice = Invoice::factory()->create([
-        'company_id' => $company->id,
-        'client_id' => $client->id,
-        'user_id' => $this->user->id,
-        'status_id' => Invoice::STATUS_SENT,
-        'tax_data' => new Response([
-                    'geoState' => 'CA',
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
             ]),
         ]);
 
@@ -722,7 +710,6 @@ class EuTaxTest extends TestCase
         $this->assertEquals(21, $process->tax_rate);
 
         $this->assertEquals(6, $process->reduced_tax_rate);
-
 
     }
 
@@ -743,7 +730,6 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
@@ -756,13 +742,13 @@ class EuTaxTest extends TestCase
         ]);
 
         $invoice = Invoice::factory()->create([
-           'company_id' => $company->id,
-           'client_id' => $client->id,
-           'user_id' => $this->user->id,
-           'status_id' => Invoice::STATUS_SENT,
-           'tax_data' => new Response([
-           'geoState' => 'CA',
-           ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
@@ -783,7 +769,6 @@ class EuTaxTest extends TestCase
 
     }
 
-
     public function testSubThresholdCorrectRate()
     {
 
@@ -801,24 +786,23 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
             'country_id' => 56,
             'shipping_country_id' => 56,
             'has_valid_vat_number' => false,
-            'vat_number' => ''
+            'vat_number' => '',
         ]);
 
         $invoice = Invoice::factory()->create([
-        'company_id' => $company->id,
-        'client_id' => $client->id,
-        'user_id' => $this->user->id,
-        'status_id' => Invoice::STATUS_SENT,
-        'tax_data' => new Response([
-                    'geoState' => 'CA',
-        ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
@@ -834,7 +818,6 @@ class EuTaxTest extends TestCase
         $this->assertEquals(7, $process->reduced_tax_rate);
 
     }
-
 
     //tests with valid vat.
     public function testDeWithValidVat()
@@ -853,7 +836,6 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
@@ -863,19 +845,18 @@ class EuTaxTest extends TestCase
         ]);
 
         $invoice = Invoice::factory()->create([
-           'company_id' => $company->id,
-           'client_id' => $client->id,
-           'user_id' => $this->user->id,
-           'status_id' => Invoice::STATUS_SENT,
-           'tax_data' => new Response([
-           'geoState' => 'CA',
-           ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
         $process->setEntity($invoice);
         $process->init();
-
 
         $this->assertInstanceOf(Rule::class, $process);
 
@@ -904,7 +885,6 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
@@ -912,21 +892,20 @@ class EuTaxTest extends TestCase
             'shipping_country_id' => 56,
             'has_valid_vat_number' => true,
         ]);
-        
+
         $invoice = Invoice::factory()->create([
-           'company_id' => $company->id,
-           'client_id' => $client->id,
-           'user_id' => $this->user->id,
-           'status_id' => Invoice::STATUS_SENT,
-           'tax_data' => new Response([
-                    'geoState' => 'CA',
-           ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
         $process->setEntity($invoice);
         $process->init();
-
 
         $this->assertInstanceOf(Rule::class, $process);
 
@@ -954,7 +933,6 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
@@ -965,19 +943,18 @@ class EuTaxTest extends TestCase
         ]);
 
         $invoice = Invoice::factory()->create([
-           'company_id' => $company->id,
-           'client_id' => $client->id,
-           'user_id' => $this->user->id,
-           'status_id' => Invoice::STATUS_SENT,
-           'tax_data' => new Response([
-                    'geoState' => 'CA',
-           ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
         $process->setEntity($invoice);
         $process->init();
-
 
         $this->assertInstanceOf(Rule::class, $process);
 
@@ -1005,7 +982,6 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
@@ -1016,13 +992,13 @@ class EuTaxTest extends TestCase
         ]);
 
         $invoice = Invoice::factory()->create([
-           'company_id' => $company->id,
-           'client_id' => $client->id,
-           'user_id' => $this->user->id,
-           'status_id' => Invoice::STATUS_SENT,
-           'tax_data' => new Response([
-                    'geoState' => 'CA',
-           ]),
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
+                'geoState' => 'CA',
+            ]),
         ]);
 
         $process = new Rule();
@@ -1054,7 +1030,6 @@ class EuTaxTest extends TestCase
             'tax_data' => $tax_data,
         ]);
 
-
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
@@ -1067,19 +1042,18 @@ class EuTaxTest extends TestCase
         ]);
 
         $invoice = Invoice::factory()->create([
-           'company_id' => $company->id,
-           'client_id' => $client->id,
-           'user_id' => $this->user->id,
-           'status_id' => Invoice::STATUS_SENT,
-           'tax_data' => new Response([
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'status_id' => Invoice::STATUS_SENT,
+            'tax_data' => new Response([
                 'geoState' => 'CA',
-           ]),
+            ]),
         ]);
 
         $process = new Rule();
         $process->setEntity($invoice);
         $process->init();
-
 
         $this->assertInstanceOf(Rule::class, $process);
 
@@ -1090,5 +1064,4 @@ class EuTaxTest extends TestCase
         $this->assertEquals(0, $process->reduced_tax_rate);
 
     }
-
 }

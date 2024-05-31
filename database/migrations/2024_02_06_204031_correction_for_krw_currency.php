@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Currency;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -12,12 +10,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if($c = Currency::find(79)) {
+        if ($c = Currency::find(79)) {
             $c->thousand_separator = ',';
             $c->decimal_separator = '.';
             $c->save();
         }
-
 
     }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -63,6 +62,7 @@ class EntityViewedObject
         $mail_obj->markdown = 'email.admin.generic';
         $mail_obj->tag = $this->company->company_key;
         $mail_obj->text_view = 'email.template.text';
+
         return $mail_obj;
     }
 
@@ -100,10 +100,10 @@ class EntityViewedObject
         $content = ctrans(
             "texts.notification_{$this->entity_type}_viewed",
             [
-                    'amount' => $this->getAmount(),
-                    'client' => $this->contact->present()->name(),
-                    'invoice' => $this->entity->number,
-                ]
+                'amount' => $this->getAmount(),
+                'client' => $this->contact->present()->name(),
+                'invoice' => $this->entity->number,
+            ]
         );
 
         $data = [

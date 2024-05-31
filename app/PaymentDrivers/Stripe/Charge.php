@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,16 +40,16 @@ class Charge
 
     /**
      * Create a charge against a payment method.
-     * @param ClientGatewayToken $cgt
-     * @param PaymentHash $payment_hash
+     *
      * @return mixed success/failure
+     *
      * @throws \Laracasts\Presenter\Exceptions\PresenterException
      */
     public function tokenBilling(ClientGatewayToken $cgt, PaymentHash $payment_hash)
     {
         if ($cgt->gateway_type_id == GatewayType::BANK_TRANSFER) {
             return (new ACH($this->stripe))->tokenBilling($cgt, $payment_hash);
-        } elseif($cgt->gateway_type_id == GatewayType::ACSS) {
+        } elseif ($cgt->gateway_type_id == GatewayType::ACSS) {
             return (new ACSS($this->stripe))->tokenBilling($cgt, $payment_hash);
         }
 
@@ -84,7 +83,7 @@ class Charge
             }
 
             /* Should improve token billing with client not present */
-            if (!auth()->guard('contact')->check()) {
+            if (! auth()->guard('contact')->check()) {
                 $data['off_session'] = true;
             }
 
@@ -151,8 +150,7 @@ class Charge
             $status = Payment::STATUS_COMPLETED;
         }
 
-
-        if (!in_array($response?->status, ['succeeded', 'processing'])) {
+        if (! in_array($response?->status, ['succeeded', 'processing'])) {
             $this->stripe->processInternallyFailedPayment($this->stripe, new \Exception('Auto billing failed.', 400));
         }
 

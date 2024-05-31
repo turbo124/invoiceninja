@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -75,6 +74,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\PurchaseOrder|null $purchase_order
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor|null $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\ExpenseFactory factory($count = null, $state = [])
@@ -86,15 +86,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|Expense withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Expense withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \App\Models\Invoice|null $invoice
  * @property-read \App\Models\BankTransaction|null $transaction
+ *
  * @mixin \Eloquent
  */
 class Expense extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'client_id',
@@ -232,15 +234,15 @@ class Expense extends BaseModel
 
     public function stringStatus()
     {
-        if($this->is_deleted) {
+        if ($this->is_deleted) {
             return ctrans('texts.deleted');
-        } elseif($this->payment_date) {
+        } elseif ($this->payment_date) {
             return ctrans('texts.paid');
-        } elseif($this->invoice_id) {
+        } elseif ($this->invoice_id) {
             return ctrans('texts.invoiced');
-        } elseif($this->should_be_invoiced) {
+        } elseif ($this->should_be_invoiced) {
             return ctrans('texts.pending');
-        } elseif($this->trashed()) {
+        } elseif ($this->trashed()) {
             return ctrans('texts.archived');
         }
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,12 +19,10 @@ class BulkUserRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
-        if($this->action == 'delete' && in_array(auth()->user()->hashed_id, $this->ids)) {
+        if ($this->action == 'delete' && in_array(auth()->user()->hashed_id, $this->ids)) {
             return false;
         }
 
@@ -52,6 +49,6 @@ class BulkUserRequest extends Request
 
     protected function failedAuthorization()
     {
-        throw new AuthorizationException("This Action is unauthorized.");
+        throw new AuthorizationException('This Action is unauthorized.');
     }
 }

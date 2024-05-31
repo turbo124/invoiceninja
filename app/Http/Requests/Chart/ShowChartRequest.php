@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,12 +19,10 @@ class ShowChartRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
-        /**@var \App\Models\User auth()->user */
+        /** @var \App\Models\User auth()->user */
         $user = auth()->user();
 
         return $user->isAdmin() || $user->hasPermission('view_dashboard');
@@ -43,12 +40,12 @@ class ShowChartRequest extends Request
     public function prepareForValidation()
     {
 
-        /**@var \App\Models\User auth()->user */
+        /** @var \App\Models\User auth()->user */
         $user = auth()->user();
 
         $input = $this->all();
 
-        if(isset($input['date_range'])) {
+        if (isset($input['date_range'])) {
             $dates = $this->calculateStartAndEndDates($input, $user->company());
             $input['start_date'] = $dates[0];
             $input['end_date'] = $dates[1];

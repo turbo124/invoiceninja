@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,6 +51,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Company $company
  * @property-read \App\Models\Gateway $gateway
  * @property-read mixed $hashed_id
+ *
  * @method getConfigField(string $field)
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyGateway filter(\App\Filters\QueryFilters $filters)
@@ -62,14 +62,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyGateway withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyGateway withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ClientGatewayToken> $client_gateway_tokens
+ *
  * @method static CompanyGateway find($value)
+ *
  * @mixin \Eloquent
  */
 class CompanyGateway extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     public const GATEWAY_CREDIT = 10000000;
 
@@ -113,12 +116,12 @@ class CompanyGateway extends BaseModel
     ];
 
     public static $credit_cards = [
-            1 => ['card' => 'images/credit_cards/Test-Visa-Icon.png', 'text' => 'Visa'],
-            2 => ['card' => 'images/credit_cards/Test-MasterCard-Icon.png', 'text' => 'Master Card'],
-            4 => ['card' => 'images/credit_cards/Test-AmericanExpress-Icon.png', 'text' => 'American Express'],
-            8 => ['card' => 'images/credit_cards/Test-Diners-Icon.png', 'text' => 'Diners'],
-            16 => ['card' => 'images/credit_cards/Test-Discover-Icon.png', 'text' => 'Discover'],
-        ];
+        1 => ['card' => 'images/credit_cards/Test-Visa-Icon.png', 'text' => 'Visa'],
+        2 => ['card' => 'images/credit_cards/Test-MasterCard-Icon.png', 'text' => 'Master Card'],
+        4 => ['card' => 'images/credit_cards/Test-AmericanExpress-Icon.png', 'text' => 'American Express'],
+        8 => ['card' => 'images/credit_cards/Test-Diners-Icon.png', 'text' => 'Diners'],
+        16 => ['card' => 'images/credit_cards/Test-Discover-Icon.png', 'text' => 'Discover'],
+    ];
 
     // const TYPE_PAYPAL = 300;
     // const TYPE_STRIPE = 301;
@@ -168,9 +171,9 @@ class CompanyGateway extends BaseModel
     public function system_logs()
     {
         return $this->company
-                    ->system_log_relation
-                    ->where('type_id', $this->gateway_consts[$this->gateway->key])
-                    ->take(50);
+            ->system_log_relation
+            ->where('type_id', $this->gateway_consts[$this->gateway->key])
+            ->take(50);
     }
 
     public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -194,12 +197,12 @@ class CompanyGateway extends BaseModel
     }
 
     /* This is the public entry point into the payment superclass */
-    public function driver(Client $client = null)
+    public function driver(?Client $client = null)
     {
         // $class = static::driver_class();
         $class = self::driver_class();
 
-        if (!$class) {
+        if (! $class) {
             return false;
         }
 
@@ -220,9 +223,6 @@ class CompanyGateway extends BaseModel
         // throw new \Exception("Payment Driver does not exist");
     }
 
-    /**
-     * @param $config
-     */
     public function setConfig($config)
     {
         $this->config = encrypt(json_encode($config));
@@ -231,9 +231,8 @@ class CompanyGateway extends BaseModel
     /**
      * setConfigField
      *
-     * @param  mixed $field
-     * @param  mixed $value
-     * @return void
+     * @param  mixed  $field
+     * @param  mixed  $value
      */
     public function setConfigField($field, $value): void
     {
@@ -259,8 +258,6 @@ class CompanyGateway extends BaseModel
     }
 
     /**
-     * @param $field
-     *
      * @return mixed
      */
     public function getConfigField($field)
@@ -352,6 +349,7 @@ class CompanyGateway extends BaseModel
     /**
      * Get Publishable Key
      * Only works for STRIPE and PAYMILL.
+     *
      * @return string The Publishable key
      */
     public function getPublishableKey(): string
@@ -361,7 +359,7 @@ class CompanyGateway extends BaseModel
 
     public function getFeesAndLimits($gateway_type_id)
     {
-        if (is_null($this->fees_and_limits) || empty($this->fees_and_limits) || !property_exists($this->fees_and_limits, $gateway_type_id)) {
+        if (is_null($this->fees_and_limits) || empty($this->fees_and_limits) || ! property_exists($this->fees_and_limits, $gateway_type_id)) {
             return false;
         }
 
@@ -375,10 +373,10 @@ class CompanyGateway extends BaseModel
     /**
      * Returns the formatted fee amount for the gateway.
      *
-     * @param float $amount The payment amount
-     * @param Client $client The client object
-     * @param int $gateway_type_id
-     * @return string           The fee amount formatted in the client currency
+     * @param  float  $amount  The payment amount
+     * @param  Client  $client  The client object
+     * @param  int  $gateway_type_id
+     * @return string The fee amount formatted in the client currency
      */
     public function calcGatewayFeeLabel($amount, Client $client, $gateway_type_id = GatewayType::CREDIT_CARD): string
     {
@@ -390,18 +388,17 @@ class CompanyGateway extends BaseModel
             $fees_and_limits = $this->fees_and_limits->{$gateway_type_id};
 
             if (strlen($fees_and_limits->fee_percent) >= 1) {
-                $label .= $fees_and_limits->fee_percent . '%';
+                $label .= $fees_and_limits->fee_percent.'%';
             }
 
             if (strlen($fees_and_limits->fee_amount) >= 1 && $fees_and_limits->fee_amount > 0) {
                 if (strlen($label) > 1) {
-                    $label .= ' + ' . Number::formatMoney($fees_and_limits->fee_amount, $client);
+                    $label .= ' + '.Number::formatMoney($fees_and_limits->fee_amount, $client);
                 } else {
                     $label .= Number::formatMoney($fees_and_limits->fee_amount, $client);
                 }
             }
         }
-
 
         return $label;
     }
@@ -415,7 +412,6 @@ class CompanyGateway extends BaseModel
         }
 
         $fee = 0;
-
 
         if ($fees_and_limits->adjust_fee_percent ?? false) {
             $adjusted_fee = 0;

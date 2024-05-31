@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -48,20 +47,20 @@ class GroupSettingTest extends TestCase
         $s = new SettingsData();
         $settings = $s->cast($settings)->toObject();
 
-        $this->assertEquals("", $settings->tax_name1);
+        $this->assertEquals('', $settings->tax_name1);
         $settings = null;
 
         $settings = new \stdClass;
         $settings->currency_id = '1';
-        $settings->tax_name1 = "1";
+        $settings->tax_name1 = '1';
         $settings->tax_rate1 = 0;
 
         $settings = $s->cast($settings)->toObject();
 
-        $this->assertEquals("1", $settings->tax_name1);
+        $this->assertEquals('1', $settings->tax_name1);
 
         $settings = $s->cast($settings)->toArray();
-        $this->assertEquals("1", $settings['tax_name1']);
+        $this->assertEquals('1', $settings['tax_name1']);
 
         $settings = new \stdClass;
         $settings->currency_id = '1';
@@ -70,10 +69,10 @@ class GroupSettingTest extends TestCase
 
         $settings = $s->cast($settings)->toObject();
 
-        $this->assertEquals("", $settings->tax_name1);
+        $this->assertEquals('', $settings->tax_name1);
 
         $settings = $s->cast($settings)->toArray();
-        $this->assertEquals("", $settings['tax_name1']);
+        $this->assertEquals('', $settings['tax_name1']);
 
         $settings = new \stdClass;
         $settings->currency_id = '1';
@@ -82,12 +81,10 @@ class GroupSettingTest extends TestCase
 
         $settings = $s->cast($settings)->toObject();
 
-        $this->assertEquals("", $settings->tax_name1);
+        $this->assertEquals('', $settings->tax_name1);
 
         $settings = $s->cast($settings)->toArray();
-        $this->assertEquals("", $settings['tax_name1']);
-
-
+        $this->assertEquals('', $settings['tax_name1']);
 
         // nlog(json_encode($settings));
     }
@@ -110,13 +107,12 @@ class GroupSettingTest extends TestCase
         ])->postJson('/api/v1/group_settings', $data);
 
         $response->assertStatus(200);
-    
+
         $arr = $response->json();
 
-        $this->assertEquals("", (string)null);
+        $this->assertEquals('', (string) null);
         $this->assertNotNull($arr['data']['settings']['tax_name1']);
     }
-            
 
     public function testAddGroupFilters()
     {
@@ -152,7 +148,6 @@ class GroupSettingTest extends TestCase
         $this->assertCount(0, $arr['data']);
 
     }
-
 
     public function testAddGroupSettings()
     {
@@ -248,7 +243,5 @@ class GroupSettingTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
         $this->assertTrue($arr['data'][0]['is_deleted']);
 
-
     }
-
 }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,11 +26,10 @@ class AccountEmailQuotaTest extends TestCase
         parent::setUp();
     }
 
-
     public function testIfQuotaBreached()
     {
         config([
-            'ninja.production' => true
+            'ninja.production' => true,
         ]);
 
         $account = Account::factory()->create([
@@ -77,17 +75,16 @@ class AccountEmailQuotaTest extends TestCase
         $account->default_company_id = $company->id;
         $account->save();
 
-
-        Cache::put("email_quota".$account->key, 3000);
+        Cache::put('email_quota'.$account->key, 3000);
 
         $this->assertFalse($account->isPaid());
         $this->assertTrue(Ninja::isNinja());
         $this->assertEquals(20, $account->getDailyEmailLimit());
 
-        $this->assertEquals(3000, Cache::get("email_quota".$account->key));
+        $this->assertEquals(3000, Cache::get('email_quota'.$account->key));
         $this->assertTrue($account->emailQuotaExceeded());
 
-        Cache::forget("email_quota".'123ifyouknowwhatimean');
+        Cache::forget('email_quota'.'123ifyouknowwhatimean');
     }
 
     public function testQuotaValidRule()
@@ -104,11 +101,11 @@ class AccountEmailQuotaTest extends TestCase
         $account->num_users = 3;
         $account->save();
 
-        Cache::increment("email_quota".$account->key);
+        Cache::increment('email_quota'.$account->key);
 
         $this->assertFalse($account->emailQuotaExceeded());
 
-        Cache::forget("email_quota".'123ifyouknowwhatimean');
+        Cache::forget('email_quota'.'123ifyouknowwhatimean');
     }
 
     public function testEmailSentCount()
@@ -125,13 +122,12 @@ class AccountEmailQuotaTest extends TestCase
         $account->num_users = 3;
         $account->save();
 
-
-        Cache::put("email_quota".$account->key, 3000);
+        Cache::put('email_quota'.$account->key, 3000);
 
         $count = $account->emailsSent();
 
         $this->assertEquals(3000, $count);
 
-        Cache::forget("email_quota".'123ifyouknowwhatimean');
+        Cache::forget('email_quota'.'123ifyouknowwhatimean');
     }
 }

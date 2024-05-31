@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,10 +23,10 @@ use Tests\TestCase;
  */
 class TaxConfigTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
-    
-    protected function setUp() :void
+    use MockAccountData;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +38,7 @@ class TaxConfigTest extends TestCase
 
         $this->makeTestData();
 
-        if(!config('services.tax.zip_tax.key')) {
+        if (! config('services.tax.zip_tax.key')) {
             $this->markTestSkipped('No API keys to test with.');
         }
     }
@@ -64,13 +63,11 @@ class TaxConfigTest extends TestCase
             'country_id' => 840,
         ]);
 
-
         // $this->assertEquals('CA', USStates::getState('90210'));
 
         $this->bootApi($client);
 
         $this->tp->updateClientTaxData();
-        
-    }
 
+    }
 }

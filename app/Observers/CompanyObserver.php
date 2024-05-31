@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,7 +19,6 @@ class CompanyObserver
     /**
      * Handle the company "created" event.
      *
-     * @param Company $company
      * @return void
      */
     public function created(Company $company)
@@ -31,7 +29,6 @@ class CompanyObserver
     /**
      * Handle the company "updated" event.
      *
-     * @param Company $company
      * @return void
      */
     public function updated(Company $company)
@@ -45,7 +42,6 @@ class CompanyObserver
     /**
      * Handle the company "deleted" event.
      *
-     * @param Company $company
      * @return void
      */
     public function deleted(Company $company)
@@ -56,7 +52,6 @@ class CompanyObserver
     /**
      * Handle the company "restored" event.
      *
-     * @param Company $company
      * @return void
      */
     public function restored(Company $company)
@@ -67,7 +62,6 @@ class CompanyObserver
     /**
      * Handle the company "force deleted" event.
      *
-     * @param Company $company
      * @return void
      */
     public function forceDeleted(Company $company)

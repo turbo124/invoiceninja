@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,7 +23,6 @@ class SubscriptionController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-
     public function index()
     {
         // if (Ninja::isHosted()) {
@@ -47,15 +45,12 @@ class SubscriptionController extends Controller
 
     /**
      * Display the recurring invoice.
-     *
-     * @param ShowRecurringInvoiceRequest $request
-     * @param RecurringInvoice $recurring_invoice
      */
     public function show(ShowRecurringInvoiceRequest $request, RecurringInvoice $recurring_invoice)
     {
         return $this->render('subscriptions.show', [
             'invoice' => $recurring_invoice->load('invoices', 'subscription'),
-            'subscription' => $recurring_invoice->subscription
+            'subscription' => $recurring_invoice->subscription,
         ]);
     }
 }

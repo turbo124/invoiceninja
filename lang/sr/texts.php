@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organizacija',
     'name' => 'Ime',
     'website' => 'Sajt',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'The Enterprise Plan adds support for multiple users and file attachments, :link to see the full list of features.',
     'return_to_app' => 'Povratak u aplikaciju',
 
-
     // Payment updates
     'refund_payment' => 'Isplata povraćaja novca',
     'refund_max' => 'Max:',
@@ -1705,7 +1704,6 @@ Kada budete imali iznose, vratite se na ovu stranicu sa načinima plaćanja i k
     'lang_Serbian' => 'Srpski',
     'lang_Bulgarian' => 'Bugarski',
     'lang_Russian (Russia)' => 'Ruski (Rusija)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Računovodstvo i pravo',
@@ -2364,7 +2362,7 @@ Kada budete imali iznose, vratite se na ovu stranicu sa načinima plaćanja i k
     'currency_gold_troy_ounce' => 'Gold Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguan Córdoba',
     'currency_malagasy_ariary' => 'Malagasy ariary',
-    "currency_tongan_pa_anga" => "Tongan Pa'anga",
+    'currency_tongan_pa_anga' => "Tongan Pa'anga",
 
     'review_app_help' => 'Nadamo se da uživate u korišćenju aplikacije. <br/> Bili bismo veoma zahvalni ako biste razmotrili :link.',
     'writing_a_review' => 'pisanje recenzije',
@@ -4426,7 +4424,7 @@ Kada budete imali iznose, vratite se na ovu stranicu sa načinima plaćanja i k
     'activity_122' => ':user archived recurring expense :recurring_expense',
     'activity_123' => ':user deleted recurring expense :recurring_expense',
     'activity_124' => ':user restored recurring expense :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'To view the :entity you need to set a password.',
     'unsubscribe' => 'Unsubscribe',
     'unsubscribed' => 'Unsubscribed',
@@ -5036,7 +5034,7 @@ Kada budete imali iznose, vratite se na ovu stranicu sa načinima plaćanja i k
     'light_dark_mode' => 'Light/Dark Mode',
     'activities' => 'Activities',
     'recent_transactions' => "Here are your company's most recent transactions:",
-    'country_Palestine' => "Palestine",
+    'country_Palestine' => 'Palestine',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Duties',
     'order_number' => 'Order Number',
@@ -5251,7 +5249,7 @@ Kada budete imali iznose, vratite se na ovu stranicu sa načinima plaćanja i k
     'rff' => 'Required fields form',
     'add_step' => 'Add step',
     'steps' => 'Steps',
-    'steps_order_help' =>  'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
+    'steps_order_help' => 'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
     'other_steps' => 'Other steps',
     'use_available_payments' => 'Use Available Payments',
     'test_email_sent' => 'Successfully sent email',
@@ -5300,6 +5298,6 @@ Kada budete imali iznose, vratite se na ovu stranicu sa načinima plaćanja i k
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -17,7 +18,7 @@ return new class extends Migration {
             $table->unsignedInteger('account_id');
             $table->unsignedInteger('company_id');
             $table->unsignedInteger('user_id');
-        
+
             $table->text('provider_name'); //providerName ie Chase
             $table->bigInteger('provider_id'); //id of the bank
             $table->bigInteger('bank_account_id'); //id

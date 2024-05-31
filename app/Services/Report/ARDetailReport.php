@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -60,7 +59,7 @@ class ARDetailReport extends BaseExport
             'clients',
             'client_id',
         ]
-    */
+     */
     public function __construct(public Company $company, public array $input)
     {
     }
@@ -81,7 +80,7 @@ class ARDetailReport extends BaseExport
         $this->csv->insertOne([]);
         $this->csv->insertOne([]);
         $this->csv->insertOne([ctrans('texts.aged_receivable_detailed_report')]);
-        $this->csv->insertOne([ctrans('texts.created_on'),' ',$this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale())]);
+        $this->csv->insertOne([ctrans('texts.created_on'), ' ', $this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale())]);
 
         if (count($this->input['report_keys']) == 0) {
             $this->input['report_keys'] = $this->report_keys;
@@ -90,15 +89,15 @@ class ARDetailReport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query = Invoice::query()
-                ->withTrashed()
-                ->whereHas('client', function ($query){
-                    $query->where('is_deleted', 0);
-                })
-                ->where('company_id', $this->company->id)
-                ->where('is_deleted', 0)
-                ->where('balance', '>', 0)
-                ->orderBy('due_date', 'ASC')
-                ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL]);
+            ->withTrashed()
+            ->whereHas('client', function ($query) {
+                $query->where('is_deleted', 0);
+            })
+            ->where('company_id', $this->company->id)
+            ->where('is_deleted', 0)
+            ->where('balance', '>', 0)
+            ->orderBy('due_date', 'ASC')
+            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL]);
 
         $query = $this->addDateRange($query);
 
@@ -141,5 +140,4 @@ class ARDetailReport extends BaseExport
 
         return $header;
     }
-
 }

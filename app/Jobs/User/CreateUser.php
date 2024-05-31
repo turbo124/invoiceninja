@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,8 @@ use Illuminate\Support\Str;
 
 class CreateUser
 {
-    use MakesHash;
     use Dispatchable;
+    use MakesHash;
 
     protected $request;
 
@@ -35,10 +34,7 @@ class CreateUser
     /**
      * Create a new job instance.
      *
-     * @param array $request
-     * @param $account
-     * @param $company
-     * @param bool $company_owner
+     * @param  bool  $company_owner
      */
     public function __construct(array $request, $account, $company, $company_owner = false)
     {
@@ -50,8 +46,6 @@ class CreateUser
 
     /**
      * Execute the job.
-     *
-     * @return User|null
      */
     public function handle(): ?User
     {

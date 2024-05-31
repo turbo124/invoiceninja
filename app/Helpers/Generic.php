@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -15,10 +14,8 @@ use App\Utils\Ninja;
  * Simple helper function that will log into "invoiceninja.log" file
  * only when extended logging is enabled.
  *
- * @param mixed $output
- * @param array $context
- *
- * @return void
+ * @param  mixed  $output
+ * @param  array  $context
  */
 function nlog($output, $context = []): void
 {
@@ -44,7 +41,6 @@ function nlog($output, $context = []): void
     $output = null;
     $context = null;
 }
-
 
 function nrlog($output, $context = []): void
 {

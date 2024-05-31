@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,19 +20,16 @@ class SubdomainController extends BaseController
 
     /**
      * Return if a subdomain is available.
-     *
      */
     public function index()
     {
-        if (!MultiDB::checkDomainAvailable(request()->input('subdomain'))) {
+        if (! MultiDB::checkDomainAvailable(request()->input('subdomain'))) {
             return response()->json(['message' => ctrans('texts.subdomain_is_not_available')], 401);
         }
 
-
-        if (!preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/', request()->input('subdomain'))) {
+        if (! preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/', request()->input('subdomain'))) {
             return response()->json(['message' => ctrans('texts.subdomain_is_not_available')], 401);
         }
-
 
         return response()->json(['message' => 'Domain available'], 200);
     }

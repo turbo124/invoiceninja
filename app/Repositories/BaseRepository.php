@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,20 +32,15 @@ class BaseRepository
     public bool $import_mode = false;
 
     private bool $new_model = false;
+
     /**
-     * @param $entity
-     * @param $type
-     *
      * @return string
      */
     private function getEventClass($entity, $type)
     {
-        return 'App\Events\\' . ucfirst(class_basename($entity)) . '\\' . ucfirst(class_basename($entity)) . 'Was' . $type;
+        return 'App\Events\\'.ucfirst(class_basename($entity)).'\\'.ucfirst(class_basename($entity)).'Was'.$type;
     }
 
-    /**
-     * @param $entity
-     */
     public function archive($entity)
     {
         if ($entity->trashed()) {
@@ -62,12 +56,9 @@ class BaseRepository
         }
     }
 
-    /**
-     * @param $entity
-     */
     public function restore($entity)
     {
-        if (!$entity->trashed()) {
+        if (! $entity->trashed()) {
             return;
         }
 
@@ -88,9 +79,6 @@ class BaseRepository
         }
     }
 
-    /**
-     * @param $entity
-     */
     public function delete($entity)
     {
         if ($entity->is_deleted) {
@@ -104,7 +92,7 @@ class BaseRepository
 
         $className = $this->getEventClass($entity, 'Deleted');
 
-        if (class_exists($className) && !($entity instanceof Company)) {
+        if (class_exists($className) && ! ($entity instanceof Company)) {
             event(new $className($entity, $entity->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
         }
     }
@@ -112,7 +100,7 @@ class BaseRepository
     /* Returns an invoice if defined as a key in the $resource array*/
     public function getInvitation($invitation, $resource)
     {
-        if (is_array($invitation) && !array_key_exists('key', $invitation)) {
+        if (is_array($invitation) && ! array_key_exists('key', $invitation)) {
             return false;
         }
 
@@ -127,13 +115,13 @@ class BaseRepository
     private function resolveEntityKey($model)
     {
         switch ($model) {
-            case ($model instanceof RecurringInvoice):
+            case $model instanceof RecurringInvoice:
                 return 'recurring_invoice_id';
-            case ($model instanceof Invoice):
+            case $model instanceof Invoice:
                 return 'invoice_id';
-            case ($model instanceof Quote):
+            case $model instanceof Quote:
                 return 'quote_id';
-            case ($model instanceof Credit):
+            case $model instanceof Credit:
                 return 'credit_id';
         }
     }
@@ -141,9 +129,8 @@ class BaseRepository
     /**
      * Alternative save used for Invoices, Recurring Invoices, Quotes & Credits.
      *
-     * @param $data
-     * @param $model
      * @return mixed
+     *
      * @throws \ReflectionException
      */
     protected function alternativeSave($data, $model)
@@ -163,7 +150,7 @@ class BaseRepository
 
         $state['starting_amount'] = $model->balance;
 
-        if (!$model->id) {
+        if (! $model->id) {
             $company_defaults = $client->setCompanyDefaults($data, lcfirst($resource));
             $data['exchange_rate'] = $company_defaults['exchange_rate'];
             $model->uses_inclusive_taxes = $client->getSetting('inclusive_taxes');
@@ -189,10 +176,10 @@ class BaseRepository
         $model->custom_surcharge_tax3 = $client->company->custom_surcharge_taxes3;
         $model->custom_surcharge_tax4 = $client->company->custom_surcharge_taxes4;
 
-        if (!$model->id) {
+        if (! $model->id) {
             $this->new_model = true;
 
-            if (is_array($model->line_items) && !($model instanceof RecurringInvoice)) {
+            if (is_array($model->line_items) && ! ($model instanceof RecurringInvoice)) {
                 $model->line_items = (collect($model->line_items))->map(function ($item) use ($client) {
                     $item->notes = Helpers::processReservedKeywords($item->notes, $client);
 
@@ -234,7 +221,7 @@ class BaseRepository
 
             foreach ($data['invitations'] as $invitation) {
                 //if no invitations are present - create one.
-                if (!$this->getInvitation($invitation, $resource)) {
+                if (! $this->getInvitation($invitation, $resource)) {
                     if (isset($invitation['id'])) {
                         unset($invitation['id']);
                     }
@@ -301,7 +288,7 @@ class BaseRepository
                 //     $model->ledger()->updateInvoiceBalance(($state['finished_amount'] - $state['starting_amount']), "Update adjustment for invoice {$model->number}");
             }
 
-            if (!$model->design_id) {
+            if (! $model->design_id) {
                 $model->design_id = intval($this->decodePrimaryKey($client->getSetting('invoice_design_id')));
             }
 
@@ -317,7 +304,7 @@ class BaseRepository
             }
 
             /** If the client does not have tax_data - then populate this now */
-            if ($client->country_id == 840 && !$client->tax_data && $model->company->calculate_taxes && !$model->company->account->isFreeHostedClient()) {
+            if ($client->country_id == 840 && ! $client->tax_data && $model->company->calculate_taxes && ! $model->company->account->isFreeHostedClient()) {
                 UpdateTaxData::dispatch($client, $client->company);
             }
 
@@ -326,7 +313,7 @@ class BaseRepository
         if ($model instanceof Credit) {
             $model = $model->calc()->getCredit();
 
-            if (!$model->design_id) {
+            if (! $model->design_id) {
                 $model->design_id = $this->decodePrimaryKey($client->getSetting('credit_design_id'));
             }
 
@@ -346,7 +333,7 @@ class BaseRepository
         }
 
         if ($model instanceof Quote) {
-            if (!$model->design_id) {
+            if (! $model->design_id) {
                 $model->design_id = intval($this->decodePrimaryKey($client->getSetting('quote_design_id')));
             }
 
@@ -360,7 +347,7 @@ class BaseRepository
         }
 
         if ($model instanceof RecurringInvoice) {
-            if (!$model->design_id) {
+            if (! $model->design_id) {
                 $model->design_id = intval($this->decodePrimaryKey($client->getSetting('invoice_design_id')));
             }
 
@@ -380,7 +367,7 @@ class BaseRepository
         return $model->fresh();
     }
 
-    public function bulkUpdate(\Illuminate\Database\Eloquent\Builder $model, string $column, mixed $new_value) :void
+    public function bulkUpdate(\Illuminate\Database\Eloquent\Builder $model, string $column, mixed $new_value): void
     {
         $model->update([$column => $new_value]);
     }

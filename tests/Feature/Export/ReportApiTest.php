@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,10 +22,10 @@ class ReportApiTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    
+
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +40,6 @@ class ReportApiTest extends TestCase
 
     }
 
-
     public function testActivityCSVExport()
     {
         $data = [
@@ -54,7 +52,7 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/activities', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
 
@@ -70,10 +68,9 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/user_sales_report', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
-
 
     public function testTaxSummaryReportApiRoute()
     {
@@ -87,10 +84,9 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/tax_summary_report', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
-
 
     public function testClientSalesReportApiRoute()
     {
@@ -104,10 +100,9 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/client_sales_report', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
-
 
     public function testArDetailReportApiRoute()
     {
@@ -121,7 +116,7 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/ar_detail_report', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
 
@@ -137,11 +132,9 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/ar_summary_report', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
-
-
 
     public function testClientBalanceReportApiRoute()
     {
@@ -155,9 +148,7 @@ class ReportApiTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/reports/client_balance_report', $data)
-        ->assertStatus(200);
+            ->assertStatus(200);
 
     }
-
-
 }

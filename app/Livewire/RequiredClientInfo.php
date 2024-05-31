@@ -6,22 +6,21 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Livewire;
 
-use App\Models\Invoice;
-use Livewire\Component;
 use App\Libraries\MultiDB;
-use Illuminate\Support\Str;
 use App\Models\ClientContact;
 use App\Models\CompanyGateway;
+use App\Models\Invoice;
 use App\Utils\Traits\MakesHash;
-use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Livewire\Attributes\Computed;
+use Livewire\Component;
 
 class RequiredClientInfo extends Component
 {
@@ -59,27 +58,46 @@ class RequiredClientInfo extends Component
      */
     public $countries;
 
-
     public $client_name;
+
     public $contact_first_name;
+
     public $contact_last_name;
+
     public $contact_email;
+
     public $client_phone;
+
     public $client_address_line_1;
+
     public $client_city;
+
     public $client_state;
+
     public $client_country_id;
+
     public $client_postal_code;
+
     public $client_shipping_address_line_1;
+
     public $client_shipping_city;
+
     public $client_shipping_state;
+
     public $client_shipping_postal_code;
+
     public $client_shipping_country_id;
+
     public $client_custom_value1;
+
     public $client_custom_value2;
+
     public $client_custom_value3;
+
     public $client_custom_value4;
+
     private ?CompanyGateway $company_gateway;
+
     private int $unfilled_fields = 0;
 
     /**
@@ -205,7 +223,7 @@ class RequiredClientInfo extends Component
         $this->contact_email = $contact->email;
         $this->client_phone = $contact->client->phone;
         $this->client_address_line_1 = $contact->client->address1;
-        $this->client_city = $contact->client->city ;
+        $this->client_city = $contact->client->city;
         $this->client_state = $contact->client->state;
         $this->client_country_id = $contact->client->country_id;
         $this->client_postal_code = $contact->client->postal_code;
@@ -232,11 +250,13 @@ class RequiredClientInfo extends Component
             $this->invoice_terms = $invoice->terms;
         }
 
-        if(!$this->company_gateway->always_show_required_fields || $this->is_subscription)
+        if (! $this->company_gateway->always_show_required_fields || $this->is_subscription) {
             $this->checkFields();
+        }
 
-        if($this->unfilled_fields > 0 || ($this->company_gateway->always_show_required_fields || $this->is_subscription))
+        if ($this->unfilled_fields > 0 || ($this->company_gateway->always_show_required_fields || $this->is_subscription)) {
             $this->show_form = true;
+        }
     }
 
     #[Computed]
@@ -244,6 +264,7 @@ class RequiredClientInfo extends Component
     {
 
         MultiDB::setDb($this->db);
+
         return ClientContact::withTrashed()->find($this->contact_id);
 
     }
@@ -253,13 +274,14 @@ class RequiredClientInfo extends Component
     {
 
         MultiDB::setDb($this->db);
+
         return ClientContact::withTrashed()->find($this->contact_id)->client;
 
     }
 
     public function toggleTermsAccepted()
     {
-        $this->terms_accepted = !$this->terms_accepted;
+        $this->terms_accepted = ! $this->terms_accepted;
     }
 
     public function handleSubmit(array $data): bool
@@ -306,10 +328,8 @@ class RequiredClientInfo extends Component
         $client = [];
         $contact = [];
 
-
         MultiDB::setDb($this->db);
         $_contact = ClientContact::withTrashed()->find($this->contact_id);
-
 
         foreach ($data as $field => $value) {
             if (Str::startsWith($field, 'client_')) {
@@ -321,14 +341,13 @@ class RequiredClientInfo extends Component
             }
         }
 
-
         $_contact->first_name = $this->contact_first_name;
         $_contact->last_name = $this->contact_last_name;
         $_contact->client->name = $this->client_name;
         $_contact->email = $this->contact_email;
         $_contact->client->phone = $this->client_phone;
         $_contact->client->address1 = $this->client_address_line_1;
-        $_contact->client->city  = $this->client_city;
+        $_contact->client->city = $this->client_city;
         $_contact->client->state = $this->client_state;
         $_contact->client->country_id = $this->client_country_id;
         $_contact->client->postal_code = $this->client_postal_code;
@@ -342,7 +361,6 @@ class RequiredClientInfo extends Component
         $_contact->client->custom_value3 = $this->client_custom_value3;
         $_contact->client->custom_value4 = $this->client_custom_value4;
         $_contact->push();
-
 
         $contact_update = $_contact
             ->fill($contact)
@@ -359,7 +377,7 @@ class RequiredClientInfo extends Component
             if ($cg && $cg->update_details) {
                 $payment_gateway = $cg->driver($_contact->client)->init();
 
-                if (method_exists($payment_gateway, "updateCustomer")) {
+                if (method_exists($payment_gateway, 'updateCustomer')) {
                     $payment_gateway->updateCustomer();
                 }
             }
@@ -399,7 +417,7 @@ class RequiredClientInfo extends Component
             }
         }
 
-        if ($this->unfilled_fields === 0 && (!$this->company_gateway->always_show_required_fields || $this->is_subscription)) {
+        if ($this->unfilled_fields === 0 && (! $this->company_gateway->always_show_required_fields || $this->is_subscription)) {
             $this->dispatch(
                 'passed-required-fields-check',
                 client_postal_code: $this->contact->client->postal_code

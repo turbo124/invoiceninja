@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,8 +22,6 @@ class StoreExpenseRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -85,7 +82,6 @@ class StoreExpenseRequest extends Request
                 unset($input['project_id']);
             }
         }
-
 
         $this->replace($input);
     }

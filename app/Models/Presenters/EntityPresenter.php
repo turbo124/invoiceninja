@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -46,7 +45,7 @@ class EntityPresenter extends Presenter
     }
 
     /**
-     * @param bool $label
+     * @param  bool  $label
      */
     public function statusLabel($label = false)
     {
@@ -65,7 +64,7 @@ class EntityPresenter extends Presenter
     }
 
     /**
-     * @param bool $subColors
+     * @param  bool  $subColors
      */
     public function calendarEvent($subColors = false)
     {

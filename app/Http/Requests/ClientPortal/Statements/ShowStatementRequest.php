@@ -9,8 +9,6 @@ class ShowStatementRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -35,8 +33,6 @@ class ShowStatementRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
-     *
-     * @return void
      */
     public function prepareForValidation(): void
     {

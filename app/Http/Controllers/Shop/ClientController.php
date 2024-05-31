@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,6 @@ class ClientController extends BaseController
 
     /**
      * ClientController constructor.
-     * @param ClientRepository $client_repo
      */
     public function __construct(ClientRepository $client_repo)
     {
@@ -61,9 +59,9 @@ class ClientController extends BaseController
         }
 
         $contact = ClientContact::with('client')
-                            ->where('company_id', $company->id)
-                            ->where('contact_key', $contact_key)
-                            ->firstOrFail();
+            ->where('company_id', $company->id)
+            ->where('contact_key', $contact_key)
+            ->firstOrFail();
 
         return $this->itemResponse($contact->client);
     }

@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="CompanySettings",
  *   type="object",
+ *
  *       @OA\Property(property="timezone_id", type="string", example="15", description="The timezone id"),
  *       @OA\Property(property="date_format_id", type="string", example="15", description="The date format id"),
  *       @OA\Property(property="military_time", type="boolean", example=true, description="Toggles 12/24 hour time"),

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,12 +20,12 @@ use Tests\TestCase;
  */
 class ClientSettingsTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +33,6 @@ class ClientSettingsTest extends TestCase
 
         $this->faker = \Faker\Factory::create();
     }
-
 
     public function testClientValidSettingsWithBadProps()
     {
@@ -64,7 +62,7 @@ class ClientSettingsTest extends TestCase
                 'custom_value3' => null,
                 'custom_value4' => null,
                 'invoice_terms' => null,
-                'quote_terms' =>null,
+                'quote_terms' => null,
                 'quote_footer' => null,
                 'credit_terms' => null,
                 'credit_footer' => null,
@@ -81,7 +79,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(200);
 
         $arr = $response->json();
-        
+
         $this->assertEquals('frank', $arr['data']['settings']['name']);
 
         $client_id = $arr['data']['id'];
@@ -95,7 +93,6 @@ class ClientSettingsTest extends TestCase
                 'name' => 'white',
             ],
         ];
-
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -124,7 +121,7 @@ class ClientSettingsTest extends TestCase
                 'custom_value3' => null,
                 'custom_value4' => null,
                 'invoice_terms' => null,
-                'quote_terms' =>null,
+                'quote_terms' => null,
                 'quote_footer' => null,
                 'credit_terms' => null,
                 'credit_footer' => null,
@@ -148,8 +145,6 @@ class ClientSettingsTest extends TestCase
         // $this->assertEquals(true, $arr['data']['settings']['send_reminders']);
         // $this->assertEquals('1', $arr['data']['settings']['valid_until']);
     }
-
-
 
     public function testClientBaseline()
     {
@@ -231,12 +226,10 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/clients/', $data);
-        
 
         $response->assertStatus(422);
     }

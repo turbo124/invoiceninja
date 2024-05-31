@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,8 +19,8 @@ use Illuminate\Contracts\Validation\Rule;
 class ValidCompanyQuantity implements Rule
 {
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -34,7 +33,7 @@ class ValidCompanyQuantity implements Rule
             return auth()->user()->company()->account->companies->count() < 10;
         }
 
-        return (auth()->user()->account->isPaid() || auth()->user()->account->isTrial()) && auth()->user()->company()->account->companies->count() < 10 ;
+        return (auth()->user()->account->isPaid() || auth()->user()->account->isTrial()) && auth()->user()->company()->account->companies->count() < 10;
     }
 
     /**

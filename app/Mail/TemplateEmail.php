@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -48,8 +47,6 @@ class TemplateEmail extends Mailable
     /**
      * Supports inline attachments for large
      * attachments in custom designs
-     *
-     * @return string
      */
     private function buildLinksForCustomDesign(): string
     {
@@ -78,7 +75,7 @@ class TemplateEmail extends Mailable
             $template_name = 'email.template.client';
         }
 
-        if($this->build_email->getTemplate() == 'premium') {
+        if ($this->build_email->getTemplate() == 'premium') {
             $template_name = 'email.template.client_premium';
         }
 
@@ -114,7 +111,7 @@ class TemplateEmail extends Mailable
         if (strlen($settings->bcc_email) > 1) {
             if (Ninja::isHosted()) {
 
-                if($company->account->isPaid()) {
+                if ($company->account->isPaid()) {
                     $bccs = explode(',', str_replace(' ', '', $settings->bcc_email));
                     $this->bcc(array_slice($bccs, 0, 5));
                 }
@@ -124,7 +121,7 @@ class TemplateEmail extends Mailable
             }
         }
 
-        $this->subject(str_replace("<br>", "", $this->build_email->getSubject()))
+        $this->subject(str_replace('<br>', '', $this->build_email->getSubject()))
             ->text('email.template.text', [
                 'text_body' => $this->build_email->getTextBody(),
                 'whitelabel' => $this->client->user->account->isPaid() ? true : false,
@@ -143,7 +140,7 @@ class TemplateEmail extends Mailable
                 'whitelabel' => $this->client->user->account->isPaid() ? true : false,
                 'logo' => $this->company->present()->logo($settings),
                 'links' => $this->build_email->getAttachmentLinks(),
-                'email_preferences' => (Ninja::isHosted() && $this->invitation && in_array($settings->email_sending_method, ['default', 'mailgun'])) ? $this->company->domain() . URL::signedRoute('client.email_preferences', ['entity' => $this->invitation->getEntityString(), 'invitation_key' => $this->invitation->key], absolute: false) : false,
+                'email_preferences' => (Ninja::isHosted() && $this->invitation && in_array($settings->email_sending_method, ['default', 'mailgun'])) ? $this->company->domain().URL::signedRoute('client.email_preferences', ['entity' => $this->invitation->getEntityString(), 'invitation_key' => $this->invitation->key], absolute: false) : false,
             ]);
 
         foreach ($this->build_email->getAttachments() as $file) {
@@ -154,8 +151,9 @@ class TemplateEmail extends Mailable
             }
         }
 
-        if(!$this->invitation)
+        if (! $this->invitation) {
             return $this;
+        }
 
         if ($this->invitation->invoice && $settings->ubl_email_attachment && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
             $ubl_string = (new CreateUbl($this->invitation->invoice))->handle();
@@ -171,41 +169,39 @@ class TemplateEmail extends Mailable
                 $xml_string = $this->invitation->invoice->service()->getEInvoice($this->invitation->contact);
 
                 if ($xml_string) {
-                    $this->attachData($xml_string, $this->invitation->invoice->getEFileName("xml"));
+                    $this->attachData($xml_string, $this->invitation->invoice->getEFileName('xml'));
                 }
 
             }
-        }
-        elseif ($this->invitation->credit){
+        } elseif ($this->invitation->credit) {
             if ($this->invitation->credit->client->getSetting('enable_e_invoice') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
                 $xml_string = $this->invitation->credit->service()->getECredit($this->invitation->contact);
 
                 if ($xml_string) {
-                    $this->attachData($xml_string, $this->invitation->credit->getEFileName("xml"));
+                    $this->attachData($xml_string, $this->invitation->credit->getEFileName('xml'));
                 }
 
             }
-        }
-        elseif ($this->invitation->quote){
+        } elseif ($this->invitation->quote) {
             if ($this->invitation->quote->client->getSetting('enable_e_invoice') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
                 $xml_string = $this->invitation->quote->service()->getEQuote($this->invitation->contact);
 
                 if ($xml_string) {
-                    $this->attachData($xml_string, $this->invitation->quote->getEFileName("xml"));
+                    $this->attachData($xml_string, $this->invitation->quote->getEFileName('xml'));
                 }
 
             }
-        }
-        elseif ($this->invitation->purchase_order){
+        } elseif ($this->invitation->purchase_order) {
             if ($this->invitation->purchase_order->vendor->getSetting('enable_e_invoice') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
                 $xml_string = $this->invitation->purchase_order->service()->getEPurchaseOrder($this->invitation->contact);
 
                 if ($xml_string) {
-                    $this->attachData($xml_string, $this->invitation->purchase_order->getEFileName("xml"));
+                    $this->attachData($xml_string, $this->invitation->purchase_order->getEFileName('xml'));
                 }
 
             }
         }
+
         return $this;
     }
 }

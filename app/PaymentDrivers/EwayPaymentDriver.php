@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -134,7 +133,7 @@ class EwayPaymentDriver extends BaseDriver
         return (new Token($this))->tokenBilling($cgt, $payment_hash);
     }
 
-    public function processWebhookRequest(PaymentWebhookRequest $request, Payment $payment = null)
+    public function processWebhookRequest(PaymentWebhookRequest $request, ?Payment $payment = null)
     {
     }
 
@@ -203,11 +202,9 @@ class EwayPaymentDriver extends BaseDriver
             $fields[] = ['name' => 'client_custom_value3', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client3'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
         if ($this->company_gateway->require_custom_value4) {
             $fields[] = ['name' => 'client_custom_value4', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client4'), 'type' => 'text', 'validation' => 'required'];
         }
-
 
         return $fields;
     }
@@ -215,16 +212,17 @@ class EwayPaymentDriver extends BaseDriver
     public function auth(): bool
     {
 
-        $response =$this->init()->eway->queryTransaction('xx');
+        $response = $this->init()->eway->queryTransaction('xx');
 
         return (bool) count($response->getErrors()) == 0;
 
     }
-    
+
     /**
      * importCustomers
      *
      * No support
+     *
      * @return void
      */
     public function importCustomers()

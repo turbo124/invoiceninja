@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Language;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -12,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
+
         Language::unguard();
 
         $language = Language::find(41);
@@ -23,11 +21,11 @@ return new class extends Migration
 
         $cur = \App\Models\Currency::find(121);
 
-        if(!$cur) {
+        if (! $cur) {
             $cur = new \App\Models\Currency();
             $cur->id = 121;
             $cur->code = 'LAK';
-            $cur->name = "Lao kip";
+            $cur->name = 'Lao kip';
             $cur->symbol = '₭';
             $cur->thousand_separator = ',';
             $cur->decimal_separator = '.';

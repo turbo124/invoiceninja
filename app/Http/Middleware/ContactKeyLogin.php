@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,7 +30,6 @@ class ContactKeyLogin
      * If the contact_key is provided in the route
      *
      * @param  Request  $request
-     * @param Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -162,7 +160,7 @@ class ContactKeyLogin
     private function setRedirectPath()
     {
         if (auth()->guard('contact')->user()->client->getSetting('enable_client_portal_dashboard') === true) {
-            return '/client/dashboard';                                                                                              
+            return '/client/dashboard';
         } elseif (auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_INVOICES) {
             return '/client/invoices';
         } elseif (auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_RECURRING_INVOICES) {

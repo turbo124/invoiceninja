@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -53,6 +52,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read mixed $hashed_id
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor|null $vendor
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\BankTransactionFactory factory($count = null, $state = [])
@@ -63,14 +63,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|BankTransaction query()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|BankTransaction withoutTrashed()
+ *
  * @property-read \App\Models\Payment|null $payment
+ *
  * @mixin \Eloquent
  */
 class BankTransaction extends BaseModel
 {
-    use SoftDeletes;
-    use MakesHash;
     use Filterable;
+    use MakesHash;
+    use SoftDeletes;
 
     public const STATUS_UNMATCHED = 1;
 
@@ -89,15 +91,14 @@ class BankTransaction extends BaseModel
         'vendor_id',
         'amount',
         'participant',
-        'participant_name'
+        'participant_name',
     ];
-
 
     public function getInvoiceIds()
     {
         $collection = collect();
 
-        $invoices = explode(",", $this->invoice_ids);
+        $invoices = explode(',', $this->invoice_ids);
 
         if (count($invoices) >= 1) {
             foreach ($invoices as $invoice) {
@@ -114,7 +115,7 @@ class BankTransaction extends BaseModel
     {
         $collection = collect();
 
-        $expenses = explode(",", $this->expense_id);
+        $expenses = explode(',', $this->expense_id);
 
         if (count($expenses) >= 1) {
             foreach ($expenses as $expense) {

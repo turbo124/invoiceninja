@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ class UniqueRecurringQuoteNumberRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,9 +43,6 @@ class UniqueRecurringQuoteNumberRule implements Rule
         return ctrans('texts.recurring_quote_number_taken', ['number' => $this->input['number']]);
     }
 
-    /**
-     * @return bool
-     */
     private function checkIfQuoteNumberUnique(): bool
     {
         if (empty($this->input['number'])) {
@@ -54,9 +50,9 @@ class UniqueRecurringQuoteNumberRule implements Rule
         }
 
         $invoice = RecurringQuote::query()->where('client_id', $this->input['client_id'])
-                        ->where('number', $this->input['number'])
-                        ->withTrashed()
-                        ->exists();
+            ->where('number', $this->input['number'])
+            ->withTrashed()
+            ->exists();
 
         if ($invoice) {
             return false;

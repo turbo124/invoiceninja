@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -60,11 +59,11 @@ class SubscriptionPurchaseController extends Controller
             $this->setLocale($request->query('locale'));
         }
 
-        if (!auth()->guard('contact')->check() && $subscription->registration_required && $subscription->company->client_can_register) {
+        if (! auth()->guard('contact')->check() && $subscription->registration_required && $subscription->company->client_can_register) {
             session()->put('url.intended', route('client.subscription.upgrade', ['subscription' => $subscription->hashed_id]));
 
             return redirect()->route('client.register', ['company_key' => $subscription->company->company_key]);
-        } elseif (!auth()->guard('contact')->check() && $subscription->registration_required && ! $subscription->company->client_can_register) {
+        } elseif (! auth()->guard('contact')->check() && $subscription->registration_required && ! $subscription->company->client_can_register) {
             return render('generic.subscription_blocked', ['account' => $subscription->company->account, 'company' => $subscription->company]);
         }
 
@@ -88,8 +87,6 @@ class SubscriptionPurchaseController extends Controller
 
     /**
      * Set locale for incoming request.
-     *
-     * @param string $locale
      */
     private function setLocale(string $locale): void
     {

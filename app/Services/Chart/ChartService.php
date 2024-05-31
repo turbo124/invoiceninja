@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,7 +34,7 @@ class ChartService
         $currencies = Client::withTrashed()
             ->where('company_id', $this->company->id)
             ->where('is_deleted', 0)
-            ->when(!$this->is_admin, function ($query) {
+            ->when(! $this->is_admin, function ($query) {
                 $query->where('user_id', $this->user->id);
             })
             ->distinct()
@@ -48,7 +47,7 @@ class ChartService
         $expense_currencies = Expense::withTrashed()
             ->where('company_id', $this->company->id)
             ->where('is_deleted', 0)
-            ->when(!$this->is_admin, function ($query) {
+            ->when(! $this->is_admin, function ($query) {
                 $query->where('user_id', $this->user->id);
             })
             ->distinct()

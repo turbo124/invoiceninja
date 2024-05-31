@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -56,10 +55,10 @@ class ActivityExport extends BaseExport
             return ['identifier' => $key, 'display_value' => $headerdisplay[$value]];
         })->toArray();
 
-
         $report = $query->cursor()
             ->map(function ($resource) {
                 $row = $this->buildActivityRow($resource);
+
                 return $this->processMetaData($row, $resource);
             })->toArray();
 
@@ -69,27 +68,27 @@ class ActivityExport extends BaseExport
     private function buildActivityRow(Activity $activity): array
     {
         return [
-        Carbon::parse($activity->created_at)->format($this->date_format),
-        ctrans("texts.activity_{$activity->activity_type_id}", [
-            'payment_amount' => $activity->payment ? $activity->payment->amount : '',
-            'adjustment' => $activity->payment ? $activity->payment->refunded : '',
-            'client' => $activity->client ? $activity->client->present()->name() : '',
-            'contact' => $activity->contact ? $activity->contact->present()->name() : '',
-            'quote' => $activity->quote ? $activity->quote->number : '',
-            'user' => $activity->user ? $activity->user->present()->name() : 'System',
-            'expense' => $activity->expense ? $activity->expense->number : '',
-            'invoice' => $activity->invoice ? $activity->invoice->number : '',
-            'recurring_invoice' => $activity->recurring_invoice ? $activity->recurring_invoice->number : '',
-            'payment' => $activity->payment ? $activity->payment->number : '',
-            'credit' => $activity->credit ? $activity->credit->number : '',
-            'task' => $activity->task ? $activity->task->number : '',
-            'vendor' => $activity->vendor ? $activity->vendor->present()->name() : '',
-            'purchase_order' => $activity->purchase_order ? $activity->purchase_order->number : '',
-            'subscription' => $activity->subscription ? $activity->subscription->name : '',
-            'vendor_contact' => $activity->vendor_contact ? $activity->vendor_contact->present()->name() : '',
-            'recurring_expense' => $activity->recurring_expense ? $activity->recurring_expense->number : '',
-        ]),
-        $activity->ip,
+            Carbon::parse($activity->created_at)->format($this->date_format),
+            ctrans("texts.activity_{$activity->activity_type_id}", [
+                'payment_amount' => $activity->payment ? $activity->payment->amount : '',
+                'adjustment' => $activity->payment ? $activity->payment->refunded : '',
+                'client' => $activity->client ? $activity->client->present()->name() : '',
+                'contact' => $activity->contact ? $activity->contact->present()->name() : '',
+                'quote' => $activity->quote ? $activity->quote->number : '',
+                'user' => $activity->user ? $activity->user->present()->name() : 'System',
+                'expense' => $activity->expense ? $activity->expense->number : '',
+                'invoice' => $activity->invoice ? $activity->invoice->number : '',
+                'recurring_invoice' => $activity->recurring_invoice ? $activity->recurring_invoice->number : '',
+                'payment' => $activity->payment ? $activity->payment->number : '',
+                'credit' => $activity->credit ? $activity->credit->number : '',
+                'task' => $activity->task ? $activity->task->number : '',
+                'vendor' => $activity->vendor ? $activity->vendor->present()->name() : '',
+                'purchase_order' => $activity->purchase_order ? $activity->purchase_order->number : '',
+                'subscription' => $activity->subscription ? $activity->subscription->name : '',
+                'vendor_contact' => $activity->vendor_contact ? $activity->vendor_contact->present()->name() : '',
+                'recurring_expense' => $activity->recurring_expense ? $activity->recurring_expense->number : '',
+            ]),
+            $activity->ip,
         ];
 
     }
@@ -109,7 +108,7 @@ class ActivityExport extends BaseExport
         }
 
         $query = Activity::query()
-                        ->where('company_id', $this->company->id);
+            ->where('company_id', $this->company->id);
 
         $query = $this->addDateRange($query);
 
@@ -127,11 +126,10 @@ class ActivityExport extends BaseExport
         //insert the header
         $this->csv->insertOne($this->buildHeader());
 
-
         $query->cursor()
-              ->each(function ($entity) {
-                  $this->buildRow($entity);
-              });
+            ->each(function ($entity) {
+                $this->buildRow($entity);
+            });
 
         return $this->csv->toString();
     }
@@ -147,7 +145,6 @@ class ActivityExport extends BaseExport
     {
         return $entity;
     }
-
 
     public function processMetaData(array $row, $resource): array
     {
@@ -167,5 +164,4 @@ class ActivityExport extends BaseExport
 
         return $clean_row;
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,23 +25,15 @@ class CompanyGatewayTransformer extends EntityTransformer
     use MakesHash;
     use SoftDeletes;
 
-    /**
-     * @var array
-     */
     protected array $defaultIncludes = [
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'system_logs',
         'gateway',
     ];
 
     /**
-     * @param CompanyGateway $company_gateway
-     *
      * @return array
      */
     public function transform(CompanyGateway $company_gateway)

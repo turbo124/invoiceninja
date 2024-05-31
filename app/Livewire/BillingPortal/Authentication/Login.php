@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -151,7 +150,7 @@ class Login extends Component
         ]);
 
         if ($attempt) {
-            
+
             $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
         }

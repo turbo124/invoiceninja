@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. PurchaseOrder Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,13 +60,13 @@ class PurchaseOrderItemExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_vendor_fields, $this->input['report_keys']));
 
         $query = PurchaseOrder::query()
-                        ->withTrashed()
-                        ->whereHas('vendor', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->with('vendor')->where('company_id', $this->company->id);
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->whereHas('vendor', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->with('vendor')->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
@@ -75,13 +74,13 @@ class PurchaseOrderItemExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
         $query = $this->addPurchaseOrderStatusFilter($query, $this->input['status'] ?? '');
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -100,16 +99,16 @@ class PurchaseOrderItemExport extends BaseExport
         })->toArray();
 
         $query->cursor()
-              ->each(function ($resource) {
-                  $this->iterateItems($resource);
+            ->each(function ($resource) {
+                $this->iterateItems($resource);
 
-                  foreach($this->storage_array as $row) {
-                      $this->storage_item_array[] = $this->processItemMetaData($row, $resource);
-                  }
+                foreach ($this->storage_array as $row) {
+                    $this->storage_item_array[] = $this->processItemMetaData($row, $resource);
+                }
 
-                  $this->storage_array = [];
+                $this->storage_array = [];
 
-              });
+            });
 
         return array_merge(['columns' => $header], $this->storage_item_array);
     }
@@ -147,15 +146,15 @@ class PurchaseOrderItemExport extends BaseExport
 
             foreach (array_values(array_intersect($this->input['report_keys'], $this->item_report_keys)) as $key) { //items iterator produces item array
 
-                if (str_contains($key, "item.")) {
+                if (str_contains($key, 'item.')) {
 
-                    $tmp_key = str_replace("item.", "", $key);
+                    $tmp_key = str_replace('item.', '', $key);
 
-                    if($tmp_key == 'type_id') {
+                    if ($tmp_key == 'type_id') {
                         $tmp_key = 'type';
                     }
 
-                    if($tmp_key == 'tax_id') {
+                    if ($tmp_key == 'tax_id') {
                         $tmp_key = 'tax_category';
                     }
 
@@ -184,7 +183,7 @@ class PurchaseOrderItemExport extends BaseExport
         foreach (array_values($this->input['report_keys']) as $key) {
             $parts = explode('.', $key);
 
-            if(is_array($parts) && $parts[0] == 'item') {
+            if (is_array($parts) && $parts[0] == 'item') {
                 continue;
             }
 
@@ -244,9 +243,6 @@ class PurchaseOrderItemExport extends BaseExport
             $entity['purchase_order.assigned_user_id'] = $purchase_order->assigned_user ? $purchase_order->assigned_user->present()->name() : '';
         }
 
-
-
         return $entity;
     }
-
 }

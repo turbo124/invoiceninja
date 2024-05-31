@@ -22,8 +22,6 @@ class RefundCancelledAccount implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param Account $account
      */
     public function __construct(Account $account)
     {

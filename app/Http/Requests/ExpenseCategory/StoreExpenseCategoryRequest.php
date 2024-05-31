@@ -5,22 +5,19 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Requests\ExpenseCategory;
 
-use App\Models\Expense;
 use App\Http\Requests\Request;
+use App\Models\Expense;
 use App\Models\ExpenseCategory;
 
 class StoreExpenseCategoryRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {

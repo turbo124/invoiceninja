@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,8 +25,6 @@ class UpdateRecurringInvoiceRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -48,7 +45,7 @@ class UpdateRecurringInvoiceRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -59,7 +56,6 @@ class UpdateRecurringInvoiceRequest extends Request
         }
 
         $rules['number'] = ['bail', 'sometimes', Rule::unique('recurring_invoices')->where('company_id', $user->company()->id)->ignore($this->recurring_invoice->id)];
-
 
         $rules['client_id'] = ['bail', 'sometimes', Rule::in([$this->recurring_invoice->client_id])];
 
@@ -85,7 +81,7 @@ class UpdateRecurringInvoiceRequest extends Request
             $input['due_date_days'] = 'terms';
         }
 
-        if(!isset($input['next_send_date']) || $input['next_send_date'] == '') {
+        if (! isset($input['next_send_date']) || $input['next_send_date'] == '') {
             $input['next_send_date'] = now()->format('Y-m-d');
         }
 
@@ -138,7 +134,7 @@ class UpdateRecurringInvoiceRequest extends Request
             unset($input['documents']);
         }
 
-        if (array_key_exists('exchange_rate', $input) && (is_null($input['exchange_rate']) || $input['exchange_rate'] == 0) || !isset($input['exchange_rate'])) {
+        if (array_key_exists('exchange_rate', $input) && (is_null($input['exchange_rate']) || $input['exchange_rate'] == 0) || ! isset($input['exchange_rate'])) {
             $input['exchange_rate'] = 1;
         }
 
@@ -150,9 +146,7 @@ class UpdateRecurringInvoiceRequest extends Request
      * off / optin / optout will reset the status of this field to off to allow
      * the client to choose whether to auto_bill or not.
      *
-     * @param string $auto_bill off/always/optin/optout
-     *
-     * @return bool
+     * @param  string  $auto_bill  off/always/optin/optout
      */
     private function setAutoBillFlag($auto_bill): bool
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,17 +27,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\PaymentController
  */
 class PaymentV2Test extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -68,8 +68,8 @@ class PaymentV2Test extends TestCase
             'amount' => 20,
             'balance' => 20,
             'discount' => 0,
-            'number' => uniqid("st", true),
-            'line_items' => []
+            'number' => uniqid('st', true),
+            'line_items' => [],
         ]);
 
         $item = InvoiceItemFactory::generateCredit();
@@ -85,29 +85,29 @@ class PaymentV2Test extends TestCase
             'amount' => 20,
             'balance' => 0,
             'discount' => 0,
-            'number' => uniqid("st", true),
+            'number' => uniqid('st', true),
             'line_items' => [
-                $item
-            ]
+                $item,
+            ],
         ]);
 
         $data = [
-                    'client_id' => $this->client->hashed_id,
-                    'invoices' => [
-                        [
-                            'invoice_id' => $invoice->hashed_id,
-                            'amount' => 20,
-                        ],
-                    ],
-                    'credits' => [
-                        [
-                            'credit_id' => $credit->hashed_id,
-                            'amount' => 20,
-                        ],
-                    ],
-                    'date' => '2020/12/12',
+            'client_id' => $this->client->hashed_id,
+            'invoices' => [
+                [
+                    'invoice_id' => $invoice->hashed_id,
+                    'amount' => 20,
+                ],
+            ],
+            'credits' => [
+                [
+                    'credit_id' => $credit->hashed_id,
+                    'amount' => 20,
+                ],
+            ],
+            'date' => '2020/12/12',
 
-                ];
+        ];
 
         $response = null;
 
@@ -130,7 +130,7 @@ class PaymentV2Test extends TestCase
 
     public function testStorePaymentWithCreditsThenDeletingInvoices()
     {
-        $client = Client::factory()->create(['company_id' =>$this->company->id, 'user_id' => $this->user->id, 'balance' => 20, 'paid_to_date' => 0]);
+        $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id, 'balance' => 20, 'paid_to_date' => 0]);
         ClientContact::factory()->create([
             'user_id' => $this->user->id,
             'client_id' => $client->id,
@@ -147,8 +147,8 @@ class PaymentV2Test extends TestCase
             'amount' => 20,
             'balance' => 20,
             'discount' => 0,
-            'number' => uniqid("st", true),
-            'line_items' => []
+            'number' => uniqid('st', true),
+            'line_items' => [],
         ]);
 
         $this->assertEquals(20, $client->balance);
@@ -165,8 +165,8 @@ class PaymentV2Test extends TestCase
             'amount' => 20,
             'balance' => 20,
             'discount' => 0,
-            'number' => uniqid("st", true),
-            'line_items' => []
+            'number' => uniqid('st', true),
+            'line_items' => [],
         ]);
 
         $this->assertEquals(20, $credit->amount);
@@ -263,7 +263,7 @@ class PaymentV2Test extends TestCase
 
     public function testStorePaymentWithCreditsThenDeletingInvoicesAndThenPayments()
     {
-        $client = Client::factory()->create(['company_id' =>$this->company->id, 'user_id' => $this->user->id, 'balance' => 100, 'paid_to_date' => 0]);
+        $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id, 'balance' => 100, 'paid_to_date' => 0]);
         ClientContact::factory()->create([
             'user_id' => $this->user->id,
             'client_id' => $client->id,
@@ -279,7 +279,6 @@ class PaymentV2Test extends TestCase
 
         $line_items[] = $item;
 
-
         $invoice = Invoice::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -289,8 +288,8 @@ class PaymentV2Test extends TestCase
             'amount' => 100,
             'balance' => 100,
             'discount' => 0,
-            'number' => uniqid("st", true),
-            'line_items' => $line_items
+            'number' => uniqid('st', true),
+            'line_items' => $line_items,
         ]);
 
         $this->assertEquals(100, $client->balance);
@@ -307,8 +306,8 @@ class PaymentV2Test extends TestCase
             'amount' => 20,
             'balance' => 20,
             'discount' => 0,
-            'number' => uniqid("st", true),
-            'line_items' => []
+            'number' => uniqid('st', true),
+            'line_items' => [],
         ]);
 
         $this->assertEquals(20, $credit->amount);
@@ -362,7 +361,7 @@ class PaymentV2Test extends TestCase
         $this->assertEquals(0, $credit->balance);
 
         $invoice = $invoice->fresh();
-        
+
         //delete the invoice
 
         $data = [
@@ -427,5 +426,4 @@ class PaymentV2Test extends TestCase
         $this->assertEquals(20, $credit->balance);
 
     }
-
 }

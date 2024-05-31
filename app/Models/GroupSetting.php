@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,6 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $documents_count
  * @property-read mixed $hashed_id
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|GroupSetting newModelQuery()
@@ -54,14 +54,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|GroupSetting whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GroupSetting withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|GroupSetting withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Client> $clients
+ *
  * @mixin \Eloquent
  */
 class GroupSetting extends StaticModel
 {
+    use Filterable;
     use MakesHash;
     use SoftDeletes;
-    use Filterable;
 
     protected $casts = [
         'settings' => 'object',
@@ -112,8 +114,8 @@ class GroupSetting extends StaticModel
     /**
      * Retrieve the model for a bound value.
      *
-     * @param mixed $value
-     * @param null $field
+     * @param  mixed  $value
+     * @param  null  $field
      * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)

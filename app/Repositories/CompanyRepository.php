@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,9 +25,8 @@ class CompanyRepository extends BaseRepository
     /**
      * Saves the client and its contacts.
      *
-     * @param array $data The data
-     * @param Company $company
-     * @return Company|null  Company Object
+     * @param  array  $data  The data
+     * @return Company|null Company Object
      */
     public function save(array $data, Company $company): ?Company
     {
@@ -41,7 +39,7 @@ class CompanyRepository extends BaseRepository
 
         // nlog($data);
         /** Only required to handle v4 migration workloads */
-        if(Ninja::isHosted() && $company->isDirty('is_disabled') && !$company->is_disabled) {
+        if (Ninja::isHosted() && $company->isDirty('is_disabled') && ! $company->is_disabled) {
             Ninja::triggerForwarding($company->company_key, $company->owner()->email);
         }
 
@@ -49,11 +47,11 @@ class CompanyRepository extends BaseRepository
             $company->saveSettings($data['settings'], $company);
         }
 
-        if(isset($data['smtp_username'])) {
+        if (isset($data['smtp_username'])) {
             $company->smtp_username = $data['smtp_username'];
         }
 
-        if(isset($data['smtp_password'])) {
+        if (isset($data['smtp_password'])) {
             $company->smtp_password = $data['smtp_password'];
         }
 
@@ -65,8 +63,7 @@ class CompanyRepository extends BaseRepository
     /**
      * parseCustomFields
      *
-     * @param  array $fields
-     * @return array
+     * @param  array  $fields
      */
     private function parseCustomFields($fields): array
     {

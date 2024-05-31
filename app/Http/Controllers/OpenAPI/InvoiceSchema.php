@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Invoice",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The invoice hashed id"),
  *       @OA\Property(property="user_id", type="string", example="Opnel5aKBz", description="The user hashed id"),
  *       @OA\Property(property="assigned_user_id", type="string", example="Opnel5aKBz", description="The assigned user hashed id"),

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,8 +25,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Invoice|null $fee_invoice
  * @property-read \App\Models\Payment|null $payment
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentHash newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentHash query()
+ *
  * @mixin \Eloquent
  */
 class PaymentHash extends Model
@@ -39,13 +40,15 @@ class PaymentHash extends Model
     ];
 
     /**
-    * @class \App\Models\PaymentHash $this
-    * @property \App\Models\PaymentHash $data
-    * @property \App\Modes\PaymentHash $hash 32 char length AlphaNum
-    * @class \stdClass $data
-    * @property string $raw_value
-    */
-
+     * @class \App\Models\PaymentHash $this
+     *
+     * @property \App\Models\PaymentHash $data
+     * @property \App\Modes\PaymentHash $hash 32 char length AlphaNum
+     *
+     * @class \stdClass $data
+     *
+     * @property string $raw_value
+     */
 
     /**
      * @return mixed
@@ -84,7 +87,8 @@ class PaymentHash extends Model
     public function withData(string $property, $value): self
     {
         $this->data = array_merge((array) $this->data, [$property => $value]); // @phpstan-ignore-line
-        $this->save();// @phpstan-ignore-line
+        $this->save(); // @phpstan-ignore-line
+
         return $this; // @phpstan-ignore-line
     }
 }

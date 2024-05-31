@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Paymentable",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="AS3df3A", description="The paymentable hashed id"),
  *       @OA\Property(property="invoice_id", type="string", example="AS3df3A", description="The invoice hashed id"),
  *       @OA\Property(property="credit_id", type="string", example="AS3df3A", description="The credit hashed id"),

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -68,6 +67,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\VendorContact> $primary_contact
  * @property-read int|null $primary_contact_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\VendorFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Vendor filter(\App\Filters\QueryFilters $filters)
@@ -78,19 +78,21 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|Vendor withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Vendor withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\VendorContact> $contacts
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\VendorContact> $primary_contact
+ *
  * @mixin \Eloquent
  */
 class Vendor extends BaseModel
 {
-    use SoftDeletes;
+    use AppSetup;
     use Filterable;
     use GeneratesCounter;
     use PresentableTrait;
-    use AppSetup;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -197,9 +199,6 @@ class Vendor extends BaseModel
         return $this->company->timezone();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -241,8 +240,7 @@ class Vendor extends BaseModel
     /**
      * Returns a vendor settings proxying company setting
      *
-     * @param string $setting
-     * @return mixed
+     * @param  string  $setting
      */
     public function getSetting($setting): mixed
     {

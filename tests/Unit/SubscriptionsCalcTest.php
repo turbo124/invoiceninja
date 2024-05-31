@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -151,7 +150,6 @@ class SubscriptionsCalcTest extends TestCase
         $this->assertEquals(90, $invoice->amount);
         $this->assertEquals(90, $invoice->balance);
 
-
         $ratio = $subscription->service()->calculateDiscountRatio($invoice);
 
         $this->assertEquals(.1, $ratio);
@@ -205,7 +203,6 @@ class SubscriptionsCalcTest extends TestCase
 
         $this->assertEquals(80, $invoice->amount);
         $this->assertEquals(80, $invoice->balance);
-
 
         $ratio = $subscription->service()->calculateDiscountRatio($invoice);
 

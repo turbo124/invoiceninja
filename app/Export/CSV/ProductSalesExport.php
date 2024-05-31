@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -80,25 +79,24 @@ class ProductSalesExport extends BaseExport
 
     public function filterByProducts($query)
     {
-    
+
         $product_keys = &$this->input['product_key'];
 
-        if ($product_keys && !empty($this->input['product_key'])) {
+        if ($product_keys && ! empty($this->input['product_key'])) {
 
-            $keys = explode(",", $product_keys);
-            $query->where(function ($q) use ($keys){
+            $keys = explode(',', $product_keys);
+            $query->where(function ($q) use ($keys) {
 
-                foreach($keys as $key)  {    
+                foreach ($keys as $key) {
                     $q->orWhereJsonContains('line_items', ['product_key' => $key]);
                 }
 
             });
-            
+
         }
 
         return $query;
     }
-
 
     public function run()
     {
@@ -120,13 +118,13 @@ class ProductSalesExport extends BaseExport
 
         //insert the header
         $query = Invoice::query()
-                        ->withTrashed()
-                        ->whereHas('client', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->where('company_id', $this->company->id)
-                        ->where('is_deleted', 0)
-                        ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL, Invoice::STATUS_PAID]);
+            ->withTrashed()
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id)
+            ->where('is_deleted', 0)
+            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL, Invoice::STATUS_PAID]);
 
         $query = $this->addDateRange($query);
 
@@ -138,34 +136,32 @@ class ProductSalesExport extends BaseExport
 
         $product_keys = &$this->input['product_key'];
 
-        if($product_keys){
-            $product_keys = explode(",", $product_keys);
+        if ($product_keys) {
+            $product_keys = explode(',', $product_keys);
         }
 
         $query->cursor()
-              ->each(function ($invoice) use($product_keys) {
-                  foreach ($invoice->line_items as $item) {
+            ->each(function ($invoice) use ($product_keys) {
+                foreach ($invoice->line_items as $item) {
 
-                    if($product_keys)
-                    {
-                     if(in_array($item->product_key, $product_keys))
+                    if ($product_keys) {
+                        if (in_array($item->product_key, $product_keys)) {
+                            $this->csv->insertOne($this->buildRow($invoice, $item));
+                        }
+                    } else {
                         $this->csv->insertOne($this->buildRow($invoice, $item));
                     }
-                    else {
-                        $this->csv->insertOne($this->buildRow($invoice, $item));
-                    }
-                    
-                  }
-              });
 
+                }
+            });
 
-        $grouped = $this->sales->groupBy('product_key')->map(function ($key, $value) use($product_keys){
+        $grouped = $this->sales->groupBy('product_key')->map(function ($key, $value) use ($product_keys) {
 
-            if($product_keys && !in_array($value, $product_keys)){
+            if ($product_keys && ! in_array($value, $product_keys)) {
                 return false;
             }
 
-            $data =  [
+            $data = [
                 'product' => $value,
                 'quantity' => $key->sum('quantity'),
                 'markup' => $key->sum('markup'),
@@ -185,7 +181,7 @@ class ProductSalesExport extends BaseExport
 
         })->reject(function ($value) {
             return $value === false;
-        });;
+        });
 
         $this->csv->insertOne([]);
         $this->csv->insertOne([]);
@@ -194,7 +190,6 @@ class ProductSalesExport extends BaseExport
         $this->csv->insertOne([ctrans('texts.clients'), ctrans('texts.type'), ctrans('texts.start_date'), ctrans('texts.end_date')]);
         $this->csv->insertOne([$this->client_description, ctrans('texts.product_sales'), $this->start_date, $this->end_date]);
         $this->csv->insertOne([]);
-
 
         if ($grouped->count() >= 1) {
             $header = [];
@@ -209,13 +204,14 @@ class ProductSalesExport extends BaseExport
                 $this->csv->insertOne(array_values($item));
             });
         }
+
         return $this->csv->toString();
     }
 
     private function buildRow($invoice, $invoice_item): array
     {
-        $transformed_entity = (array)$invoice_item;
-        $transformed_entity['price'] = ($invoice_item->product_cost ?? 1) * ($invoice->exchange_rate ?? 1) ;
+        $transformed_entity = (array) $invoice_item;
+        $transformed_entity['price'] = ($invoice_item->product_cost ?? 1) * ($invoice->exchange_rate ?? 1);
 
         $entity = [];
 
@@ -224,7 +220,7 @@ class ProductSalesExport extends BaseExport
 
             if (array_key_exists($key, $transformed_entity)) {
                 $entity[$keyval] = $transformed_entity[$key];
-            } elseif($key == 'currency') {
+            } elseif ($key == 'currency') {
                 $entity['currency'] = $invoice->client->currency()->code;
             } else {
                 $entity[$keyval] = '';
@@ -257,21 +253,21 @@ class ProductSalesExport extends BaseExport
         $entity['profit'] = $entity['price'] - $entity['discount'] - $entity['cost'];
 
         if (strlen($entity['tax_name1']) > 1) {
-            $entity['tax_name1'] = $entity['tax_name1'] . ' [' . $entity['tax_rate1'] . '%]';
+            $entity['tax_name1'] = $entity['tax_name1'].' ['.$entity['tax_rate1'].'%]';
             $entity['tax_amount1'] = $this->calculateTax($invoice, $entity['line_total'], $entity['tax_rate1']);
         } else {
             $entity['tax_amount1'] = 0;
         }
 
         if (strlen($entity['tax_name2']) > 1) {
-            $entity['tax_name2'] = $entity['tax_name2'] . ' [' . $entity['tax_rate2'] . '%]';
+            $entity['tax_name2'] = $entity['tax_name2'].' ['.$entity['tax_rate2'].'%]';
             $entity['tax_amount2'] = $this->calculateTax($invoice, $entity['line_total'], $entity['tax_rate2']);
         } else {
             $entity['tax_amount2'] = 0;
         }
 
         if (strlen($entity['tax_name3']) > 1) {
-            $entity['tax_name3'] = $entity['tax_name3'] . ' [' . $entity['tax_rate3'] . '%]';
+            $entity['tax_name3'] = $entity['tax_name3'].' ['.$entity['tax_rate3'].'%]';
             $entity['tax_amount3'] = $this->calculateTax($invoice, $entity['line_total'], $entity['tax_rate3']);
         } else {
             $entity['tax_amount3'] = 0;
@@ -282,11 +278,6 @@ class ProductSalesExport extends BaseExport
 
     /**
      * calculateTax
-     *
-     * @param  Invoice $invoice
-     * @param  float $amount
-     * @param  float $tax_rate
-     * @return float
      */
     private function calculateTax(Invoice $invoice, float $amount, float $tax_rate): float
     {
@@ -299,14 +290,10 @@ class ProductSalesExport extends BaseExport
         }
     }
 
-
-
     /**
      * calculateDiscount
      *
-     * @param  Invoice $invoice
-     * @param  mixed $entity
-     * @return float
+     * @param  mixed  $entity
      */
     private function calculateDiscount(Invoice $invoice, $entity): float
     {
@@ -316,7 +303,7 @@ class ProductSalesExport extends BaseExport
 
         if ($invoice->is_amount_discount && $entity['discount'] != 0) {
             return $entity['discount'];
-        } elseif (!$invoice->is_amount_discount && $entity['discount'] != 0) {
+        } elseif (! $invoice->is_amount_discount && $entity['discount'] != 0) {
             return round($entity['line_total'] * ($entity['discount'] / 100), 2);
         }
 
@@ -325,9 +312,6 @@ class ProductSalesExport extends BaseExport
 
     /**
      * getProduct
-     *
-     * @param  string $product_key
-     * @return Product
      */
     private function getProduct(string $product_key): ?Product
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,17 +23,18 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\ExpenseController
  */
 class ExpenseApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class ExpenseApiTest extends TestCase
         $bi = BankIntegration::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
-            'account_id' => $this->account->id
+            'account_id' => $this->account->id,
         ]);
 
         $bt = BankTransaction::factory()->create([
@@ -66,7 +66,7 @@ class ExpenseApiTest extends TestCase
             'user_id' => $this->user->id,
             'transaction_id' => $bt->id,
         ]);
-        
+
         $this->assertNotNull($e->transaction_id);
 
         $expense_repo = app('App\Repositories\ExpenseRepository');
@@ -236,12 +236,10 @@ class ExpenseApiTest extends TestCase
     public function testExpenseBulkCategorize()
     {
 
-
         $e = Expense::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
         ]);
-
 
         $ec = ExpenseCategory::factory()->create([
             'company_id' => $this->company->id,
@@ -267,7 +265,6 @@ class ExpenseApiTest extends TestCase
 
         $this->assertEquals($ec->hashed_id, $arr['data'][0]['category_id']);
     }
-
 
     public function testAddingExpense()
     {

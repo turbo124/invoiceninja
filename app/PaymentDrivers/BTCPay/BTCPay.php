@@ -6,20 +6,19 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2023. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\PaymentDrivers\BTCPay;
 
+use App\Exceptions\PaymentFailed;
+use App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest;
 use App\Models\GatewayType;
 use App\Models\Payment;
 use App\Models\PaymentType;
 use App\PaymentDrivers\BTCPayPaymentDriver;
-use App\Utils\Traits\MakesHash;
 use App\PaymentDrivers\Common\MethodInterface;
-use App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest;
-use App\Exceptions\PaymentFailed;
+use App\Utils\Traits\MakesHash;
 
 class BTCPay implements MethodInterface
 {
@@ -40,6 +39,7 @@ class BTCPay implements MethodInterface
     public function authorizeRequest($request)
     {
     }
+
     public function authorizeResponse($request)
     {
     }
@@ -71,7 +71,7 @@ class BTCPay implements MethodInterface
         ) {
             throw new PaymentFailed('BTCPay is not well configured');
         }
-        if (!filter_var($this->driver_class->btcpay_url, FILTER_VALIDATE_URL)) {
+        if (! filter_var($this->driver_class->btcpay_url, FILTER_VALIDATE_URL)) {
             throw new PaymentFailed('Wrong format for BTCPay Url');
         }
 
@@ -84,23 +84,22 @@ class BTCPay implements MethodInterface
                 'payment_type' => PaymentType::CRYPTO,
                 'amount' => $request->amount,
                 'gateway_type_id' => GatewayType::CRYPTO,
-                'transaction_reference' =>  'xxx'
+                'transaction_reference' => 'xxx',
             ];
             $payment = $drv->createPayment($dataPayment, \App\Models\Payment::STATUS_PENDING);
 
             $metaData = [
                 'buyerName' => $cli->name,
                 'buyerAddress1' => $cli->address1,
-                'buyerAddress2' =>  $cli->address2,
-                'buyerCity' =>  $cli->city,
+                'buyerAddress2' => $cli->address2,
+                'buyerCity' => $cli->city,
                 'buyerState' => $cli->state,
                 'buyerZip' => $cli->postal_code,
                 'buyerCountry' => $cli->country_id,
                 'buyerPhone' => $cli->phone,
-                'itemDesc' => "From InvoiceNinja",
-                'paymentID' => $payment->id
+                'itemDesc' => 'From InvoiceNinja',
+                'paymentID' => $payment->id,
             ];
-
 
             $urlRedirect = redirect()->route('client.payments.show', ['payment' => $payment->hashed_id])->getTargetUrl();
             $checkoutOptions = new \BTCPayServer\Client\InvoiceCheckoutOptions();
@@ -121,7 +120,7 @@ class BTCPay implements MethodInterface
 
             return redirect($rep->getCheckoutLink());
         } catch (\Throwable $e) {
-            throw new PaymentFailed('Error during BTCPay payment : ' . $e->getMessage());
+            throw new PaymentFailed('Error during BTCPay payment : '.$e->getMessage());
         }
     }
 
@@ -132,16 +131,16 @@ class BTCPay implements MethodInterface
             $isPartialRefund = ($amount < $payment->amount);
 
             $client = new \BTCPayServer\Client\Invoice($this->driver_class->btcpay_url, $this->driver_class->api_key);
-            $refund = $client->refundInvoice($this->driver_class->store_id,  $payment->transaction_reference);
+            $refund = $client->refundInvoice($this->driver_class->store_id, $payment->transaction_reference);
 
-           /* $data = [];
-            $data['InvoiceNumber'] = $invoice->number;
-            $data['isPartialRefund'] = $isPartialRefund;
-            $data['BTCPayLink'] = $refund->getViewLink();*/
+            /* $data = [];
+             $data['InvoiceNumber'] = $invoice->number;
+             $data['isPartialRefund'] = $isPartialRefund;
+             $data['BTCPayLink'] = $refund->getViewLink();*/
 
             return $refund->getViewLink();
         } catch (\Throwable $e) {
-            throw new PaymentFailed('Error during BTCPay refund : ' . $e->getMessage());
+            throw new PaymentFailed('Error during BTCPay refund : '.$e->getMessage());
         }
     }
 }

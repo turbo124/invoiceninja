@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,8 +33,7 @@ class InvoiceController extends BaseController
     /**
      * List Invoices.
      *
-     * @param InvoiceFilters $filters  The filters
-     *
+     * @param  InvoiceFilters  $filters  The filters
      * @return Response
      */
     public function index(InvoiceFilters $filters)

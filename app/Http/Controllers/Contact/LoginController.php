@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -56,9 +55,9 @@ class LoginController extends BaseController
     /**
      * Login via API.
      *
-     * @param Request $request The request
-     *
+     * @param  Request  $request  The request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function apiLogin(Request $request)
@@ -85,7 +84,6 @@ class LoginController extends BaseController
     /**
      * Redirect the user to the provider authentication page.
      *
-     * @param string $provider
      * @return void
      */
     public function redirectToProvider(string $provider)

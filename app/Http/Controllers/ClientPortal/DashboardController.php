@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,7 +20,7 @@ class DashboardController extends Controller
     {
         if (auth()->guard('contact')->user()->client->getSetting('enable_client_portal_dashboard') === false) {
             return redirect()->route('client.invoices.index');
-        } 
+        }
 
         $total_invoices = Invoice::withTrashed()
             ->where('client_id', auth()->guard('contact')->user()->client_id)

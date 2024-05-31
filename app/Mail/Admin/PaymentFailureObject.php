@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,10 +26,7 @@ class PaymentFailureObject
     /**
      * Create a new job instance.
      *
-     * @param $client
-     * @param $message
-     * @param $company
-     * @param $amount
+     * @param  $message
      */
     public function __construct(public Client $client, public string $error, public Company $company, public float $amount, public ?PaymentHash $payment_hash, protected bool $use_react_url)
     {
@@ -77,10 +73,10 @@ class PaymentFailureObject
         $content = ctrans(
             'texts.notification_invoice_payment_failed',
             [
-                    'client' => $this->client->present()->name(),
-                    'invoice' => $this->getDescription(),
-                    'amount' => Number::formatMoney($this->amount, $this->client),
-                ]
+                'client' => $this->client->present()->name(),
+                'invoice' => $this->getDescription(),
+                'amount' => Number::formatMoney($this->amount, $this->client),
+            ]
         );
 
         $data = [

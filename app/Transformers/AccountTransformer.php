@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,18 +24,12 @@ class AccountTransformer extends EntityTransformer
 {
     use MakesHash;
 
-    /**
-     * @var array
-     */
     protected array $defaultIncludes = [
         //'default_company',
         //'user',
         //'company_users'
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'default_company',
         'company_users',
@@ -44,9 +37,6 @@ class AccountTransformer extends EntityTransformer
     ];
 
     /**
-     * @param Account $account
-     *
-     *
      * @return array
      */
     public function transform(Account $account)
@@ -90,7 +80,7 @@ class AccountTransformer extends EntityTransformer
             'set_react_as_default_ap' => (bool) $account->set_react_as_default_ap,
             'trial_days_left' => Ninja::isHosted() ? (int) $account->getTrialDays() : 0,
             'account_sms_verified' => (bool) $account->account_sms_verified,
-            'has_iap_plan' => (bool)$account->inapp_transaction_id,
+            'has_iap_plan' => (bool) $account->inapp_transaction_id,
             'tax_api_enabled' => (bool) config('services.tax.zip_tax.key') ? true : false,
             'nordigen_enabled' => (bool) (config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key')) ? true : false,
             'upload_extensions' => (string) config('ninja.upload_extensions'),

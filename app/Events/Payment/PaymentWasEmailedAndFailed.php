@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,10 +38,6 @@ class PaymentWasEmailedAndFailed
 
     /**
      * PaymentWasEmailedAndFailed constructor.
-     * @param Payment $payment
-     * @param $company
-     * @param string $errors
-     * @param array $event_vars
      */
     public function __construct(Payment $payment, Company $company, string $errors, array $event_vars)
     {

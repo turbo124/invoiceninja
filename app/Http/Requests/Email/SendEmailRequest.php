@@ -5,24 +5,24 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Requests\Email;
 
-use App\Utils\Ninja;
-use Illuminate\Support\Str;
 use App\Http\Requests\Request;
+use App\Utils\Ninja;
 use App\Utils\Traits\MakesHash;
-use Illuminate\Validation\Rule;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class SendEmailRequest extends Request
 {
     use MakesHash;
 
     private string $entity_plural = '';
+
     private string $error_message = '';
 
     public array $templates = [
@@ -44,8 +44,6 @@ class SendEmailRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -98,8 +96,8 @@ class SendEmailRequest extends Request
             $input['entity'] = "App\Models\\".ucfirst(Str::camel($input['entity']));
         }
 
-        if(isset($input['cc_email'])) {
-            $input['cc_email'] = collect(explode(",", $input['cc_email']))->map(function ($email) {
+        if (isset($input['cc_email'])) {
+            $input['cc_email'] = collect(explode(',', $input['cc_email']))->map(function ($email) {
                 return trim($email);
             })->filter(function ($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -123,19 +121,20 @@ class SendEmailRequest extends Request
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (Ninja::isHosted() && !$user->account->account_sms_verified) {
+        if (Ninja::isHosted() && ! $user->account->account_sms_verified) {
             $this->error_message = ctrans('texts.authorization_sms_failure');
+
             return false;
         }
 
         if (Ninja::isHosted() && $user->account->emailQuotaExceeded()) {
             $this->error_message = ctrans('texts.email_quota_exceeded_subject');
+
             return false;
         }
 
         /*Make sure we have all the require ingredients to send a template*/
         if (isset($input['entity']) && array_key_exists('entity_id', $input) && is_string($input['entity']) && $input['entity_id']) {
-
 
             $company = $user->company();
 
@@ -149,7 +148,7 @@ class SendEmailRequest extends Request
                 return true;
             }
         } else {
-            $this->error_message = "Invalid entity or entity_id";
+            $this->error_message = 'Invalid entity or entity_id';
         }
 
         return false;

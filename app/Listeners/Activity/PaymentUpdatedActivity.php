@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,8 +23,6 @@ class PaymentUpdatedActivity implements ShouldQueue
 
     /**
      * Create the event listener.
-     *
-     * @param ActivityRepository $activity_repo
      */
     public function __construct(ActivityRepository $activity_repo)
     {

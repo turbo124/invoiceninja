@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,12 +20,12 @@ class SmsNumberTest extends TestCase
 {
     public function testArrayHit()
     {
-        $this->assertTrue(SMSNumbers::hasNumber("+461614222"));
+        $this->assertTrue(SMSNumbers::hasNumber('+461614222'));
     }
 
     public function testArrayMiss()
     {
-        $this->assertFalse(SMSNumbers::hasNumber("+5485454"));
+        $this->assertFalse(SMSNumbers::hasNumber('+5485454'));
     }
 
     public function testSmsArrayType()

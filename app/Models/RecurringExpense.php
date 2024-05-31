@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -78,6 +77,7 @@ use Illuminate\Support\Carbon;
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Vendor|null $vendor
  * @property-read \App\Models\ExpenseCategory|null $category
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\RecurringExpenseFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringExpense filter(\App\Filters\QueryFilters $filters)
@@ -139,13 +139,15 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringExpense whereVendorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringExpense withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|RecurringExpense withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
+ *
  * @mixin \Eloquent
  */
 class RecurringExpense extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'client_id',
@@ -221,7 +223,7 @@ class RecurringExpense extends BaseModel
         return $this->belongsTo(User::class, 'assigned_user_id', 'id');
     }
 
-    public function company():\Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
@@ -240,7 +242,6 @@ class RecurringExpense extends BaseModel
     {
         return $this->belongsTo(ExpenseCategory::class)->withTrashed();
     }
-
 
     /**
      * Service entry points.

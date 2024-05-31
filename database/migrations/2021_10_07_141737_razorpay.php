@@ -4,7 +4,8 @@ use App\Models\Gateway;
 use App\Models\GatewayType;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *

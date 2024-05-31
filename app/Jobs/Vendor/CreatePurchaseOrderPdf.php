@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,13 +39,13 @@ class CreatePurchaseOrderPdf implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use MakesHash;
+    use MakesInvoiceHtml;
+    use NumberFormatter;
+    use PageNumbering;
+    use PdfMaker;
     use Queueable;
     use SerializesModels;
-    use NumberFormatter;
-    use MakesInvoiceHtml;
-    use PdfMaker;
-    use MakesHash;
-    use PageNumbering;
 
     public $entity;
 
@@ -68,8 +67,6 @@ class CreatePurchaseOrderPdf implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param $invitation
      */
     public function __construct($invitation, $disk = null)
     {
@@ -96,17 +93,16 @@ class CreatePurchaseOrderPdf implements ShouldQueue
             "{$this->entity_string}s" => [$this->entity],
         ]);
 
-        nlog("returning purchase order");
+        nlog('returning purchase order');
 
         return $ps->boot()->getPdf();
-
 
         $pdf = $this->rawPdf();
 
         if ($pdf) {
             try {
                 Storage::disk($this->disk)->put($this->file_path, $pdf);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 throw new FilePermissionsFailure($e->getMessage());
             }
         }
@@ -145,7 +141,7 @@ class CreatePurchaseOrderPdf implements ShouldQueue
         $design = Design::withTrashed()->find($entity_design_id);
 
         /* Catch all in case migration doesn't pass back a valid design */
-        if (!$design) {
+        if (! $design) {
             /** @var \App\Models\Design $design */
             $design = Design::find(2);
         }
@@ -154,8 +150,8 @@ class CreatePurchaseOrderPdf implements ShouldQueue
 
         if ($design->is_custom) {
             $options = [
-            'custom_partials' => json_decode(json_encode($design->design), true)
-          ];
+                'custom_partials' => json_decode(json_encode($design->design), true),
+            ];
             $template = new PdfMakerDesign(PdfDesignModel::CUSTOM, $options);
         } else {
             $template = new PdfMakerDesign(strtolower($design->name));

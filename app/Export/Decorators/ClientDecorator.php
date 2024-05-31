@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,15 +20,15 @@ class ClientDecorator extends Decorator implements DecoratorInterface
     {
         $client = false;
 
-        if($entity instanceof Client) {
+        if ($entity instanceof Client) {
             $client = $entity;
-        } elseif($entity->client) {
+        } elseif ($entity->client) {
             $client = $entity->client;
         }
 
-        if($client && method_exists($this, $key)) {
+        if ($client && method_exists($this, $key)) {
             return $this->{$key}($client);
-        } elseif($client && ($client->{$key} ?? false)) {
+        } elseif ($client && ($client->{$key} ?? false)) {
             return $client->{$key};
         }
 
@@ -58,7 +57,7 @@ class ClientDecorator extends Decorator implements DecoratorInterface
 
     public function private_notes(Client $client)
     {
-        return strip_tags($client->private_notes  ?? '');
+        return strip_tags($client->private_notes ?? '');
     }
 
     public function industry_id(Client $client)
@@ -108,5 +107,4 @@ class ClientDecorator extends Decorator implements DecoratorInterface
 
         return ctrans('texts.active');
     }
-
 }

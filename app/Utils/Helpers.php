@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,7 +22,7 @@ class Helpers
 {
     use MakesDates;
 
-    public static function sharedEmailVariables(?Client $client, array $settings = null): array
+    public static function sharedEmailVariables(?Client $client, ?array $settings = null): array
     {
         if (! $client) {
             $elements['signature'] = '';
@@ -47,19 +46,17 @@ class Helpers
     /**
      * A centralised method to format the custom fields content.
      *
-     * @param mixed|null $custom_fields
-     * @param mixed $field
-     * @param mixed $value
-     * @param \App\Models\Client|null $entity
-     *
-     * @return null|string
+     * @param  mixed|null  $custom_fields
+     * @param  mixed  $field
+     * @param  mixed  $value
+     * @param  \App\Models\Client|null  $entity
      */
     public function formatCustomFieldValue($custom_fields, $field, $value, $entity = null): ?string
     {
         $custom_field = '';
         $quote_or_credit_field = false;
 
-        if($custom_fields && stripos($field, 'quote') !== false && property_exists($custom_fields, $field)) {
+        if ($custom_fields && stripos($field, 'quote') !== false && property_exists($custom_fields, $field)) {
             $custom_field = $custom_fields->{$field};
             $custom_field_parts = explode('|', $custom_field);
 
@@ -69,7 +66,7 @@ class Helpers
 
             $quote_or_credit_field = true;
 
-        } elseif($custom_fields && stripos($field, 'credit') !== false && property_exists($custom_fields, $field)) {
+        } elseif ($custom_fields && stripos($field, 'credit') !== false && property_exists($custom_fields, $field)) {
             $custom_field = $custom_fields->{$field};
             $custom_field_parts = explode('|', $custom_field);
 
@@ -79,13 +76,13 @@ class Helpers
 
             $quote_or_credit_field = true;
 
-        } elseif($custom_fields && stripos($field, 'credit') !== false) {
-            $field = str_replace("credit", "invoice", $field);
-        } elseif($custom_fields && stripos($field, 'quote') !== false) {
-            $field = str_replace("quote", "invoice", $field);
+        } elseif ($custom_fields && stripos($field, 'credit') !== false) {
+            $field = str_replace('credit', 'invoice', $field);
+        } elseif ($custom_fields && stripos($field, 'quote') !== false) {
+            $field = str_replace('quote', 'invoice', $field);
         }
 
-        if (!$quote_or_credit_field && $custom_fields && property_exists($custom_fields, $field)) {
+        if (! $quote_or_credit_field && $custom_fields && property_exists($custom_fields, $field)) {
             $custom_field = $custom_fields->{$field};
             $custom_field_parts = explode('|', $custom_field);
 
@@ -111,10 +108,9 @@ class Helpers
 
     /**
      * A centralised method to make custom field.
-     * @param mixed|null $custom_fields
-     * @param mixed $field
      *
-     * @return string
+     * @param  mixed|null  $custom_fields
+     * @param  mixed  $field
      */
     public function makeCustomField($custom_fields, $field): string
     {
@@ -127,7 +123,7 @@ class Helpers
             return $custom_field_parts[0];
         }
 
-        $field = str_replace(["quote","credit"], ["invoice", "invoice"], $field);
+        $field = str_replace(['quote', 'credit'], ['invoice', 'invoice'], $field);
 
         if ($custom_fields && property_exists($custom_fields, $field)) {
             $custom_field = $custom_fields->{$field};
@@ -143,10 +139,8 @@ class Helpers
     /**
      * Process reserved keywords on PDF.
      *
-     * @param string $value
-     * @param \App\Models\Client|\App\Models\Company|\App\Models\Vendor $entity
-     * @param null|Carbon $currentDateTime
-     * @return null|string
+     * @param  \App\Models\Client|\App\Models\Company|\App\Models\Vendor  $entity
+     * @param  null|Carbon  $currentDateTime
      */
     public static function processReservedKeywords(?string $value, $entity, $currentDateTime = null): ?string
     {
@@ -157,20 +151,20 @@ class Helpers
         // 04-10-2022 Return Early if no reserved keywords are present, this is a very expensive process
         $string_hit = false;
 
-        foreach ([':MONTH',':YEAR',':QUARTER',':WEEK'] as $string) {
+        foreach ([':MONTH', ':YEAR', ':QUARTER', ':WEEK'] as $string) {
             if (stripos($value, $string) !== false) {
                 $string_hit = true;
             }
         }
 
-        if (!$string_hit) {
+        if (! $string_hit) {
             return $value;
         }
 
         // 04-10-2022 Return Early if no reserved keywords are present, this is a very expensive process
         Carbon::setLocale($entity->locale());
 
-        if (!$currentDateTime) {
+        if (! $currentDateTime) {
             $currentDateTime = Carbon::now()->timezone($entity->timezone()->name);
         }
 
@@ -267,12 +261,12 @@ class Helpers
                 $_right = '';
 
                 // If right side doesn't have any calculations, replace with raw ranges keyword.
-                if (! Str::contains(str_replace("</", "", $right), ['-', '+', '/', '*'])) {
+                if (! Str::contains(str_replace('</', '', $right), ['-', '+', '/', '*'])) {
                     $_right = Carbon::createFromDate($currentDateTime->year, $currentDateTime->month)->translatedFormat('F Y');
                 }
 
                 // If right side contains one of math operations, calculate.
-                if (Str::contains(str_replace("</", "", $right), ['+'])) {
+                if (Str::contains(str_replace('</', '', $right), ['+'])) {
                     $operation = preg_match_all('/(?!^-)[+*\/-](\s?-)?/', $right, $_matches);
 
                     $_operation = array_shift($_matches)[0]; // + -
@@ -307,7 +301,7 @@ class Helpers
                 continue;
             }
 
-            if (! Str::contains(str_replace("</", "", $match), ['-', '+', '/', '*'])) {
+            if (! Str::contains(str_replace('</', '', $match), ['-', '+', '/', '*'])) {
                 $value = preg_replace(
                     sprintf('/%s/', $matches->keys()->first()),
                     $replacements['literal'][$matches->keys()->first()],
@@ -316,7 +310,7 @@ class Helpers
                 );
             }
 
-            if (Str::contains(str_replace("</", "", $match), ['-', '+', '/', '*'])) {
+            if (Str::contains(str_replace('</', '', $match), ['-', '+', '/', '*'])) {
                 $operation = preg_match_all('/(?!^-)[+*\/-](\s?-)?/', $match, $_matches);
 
                 $_operation = array_shift($_matches)[0];
@@ -375,9 +369,6 @@ class Helpers
 
     /**
      * Resolve the font from the supported fonts array.
-     *
-     * @param string $font
-     * @return array
      */
     public static function resolveFont(string $font = 'Arial'): array
     {

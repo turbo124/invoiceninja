@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,8 +18,8 @@ trait NumberFormatter
     /**
      * Undocumented function
      *
-     * @param float $value
-     * @param int $precision
+     * @param  float  $value
+     * @param  int  $precision
      * @return string|float
      */
     private function formatValue($value, $precision)
@@ -33,8 +32,8 @@ trait NumberFormatter
     /**
      * Parse a float value that may be delimited with either a comma or decimal point.
      *
-     * @param      string $value  The value
-     * @return     float   Consumable float value
+     * @param  string  $value  The value
+     * @return float Consumable float value
      */
     private function parseFloat($value): float
     {

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,10 +26,10 @@ class UpdateAutoBilling extends Component
             $this->invoice->saveQuietly();
 
             Invoice::where('recurring_id', $this->invoice->id)
-                        ->whereIn('status_id', [2,3])
-                        ->where('is_deleted', 0)
-                        ->where('balance', '>', 0)
-                        ->update(['auto_bill_enabled' => $this->invoice->auto_bill_enabled]);
+                ->whereIn('status_id', [2, 3])
+                ->where('is_deleted', 0)
+                ->where('balance', '>', 0)
+                ->update(['auto_bill_enabled' => $this->invoice->auto_bill_enabled]);
         }
     }
 

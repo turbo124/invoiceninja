@@ -32,7 +32,6 @@ class CreditCard
     /**
      * Show the page for credit card payments.
      *
-     * @param array $data
      * @return Factory|View
      */
     public function paymentView(array $data)
@@ -45,7 +44,6 @@ class CreditCard
     /**
      * Create a payment object.
      *
-     * @param PaymentResponseRequest $request
      * @return mixed
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -71,7 +69,7 @@ class CreditCard
                     'customerId' => $cgt->gateway_customer_reference,
                     'sequenceType' => 'recurring',
                     'description' => $description,
-                    'webhookUrl'  => $this->mollie->company_gateway->webhookUrl(),
+                    'webhookUrl' => $this->mollie->company_gateway->webhookUrl(),
                     // 'idempotencyKey' => uniqid("st", true),
                     'metadata' => [
                         'client_id' => $this->mollie->client->hashed_id,
@@ -93,7 +91,7 @@ class CreditCard
                 if ($payment->status === 'open') {
                     $this->mollie->payment_hash->withData('payment_id', $payment->id);
 
-                    if (!$payment->getCheckoutUrl()) {
+                    if (! $payment->getCheckoutUrl()) {
                         return render('gateways.mollie.mollie_placeholder');
                     } else {
                         return redirect()->away($payment->getCheckoutUrl());
@@ -117,7 +115,7 @@ class CreditCard
                     'company_gateway_id' => $this->mollie->company_gateway->hashed_id,
                     'hash' => $this->mollie->payment_hash->hash,
                 ]),
-                'webhookUrl'  => $this->mollie->company_gateway->webhookUrl(),
+                'webhookUrl' => $this->mollie->company_gateway->webhookUrl(),
                 'metadata' => [
                     'client_id' => $this->mollie->client->hashed_id,
                     'hash' => $this->mollie->payment_hash->hash,
@@ -158,10 +156,10 @@ class CreditCard
             if ($payment->status === 'open') {
                 $this->mollie->payment_hash->withData('payment_id', $payment->id);
 
-                nlog("Mollie");
+                nlog('Mollie');
                 nlog($payment);
 
-                if (!$payment->getCheckoutUrl()) {
+                if (! $payment->getCheckoutUrl()) {
                     return render('gateways.mollie.mollie_placeholder');
                 } else {
                     return redirect()->away($payment->getCheckoutUrl());
@@ -195,7 +193,7 @@ class CreditCard
             $this->mollie->storeGatewayToken([
                 'token' => $mandates[0]->id,
                 'payment_method_id' => GatewayType::CREDIT_CARD,
-                'payment_meta' =>  $payment_meta,
+                'payment_meta' => $payment_meta,
             ], ['gateway_customer_reference' => $payment_hash->data->mollieCustomerId]);
         }
 
@@ -239,7 +237,6 @@ class CreditCard
     /**
      * Show authorization page.
      *
-     * @param array $data
      * @return Factory|View
      */
     public function authorizeView(array $data)
@@ -250,8 +247,7 @@ class CreditCard
     /**
      * Handle authorization response.
      *
-     * @param mixed $request
-     * @return RedirectResponse
+     * @param  mixed  $request
      */
     public function authorizeResponse($request): RedirectResponse
     {

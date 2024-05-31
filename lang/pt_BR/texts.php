@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Empresa',
     'name' => 'Nome',
     'website' => 'Website',
@@ -1173,7 +1173,6 @@ $lang = array(
     'enterprise_plan_features' => 'O Plano Empresarial adiciona suporte para vários usuários e anexos de arquivos, :link para ver a lista completa de recursos.',
     'return_to_app' => 'Voltar ao App',
 
-
     // Payment updates
     'refund_payment' => 'Reembolsar Pagamento',
     'refund_max' => 'Máx:',
@@ -1702,7 +1701,6 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'lang_Serbian' => 'Sérvia',
     'lang_Bulgarian' => 'Búlgaro ',
     'lang_Russian (Russia)' => 'Russo',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Contabilidade & Jurídico',
@@ -2361,7 +2359,7 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'currency_gold_troy_ounce' => 'Onça Troy de Ouro',
     'currency_nicaraguan_córdoba' => 'Córdoba Nicaraguense',
     'currency_malagasy_ariary' => 'Ariário malgaxe',
-    "currency_tongan_pa_anga" => "Pa&#39;anga de Tonga",
+    'currency_tongan_pa_anga' => 'Pa&#39;anga de Tonga',
 
     'review_app_help' => 'Esperamos que esteja aproveitando o app. <br/>Se você considerar :link agradeceríamos bastante!',
     'writing_a_review' => 'Escrevendo uma avaliação',
@@ -4423,7 +4421,7 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'activity_122' => ':user despesa recorrente arquivada :recurring_expense',
     'activity_123' => ':user excluiu despesa recorrente :recurring_expense',
     'activity_124' => ':user despesa recorrente restaurada :recurring_expense',
-    'fpx' => "FPS",
+    'fpx' => 'FPS',
     'to_view_entity_set_password' => 'Para visualizar o :entity você precisa definir uma senha.',
     'unsubscribe' => 'Cancelar subscrição',
     'unsubscribed' => 'Inscrição cancelada',
@@ -4927,7 +4925,7 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Transferência Interac E',
     'xinvoice_payable' => 'A pagar dentro de :payeddue dias líquidos até :paydate',
-    'xinvoice_no_buyers_reference' => "Nenhuma referência do comprador fornecida",
+    'xinvoice_no_buyers_reference' => 'Nenhuma referência do comprador fornecida',
     'xinvoice_online_payment' => 'A fatura precisa ser paga on-line através do link fornecido',
     'pre_payment' => 'Pré-pagamento',
     'number_of_payments' => 'Número de pagamentos',
@@ -5032,8 +5030,8 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'e_invoice' => 'Fatura eletrônica',
     'light_dark_mode' => 'Modo claro/escuro',
     'activities' => 'Atividades',
-    'recent_transactions' => "Aqui estão as transações mais recentes da sua empresa:",
-    'country_Palestine' => "Palestina",
+    'recent_transactions' => 'Aqui estão as transações mais recentes da sua empresa:',
+    'country_Palestine' => 'Palestina',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Obrigações',
     'order_number' => 'Número do pedido',
@@ -5248,7 +5246,7 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'rff' => 'Formulário de campos obrigatórios',
     'add_step' => 'Adicionar etapa',
     'steps' => 'Passos',
-    'steps_order_help' =>  'A ordem das etapas é importante. O primeiro passo não deve depender de nenhum outro passo. A segunda etapa deve depender da primeira etapa e assim por diante.',
+    'steps_order_help' => 'A ordem das etapas é importante. O primeiro passo não deve depender de nenhum outro passo. A segunda etapa deve depender da primeira etapa e assim por diante.',
     'other_steps' => 'Outras etapas',
     'use_available_payments' => 'Use pagamentos disponíveis',
     'test_email_sent' => 'E-mail enviado com sucesso',
@@ -5297,6 +5295,6 @@ Quando tiver as quantias, volte a esta página de formas de pagamento e clique "
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

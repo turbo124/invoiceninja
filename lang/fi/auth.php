@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'failed'   => 'Kirjautuminen epäonnistui.',
+    'failed' => 'Kirjautuminen epäonnistui.',
     'throttle' => 'Liian monta kirjautumisyritystä. Yritä uudelleen :seconds sekunnin kuluttua.',
 
 ];

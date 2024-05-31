@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -47,9 +46,10 @@ class CreditService
     {
         return $this->getECredit($contact);
     }
-    
+
     /**
      * Applies the invoice number.
+     *
      * @return $this InvoiceService object
      */
     public function applyNumber()
@@ -116,9 +116,9 @@ class CreditService
         $adjustment = $this->credit->balance;
 
         $this->updateBalance($adjustment)
-             ->updatePaidToDate($adjustment)
-             ->setStatus(Credit::STATUS_APPLIED)
-             ->save();
+            ->updatePaidToDate($adjustment)
+            ->setStatus(Credit::STATUS_APPLIED)
+            ->save();
 
         //create a negative payment of total $this->credit->balance
         $payment = PaymentFactory::create($this->credit->company_id, $this->credit->user_id);
@@ -138,14 +138,14 @@ class CreditService
         $payment->saveQuietly();
 
         $payment
-             ->credits()
-             ->attach($this->credit->id, ['amount' => $adjustment]);
+            ->credits()
+            ->attach($this->credit->id, ['amount' => $adjustment]);
 
         $client = $this->credit->client->fresh();
         $client->service()
-                ->updatePaidToDate($adjustment)
-                ->adjustCreditBalance($adjustment * -1)
-                ->save();
+            ->updatePaidToDate($adjustment)
+            ->adjustCreditBalance($adjustment * -1)
+            ->save();
 
         event('eloquent.created: App\Models\Payment', $payment);
 
@@ -236,8 +236,6 @@ class CreditService
                 nlog($e->getMessage());
             }
 
-
-
         });
 
         return $this;
@@ -250,12 +248,12 @@ class CreditService
         $this->credit->invitations->each(function ($invitation) {
             try {
                 // if (Storage::disk(config('filesystems.default'))->exists($this->invoice->client->e_invoice_filepath($invitation).$this->invoice->getFileName("xml"))) {
-                Storage::disk(config('filesystems.default'))->delete($this->credit->client->e_document_filepath($invitation).$this->credit->getFileName("xml"));
+                Storage::disk(config('filesystems.default'))->delete($this->credit->client->e_document_filepath($invitation).$this->credit->getFileName('xml'));
                 // }
 
                 // if (Ninja::isHosted() && Storage::disk('public')->exists($this->invoice->client->e_invoice_filepath($invitation).$this->invoice->getFileName("xml"))) {
                 if (Ninja::isHosted()) {
-                    Storage::disk('public')->delete($this->credit->client->e_document_filepath($invitation).$this->credit->getFileName("xml"));
+                    Storage::disk('public')->delete($this->credit->client->e_document_filepath($invitation).$this->credit->getFileName('xml'));
                 }
             } catch (\Exception $e) {
                 nlog($e->getMessage());
@@ -264,6 +262,7 @@ class CreditService
 
         return $this;
     }
+
     public function triggeredActions($request)
     {
         $this->credit = (new TriggeredActions($this->credit, $request))->run();
@@ -274,28 +273,28 @@ class CreditService
     public function deleteCredit()
     {
         $this->credit
-             ->client
-             ->service()
-             ->adjustCreditBalance($this->credit->balance * -1)
-             ->save();
+            ->client
+            ->service()
+            ->adjustCreditBalance($this->credit->balance * -1)
+            ->save();
 
         return $this;
     }
 
-
     public function restoreCredit()
     {
         $this->credit
-             ->client
-             ->service()
-             ->adjustCreditBalance($this->credit->balance)
-             ->save();
+            ->client
+            ->service()
+            ->adjustCreditBalance($this->credit->balance)
+            ->save();
 
         return $this;
     }
 
     /**
      * Saves the credit.
+     *
      * @return Credit object
      */
     public function save(): ?Credit

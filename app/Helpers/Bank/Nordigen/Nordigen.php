@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  *
  * Documentation of Api-Usage: https://developer.gocardless.com/bank-account-data/overview
@@ -19,20 +18,20 @@
 
 namespace App\Helpers\Bank\Nordigen;
 
-use App\Models\Company;
-use App\Services\Email\Email;
-use App\Models\BankIntegration;
-use App\Services\Email\EmailObject;
-use Illuminate\Support\Facades\App;
 use App\Helpers\Bank\Nordigen\Transformer\AccountTransformer;
 use App\Helpers\Bank\Nordigen\Transformer\TransactionTransformer;
+use App\Models\BankIntegration;
+use App\Models\Company;
+use App\Services\Email\Email;
+use App\Services\Email\EmailObject;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Support\Facades\App;
 
 class Nordigen
 {
     public bool $test_mode; // https://developer.gocardless.com/bank-account-data/sandbox
 
-    public string $sandbox_institutionId = "SANDBOXFINANCE_SFIN0000";
+    public string $sandbox_institutionId = 'SANDBOXFINANCE_SFIN0000';
 
     protected \Nordigen\NordigenPHP\API\NordigenClient $client;
 
@@ -40,7 +39,7 @@ class Nordigen
     {
         $this->test_mode = config('ninja.nordigen.test_mode');
 
-        if (!(config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key'))) {
+        if (! (config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key'))) {
             throw new \Exception('missing nordigen credentials');
         }
 
@@ -74,7 +73,7 @@ class Nordigen
         try {
             return $this->client->requisition->getRequisition($requisitionId);
         } catch (\Exception $e) {
-            if (strpos($e->getMessage(), "Invalid Requisition ID") !== false) {
+            if (strpos($e->getMessage(), 'Invalid Requisition ID') !== false) {
                 return false;
             }
 
@@ -88,18 +87,19 @@ class Nordigen
         try {
             $out = new \stdClass();
 
-            $out->data = $this->client->account($account_id)->getAccountDetails()["account"];
+            $out->data = $this->client->account($account_id)->getAccountDetails()['account'];
             $out->metadata = $this->client->account($account_id)->getAccountMetaData();
-            $out->balances = $this->client->account($account_id)->getAccountBalances()["balances"];
-            $out->institution = $this->client->institution->getInstitution($out->metadata["institution_id"]);
+            $out->balances = $this->client->account($account_id)->getAccountBalances()['balances'];
+            $out->institution = $this->client->institution->getInstitution($out->metadata['institution_id']);
 
             $it = new AccountTransformer();
+
             return $it->transform($out);
 
         } catch (\Exception $e) {
 
-            nlog("Nordigen getAccount() failed => {$account_id} => " . $e->getMessage());
-            
+            nlog("Nordigen getAccount() failed => {$account_id} => ".$e->getMessage());
+
             return false;
 
         }
@@ -107,23 +107,21 @@ class Nordigen
 
     /**
      * isAccountActive
-     *
-     * @param  string $account_id
-     * @return bool
      */
     public function isAccountActive(string $account_id): bool
     {
         try {
             $account = $this->client->account($account_id)->getAccountMetaData();
 
-            if ($account["status"] != "READY") {
-                nlog('nordigen account was not in status ready. accountId: ' . $account_id . ' status: ' . $account["status"]);
+            if ($account['status'] != 'READY') {
+                nlog('nordigen account was not in status ready. accountId: '.$account_id.' status: '.$account['status']);
+
                 return false;
             }
 
             return true;
         } catch (\Exception $e) {
-            if (strpos($e->getMessage(), "Invalid Account ID") !== false) {
+            if (strpos($e->getMessage(), 'Invalid Account ID') !== false) {
                 return false;
             }
 
@@ -131,19 +129,15 @@ class Nordigen
         }
     }
 
-
     /**
      * getTransactions
-     *
-     * @param  string $accountId
-     * @param  string $dateFrom
-     * @return array
      */
-    public function getTransactions(Company $company, string $accountId, string $dateFrom = null): array
+    public function getTransactions(Company $company, string $accountId, ?string $dateFrom = null): array
     {
         $transactionResponse = $this->client->account($accountId)->getAccountTransactions($dateFrom);
 
         $it = new TransactionTransformer($company);
+
         return $it->transform($transactionResponse);
     }
 
@@ -164,7 +158,5 @@ class Nordigen
 
         Email::dispatch($mo, $bank_integration->company);
 
-
     }
-
 }

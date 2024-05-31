@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,9 +40,6 @@ class SubscriptionPlanSwitch extends Component
      */
     public $target;
 
-    /**
-     * @var ClientContact
-     */
     public ClientContact $contact;
 
     /**
@@ -57,6 +53,7 @@ class SubscriptionPlanSwitch extends Component
     public $total;
 
     public $hide_button = false;
+
     /**
      * @var array
      */
@@ -140,13 +137,13 @@ class SubscriptionPlanSwitch extends Component
             Cache::put(
                 $this->hash,
                 [
-                'subscription_id' => $this->target->hashed_id,
-                'target_id' => $this->target->hashed_id,
-                'recurring_invoice' => $this->recurring_invoice->hashed_id,
-                'client_id' => $this->recurring_invoice->client->hashed_id,
-                'invoice_id' => $this->state['invoice']->hashed_id,
-                'context' => 'change_plan',
-                now()->addMinutes(60), ]
+                    'subscription_id' => $this->target->hashed_id,
+                    'target_id' => $this->target->hashed_id,
+                    'recurring_invoice' => $this->recurring_invoice->hashed_id,
+                    'client_id' => $this->recurring_invoice->client->hashed_id,
+                    'invoice_id' => $this->state['invoice']->hashed_id,
+                    'context' => 'change_plan',
+                    now()->addMinutes(60), ]
             );
 
             $this->state['payment_initialised'] = true;
@@ -160,9 +157,6 @@ class SubscriptionPlanSwitch extends Component
     /**
      * Middle method between selecting payment method &
      * submitting the from to the backend.
-     *
-     * @param $company_gateway_id
-     * @param $gateway_type_id
      */
     public function handleMethodSelectingEvent($company_gateway_id, $gateway_type_id)
     {
@@ -176,7 +170,7 @@ class SubscriptionPlanSwitch extends Component
     {
         $this->hide_button = true;
 
-        $response =  $this->target->service()->createChangePlanCreditV2([
+        $response = $this->target->service()->createChangePlanCreditV2([
             'recurring_invoice' => $this->recurring_invoice,
             'subscription' => $this->subscription,
             'target' => $this->target,

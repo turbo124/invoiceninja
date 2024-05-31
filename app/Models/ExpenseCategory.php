@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $bank_category_id
  * @property-read \App\Models\Expense|null $expense
  * @property-read mixed $hashed_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\ExpenseCategoryFactory factory($count = null, $state = [])
@@ -50,12 +50,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|ExpenseCategory whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ExpenseCategory withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ExpenseCategory withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class ExpenseCategory extends BaseModel
 {
-    use SoftDeletes;
     use Filterable;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,9 +33,6 @@ class ActivityTransformer extends EntityTransformer
 
     protected array $defaultIncludes = [];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'history',
         'user',
@@ -55,8 +51,6 @@ class ActivityTransformer extends EntityTransformer
     ];
 
     /**
-     * @param Activity $activity
-     *
      * @return array
      */
     public function transform(Activity $activity)
@@ -99,7 +93,7 @@ class ActivityTransformer extends EntityTransformer
     public function includeClient(Activity $activity)
     {
 
-        if (!$activity->client) {
+        if (! $activity->client) {
             return null;
         }
 
@@ -110,7 +104,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includeVendor(Activity $activity)
     {
-        if (!$activity->vendor) {
+        if (! $activity->vendor) {
             return null;
         }
 
@@ -122,7 +116,7 @@ class ActivityTransformer extends EntityTransformer
     public function includeContact(Activity $activity)
     {
 
-        if (!$activity->contact) {
+        if (! $activity->contact) {
             return null;
         }
 
@@ -134,7 +128,7 @@ class ActivityTransformer extends EntityTransformer
     public function includeVendorContact(Activity $activity)
     {
 
-        if (!$activity->vendor_contact) {
+        if (! $activity->vendor_contact) {
             return null;
         }
 
@@ -146,7 +140,7 @@ class ActivityTransformer extends EntityTransformer
     public function includeRecurringInvoice(Activity $activity)
     {
 
-        if (!$activity->recurring_invoice) {
+        if (! $activity->recurring_invoice) {
             return null;
         }
 
@@ -158,7 +152,7 @@ class ActivityTransformer extends EntityTransformer
     public function includePurchaseOrder(Activity $activity)
     {
 
-        if (!$activity->purchase_order) {
+        if (! $activity->purchase_order) {
             return null;
         }
 
@@ -167,11 +161,10 @@ class ActivityTransformer extends EntityTransformer
         return $this->includeItem($activity->purchase_order, $transformer, PurchaseOrder::class);
     }
 
-
     public function includeQuote(Activity $activity)
     {
 
-        if (!$activity->quote) {
+        if (! $activity->quote) {
             return null;
         }
 
@@ -182,7 +175,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includeInvoice(Activity $activity)
     {
-        if (!$activity->invoice) {
+        if (! $activity->invoice) {
             return null;
         }
 
@@ -193,7 +186,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includeCredit(Activity $activity)
     {
-        if (!$activity->credit) {
+        if (! $activity->credit) {
             return null;
         }
 
@@ -204,7 +197,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includePayment(Activity $activity)
     {
-        if (!$activity->payment) {
+        if (! $activity->payment) {
             return null;
         }
 
@@ -215,7 +208,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includeUser(Activity $activity)
     {
-        if (!$activity->user) {
+        if (! $activity->user) {
             return null;
         }
 
@@ -226,7 +219,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includeExpense(Activity $activity)
     {
-        if (!$activity->expense) {
+        if (! $activity->expense) {
             return null;
         }
 
@@ -237,7 +230,7 @@ class ActivityTransformer extends EntityTransformer
 
     public function includeTask(Activity $activity)
     {
-        if (!$activity->task) {
+        if (! $activity->task) {
             return null;
         }
 

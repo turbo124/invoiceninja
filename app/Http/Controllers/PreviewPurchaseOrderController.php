@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,7 +44,6 @@ class PreviewPurchaseOrderController extends BaseController
     use MakesInvoiceHtml;
     use PageNumbering;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -62,23 +60,30 @@ class PreviewPurchaseOrderController extends BaseController
      *      tags={"preview"},
      *      summary="Returns a pdf preview for purchase order",
      *      description="Returns a pdf preview for purchase order.",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The pdf response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -125,8 +130,8 @@ class PreviewPurchaseOrderController extends BaseController
                 'process_markdown' => $entity_obj->company->markdown_enabled,
                 'options' => [
                     'vendor' => $entity_obj->vendor ?? [],
-                    request()->input('entity')."s" => [$entity_obj],
-                ]
+                    request()->input('entity').'s' => [$entity_obj],
+                ],
             ];
 
             $design = new Design(request()->design['name']);
@@ -183,10 +188,10 @@ class PreviewPurchaseOrderController extends BaseController
         $entity_obj = $invitation->purchase_order;
         $entity_obj->fill($request->all());
 
-        if(!$entity_obj->id) {
-            $entity_obj->design_id = intval($this->decodePrimaryKey($settings->{"purchase_order_design_id"}));
-            $entity_obj->footer = empty($entity_obj->footer) ? $settings->{"purchase_order_footer"} : $entity_obj->footer;
-            $entity_obj->terms = empty($entity_obj->terms) ? $settings->{"purchase_order_terms"} : $entity_obj->terms;
+        if (! $entity_obj->id) {
+            $entity_obj->design_id = intval($this->decodePrimaryKey($settings->{'purchase_order_design_id'}));
+            $entity_obj->footer = empty($entity_obj->footer) ? $settings->{'purchase_order_footer'} : $entity_obj->footer;
+            $entity_obj->terms = empty($entity_obj->terms) ? $settings->{'purchase_order_terms'} : $entity_obj->terms;
             $entity_obj->public_notes = empty($entity_obj->public_notes) ? $request->getVendor()->public_notes : $entity_obj->public_notes;
             $invitation->setRelation($request->entity, $entity_obj);
 
@@ -195,15 +200,15 @@ class PreviewPurchaseOrderController extends BaseController
         $ps = new PdfService($invitation, 'purchase_order', [
             'client' => $entity_obj->client ?? false,
             'vendor' => $vendor ?? false,
-            "purchase_orders" => [$entity_obj],
+            'purchase_orders' => [$entity_obj],
         ]);
 
         $pdf = $ps->boot()->getPdf();
 
         if (Ninja::isHosted()) {
             LightLogs::create(new LivePreview())
-                        ->increment()
-                        ->batch();
+                ->increment()
+                ->batch();
         }
 
         /** Return PDF */
@@ -213,9 +218,8 @@ class PreviewPurchaseOrderController extends BaseController
             'Content-Disposition' => 'inline',
             'Content-Type' => 'application/pdf',
             'Cache-Control:' => 'no-cache',
-            'Server-Timing' => microtime(true) - $start
+            'Server-Timing' => microtime(true) - $start,
         ]);
-
 
     }
 
@@ -240,18 +244,18 @@ class PreviewPurchaseOrderController extends BaseController
             DB::connection(config('database.default'))->beginTransaction();
 
             if ($request->has('entity_id')) {
-                /** @var \App\Models\PurchaseOrder|\Illuminate\Contracts\Database\Eloquent\Builder $entity_obj **/
+                /** @var \App\Models\PurchaseOrder|\Illuminate\Contracts\Database\Eloquent\Builder $entity_obj * */
                 $entity_obj = \App\Models\PurchaseOrder::on(config('database.default'))
-                                    ->with('vendor.company')
-                                    ->where('id', $this->decodePrimaryKey($request->input('entity_id')))
-                                    ->where('company_id', $company->id)
-                                    ->withTrashed()
-                                    ->first();
+                    ->with('vendor.company')
+                    ->where('id', $this->decodePrimaryKey($request->input('entity_id')))
+                    ->where('company_id', $company->id)
+                    ->withTrashed()
+                    ->first();
             }
 
             $entity_obj = $repo->save($request->all(), $entity_obj);
 
-            if (!$request->has('entity_id')) {
+            if (! $request->has('entity_id')) {
                 $entity_obj->service()->fillDefaults()->save();
             }
 
@@ -266,14 +270,14 @@ class PreviewPurchaseOrderController extends BaseController
             $design = \App\Models\Design::withTrashed()->find($entity_obj->design_id);
 
             /* Catch all in case migration doesn't pass back a valid design */
-            if (!$design) {
+            if (! $design) {
                 $design = \App\Models\Design::find(2);
             }
 
             if ($design->is_custom) {
                 $options = [
-                'custom_partials' => json_decode(json_encode($design->design), true)
-              ];
+                    'custom_partials' => json_decode(json_encode($design->design), true),
+                ];
                 $template = new PdfMakerDesign(PdfDesignModel::CUSTOM, $options);
             } else {
                 $template = new PdfMakerDesign(strtolower($design->name));
@@ -311,8 +315,9 @@ class PreviewPurchaseOrderController extends BaseController
             if (request()->query('html') == 'true') {
                 return $maker->getCompiledHTML();
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::connection(config('database.default'))->rollBack();
+
             return;
         }
 
@@ -338,13 +343,11 @@ class PreviewPurchaseOrderController extends BaseController
 
         $file_path = (new PreviewPdf($maker->getCompiledHTML(true), $company))->handle();
 
-
         if (Ninja::isHosted()) {
             LightLogs::create(new LivePreview())
-                     ->increment()
-                     ->batch();
+                ->increment()
+                ->batch();
         }
-
 
         $response = Response::make($file_path, 200);
         $response->header('Content-Type', 'application/pdf');
@@ -365,7 +368,7 @@ class PreviewPurchaseOrderController extends BaseController
         $invitation = PurchaseOrderInvitation::where('company_id', $user->company()->id)->orderBy('id', 'desc')->first();
 
         /* If we don't have a valid invitation in the system - create a mock using transactions */
-        if (!$invitation) {
+        if (! $invitation) {
             return $this->mockEntity();
         }
 
@@ -395,7 +398,6 @@ class PreviewPurchaseOrderController extends BaseController
             ],
         ];
 
-
         $maker = new PdfMaker($state);
 
         $maker
@@ -414,7 +416,7 @@ class PreviewPurchaseOrderController extends BaseController
         $user = auth()->user();
 
         if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
-            $pdf =  (new NinjaPdf())->build($maker->getCompiledHTML(true));
+            $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
 
             $numbered_pdf = $this->pageNumbering($pdf, $user->company());
 
@@ -442,35 +444,35 @@ class PreviewPurchaseOrderController extends BaseController
 
         /** @var \App\Models\Vendor $vendor */
         $vendor = Vendor::factory()->create([
-                'user_id' => $user->id,
-                'company_id' => $user->company()->id,
-            ]);
+            'user_id' => $user->id,
+            'company_id' => $user->company()->id,
+        ]);
 
         /** @var \App\Models\VendorContact $contact */
         $contact = VendorContact::factory()->create([
-                'user_id' => $user->id,
-                'company_id' => $user->company()->id,
-                'vendor_id' => $vendor->id,
-                'is_primary' => 1,
-                'send_email' => true,
-            ]);
+            'user_id' => $user->id,
+            'company_id' => $user->company()->id,
+            'vendor_id' => $vendor->id,
+            'is_primary' => 1,
+            'send_email' => true,
+        ]);
 
         /** @var \App\Models\PurchaseOrder $purchase_order */
         $purchase_order = PurchaseOrder::factory()->create([
-                    'user_id' => $user->id,
-                    'company_id' => $user->company()->id,
-                    'vendor_id' => $vendor->id,
-                    'terms' => 'Sample Terms',
-                    'footer' => 'Sample Footer',
-                    'public_notes' => 'Sample Public Notes',
-                ]);
+            'user_id' => $user->id,
+            'company_id' => $user->company()->id,
+            'vendor_id' => $vendor->id,
+            'terms' => 'Sample Terms',
+            'footer' => 'Sample Footer',
+            'public_notes' => 'Sample Public Notes',
+        ]);
 
         /** @var \App\Models\PurchaseOrderInvitation $invitation */
         $invitation = PurchaseOrderInvitation::factory()->create([
-                    'user_id' => $user->id,
-                    'company_id' => $user->company()->id,
-                    'purchase_order_id' => $purchase_order->id,
-                    'vendor_contact_id' => $contact->id,
+            'user_id' => $user->id,
+            'company_id' => $user->company()->id,
+            'purchase_order_id' => $purchase_order->id,
+            'vendor_contact_id' => $contact->id,
         ]);
 
         $purchase_order->setRelation('invitations', $invitation);
@@ -498,7 +500,7 @@ class PreviewPurchaseOrderController extends BaseController
             ]),
             'variables' => $html->generateLabelsAndValues(),
             'process_markdown' => $purchase_order->company->markdown_enabled,
-             'options' => [
+            'options' => [
                 'vendor' => $invitation->purchase_order->vendor,
                 'purchase_orders' => [$invitation->purchase_order],
             ],

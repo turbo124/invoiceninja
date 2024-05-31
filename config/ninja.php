@@ -41,7 +41,7 @@ return [
     'trusted_proxies' => env('TRUSTED_PROXIES', false),
     'is_docker' => env('IS_DOCKER', false),
     'local_download' => env('LOCAL_DOWNLOAD', false),
-    'sentry_dsn' => env('SENTRY_LARAVEL_DSN', "https://39389664f3f14969b4c43dadda00a40b@sentry2.invoicing.co/5"),
+    'sentry_dsn' => env('SENTRY_LARAVEL_DSN', 'https://39389664f3f14969b4c43dadda00a40b@sentry2.invoicing.co/5'),
     'environment' => env('NINJA_ENVIRONMENT', 'selfhost'), // 'hosted', 'development', 'selfhost', 'reseller'
     'preconfigured_install' => env('PRECONFIGURED_INSTALL', false),
     'update_secret' => env('UPDATE_SECRET', ''),
@@ -80,11 +80,11 @@ return [
         'username' => 'user@example.com',
         'clientname' => 'client@example.com',
         'password' => 'password',
-        'gocardless' => env('GOCARDLESS_KEYS',''),
-        'square' => env('SQUARE_KEYS',''),
-        'eway' => env('EWAY_KEYS',''),
-        'mollie', env('MOLLIE_KEYS',''),
-        'paytrace' => env('PAYTRACE_KEYS',''),
+        'gocardless' => env('GOCARDLESS_KEYS', ''),
+        'square' => env('SQUARE_KEYS', ''),
+        'eway' => env('EWAY_KEYS', ''),
+        'mollie', env('MOLLIE_KEYS', ''),
+        'paytrace' => env('PAYTRACE_KEYS', ''),
         'stripe' => env('STRIPE_KEYS', ''),
         'paypal' => env('PAYPAL_KEYS', ''),
         'ppcp' => env('PPCP_KEYS', ''),
@@ -210,17 +210,17 @@ return [
         'client_id' => env('YODLEE_CLIENT_ID', false),
         'client_secret' => env('YODLEE_CLIENT_SECRET', false),
         'admin_name' => env('YODLEE_LOGIN_ADMIN_NAME', false),
-        'test_mode' => env("YODLEE_TEST_MODE", false),
-        'dev_mode' => env("YODLEE_DEV_MODE", false),
-        'config_name' => env("YODLEE_CONFIG_NAME", false),
+        'test_mode' => env('YODLEE_TEST_MODE', false),
+        'dev_mode' => env('YODLEE_DEV_MODE', false),
+        'config_name' => env('YODLEE_CONFIG_NAME', false),
     ],
     'nordigen' => [
         'secret_id' => env('NORDIGEN_SECRET_ID', false),
         'secret_key' => env('NORDIGEN_SECRET_KEY', false),
-        'test_mode' => env("NORDIGEN_TEST_MODE", false),
+        'test_mode' => env('NORDIGEN_TEST_MODE', false),
     ],
     'licenses' => env('LICENSES', false),
-    'google_application_credentials' => env("GOOGLE_APPLICATION_CREDENTIALS", false),
+    'google_application_credentials' => env('GOOGLE_APPLICATION_CREDENTIALS', false),
     'shopify' => [
         'client_id' => env('SHOPIFY_CLIENT_ID', null),
         'client_secret' => env('SHOPIFY_CLIENT_SECRET', null),
@@ -233,12 +233,12 @@ return [
     'cloudflare' => [
         'turnstile' => [
             'secret' => env('CLOUDFLARE_SECRET', null),
-        ]
+        ],
     ],
     'encryption' => [
         'public_key' => env('NINJA_PUBLIC_KEY', false),
         'private_key' => env('NINJA_PRIVATE_KEY', false),
     ],
     'upload_extensions' => env('ADDITIONAL_UPLOAD_EXTENSIONS', ''),
-    
+
 ];

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,8 +38,6 @@ class Phantom
     /**
      * Generate a PDF from the
      * Phantom JS API.
-     *
-     * @param $invitation
      */
     public function generate($invitation, $return_pdf = false)
     {
@@ -87,14 +84,14 @@ class Phantom
         $key = config('ninja.phantomjs_key');
         $phantom_url = "https://phantomjscloud.com/api/browser/v2/{$key}/";
         $pdf = CurlUtils::post($phantom_url, json_encode([
-            'url'            => $url,
-            'renderType'     => 'pdf',
-            'outputAsJson'   => false,
+            'url' => $url,
+            'renderType' => 'pdf',
+            'outputAsJson' => false,
             'renderSettings' => [
                 'emulateMedia' => 'print',
-                'pdfOptions'   => [
+                'pdfOptions' => [
                     'preferCSSPageSize' => true,
-                    'printBackground'   => true,
+                    'printBackground' => true,
                 ],
             ],
         ]));
@@ -125,14 +122,14 @@ class Phantom
         $key = config('ninja.phantomjs_key');
         $phantom_url = "https://phantomjscloud.com/api/browser/v2/{$key}/";
         $pdf = CurlUtils::post($phantom_url, json_encode([
-            'content'            => $html,
-            'renderType'     => 'pdf',
-            'outputAsJson'   => false,
+            'content' => $html,
+            'renderType' => 'pdf',
+            'outputAsJson' => false,
             'renderSettings' => [
                 'emulateMedia' => 'print',
-                'pdfOptions'   => [
+                'pdfOptions' => [
                     'preferCSSPageSize' => true,
-                    'printBackground'   => true,
+                    'printBackground' => true,
                 ],
             ],
         ]));
@@ -224,8 +221,8 @@ class Phantom
         $maker = new PdfMakerService($state);
 
         $data['html'] = $maker->design($template)
-                              ->build()
-                              ->getCompiledHTML(true);
+            ->build()
+            ->getCompiledHTML(true);
 
         if (config('ninja.log_pdf_html')) {
             info($data['html']);
@@ -233,5 +230,4 @@ class Phantom
 
         return view('pdf.html', $data);
     }
-
 }

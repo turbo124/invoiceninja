@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Currency;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -15,11 +13,11 @@ return new class extends Migration
 
         $cur = Currency::find(122);
 
-        if(!$cur) {
+        if (! $cur) {
             $cur = new \App\Models\Currency();
             $cur->id = 122;
             $cur->code = 'BTN';
-            $cur->name = "Bhutan Ngultrum";
+            $cur->name = 'Bhutan Ngultrum';
             $cur->symbol = 'Nu';
             $cur->thousand_separator = ',';
             $cur->decimal_separator = '.';
@@ -29,11 +27,11 @@ return new class extends Migration
 
         $cur = Currency::find(123);
 
-        if(!$cur) {
+        if (! $cur) {
             $cur = new \App\Models\Currency();
             $cur->id = 123;
             $cur->code = 'MRU';
-            $cur->name = "Mauritanian Ouguiya";
+            $cur->name = 'Mauritanian Ouguiya';
             $cur->symbol = 'UM';
             $cur->thousand_separator = ',';
             $cur->decimal_separator = '.';

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,7 +41,7 @@ class MarkSent
             ->adjustBalance($this->purchase_order->amount) //why was this commented out previously?
             ->save();
 
-        $this->purchase_order->sendEvent(Webhook::EVENT_SENT_PURCHASE_ORDER, "vendor");
+        $this->purchase_order->sendEvent(Webhook::EVENT_SENT_PURCHASE_ORDER, 'vendor');
 
         return $this->purchase_order;
     }

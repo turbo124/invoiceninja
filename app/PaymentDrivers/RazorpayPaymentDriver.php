@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -96,8 +95,7 @@ class RazorpayPaymentDriver extends BaseDriver
     /**
      * Convert the amount to the format that Razorpay supports.
      *
-     * @param mixed|float $amount
-     * @return int
+     * @param  mixed|float  $amount
      */
     public function convertToRazorpayAmount($amount): int
     {

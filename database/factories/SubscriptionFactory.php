@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,7 +26,7 @@ class SubscriptionFactory extends Factory
         return [
             'frequency_id' => RecurringInvoice::FREQUENCY_MONTHLY,
             'name' => $this->faker->company(),
-            'steps' => "cart,auth.login-or-register",
+            'steps' => 'cart,auth.login-or-register',
         ];
     }
 }

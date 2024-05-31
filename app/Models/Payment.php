@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -78,6 +77,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\PaymentType|null $type
  * @property-read \App\Models\User|null $user
  * @property-read \App\Models\Vendor|null $vendor
+ *
  * @method static \Database\Factories\PaymentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Payment filter(\App\Filters\QueryFilters $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newModelQuery()
@@ -86,21 +86,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Payment query()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyLedger> $company_ledger
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Credit> $credits
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invoice> $invoices
  * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\Payment>|\Illuminate\Support\Collection $paymentables
+ *
  * @mixin \Eloquent
  */
 class Payment extends BaseModel
 {
-    use MakesHash;
     use Filterable;
-    use MakesDates;
-    use SoftDeletes;
-    use Refundable;
     use Inviteable;
+    use MakesDates;
+    use MakesHash;
+    use Refundable;
+    use SoftDeletes;
 
     public const STATUS_PENDING = 1;
 
@@ -325,8 +327,8 @@ class Payment extends BaseModel
                 return '<h6><span class="badge badge-danger">'.ctrans('texts.payment_status_3').'</span></h6>';
             case self::STATUS_COMPLETED:
 
-                if($this->amount > $this->applied) {
-                    return '<h6><span class="badge badge-info">' . ctrans('texts.partially_unapplied') . '</span></h6>';
+                if ($this->amount > $this->applied) {
+                    return '<h6><span class="badge badge-info">'.ctrans('texts.partially_unapplied').'</span></h6>';
                 }
 
                 return '<h6><span class="badge badge-info">'.ctrans('texts.payment_status_4').'</span></h6>';
@@ -383,18 +385,12 @@ class Payment extends BaseModel
             'gateway_refund' => false,
             'email_receipt' => false,
         ];
-     *
-     * @param array $data
-     * @return self
      */
     public function refund(array $data): self
     {
         return $this->service()->refundPayment($data);
     }
 
-    /**
-     * @return float
-     */
     public function getCompletedAmount(): float
     {
         return $this->amount - $this->refunded;

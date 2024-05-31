@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -64,28 +63,25 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
         $company = Company::query()->where('company_key', $this->company_key)->first();
 
         foreach ($this->stripe_request as $transaction) {
-            
 
             $payment = Payment::query()
                 ->where('company_id', $company->id)
                 ->where(function ($query) use ($transaction) {
 
-                    if(isset($transaction['payment_intent'])) {
+                    if (isset($transaction['payment_intent'])) {
                         $query->where('transaction_reference', $transaction['payment_intent']);
                     }
 
-                    if(isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                    if (isset($transaction['payment_intent']) && isset($transaction['id'])) {
                         $query->orWhere('transaction_reference', $transaction['id']);
                     }
 
-                    if(!isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                    if (! isset($transaction['payment_intent']) && isset($transaction['id'])) {
                         $query->where('transaction_reference', $transaction['id']);
                     }
 
                 })
                 ->first();
-
-
 
             if ($payment) {
                 $payment->status_id = Payment::STATUS_PENDING;
@@ -95,7 +91,7 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
             }
 
             if (isset($transaction['payment_method'])) {
-                /** @var \App\Models\ClientGatewayToken $cgt **/
+                /** @var \App\Models\ClientGatewayToken $cgt * */
                 $cgt = ClientGatewayToken::where('token', $transaction['payment_method'])->first();
 
                 if ($cgt && $cgt->meta?->state == 'unauthorized') {
@@ -122,9 +118,9 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
             $charge_id = $this->stripe_request['object']['latest_charge'];
         } // API VERSION 2022-11-15
 
+        if (! $charge_id) {
+            nlog('could not resolve charge');
 
-        if (!$charge_id) {
-            nlog("could not resolve charge");
             return;
         }
 
@@ -132,22 +128,24 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
 
         $charge = \Stripe\Charge::retrieve($charge_id, $stripe_driver->stripe_connect_auth);
 
-        if (!$charge) {
-            nlog("no charge found");
+        if (! $charge) {
+            nlog('no charge found');
             nlog($this->stripe_request);
+
             return;
         }
 
         $company = Company::query()->where('company_key', $this->company_key)->first();
 
         $payment = Payment::query()
-                         ->where('company_id', $company->id)
-                         ->where('transaction_reference', $charge['id'])
-                         ->first();
+            ->where('company_id', $company->id)
+            ->where('transaction_reference', $charge['id'])
+            ->first();
 
         //return early
         if ($payment && $payment->status_id == Payment::STATUS_PENDING) {
-            nlog(" payment found and status correct - returning ");
+            nlog(' payment found and status correct - returning ');
+
             return;
         } elseif ($payment) {
             $payment->status_id = Payment::STATUS_PENDING;
@@ -156,13 +154,13 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
 
         $hash = isset($charge['metadata']['payment_hash']) ? $charge['metadata']['payment_hash'] : false;
 
-        if (!$hash) {
+        if (! $hash) {
             return;
         }
 
         $payment_hash = PaymentHash::where('hash', $hash)->first();
 
-        if (!$payment_hash) {
+        if (! $payment_hash) {
             return;
         }
 
@@ -173,7 +171,7 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
             'transaction_reference' => $charge['id'],
             'customer' => $charge['customer'],
             'payment_method' => $charge['payment_method'],
-            'card_details' => isset($charge['payment_method_details']['card']['brand']) ? $charge['payment_method_details']['card']['brand'] : PaymentType::CREDIT_CARD_OTHER
+            'card_details' => isset($charge['payment_method_details']['card']['brand']) ? $charge['payment_method_details']['card']['brand'] : PaymentType::CREDIT_CARD_OTHER,
         ];
 
         SystemLogger::dispatch(
@@ -262,8 +260,8 @@ class PaymentIntentProcessingWebhook implements ShouldQueue
             }
 
             $driver->storeGatewayToken($data, $additional_data);
-        } catch(\Exception $e) {
-            nlog("failed to import payment methods");
+        } catch (\Exception $e) {
+            nlog('failed to import payment methods');
             nlog($e->getMessage());
         }
     }

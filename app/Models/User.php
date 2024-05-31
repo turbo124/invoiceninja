@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -85,6 +84,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyToken> $tokens
  * @property-read int|null $tokens_count
  * @property \App\Models\CompanyToken $token
+ *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|User filter(\App\Filters\QueryFilters $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
@@ -94,10 +94,12 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|User where($column, $value)
  * @method static \Illuminate\Database\Eloquent\Builder|User withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyUser> $company_users
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyToken> $tokens
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company> $companies
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel companies()
  * @method bool hasPermissionTo(string $permission)
  * @method \App\Models\Company getCompany()
@@ -108,19 +110,20 @@ use Laracasts\Presenter\PresentableTrait;
  * @method bool hasIntersectPermissions(array $permissions)
  * @method int companyId()
  * @method bool isOwner()
+ *
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable;
-    use SoftDeletes;
-    use PresentableTrait;
-    use MakesHash;
-    use UserSessionAttributes;
-    use UserSettings;
+    use \Awobaz\Compoships\Compoships;
     use Filterable;
     use HasFactory;
-    use \Awobaz\Compoships\Compoships;
+    use MakesHash;
+    use Notifiable;
+    use PresentableTrait;
+    use SoftDeletes;
+    use UserSessionAttributes;
+    use UserSettings;
 
     protected $guard = 'user';
 
@@ -138,7 +141,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The attributes that are mass assignable.
-     *
      */
     protected $fillable = [
         'user_logged_in_notification',
@@ -164,7 +166,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The attributes that should be hidden for arrays.
-     *
      */
     protected $hidden = [
         'remember_token',
@@ -176,10 +177,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $casts = [
         'oauth_user_token' => 'object',
-        'settings'         => 'object',
-        'updated_at'       => 'timestamp',
-        'created_at'       => 'timestamp',
-        'deleted_at'       => 'timestamp',
+        'settings' => 'object',
+        'updated_at' => 'timestamp',
+        'created_at' => 'timestamp',
+        'deleted_at' => 'timestamp',
         'oauth_user_token_expiry' => 'datetime',
     ];
 
@@ -236,8 +237,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns all companies a user has access to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function companies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
@@ -248,7 +247,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * As we are authenticating on CompanyToken,
      * we need to link the company to the user manually. This allows
      * us to decouple a $user and their attached companies.
-     * @param $company
      */
     public function setCompany($company)
     {
@@ -270,6 +268,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return $truth->getCompany();
         } elseif (request()->header('X-API-TOKEN')) {
             $company_token = CompanyToken::with('company')->where('token', request()->header('X-API-TOKEN'))->first();
+
             return $company_token->company;
         }
 
@@ -325,8 +324,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns the currently set company id for the user.
-     *
-     * @return int
      */
     public function companyId(): int
     {
@@ -362,8 +359,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns a boolean of the administrator status of the user.
-     *
-     * @return bool
      */
     public function isAdmin(): bool
     {
@@ -380,10 +375,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->company_users()->where('is_owner', true)->exists();
     }
+
     /**
      * Returns true is user is an admin _or_ owner
-     *
-     * @return boolean
      */
     public function isSuperUser(): bool
     {
@@ -392,8 +386,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns all user created contacts.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function contacts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -403,8 +395,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Returns a boolean value if the user owns the current Entity.
      *
-     * @param  mixed $entity
-     * @return bool
+     * @param  mixed  $entity
      */
     public function owns($entity): bool
     {
@@ -414,8 +405,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Returns a boolean value if the user is assigned to the current Entity.
      *
-     * @param  mixed $entity
-     * @return bool
+     * @param  mixed  $entity
      */
     public function assigned($entity): bool
     {
@@ -425,8 +415,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Returns true if permissions exist in the map.
      *
-     * @param  string $permission
-     * @return bool
+     * @param  string  $permission
      */
     public function hasPermission($permission): bool
     {
@@ -439,7 +428,6 @@ class User extends Authenticatable implements MustVerifyEmail
          * leak permissions for other recurring_* entities
          *
          * The solution here will split the word - consistently - into view _ {entity} and edit _ {entity}
-         *
          */
         $parts = explode('_', $permission, 2);
         $all_permission = '____';
@@ -457,7 +445,7 @@ class User extends Authenticatable implements MustVerifyEmail
             }
         }
 
-        return  $this->isSuperUser() ||
+        return $this->isSuperUser() ||
                 (stripos($this->token()->cu->permissions, $permission) !== false) ||
                 (stripos($this->token()->cu->permissions, $all_permission) !== false) ||
                 (stripos($this->token()->cu->permissions, $edit_all) !== false) ||
@@ -471,8 +459,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * This method is used when we need to scope down the query
      * and display a limited subset.
      *
-     * @param  string  $permission '["view_all"]'
-     * @return boolean
+     * @param  string  $permission  '["view_all"]'
      */
     public function hasExactPermissionAndAll(string $permission = '___'): bool
     {
@@ -483,7 +470,7 @@ class User extends Authenticatable implements MustVerifyEmail
             $all_permission = $parts[0].'_all';
         }
 
-        return  (stripos($this->token()->cu->permissions, $all_permission) !== false) ||
+        return (stripos($this->token()->cu->permissions, $all_permission) !== false) ||
                 (stripos($this->token()->cu->permissions, $permission) !== false);
     }
 
@@ -493,9 +480,6 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * This method is used when we need to scope down the query
      * and display a limited subset.
-     *
-     * @param  array  $permissions
-     * @return boolean
      */
     public function hasIntersectPermissions(array $permissions = []): bool
     {
@@ -515,14 +499,12 @@ class User extends Authenticatable implements MustVerifyEmail
      * This method is used when we need to scope down the query
      * and display a limited subset.
      *
-     * @param  string  $permission '["view_all"]'
-     * @return boolean
+     * @param  string  $permission  '["view_all"]'
      */
     public function hasExactPermission(string $permission = '___'): bool
     {
-        return  (stripos($this->token()->cu->permissions, $permission) !== false);
+        return stripos($this->token()->cu->permissions, $permission) !== false;
     }
-
 
     /**
      * Used when we need to match a range of permissions
@@ -530,9 +512,6 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * This method is used when we need to scope down the query
      * and display a limited subset.
-     *
-     * @param  array  $permissions
-     * @return boolean
      */
     public function hasIntersectPermissionsOrAdmin(array $permissions = []): bool
     {
@@ -561,10 +540,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * If those permissions are not hit, then we can iterate through the matched_permissions and search for a hit.
      *
      * Note, returning FALSE here means the user does NOT have the permission we want to exclude
-     *
-     * @param  array $matched_permission
-     * @param  array $excluded_permissions
-     * @return bool
      */
     public function hasExcludedPermissions(array $matched_permission = [], array $excluded_permissions = []): bool
     {
@@ -621,8 +596,8 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Retrieve the model for a bound value.
      *
-     * @param mixed $value
-     * @param null $field
+     * @param  mixed  $value
+     * @param  null  $field
      * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
@@ -668,7 +643,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $locale = $this->language->locale ?? null;
 
-        if($locale) {
+        if ($locale) {
             App::setLocale($locale);
         }
 

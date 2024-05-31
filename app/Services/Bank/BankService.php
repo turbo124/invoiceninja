@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,15 +19,14 @@ class BankService
     {
     }
 
-
     public function matchInvoiceNumber()
     {
         if (strlen($this->bank_transaction->description) > 1) {
             $i = Invoice::query()->where('company_id', $this->bank_transaction->company_id)
-                    ->whereIn('status_id', [1,2,3])
-                    ->where('is_deleted', 0)
-                    ->where('number', 'LIKE', '%'.$this->bank_transaction->description.'%')
-                    ->first();
+                ->whereIn('status_id', [1, 2, 3])
+                ->where('is_deleted', 0)
+                ->where('number', 'LIKE', '%'.$this->bank_transaction->description.'%')
+                ->first();
 
             return $i ?: false;
         }

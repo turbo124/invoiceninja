@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,13 +21,12 @@ use Illuminate\Http\Response;
 
 class UploadController extends Controller
 {
-    use SavesDocuments;
     use MakesHash;
+    use SavesDocuments;
 
     /**
      * Main logic behind uploading the files.
      *
-     * @param StoreUploadRequest $request
      * @return Response|ResponseFactory
      */
     public function upload(StoreUploadRequest $request, PurchaseOrder $purchase_order)

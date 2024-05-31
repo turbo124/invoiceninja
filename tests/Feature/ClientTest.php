@@ -5,52 +5,50 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Client;
-use App\Models\Credit;
-use App\Models\Account;
-use App\Models\Company;
-use App\Models\Currency;
-use Tests\MockAccountData;
-use Illuminate\Support\Str;
-use App\Models\CompanyToken;
-use App\Models\GroupSetting;
-use App\Models\ClientContact;
-use App\Utils\Traits\MakesHash;
-use Tests\Unit\GroupSettingsTest;
 use App\DataMapper\ClientSettings;
 use App\DataMapper\CompanySettings;
 use App\DataMapper\DefaultSettings;
-use App\Factory\InvoiceItemFactory;
 use App\Factory\GroupSettingFactory;
+use App\Factory\InvoiceItemFactory;
+use App\Models\Account;
+use App\Models\Client;
+use App\Models\ClientContact;
+use App\Models\Company;
+use App\Models\CompanyToken;
+use App\Models\Credit;
+use App\Models\Currency;
+use App\Models\User;
+use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\ClientController
  */
 class ClientTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
 
     public $client_id;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -101,12 +99,12 @@ class ClientTest extends TestCase
 
         $arr = $response->json();
 
-        Client::query()->whereIn('id', $this->transformKeys($ids))->cursor()->each(function ($c) use ($gs, $arr) {
+        Client::query()->whereIn('id', $this->transformKeys($ids))->cursor()->each(function ($c) use ($gs) {
             $this->assertEquals($gs->id, $c->group_settings_id);
         });
 
-        foreach($arr['data'] as $client_response){
-            
+        foreach ($arr['data'] as $client_response) {
+
             $this->assertEquals($gs->hashed_id, $client_response['group_settings_id']);
         }
     }
@@ -117,41 +115,40 @@ class ClientTest extends TestCase
         $settings->currency_id = 12;
 
         $c = Client::factory()
-                ->create([
-                    'company_id' => $this->company->id,
-                    'user_id' => $this->user->id,
-                    'settings' => $settings
-                ]);
+            ->create([
+                'company_id' => $this->company->id,
+                'user_id' => $this->user->id,
+                'settings' => $settings,
+            ]);
 
         $settings = $this->company->settings;
         $settings->currency_id = '3';
 
         $this->company->saveSettings($settings, $this->company);
 
-        $client_exchange_rate = round($c->setExchangeRate(),2);
+        $client_exchange_rate = round($c->setExchangeRate(), 2);
 
         $aud_currency = Currency::find(12);
         $eur_currency = Currency::find(3);
 
         $synthetic_exchange = $aud_currency->exchange_rate / $eur_currency->exchange_rate;
 
-        $this->assertEquals($client_exchange_rate, round($synthetic_exchange,2));
+        $this->assertEquals($client_exchange_rate, round($synthetic_exchange, 2));
 
     }
 
     public function testStoreClientFixes2()
     {
         $data = [
-            "contacts" => [
+            'contacts' => [
                 [
-                "email" => "tenda@gmail.com",
-                "first_name" => "Tenda",
-                "last_name" => "Bavuma",
+                    'email' => 'tenda@gmail.com',
+                    'first_name' => 'Tenda',
+                    'last_name' => 'Bavuma',
                 ],
             ],
-            "name" => "Tenda Bavuma",
-            ];
-
+            'name' => 'Tenda Bavuma',
+        ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -166,26 +163,24 @@ class ClientTest extends TestCase
 
     }
 
-
     public function testStoreClientFixes()
     {
         $data = [
-            "contacts" => [
-            [
-            "email" => "tenda@gmail.com",
-            "first_name" => "Tenda",
-            "is_primary" => true,
-            "last_name" => "Bavuma",
-            "password" => null,
-            "send_email" => true
+            'contacts' => [
+                [
+                    'email' => 'tenda@gmail.com',
+                    'first_name' => 'Tenda',
+                    'is_primary' => true,
+                    'last_name' => 'Bavuma',
+                    'password' => null,
+                    'send_email' => true,
+                ],
             ],
-        ],
-            "country_id" => "356",
-            "display_name" => "Tenda Bavuma",
-            "name" => "Tenda Bavuma",
-            "shipping_country_id" => "356",
-            ];
-
+            'country_id' => '356',
+            'display_name' => 'Tenda Bavuma',
+            'name' => 'Tenda Bavuma',
+            'shipping_country_id' => '356',
+        ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -213,7 +208,6 @@ class ClientTest extends TestCase
             'company_id' => $this->company->id,
         ]);
 
-
         $c1 = Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id]);
 
         ClientContact::factory()->create([
@@ -233,9 +227,8 @@ class ClientTest extends TestCase
             'user_id' => $this->user->id,
             'client_id' => $c1->id,
             'company_id' => $this->company->id,
-            'email' => ''
+            'email' => '',
         ]);
-          
 
         $this->assertEquals(2, $c->contacts->count());
         $this->assertEquals(3, $c1->contacts->count());
@@ -254,7 +247,7 @@ class ClientTest extends TestCase
     {
         $line_items = [];
 
-        for ($x=0; $x<$number; $x++) {
+        for ($x = 0; $x < $number; $x++) {
             $item = InvoiceItemFactory::create();
             $item->quantity = 1;
             $item->cost = 10;
@@ -286,7 +279,7 @@ class ClientTest extends TestCase
             'custom_value4' => 0,
             'status' => 1,
             'client_id' => $this->encodePrimaryKey($this->client->id),
-            'line_items' => $this->buildLineItems()
+            'line_items' => $this->buildLineItems(),
         ];
 
         $response = $this->withHeaders([
@@ -325,7 +318,7 @@ class ClientTest extends TestCase
             'custom_value4' => 0,
             'status' => 1,
             'client_id' => $this->encodePrimaryKey($this->client->id),
-            'line_items' => $this->buildLineItems(3)
+            'line_items' => $this->buildLineItems(3),
         ];
 
         $response = $this->withHeaders([
@@ -647,7 +640,7 @@ class ClientTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/clients/', $data)
-                ->assertStatus(200);
+            ->assertStatus(200);
 
         // $arr = $response->json();
 
@@ -665,7 +658,7 @@ class ClientTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/clients/', $data)
-                ->assertStatus(200);
+            ->assertStatus(200);
 
         $data = [
             'name' => 'A loyal Client',

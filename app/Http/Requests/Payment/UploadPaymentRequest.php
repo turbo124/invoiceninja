@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Payment Ninja LLC (https://paymentninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -17,8 +16,6 @@ class UploadPaymentRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -53,7 +50,7 @@ class UploadPaymentRequest extends Request
     {
         $input = $this->all();
 
-        if(isset($input['is_public'])) {
+        if (isset($input['is_public'])) {
             $input['is_public'] = $this->toBoolean($input['is_public']);
         }
 

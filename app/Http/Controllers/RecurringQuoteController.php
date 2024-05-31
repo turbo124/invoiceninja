@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,7 +51,7 @@ class RecurringQuoteController extends BaseController
     /**
      * RecurringQuoteController constructor.
      *
-     * @param RecurringQuoteRepository $recurring_quote_repo  The RecurringQuote repo
+     * @param  RecurringQuoteRepository  $recurring_quote_repo  The RecurringQuote repo
      */
     public function __construct(RecurringQuoteRepository $recurring_quote_repo)
     {
@@ -64,10 +63,8 @@ class RecurringQuoteController extends BaseController
     /**
      * Show the list of recurring_invoices.
      *
-     * @param RecurringQuoteFilters $filters  The filters
-     *
+     * @param  RecurringQuoteFilters  $filters  The filters
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/recurring_quotes",
@@ -80,23 +77,30 @@ class RecurringQuoteController extends BaseController
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of recurring_quotes",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -111,10 +115,8 @@ class RecurringQuoteController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateRecurringQuoteRequest $request  The request
-     *
+     * @param  CreateRecurringQuoteRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/recurring_quotes/create",
@@ -122,26 +124,34 @@ class RecurringQuoteController extends BaseController
      *      tags={"recurring_quotes"},
      *      summary="Gets a new blank RecurringQuote object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank RecurringQuote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -159,10 +169,8 @@ class RecurringQuoteController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreRecurringQuoteRequest $request  The request
-     *
+     * @param  StoreRecurringQuoteRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Post(
      *      path="/api/v1/recurring_quotes",
@@ -170,26 +178,34 @@ class RecurringQuoteController extends BaseController
      *      tags={"recurring_quotes"},
      *      summary="Adds a RecurringQuote",
      *      description="Adds an RecurringQuote to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved RecurringQuote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -207,11 +223,9 @@ class RecurringQuoteController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowRecurringQuoteRequest $request  The request
-     * @param RecurringQuote $recurring_quote  The RecurringQuote
-     *
+     * @param  ShowRecurringQuoteRequest  $request  The request
+     * @param  RecurringQuote  $recurring_quote  The RecurringQuote
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/recurring_quotes/{id}",
@@ -219,6 +233,7 @@ class RecurringQuoteController extends BaseController
      *      tags={"recurring_quotes"},
      *      summary="Shows an RecurringQuote",
      *      description="Displays an RecurringQuote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -228,28 +243,36 @@ class RecurringQuoteController extends BaseController
      *          description="The RecurringQuote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the RecurringQuote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -262,11 +285,9 @@ class RecurringQuoteController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditRecurringQuoteRequest $request  The request
-     * @param RecurringQuote $recurring_quote  The RecurringQuote
-     *
+     * @param  EditRecurringQuoteRequest  $request  The request
+     * @param  RecurringQuote  $recurring_quote  The RecurringQuote
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/recurring_quotes/{id}/edit",
@@ -274,6 +295,7 @@ class RecurringQuoteController extends BaseController
      *      tags={"recurring_quotes"},
      *      summary="Shows an RecurringQuote for editting",
      *      description="Displays an RecurringQuote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -283,28 +305,36 @@ class RecurringQuoteController extends BaseController
      *          description="The RecurringQuote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the RecurringQuote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -317,11 +347,9 @@ class RecurringQuoteController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateRecurringQuoteRequest $request  The request
-     * @param RecurringQuote $recurring_quote  The RecurringQuote
-     *
+     * @param  UpdateRecurringQuoteRequest  $request  The request
+     * @param  RecurringQuote  $recurring_quote  The RecurringQuote
      * @return Response
-     *
      *
      * @OA\Put(
      *      path="/api/v1/recurring_quotes/{id}",
@@ -329,6 +357,7 @@ class RecurringQuoteController extends BaseController
      *      tags={"recurring_quotes"},
      *      summary="Updates an RecurringQuote",
      *      description="Handles the updating of an RecurringQuote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -338,28 +367,36 @@ class RecurringQuoteController extends BaseController
      *          description="The RecurringQuote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the RecurringQuote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -378,19 +415,18 @@ class RecurringQuoteController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyRecurringQuoteRequest $request
-     * @param RecurringQuote $recurring_quote
      *
-     * @return     Response
-     *
+     * @return Response
      *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/recurring_quotes/{id}",
      *      operationId="deleteRecurringQuote",
      *      tags={"recurring_quotes"},
      *      summary="Deletes a RecurringQuote",
      *      description="Handles the deletion of an RecurringQuote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -400,27 +436,34 @@ class RecurringQuoteController extends BaseController
      *          description="The RecurringQuote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -437,23 +480,27 @@ class RecurringQuoteController extends BaseController
      *
      * @return \Illuminate\Support\Collection
      *
-     *
      * @OA\Post(
      *      path="/api/v1/recurring_quotes/bulk",
      *      operationId="bulkRecurringQuotes",
      *      tags={"recurring_quotes"},
      *      summary="Performs bulk actions on an array of recurring_quotes",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="Hashed ids",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -462,23 +509,30 @@ class RecurringQuoteController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The RecurringQuote response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -515,15 +569,6 @@ class RecurringQuoteController extends BaseController
      *      summary="Performs a custom action on an RecurringQuote",
      *      description="Performs a custom action on an RecurringQuote.
 
-    The current range of actions are as follows
-    - clone_to_RecurringQuote
-    - clone_to_quote
-    - history
-    - delivery_note
-    - mark_paid
-    - download
-    - archive
-    - delete
     - email",
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
@@ -534,45 +579,52 @@ class RecurringQuoteController extends BaseController
      *          description="The RecurringQuote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Parameter(
      *          name="action",
      *          in="path",
      *          description="The action string to be performed",
      *          example="clone_to_quote",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the RecurringQuote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/RecurringQuote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param ActionRecurringQuoteRequest $request
-     * @param RecurringQuote $recurring_quote
-     * @param $action
      */
     public function action(ActionRecurringQuoteRequest $request, RecurringQuote $recurring_quote, $action)
     {

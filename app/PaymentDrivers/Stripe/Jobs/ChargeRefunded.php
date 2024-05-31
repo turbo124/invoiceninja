@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -71,15 +70,15 @@ class ChargeRefunded implements ShouldQueue
 
         $stripe_driver->payment_hash = $payment_hash;
 
-        /** @var \App\Models\Payment $payment **/
+        /** @var \App\Models\Payment $payment * */
         $payment = Payment::query()
-                         ->withTrashed()
-                         ->where('company_id', $company->id)
-                         ->where('transaction_reference', $charge_id)
-                         ->first();
+            ->withTrashed()
+            ->where('company_id', $company->id)
+            ->where('transaction_reference', $charge_id)
+            ->first();
 
         //don't touch if already refunded
-        if(!$payment || in_array($payment->status_id, [Payment::STATUS_PARTIALLY_REFUNDED, Payment::STATUS_REFUNDED])) {
+        if (! $payment || in_array($payment->status_id, [Payment::STATUS_PARTIALLY_REFUNDED, Payment::STATUS_REFUNDED])) {
             return;
         }
 
@@ -91,33 +90,34 @@ class ChargeRefunded implements ShouldQueue
             $payment->service()->deletePayment();
             $payment->status_id = Payment::STATUS_FAILED;
             $payment->save();
+
             return;
         }
 
-        if($payment->status_id == Payment::STATUS_COMPLETED) {
+        if ($payment->status_id == Payment::STATUS_COMPLETED) {
 
             $invoice_collection = $payment->paymentables
-                        ->where('paymentable_type', 'invoices')
-                        ->map(function ($pivot) {
-                            return [
-                                'invoice_id' => $pivot->paymentable_id,
-                                'amount' => $pivot->amount - $pivot->refunded
-                            ];
-                        });
+                ->where('paymentable_type', 'invoices')
+                ->map(function ($pivot) {
+                    return [
+                        'invoice_id' => $pivot->paymentable_id,
+                        'amount' => $pivot->amount - $pivot->refunded,
+                    ];
+                });
 
-            if($invoice_collection->count() == 1 && $invoice_collection->first()['amount'] >= $amount_refunded) {
+            if ($invoice_collection->count() == 1 && $invoice_collection->first()['amount'] >= $amount_refunded) {
                 //If there is only one invoice- and we are refunding _less_ than the amount of the invoice, we can just refund the payment
 
                 $invoice_collection = $payment->paymentables
-                        ->where('paymentable_type', 'invoices')
-                        ->map(function ($pivot) use ($amount_refunded) {
-                            return [
-                                'invoice_id' => $pivot->paymentable_id,
-                                'amount' => $amount_refunded
-                            ];
-                        });
+                    ->where('paymentable_type', 'invoices')
+                    ->map(function ($pivot) use ($amount_refunded) {
+                        return [
+                            'invoice_id' => $pivot->paymentable_id,
+                            'amount' => $amount_refunded,
+                        ];
+                    });
 
-            } elseif($invoice_collection->sum('amount') != $amount_refunded) {
+            } elseif ($invoice_collection->sum('amount') != $amount_refunded) {
                 //too many edges cases at this point, return early
                 return;
             }
@@ -138,6 +138,7 @@ class ChargeRefunded implements ShouldQueue
             $payment->refund($data);
 
             $payment->private_notes .= 'Refunded via Stripe';
+
             return;
         }
 

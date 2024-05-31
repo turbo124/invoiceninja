@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,18 +28,19 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\UserController
  */
 class UserTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
     private $default_email = 'attach@gmail.com';
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -87,7 +87,6 @@ class UserTest extends TestCase
             'settings' => $settings,
         ]);
 
-
         $cu = CompanyUserFactory::create($user->id, $company->id, $account->id);
         $cu->is_owner = true;
         $cu->is_admin = true;
@@ -111,10 +110,10 @@ class UserTest extends TestCase
 
     public function testUserLocale()
     {
-        $this->user->language_id = "13";
+        $this->user->language_id = '13';
         $this->user->save();
 
-        $this->assertEquals("fr_CA", $this->user->getLocale());
+        $this->assertEquals('fr_CA', $this->user->getLocale());
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -125,23 +124,21 @@ class UserTest extends TestCase
 
     }
 
-
-
     public function testUserResponse()
     {
         $company_token = $this->mockAccount();
 
         $data = [
-                'first_name' => 'hey',
-                'last_name' => 'you',
-                'email' => 'normal_user@gmail.com',
-                'company_user' => [
-                    'is_admin' => true,
-                    'is_owner' => false,
-                    'permissions' => 'create_client,create_invoice',
-                ],
-                'phone' => null,
-            ];
+            'first_name' => 'hey',
+            'last_name' => 'you',
+            'email' => 'normal_user@gmail.com',
+            'company_user' => [
+                'is_admin' => true,
+                'is_owner' => false,
+                'permissions' => 'create_client,create_invoice',
+            ],
+            'phone' => null,
+        ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -208,7 +205,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
-        
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $company_token->token,
@@ -217,7 +214,6 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertCount(0, $response->json()['data']);
-
 
     }
 
@@ -247,7 +243,6 @@ class UserTest extends TestCase
             'account_id' => $account->id,
             'settings' => $settings,
         ]);
-
 
         $cu = CompanyUserFactory::create($user->id, $company->id, $account->id);
         $cu->is_owner = true;
@@ -365,7 +360,7 @@ class UserTest extends TestCase
                 'is_owner' => false,
                 'permissions' => 'create_client,create_invoice',
             ],
-            'phone' => "",
+            'phone' => '',
         ];
 
         $response = $this->withHeaders([
@@ -381,7 +376,6 @@ class UserTest extends TestCase
         $user_id = $this->decodePrimaryKey($arr['data']['id']);
         $user = User::find($user_id);
 
-
         $data = [
             'first_name' => 'hey',
             'last_name' => 'you',
@@ -392,7 +386,7 @@ class UserTest extends TestCase
                 'permissions' => 'create_client,create_invoice',
                 'notifications' => '',
             ],
-            'phone' => "",
+            'phone' => '',
         ];
 
         $response = $this->withHeaders([

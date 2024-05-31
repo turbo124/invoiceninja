@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Οργανισμός',
     'name' => 'Επωνυμία',
     'website' => 'Ιστοσελίδα',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'The Enterprise Plan adds support for multiple users and file attachments, :link to see the full list of features.',
     'return_to_app' => 'Επιστροφή στην Εφαρμοφή',
 
-
     // Payment updates
     'refund_payment' => 'Επιστροφή Πληρωμής',
     'refund_max' => 'Μέγιστο:',
@@ -1705,7 +1704,6 @@ $lang = array(
     'lang_Serbian' => 'Σέρβικα',
     'lang_Bulgarian' => 'Βουλγάρικα',
     'lang_Russian (Russia)' => 'Russian (Russia)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Λογιστικά & Νομικά',
@@ -2364,7 +2362,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'Gold Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguan Córdoba',
     'currency_malagasy_ariary' => 'Malagasy ariary',
-    "currency_tongan_pa_anga" => "Tongan Pa'anga",
+    'currency_tongan_pa_anga' => "Tongan Pa'anga",
 
     'review_app_help' => 'Ελπίζουμε να απολαμβάνετε τη χρήση της εφαρμογής.<br/> Εάν θα θέλατε να γράψετε μια κριτική :link θα το εκτιμούσαμε ιδιαίτερα!',
     'writing_a_review' => 'συγγραφή κριτικής',
@@ -4426,7 +4424,7 @@ $lang = array(
     'activity_122' => ':user archived recurring expense :recurring_expense',
     'activity_123' => ':user deleted recurring expense :recurring_expense',
     'activity_124' => ':user restored recurring expense :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'To view the :entity you need to set a password.',
     'unsubscribe' => 'Unsubscribe',
     'unsubscribed' => 'Unsubscribed',
@@ -5036,7 +5034,7 @@ $lang = array(
     'light_dark_mode' => 'Light/Dark Mode',
     'activities' => 'Activities',
     'recent_transactions' => "Here are your company's most recent transactions:",
-    'country_Palestine' => "Palestine",
+    'country_Palestine' => 'Palestine',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Duties',
     'order_number' => 'Order Number',
@@ -5251,7 +5249,7 @@ $lang = array(
     'rff' => 'Required fields form',
     'add_step' => 'Add step',
     'steps' => 'Steps',
-    'steps_order_help' =>  'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
+    'steps_order_help' => 'The order of the steps is important. The first step should not depend on any other step. The second step should depend on the first step, and so on.',
     'other_steps' => 'Other steps',
     'use_available_payments' => 'Use Available Payments',
     'test_email_sent' => 'Successfully sent email',
@@ -5297,6 +5295,6 @@ $lang = array(
     'rappen_rounding_help' => 'Round amount to 5 cents',
     'assign_group' => 'Assign group',
     'paypal_advanced_cards' => 'Advanced Card Payments',
-);
+];
 
 return $lang;

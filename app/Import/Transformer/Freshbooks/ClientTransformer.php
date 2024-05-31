@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,6 @@ use Illuminate\Support\Str;
 class ClientTransformer extends BaseTransformer
 {
     /**
-     * @param $data
-     *
      * @return array|bool
      */
     public function transform($data)
@@ -32,24 +29,24 @@ class ClientTransformer extends BaseTransformer
         }
 
         return [
-            'company_id'     => $this->company->id,
-            'name'           => $this->getString($data, 'Organization'),
-            'phone'     => $this->getString($data, 'Phone'),
-            'address1'       => $this->getString($data, 'Street'),
-            'city'           => $this->getString($data, 'City'),
-            'state'          => $this->getString($data, 'Province/State'),
-            'postal_code'    => $this->getString($data, 'Postal Code'),
-            'country_id'     => isset($data['Country']) ? $this->getCountryId($data['Country']) : null,
-            'private_notes'   => $this->getString($data, 'Notes'),
+            'company_id' => $this->company->id,
+            'name' => $this->getString($data, 'Organization'),
+            'phone' => $this->getString($data, 'Phone'),
+            'address1' => $this->getString($data, 'Street'),
+            'city' => $this->getString($data, 'City'),
+            'state' => $this->getString($data, 'Province/State'),
+            'postal_code' => $this->getString($data, 'Postal Code'),
+            'country_id' => isset($data['Country']) ? $this->getCountryId($data['Country']) : null,
+            'private_notes' => $this->getString($data, 'Notes'),
             'credit_balance' => 0,
-            'settings'       => new \stdClass(),
-            'client_hash'    => Str::random(40),
-            'contacts'       => [
+            'settings' => new \stdClass(),
+            'client_hash' => Str::random(40),
+            'contacts' => [
                 [
-                    'first_name'    => $this->getString($data, 'First Name'),
-                    'last_name'     => $this->getString($data, 'Last Name'),
-                    'email'         => $this->getString($data, 'Email'),
-                    'phone'         => $this->getString($data, 'Phone'),
+                    'first_name' => $this->getString($data, 'First Name'),
+                    'last_name' => $this->getString($data, 'Last Name'),
+                    'email' => $this->getString($data, 'Email'),
+                    'phone' => $this->getString($data, 'Phone'),
                 ],
             ],
         ];

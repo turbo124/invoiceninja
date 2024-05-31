@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ class LockedInvoiceRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,9 +43,6 @@ class LockedInvoiceRule implements Rule
         return ctrans('texts.locked_invoice');
     }
 
-    /**
-     * @return bool
-     */
     private function checkIfInvoiceLocked(): bool
     {
         $lock_invoices = $this->invoice->client->getSetting('lock_invoices');

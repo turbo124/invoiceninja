@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,6 +28,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Services\Report\ProfitLoss
  */
 class ProfitAndLossReportTest extends TestCase
@@ -37,7 +37,7 @@ class ProfitAndLossReportTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -159,9 +159,8 @@ class ProfitAndLossReportTest extends TestCase
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
             'is_deleted' => 0,
-            'settings' => $settings
+            'settings' => $settings,
         ]);
-
 
         $client2 = Client::factory()->create([
             'user_id' => $this->user->id,
@@ -187,7 +186,7 @@ class ProfitAndLossReportTest extends TestCase
             'tax_name2' => '',
             'tax_name3' => '',
             'uses_inclusive_taxes' => false,
-            'exchange_rate' => 2
+            'exchange_rate' => 2,
         ]);
 
         Invoice::factory()->create([
@@ -208,9 +207,8 @@ class ProfitAndLossReportTest extends TestCase
             'tax_name2' => '',
             'tax_name3' => '',
             'uses_inclusive_taxes' => false,
-            'exchange_rate' => 1
+            'exchange_rate' => 1,
         ]);
-
 
         $pl = new ProfitLoss($this->company, $this->payload);
         $pl->build();

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,6 +27,7 @@ class TrialFinished extends GenericCounter
 
     /**
      * The name of the counter.
+     *
      * @var string
      */
     public $name = 'account.trial_finished';

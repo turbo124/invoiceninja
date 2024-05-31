@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,7 +36,7 @@ class ClientContactRequestCancellationObject
         $content = ctrans('texts.recurring_cancellation_request_body', ['contact' => $this->client_contact->present()->name(), 'client' => $this->client_contact->client->present()->name(), 'invoice' => $this->recurring_invoice->number]);
 
         if ($this->gateway_refund_attempted) {
-            $content .= "\n\n" . ctrans('texts.status') . " : " . ctrans('texts.payment_status_6');
+            $content .= "\n\n".ctrans('texts.status').' : '.ctrans('texts.payment_status_6');
         }
 
         $data = [

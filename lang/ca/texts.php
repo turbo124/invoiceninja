@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organització',
     'name' => 'Nom',
     'website' => 'Lloc web',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'El pla empresarial afegeix suport per a diversos usuaris i fitxers adjunts, :link per veure la llista completa de funcions.',
     'return_to_app' => 'Return To App',
 
-
     // Payment updates
     'refund_payment' => 'Refund Payment',
     'refund_max' => 'Max:',
@@ -1705,7 +1704,6 @@ $lang = array(
     'lang_Serbian' => 'Serbian',
     'lang_Bulgarian' => 'Bulgarian',
     'lang_Russian (Russia)' => 'Russian (Russia)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Accounting & Legal',
@@ -2364,7 +2362,7 @@ $lang = array(
     'currency_gold_troy_ounce' => 'Unça Troia d&#39;or',
     'currency_nicaraguan_córdoba' => 'Còrdova nicaragüenca',
     'currency_malagasy_ariary' => 'ariary malgaix',
-    "currency_tongan_pa_anga" => "Pa&#39;anga de Tonga",
+    'currency_tongan_pa_anga' => 'Pa&#39;anga de Tonga',
 
     'review_app_help' => 'We hope you\'re enjoying using the app.<br/>If you\'d consider :link we\'d greatly appreciate it!',
     'writing_a_review' => 'escriu una ressenya',
@@ -4426,7 +4424,7 @@ $lang = array(
     'activity_122' => ':user archived recurring expense :recurring_expense',
     'activity_123' => ':user deleted recurring expense :recurring_expense',
     'activity_124' => ':user restored recurring expense :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Per a veure :entity haureu d\'establir una contrasenya.',
     'unsubscribe' => 'Unsubscribe',
     'unsubscribed' => 'Unsubscribed',
@@ -4930,7 +4928,7 @@ $lang = array(
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Transferència Interac E',
     'xinvoice_payable' => 'Pagament dins de :payeddue dies nets fins a :paydate',
-    'xinvoice_no_buyers_reference' => "No s&#39;ha donat cap referència del comprador",
+    'xinvoice_no_buyers_reference' => 'No s&#39;ha donat cap referència del comprador',
     'xinvoice_online_payment' => 'La factura s&#39;ha de pagar en línia mitjançant l&#39;enllaç proporcionat',
     'pre_payment' => 'Prepagament',
     'number_of_payments' => 'Nombre de pagaments',
@@ -5035,8 +5033,8 @@ $lang = array(
     'e_invoice' => 'Factura electrònica',
     'light_dark_mode' => 'Mode clar/fosc',
     'activities' => 'Activitats',
-    'recent_transactions' => "Aquestes són les transaccions més recents de la vostra empresa:",
-    'country_Palestine' => "Palestina",
+    'recent_transactions' => 'Aquestes són les transaccions més recents de la vostra empresa:',
+    'country_Palestine' => 'Palestina',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Deures',
     'order_number' => 'Número d&#39;ordre',
@@ -5251,7 +5249,7 @@ $lang = array(
     'rff' => 'Formulari de camps obligatoris',
     'add_step' => 'Afegeix un pas',
     'steps' => 'Passos',
-    'steps_order_help' =>  'L&#39;ordre dels passos és important. El primer pas no ha de dependre de cap altre pas. El segon pas hauria de dependre del primer pas, i així successivament.',
+    'steps_order_help' => 'L&#39;ordre dels passos és important. El primer pas no ha de dependre de cap altre pas. El segon pas hauria de dependre del primer pas, i així successivament.',
     'other_steps' => 'Altres passos',
     'use_available_payments' => 'Utilitzeu els pagaments disponibles',
     'test_email_sent' => 'Correu electrònic enviat correctament',
@@ -5300,6 +5298,6 @@ $lang = array(
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

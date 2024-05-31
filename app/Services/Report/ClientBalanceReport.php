@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,6 +23,7 @@ use League\Csv\Writer;
 class ClientBalanceReport extends BaseExport
 {
     use MakesDates;
+
     //Name
     //Invoice count
     //Amount
@@ -50,7 +50,7 @@ class ClientBalanceReport extends BaseExport
             'clients',
             'client_id',
         ]
-    */
+     */
     public function __construct(public Company $company, public array $input)
     {
     }
@@ -71,7 +71,7 @@ class ClientBalanceReport extends BaseExport
         $this->csv->insertOne([]);
         $this->csv->insertOne([]);
         $this->csv->insertOne([ctrans('texts.client_balance_report')]);
-        $this->csv->insertOne([ctrans('texts.created_on'),' ',$this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale())]);
+        $this->csv->insertOne([ctrans('texts.created_on'), ' ', $this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale())]);
 
         if (count($this->input['report_keys']) == 0) {
             $this->input['report_keys'] = $this->report_keys;
@@ -98,17 +98,18 @@ class ClientBalanceReport extends BaseExport
     {
         $headers = [];
 
-        foreach($this->report_keys as $key) {
+        foreach ($this->report_keys as $key) {
             $headers[] = ctrans("texts.{$key}");
         }
 
         return $headers;
 
     }
+
     private function buildRow(Client $client): array
     {
         $query = Invoice::query()->where('client_id', $client->id)
-                                ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL]);
+            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL]);
 
         $query = $this->addDateRange($query);
 

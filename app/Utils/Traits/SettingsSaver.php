@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,8 +32,9 @@ trait SettingsSaver
      *
      * Returns an array of errors, or boolean TRUE
      * on successful validation
-     * @param  array $settings The request() settings array
-     * @return array|bool      Array on failure, boolean TRUE on success
+     *
+     * @param  array  $settings  The request() settings array
+     * @return array|bool Array on failure, boolean TRUE on success
      */
     public function validateSettings($settings)
     {
@@ -63,7 +63,7 @@ trait SettingsSaver
             elseif (substr($key, -3) == '_id' || substr($key, -14) == 'number_counter' || ($key == 'payment_terms' && property_exists($settings, $key) && strlen($settings->{$key}) >= 1) || ($key == 'valid_until' && property_exists($settings, $key) && strlen($settings->{$key}) >= 1)) {
                 $value = 'integer';
 
-                if(in_array($key, $this->string_ids)) {
+                if (in_array($key, $this->string_ids)) {
                     // if ($key == 'gmail_sending_user_id' || $key == 'besr_id') {
                     $value = 'string';
                 }
@@ -95,9 +95,10 @@ trait SettingsSaver
 
     /**
      * Type checks a object property.
-     * @param  string $key   The type
-     * @param  string $value The object property
-     * @return bool        TRUE if the property is the expected type
+     *
+     * @param  string  $key  The type
+     * @param  string  $value  The object property
+     * @return bool TRUE if the property is the expected type
      */
     private function checkAttribute($key, $value): bool
     {
@@ -108,9 +109,9 @@ trait SettingsSaver
             case 'real':
             case 'float':
             case 'double':
-                return !is_string($value) && (is_float($value) || is_numeric(strval($value)));
+                return ! is_string($value) && (is_float($value) || is_numeric(strval($value)));
             case 'string':
-                return !is_int($value) || (is_string($value) && method_exists($value, '__toString')) || is_null($value) || is_string($value);
+                return ! is_int($value) || (is_string($value) && method_exists($value, '__toString')) || is_null($value) || is_string($value);
             case 'bool':
             case 'boolean':
                 return is_bool($value) || (int) filter_var($value, FILTER_VALIDATE_BOOLEAN);

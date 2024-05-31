@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,10 +44,7 @@ class PaymentFailureMailer implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $client
-     * @param $message
-     * @param $company
-     * @param $amount
+     * @param  $message
      */
     public function __construct($client, $error, $company, $amount)
     {
@@ -90,10 +86,9 @@ class PaymentFailureMailer implements ShouldQueue
 
                 $use_react_link = false;
 
-                if(isset($company_user->react_settings->react_notification_link) && $company_user->react_settings->react_notification_link) {
+                if (isset($company_user->react_settings->react_notification_link) && $company_user->react_settings->react_notification_link) {
                     $use_react_link = true;
                 }
-
 
                 $mail_obj = (new PaymentFailureObject($this->client, $this->error, $this->company, $this->amount, null, $use_react_link))->build();
 

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -96,8 +95,8 @@ class AddGatewayFee extends AbstractService
             $adjustment = $new_balance - $balance;
 
             $this->invoice
-            ->ledger()
-            ->updateInvoiceBalance($adjustment, 'Adjustment for adding gateway fee');
+                ->ledger()
+                ->updateInvoiceBalance($adjustment, 'Adjustment for adding gateway fee');
 
             $this->invoice->client->service()->calculateBalance();
 
@@ -146,8 +145,8 @@ class AddGatewayFee extends AbstractService
             // ->save();
 
             $this->invoice
-            ->ledger()
-            ->updateInvoiceBalance($adjustment * -1, 'Adjustment for adding gateway DISCOUNT');
+                ->ledger()
+                ->updateInvoiceBalance($adjustment * -1, 'Adjustment for adding gateway DISCOUNT');
 
             $this->invoice->client->service()->calculateBalance();
 

@@ -39,12 +39,12 @@ return [
     ],
 
     'postmark-outlook' => [
-        'token' => env('POSTMARK_OUTLOOK_SECRET',''),
+        'token' => env('POSTMARK_OUTLOOK_SECRET', ''),
         'from' => [
-            'address' => env('POSTMARK_OUTLOOK_FROM_ADDRESS', '')
+            'address' => env('POSTMARK_OUTLOOK_FROM_ADDRESS', ''),
         ],
     ],
-    
+
     'microsoft' => [
         'client_id' => env('MICROSOFT_CLIENT_ID'),
         'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
@@ -120,5 +120,5 @@ return [
     'chorus' => [
         'client_id' => env('CHORUS_CLIENT_ID', false),
         'secret' => env('CHORUS_SECRET', false),
-    ]
+    ],
 ];

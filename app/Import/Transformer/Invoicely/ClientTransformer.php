@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,8 +20,6 @@ use Illuminate\Support\Str;
 class ClientTransformer extends BaseTransformer
 {
     /**
-     * @param $data
-     *
      * @return array|bool
      */
     public function transform($data)
@@ -32,17 +29,17 @@ class ClientTransformer extends BaseTransformer
         }
 
         $transformed = [
-            'company_id'     => $this->company->id,
-            'name'           => $this->getString($data, 'Client Name'),
-            'phone'     => $this->getString($data, 'Phone'),
-            'country_id'     => isset($data['Country']) ? $this->getCountryIdBy2($data['Country']) : null,
+            'company_id' => $this->company->id,
+            'name' => $this->getString($data, 'Client Name'),
+            'phone' => $this->getString($data, 'Phone'),
+            'country_id' => isset($data['Country']) ? $this->getCountryIdBy2($data['Country']) : null,
             'credit_balance' => 0,
-            'settings'       => new \stdClass(),
-            'client_hash'    => Str::random(40),
-            'contacts'       => [
+            'settings' => new \stdClass(),
+            'client_hash' => Str::random(40),
+            'contacts' => [
                 [
-                    'email'         => $this->getString($data, 'Email'),
-                    'phone'         => $this->getString($data, 'Phone'),
+                    'email' => $this->getString($data, 'Email'),
+                    'phone' => $this->getString($data, 'Phone'),
                 ],
             ],
         ];

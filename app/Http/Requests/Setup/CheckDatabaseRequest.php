@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,8 +36,8 @@ class CheckDatabaseRequest extends Request
         }
 
         return [
-            'db_host'     => ['required'],
-            'db_port'     => ['required'],
+            'db_host' => ['required'],
+            'db_port' => ['required'],
             'db_database' => ['required'],
             'db_username' => ['required'],
         ];

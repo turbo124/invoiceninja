@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,8 +21,6 @@ class StatementController extends Controller
 {
     /**
      * Show the statement in the client portal.
-     *
-     * @return \Illuminate\View\View
      */
     public function index(): View
     {
@@ -33,7 +30,6 @@ class StatementController extends Controller
     /**
      * Show the raw stream of the PDF.
      *
-     * @param ShowStatementRequest $request
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|JsonResponse|\Illuminate\Http\Response|StreamedResponse
      */
     public function raw(ShowStatementRequest $request)

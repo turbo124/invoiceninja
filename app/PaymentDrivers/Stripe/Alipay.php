@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,7 +43,6 @@ class Alipay
                 'gateway_type_id' => GatewayType::ALIPAY,
             ],
         ], $this->stripe->stripe_connect_auth);
-
 
         $data['gateway'] = $this->stripe;
         $data['return_url'] = $this->buildReturnUrl();

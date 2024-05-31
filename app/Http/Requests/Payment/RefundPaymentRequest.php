@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,13 +22,12 @@ class RefundPaymentRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
+
         return $user->isAdmin();
     }
 
@@ -67,7 +65,7 @@ class RefundPaymentRequest extends Request
         $input = $this->all();
 
         $rules = [
-            'id' => ['bail','required', new ValidRefundableRequest($input)],
+            'id' => ['bail', 'required', new ValidRefundableRequest($input)],
             'amount' => ['numeric', 'max:99999999999999'],
             'date' => 'required',
             'invoices.*.invoice_id' => 'required',

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,7 +27,7 @@ class InventoryManagementTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -95,7 +94,7 @@ class InventoryManagementTest extends TestCase
         $invoice->service()->markDeleted()->save();
         $invoice->is_deleted = true;
         $invoice->save();
-        
+
         $this->assertEquals(100, $product->fresh()->in_stock_quantity);
 
         $invoice = Invoice::withTrashed()->find($this->decodePrimaryKey($data['data']['id']));

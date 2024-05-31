@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,9 +20,6 @@ class BankTransactionFilters extends QueryFilters
 {
     /**
      * Filter by name.
-     *
-     * @param string $name
-     * @return Builder
      */
     public function name(string $name = ''): Builder
     {
@@ -37,8 +33,6 @@ class BankTransactionFilters extends QueryFilters
     /**
      * Filter based on search text.
      *
-     * @param string $filter
-     * @return Builder
      * @deprecated
      */
     public function filter(string $filter = ''): Builder
@@ -47,25 +41,22 @@ class BankTransactionFilters extends QueryFilters
             return $this->builder;
         }
 
-        return  $this->builder->where(function ($query) use ($filter) {
+        return $this->builder->where(function ($query) use ($filter) {
             $query->where('bank_transactions.description', 'like', '%'.$filter.'%');
         });
     }
 
-
     /**
-         * Filter based on client status.
-         *
-         * Statuses we need to handle
-         * - all
-         * - unmatched
-         * - matched
-         * - converted
-         * - deposits
-         * - withdrawals
-         *
-         * @return Builder
-         */
+     * Filter based on client status.
+     *
+     * Statuses we need to handle
+     * - all
+     * - unmatched
+     * - matched
+     * - converted
+     * - deposits
+     * - withdrawals
+     */
     public function client_status(string $value = ''): Builder
     {
         if (strlen($value) == 0) {
@@ -118,14 +109,13 @@ class BankTransactionFilters extends QueryFilters
     /**
      * Sorts the list based on $sort.
      *
-     * @param string $sort formatted as column|asc
-     * @return Builder
+     * @param  string  $sort  formatted as column|asc
      */
     public function sort(string $sort = ''): Builder
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (! is_array($sort_col) || count($sort_col) != 2) {
             return $this->builder;
         }
 
@@ -143,7 +133,7 @@ class BankTransactionFilters extends QueryFilters
             $sort_col[0] = 'status_id';
         }
 
-        if (in_array($sort_col[0], ['invoices','expense'])) {
+        if (in_array($sort_col[0], ['invoices', 'expense'])) {
             return $this->builder;
         }
 

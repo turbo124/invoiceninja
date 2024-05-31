@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,15 +23,12 @@ class VerifyPhone implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use MakesHash;
     use Queueable;
     use SerializesModels;
-    use MakesHash;
-
 
     /**
      * Create a new job instance.
-     *
-     * @param User $user
      */
     public function __construct(private User $user)
     {
@@ -40,8 +36,6 @@ class VerifyPhone implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -50,7 +44,7 @@ class VerifyPhone implements ShouldQueue
         $sid = config('ninja.twilio_account_sid');
         $token = config('ninja.twilio_auth_token');
 
-        if (!$sid) {
+        if (! $sid) {
             return;
         } // no twilio api credentials provided, bail.
 
@@ -58,7 +52,7 @@ class VerifyPhone implements ShouldQueue
 
         $country = $this->user->account?->companies()?->first()?->country();
 
-        if (!$country || strlen($this->user->phone) < 2) {
+        if (! $country || strlen($this->user->phone) < 2) {
             return;
         }
 
@@ -66,10 +60,11 @@ class VerifyPhone implements ShouldQueue
 
         try {
             $phone_number = $twilio->lookups->v1->phoneNumbers($this->user->phone)
-                                                ->fetch(["countryCode" => $countryCode]);
-        } catch(\Exception $e) {
+                ->fetch(['countryCode' => $countryCode]);
+        } catch (\Exception $e) {
             $this->user->verified_phone_number = false;
             $this->user->save();
+
             return;
         }
 

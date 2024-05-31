@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -41,7 +40,7 @@ class LateFeeTest extends TestCase
 
     public $client;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -107,7 +106,7 @@ class LateFeeTest extends TestCase
         $invoice_items[] = $invoice_item;
 
         $this->invoice->line_items = $invoice_items;
-        
+
         $this->assertGreaterThan(1, count($this->invoice->line_items));
 
         /**Refresh Invoice values*/
@@ -120,18 +119,18 @@ class LateFeeTest extends TestCase
     public function testModelBehaviourInsideMap()
     {
         $i = Invoice::factory()->count(5)
-        ->create([
-            'client_id' => $this->client->id,
-            'company_id' => $this->company->id,
-            'user_id' => $this->user->id,
-            'tax_name1' => '',
-            'tax_rate1' => 0,
-            'tax_name2' => '',
-            'tax_rate2' => 0,
-            'tax_name3' => '',
-            'tax_rate3' => 0,
-            'discount' => 0,
-        ]);
+            ->create([
+                'client_id' => $this->client->id,
+                'company_id' => $this->company->id,
+                'user_id' => $this->user->id,
+                'tax_name1' => '',
+                'tax_rate1' => 0,
+                'tax_name2' => '',
+                'tax_rate2' => 0,
+                'tax_name3' => '',
+                'tax_rate3' => 0,
+                'discount' => 0,
+            ]);
 
         $i->each(function ($invoice) {
             $this->assertGreaterThan(1, count($invoice->line_items));
@@ -141,6 +140,7 @@ class LateFeeTest extends TestCase
 
         $invoices = $i->map(function ($invoice) {
             $invoice->service()->removeUnpaidGatewayFees();
+
             return $invoice;
         });
 
@@ -151,7 +151,7 @@ class LateFeeTest extends TestCase
         $ids = $invoices->pluck('id');
 
         $invoices = $i->map(function ($invoice) {
-            
+
             $line_items = $invoice->line_items;
 
             $item = new InvoiceItem;
@@ -177,7 +177,7 @@ class LateFeeTest extends TestCase
 
         $invoices = Invoice::whereIn('id', $ids)->cursor()->map(function ($invoice) {
             $this->assertGreaterThan(0, count($invoice->line_items));
-            
+
             $invoice->service()->removeUnpaidGatewayFees();
             $invoice = $invoice->fresh();
             $this->assertGreaterThan(0, count($invoice->line_items));
@@ -207,7 +207,7 @@ class LateFeeTest extends TestCase
         $this->invoice->service()->removeUnpaidGatewayFees();
 
         $this->invoice = $this->invoice->fresh();
-        
+
         $this->assertCount($line_count, $this->invoice->line_items);
     }
 
@@ -306,7 +306,6 @@ class LateFeeTest extends TestCase
         $cgt->company_gateway_id = $cg->id;
         $cgt->save();
 
-
         $i = Invoice::factory()->create([
             'client_id' => $this->client->id,
             'company_id' => $this->company->id,
@@ -364,9 +363,9 @@ class LateFeeTest extends TestCase
         $this->assertEquals(20, $i->amount);
 
         $i->line_items = collect($i->line_items)
-                                    ->reject(function ($item) {
-                                        return $item->type_id == '3';
-                                    })->toArray();
+            ->reject(function ($item) {
+                return $item->type_id == '3';
+            })->toArray();
 
         $this->assertEquals(2, count($i->line_items));
 
@@ -450,7 +449,7 @@ class LateFeeTest extends TestCase
 
         $this->assertEquals(10, $i->amount);
         $this->assertEquals(10, $i->balance);
-        
+
         $reflectionMethod = new \ReflectionMethod(ReminderJob::class, 'sendReminderForInvoice');
         $reflectionMethod->setAccessible(true);
         $reflectionMethod->invokeArgs(new ReminderJob(), [$i]);
@@ -502,7 +501,7 @@ class LateFeeTest extends TestCase
 
         $i = $i->calc()->getInvoice();
         $i->service()->applyNumber()->createInvitations()->markSent()->save();
-        
+
         $this->assertEquals(10, $i->amount);
         $this->assertEquals(10, $i->balance);
         $this->assertEquals(10, $client->fresh()->balance);
@@ -517,7 +516,6 @@ class LateFeeTest extends TestCase
         $this->assertEquals(20, $client->fresh()->balance);
     }
 
-
     public function testLateFeeBalances()
     {
         $this->assertEquals(10, $this->client->balance);
@@ -529,7 +527,7 @@ class LateFeeTest extends TestCase
         $this->assertEquals(15, $this->invoice->fresh()->balance);
     }
 
-    private function setLateFee($invoice, $amount, $percent) :Invoice
+    private function setLateFee($invoice, $amount, $percent): Invoice
     {
         $temp_invoice_balance = $invoice->balance;
 

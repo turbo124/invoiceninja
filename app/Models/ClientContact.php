@@ -5,34 +5,33 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Models;
 
-use App\Utils\Ninja;
-use Illuminate\Support\Str;
 use App\Jobs\Mail\NinjaMailer;
-use App\Utils\Traits\AppSetup;
-use App\Utils\Traits\MakesHash;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Laracasts\Presenter\PresentableTrait;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Presenters\ClientContactPresenter;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Translation\HasLocalePreference;
 use App\Mail\ClientContact\ClientContactResetPasswordObject;
+use App\Models\Presenters\ClientContactPresenter;
+use App\Utils\Ninja;
+use App\Utils\Traits\AppSetup;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
+use Laracasts\Presenter\PresentableTrait;
 
 /**
  * Class ClientContact
  *
  * @method scope() static
+ *
  * @property int $id
  * @property int $company_id
  * @property int $client_id
@@ -77,6 +76,7 @@ use App\Mail\ClientContact\ClientContactResetPasswordObject;
  * @property-read int|null $quote_invitations_count
  * @property-read int|null $recurring_invoice_invitations_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\ClientContactFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|ClientContact newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ClientContact newQuery()
@@ -84,21 +84,23 @@ use App\Mail\ClientContact\ClientContactResetPasswordObject;
  * @method static \Illuminate\Database\Eloquent\Builder|ClientContact query()
  * @method static \Illuminate\Database\Eloquent\Builder|ClientContact withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ClientContact withoutTrashed()
+ *
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\QuoteInvitation> $quote_invitations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringInvoiceInvitation> $recurring_invoice_invitations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditInvitation> $credit_invitations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\InvoiceInvitation> $invoice_invitations
+ *
  * @mixin \Eloquent
  */
 class ClientContact extends Authenticatable implements HasLocalePreference
 {
-    use Notifiable;
+    use AppSetup;
+    use HasFactory;
     use MakesHash;
+    use Notifiable;
     use PresentableTrait;
     use SoftDeletes;
-    use HasFactory;
-    use AppSetup;
 
     /* Used to authenticate a contact */
     protected $guard = 'contact';
@@ -290,8 +292,8 @@ class ClientContact extends Authenticatable implements HasLocalePreference
     /**
      * Retrieve the model for a bound value.
      *
-     * @param mixed $value
-     * @param null $field
+     * @param  mixed  $value
+     * @param  null  $field
      * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)

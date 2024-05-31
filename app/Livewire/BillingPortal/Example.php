@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,7 +20,7 @@ class Example extends Component
     public function mount()
     {
         $this->dispatch('purchase.context', property: 'quantity', value: 1);
-        $this->dispatch('purchase.next');        
+        $this->dispatch('purchase.next');
     }
 
     public function render()

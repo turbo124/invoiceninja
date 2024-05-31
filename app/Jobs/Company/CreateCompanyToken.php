@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,10 +35,6 @@ class CreateCompanyToken implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param Company $company
-     * @param User $user
-     * @param string $custom_token_name
      */
     public function __construct(Company $company, User $user, string $custom_token_name)
     {
@@ -52,8 +47,6 @@ class CreateCompanyToken implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return CompanyToken|null
      */
     public function handle(): ?CompanyToken
     {

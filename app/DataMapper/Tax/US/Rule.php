@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,13 +21,10 @@ use App\Models\Product;
  */
 class Rule extends BaseRule implements RuleInterface
 {
-    /** @var string $seller_region */
     public string $seller_region = 'US';
 
     /**
      * Initializes the rules and builds any required data.
-     *
-     * @return self
      */
     public function init(): self
     {
@@ -40,8 +36,7 @@ class Rule extends BaseRule implements RuleInterface
     /**
      * Override tax class, we use this when we do not modify the input taxes
      *
-     * @param  mixed $item
-     * @return self
+     * @param  mixed  $item
      */
     public function override($item): self
     {
@@ -60,13 +55,12 @@ class Rule extends BaseRule implements RuleInterface
     /**
      * Sets the correct tax rate based on the product type.
      *
-     * @param  mixed $item
-     * @return self
+     * @param  mixed  $item
      */
     public function taxByType($item): self
     {
 
-        match(intval($item->tax_id)) {
+        match (intval($item->tax_id)) {
             Product::PRODUCT_TYPE_EXEMPT => $this->taxExempt($item),
             Product::PRODUCT_TYPE_DIGITAL => $this->taxDigital($item),
             Product::PRODUCT_TYPE_SERVICE => $this->taxService($item),
@@ -83,9 +77,8 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Sets the tax as exempt (0)
-     * @param  mixed $item
      *
-     * @return self
+     * @param  mixed  $item
      */
     public function taxExempt($item): self
     {
@@ -97,9 +90,8 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for a digital product
-     * @param  mixed $item
      *
-     * @return self
+     * @param  mixed  $item
      */
     public function taxDigital($item): self
     {
@@ -110,13 +102,12 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for a service product
-     * @param  mixed $item
      *
-     * @return self
+     * @param  mixed  $item
      */
     public function taxService($item): self
     {
-        if(in_array($this->tax_data?->txbService, ['Y','L'])) {
+        if (in_array($this->tax_data?->txbService, ['Y', 'L'])) {
             $this->default($item);
         } else {
             $this->taxExempt($item);
@@ -127,13 +118,12 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for a shipping product
-     * @param  mixed $item
      *
-     * @return self
+     * @param  mixed  $item
      */
     public function taxShipping($item): self
     {
-        if($this->tax_data?->txbFreight == 'Y') {
+        if ($this->tax_data?->txbFreight == 'Y') {
             return $this->default($item);
         }
 
@@ -145,9 +135,8 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for a physical product
-     * @param  mixed $item
      *
-     * @return self
+     * @param  mixed  $item
      */
     public function taxPhysical($item): self
     {
@@ -158,13 +147,11 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for an undefined product uses the default tax rate for the client county
-     *
-     * @return self
      */
     public function default($item): self
     {
 
-        if($this->tax_data?->stateSalesTax == 0) {
+        if ($this->tax_data?->stateSalesTax == 0) {
 
             $this->tax_rate1 = 0;
             $this->tax_name1 = '';
@@ -173,7 +160,7 @@ class Rule extends BaseRule implements RuleInterface
         }
 
         $this->tax_rate1 = $this->tax_data->taxSales * 100;
-        $this->tax_name1 = "Sales Tax";
+        $this->tax_name1 = 'Sales Tax';
 
         return $this;
     }
@@ -190,8 +177,6 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for a reduced tax product
-     *
-     * @return self
      */
     public function taxReduced($item): self
     {
@@ -202,8 +187,6 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rate for a reverse tax product
-     *
-     * @return self
      */
     public function reverseTax($item): self
     {
@@ -214,12 +197,9 @@ class Rule extends BaseRule implements RuleInterface
 
     /**
      * Calculates the tax rates to be applied
-     *
-     * @return self
      */
     public function calculateRates(): self
     {
         return $this;
     }
-
 }

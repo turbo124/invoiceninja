@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -96,6 +95,7 @@ use Illuminate\Support\Carbon;
  * @property \App\Models\User $user
  * @property \App\Models\Vendor $vendor
  * @property \App\Models\PurchaseOrderInvitation $invitation
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrder exclude($columns)
  * @method static \Database\Factories\PurchaseOrderFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrder filter(\App\Filters\QueryFilters $filters)
@@ -104,20 +104,23 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrder onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Backup> $history
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseOrderInvitation> $invitations
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrder withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrder withoutTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
+ *
  * @mixin \Eloquent
  */
 class PurchaseOrder extends BaseModel
 {
     use Filterable;
-    use SoftDeletes;
     use MakesDates;
+    use SoftDeletes;
 
     protected $hidden = [
         'id',
@@ -192,9 +195,13 @@ class PurchaseOrder extends BaseModel
     ];
 
     public const STATUS_DRAFT = 1;
+
     public const STATUS_SENT = 2;
+
     public const STATUS_ACCEPTED = 3;
+
     public const STATUS_RECEIVED = 4;
+
     public const STATUS_CANCELLED = 5;
 
     public static function stringStatus(int $status)
@@ -213,7 +220,6 @@ class PurchaseOrder extends BaseModel
 
         }
     }
-
 
     public static function badgeForStatus(int $status)
     {
@@ -241,9 +247,6 @@ class PurchaseOrder extends BaseModel
         return $this->belongsTo(User::class, 'assigned_user_id', 'id')->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function vendor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Vendor::class)->withTrashed();
@@ -309,7 +312,6 @@ class PurchaseOrder extends BaseModel
         return $this->belongsTo(Invoice::class);
     }
 
-    /** @return PurchaseOrderService  */
     public function service(): PurchaseOrderService
     {
         return new PurchaseOrderService($this);
@@ -335,7 +337,7 @@ class PurchaseOrder extends BaseModel
      *
      * @return InvoiceSumInclusive | InvoiceSum The invoice calculator object getters
      */
-    public function calc(): InvoiceSumInclusive | InvoiceSum
+    public function calc(): InvoiceSumInclusive|InvoiceSum
     {
         $purchase_order_calc = null;
 
@@ -356,7 +358,7 @@ class PurchaseOrder extends BaseModel
     public function typeIdString($id): string
     {
         $type = '';
-        match($id) {
+        match ($id) {
             '1' => $type = ctrans('texts.product'),
             '2' => $type = ctrans('texts.service'),
             '3' => $type = ctrans('texts.gateway_fees'),
@@ -374,7 +376,7 @@ class PurchaseOrder extends BaseModel
     {
         $tax_type = '';
 
-        match(intval($id)) {
+        match (intval($id)) {
             Product::PRODUCT_TYPE_PHYSICAL => $tax_type = ctrans('texts.physical_goods'),
             Product::PRODUCT_TYPE_SERVICE => $tax_type = ctrans('texts.services'),
             Product::PRODUCT_TYPE_DIGITAL => $tax_type = ctrans('texts.digital_products'),
@@ -389,5 +391,4 @@ class PurchaseOrder extends BaseModel
 
         return $tax_type;
     }
-
 }

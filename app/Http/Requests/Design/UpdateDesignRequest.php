@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,13 +26,11 @@ class UpdateDesignRequest extends Request
         'credit',
         'purchase_order',
         'project',
-        'task'
+        'task',
     ];
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -47,7 +44,7 @@ class UpdateDesignRequest extends Request
     {
         return [
             'is_template' => 'sometimes|boolean',
-            'entities' => 'sometimes|string|nullable'
+            'entities' => 'sometimes|string|nullable',
         ];
     }
 
@@ -79,8 +76,8 @@ class UpdateDesignRequest extends Request
             $input['design']['body'] = '';
         }
 
-        if(array_key_exists('entities', $input)) {
-            $user_entities = explode(",", $input['entities']);
+        if (array_key_exists('entities', $input)) {
+            $user_entities = explode(',', $input['entities']);
 
             $e = [];
 
@@ -90,9 +87,8 @@ class UpdateDesignRequest extends Request
                 }
             }
 
-            $input['entities'] = implode(",", $e);
+            $input['entities'] = implode(',', $e);
         }
-
 
         $this->replace($input);
     }

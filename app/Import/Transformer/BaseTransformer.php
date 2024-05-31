@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -47,7 +46,7 @@ class BaseTransformer
 
     public function parseDate($date)
     {
-        if(stripos($date, "/") !== false && $this->company->settings->country_id != 840) {
+        if (stripos($date, '/') !== false && $this->company->settings->country_id != 840) {
             $date = str_replace('/', '-', $date);
         }
 
@@ -55,7 +54,7 @@ class BaseTransformer
             $parsed_date = Carbon::parse($date);
 
             return $parsed_date->format('Y-m-d');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $parsed_date = date('Y-m-d', strtotime($date));
 
             if ($parsed_date == '1970-01-01') {
@@ -65,16 +64,16 @@ class BaseTransformer
             return $parsed_date;
         }
     }
-    
+
     public function parseDateOrNull($data, $field)
     {
         $date = &$data[$field];
 
-        if(!$date || strlen($date) <= 1) {
+        if (! $date || strlen($date) <= 1) {
             return null;
         }
 
-        if(stripos($date, "/") !== false && $this->company->settings->country_id != 840) {
+        if (stripos($date, '/') !== false && $this->company->settings->country_id != 840) {
             $date = str_replace('/', '-', $date);
         }
 
@@ -82,7 +81,7 @@ class BaseTransformer
             $parsed_date = Carbon::parse($date);
 
             return $parsed_date->format('Y-m-d');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $parsed_date = date('Y-m-d', strtotime($date));
 
             if ($parsed_date == '1970-01-01') {
@@ -91,18 +90,17 @@ class BaseTransformer
 
             return $parsed_date;
         }
-
 
     }
 
     public function getInvoiceTypeId($data, $field)
     {
-        return isset($data[$field]) && $data[$field] ? (string)$data[$field] : '1';
+        return isset($data[$field]) && $data[$field] ? (string) $data[$field] : '1';
     }
 
     public function getNumber($data, $field)
     {
-        return (isset($data->$field) && $data->$field) ? (int)$data->$field : 0;
+        return (isset($data->$field) && $data->$field) ? (int) $data->$field : 0;
     }
 
     public function getString($data, $field)
@@ -185,7 +183,7 @@ class BaseTransformer
             return -1;
         }
 
-        return (int)$remaining_cycles;
+        return (int) $remaining_cycles;
     }
 
     public function getAutoBillFlag(string $option): string
@@ -232,8 +230,8 @@ class BaseTransformer
             $contacts = ClientContact::query()->whereHas('client', function ($query) {
                 $query->where('is_deleted', false);
             })
-            ->where('company_id', $this->company->id)
-            ->where('email', $client_email);
+                ->where('company_id', $this->company->id)
+                ->where('email', $client_email);
 
             if ($contacts->count() >= 1) {
                 return $contacts->first()->client_id;
@@ -266,8 +264,6 @@ class BaseTransformer
 
     ///////////////////////////////////////////////////////////////////////////////////
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function hasClient($name)
@@ -289,10 +285,7 @@ class BaseTransformer
             ->exists();
     }
 
-
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function hasVendor($name)
@@ -306,8 +299,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function hasProject($name)
@@ -321,8 +312,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $key
-     *
      * @return bool
      */
     public function hasProduct($key)
@@ -336,25 +325,19 @@ class BaseTransformer
     }
 
     /**
-     * @param $data
-     * @param $field
-     *
      * @return float
      */
     public function getFloat($data, $field)
     {
         if (array_key_exists($field, $data)) {
             return Number::parseFloat($data[$field]);
-        } 
-        
+        }
+
         return 0;
-        
+
     }
 
     /**
-     * @param $data
-     * @param $field
-     *
      * @return float
      */
     public function getFloatOrOne($data, $field)
@@ -368,8 +351,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getClientId($name)
@@ -385,8 +366,7 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
+     * @param  $name
      * @return string
      */
     public function getProduct($key)
@@ -402,8 +382,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $email
-     *
      * @return ?ClientContact
      */
     public function getContact($email): ?ClientContact
@@ -422,8 +400,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getCountryId($name)
@@ -441,8 +417,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getCountryIdBy2($name)
@@ -453,8 +427,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return float
      */
     public function getTaxRate($name)
@@ -472,8 +444,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return string
      */
     public function getTaxName($name)
@@ -491,10 +461,8 @@ class BaseTransformer
     }
 
     /**
-     *
-     * @param mixed  $data
-     * @param mixed  $field
-     *
+     * @param  mixed  $data
+     * @param  mixed  $field
      * @return ?string
      */
     public function getDate($data, $field)
@@ -512,8 +480,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $number
-     *
      * @return ?string
      */
     public function getInvoiceNumber($number)
@@ -522,8 +488,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $invoice_number
-     *
      * @return int|null
      */
     public function getInvoiceId($invoice_number)
@@ -539,8 +503,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $invoice_number
-     *
      * @return bool
      */
     public function hasInvoice($invoice_number)
@@ -553,10 +515,7 @@ class BaseTransformer
             ->exists();
     }
 
-
     /**
-     * @param $invoice_number
-     *
      * @return bool
      */
     public function hasRecurringInvoice($invoice_number)
@@ -583,8 +542,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $quote_number
-     *
      * @return bool
      */
     public function hasQuote($quote_number)
@@ -598,8 +555,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $invoice_number
-     *
      * @return int|null
      */
     public function getInvoiceClientId($invoice_number)
@@ -615,8 +570,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getVendorId($name)
@@ -651,14 +604,11 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getExpenseCategoryId($name)
     {
         /** @var \App\Models\ExpenseCategory $ec */
-
         $ec = ExpenseCategory::query()->where('company_id', $this->company->id)
             ->where('is_deleted', false)
             ->whereRaw("LOWER(REPLACE(`name`, ' ' ,''))  = ?", [
@@ -666,7 +616,7 @@ class BaseTransformer
             ])
             ->first();
 
-        if($ec) {
+        if ($ec) {
             return $ec->id;
         }
 
@@ -697,13 +647,11 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getProjectId($name, $clientId = null)
     {
-        if(strlen($name) == 0) {
+        if (strlen($name) == 0) {
             return null;
         }
 
@@ -732,8 +680,6 @@ class BaseTransformer
     }
 
     /**
-     * @param $name
-     *
      * @return int|null
      */
     public function getPaymentTypeId($name)

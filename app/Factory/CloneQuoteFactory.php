@@ -5,7 +5,6 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 

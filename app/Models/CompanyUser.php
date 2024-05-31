@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,6 +44,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyUser authCompany()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyUser newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyUser newQuery()
@@ -69,6 +69,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyUser whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyUser withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyUser withoutTrashed()
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyToken> $token
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyToken> $tokens
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
@@ -78,18 +79,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyUser> $cu
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyToken> $token
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CompanyToken> $tokens
+ *
  * @mixin \Eloquent
  */
 class CompanyUser extends Pivot
 {
-    use SoftDeletes;
     use \Awobaz\Compoships\Compoships;
+    use SoftDeletes;
 
     protected $dateFormat = 'Y-m-d H:i:s.u';
 
     /**
      * The attributes that should be cast to native types.
-     *
      */
     protected $casts = [
         'permissions_updated_at' => 'timestamp',
@@ -129,17 +130,11 @@ class CompanyUser extends Pivot
         return $this->belongsTo(Account::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
     public function user_pivot(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(User::class)->withPivot('permissions', 'settings', 'react_settings', 'is_admin', 'is_owner', 'is_locked', 'slack_webhook_url', 'migrating');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
     public function company_pivot(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Company::class)->withPivot('permissions', 'settings', 'react_settings', 'is_admin', 'is_owner', 'is_locked', 'slack_webhook_url', 'migrating');
@@ -197,12 +192,9 @@ class CompanyUser extends Pivot
 
     /**
      * Determines if the notifications should be React or Flutter links
-     *
-     * @return bool
      */
     public function portalType(): bool
     {
         return isset($this->react_settings->react_notification_link) && $this->react_settings->react_notification_link;
     }
-
 }

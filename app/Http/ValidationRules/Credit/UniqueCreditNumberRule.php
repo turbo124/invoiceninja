@@ -5,7 +5,6 @@
  * @link https://github.com/creditninja/creditninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://creditninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,8 @@ class UniqueCreditNumberRule implements Rule
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -44,15 +43,12 @@ class UniqueCreditNumberRule implements Rule
         return ctrans('texts.credit_number_taken');
     }
 
-    /**
-     * @return bool
-     */
     private function checkIfCreditNumberUnique(): bool
     {
         $credit = Credit::query()->where('client_id', $this->input['client_id'])
-                        ->where('number', $this->input['number'])
-                        ->withTrashed()
-                        ->exists();
+            ->where('number', $this->input['number'])
+            ->withTrashed()
+            ->exists();
 
         if ($credit) {
             return false;

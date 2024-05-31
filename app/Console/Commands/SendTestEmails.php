@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -61,15 +60,14 @@ class SendTestEmails extends Command
 
         try {
 
-            Mail::raw("Test Message", function ($message) {
+            Mail::raw('Test Message', function ($message) {
                 $message->to(config('mail.from.address'))
-                        ->from(config('mail.from.address'), config('mail.from.name'))
-                        ->subject('Test Email');
+                    ->from(config('mail.from.address'), config('mail.from.name'))
+                    ->subject('Test Email');
             });
 
-
-        } catch(\Exception $e) {
-            $this->info("Error sending email: " . $e->getMessage());
+        } catch (\Exception $e) {
+            $this->info('Error sending email: '.$e->getMessage());
         }
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -43,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @property mixed $hashed_id
  * @property \App\Models\Quote $quote
  * @property \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\QuoteInvitationFactory factory($count = null, $state = [])
@@ -53,12 +53,13 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel scope()
  * @method static \Illuminate\Database\Eloquent\Builder|QuoteInvitation withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|QuoteInvitation withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class QuoteInvitation extends BaseModel
 {
-    use MakesDates;
     use Inviteable;
+    use MakesDates;
     use SoftDeletes;
 
     protected $fillable = [
@@ -88,41 +89,26 @@ class QuoteInvitation extends BaseModel
         return Quote::class;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function quote(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Quote::class)->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function entity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Quote::class)->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function contact(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ClientContact::class, 'client_contact_id', 'id')->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -142,5 +128,4 @@ class QuoteInvitation extends BaseModel
         $this->viewed_date = Carbon::now();
         $this->save();
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -480,7 +479,7 @@ class SettingsData
 
                 try {
                     settype($object->{$key}, gettype($this->{$key}));
-                } catch (\Exception | \Error | \Throwable $e) {
+                } catch (\Exception|\Error|\Throwable $e) {
 
                     if (property_exists($this, $key)) {
                         $object->{$key} = $this->{$key};

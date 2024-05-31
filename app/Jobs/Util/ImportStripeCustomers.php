@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,8 +35,8 @@ class ImportStripeCustomers implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param $event_id
-     * @param $entity
+     * @param  $event_id
+     * @param  $entity
      */
     public function __construct($company)
     {
@@ -46,17 +45,16 @@ class ImportStripeCustomers implements ShouldQueue
 
     /**
      * Execute the job.
-     *
      */
     public function handle()
     {
         MultiDB::setDb($this->company->db);
 
         $cgs = CompanyGateway::query()
-                            ->where('company_id', $this->company->id)
-                            ->where('is_deleted', 0)
-                            ->whereIn('gateway_key', $this->stripe_keys)
-                            ->get();
+            ->where('company_id', $this->company->id)
+            ->where('is_deleted', 0)
+            ->whereIn('gateway_key', $this->stripe_keys)
+            ->get();
 
         $cgs->each(function ($company_gateway) {
             $company_gateway->driver(new Client())->importCustomers();

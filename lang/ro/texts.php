@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organizație',
     'name' => 'Nume',
     'website' => 'Site web',
@@ -1176,7 +1176,6 @@ $lang = array(
     'enterprise_plan_features' => 'Planul Enterprise adaugă suport pentru mai mulți utilizatori și fișiere atașate, :link pentru a vedea lista completă a caracteristicilor.',
     'return_to_app' => 'Reveniți la aplicație',
 
-
     // Payment updates
     'refund_payment' => 'Rambursare plată',
     'refund_max' => 'Max:',
@@ -1705,7 +1704,6 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'lang_Serbian' => 'Sârbă',
     'lang_Bulgarian' => 'Bulgară',
     'lang_Russian (Russia)' => 'Rusă (Federația Rusă)',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Contabilitate & Juridic',
@@ -2364,7 +2362,7 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'currency_gold_troy_ounce' => 'Uncie Troy de aur',
     'currency_nicaraguan_córdoba' => 'Córdoba din Nicaragua',
     'currency_malagasy_ariary' => 'ariar malgaș',
-    "currency_tongan_pa_anga" => "Tongan Pa&#39;anga",
+    'currency_tongan_pa_anga' => 'Tongan Pa&#39;anga',
 
     'review_app_help' => 'Sperăm că vă place aplicația.<br/>Am aprecia dacă :link!',
     'writing_a_review' => 'părerea dumneavoastră',
@@ -4427,7 +4425,7 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'activity_122' => ':user a arhivat cheltuiala recurentă :recurring_expense',
     'activity_123' => ':user a eliminat cheltuiala recurentă :recurring_expense',
     'activity_124' => ':user a restabilit cheltuiala recurentă :recurring_expense',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Pentru a vizualiza :entity trebuie să setați o parolă.',
     'unsubscribe' => 'Dezabonați-vă',
     'unsubscribed' => 'Dezabonat',
@@ -4931,7 +4929,7 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E Transfer',
     'xinvoice_payable' => 'Plătibil în termen de :payeddue zile net până la :paydate',
-    'xinvoice_no_buyers_reference' => "Nu s-a oferit nicio referință de cumpărător",
+    'xinvoice_no_buyers_reference' => 'Nu s-a oferit nicio referință de cumpărător',
     'xinvoice_online_payment' => 'Factura trebuie plătită online prin link-ul furnizat',
     'pre_payment' => 'Plată anticipată',
     'number_of_payments' => 'Numărul de plăți',
@@ -5036,8 +5034,8 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'e_invoice' => 'Factură electronică',
     'light_dark_mode' => 'Mod lumină/întuneric',
     'activities' => 'Activități',
-    'recent_transactions' => "Iată cele mai recente tranzacții ale companiei dvs.:",
-    'country_Palestine' => "Palestina",
+    'recent_transactions' => 'Iată cele mai recente tranzacții ale companiei dvs.:',
+    'country_Palestine' => 'Palestina',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Atribuțiile',
     'order_number' => 'Număr de ordine',
@@ -5252,7 +5250,7 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'rff' => 'Formular câmpuri obligatorii',
     'add_step' => 'Adăugați pasul',
     'steps' => 'Pași',
-    'steps_order_help' =>  'Ordinea pașilor este importantă. Primul pas nu ar trebui să depindă de niciun alt pas. Al doilea pas ar trebui să depindă de primul pas și așa mai departe.',
+    'steps_order_help' => 'Ordinea pașilor este importantă. Primul pas nu ar trebui să depindă de niciun alt pas. Al doilea pas ar trebui să depindă de primul pas și așa mai departe.',
     'other_steps' => 'Alți pași',
     'use_available_payments' => 'Utilizați plățile disponibile',
     'test_email_sent' => 'E-mail trimis cu succes',
@@ -5301,6 +5299,6 @@ Odată ce sumele au ajuns la dumneavoastră, reveniți la pagina cu metode de pl
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,7 +39,7 @@ class VerifyUserObject
 
         $react_redirect = '';
 
-        if($this->is_react) {
+        if ($this->is_react) {
             $react_redirect = '?react=true';
         }
 

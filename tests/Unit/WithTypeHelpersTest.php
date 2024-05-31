@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -15,12 +14,10 @@ namespace Tests\Unit;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\Document;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class WithTypeHelpersTest extends TestCase
 {
-    
     public function testIsImageHelper(): void
     {
         $account = Account::factory()->create();

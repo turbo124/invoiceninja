@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -39,6 +38,7 @@ namespace App\Models;
  * @property string $credit_balance
  * @property string $credit_amount
  * @property int|null $credit_status
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|TransactionEvent newModelQuery()
@@ -69,6 +69,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|TransactionEvent wherePaymentStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TransactionEvent wherePaymentables($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TransactionEvent whereTimestamp($value)
+ *
  * @mixin \Eloquent
  */
 class TransactionEvent extends StaticModel

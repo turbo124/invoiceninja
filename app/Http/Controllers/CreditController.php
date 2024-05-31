@@ -5,43 +5,42 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Controllers;
 
-use App\Utils\Ninja;
-use App\Models\Client;
-use App\Models\Credit;
-use App\Models\Account;
-use App\Models\Invoice;
-use App\Models\Webhook;
-use Illuminate\Http\Response;
-use App\Factory\CreditFactory;
-use App\Filters\CreditFilters;
-use App\Jobs\Credit\ZipCredits;
-use App\Utils\Traits\MakesHash;
-use App\Jobs\Entity\EmailEntity;
-use App\Factory\CloneCreditFactory;
-use App\Services\PdfMaker\PdfMerge;
-use Illuminate\Support\Facades\App;
-use App\Utils\Traits\SavesDocuments;
-use App\Repositories\CreditRepository;
 use App\Events\Credit\CreditWasCreated;
 use App\Events\Credit\CreditWasUpdated;
-use App\Transformers\CreditTransformer;
-use Illuminate\Support\Facades\Storage;
-use App\Services\Template\TemplateAction;
+use App\Factory\CloneCreditFactory;
+use App\Factory\CreditFactory;
+use App\Filters\CreditFilters;
+use App\Http\Requests\Credit\ActionCreditRequest;
 use App\Http\Requests\Credit\BulkCreditRequest;
+use App\Http\Requests\Credit\CreateCreditRequest;
+use App\Http\Requests\Credit\DestroyCreditRequest;
 use App\Http\Requests\Credit\EditCreditRequest;
 use App\Http\Requests\Credit\ShowCreditRequest;
 use App\Http\Requests\Credit\StoreCreditRequest;
-use App\Http\Requests\Credit\ActionCreditRequest;
-use App\Http\Requests\Credit\CreateCreditRequest;
 use App\Http\Requests\Credit\UpdateCreditRequest;
 use App\Http\Requests\Credit\UploadCreditRequest;
-use App\Http\Requests\Credit\DestroyCreditRequest;
+use App\Jobs\Credit\ZipCredits;
+use App\Jobs\Entity\EmailEntity;
+use App\Models\Account;
+use App\Models\Client;
+use App\Models\Credit;
+use App\Models\Invoice;
+use App\Models\Webhook;
+use App\Repositories\CreditRepository;
+use App\Services\PdfMaker\PdfMerge;
+use App\Services\Template\TemplateAction;
+use App\Transformers\CreditTransformer;
+use App\Utils\Ninja;
+use App\Utils\Traits\MakesHash;
+use App\Utils\Traits\SavesDocuments;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class CreditController.
@@ -67,8 +66,7 @@ class CreditController extends BaseController
     /**
      * Show the list of Credits.
      *
-     * @param CreditFilters $filters  The filters
-     *
+     * @param  CreditFilters  $filters  The filters
      * @return Response
      *
      * @OA\Get(
@@ -79,26 +77,34 @@ class CreditController extends BaseController
      *      description="Lists credits, search and filters allow fine grained lists to be generated.
      *
      *      Query parameters can be added to performed more fine grained filtering of the credits, these are handled by the CreditFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of credits",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -113,10 +119,8 @@ class CreditController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateCreditRequest $request  The request
-     *
+     * @param  CreateCreditRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/credits/create",
@@ -124,33 +128,41 @@ class CreditController extends BaseController
      *      tags={"credits"},
      *      summary="Gets a new blank credit object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank credit object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
      */
     public function create(CreateCreditRequest $request)
     {
-        /** @var \App\Models\User $user **/
+        /** @var \App\Models\User $user * */
         $user = auth()->user();
 
         $credit = CreditFactory::create($user->company()->id, $user->id);
@@ -162,10 +174,8 @@ class CreditController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreCreditRequest $request  The request
-     *
+     * @param  StoreCreditRequest  $request  The request
      * @return Response
-     *
      *
      * @OA\Post(
      *      path="/api/v1/credits",
@@ -173,26 +183,34 @@ class CreditController extends BaseController
      *      tags={"credits"},
      *      summary="Adds a credit",
      *      description="Adds an credit to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved credit object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -200,15 +218,15 @@ class CreditController extends BaseController
     public function store(StoreCreditRequest $request)
     {
 
-        /** @var \App\Models\User $user **/
+        /** @var \App\Models\User $user * */
         $user = auth()->user();
 
         $credit = $this->credit_repository->save($request->all(), CreditFactory::create($user->company()->id, $user->id));
 
         $credit = $credit->service()
-                         ->fillDefaults()
-                         ->triggeredActions($request)
-                         ->save();
+            ->fillDefaults()
+            ->triggeredActions($request)
+            ->save();
 
         if ($credit->invoice_id) {
             $credit = $credit->service()->markSent()->save();
@@ -223,11 +241,9 @@ class CreditController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowCreditRequest $request  The request
-     * @param Credit $credit  The credit
-     *
+     * @param  ShowCreditRequest  $request  The request
+     * @param  Credit  $credit  The credit
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/credits/{id}",
@@ -235,6 +251,7 @@ class CreditController extends BaseController
      *      tags={"credits"},
      *      summary="Shows an credit",
      *      description="Displays an credit by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -244,28 +261,36 @@ class CreditController extends BaseController
      *          description="The Credit Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the credit object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -278,9 +303,8 @@ class CreditController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditCreditRequest $request The request
-     * @param Credit $credit The credit
-     *
+     * @param  EditCreditRequest  $request  The request
+     * @param  Credit  $credit  The credit
      * @return Response
      *
      * @OA\Get(
@@ -289,6 +313,7 @@ class CreditController extends BaseController
      *      tags={"credits"},
      *      summary="Shows an credit for editting",
      *      description="Displays an credit by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -298,28 +323,36 @@ class CreditController extends BaseController
      *          description="The Invoice Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the credit object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Invoice"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -332,18 +365,18 @@ class CreditController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateCreditRequest $request The request
-     * @param Credit $credit
+     * @param  UpdateCreditRequest  $request  The request
      * @return Response
      *
-     *
      * @throws \ReflectionException
+     *
      * @OA\Put(
      *      path="/api/v1/credits/{id}",
      *      operationId="updateCredit",
      *      tags={"Credits"},
      *      summary="Updates an Credit",
      *      description="Handles the updating of an Credit by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -353,28 +386,36 @@ class CreditController extends BaseController
      *          description="The Credit Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Credit object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -388,10 +429,10 @@ class CreditController extends BaseController
         $credit = $this->credit_repository->save($request->all(), $credit);
 
         $credit->service()
-               ->triggeredActions($request);
+            ->triggeredActions($request);
         //    ->deletePdf();
 
-        /** @var \App\Models\User $user**/
+        /** @var \App\Models\User $user* */
         $user = auth()->user();
 
         event(new CreditWasUpdated($credit, $credit->company, Ninja::eventVars($user->id)));
@@ -402,18 +443,18 @@ class CreditController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyCreditRequest $request
-     * @param Credit $credit
      *
-     * @return     Response
+     * @return Response
      *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/credits/{id}",
      *      operationId="deleteCredit",
      *      tags={"credits"},
      *      summary="Deletes a credit",
      *      description="Handles the deletion of an credit by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -423,27 +464,34 @@ class CreditController extends BaseController
      *          description="The Credit Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -466,16 +514,21 @@ class CreditController extends BaseController
      *      tags={"credits"},
      *      summary="Performs bulk actions on an array of credits",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="User credentials",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -484,22 +537,28 @@ class CreditController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Bulk Action response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -507,19 +566,19 @@ class CreditController extends BaseController
     public function bulk(BulkCreditRequest $request)
     {
 
-        /** @var \App\Models\User $user **/
+        /** @var \App\Models\User $user * */
         $user = auth()->user();
 
         $action = $request->input('action');
 
-        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && !$user->company()->account->account_sms_verified) {
+        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && ! $user->company()->account->account_sms_verified) {
             return response(['message' => 'Please verify your account to send emails.'], 400);
         }
 
         $credits = Credit::withTrashed()
-                         ->whereIn('id', $request->ids)
-                         ->company()
-                         ->get();
+            ->whereIn('id', $request->ids)
+            ->company()
+            ->get();
 
         if (! $credits) {
             return response()->json(['message' => ctrans('texts.no_credits_found')]);
@@ -549,12 +608,11 @@ class CreditController extends BaseController
             $merge = (new PdfMerge($paths->toArray()))->run();
 
             return response()->streamDownload(function () use ($merge) {
-                echo($merge);
+                echo $merge;
             }, 'print.pdf', ['Content-Type' => 'application/pdf']);
         }
 
-
-        if($action == 'template' && $user->can('view', $credits->first())) {
+        if ($action == 'template' && $user->can('view', $credits->first())) {
 
             $hash_or_response = $request->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 
@@ -578,7 +636,7 @@ class CreditController extends BaseController
             }
         });
 
-        return $this->listResponse(Credit::with(['invitations','documents'])->withTrashed()->company()->whereIn('id', $request->ids));
+        return $this->listResponse(Credit::with(['invitations', 'documents'])->withTrashed()->company()->whereIn('id', $request->ids));
     }
 
     public function action(ActionCreditRequest $request, Credit $credit, $action)
@@ -616,7 +674,7 @@ class CreditController extends BaseController
 
                 return response()->streamDownload(function () use ($file) {
                     echo $file;
-                }, $credit->numberFormatter() . '.pdf', ['Content-Type' => 'application/pdf']);
+                }, $credit->numberFormatter().'.pdf', ['Content-Type' => 'application/pdf']);
                 break;
             case 'archive':
                 $this->credit_repository->archive($credit);
@@ -666,6 +724,7 @@ class CreditController extends BaseController
      *      tags={"quotes"},
      *      summary="Download a specific credit by invitation key",
      *      description="Downloads a specific quote",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -675,31 +734,38 @@ class CreditController extends BaseController
      *          description="The Credit Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the credit pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadPdf($invitation_key)
@@ -724,9 +790,10 @@ class CreditController extends BaseController
 
         return response()->streamDownload(function () use ($file) {
             echo $file;
-        }, $credit->numberFormatter() . '.pdf', $headers);
+        }, $credit->numberFormatter().'.pdf', $headers);
 
     }
+
     /**
      * @OA\Get(
      *      path="/api/v1/credit/{invitation_key}/download_e_credit",
@@ -734,6 +801,7 @@ class CreditController extends BaseController
      *      tags={"credit"},
      *      summary="Download a specific x-credit by invitation key",
      *      description="Downloads a specific x-credit",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -743,31 +811,38 @@ class CreditController extends BaseController
      *          description="The credit Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the x-credit pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadECredit($invitation_key)
@@ -782,7 +857,7 @@ class CreditController extends BaseController
         $credit = $invitation->credit;
 
         $file = $credit->service()->getECredit($contact);
-        $file_name = $credit->getFileName("xml");
+        $file_name = $credit->getFileName('xml');
 
         $headers = ['Content-Type' => 'application/xml'];
 
@@ -795,15 +870,10 @@ class CreditController extends BaseController
         }, $file_name, $headers);
     }
 
-
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadCreditRequest $request
-     * @param Credit $credit
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/credits/{id}/upload",
@@ -811,6 +881,7 @@ class CreditController extends BaseController
      *      tags={"credits"},
      *      summary="Uploads a document to a credit",
      *      description="Handles the uploading of a document to a credit",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -820,28 +891,36 @@ class CreditController extends BaseController
      *          description="The Credit Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Credit object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Credit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

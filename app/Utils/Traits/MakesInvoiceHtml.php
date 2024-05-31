@@ -5,17 +5,14 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Utils\Traits;
 
-use Exception;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\Factory;
-use Throwable;
 
 /**
  * Class MakesInvoiceHtml.
@@ -33,10 +30,12 @@ trait MakesInvoiceHtml
     /**
      * Parses the blade file string and processes the template variables.
      *
-     * @param string $string The Blade file string
-     * @param array $data The array of template variables
-     * @return string         The return HTML string
+     * @param  string  $string  The Blade file string
+     * @param  array  $data  The array of template variables
+     * @return string The return HTML string
+     *
      * @deprecated // not needed!
+     *
      * @throws FatalThrowableError
      */
     public function renderView($string, $data = []): string

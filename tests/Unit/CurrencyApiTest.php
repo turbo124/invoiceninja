@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,11 +17,12 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Libraries\Currency\Conversion\CurrencyApi
  */
 class CurrencyApiTest extends TestCase
 {
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -39,7 +39,7 @@ class CurrencyApiTest extends TestCase
         $converted_synthetic = 100 / ($aud_currency->exchange_rate / $eur_currency->exchange_rate);
 
         $this->assertEquals(round($converted_synthetic, 2), round($converted_amount, 2));
-        
+
     }
 
     public function testCurrencyConversionWorking()

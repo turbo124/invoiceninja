@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,6 +21,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class QuoteEmailedNotification implements ShouldQueue
 {
     use UserNotifies;
+
     public $delay = 5;
 
     public function __construct()

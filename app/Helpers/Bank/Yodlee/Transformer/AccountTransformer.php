@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -60,15 +59,13 @@ use App\Helpers\Bank\AccountTransformerInterface;
 )
     )
  */
-
-
 class AccountTransformer implements AccountTransformerInterface
 {
     public function transform($yodlee_account)
     {
         $data = [];
 
-        if (!property_exists($yodlee_account, 'account')) {
+        if (! property_exists($yodlee_account, 'account')) {
             return $data;
         }
 
@@ -84,50 +81,50 @@ class AccountTransformer implements AccountTransformerInterface
         $current_balance = 0;
         $account_currency = '';
 
-        if(property_exists($account, 'currentBalance')) {
+        if (property_exists($account, 'currentBalance')) {
             $current_balance = $account->currentBalance->amount ?? 0;
             $account_currency = $account->currentBalance->currency ?? '';
-        } elseif(property_exists($account, 'balance')) {
+        } elseif (property_exists($account, 'balance')) {
             $current_balance = $account->balance->amount ?? 0;
             $account_currency = $account->balance->currency ?? '';
         }
 
         $account_status = $account->accountStatus;
 
-        if(property_exists($account, 'dataset')) {
+        if (property_exists($account, 'dataset')) {
             $dataset = $account->dataset[0];
             $status = false;
             $update = false;
 
-            match($dataset->additionalStatus ?? '') {
-                'LOGIN_IN_PROGRESS' => $status =  'Data retrieval in progress.',
-                'USER_INPUT_REQUIRED' => $status =  'Please reconnect your account, authentication required.',
-                'LOGIN_SUCCESS' => $status =  'Data retrieval in progress',
-                'ACCOUNT_SUMMARY_RETRIEVED' => $status =  'Account summary retrieval in progress.',
-                'NEVER_INITIATED' => $status =  'Upstream working on connecting to your account.',
-                'LOGIN_FAILED' => $status =  'Authentication failed, please try reauthenticating.',
-                'REQUEST_TIME_OUT' => $status =  'Timeout encountered retrieving data.',
-                'DATA_RETRIEVAL_FAILED' => $status =  'Login successful, but data retrieval failed.',
-                'PARTIAL_DATA_RETRIEVED' => $status =  'Partial data update failed.',
-                'PARTIAL_DATA_RETRIEVED_REM_SCHED' => $status =  'Partial data update failed.',
-                'SUCCESS' => $status =  'All accounts added or updated successfully.',
+            match ($dataset->additionalStatus ?? '') {
+                'LOGIN_IN_PROGRESS' => $status = 'Data retrieval in progress.',
+                'USER_INPUT_REQUIRED' => $status = 'Please reconnect your account, authentication required.',
+                'LOGIN_SUCCESS' => $status = 'Data retrieval in progress',
+                'ACCOUNT_SUMMARY_RETRIEVED' => $status = 'Account summary retrieval in progress.',
+                'NEVER_INITIATED' => $status = 'Upstream working on connecting to your account.',
+                'LOGIN_FAILED' => $status = 'Authentication failed, please try reauthenticating.',
+                'REQUEST_TIME_OUT' => $status = 'Timeout encountered retrieving data.',
+                'DATA_RETRIEVAL_FAILED' => $status = 'Login successful, but data retrieval failed.',
+                'PARTIAL_DATA_RETRIEVED' => $status = 'Partial data update failed.',
+                'PARTIAL_DATA_RETRIEVED_REM_SCHED' => $status = 'Partial data update failed.',
+                'SUCCESS' => $status = 'All accounts added or updated successfully.',
                 default => $status = false
             };
 
-            if($status) {
+            if ($status) {
                 $account_status = $status;
             }
 
-            match($dataset->updateEligibility ?? '') {
+            match ($dataset->updateEligibility ?? '') {
                 'ALLOW_UPDATE' => $update = 'Account connection stable.',
                 'ALLOW_UPDATE_WITH_CREDENTIALS' => $update = 'Please reconnect your account with updated credentials.',
                 'DISALLOW_UPDATE' => $update = 'Update not available due to technical issues.',
                 default => $update = false,
             };
 
-            if($status && $update) {
-                $account_status = $status . ' - ' . $update;
-            } elseif($update) {
+            if ($status && $update) {
+                $account_status = $status.' - '.$update;
+            } elseif ($update) {
                 $account_status = $update;
             }
 
@@ -139,7 +136,7 @@ class AccountTransformer implements AccountTransformerInterface
             // 'account_name' => $account->accountName,
             'account_name' => property_exists($account, 'accountName') ? $account->accountName : ($account->nickname ?? 'Unknown Account'),
             'account_status' => $account_status,
-            'account_number' => property_exists($account, 'accountNumber') ? '**** ' . substr($account?->accountNumber, -7) : '',
+            'account_number' => property_exists($account, 'accountNumber') ? '**** '.substr($account?->accountNumber, -7) : '',
             'provider_account_id' => $account->providerAccountId,
             'provider_id' => $account->providerId,
             'provider_name' => $account->providerName,

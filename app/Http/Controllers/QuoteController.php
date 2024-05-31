@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,9 +51,9 @@ use Illuminate\Support\Facades\Storage;
  */
 class QuoteController extends BaseController
 {
+    use GeneratesCounter;
     use MakesHash;
     use SavesDocuments;
-    use GeneratesCounter;
 
     protected $entity_type = Quote::class;
 
@@ -69,8 +68,6 @@ class QuoteController extends BaseController
 
     /**
      * QuoteController constructor.
-     *
-     * @param QuoteRepository $quote_repo
      */
     public function __construct(QuoteRepository $quote_repo)
     {
@@ -82,9 +79,7 @@ class QuoteController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @param QuoteFilters $filters
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/quotes",
@@ -94,25 +89,33 @@ class QuoteController extends BaseController
      *      description="Lists quotes, search and filters allow fine grained lists to be generated.
      *
      *      Query parameters can be added to performed more fine grained filtering of the quotes, these are handled by the QuoteFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of quotes",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -127,10 +130,7 @@ class QuoteController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateQuoteRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/quotes/create",
@@ -138,26 +138,34 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Gets a new blank Quote object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -176,11 +184,8 @@ class QuoteController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreQuoteRequest $request  The request
-     *
+     * @param  StoreQuoteRequest  $request  The request
      * @return Response
-     *
-     *
      *
      * @OA\Post(
      *      path="/api/v1/quotes",
@@ -188,26 +193,34 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Adds a Quote",
      *      description="Adds an Quote to the system",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the saved Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -220,9 +233,9 @@ class QuoteController extends BaseController
         $quote = $this->quote_repo->save($request->all(), QuoteFactory::create($user->company()->id, $user->id));
 
         $quote = $quote->service()
-                       ->fillDefaults()
-                       ->triggeredActions($request)
-                       ->save();
+            ->fillDefaults()
+            ->triggeredActions($request)
+            ->save();
 
         event(new QuoteWasCreated($quote, $quote->company, Ninja::eventVars($user->id)));
 
@@ -232,11 +245,9 @@ class QuoteController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowQuoteRequest $request  The request
-     * @param Quote $quote  The quote
-     *
+     * @param  ShowQuoteRequest  $request  The request
+     * @param  Quote  $quote  The quote
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/quotes/{id}",
@@ -244,6 +255,7 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Shows an Quote",
      *      description="Displays an Quote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -253,28 +265,36 @@ class QuoteController extends BaseController
      *          description="The Quote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -287,11 +307,9 @@ class QuoteController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditQuoteRequest $request  The request
-     * @param Quote $quote  The quote
-     *
+     * @param  EditQuoteRequest  $request  The request
+     * @param  Quote  $quote  The quote
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/quotes/{id}/edit",
@@ -299,6 +317,7 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Shows an Quote for editting",
      *      description="Displays an Quote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -308,28 +327,36 @@ class QuoteController extends BaseController
      *          description="The Quote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -342,11 +369,9 @@ class QuoteController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateQuoteRequest $request  The request
-     * @param Quote $quote  The quote
-     *
+     * @param  UpdateQuoteRequest  $request  The request
+     * @param  Quote  $quote  The quote
      * @return Response
-     *
      *
      * @OA\Put(
      *      path="/api/v1/quotes/{id}",
@@ -354,6 +379,7 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Updates an Quote",
      *      description="Handles the updating of an Quote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -363,28 +389,36 @@ class QuoteController extends BaseController
      *          description="The Quote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -398,7 +432,7 @@ class QuoteController extends BaseController
         $quote = $this->quote_repo->save($request->all(), $quote);
 
         $quote->service()
-              ->triggeredActions($request);
+            ->triggeredActions($request);
 
         event(new QuoteWasUpdated($quote, $quote->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
 
@@ -408,19 +442,18 @@ class QuoteController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyQuoteRequest $request
-     * @param Quote $quote
      *
-     * @return     Response
-     *
+     * @return Response
      *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/quotes/{id}",
      *      operationId="deleteQuote",
      *      tags={"quotes"},
      *      summary="Deletes a Quote",
      *      description="Handles the deletion of an Quote by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -430,27 +463,34 @@ class QuoteController extends BaseController
      *          description="The Quote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -467,23 +507,27 @@ class QuoteController extends BaseController
      *
      * @return \Illuminate\Support\Collection
      *
-     *
      * @OA\Post(
      *      path="/api/v1/quotes/bulk",
      *      operationId="bulkQuotes",
      *      tags={"quotes"},
      *      summary="Performs bulk actions on an array of quotes",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="Hashed ids",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -492,23 +536,30 @@ class QuoteController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The Quote response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -522,7 +573,7 @@ class QuoteController extends BaseController
 
         $ids = $request->input('ids');
 
-        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && !$user->account->account_sms_verified) {
+        if (Ninja::isHosted() && (stripos($action, 'email') !== false) && ! $user->account->account_sms_verified) {
             return response(['message' => 'Please verify your account to send emails.'], 400);
         }
 
@@ -568,10 +619,9 @@ class QuoteController extends BaseController
             $merge = (new PdfMerge($paths->toArray()))->run();
 
             return response()->streamDownload(function () use ($merge) {
-                echo($merge);
+                echo $merge;
             }, 'print.pdf', ['Content-Type' => 'application/pdf']);
         }
-
 
         if ($action == 'convert_to_project') {
             $quotes->each(function ($quote, $key) use ($user) {
@@ -585,8 +635,7 @@ class QuoteController extends BaseController
             return $this->listResponse(Quote::query()->withTrashed()->whereIn('id', $this->transformKeys($ids))->company());
         }
 
-
-        if($action == 'template' && $user->can('view', $quotes->first())) {
+        if ($action == 'template' && $user->can('view', $quotes->first())) {
 
             $hash_or_response = $request->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 
@@ -603,9 +652,6 @@ class QuoteController extends BaseController
 
             return response()->json(['message' => $hash_or_response], 200);
         }
-
-
-
 
         /*
          * Send the other actions to the switch
@@ -644,6 +690,7 @@ class QuoteController extends BaseController
      *  - convert
      *  - convert_to_invoice
      *  - email",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -653,45 +700,53 @@ class QuoteController extends BaseController
      *          description="The Quote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Parameter(
      *          name="action",
      *          in="path",
      *          description="The action string to be performed",
      *          example="clone_to_quote",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param ActionQuoteRequest $request
-     * @param Quote $quote
-     * @param $action
+     *
      * @return \Illuminate\Http\JsonResponse|Response|mixed|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function action(ActionQuoteRequest $request, Quote $quote, $action)
@@ -798,6 +853,7 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Download a specific quote by invitation key",
      *      description="Downloads a specific quote",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -807,34 +863,40 @@ class QuoteController extends BaseController
      *          description="The Quote Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the quote pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-
     public function downloadPdf($invitation_key)
     {
         $invitation = $this->quote_repo->getInvitationByKey($invitation_key);
@@ -867,6 +929,7 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Download a specific x-quote by invitation key",
      *      description="Downloads a specific x-quote",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -876,31 +939,38 @@ class QuoteController extends BaseController
      *          description="The Quote Invitation Key",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the x-quote pdf",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     * @param $invitation_key
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadEQuote($invitation_key)
@@ -915,7 +985,7 @@ class QuoteController extends BaseController
         $quote = $invitation->quote;
 
         $file = $quote->service()->getEQuote($contact);
-        $file_name = $quote->getFileName("xml");
+        $file_name = $quote->getFileName('xml');
 
         $headers = ['Content-Type' => 'application/xml'];
 
@@ -928,15 +998,10 @@ class QuoteController extends BaseController
         }, $file_name, $headers);
     }
 
-
     /**
      * Update the specified resource in storage.
      *
-     * @param UploadQuoteRequest $request
-     * @param Quote $quote
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/quotes/{id}/upload",
@@ -944,6 +1009,7 @@ class QuoteController extends BaseController
      *      tags={"quotes"},
      *      summary="Uploads a document to a quote",
      *      description="Handles the uploading of a document to a quote",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -953,28 +1019,36 @@ class QuoteController extends BaseController
      *          description="The Quote Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Quote object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Quote"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

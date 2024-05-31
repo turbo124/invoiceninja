@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,21 +37,21 @@ class MarkSent
         $this->credit->markInvitationsSent();
 
         $this->credit
-             ->service()
-             ->setStatus(Credit::STATUS_SENT)
-             ->applyNumber()
-             ->adjustBalance($this->credit->amount)
+            ->service()
+            ->setStatus(Credit::STATUS_SENT)
+            ->applyNumber()
+            ->adjustBalance($this->credit->amount)
             //  ->deletePdf()
-             ->save();
+            ->save();
 
         $this->client
-             ->service()
-             ->adjustCreditBalance($this->credit->amount)
-             ->save();
+            ->service()
+            ->adjustCreditBalance($this->credit->amount)
+            ->save();
 
         event(new CreditWasMarkedSent($this->credit, $this->credit->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
 
-        if($fire_event) {
+        if ($fire_event) {
 
             event('eloquent.updated: App\Models\Credit', $this->credit);
             $this->credit->sendEvent(Webhook::EVENT_SENT_CREDIT);

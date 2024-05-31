@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,6 +43,7 @@ class HandleRestore extends AbstractService
         foreach ($this->invoice->payments as $payment) {
             if (($this->invoice->paid_to_date == 0) && $payment->is_deleted) {
                 $this->invoice->delete();
+
                 return $this->invoice;
             }
         }
@@ -53,9 +53,9 @@ class HandleRestore extends AbstractService
 
         //@todo
         $this->invoice->client
-                      ->service()
-                      ->updateBalanceAndPaidToDate($this->invoice->balance, $this->invoice->paid_to_date)
-                      ->save();
+            ->service()
+            ->updateBalanceAndPaidToDate($this->invoice->balance, $this->invoice->paid_to_date)
+            ->save();
 
         $this->windBackInvoiceNumber();
 
@@ -63,13 +63,12 @@ class HandleRestore extends AbstractService
         $this->invoice->save();
 
         $this->restorePaymentables()
-             ->setAdjustmentAmount()
-             ->adjustPayments();
+            ->setAdjustmentAmount()
+            ->adjustPayments();
 
         if ($this->invoice->company->track_inventory) {
             (new AdjustProductInventory($this->invoice->company, $this->invoice, []))->handleRestoredInvoice();
         }
-
 
         return $this->invoice;
     }
@@ -79,27 +78,26 @@ class HandleRestore extends AbstractService
     {
         $this->invoice->payments->each(function ($payment) {
             Paymentable::query()
-            ->withTrashed()
-            ->where('payment_id', $payment->id)
-            ->update(['deleted_at' => null]);
+                ->withTrashed()
+                ->where('payment_id', $payment->id)
+                ->update(['deleted_at' => null]);
         });
 
         return $this;
     }
 
-
     private function setAdjustmentAmount()
     {
         foreach ($this->invoice->payments as $payment) {
             $this->adjustment_amount += $payment->paymentables
-                                                ->where('paymentable_type', '=', 'invoices')
-                                                ->where('paymentable_id', $this->invoice->id)
-                                                ->sum('amount');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('amount');
 
             //14/07/2023 - do not include credits in the payment amount
             $this->adjustment_amount -= $payment->paymentables
-                                            ->where('paymentable_type', '=', 'App\Models\Credit')
-                                            ->sum('amount');
+                ->where('paymentable_type', '=', 'App\Models\Credit')
+                ->sum('amount');
 
             nlog("Adjustment amount: {$this->adjustment_amount}");
         }
@@ -123,18 +121,18 @@ class HandleRestore extends AbstractService
 
         $this->invoice->net_payments()->each(function ($payment) {
             $payment_adjustment = $payment->paymentables
-                                            ->where('paymentable_type', '=', 'invoices')
-                                            ->where('paymentable_id', $this->invoice->id)
-                                            ->sum('amount');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('amount');
 
             $payment_adjustment -= $payment->paymentables
-                                            ->where('paymentable_type', '=', 'invoices')
-                                            ->where('paymentable_id', $this->invoice->id)
-                                            ->sum('refunded');
+                ->where('paymentable_type', '=', 'invoices')
+                ->where('paymentable_id', $this->invoice->id)
+                ->sum('refunded');
 
             $payment_adjustment -= $payment->paymentables
-                        ->where('paymentable_type', '=', 'App\Models\Credit')
-                        ->sum('amount');
+                ->where('paymentable_type', '=', 'App\Models\Credit')
+                ->sum('amount');
 
             $payment->amount += $payment_adjustment;
             $payment->applied += $payment_adjustment;
@@ -146,7 +144,6 @@ class HandleRestore extends AbstractService
 
         return $this;
     }
-
 
     private function windBackInvoiceNumber()
     {

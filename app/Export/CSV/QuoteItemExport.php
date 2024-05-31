@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -64,13 +63,13 @@ class QuoteItemExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_client_fields, $this->input['report_keys']));
 
         $query = Quote::query()
-                            ->withTrashed()
-                            ->whereHas('client', function ($q){
-                                $q->where('is_deleted', false);
-                            })
-                            ->with('client')->where('company_id', $this->company->id);
-                            
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->with('client')->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
@@ -78,13 +77,13 @@ class QuoteItemExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
         $query = $this->addQuoteStatusFilter($query, $this->input['status'] ?? '');
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -106,7 +105,7 @@ class QuoteItemExport extends BaseExport
             ->each(function ($resource) {
                 $this->iterateItems($resource);
 
-                foreach($this->storage_array as $row) {
+                foreach ($this->storage_array as $row) {
                     $this->storage_item_array[] = $this->processItemMetaData($row, $resource);
                 }
 
@@ -117,7 +116,6 @@ class QuoteItemExport extends BaseExport
         return array_merge(['columns' => $header], $this->storage_item_array);
 
     }
-
 
     public function run()
     {
@@ -130,7 +128,6 @@ class QuoteItemExport extends BaseExport
 
         //insert the header
         $this->csv->insertOne($this->buildHeader());
-
 
         $query->cursor()
             ->each(function ($quote) {
@@ -154,15 +151,15 @@ class QuoteItemExport extends BaseExport
 
             foreach (array_values(array_intersect($this->input['report_keys'], $this->item_report_keys)) as $key) { //items iterator produces item array
 
-                if (str_contains($key, "item.")) {
+                if (str_contains($key, 'item.')) {
 
-                    $tmp_key = str_replace("item.", "", $key);
+                    $tmp_key = str_replace('item.', '', $key);
 
-                    if($tmp_key == 'type_id') {
+                    if ($tmp_key == 'type_id') {
                         $tmp_key = 'type';
                     }
 
-                    if($tmp_key == 'tax_id') {
+                    if ($tmp_key == 'tax_id') {
                         $tmp_key = 'tax_category';
                     }
 
@@ -192,7 +189,7 @@ class QuoteItemExport extends BaseExport
 
             $parts = explode('.', $key);
 
-            if(is_array($parts) && $parts[0] == 'item') {
+            if (is_array($parts) && $parts[0] == 'item') {
                 continue;
             }
 
@@ -210,6 +207,7 @@ class QuoteItemExport extends BaseExport
         // return $entity;
         return $this->decorateAdvancedFields($quote, $entity);
     }
+
     private function decorateAdvancedFields(Quote $quote, array $entity): array
     {
         // if (in_array('currency_id', $this->input['report_keys'])) {
@@ -231,8 +229,6 @@ class QuoteItemExport extends BaseExport
         if (in_array('quote.user_id', $this->input['report_keys'])) {
             $entity['quote.user_id'] = $quote->user ? $quote->user->present()->name() : '';
         }
-
-
 
         return $entity;
     }

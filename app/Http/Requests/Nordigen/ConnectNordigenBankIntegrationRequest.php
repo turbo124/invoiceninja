@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -45,14 +44,16 @@ class ConnectNordigenBankIntegrationRequest extends Request
 
         $context = $this->getTokenContent();
 
-        if(isset($context['institution_id']))
+        if (isset($context['institution_id'])) {
             $input['institution_id'] = $context['institution_id'];
+        }
 
-        $input["redirect"] = isset($context["is_react"]) && $context['is_react'] ? config('ninja.react_url') . "/#/settings/bank_accounts" : config('ninja.app_url');
+        $input['redirect'] = isset($context['is_react']) && $context['is_react'] ? config('ninja.react_url').'/#/settings/bank_accounts' : config('ninja.app_url');
 
         $this->replace($input);
 
     }
+
     public function getTokenContent()
     {
         if ($this->state) {

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,20 +28,25 @@ class CreditCard
 
     public $forte;
 
-    private $forte_base_uri = "";
-    private $forte_api_access_id = "";
-    private $forte_secure_key = "";
-    private $forte_auth_organization_id = "";
-    private $forte_organization_id = "";
-    private $forte_location_id = "";
+    private $forte_base_uri = '';
+
+    private $forte_api_access_id = '';
+
+    private $forte_secure_key = '';
+
+    private $forte_auth_organization_id = '';
+
+    private $forte_organization_id = '';
+
+    private $forte_location_id = '';
 
     public function __construct(FortePaymentDriver $forte)
     {
         $this->forte = $forte;
 
-        $this->forte_base_uri = "https://sandbox.forte.net/api/v3/";
+        $this->forte_base_uri = 'https://sandbox.forte.net/api/v3/';
         if ($this->forte->company_gateway->getConfigField('testMode') == false) {
-            $this->forte_base_uri = "https://api.forte.net/v3/";
+            $this->forte_base_uri = 'https://api.forte.net/v3/';
         }
         $this->forte_api_access_id = $this->forte->company_gateway->getConfigField('apiAccessId');
         $this->forte_secure_key = $this->forte->company_gateway->getConfigField('secureKey');
@@ -54,6 +58,7 @@ class CreditCard
     public function authorizeView(array $data)
     {
         $data['gateway'] = $this->forte;
+
         return render('gateways.forte.credit_card.authorize', $data);
     }
 
@@ -83,6 +88,7 @@ class CreditCard
         $this->forte->payment_hash->save();
 
         $data['gateway'] = $this->forte;
+
         return render('gateways.forte.credit_card.pay', $data);
     }
 
@@ -98,7 +104,7 @@ class CreditCard
         if (property_exists($fees_and_limits, 'fee_percent') && $fees_and_limits->fee_percent > 0) {
             $fee_total = 0;
 
-            for ($i = ($invoice_totals * 100) ; $i < ($amount_with_fee * 100); $i++) {
+            for ($i = ($invoice_totals * 100); $i < ($amount_with_fee * 100); $i++) {
                 $calculated_fee = (3 * $i) / 100;
                 $calculated_amount_with_fee = round(($i + $calculated_fee) / 100, 2);
                 if ($calculated_amount_with_fee == $amount_with_fee) {
@@ -134,11 +140,11 @@ class CreditCard
                      }
               }',
                 CURLOPT_HTTPHEADER => [
-                  'Content-Type: application/json',
-                  'X-Forte-Auth-Organization-Id: '.$this->forte_organization_id,
-                  'Authorization: Basic '.base64_encode($this->forte_api_access_id.':'.$this->forte_secure_key)
+                    'Content-Type: application/json',
+                    'X-Forte-Auth-Organization-Id: '.$this->forte_organization_id,
+                    'Authorization: Basic '.base64_encode($this->forte_api_access_id.':'.$this->forte_secure_key),
                 ],
-              ]);
+            ]);
 
             $response = curl_exec($curl);
             $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -167,6 +173,7 @@ class CreditCard
             );
             $error = Validator::make([], []);
             $error->getMessageBag()->add('gateway_error', $response->response->response_desc);
+
             return redirect('client/invoices')->withErrors($error);
         }
 
@@ -187,6 +194,7 @@ class CreditCard
             'gateway_type_id' => GatewayType::CREDIT_CARD,
         ];
         $payment = $this->forte->createPayment($data, Payment::STATUS_COMPLETED);
+
         return redirect('client/invoices')->withSuccess('Invoice paid.');
     }
 }

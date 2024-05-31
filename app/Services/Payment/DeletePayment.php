@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class DeletePayment
     private float $_paid_to_date_deleted = 0;
 
     /**
-     * @param Payment $payment
      * @return void
      */
     public function __construct(public Payment $payment, private bool $update_client_paid_to_date)
@@ -31,6 +29,7 @@ class DeletePayment
 
     /**
      * @return Payment
+     *
      * @throws BindingResolutionException
      */
     public function run()
@@ -38,7 +37,7 @@ class DeletePayment
         \DB::connection(config('database.default'))->transaction(function () {
             $this->payment = Payment::withTrashed()->where('id', $this->payment->id)->lockForUpdate()->first();
 
-            if ($this->payment && !$this->payment->is_deleted) {
+            if ($this->payment && ! $this->payment->is_deleted) {
                 $this->setStatus(Payment::STATUS_CANCELLED) //sets status of payment
                     ->updateCreditables() //return the credits first
                     ->adjustInvoices()
@@ -73,9 +72,9 @@ class DeletePayment
     {
 
         $this->payment->paymentables()
-                ->each(function ($pp) {
-                    $pp->forceDelete();
-                });
+            ->each(function ($pp) {
+                $pp->forceDelete();
+            });
 
         return $this;
     }
@@ -98,24 +97,24 @@ class DeletePayment
                     $paymentable_invoice->restore();
 
                     $paymentable_invoice->service()
-                                        ->updateBalance($net_deletable)
-                                        ->updatePaidToDate($net_deletable * -1)
-                                        ->save();
+                        ->updateBalance($net_deletable)
+                        ->updatePaidToDate($net_deletable * -1)
+                        ->save();
 
                     $paymentable_invoice->ledger()
-                                        ->updateInvoiceBalance($net_deletable, "Adjusting invoice {$paymentable_invoice->number} due to deletion of Payment {$this->payment->number}")
-                                        ->save();
+                        ->updateInvoiceBalance($net_deletable, "Adjusting invoice {$paymentable_invoice->number} due to deletion of Payment {$this->payment->number}")
+                        ->save();
 
                     //@todo refactor
                     $this->payment
-                         ->client
-                         ->service()
-                         ->updateBalanceAndPaidToDate($net_deletable, $net_deletable * -1)
-                         ->save();
+                        ->client
+                        ->service()
+                        ->updateBalanceAndPaidToDate($net_deletable, $net_deletable * -1)
+                        ->save();
 
                     if ($paymentable_invoice->balance == $paymentable_invoice->amount) {
                         $paymentable_invoice->service()->setStatus(Invoice::STATUS_SENT)->save();
-                    } elseif($paymentable_invoice->balance == 0) {
+                    } elseif ($paymentable_invoice->balance == 0) {
                         $paymentable_invoice->service()->setStatus(Invoice::STATUS_PAID)->save();
                     } else {
                         $paymentable_invoice->service()->setStatus(Invoice::STATUS_PARTIAL)->save();
@@ -123,8 +122,8 @@ class DeletePayment
                 } else {
                     $paymentable_invoice->restore();
                     $paymentable_invoice->service()
-                                        ->updatePaidToDate($net_deletable * -1)
-                                        ->save();
+                        ->updatePaidToDate($net_deletable * -1)
+                        ->save();
                     $paymentable_invoice->delete();
 
                 }
@@ -134,10 +133,10 @@ class DeletePayment
         //sometimes the payment is NOT created properly, this catches the payment and prevents the paid to date reducing inappropriately.
         if ($this->update_client_paid_to_date) {
             $this->payment
-            ->client
-            ->service()
-            ->updatePaidToDate(min(0, ($this->payment->amount - $this->payment->refunded - $this->_paid_to_date_deleted) * -1))
-            ->save();
+                ->client
+                ->service()
+                ->updatePaidToDate(min(0, ($this->payment->amount - $this->payment->refunded - $this->_paid_to_date_deleted) * -1))
+                ->save();
         }
 
         return $this;
@@ -155,17 +154,17 @@ class DeletePayment
                 }
 
                 $paymentable_credit->service()
-                                   ->updateBalance($paymentable_credit->pivot->amount * $multiplier * -1)
-                                   ->updatePaidToDate($paymentable_credit->pivot->amount * $multiplier * -1)
-                                   ->setStatus(Credit::STATUS_SENT)
-                                   ->save();
+                    ->updateBalance($paymentable_credit->pivot->amount * $multiplier * -1)
+                    ->updatePaidToDate($paymentable_credit->pivot->amount * $multiplier * -1)
+                    ->setStatus(Credit::STATUS_SENT)
+                    ->save();
 
                 $client = $this->payment->client->fresh();
 
                 $client
-                ->service()
-                ->adjustCreditBalance($paymentable_credit->pivot->amount)
-                ->save();
+                    ->service()
+                    ->adjustCreditBalance($paymentable_credit->pivot->amount)
+                    ->save();
             });
         }
 
@@ -173,7 +172,7 @@ class DeletePayment
     }
 
     /**
-     * @param mixed $status
+     * @param  mixed  $status
      * @return $this
      */
     private function setStatus($status)

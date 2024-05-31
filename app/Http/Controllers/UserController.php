@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,8 +41,8 @@ use Illuminate\Http\Response;
  */
 class UserController extends BaseController
 {
-    use VerifiesUserEmail;
     use MakesHash;
+    use VerifiesUserEmail;
 
     protected $entity_type = User::class;
 
@@ -54,7 +53,7 @@ class UserController extends BaseController
     /**
      * Constructor.
      *
-     * @param UserRepository $user_repo  The user repo
+     * @param  UserRepository  $user_repo  The user repo
      */
     public function __construct(UserRepository $user_repo)
     {
@@ -66,9 +65,7 @@ class UserController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @param UserFilters $filters
      * @return Response
-     *
      */
     public function index(UserFilters $filters)
     {
@@ -80,9 +77,7 @@ class UserController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateUserRequest $request
      * @return Response
-     *
      */
     public function create(CreateUserRequest $request)
     {
@@ -94,9 +89,7 @@ class UserController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreUserRequest $request
      * @return Response
-     *
      */
     public function store(StoreUserRequest $request)
     {
@@ -124,10 +117,7 @@ class UserController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowUserRequest $request
-     * @param User $user
      * @return Response
-     *
      */
     public function show(ShowUserRequest $request, User $user)
     {
@@ -137,10 +127,7 @@ class UserController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditUserRequest $request
-     * @param User $user
      * @return Response
-     *
      */
     public function edit(EditUserRequest $request, User $user)
     {
@@ -150,8 +137,6 @@ class UserController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateUserRequest $request
-     * @param User $user
      * @return Response|mixed
      */
     public function update(UpdateUserRequest $request, User $user)
@@ -189,10 +174,7 @@ class UserController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyUserRequest $request
-     * @param User $user
      * @return \Illuminate\Http\JsonResponse
-     *
      */
     public function destroy(DestroyUserRequest $request, User $user)
     {
@@ -215,7 +197,6 @@ class UserController extends BaseController
      * Perform bulk actions on the list view.
      *
      * @return Response
-     *
      */
     public function bulk(BulkUserRequest $request)
     {
@@ -251,8 +232,6 @@ class UserController extends BaseController
     /**
      * Detach an existing user to a company.
      *
-     * @param DetachCompanyUserRequest $request
-     * @param User $user
      * @return \Illuminate\Http\JsonResponse
      */
     public function detach(DetachCompanyUserRequest $request, User $user)
@@ -260,10 +239,10 @@ class UserController extends BaseController
         /** @var \App\Models\User $logged_in_user */
         $logged_in_user = auth()->user();
 
-        $company_user = CompanyUser::where('user_id',$user->id)
-                                    ->where('company_id', $logged_in_user->companyId())
-                                    ->withTrashed()
-                                    ->first();
+        $company_user = CompanyUser::where('user_id', $user->id)
+            ->where('company_id', $logged_in_user->companyId())
+            ->withTrashed()
+            ->first();
 
         if ($company_user->is_owner) {
             return response()->json(['message', 'Cannot detach owner.'], 401);
@@ -281,8 +260,6 @@ class UserController extends BaseController
     /**
      * Invite an existing user to a company.
      *
-     * @param ReconfirmUserRequest $request
-     * @param User $user
      * @return \Illuminate\Http\JsonResponse
      */
     public function invite(ReconfirmUserRequest $request, User $user)
@@ -295,12 +272,9 @@ class UserController extends BaseController
         return response()->json(['message' => ctrans('texts.confirmation_resent')], 200);
     }
 
-
     /**
      * Invite an existing user to a company.
      *
-     * @param ReconfirmUserRequest $request
-     * @param User $user
      * @return \Illuminate\Http\JsonResponse
      */
     public function reconfirm(ReconfirmUserRequest $request, User $user)
@@ -320,14 +294,13 @@ class UserController extends BaseController
         $user->oauth_user_refresh_token = null;
         $user->save();
 
-
         /** @var \App\Models\User $logged_in_user */
         $logged_in_user = auth()->user();
         $company = $logged_in_user->company();
 
         $settings = $company->settings;
-        $settings->email_sending_method = "default";
-        $settings->gmail_sending_user_id = "0";
+        $settings->email_sending_method = 'default';
+        $settings->gmail_sending_user_id = '0';
 
         $company->settings = $settings;
         $company->save();
@@ -348,5 +321,4 @@ class UserController extends BaseController
         return $this->itemResponse($user->fresh());
 
     }
-
 }

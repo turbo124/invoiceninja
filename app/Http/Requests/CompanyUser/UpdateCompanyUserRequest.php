@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,8 +19,6 @@ class UpdateCompanyUserRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -40,8 +37,9 @@ class UpdateCompanyUserRequest extends Request
     {
         $input = $this->all();
 
-        if(isset($input['company_user']['user']))
+        if (isset($input['company_user']['user'])) {
             unset($input['company_user']['user']);
+        }
 
         $this->replace($input);
     }

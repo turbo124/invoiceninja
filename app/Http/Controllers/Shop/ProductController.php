@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,7 +30,6 @@ class ProductController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return Response
      */
     public function index(Request $request)
@@ -58,8 +56,8 @@ class ProductController extends BaseController
         }
 
         $product = Product::where('company_id', $company->id)
-                            ->where('product_key', $product_key)
-                            ->first();
+            ->where('product_key', $product_key)
+            ->first();
 
         return $this->itemResponse($product);
     }

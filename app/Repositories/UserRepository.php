@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,10 +32,9 @@ class UserRepository extends BaseRepository
     /**
      * Saves the user and its contacts.
      *
-     * @param array $data The data
-     * @param \App\Models\User $user The user
-     *
-     * @param bool $unset_company_user
+     * @param  array  $data  The data
+     * @param  \App\Models\User  $user  The user
+     * @param  bool  $unset_company_user
      * @return \App\Models\User user Object
      */
     public function save(array $data, User $user, $unset_company_user = false, $is_migrating = false)
@@ -68,7 +66,7 @@ class UserRepository extends BaseRepository
             $user->password = Hash::make($data['password']);
         }
 
-        if (! $user->confirmation_code && !$is_migrating) {
+        if (! $user->confirmation_code && ! $is_migrating) {
             $user->confirmation_code = $this->createDbHash($company->db);
         }
 
@@ -108,7 +106,7 @@ class UserRepository extends BaseRepository
 
             $user->with(['company_users' => function ($query) use ($company, $user) {
                 $query->whereCompanyId($company->id)
-                      ->whereUserId($user->id);
+                    ->whereUserId($user->id);
             }])->first();
         }
         $user->restore();
@@ -130,8 +128,8 @@ class UserRepository extends BaseRepository
             $company = auth()->user()->company();
 
             $cu = CompanyUser::query()->whereUserId($user->id)
-                             ->whereCompanyId($company->id)
-                             ->first();
+                ->whereCompanyId($company->id)
+                ->first();
 
             $cu->tokens()->forceDelete();
             $cu->forceDelete();
@@ -152,8 +150,8 @@ class UserRepository extends BaseRepository
         $company = auth()->user()->company();
 
         $cu = CompanyUser::query()->whereUserId($user->id)
-                         ->whereCompanyId($company->id)
-                         ->first();
+            ->whereCompanyId($company->id)
+            ->first();
 
         if ($cu) {
             $cu->tokens()->delete();
@@ -181,7 +179,7 @@ class UserRepository extends BaseRepository
     }
 
     /**
-     * @param $entity
+     * @param  $entity
      */
     public function restore($user)
     {
@@ -201,39 +199,35 @@ class UserRepository extends BaseRepository
         $user->restore();
 
         $cu = CompanyUser::withTrashed()
-                         ->where('user_id', $user->id)
-                         ->where('company_id', auth()->user()->company()->id)
-                         ->first();
+            ->where('user_id', $user->id)
+            ->where('company_id', auth()->user()->company()->id)
+            ->first();
 
         $cu->restore();
         $cu->tokens()->restore();
-        
+
         event(new UserWasRestored($user, auth()->user(), auth()->user()->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
     }
-
 
     /**
      * If we have multiple users in the system,
      * and there are some that are not admins,
      * we force all companies to large to ensure
      * the queries are appropriate for all users
-     *
-     * @param  User   $user
-     * @return void
      */
     private function verifyCorrectCompanySizeForPermissions(User $user): void
     {
         if (Ninja::isSelfHost() || (Ninja::isHosted() && $user->account->isEnterpriseClient())) {
             $user->account()
-               ->whereHas('companies', function ($query) {
-                   $query->where('is_large', 0);
-               })
-               ->whereHas('company_users', function ($query) {
-                   $query->where('is_admin', 0);
-               })
-               ->cursor()->each(function ($account) {
-                   $account->companies()->update(['is_large' => true]);
-               });
+                ->whereHas('companies', function ($query) {
+                    $query->where('is_large', 0);
+                })
+                ->whereHas('company_users', function ($query) {
+                    $query->where('is_admin', 0);
+                })
+                ->cursor()->each(function ($account) {
+                    $account->companies()->update(['is_large' => true]);
+                });
         }
     }
 }

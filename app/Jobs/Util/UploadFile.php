@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,9 +25,9 @@ class UploadFile implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
+    use MakesHash;
     use Queueable;
     use SerializesModels;
-    use MakesHash;
 
     public const IMAGE = 1;
 
@@ -72,8 +71,6 @@ class UploadFile implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return Document|null
      */
     public function handle(): ?Document
     {
@@ -104,7 +101,7 @@ class UploadFile implements ShouldQueue
         $document->user_id = $this->user->id;
         $document->company_id = $this->company->id;
         $document->url = $instance;
-        $document->name = str_replace("/", "-", $this->file->getClientOriginalName());
+        $document->name = str_replace('/', '-', $this->file->getClientOriginalName());
         $document->type = $this->file->extension();
         $document->disk = $this->disk;
         $document->hash = $this->file->hashName();

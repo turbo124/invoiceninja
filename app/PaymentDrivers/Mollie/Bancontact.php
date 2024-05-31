@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,9 +37,6 @@ class Bancontact implements MethodInterface
 
     /**
      * Show the authorization page for Bancontact.
-     *
-     * @param array $data
-     * @return \Illuminate\View\View
      */
     public function authorizeView(array $data): View
     {
@@ -49,9 +45,6 @@ class Bancontact implements MethodInterface
 
     /**
      * Handle the authorization for Bancontact.
-     *
-     * @param Request $request
-     * @return RedirectResponse
      */
     public function authorizeResponse(Request $request): RedirectResponse
     {
@@ -61,7 +54,6 @@ class Bancontact implements MethodInterface
     /**
      * Show the payment page for Bancontact.
      *
-     * @param array $data
      * @return Redirector|RedirectResponse
      */
     public function paymentView(array $data)
@@ -97,7 +89,7 @@ class Bancontact implements MethodInterface
             return redirect(
                 $payment->getCheckoutUrl()
             );
-        } catch (\Mollie\Api\Exceptions\ApiException | \Exception $exception) {
+        } catch (\Mollie\Api\Exceptions\ApiException|\Exception $exception) {
             return $this->processUnsuccessfulPayment($exception);
         }
     }
@@ -105,9 +97,9 @@ class Bancontact implements MethodInterface
     /**
      * Handle unsuccessful payment.
      *
-     * @param Exception $exception
+     * @param  Exception  $exception
+     *
      * @throws PaymentFailed
-     * @return void
      */
     public function processUnsuccessfulPayment(\Exception $exception): void
     {
@@ -128,7 +120,6 @@ class Bancontact implements MethodInterface
     /**
      * Handle the payments for the KBC.
      *
-     * @param PaymentResponseRequest $request
      * @return mixed
      */
     public function paymentResponse(PaymentResponseRequest $request)
@@ -161,7 +152,7 @@ class Bancontact implements MethodInterface
             return $this->processUnsuccessfulPayment(
                 new PaymentFailed(ctrans('texts.status_voided'))
             );
-        } catch (\Mollie\Api\Exceptions\ApiException | \Exception $exception) {
+        } catch (\Mollie\Api\Exceptions\ApiException|\Exception $exception) {
             return $this->processUnsuccessfulPayment($exception);
         }
     }
@@ -169,9 +160,7 @@ class Bancontact implements MethodInterface
     /**
      * Handle the successful payment for Bancontact.
      *
-     * @param string $status
-     * @param ResourcesPayment $payment
-     * @return RedirectResponse
+     * @param  ResourcesPayment  $payment
      */
     public function processSuccessfulPayment(\Mollie\Api\Resources\Payment $payment, string $status = 'paid'): RedirectResponse
     {
@@ -202,8 +191,7 @@ class Bancontact implements MethodInterface
     /**
      * Handle 'open' payment status for Bancontact.
      *
-     * @param ResourcesPayment $payment
-     * @return RedirectResponse
+     * @param  ResourcesPayment  $payment
      */
     public function processOpenPayment(\Mollie\Api\Resources\Payment $payment): RedirectResponse
     {

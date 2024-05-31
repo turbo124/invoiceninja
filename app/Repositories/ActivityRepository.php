@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,15 +33,15 @@ use App\Utils\VendorHtmlEngine;
  */
 class ActivityRepository extends BaseRepository
 {
-    use MakesInvoiceHtml;
     use MakesHash;
+    use MakesInvoiceHtml;
 
     /**
      * Save the Activity.
      *
-     * @param \stdClass $fields The fields
-     * @param \App\Models\Invoice | \App\Models\Quote | \App\Models\Credit | \App\Models\PurchaseOrder | \App\Models\Expense $entity
-     * @param array $event_vars
+     * @param  \stdClass  $fields  The fields
+     * @param  \App\Models\Invoice | \App\Models\Quote | \App\Models\Credit | \App\Models\PurchaseOrder | \App\Models\Expense  $entity
+     * @param  array  $event_vars
      */
     public function save($fields, $entity, $event_vars)
     {
@@ -52,7 +51,7 @@ class ActivityRepository extends BaseRepository
             $activity->{$key} = $value;
         }
 
-        if($entity->company) {
+        if ($entity->company) {
             $activity->account_id = $entity->company->account_id;
         }
 
@@ -72,8 +71,8 @@ class ActivityRepository extends BaseRepository
     /**
      * Creates a backup.
      *
-     * @param \App\Models\Invoice | \App\Models\Quote | \App\Models\Credit | \App\Models\PurchaseOrder | \App\Models\Expense $entity
-     * @param \App\Models\Activity $activity  The activity
+     * @param  \App\Models\Invoice | \App\Models\Quote | \App\Models\Credit | \App\Models\PurchaseOrder | \App\Models\Expense  $entity
+     * @param  \App\Models\Activity  $activity  The activity
      */
     public function createBackup($entity, $activity)
     {
@@ -98,7 +97,7 @@ class ActivityRepository extends BaseRepository
             return;
         }
 
-        if(get_class($entity) == PurchaseOrder::class) {
+        if (get_class($entity) == PurchaseOrder::class) {
 
             $backup = new Backup();
             $entity->load('client');
@@ -117,7 +116,7 @@ class ActivityRepository extends BaseRepository
     public function getTokenId(array $event_vars)
     {
         if ($event_vars['token']) {
-            /** @var \App\Models\CompanyToken $company_token **/
+            /** @var \App\Models\CompanyToken $company_token * */
             $company_token = CompanyToken::query()->where('token', $event_vars['token'])->first();
 
             if ($company_token) {
@@ -171,8 +170,8 @@ class ActivityRepository extends BaseRepository
         $maker = new PdfMakerService($state);
 
         $html = $maker->design($template)
-                    ->build()
-                    ->getCompiledHTML(true);
+            ->build()
+            ->getCompiledHTML(true);
 
         $maker = null;
         $state = null;
@@ -241,8 +240,8 @@ class ActivityRepository extends BaseRepository
         $maker = new PdfMakerService($state);
 
         $html = $maker->design($template)
-                     ->build()
-                     ->getCompiledHTML(true);
+            ->build()
+            ->getCompiledHTML(true);
 
         $maker = null;
         $state = null;

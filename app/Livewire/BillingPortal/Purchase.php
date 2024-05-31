@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,10 +18,10 @@ use App\Livewire\BillingPortal\Authentication\RegisterOrLogin;
 use App\Livewire\BillingPortal\Cart\Cart;
 use App\Livewire\BillingPortal\Payments\Methods;
 use App\Models\Subscription;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Support\Str;
 
 class Purchase extends Component
 {
@@ -36,7 +35,7 @@ class Purchase extends Component
 
     public ?string $campaign;
 
-    // 
+    //
 
     public int $step = 0;
 
@@ -127,11 +126,11 @@ class Purchase extends Component
 
     public function mount()
     {
-        $classes = collect(self::$dependencies)->mapWithKeys(fn($dependency, $class) => [$dependency['id'] => $class])->toArray();
+        $classes = collect(self::$dependencies)->mapWithKeys(fn ($dependency, $class) => [$dependency['id'] => $class])->toArray();
 
         if ($this->subscription->steps) {
             $steps = collect(explode(',', $this->subscription->steps))
-                ->map(fn($step) => $classes[$step])
+                ->map(fn ($step) => $classes[$step])
                 ->toArray();
 
             $this->steps = [

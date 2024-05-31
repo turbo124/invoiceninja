@@ -6,23 +6,22 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Http\Controllers\ClientPortal;
 
-use App\Utils\TempFile;
-use App\Models\Document;
-use Illuminate\View\View;
-use App\Libraries\MultiDB;
-use App\Utils\Traits\MakesHash;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\Document\DownloadMultipleDocumentsRequest;
 use App\Http\Requests\ClientPortal\Documents\ShowDocumentRequest;
+use App\Http\Requests\Document\DownloadMultipleDocumentsRequest;
+use App\Libraries\MultiDB;
+use App\Models\Document;
+use App\Utils\TempFile;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class DocumentController extends Controller
 {
@@ -37,8 +36,6 @@ class DocumentController extends Controller
     }
 
     /**
-     * @param ShowDocumentRequest $request
-     * @param Document $document
      * @return Factory|View
      */
     public function show(ShowDocumentRequest $request, Document $document)
@@ -57,7 +54,7 @@ class DocumentController extends Controller
     {
         MultiDB::documentFindAndSetDb($document_hash);
 
-        /** @var \App\Models\Document $document **/
+        /** @var \App\Models\Document $document * */
         $document = Document::where('hash', $document_hash)->firstOrFail();
 
         $headers = ['Cache-Control:' => 'no-cache'];
@@ -74,13 +71,13 @@ class DocumentController extends Controller
 
         $hash = Cache::pull($hash);
 
-        if(!$hash) {
+        if (! $hash) {
             abort(404);
         }
 
         MultiDB::setDb($hash['db']);
 
-        /** @var \App\Models\Document $document **/
+        /** @var \App\Models\Document $document * */
         $document = Document::where('hash', $hash['doc_hash'])->firstOrFail();
 
         $headers = ['Cache-Control:' => 'no-cache'];
@@ -92,10 +89,9 @@ class DocumentController extends Controller
         return Storage::disk($document->disk)->download($document->url, $document->name, $headers);
     }
 
-
     public function downloadMultiple(DownloadMultipleDocumentsRequest $request)
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<Document> $documents **/
+        /** @var \Illuminate\Database\Eloquent\Collection<Document> $documents * */
         $documents = Document::query()->whereIn('id', $this->transformKeys($request->file_hash))
             ->where('company_id', auth()->guard('contact')->user()->company_id)
             ->get();
@@ -111,7 +107,7 @@ class DocumentController extends Controller
             $filepath = sys_get_temp_dir().'/'.$filename;
 
             $zipFile->saveAsFile($filepath) // save the archive to a file
-                   ->close(); // close archive
+                ->close(); // close archive
 
             return response()->download($filepath, $filename)->deleteFileAfterSend(true);
         } catch (\PhpZip\Exception\ZipException $e) {

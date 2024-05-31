@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,10 +43,10 @@ class AuthorizeCreditCard
     public function processPaymentView($data)
     {
         $tokens = ClientGatewayToken::where('client_id', $this->authorize->client->id)
-                                    ->where('company_gateway_id', $this->authorize->company_gateway->id)
-                                    ->where('gateway_type_id', GatewayType::CREDIT_CARD)
-                                    ->orderBy('is_default', 'desc')
-                                    ->get();
+            ->where('company_gateway_id', $this->authorize->company_gateway->id)
+            ->where('gateway_type_id', GatewayType::CREDIT_CARD)
+            ->orderBy('is_default', 'desc')
+            ->get();
 
         $data['tokens'] = $tokens;
         $data['gateway'] = $this->authorize;

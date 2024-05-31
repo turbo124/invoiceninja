@@ -21,8 +21,7 @@ class SystemLogController extends BaseController
     /**
      * Show the list of Invoices.
      *
-     * @param SystemLogFilters $filters The filters
-     *
+     * @param  SystemLogFilters  $filters  The filters
      * @return Response
      *
      * @OA\Get(
@@ -33,25 +32,33 @@ class SystemLogController extends BaseController
      *      description="Lists system logs, search and filters allow fine grained lists to be generated.
      *
      *      Query parameters can be added to performed more fine grained filtering of the system logs, these are handled by the SystemLogFilters class which defines the methods available",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of system logs",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/SystemLog"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -88,7 +95,6 @@ class SystemLogController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return Response
      */
     public function store(Request $request)
@@ -104,10 +110,8 @@ class SystemLogController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param Request $request The request
-     * @param SystemLog $system_log
+     * @param  Request  $request  The request
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/system_logs/{id}",
@@ -115,6 +119,7 @@ class SystemLogController extends BaseController
      *      tags={"system_logs"},
      *      summary="Shows a system_logs",
      *      description="Displays a system_logs by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -124,28 +129,36 @@ class SystemLogController extends BaseController
      *          description="The system_logs Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the system_logs object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/SystemLog"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -174,7 +187,6 @@ class SystemLogController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
      * @param  int  $id
      * @return Response
      */

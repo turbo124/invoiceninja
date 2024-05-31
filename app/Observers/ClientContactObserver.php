@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class ClientContactObserver
     /**
      * Handle the client contact "created" event.
      *
-     * @param ClientContact $clientContact
      * @return void
      */
     public function created(ClientContact $clientContact)
@@ -33,7 +31,6 @@ class ClientContactObserver
     /**
      * Handle the client contact "updated" event.
      *
-     * @param ClientContact $clientContact
      * @return void
      */
     public function updated(ClientContact $clientContact)
@@ -44,7 +41,6 @@ class ClientContactObserver
     /**
      * Handle the client contact "deleted" event.
      *
-     * @param ClientContact $clientContact
      * @return void
      */
     public function deleted(ClientContact $clientContact)
@@ -63,7 +59,6 @@ class ClientContactObserver
                 $invite->invoice->service()->createInvitations();
             }
         });
-
 
         QuoteInvitation::withTrashed()->where('client_contact_id', $client_contact_id)->cursor()->each(function ($invite) {
             if ($invite->quote()->doesnthave('invitations')) {
@@ -87,7 +82,6 @@ class ClientContactObserver
     /**
      * Handle the client contact "restored" event.
      *
-     * @param ClientContact $clientContact
      * @return void
      */
     public function restored(ClientContact $clientContact)
@@ -97,7 +91,6 @@ class ClientContactObserver
     /**
      * Handle the client contact "force deleted" event.
      *
-     * @param ClientContact $clientContact
      * @return void
      */
     public function forceDeleted(ClientContact $clientContact)

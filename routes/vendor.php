@@ -18,13 +18,13 @@ use App\Http\Controllers\VendorPortal\VendorContactController;
 use App\Http\Controllers\VendorPortal\VendorContactHashLoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('vendors', [VendorContactLoginController::class, 'catch'])->name('vendor.catchall')->middleware(['domain_db', 'contact_account','vendor_locale']); //catch all
-Route::get('vendor/key_login/{contact_key}', [VendorContactHashLoginController::class, 'login'])->name('contact_login')->middleware(['domain_db','vendor_contact_key_login']);
+Route::get('vendors', [VendorContactLoginController::class, 'catch'])->name('vendor.catchall')->middleware(['domain_db', 'contact_account', 'vendor_locale']); //catch all
+Route::get('vendor/key_login/{contact_key}', [VendorContactHashLoginController::class, 'login'])->name('contact_login')->middleware(['domain_db', 'vendor_contact_key_login']);
 
 Route::group(['middleware' => ['invite_db'], 'prefix' => 'vendor', 'as' => 'vendor.'], function () {
     /*Invitation catches*/
     Route::get('purchase_order/{invitation_key}', [InvitationController::class, 'purchaseOrder']);
-    Route::get('purchase_order/{invitation_key}/download', [InvitationController::class, 'download']);//->middleware('token_auth');
+    Route::get('purchase_order/{invitation_key}/download', [InvitationController::class, 'download']); //->middleware('token_auth');
 });
 
 Route::group(['middleware' => ['auth:vendor', 'vendor_locale', 'domain_db'], 'prefix' => 'vendor', 'as' => 'vendor.'], function () {
@@ -40,7 +40,7 @@ Route::group(['middleware' => ['auth:vendor', 'vendor_locale', 'domain_db'], 'pr
 
     Route::post('purchase_orders/bulk', [PurchaseOrderController::class, 'bulk'])->name('purchase_orders.bulk');
     Route::get('logout', [VendorContactLoginController::class, 'logout'])->name('logout');
-    Route::post('purchase_order/upload/{purchase_order}', [UploadController::class,'upload'])->name('upload.store');
+    Route::post('purchase_order/upload/{purchase_order}', [UploadController::class, 'upload'])->name('upload.store');
 
     Route::post('documents/download_multiple', [App\Http\Controllers\VendorPortal\DocumentController::class, 'downloadMultiple'])->name('documents.download_multiple');
     Route::get('documents/{document}/download', [App\Http\Controllers\VendorPortal\DocumentController::class, 'download'])->name('documents.download');
@@ -50,6 +50,5 @@ Route::group(['middleware' => ['auth:vendor', 'vendor_locale', 'domain_db'], 'pr
     Route::resource('documents', App\Http\Controllers\VendorPortal\DocumentController::class)->only(['index', 'show']);
 
 });
-
 
 Route::fallback([BaseController::class, 'notFoundVendor']);

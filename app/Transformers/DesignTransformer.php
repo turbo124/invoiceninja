@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -23,21 +22,13 @@ class DesignTransformer extends EntityTransformer
     use MakesHash;
     use SoftDeletes;
 
-    /**
-     * @var array
-     */
     protected array $defaultIncludes = [
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
     ];
 
     /**
-     * @param Design $design
-     *
      * @return array
      */
     public function transform(Design $design)

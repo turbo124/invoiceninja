@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -38,8 +37,6 @@ class DocumentController extends Controller
     }
 
     /**
-     * @param ShowDocumentRequest $request
-     * @param Document $document
      * @return Factory|View
      */
     public function show(ShowDocumentRequest $request, Document $document)
@@ -51,7 +48,6 @@ class DocumentController extends Controller
             'company' => auth()->guard('vendor')->user()->company,
         ]);
     }
-
 
     private function sidebarMenu(): array
     {
@@ -70,7 +66,6 @@ class DocumentController extends Controller
 
         return $data;
     }
-
 
     public function download(ShowDocumentRequest $request, Document $document)
     {
@@ -111,7 +106,7 @@ class DocumentController extends Controller
             $filepath = sys_get_temp_dir().'/'.$filename;
 
             $zipFile->saveAsFile($filepath) // save the archive to a file
-                   ->close(); // close archive
+                ->close(); // close archive
 
             return response()->download($filepath, $filename)->deleteFileAfterSend(true);
         } catch (\PhpZip\Exception\ZipException $e) {

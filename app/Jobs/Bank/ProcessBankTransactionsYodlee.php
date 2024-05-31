@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Credit Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -14,7 +13,6 @@ namespace App\Jobs\Bank;
 use App\Helpers\Bank\Yodlee\Transformer\AccountTransformer;
 use App\Helpers\Bank\Yodlee\Yodlee;
 use App\Libraries\MultiDB;
-use App\Models\Account;
 use App\Models\BankIntegration;
 use App\Models\BankTransaction;
 use App\Models\Company;
@@ -67,7 +65,7 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
     public function handle()
     {
         if ($this->bank_integration->integration_type != BankIntegration::INTEGRATION_TYPE_YODLEE) {
-            throw new \Exception("Invalid BankIntegration Type");
+            throw new \Exception('Invalid BankIntegration Type');
         }
 
         set_time_limit(0);
@@ -81,15 +79,16 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
             try {
                 $this->processTransactions();
             } catch (\Exception $e) {
-                nlog("Yodlee: {$this->bank_integration->bank_account_id} - exited abnormally => " . $e->getMessage());
+                nlog("Yodlee: {$this->bank_integration->bank_account_id} - exited abnormally => ".$e->getMessage());
 
                 $content = [
                     "Processing transactions for account: {$this->bank_integration->bank_account_id} failed",
-                    "Exception Details => ",
+                    'Exception Details => ',
                     $e->getMessage(),
                 ];
 
                 $this->bank_integration->company->notification(new GenericNinjaAdminNotification($content))->ninja();
+
                 return;
             }
         } while ($this->stop_loop);
@@ -97,15 +96,15 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
         BankMatchingService::dispatch($this->company->id, $this->company->db);
     }
 
-
     private function processTransactions()
     {
         $yodlee = new Yodlee($this->bank_integration_account_id);
 
-        if (!$yodlee->getAccount($this->bank_integration->bank_account_id)) {
+        if (! $yodlee->getAccount($this->bank_integration->bank_account_id)) {
             $this->bank_integration->disabled_upstream = true;
             $this->bank_integration->save();
             $this->stop_loop = false;
+
             return;
         }
 
@@ -126,7 +125,7 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
 
             }
         } catch (\Exception $e) {
-            nlog("YODLEE: unable to update account summary for {$this->bank_integration->bank_account_id} => " . $e->getMessage());
+            nlog("YODLEE: unable to update account summary for {$this->bank_integration->bank_account_id} => ".$e->getMessage());
         }
 
         $data = [
@@ -151,6 +150,7 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
             $this->bank_integration->disabled_upstream = false;
             $this->bank_integration->save();
             $this->stop_loop = false;
+
             return;
         }
 
@@ -183,7 +183,6 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
             );
         }
 
-
         $this->skip = $this->skip + 500;
 
         if ($count < 500) {
@@ -192,7 +191,6 @@ class ProcessBankTransactionsYodlee implements ShouldQueue
             $this->bank_integration->save();
         }
     }
-
 
     public function middleware()
     {

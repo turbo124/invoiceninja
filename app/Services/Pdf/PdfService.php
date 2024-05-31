@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,10 +28,10 @@ use horstoeko\zugferd\ZugferdDocumentPdfBuilder;
 
 class PdfService
 {
-    use PdfMaker;
     use PageNumbering;
+    use PdfMaker;
 
-    public InvoiceInvitation | QuoteInvitation | CreditInvitation | RecurringInvoiceInvitation | PurchaseOrderInvitation $invitation;
+    public InvoiceInvitation|QuoteInvitation|CreditInvitation|RecurringInvoiceInvitation|PurchaseOrderInvitation $invitation;
 
     public Company $company;
 
@@ -53,8 +52,11 @@ class PdfService
     public float $execution_time;
 
     public const DELIVERY_NOTE = 'delivery_note';
+
     public const STATEMENT = 'statement';
+
     public const PURCHASE_ORDER = 'purchase_order';
+
     public const PRODUCT = 'product';
 
     public function __construct($invitation, $document_type = 'product', $options = [])
@@ -84,7 +86,6 @@ class PdfService
      * string.
      *
      * @return mixed | Exception
-     *
      */
     public function getPdf()
     {
@@ -97,7 +98,7 @@ class PdfService
                 $pdf = $numbered_pdf;
             }
 
-            if($this->config->entity_string == "invoice" && $this->config->settings->enable_e_invoice) {
+            if ($this->config->entity_string == 'invoice' && $this->config->settings->enable_e_invoice) {
                 $pdf = $this->checkEInvoice($pdf);
             }
 
@@ -113,9 +114,6 @@ class PdfService
 
     /**
      * Renders the dom document to HTML
-     *
-     * @return string
-     *
      */
     public function getHtml(): string
     {
@@ -133,15 +131,12 @@ class PdfService
 
     /**
      * Initialize all the services to build the PDF
-     *
-     * @return self
      */
     public function init(): self
     {
         $this->start_time = microtime(true);
 
         $this->config = (new PdfConfiguration($this))->init();
-
 
         $this->html_variables = $this->config->client ?
                                     (new HtmlEngine($this->invitation))->generateLabelsAndValues() :
@@ -156,8 +151,6 @@ class PdfService
 
     /**
      * resolvePdfEngine
-     *
-     * @return mixed
      */
     public function resolvePdfEngine(string $html): mixed
     {
@@ -174,27 +167,24 @@ class PdfService
 
     /**
      * Switch to determine if we need to embed the xml into the PDF itself
-     *
-     * @param  string $pdf
-     * @return string
      */
     private function checkEInvoice(string $pdf): string
     {
-        if(!$this->config->entity instanceof Invoice) {
+        if (! $this->config->entity instanceof Invoice) {
             return $pdf;
         }
 
         $e_invoice_type = $this->config->settings->e_invoice_type;
 
         switch ($e_invoice_type) {
-            case "EN16931":
-            case "XInvoice_2_2":
-            case "XInvoice_2_1":
-            case "XInvoice_2_0":
-            case "XInvoice_1_0":
-            case "XInvoice-Extended":
-            case "XInvoice-BasicWL":
-            case "XInvoice-Basic":
+            case 'EN16931':
+            case 'XInvoice_2_2':
+            case 'XInvoice_2_1':
+            case 'XInvoice_2_0':
+            case 'XInvoice_1_0':
+            case 'XInvoice-Extended':
+            case 'XInvoice-BasicWL':
+            case 'XInvoice-Basic':
                 return $this->embedEInvoiceZuGFerD($pdf) ?? $pdf;
                 //case "Facturae_3.2":
                 //case "Facturae_3.2.1":
@@ -208,9 +198,6 @@ class PdfService
 
     /**
      * Embed the .xml file into the PDF
-     *
-     * @param  string $pdf
-     * @return string
      */
     private function embedEInvoiceZuGFerD(string $pdf): string
     {
@@ -223,10 +210,9 @@ class PdfService
             return $pdfBuilder->downloadString(basename($this->config->entity->getFileName()));
 
         } catch (\Exception $e) {
-            nlog("E_Invoice Merge failed - " . $e->getMessage());
+            nlog('E_Invoice Merge failed - '.$e->getMessage());
         }
 
         return $pdf;
     }
-
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,7 +33,7 @@ class UserSalesReportTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -158,13 +157,12 @@ class UserSalesReportTest extends TestCase
     {
         $this->buildData();
 
-
         $this->payload = [
             'start_date' => '2000-01-01',
             'end_date' => '2030-01-11',
             'date_range' => 'custom',
             'client_id' => $this->client->id,
-            'report_keys' => []
+            'report_keys' => [],
         ];
 
         $i = Invoice::factory()->create([
@@ -198,7 +196,6 @@ class UserSalesReportTest extends TestCase
         $this->account->delete();
     }
 
-
     private function buildLineItems()
     {
         $line_items = [];
@@ -213,7 +210,6 @@ class UserSalesReportTest extends TestCase
 
         $line_items[] = $item;
 
-
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
         $item->cost = 10;
@@ -223,7 +219,6 @@ class UserSalesReportTest extends TestCase
         // $item->expense_id = $this->encodePrimaryKey($this->expense->id);
 
         $line_items[] = $item;
-
 
         return $line_items;
     }

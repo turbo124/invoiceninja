@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -94,6 +93,7 @@ class QuoteService
 
     /**
      * Applies the invoice number.
+     *
      * @return $this InvoiceService object
      */
     public function applyNumber(): self
@@ -131,18 +131,16 @@ class QuoteService
             $this->convert();
 
             $this->invoice
-                 ->service()
-                 ->markSent()
+                ->service()
+                ->markSent()
                 //  ->deletePdf()
-                 ->save();
+                ->save();
         }
 
         event(new QuoteWasApproved($contact, $this->quote, $this->quote->company, Ninja::eventVars()));
 
         return $this;
     }
-
-
 
     public function approveWithNoCoversion($contact = null): self
     {
@@ -237,6 +235,7 @@ class QuoteService
 
         return $this;
     }
+
     public function deleteEQuote()
     {
         $this->quote->load('invitations');
@@ -244,12 +243,12 @@ class QuoteService
         $this->quote->invitations->each(function ($invitation) {
             try {
                 // if (Storage::disk(config('filesystems.default'))->exists($this->invoice->client->e_invoice_filepath($invitation).$this->invoice->getFileName("xml"))) {
-                Storage::disk(config('filesystems.default'))->delete($this->quote->client->e_document_filepath($invitation).$this->quote->getFileName("xml"));
+                Storage::disk(config('filesystems.default'))->delete($this->quote->client->e_document_filepath($invitation).$this->quote->getFileName('xml'));
                 // }
 
                 // if (Ninja::isHosted() && Storage::disk('public')->exists($this->invoice->client->e_invoice_filepath($invitation).$this->invoice->getFileName("xml"))) {
                 if (Ninja::isHosted()) {
-                    Storage::disk('public')->delete($this->quote->client->e_document_filepath($invitation).$this->quote->getFileName("xml"));
+                    Storage::disk('public')->delete($this->quote->client->e_document_filepath($invitation).$this->quote->getFileName('xml'));
                 }
             } catch (\Exception $e) {
                 nlog($e->getMessage());
@@ -261,7 +260,6 @@ class QuoteService
 
     /**
      * Saves the quote.
-     * @return Quote|null
      */
     public function save(): ?Quote
     {

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class UserQualityNotification extends Notification
      *
      * @return void
      */
-
     protected User $user;
 
     protected string $account_key;
@@ -48,7 +46,6 @@ class UserQualityNotification extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     *
      */
     public function toMail($notifiable)
     {
@@ -73,9 +70,9 @@ class UserQualityNotification extends Notification
         $content .= "Account: {$this->account_key }\n";
 
         return (new SlackMessage())
-                ->success()
-                ->from(ctrans('texts.notification_bot'))
-                ->image('https://app.invoiceninja.com/favicon.png')
-                ->content($content);
+            ->success()
+            ->from(ctrans('texts.notification_bot'))
+            ->image('https://app.invoiceninja.com/favicon.png')
+            ->content($content);
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -34,7 +33,7 @@ class LogRequestSending
 
     public function handle(RequestSending $event)
     {
-        nlog("Request");
+        nlog('Request');
         nlog($event->request->headers());
         nlog($event->request->url());
         nlog(json_encode($event->request->headers()));

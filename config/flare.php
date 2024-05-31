@@ -62,8 +62,8 @@ return [
         CensorRequestHeaders::class => [
             'headers' => [
                 'API-KEY',
-            ]
-        ]
+            ],
+        ],
     ],
 
     /*

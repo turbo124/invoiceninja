@@ -5,8 +5,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
-* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ use App\PaymentDrivers\StripePaymentDriver;
 
 class Bancontact
 {
-    /** @var StripePaymentDriver */
     public StripePaymentDriver $stripe;
 
     public function __construct(StripePaymentDriver $stripe)
@@ -57,7 +55,7 @@ class Bancontact
                 'gateway_type_id' => GatewayType::BANCONTACT,
             ],
 
-        ], array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid("st", true)]));
+        ], array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid('st', true)]));
 
         $data['pi_client_secret'] = $intent->client_secret;
 
@@ -81,7 +79,7 @@ class Bancontact
         $this->stripe->payment_hash->data = array_merge((array) $this->stripe->payment_hash->data, $request->all());
         $this->stripe->payment_hash->save();
 
-        if (in_array($request->redirect_status, ['succeeded','pending'])) {
+        if (in_array($request->redirect_status, ['succeeded', 'pending'])) {
             return $this->processSuccessfulPayment($request->payment_intent);
         }
 

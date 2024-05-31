@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Vendor",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed id of the vendor"),
  *       @OA\Property(property="user_id", type="string", example="Opnel5aKBz", description="The hashed id of the user who created the vendor"),
  *       @OA\Property(property="assigned_user_id", type="string", example="Opnel5aKBz", description="The hashed id of the assigned user to this vendor"),
@@ -11,11 +12,13 @@
  *       @OA\Property(
  *       	property="contacts",
  *        	type="array",
+ *
  *        	@OA\Items(
  *
  *           	ref="#/components/schemas/VendorContact",
  *          ),
  *       ),
+ *
  *       @OA\Property(property="name", type="string", example="Harry's cafe de wheels", description="The vendor name"),
  *       @OA\Property(property="website", type="string", example="www.harry.com", description="The website of the vendor"),
  *       @OA\Property(property="private_notes", type="string", example="Shhh, don't tell the vendor", description="The private notes of the vendor"),

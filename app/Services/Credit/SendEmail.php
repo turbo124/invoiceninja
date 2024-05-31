@@ -5,17 +5,16 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Credit;
 
-use App\Utils\Ninja;
-use App\Models\Webhook;
-use App\Models\ClientContact;
-use App\Jobs\Entity\EmailEntity;
 use App\Events\Credit\CreditWasEmailed;
+use App\Jobs\Entity\EmailEntity;
+use App\Models\ClientContact;
+use App\Models\Webhook;
+use App\Utils\Ninja;
 
 class SendEmail
 {
@@ -25,7 +24,7 @@ class SendEmail
 
     protected $contact;
 
-    public function __construct($credit, $reminder_template = null, ClientContact $contact = null)
+    public function __construct($credit, $reminder_template = null, ?ClientContact $contact = null)
     {
         $this->credit = $credit;
 
@@ -53,7 +52,7 @@ class SendEmail
 
         if ($this->credit->invitations->count() >= 1) {
             event(new CreditWasEmailed($this->credit->invitations->first(), $this->credit->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'credit'));
-            $this->credit->sendEvent(Webhook::EVENT_SENT_CREDIT, "client");
+            $this->credit->sendEvent(Webhook::EVENT_SENT_CREDIT, 'client');
 
         }
 

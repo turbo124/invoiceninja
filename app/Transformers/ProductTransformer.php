@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,17 +24,12 @@ class ProductTransformer extends EntityTransformer
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'company',
         'user',
     ];
 
     /**
-     * @param Product $product
-     *
      * @return \Illuminate\Support\Collection
      */
     public function includeUser(Product $product)
@@ -46,8 +40,6 @@ class ProductTransformer extends EntityTransformer
     }
 
     /**
-     * @param Product $product
-     *
      * @return \Illuminate\Support\Collection
      */
     public function includeCompany(Product $product)

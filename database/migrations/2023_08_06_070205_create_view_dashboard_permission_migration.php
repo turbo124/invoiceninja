@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +14,7 @@ return new class extends Migration {
         \App\Models\CompanyUser::query()->where('is_admin', 0)->cursor()->each(function ($cu) {
             $permissions = $cu->permissions;
 
-            if (!$permissions || strlen($permissions) == 0) {
+            if (! $permissions || strlen($permissions) == 0) {
                 $permissions = 'view_dashboard';
                 $cu->permissions = $permissions;
                 $cu->save();
@@ -22,7 +23,7 @@ return new class extends Migration {
 
                 $permissions_array[] = 'view_dashboard';
 
-                $modified_permissions_string = implode(",", $permissions_array);
+                $modified_permissions_string = implode(',', $permissions_array);
 
                 $cu->permissions = $modified_permissions_string;
                 $cu->save();

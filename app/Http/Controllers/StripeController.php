@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -63,9 +62,9 @@ class StripeController extends BaseController
 
             /** @var \App\Models\CompanyGateway $company_gateway */
             $company_gateway = CompanyGateway::where('company_id', $user->company()->id)
-                                ->where('is_deleted', 0)
-                                ->whereIn('gateway_key', $this->stripe_keys)
-                                ->first();
+                ->where('is_deleted', 0)
+                ->whereIn('gateway_key', $this->stripe_keys)
+                ->first();
 
             return $company_gateway->driver(new Client())->verifyConnect();
         }
@@ -80,9 +79,9 @@ class StripeController extends BaseController
 
         /** @var \App\Models\CompanyGateway $company_gateway */
         $company_gateway = CompanyGateway::where('company_id', $user->company()->id)
-                                         ->where('id', $this->decodePrimaryKey($company_gateway_id))
-                                         ->whereIn('gateway_key', $this->stripe_keys)
-                                         ->firstOrFail();
+            ->where('id', $this->decodePrimaryKey($company_gateway_id))
+            ->whereIn('gateway_key', $this->stripe_keys)
+            ->firstOrFail();
 
         return $company_gateway->driver()->disconnect();
     }

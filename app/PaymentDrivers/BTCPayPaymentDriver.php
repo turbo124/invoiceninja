@@ -6,19 +6,17 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://opensource.org/licenses/AAL
  */
 
 namespace App\PaymentDrivers;
 
-use App\Utils\Traits\MakesHash;
-use App\Models\GatewayType;
-use App\PaymentDrivers\BTCPay\BTCPay;
-use App\Models\SystemLog;
-use App\Models\Payment;
 use App\Exceptions\PaymentFailed;
-
+use App\Models\GatewayType;
+use App\Models\Payment;
+use App\Models\SystemLog;
+use App\PaymentDrivers\BTCPay\BTCPay;
+use App\Utils\Traits\MakesHash;
 use BTCPayServer\Client\Webhook;
 
 class BTCPayPaymentDriver extends BaseDriver
@@ -41,12 +39,15 @@ class BTCPayPaymentDriver extends BaseDriver
 
     const SYSTEM_LOG_TYPE = SystemLog::TYPE_CHECKOUT; //define a constant for your gateway ie TYPE_YOUR_CUSTOM_GATEWAY - set the const in the SystemLog model
 
-    public $btcpay_url  = "";
-    public $api_key  = "";
-    public $store_id = "";
-    public $webhook_secret = "";
-    public $btcpay;
+    public $btcpay_url = '';
 
+    public $api_key = '';
+
+    public $store_id = '';
+
+    public $webhook_secret = '';
+
+    public $btcpay;
 
     public function init()
     {
@@ -54,6 +55,7 @@ class BTCPayPaymentDriver extends BaseDriver
         $this->api_key = $this->company_gateway->getConfigField('apiKey');
         $this->store_id = $this->company_gateway->getConfigField('storeId');
         $this->webhook_secret = $this->company_gateway->getConfigField('webhookSecret');
+
         return $this; /* This is where you boot the gateway with your auth credentials*/
     }
 
@@ -71,6 +73,7 @@ class BTCPayPaymentDriver extends BaseDriver
     {
         $class = self::$methods[$payment_method_id];
         $this->payment_method = new $class($this);
+
         return $this;
     }
 
@@ -88,12 +91,12 @@ class BTCPayPaymentDriver extends BaseDriver
         if ($btcpayRep == null) {
             throw new PaymentFailed('Empty data');
         }
-        if (true === empty($btcpayRep->invoiceId)) {
+        if (empty($btcpayRep->invoiceId) === true) {
             throw new PaymentFailed(
                 'Invalid BTCPayServer payment notification- did not receive invoice ID.'
             );
         }
-        if (str_starts_with($btcpayRep->invoiceId, "__test__") || $btcpayRep->type == "InvoiceCreated") {
+        if (str_starts_with($btcpayRep->invoiceId, '__test__') || $btcpayRep->type == 'InvoiceCreated') {
             return;
         }
 
@@ -107,32 +110,32 @@ class BTCPayPaymentDriver extends BaseDriver
         $this->init();
         $webhookClient = new Webhook($this->btcpay_url, $this->api_key);
 
-        if (!$webhookClient->isIncomingWebhookRequestValid($webhook_payload, $sig, $this->webhook_secret)) {
+        if (! $webhookClient->isIncomingWebhookRequestValid($webhook_payload, $sig, $this->webhook_secret)) {
             throw new \RuntimeException(
                 'Invalid BTCPayServer payment notification message received - signature did not match.'
             );
         }
 
-        /** @var \App\Models\Payment $payment **/
+        /** @var \App\Models\Payment $payment * */
         $payment = Payment::find($btcpayRep->metafata->paymentID);
         switch ($btcpayRep->type) {
-            case "InvoiceExpired":
+            case 'InvoiceExpired':
                 $payment->status_id = Payment::STATUS_CANCELLED;
                 break;
-            case "InvoiceInvalid":
+            case 'InvoiceInvalid':
                 $payment->status_id = Payment::STATUS_FAILED;
                 break;
-            case "InvoiceSettled":
+            case 'InvoiceSettled':
                 $payment->status_id = Payment::STATUS_COMPLETED;
                 break;
         }
         $payment->save();
     }
 
-
     public function refund(Payment $payment, $amount, $return_client_response = false)
     {
         $this->setPaymentMethod(GatewayType::CRYPTO);
+
         return $this->payment_method->refund($payment, $amount); //this is your custom implementation from here
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/purchase_orderninja/purchase_orderninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://purchase_orderninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,8 +24,6 @@ class PurchaseOrderEmailActivity implements ShouldQueue
 
     /**
      * Create the event listener.
-     *
-     * @param ActivityRepository $activity_repo
      */
     public function __construct(ActivityRepository $activity_repo)
     {

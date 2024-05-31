@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,8 +28,9 @@ trait ClientGroupSettingsSaver
      * Saves a setting object.
      *
      * Works for groups|clients|companies
-     * @param  array|object $settings The request input settings array
-     * @param  object $entity   The entity which the settings belongs to
+     *
+     * @param  array|object  $settings  The request input settings array
+     * @param  object  $entity  The entity which the settings belongs to
      * @return array|object
      */
     public function saveSettings($settings, $entity)
@@ -72,8 +72,9 @@ trait ClientGroupSettingsSaver
      *
      * Returns an array of errors, or boolean TRUE
      * on successful validation
-     * @param  array $settings The request() settings array
-     * @return array|bool      Array on failure, boolean TRUE on success
+     *
+     * @param  array  $settings  The request() settings array
+     * @return array|bool Array on failure, boolean TRUE on success
      */
     public function validateSettings($settings)
     {
@@ -86,7 +87,7 @@ trait ClientGroupSettingsSaver
             unset($settings->translations);
         }
 
-        foreach(['translations','pdf_variables'] as $key) {
+        foreach (['translations', 'pdf_variables'] as $key) {
             if (property_exists($settings, $key)) {
                 unset($settings->{$key});
             }
@@ -153,8 +154,8 @@ trait ClientGroupSettingsSaver
      * the object and will also settype() the property
      * so that it can be saved cleanly
      *
-     * @param  array $settings The settings request() array
-     * @return stdClass          stdClass object
+     * @param  array  $settings  The settings request() array
+     * @return stdClass stdClass object
      */
     private function checkSettingType($settings): stdClass
     {
@@ -212,9 +213,10 @@ trait ClientGroupSettingsSaver
 
     /**
      * Type checks a object property.
-     * @param  string $key   The type
-     * @param  string $value The object property
-     * @return bool        TRUE if the property is the expected type
+     *
+     * @param  string  $key  The type
+     * @param  string  $value  The object property
+     * @return bool TRUE if the property is the expected type
      */
     private function checkAttribute($key, $value): bool
     {

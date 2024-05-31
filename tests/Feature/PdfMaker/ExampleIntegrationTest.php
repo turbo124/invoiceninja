@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://opensource.org/licenses/AAL
  */
 
@@ -49,9 +48,9 @@ class ExampleIntegrationTest extends TestCase
                 'pdf_variables' => (array) $invoice->company->settings->pdf_variables,
             ]),
             'variables' => $engine->generateLabelsAndValues(),
-             'options' => [
+            'options' => [
                 'client' => $invoice->client,
-                'invoices' => [$invoice]
+                'invoices' => [$invoice],
             ],
         ];
 

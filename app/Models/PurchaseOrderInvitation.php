@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,6 +43,7 @@ use Illuminate\Support\Str;
  * @property string $hashed_id
  * @property \App\Models\PurchaseOrder $purchase_order
  * @property \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Database\Factories\PurchaseOrderInvitationFactory factory($count = null, $state = [])
@@ -72,13 +72,14 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrderInvitation whereViewedDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrderInvitation withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PurchaseOrderInvitation withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class PurchaseOrderInvitation extends BaseModel
 {
+    use Inviteable;
     use MakesDates;
     use SoftDeletes;
-    use Inviteable;
 
     protected $fillable = [
         'id',
@@ -198,5 +199,4 @@ class PurchaseOrderInvitation extends BaseModel
 
         return config('ninja.react_url')."/#/{$entity_type}s/{$this->{$entity_type}->hashed_id}/edit";
     }
-
 }

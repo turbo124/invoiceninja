@@ -5,7 +5,6 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,8 +36,8 @@ class QuoteApprovedWebhook implements ShouldQueue
         $quote = $event->quote;
 
         $subscriptions = Webhook::where('company_id', $quote->company_id)
-                        ->where('event_id', Webhook::EVENT_APPROVE_QUOTE)
-                        ->exists();
+            ->where('event_id', Webhook::EVENT_APPROVE_QUOTE)
+            ->exists();
 
         if ($subscriptions) {
             WebhookHandler::dispatch(Webhook::EVENT_APPROVE_QUOTE, $quote, $quote->company);

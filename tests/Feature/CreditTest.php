@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,12 +23,12 @@ use Tests\TestCase;
 
 class CreditTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     public $faker;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -69,11 +68,11 @@ class CreditTest extends TestCase
             'tax_rate3' => 0,
             'discount' => 0,
             'line_items' => [
-                $ii
+                $ii,
             ],
             'status_id' => 1,
         ]);
-        
+
         $i->save();
 
         $i->calc()->getInvoice();
@@ -92,12 +91,11 @@ class CreditTest extends TestCase
             'tax_rate3' => 0,
             'discount' => 0,
             'line_items' => [
-                $ii
+                $ii,
             ],
             'status_id' => 1,
         ]);
 
-        
         $cr->calc()->getCredit();
 
         $cr->service()->markSent()->save();
@@ -121,14 +119,14 @@ class CreditTest extends TestCase
             'invoices' => [
                 [
                     'invoice_id' => $i->hashed_id,
-                    'amount' => 100
+                    'amount' => 100,
                 ],
             ],
             'credits' => [
                 [
                     'credit_id' => $cr->hashed_id,
-                    'amount' => 100
-                ]
+                    'amount' => 100,
+                ],
             ],
         ];
 
@@ -157,14 +155,14 @@ class CreditTest extends TestCase
         $this->assertEquals(0, $c->balance);
 
         $p = \App\Models\Payment::find($this->decodePrimaryKey($p_id));
-    
+
         $this->assertEquals(0, $p->amount);
         $this->assertEquals(0, $p->applied);
-                    
+
         $response = $this->withHeaders([
-                    'X-API-SECRET' => config('ninja.api_secret'),
-                    'X-API-TOKEN' => $this->token,
-                ])->deleteJson("/api/v1/payments/{$p_id}");
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->deleteJson("/api/v1/payments/{$p_id}");
 
         $response->assertStatus(200);
 
@@ -185,27 +183,27 @@ class CreditTest extends TestCase
         $this->assertEquals(100, $c->balance);
         $this->assertEquals(0, $c->paid_to_date);
 
-            
         $response = $this->withHeaders([
-                    'X-API-SECRET' => config('ninja.api_secret'),
-                    'X-API-TOKEN' => $this->token,
-                ])->deleteJson("/api/v1/credits/{$cr->hashed_id}");
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->deleteJson("/api/v1/credits/{$cr->hashed_id}");
 
         $response->assertStatus(200);
 
         $cr = $cr->fresh();
 
-        $this->assertEquals(true, $cr->is_deleted); 
+        $this->assertEquals(true, $cr->is_deleted);
 
         $this->assertEquals(100, $c->balance);
         $this->assertEquals(0, $c->paid_to_date);
-
 
     }
 
     public function testApplicableFilters()
     {
-        Credit::where('company_id', $this->company->id)->cursor()->each(function ($c) { $c->forceDelete(); });
+        Credit::where('company_id', $this->company->id)->cursor()->each(function ($c) {
+            $c->forceDelete();
+        });
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -288,7 +286,7 @@ class CreditTest extends TestCase
         $response->assertStatus(200);
         $arr = $response->json();
         $this->assertCount(1, $arr['data']);
-        
+
         $c->status_id = Credit::STATUS_APPLIED;
         $c->amount = 20;
         $c->balance = 20;
@@ -303,8 +301,6 @@ class CreditTest extends TestCase
         $response->assertStatus(200);
         $arr = $response->json();
         $this->assertCount(0, $arr['data']);
-
-
 
     }
 
@@ -321,43 +317,40 @@ class CreditTest extends TestCase
         $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
     }
 
-
     public function testBulkActions()
     {
         $data = [
             'action' => 'archive',
-            'ids' => [$this->credit->hashed_id]
+            'ids' => [$this->credit->hashed_id],
         ];
 
         $response = $this->withHeaders([
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/credits/bulk', $data)
-          ->assertStatus(200);
-
+            ->assertStatus(200);
 
         $data = [
             'ids' => [$this->credit->hashed_id],
-            'action' => 'restore'
+            'action' => 'restore',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/credits/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
 
         $data = [
             'ids' => [$this->credit->hashed_id],
-            'action' => 'delete'
+            'action' => 'delete',
         ];
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/credits/bulk', $data)
-          ->assertStatus(200);
+            ->assertStatus(200);
     }
-
 
     public function testCreditGetClientStatus()
     {

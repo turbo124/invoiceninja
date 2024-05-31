@@ -3,6 +3,7 @@
  * @OA\Schema(
  *     schema="FillableInvoice",
  *     type="object",
+ *
  *         @OA\Property(property="assigned_user_id", type="string", example="", description="__________"),
  *         @OA\Property(property="client_id", type="string", example="", description="________"),
  *         @OA\Property(property="number", type="string", example="INV_101", description="The invoice number - is a unique alpha numeric number per invoice per company"),

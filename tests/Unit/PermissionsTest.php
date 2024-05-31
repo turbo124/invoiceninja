@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -37,7 +36,7 @@ class PermissionsTest extends TestCase
 
     public $token;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +57,7 @@ class PermissionsTest extends TestCase
         $this->user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => '123',
-            'email' =>  $this->faker->safeEmail(),
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $this->cu = CompanyUserFactory::create($this->user->id, $this->company->id, $account->id);
@@ -85,7 +84,7 @@ class PermissionsTest extends TestCase
         $u = User::factory()->create([
             'account_id' => $this->company->account_id,
             'confirmation_code' => '123',
-            'email' =>  $this->faker->safeEmail(),
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $c = Client::factory()->create([
@@ -97,23 +96,22 @@ class PermissionsTest extends TestCase
             'company_id' => $this->company->id,
             'client_id' => $c->id,
             'user_id' => $u->id,
-            'status_id' => 2
+            'status_id' => 2,
         ]);
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_client","create_client","create_invoice","edit_invoice","create_quote","edit_quote"]';
         $low_cu->save();
 
-    
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/invoices');
-        
+
         $response->assertStatus(200);
 
         $data = $response->json();
-        
+
         $this->assertEquals(2, count($data));
 
         $response = $this->withHeaders([
@@ -129,21 +127,20 @@ class PermissionsTest extends TestCase
 
     }
 
-
     public function testHasExcludedPermissions()
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
         $low_cu->save();
 
-        $this->assertTrue($this->user->hasExcludedPermissions(["view_client"]));
+        $this->assertTrue($this->user->hasExcludedPermissions(['view_client']));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client';
         $low_cu->save();
 
-        $this->assertTrue($this->user->hasExcludedPermissions(["view_client"]));
-    
+        $this->assertTrue($this->user->hasExcludedPermissions(['view_client']));
+
     }
 
     public function testHasExcludedPermissions2()
@@ -152,26 +149,25 @@ class PermissionsTest extends TestCase
         $low_cu->permissions = '["view_client","edit_all"]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['edit_all']));
+        $this->assertFalse($this->user->hasExcludedPermissions(['view_client'], ['edit_all']));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client,edit_all';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['edit_all']));
+        $this->assertFalse($this->user->hasExcludedPermissions(['view_client'], ['edit_all']));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client,view_all';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['view_all']));
-
+        $this->assertFalse($this->user->hasExcludedPermissions(['view_client'], ['view_all']));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client,view_invoice';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['view_invoice']));
+        $this->assertFalse($this->user->hasExcludedPermissions(['view_client'], ['view_invoice']));
 
     }
 
@@ -181,30 +177,29 @@ class PermissionsTest extends TestCase
         $low_cu->permissions = '["view_client"]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasIntersectPermissions(["viewclient"]));
-        $this->assertTrue($this->user->hasIntersectPermissions(["view_client"]));
-
+        $this->assertFalse($this->user->hasIntersectPermissions(['viewclient']));
+        $this->assertTrue($this->user->hasIntersectPermissions(['view_client']));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_all"]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasIntersectPermissions(["viewclient"]));
-        $this->assertTrue($this->user->hasIntersectPermissions(["view_client"]));
+        $this->assertFalse($this->user->hasIntersectPermissions(['viewclient']));
+        $this->assertTrue($this->user->hasIntersectPermissions(['view_client']));
 
-        $this->assertFalse($this->user->hasIntersectPermissions(["viewbank_transaction"]));
-        $this->assertTrue($this->user->hasIntersectPermissions(["view_bank_transaction"]));
+        $this->assertFalse($this->user->hasIntersectPermissions(['viewbank_transaction']));
+        $this->assertTrue($this->user->hasIntersectPermissions(['view_bank_transaction']));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["create_all"]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasIntersectPermissions(["createclient"]));
-        $this->assertTrue($this->user->hasIntersectPermissions(["create_client"]));
+        $this->assertFalse($this->user->hasIntersectPermissions(['createclient']));
+        $this->assertTrue($this->user->hasIntersectPermissions(['create_client']));
 
-        $this->assertFalse($this->user->hasIntersectPermissions(["createbank_transaction"]));
-        $this->assertTrue($this->user->hasIntersectPermissions(["create_bank_transaction"]));
-        $this->assertTrue($this->user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction']));
+        $this->assertFalse($this->user->hasIntersectPermissions(['createbank_transaction']));
+        $this->assertTrue($this->user->hasIntersectPermissions(['create_bank_transaction']));
+        $this->assertTrue($this->user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction']));
     }
 
     public function testViewClientPermission()
@@ -213,29 +208,28 @@ class PermissionsTest extends TestCase
         $low_cu->permissions = '["view_client"]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasPermission("viewclient"));
+        $this->assertFalse($this->user->hasPermission('viewclient'));
 
         // this is aberrant
-        $this->assertFalse($this->user->hasPermission("view____client"));
+        $this->assertFalse($this->user->hasPermission('view____client'));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_client"]';
         $low_cu->save();
 
-        $this->assertTrue($this->user->hasPermission("view_client"));
-
+        $this->assertTrue($this->user->hasPermission('view_client'));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_all"]';
         $low_cu->save();
 
-        $this->assertTrue($this->user->hasPermission("view_client"));
+        $this->assertTrue($this->user->hasPermission('view_client'));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_all"]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasPermission("edit_client"));
+        $this->assertFalse($this->user->hasPermission('edit_client'));
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_all"]';
@@ -254,7 +248,6 @@ class PermissionsTest extends TestCase
         $this->assertTrue($this->user->hasPermission('view_purchase_order'));
         $this->assertTrue($this->user->hasPermission('view_expense'));
         $this->assertTrue($this->user->hasPermission('view_bank_transaction'));
-
 
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_recurring_invoice"]';
@@ -312,8 +305,8 @@ class PermissionsTest extends TestCase
 
     public function testExactPermissions()
     {
-        $this->assertTrue($this->user->hasExactPermissionAndAll("view_client"));
-        $this->assertFalse($this->user->hasExactPermissionAndAll("view_all"));
+        $this->assertTrue($this->user->hasExactPermissionAndAll('view_client'));
+        $this->assertFalse($this->user->hasExactPermissionAndAll('view_all'));
     }
 
     public function testMissingPermissions()
@@ -322,8 +315,8 @@ class PermissionsTest extends TestCase
         $low_cu->permissions = '[""]';
         $low_cu->save();
 
-        $this->assertFalse($this->user->hasExactPermissionAndAll("view_client"));
-        $this->assertFalse($this->user->hasExactPermissionAndAll("view_all"));
+        $this->assertFalse($this->user->hasExactPermissionAndAll('view_client'));
+        $this->assertFalse($this->user->hasExactPermissionAndAll('view_all'));
     }
 
     public function testViewAllValidPermissions()
@@ -332,37 +325,37 @@ class PermissionsTest extends TestCase
         $low_cu->permissions = '["view_all"]';
         $low_cu->save();
 
-        $this->assertTrue($this->user->hasExactPermissionAndAll("view_client"));
-        $this->assertTrue($this->user->hasExactPermissionAndAll("view_all"));
+        $this->assertTrue($this->user->hasExactPermissionAndAll('view_client'));
+        $this->assertTrue($this->user->hasExactPermissionAndAll('view_all'));
     }
 
     public function testReturnTypesOfStripos()
     {
-        $this->assertEquals(0, stripos("view_client", ''));
+        $this->assertEquals(0, stripos('view_client', ''));
 
         $all_permission = '[]';
-        $this->assertFalse(stripos($all_permission, "view_client") !== false);
-        $this->assertTrue(stripos($all_permission, "view_client") == 0);
-        $this->assertFalse(is_int(stripos($all_permission, "view_client")));
+        $this->assertFalse(stripos($all_permission, 'view_client') !== false);
+        $this->assertTrue(stripos($all_permission, 'view_client') == 0);
+        $this->assertFalse(is_int(stripos($all_permission, 'view_client')));
 
         $all_permission = ' ';
-        $this->assertFalse(stripos($all_permission, "view_client") !== false);
-        $this->assertFalse(is_int(stripos($all_permission, "view_client")));
-        
-        $all_permission = "";//problems are empty strings
+        $this->assertFalse(stripos($all_permission, 'view_client') !== false);
+        $this->assertFalse(is_int(stripos($all_permission, 'view_client')));
+
+        $all_permission = ''; //problems are empty strings
         $this->assertTrue(empty($all_permission));
 
-        $this->assertFalse(stripos($all_permission, "view_client") !== false);
-        $this->assertFalse(is_int(stripos($all_permission, "view_client")));
-        
-        $all_permission = 'view';//will always pass currently
-        $this->assertFalse(stripos($all_permission, "view_client") !== false);
-        $this->assertFalse(is_int(stripos($all_permission, "view_client")));
+        $this->assertFalse(stripos($all_permission, 'view_client') !== false);
+        $this->assertFalse(is_int(stripos($all_permission, 'view_client')));
 
-        $all_permission = "view_client";
-        $this->assertTrue(stripos($all_permission, "view_client") !== false);
-        $this->assertTrue(is_int(stripos($all_permission, "view_client")) !== false);
+        $all_permission = 'view'; //will always pass currently
+        $this->assertFalse(stripos($all_permission, 'view_client') !== false);
+        $this->assertFalse(is_int(stripos($all_permission, 'view_client')));
 
-        $this->assertTrue(is_int(stripos($all_permission, "view_client")));
+        $all_permission = 'view_client';
+        $this->assertTrue(stripos($all_permission, 'view_client') !== false);
+        $this->assertTrue(is_int(stripos($all_permission, 'view_client')) !== false);
+
+        $this->assertTrue(is_int(stripos($all_permission, 'view_client')));
     }
 }

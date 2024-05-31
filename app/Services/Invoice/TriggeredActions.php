@@ -5,20 +5,19 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Invoice;
 
-use App\Utils\Ninja;
+use App\Events\Invoice\InvoiceWasEmailed;
+use App\Jobs\Entity\EmailEntity;
 use App\Models\Invoice;
 use App\Models\Webhook;
-use Illuminate\Http\Request;
-use App\Jobs\Entity\EmailEntity;
 use App\Services\AbstractService;
+use App\Utils\Ninja;
 use App\Utils\Traits\GeneratesCounter;
-use App\Events\Invoice\InvoiceWasEmailed;
+use Illuminate\Http\Request;
 
 class TriggeredActions extends AbstractService
 {
@@ -35,7 +34,7 @@ class TriggeredActions extends AbstractService
         if ($this->request->has('auto_bill') && $this->request->input('auto_bill') == 'true') {
             try {
                 $this->invoice->service()->autoBill();
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
 
             } //update notification sends automatically for this.
         }
@@ -83,10 +82,9 @@ class TriggeredActions extends AbstractService
 
         if ($this->updated) {
             // event('eloquent.updated: App\Models\Invoice', $this->invoice);
-            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
+            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, 'client');
 
         }
-
 
         return $this->invoice;
     }
@@ -101,7 +99,7 @@ class TriggeredActions extends AbstractService
 
         if ($this->invoice->invitations->count() > 0) {
             event(new InvoiceWasEmailed($this->invoice->invitations->first(), $this->invoice->company, Ninja::eventVars(), 'invoice'));
-            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
+            $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, 'client');
         }
     }
 }

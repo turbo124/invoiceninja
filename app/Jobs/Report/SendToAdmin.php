@@ -5,24 +5,23 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Jobs\Report;
 
-use App\Models\User;
-use App\Models\Company;
-use App\Libraries\MultiDB;
-use App\Mail\DownloadReport;
-use Illuminate\Bus\Queueable;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Libraries\MultiDB;
+use App\Mail\DownloadReport;
+use App\Models\Company;
+use App\Models\User;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
+use Illuminate\Queue\SerializesModels;
 
 class SendToAdmin implements ShouldQueue
 {
@@ -57,8 +56,7 @@ class SendToAdmin implements ShouldQueue
         $csv = $export->run();
         $user = $this->company->owner();
 
-        if(isset($this->request['user_id']))
-        {
+        if (isset($this->request['user_id'])) {
             $user = User::find($this->request['user_id']) ?? $this->company->owner();
         }
 

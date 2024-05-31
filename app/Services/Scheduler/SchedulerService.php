@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -17,8 +16,8 @@ use App\Utils\Traits\MakesHash;
 
 class SchedulerService
 {
-    use MakesHash;
     use MakesDates;
+    use MakesHash;
 
     public function __construct(public Scheduler $scheduler)
     {
@@ -26,8 +25,6 @@ class SchedulerService
 
     /**
      * Called from the TaskScheduler Cron
-     *
-     * @return void
      */
     public function runTask(): void
     {
@@ -51,12 +48,9 @@ class SchedulerService
         (new EmailReport($this->scheduler))->run();
     }
 
-
     /**
      * Sets the next run date of the scheduled task
-     *
      */
-
 
     //handle when the scheduler has been paused.
 }

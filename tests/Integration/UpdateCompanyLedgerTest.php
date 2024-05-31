@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,10 +18,10 @@ use Tests\TestCase;
 /** @test*/
 class UpdateCompanyLedgerTest extends TestCase
 {
-    use MockAccountData;
     use DatabaseTransactions;
+    use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,9 +36,9 @@ class UpdateCompanyLedgerTest extends TestCase
         $invoice = $this->invoice->service()->markPaid()->save();
 
         $ledger = CompanyLedger::whereClientId($invoice->client_id)
-                                ->whereCompanyId($invoice->company_id)
-                                ->orderBy('id', 'DESC')
-                                ->first();
+            ->whereCompanyId($invoice->company_id)
+            ->orderBy('id', 'DESC')
+            ->first();
 
         $payment = $ledger->adjustment * -1;
         $this->assertEquals($invoice->amount, $payment);

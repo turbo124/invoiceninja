@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,8 +19,8 @@ use Illuminate\Http\Response;
 class TemplateController extends BaseController
 {
     use MakesHash;
-    use MakesTemplateData;
     use MakesInvoiceHtml;
+    use MakesTemplateData;
 
     public function __construct()
     {
@@ -39,14 +38,19 @@ class TemplateController extends BaseController
      *      tags={"templates"},
      *      summary="Returns a entity template with the template variables replaced with the Entities",
      *      description="Returns a entity template with the template variables replaced with the Entities",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\RequestBody(
      *         description="The template subject and body",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="object",
+     *
      *                 @OA\Property(
      *                     property="subject",
      *                     description="The email template subject",
@@ -60,23 +64,30 @@ class TemplateController extends BaseController
      *             )
      *         )
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The template response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Template"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )

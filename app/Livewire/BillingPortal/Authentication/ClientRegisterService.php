@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -81,7 +80,7 @@ class ClientRegisterService
         $client->number = $this->getNextClientNumber($client);
         $client->save();
 
-        if (!array_key_exists('country_id', $data) && strlen($client->company->settings->country_id) > 1) {
+        if (! array_key_exists('country_id', $data) && strlen($client->company->settings->country_id) > 1) {
             $client->update(['country_id' => $client->company->settings->country_id]);
         }
 

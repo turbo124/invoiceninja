@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -200,7 +199,7 @@ class EntitySentObject
             'whitelabel' => $this->company->account->isPaid() ? true : false,
             'text_body' => $content,
             'template' => $this->company->account->isPremium() ? 'email.template.admin_premium' : 'email.template.admin',
-            
+
         ];
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -29,16 +28,11 @@ class VendorTransformer extends EntityTransformer
         'documents',
     ];
 
-    /**
-     * @var array
-     */
     protected array $availableIncludes = [
         'activities',
     ];
 
     /**
-     * @param Vendor $vendor
-     *
      * @return \Illuminate\Support\Collection
      */
     public function includeActivities(Vendor $vendor)
@@ -49,8 +43,6 @@ class VendorTransformer extends EntityTransformer
     }
 
     /**
-     * @param Vendor $vendor
-     *
      * @return \Illuminate\Support\Collection
      */
     public function includeContacts(Vendor $vendor)
@@ -68,8 +60,6 @@ class VendorTransformer extends EntityTransformer
     }
 
     /**
-     * @param Vendor $vendor
-     *
      * @return array
      */
     public function transform(Vendor $vendor)
@@ -104,7 +94,7 @@ class VendorTransformer extends EntityTransformer
             'number' => (string) $vendor->number ?: '',
             'language_id' => (string) $vendor->language_id ?: '',
             'classification' => (string) $vendor->classification ?: '',
-            'display_name' =>  (string) $vendor->present()->name(),
+            'display_name' => (string) $vendor->present()->name(),
             'routing_id' => (string) $vendor->routing_id ?: '',
         ];
     }

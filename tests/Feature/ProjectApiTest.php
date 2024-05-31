@@ -5,36 +5,36 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Feature;
 
 use App\Models\Expense;
-use Tests\TestCase;
 use App\Models\Invoice;
 use App\Models\Quote;
-use Tests\MockAccountData;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\ProjectController
  */
 class ProjectApiTest extends TestCase
 {
-    use MakesHash;
     use DatabaseTransactions;
+    use MakesHash;
     use MockAccountData;
 
     protected $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +74,6 @@ class ProjectApiTest extends TestCase
             'project_id' => $this->project->id,
         ]);
 
-        
         $e = Expense::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -82,14 +81,12 @@ class ProjectApiTest extends TestCase
             'project_id' => $this->project->id,
         ]);
 
-        
         $q = Quote::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
             'client_id' => $this->project->client_id,
             'project_id' => $this->project->id,
         ]);
-
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -110,7 +107,7 @@ class ProjectApiTest extends TestCase
     {
 
         $data = $this->project->toArray();
-        $data['budgeted_hours'] = "aa";
+        $data['budgeted_hours'] = 'aa';
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -136,12 +133,11 @@ class ProjectApiTest extends TestCase
 
     }
 
-
     public function testProjectValidationForBudgetedHoursPutEmpty()
     {
 
         $data = $this->project->toArray();
-        $data['budgeted_hours'] = "";
+        $data['budgeted_hours'] = '';
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -152,7 +148,6 @@ class ProjectApiTest extends TestCase
 
     }
 
-
     public function testProjectValidationForBudgetedHours()
     {
 
@@ -160,7 +155,7 @@ class ProjectApiTest extends TestCase
             'name' => $this->faker->firstName(),
             'client_id' => $this->client->hashed_id,
             'number' => 'duplicate',
-            'budgeted_hours' => null
+            'budgeted_hours' => null,
         ];
 
         $response = $this->withHeaders([
@@ -179,7 +174,7 @@ class ProjectApiTest extends TestCase
             'name' => $this->faker->firstName(),
             'client_id' => $this->client->hashed_id,
             'number' => 'duplicate',
-            'budgeted_hours' => "a"
+            'budgeted_hours' => 'a',
         ];
 
         $response = $this->withHeaders([
@@ -198,7 +193,7 @@ class ProjectApiTest extends TestCase
             'name' => $this->faker->firstName(),
             'client_id' => $this->client->hashed_id,
             'number' => 'duplicate',
-            'budgeted_hours' => ""
+            'budgeted_hours' => '',
         ];
 
         $response = $this->withHeaders([

@@ -5,29 +5,28 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Helpers\Invoice;
 
-use App\Models\Quote;
 use App\Models\Credit;
 use App\Models\Invoice;
 use App\Models\PurchaseOrder;
-use App\Models\RecurringQuote;
+use App\Models\Quote;
 use App\Models\RecurringInvoice;
-use Illuminate\Support\Collection;
+use App\Models\RecurringQuote;
 use App\Utils\Traits\NumberFormatter;
+use Illuminate\Support\Collection;
 
 class InvoiceSumInclusive
 {
-    use Taxer;
     use CustomValuer;
     use Discounter;
     use NumberFormatter;
+    use Taxer;
 
-    protected RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice;
+    protected RecurringInvoice|Invoice|Quote|Credit|PurchaseOrder|RecurringQuote $invoice;
 
     public $tax_map;
 
@@ -50,10 +49,11 @@ class InvoiceSumInclusive
     private $rappen_rounding = false;
 
     public InvoiceItemSumInclusive $invoice_items;
+
     /**
      * Constructs the object with Invoice and Settings object.
      *
-     * @param RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice;
+     * @param  RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote  $invoice;
      */
     public function __construct($invoice)
     {
@@ -73,13 +73,13 @@ class InvoiceSumInclusive
     public function build()
     {
         $this->calculateLineItems()
-             ->calculateDiscount()
-             ->calculateInvoiceTaxes()
-             ->calculateCustomValues()
-             ->setTaxMap()
-             ->calculateTotals() //just don't add the taxes!!
-             ->calculateBalance()
-             ->calculatePartial();
+            ->calculateDiscount()
+            ->calculateInvoiceTaxes()
+            ->calculateCustomValues()
+            ->setTaxMap()
+            ->calculateTotals() //just don't add the taxes!!
+            ->calculateBalance()
+            ->calculatePartial();
 
         return $this;
     }
@@ -171,14 +171,14 @@ class InvoiceSumInclusive
             $this->total_taxes += $tax;
             $this->total_tax_map[] = ['name' => $this->invoice->tax_name3.' '.floatval($this->invoice->tax_rate3).'%', 'total' => $tax];
         }
-        
+
         return $this;
     }
 
     /**
      * Calculates the balance.
      *
-     * @return     self  The balance.
+     * @return self The balance.
      */
     private function calculateBalance()
     {
@@ -279,10 +279,9 @@ class InvoiceSumInclusive
     private function setCalculatedAttributes()
     {
         /* If amount != balance then some money has been paid on the invoice, need to subtract this difference from the total to set the new balance */
-        if($this->invoice->status_id == Invoice::STATUS_CANCELLED){
+        if ($this->invoice->status_id == Invoice::STATUS_CANCELLED) {
             $this->invoice->balance = 0;
-        }
-        elseif ($this->invoice->status_id != Invoice::STATUS_DRAFT) {
+        } elseif ($this->invoice->status_id != Invoice::STATUS_DRAFT) {
             if ($this->invoice->amount != $this->invoice->balance) {
                 $this->invoice->balance = $this->formatValue($this->getTotal(), $this->precision) - $this->invoice->paid_to_date;
             } else {
@@ -293,7 +292,7 @@ class InvoiceSumInclusive
         /* Set new calculated total */
         $this->invoice->amount = $this->formatValue($this->getTotal(), $this->precision);
 
-        if($this->rappen_rounding) {
+        if ($this->rappen_rounding) {
             $this->invoice->amount = $this->roundRappen($this->invoice->amount);
             $this->invoice->balance = $this->roundRappen($this->invoice->balance);
         }
@@ -302,8 +301,8 @@ class InvoiceSumInclusive
 
         return $this;
     }
-    
-    function roundRappen($value): float
+
+    public function roundRappen($value): float
     {
         return round($value / .05, 0) * .05;
     }
@@ -373,7 +372,7 @@ class InvoiceSumInclusive
 
             $this->total_taxes += $total_line_tax;
         }
-        
+
         return $this;
     }
 

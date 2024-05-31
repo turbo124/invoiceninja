@@ -15,12 +15,12 @@ class FortePaymentGateway extends Migration
     {
         $fields = new \stdClass;
         $fields->testMode = false;
-        $fields->apiLoginId = "";
-        $fields->apiAccessId = "";
-        $fields->secureKey = "";
-        $fields->authOrganizationId = "";
-        $fields->organizationId = "";
-        $fields->locationId = "";
+        $fields->apiLoginId = '';
+        $fields->apiAccessId = '';
+        $fields->secureKey = '';
+        $fields->authOrganizationId = '';
+        $fields->organizationId = '';
+        $fields->locationId = '';
 
         $forte = new Gateway;
         $forte->id = 59;

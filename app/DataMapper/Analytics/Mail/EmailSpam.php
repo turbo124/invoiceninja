@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,6 +27,7 @@ class EmailSpam extends GenericMixedMetric
 
     /**
      * The name of the counter.
+     *
      * @var string
      */
     public $name = 'job.spam.email';
@@ -59,6 +59,7 @@ class EmailSpam extends GenericMixedMetric
 
     /**
      * Company Key
+     *
      * @var string
      */
     public $string_metric7 = 'messageid';

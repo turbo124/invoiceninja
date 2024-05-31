@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,8 +25,6 @@ class QueryLogging
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
      *
      * @return mixed
      */
@@ -40,6 +37,7 @@ class QueryLogging
         }
 
         DB::enableQueryLog();
+
         return $next($request);
 
     }
@@ -78,13 +76,11 @@ class QueryLogging
 
             if ($request->hasHeader('X-CLIENT-PLATFORM')) {
                 $platform = $request->header('X-CLIENT-PLATFORM');
-            }
-            elseif($request->hasHeader('X-React')){
+            } elseif ($request->hasHeader('X-React')) {
                 $platform = 'react';
             }
 
-            if ($request->hasHeader('X-CLIENT-VERSION'))
-            {   
+            if ($request->hasHeader('X-CLIENT-VERSION')) {
                 $client_version = $request->header('X-CLIENT-VERSION');
             }
 

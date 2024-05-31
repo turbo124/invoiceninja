@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -44,22 +43,22 @@ class SearchController extends Controller
     private function clientMap(User $user)
     {
 
-        $clients =  Client::query()
-                     ->company()
-                     ->where('is_deleted', 0)
-                     ->when(!$user->hasPermission('view_all') || !$user->hasPermission('view_client'), function ($query) use ($user) {
-                         $query->where('user_id', $user->id);
-                     })
-                     ->orderBy('updated_at', 'desc')
-                     ->take(1000)
-                     ->get();
+        $clients = Client::query()
+            ->company()
+            ->where('is_deleted', 0)
+            ->when(! $user->hasPermission('view_all') || ! $user->hasPermission('view_client'), function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->orderBy('updated_at', 'desc')
+            ->take(1000)
+            ->get();
 
-        foreach($clients as $client) {
+        foreach ($clients as $client) {
             $this->clients[] = [
                 'name' => $client->present()->name(),
                 'type' => '/client',
                 'id' => $client->hashed_id,
-                'path' => "/clients/{$client->hashed_id}"
+                'path' => "/clients/{$client->hashed_id}",
             ];
 
             $client->contacts->each(function ($contact) {
@@ -67,11 +66,10 @@ class SearchController extends Controller
                     'name' => $contact->present()->search_display(),
                     'type' => '/client',
                     'id' => $contact->client->hashed_id,
-                    'path' => "/clients/{$contact->client->hashed_id}"
+                    'path' => "/clients/{$contact->client->hashed_id}",
                 ];
             });
         }
-
 
     }
 
@@ -79,25 +77,25 @@ class SearchController extends Controller
     {
 
         $invoices = Invoice::query()
-                     ->company()
-                     ->with('client')
-                     ->where('is_deleted', 0)
-                     ->whereHas('client', function ($q) {
-                         $q->where('is_deleted', 0);
-                     })
-                     ->when(!$user->hasPermission('view_all') || !$user->hasPermission('view_invoice'), function ($query) use ($user) {
-                         $query->where('user_id', $user->id);
-                     })
-                     ->orderBy('id', 'desc')
-                    ->take(3000)
-                    ->get();
+            ->company()
+            ->with('client')
+            ->where('is_deleted', 0)
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', 0);
+            })
+            ->when(! $user->hasPermission('view_all') || ! $user->hasPermission('view_invoice'), function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->orderBy('id', 'desc')
+            ->take(3000)
+            ->get();
 
-        foreach($invoices as $invoice) {
+        foreach ($invoices as $invoice) {
             $this->invoices[] = [
-                'name' => $invoice->client->present()->name() . ' - ' . $invoice->number,
+                'name' => $invoice->client->present()->name().' - '.$invoice->number,
                 'type' => '/invoice',
                 'id' => $invoice->hashed_id,
-                'path' => "/invoices/{$invoice->hashed_id}/edit"
+                'path' => "/invoices/{$invoice->hashed_id}/edit",
             ];
         }
 
@@ -179,15 +177,15 @@ class SearchController extends Controller
 
         $data = [];
 
-        foreach($paths as $key => $value) {
+        foreach ($paths as $key => $value) {
 
             $translation = '';
 
-            foreach(explode(",", $key) as $transkey) {
-                $translation .= ctrans("texts.{$transkey}")." ";
+            foreach (explode(',', $key) as $transkey) {
+                $translation .= ctrans("texts.{$transkey}").' ';
             }
 
-            $translation = rtrim($translation, " ");
+            $translation = rtrim($translation, ' ');
 
             $data[] = [
                 'id' => $translation,
@@ -201,5 +199,4 @@ class SearchController extends Controller
 
         return $data;
     }
-
 }

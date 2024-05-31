@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -50,16 +49,13 @@ class WePayPaymentDriver extends BaseDriver
 
     public function init()
     {
-        throw new \Exception("Gateway no longer supported", 500);
-
+        throw new \Exception('Gateway no longer supported', 500);
 
         return $this;
     }
 
     /**
      * Return the gateway types that have been enabled
-     *
-     * @return array
      */
     public function gatewayTypes(): array
     {
@@ -74,7 +70,7 @@ class WePayPaymentDriver extends BaseDriver
     /**
      * Setup the gateway
      *
-     * @param  array $data user_id + company
+     * @param  array  $data  user_id + company
      * @return \Illuminate\View\View
      */
     public function setup(array $data)
@@ -84,7 +80,7 @@ class WePayPaymentDriver extends BaseDriver
     /**
      * Set the payment method
      *
-     * @param int $payment_method_id Alias of GatewayType
+     * @param  int  $payment_method_id  Alias of GatewayType
      */
     public function setPaymentMethod($payment_method_id)
     {
@@ -150,7 +146,7 @@ class WePayPaymentDriver extends BaseDriver
         return $this->payment_method->tokenBilling($cgt, $payment_hash);
     }
 
-    public function processWebhookRequest(PaymentWebhookRequest $request, Payment $payment = null)
+    public function processWebhookRequest(PaymentWebhookRequest $request, ?Payment $payment = null)
     {
         $this->init();
     }
@@ -163,7 +159,7 @@ class WePayPaymentDriver extends BaseDriver
 
     public function detach(ClientGatewayToken $token)
     {
-    
+
     }
 
     public function getClientRequiredFields(): array
@@ -207,8 +203,6 @@ class WePayPaymentDriver extends BaseDriver
             $fields[] = ['name' => 'client_shipping_country_id', 'label' => ctrans('texts.shipping_country'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
-
         if ($this->company_gateway->require_custom_value1) {
             $fields[] = ['name' => 'client_custom_value1', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client1'), 'type' => 'text', 'validation' => 'required'];
         }
@@ -217,17 +211,13 @@ class WePayPaymentDriver extends BaseDriver
             $fields[] = ['name' => 'client_custom_value2', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client2'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
         if ($this->company_gateway->require_custom_value3) {
             $fields[] = ['name' => 'client_custom_value3', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client3'), 'type' => 'text', 'validation' => 'required'];
         }
 
-
         if ($this->company_gateway->require_custom_value4) {
             $fields[] = ['name' => 'client_custom_value4', 'label' => $this->helpers->makeCustomField($this->client->company->custom_fields, 'client4'), 'type' => 'text', 'validation' => 'required'];
         }
-
-
 
         return $fields;
     }

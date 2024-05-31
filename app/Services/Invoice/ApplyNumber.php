@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -42,8 +41,9 @@ class ApplyNumber extends AbstractService
 
         /** Do not give a pro forma invoice a proper invoice number */
         if ($this->invoice->is_proforma && $this->invoice->recurring_id) {
-            $this->invoice->number = ctrans('texts.pre_payment') . " " . now()->format('Y-m-d : H:i:s');
+            $this->invoice->number = ctrans('texts.pre_payment').' '.now()->format('Y-m-d : H:i:s');
             $this->invoice->saveQuietly();
+
             return $this->invoice;
         }
 
@@ -74,7 +74,7 @@ class ApplyNumber extends AbstractService
                 $this->invoice->saveQuietly();
 
                 $this->completed = false;
-            } catch(QueryException $e) {
+            } catch (QueryException $e) {
                 $x++;
 
                 if ($x > 50) {
@@ -82,7 +82,6 @@ class ApplyNumber extends AbstractService
                 }
             }
         } while ($this->completed);
-
 
         return $this;
     }

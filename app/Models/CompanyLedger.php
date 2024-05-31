@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Company $company
  * @property-read Model|\Eloquent $company_ledgerable
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyLedger newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyLedger newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyLedger query()
@@ -49,6 +49,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyLedger whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyLedger whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompanyLedger whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class CompanyLedger extends Model

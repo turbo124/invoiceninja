@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,7 +24,8 @@ class StripeConnectController extends BaseController
     /**
      * Initialize Stripe Connect flow.
      *
-     * @param string $token One-time token
+     * @param  string  $token  One-time token
+     *
      * @throws ApiErrorException
      */
     public function initialize(InitializeStripeConnectRequest $request, string $token)
@@ -64,24 +64,24 @@ class StripeConnectController extends BaseController
         if ($request->has('error') && $request->error == 'access_denied') {
             return view('auth.connect.access_denied');
         }
-        
+
         $response = false;
 
         try {
             /** @class \stdClass $response
-             *  @property string $scope
-             *  @property string $stripe_user_id
-             *  @property string $stripe_publishable_key
-             *  @property string $refresh_token
-             *  @property string $livemode
-             *  @property string $access_token
-             *  @property string $token_type
-             *  @property string $stripe_user
-             *  @property string $stripe_account
-             *  @property string $error
-            */
+             * @property string $scope
+             * @property string $stripe_user_id
+             * @property string $stripe_publishable_key
+             * @property string $refresh_token
+             * @property string $livemode
+             * @property string $access_token
+             * @property string $token_type
+             * @property string $stripe_user
+             * @property string $stripe_account
+             * @property string $error
+             */
 
-            /** @var  \stdClass $response */
+            /** @var \stdClass $response */
             $response = \Stripe\OAuth::token([
                 'grant_type' => 'authorization_code',
                 'code' => $request->input('code'),
@@ -91,10 +91,9 @@ class StripeConnectController extends BaseController
 
         } catch (\Exception $e) {
 
-           
         }
 
-        if(!$response) {
+        if (! $response) {
             return view('auth.connect.access_denied');
         }
 
@@ -136,15 +135,15 @@ class StripeConnectController extends BaseController
             $stripe = $company_gateway->driver()->init();
             $a = \Stripe\Account::retrieve($response->stripe_user_id, $stripe->stripe_connect_auth);
 
-            if($a->business_name ?? false) {
+            if ($a->business_name ?? false) {
                 $company_gateway->label = substr("Stripe - {$a->business_name}", 0, 250);
                 $company_gateway->save();
             }
-        } catch(\Exception $e) {
-            nlog("could not harvest stripe company name");
+        } catch (\Exception $e) {
+            nlog('could not harvest stripe company name');
         }
 
-        if(isset($request->getTokenContent()['is_react']) && $request->getTokenContent()['is_react']) {
+        if (isset($request->getTokenContent()['is_react']) && $request->getTokenContent()['is_react']) {
             $redirect_uri = config('ninja.react_url').'/#/settings/online_payments';
         } else {
             $redirect_uri = config('ninja.app_url');
@@ -154,7 +153,6 @@ class StripeConnectController extends BaseController
 
         //response here
         return view('auth.connect.completed', ['url' => $redirect_uri]);
-        
-    }
 
+    }
 }

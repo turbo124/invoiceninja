@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,6 +27,7 @@ class EmailSuccess extends GenericMixedMetric
 
     /**
      * The name of the counter.
+     *
      * @var string
      */
     public $name = 'job.success.email';
@@ -36,7 +36,6 @@ class EmailSuccess extends GenericMixedMetric
      * The datetime of the counter measurement.
      *
      * date("Y-m-d H:i:s")
-     *
      */
     public $datetime;
 
@@ -59,18 +58,19 @@ class EmailSuccess extends GenericMixedMetric
     /**
      * The counter
      * set to 1.
-     *
      */
     public $int_metric1 = 1;
 
     /**
      * Company Key
+     *
      * @var string
      */
     public $string_metric7 = '';
 
     /**
      * Subject
+     *
      * @var string
      */
     public $string_metric8 = '';

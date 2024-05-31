@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,6 @@ class Controller extends BaseController
     /**
      * Proxy method for rendering views.
      *
-     * @param string $path
-     * @param array $options
      *
      * @return Factory|View
      */

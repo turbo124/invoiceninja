@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,9 +19,8 @@ class RedirectIfAuthenticated
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
-     * @param string|null $guard
+     * @param  Request  $request
+     * @param  string|null  $guard
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)

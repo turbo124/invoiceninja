@@ -1,6 +1,6 @@
 <?php
 
-$lang = array(
+$lang = [
     'organization' => 'Organisatie',
     'name' => 'Bedrijfsnaam',
     'website' => 'Website',
@@ -1173,7 +1173,6 @@ $lang = array(
     'enterprise_plan_features' => 'Het Enterprise Plan voegt ondersteuning toe voor meerdere gebruikers en bestandsbijlagen, :link om de volledige lijst met functies te zien.',
     'return_to_app' => 'Terug naar de app',
 
-
     // Payment updates
     'refund_payment' => 'Terugbetalen',
     'refund_max' => 'Max:',
@@ -1702,7 +1701,6 @@ Kom terug naar deze betalingsmethode pagina zodra u de bedragen heeft ontvangen 
     'lang_Serbian' => 'Servisch',
     'lang_Bulgarian' => 'Bulgaars',
     'lang_Russian (Russia)' => 'Russisch',
-
 
     // Industries
     'industry_Accounting & Legal' => 'Boekhouding & juridisch',
@@ -2361,7 +2359,7 @@ Kom terug naar deze betalingsmethode pagina zodra u de bedragen heeft ontvangen 
     'currency_gold_troy_ounce' => 'Gouden Troy Ounce',
     'currency_nicaraguan_córdoba' => 'Nicaraguaans Córdoba',
     'currency_malagasy_ariary' => 'Malagassische ariarium',
-    "currency_tongan_pa_anga" => "Tongaanse Pa&#39;anga",
+    'currency_tongan_pa_anga' => 'Tongaanse Pa&#39;anga',
 
     'review_app_help' => 'We hopen dat je het leuk vindt om de app te gebruiken.<br/> Als je zou overwegen :link, zouden we dat zeer op prijs stellen!',
     'writing_a_review' => 'een recensie schrijven',
@@ -4426,7 +4424,7 @@ Email: :email<b><br><b>',
     'activity_122' => ':user heeft terugkerende uitgave :recurring_expense gearchiveerd',
     'activity_123' => ':user heeft terugkerende uitgave :recurring_expense verwijderd',
     'activity_124' => ':user heeft terugkerende uitgave :recurring_expense teruggezet',
-    'fpx' => "FPX",
+    'fpx' => 'FPX',
     'to_view_entity_set_password' => 'Om de :entity te bekijken, moet u een wachtwoord instellen.',
     'unsubscribe' => 'Afmelden',
     'unsubscribed' => 'Afgemeld',
@@ -4930,7 +4928,7 @@ Email: :email<b><br><b>',
     'payment_type_Klarna' => 'Klarna',
     'payment_type_Interac E Transfer' => 'Interac E-overdracht',
     'xinvoice_payable' => 'Te betalen binnen :payeddue vervaldagen netto tot :paydate',
-    'xinvoice_no_buyers_reference' => "Geen kopersreferentie opgegeven",
+    'xinvoice_no_buyers_reference' => 'Geen kopersreferentie opgegeven',
     'xinvoice_online_payment' => 'De factuur dient online betaald te worden via de voorziene link',
     'pre_payment' => 'Vooruitbetaling',
     'number_of_payments' => 'Aantal betalingen',
@@ -5035,8 +5033,8 @@ Email: :email<b><br><b>',
     'e_invoice' => 'E-factuur',
     'light_dark_mode' => 'Licht/Donkere modus',
     'activities' => 'Activiteiten',
-    'recent_transactions' => "Hier zijn het bedrijfs meest recente transacties:",
-    'country_Palestine' => "Palestina",
+    'recent_transactions' => 'Hier zijn het bedrijfs meest recente transacties:',
+    'country_Palestine' => 'Palestina',
     'country_Taiwan' => 'Taiwan',
     'duties' => 'Taken',
     'order_number' => 'Bestellingsnummer',
@@ -5251,7 +5249,7 @@ Email: :email<b><br><b>',
     'rff' => 'Verplichte velden formulier',
     'add_step' => 'Stap toevoegen',
     'steps' => 'Stappen',
-    'steps_order_help' =>  'De volgorde van de stappen is belangrijk. De eerste stap mag niet afhankelijk zijn van een andere stap. De tweede stap moet afhankelijk zijn van de eerste stap, enzovoort.',
+    'steps_order_help' => 'De volgorde van de stappen is belangrijk. De eerste stap mag niet afhankelijk zijn van een andere stap. De tweede stap moet afhankelijk zijn van de eerste stap, enzovoort.',
     'other_steps' => 'Andere stappen',
     'use_available_payments' => 'Gebruik beschikbare betalingen',
     'test_email_sent' => 'E-mail succesvol verzonden',
@@ -5300,6 +5298,6 @@ Email: :email<b><br><b>',
     'local_domain_help' => 'EHLO domain (optional)',
     'port_help' => 'ie. 25,587,465',
     'host_help' => 'ie. smtp.gmail.com',
-);
+];
 
 return $lang;

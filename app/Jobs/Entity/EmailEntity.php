@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -63,10 +62,9 @@ class EmailEntity implements ShouldQueue
      * EmailEntity constructor.
      *
      *
-     * @param mixed $invitation
-     * @param Company    $company
-     * @param ?string    $reminder_template
-     * @param array      $template_data
+     * @param  mixed  $invitation
+     * @param  ?string  $reminder_template
+     * @param  array  $template_data
      */
     public function __construct($invitation, Company $company, ?string $reminder_template = null, $template_data = null)
     {
@@ -89,9 +87,6 @@ class EmailEntity implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -162,7 +157,7 @@ class EmailEntity implements ShouldQueue
 
     public function failed($e)
     {
-        nlog("EmailEntity");
+        nlog('EmailEntity');
         nlog($e->getMessage());
     }
 }

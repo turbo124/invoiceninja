@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -54,9 +53,9 @@ use Illuminate\Support\Str;
 
 class DemoMode extends Command
 {
-    use MakesHash;
-    use GeneratesCounter;
     use AppSetup;
+    use GeneratesCounter;
+    use MakesHash;
 
     protected $signature = 'ninja:demo-mode';
 
@@ -111,7 +110,7 @@ class DemoMode extends Command
         $this->info('Creating Small Account and Company');
 
         $account = Account::factory()->create([
-            "set_react_as_default_ap" => 0,
+            'set_react_as_default_ap' => 0,
         ]);
         $company = Company::factory()->create([
             'account_id' => $account->id,
@@ -179,8 +178,8 @@ class DemoMode extends Command
 
         if (! $u2) {
             $u2 = User::factory()->create([
-                'email'             => 'demo@invoiceninja.com',
-                'password'          => Hash::make('Password0'),
+                'email' => 'demo@invoiceninja.com',
+                'password' => Hash::make('Password0'),
                 'account_id' => $account->id,
                 'confirmation_code' => $this->createDbHash(config('database.default')),
                 'email_verified_at' => now(),

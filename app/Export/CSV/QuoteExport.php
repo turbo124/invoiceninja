@@ -5,7 +5,6 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -54,7 +53,6 @@ class QuoteExport extends BaseExport
         $t = app('translator');
         $t->replace(Ninja::transformTranslations($this->company->settings));
 
-
         if (count($this->input['report_keys']) == 0) {
             $this->input['report_keys'] = array_values($this->quote_report_keys);
         }
@@ -62,14 +60,14 @@ class QuoteExport extends BaseExport
         $this->input['report_keys'] = array_merge($this->input['report_keys'], array_diff($this->forced_client_fields, $this->input['report_keys']));
 
         $query = Quote::query()
-                        ->withTrashed()
-                        ->with('client')
-                        ->whereHas('client', function ($q){
-                            $q->where('is_deleted', false);
-                        })
-                        ->where('company_id', $this->company->id);
-                        
-        if(!$this->input['include_deleted'] ?? false){
+            ->withTrashed()
+            ->with('client')
+            ->whereHas('client', function ($q) {
+                $q->where('is_deleted', false);
+            })
+            ->where('company_id', $this->company->id);
+
+        if (! $this->input['include_deleted'] ?? false) {
             $query->where('is_deleted', 0);
         }
 
@@ -77,13 +75,13 @@ class QuoteExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
         $query = $this->addQuoteStatusFilter($query, $this->input['status'] ?? '');
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
         }
 
@@ -102,13 +100,13 @@ class QuoteExport extends BaseExport
         })->toArray();
 
         $report = $query->cursor()
-                ->map(function ($resource) {
-                    $row = $this->buildRow($resource);
-                    return $this->processMetaData($row, $resource);
-                })->toArray();
+            ->map(function ($resource) {
+                $row = $this->buildRow($resource);
+
+                return $this->processMetaData($row, $resource);
+            })->toArray();
 
         return array_merge(['columns' => $header], $report);
-
 
     }
 
@@ -151,6 +149,7 @@ class QuoteExport extends BaseExport
             }
 
         }
+
         // return $entity;
         return $this->decorateAdvancedFields($quote, $entity);
     }
@@ -180,7 +179,6 @@ class QuoteExport extends BaseExport
         if (in_array('quote.user_id', $this->input['report_keys'])) {
             $entity['quote.user_id'] = $quote->user ? $quote->user->present()->name() : '';
         }
-
 
         return $entity;
     }

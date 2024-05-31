@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -62,12 +61,11 @@ class TaskScheduler implements ShouldQueue
                     try {
                         //@var \App\Models\Schedule $scheduler
                         $scheduler->service()->runTask();
-                    } catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         nlog($e->getMessage());
                     }
 
                 });
-
 
             return;
         }
@@ -88,13 +86,11 @@ class TaskScheduler implements ShouldQueue
                     try {
                         /** @var \App\Models\Scheduler $scheduler */
                         $scheduler->service()->runTask();
-                    } catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         nlog($e->getMessage());
                     }
-
 
                 });
         }
     }
-
 }

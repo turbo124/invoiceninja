@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -24,6 +23,7 @@ use App\Models\RecurringInvoiceInvitation;
 use App\Models\SystemLog;
 use App\Notifications\Ninja\EmailBounceNotification;
 use App\Notifications\Ninja\EmailSpamNotification;
+use Brevo\Client\Api\TransactionalEmailsApi;
 use Brevo\Client\Configuration;
 use Brevo\Client\Model\GetTransacEmailContentEvents;
 use Illuminate\Bus\Queueable;
@@ -31,7 +31,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Brevo\Client\Api\TransactionalEmailsApi;
 use Turbo124\Beacon\Facades\LightLogs;
 
 class ProcessBrevoWebhook implements ShouldQueue
@@ -56,7 +55,6 @@ class ProcessBrevoWebhook implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
      */
     public function __construct(private array $request)
     {
@@ -96,7 +94,7 @@ class ProcessBrevoWebhook implements ShouldQueue
             $this->company->notification(new EmailSpamNotification($this->company))->ninja();
         }
 
-        if (!$this->invitation) {
+        if (! $this->invitation) {
             return;
         }
 
@@ -124,7 +122,7 @@ class ProcessBrevoWebhook implements ShouldQueue
             case 'click':
                 return $this->processOpen();
             default:
-                # code...
+                // code...
                 break;
         }
     }
@@ -195,6 +193,7 @@ class ProcessBrevoWebhook implements ShouldQueue
 
         if ($sl) {
             $this->updateSystemLog($sl, $data);
+
             return;
         }
 
@@ -239,6 +238,7 @@ class ProcessBrevoWebhook implements ShouldQueue
 
         if ($sl) {
             $this->updateSystemLog($sl, $data);
+
             return;
         }
 
@@ -343,6 +343,7 @@ class ProcessBrevoWebhook implements ShouldQueue
 
         if ($sl) {
             $this->updateSystemLog($sl, $data);
+
             return;
         }
 
@@ -384,6 +385,7 @@ class ProcessBrevoWebhook implements ShouldQueue
 
         if ($sl) {
             $this->updateSystemLog($sl, $data);
+
             return;
         }
 
@@ -400,18 +402,23 @@ class ProcessBrevoWebhook implements ShouldQueue
 
         if ($invitation = InvoiceInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'invoice';
+
             return $invitation;
         } elseif ($invitation = QuoteInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'quote';
+
             return $invitation;
         } elseif ($invitation = RecurringInvoiceInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'recurring_invoice';
+
             return $invitation;
         } elseif ($invitation = CreditInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'credit';
+
             return $invitation;
         } elseif ($invitation = PurchaseOrderInvitation::where('message_id', $message_id)->first()) {
             $this->entity = 'purchase_order';
+
             return $invitation;
         } else {
             return $invitation;
@@ -421,14 +428,14 @@ class ProcessBrevoWebhook implements ShouldQueue
     public function getRawMessage(string $message_id)
     {
 
-        $brevo_secret = !empty($this->company->settings->brevo_secret) ? $this->company->settings->brevo_secret : config('services.brevo.key');
+        $brevo_secret = ! empty($this->company->settings->brevo_secret) ? $this->company->settings->brevo_secret : config('services.brevo.key');
 
         $brevo = new TransactionalEmailsApi(null, Configuration::getDefaultConfiguration()->setApiKey('api-key', $brevo_secret));
         $messageDetail = $brevo->getTransacEmailContent($message_id);
+
         return $messageDetail;
 
     }
-
 
     public function getBounceId(string $message_id): ?int
     {
@@ -456,9 +463,9 @@ class ProcessBrevoWebhook implements ShouldQueue
 
             $messageDetail = $this->getRawMessage($this->request['message-id']);
 
-            $recipient = array_key_exists("email", $this->request) ? $this->request["email"] : '';
-            $server_ip = array_key_exists("sending_ip", $this->request) ? $this->request["sending_ip"] : '';
-            $delivery_message = array_key_exists("reason", $this->request) ? $this->request["reason"] : '';
+            $recipient = array_key_exists('email', $this->request) ? $this->request['email'] : '';
+            $server_ip = array_key_exists('sending_ip', $this->request) ? $this->request['sending_ip'] : '';
+            $delivery_message = array_key_exists('reason', $this->request) ? $this->request['reason'] : '';
             $subject = $messageDetail->getSubject() ?? '';
 
             $events = collect($messageDetail->getEvents())->map(function (GetTransacEmailContentEvents $event) use ($recipient, $server_ip, $delivery_message) { // @turbo124 event does only contain name & time property, how to handle transformation?!

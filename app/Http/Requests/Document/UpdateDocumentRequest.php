@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,8 +19,6 @@ class UpdateDocumentRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -39,16 +36,14 @@ class UpdateDocumentRequest extends Request
         ];
     }
 
-
     public function prepareForValidation()
     {
         $input = $this->all();
 
-        if(isset($input['is_public'])) {
+        if (isset($input['is_public'])) {
             $input['is_public'] = $this->toBoolean($input['is_public']);
         }
 
         $this->replace($input);
     }
-
 }

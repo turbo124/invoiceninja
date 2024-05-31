@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="RecurringExpense",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="Opnel5aKBz", description="The hashed id of the recurring expense"),
  *       @OA\Property(property="user_id", type="string", example="Opnel5aKBz", description="The hashed id of the user who created the recurring expense"),
  *       @OA\Property(property="assigned_user_id", type="string", example="Opnel5aKBz", description="The hashed id of the user assigned to this recurring expense"),

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,13 +20,13 @@ class PaytraceCustomerFactory
         return
             collect([
                 'name' => $customer->billing_address->name ?? $customer->shipping_address->name,
-                'contacts' => [    
+                'contacts' => [
                     [
                         'first_name' => $customer->billing_address->name ?? $customer->shipping_address->name,
                         'last_name' => '',
                         'email' => $customer->email,
                         'phone' => $customer->phone,
-                    ]
+                    ],
                 ],
                 'currency_id' => $company->settings->currency_id,
                 'address1' => $customer->billing_address->street_address,
@@ -52,8 +51,7 @@ class PaytraceCustomerFactory
                     'expiry_year' => $customer->credit_card->expiration_year,
                 ],
             ])
-            ->toArray();
+                ->toArray();
 
     }
-   
 }

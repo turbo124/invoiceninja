@@ -40,7 +40,6 @@ class PayPal
     /**
      * Credit card payment page.
      *
-     * @param array $data
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function paymentView(array $data)
@@ -120,9 +119,6 @@ class PayPal
 
     /**
      * Process & complete the successful PayPal transaction.
-     *
-     * @param $response
-     * @return \Illuminate\Http\RedirectResponse
      */
     private function processSuccessfulPayment($response): \Illuminate\Http\RedirectResponse
     {

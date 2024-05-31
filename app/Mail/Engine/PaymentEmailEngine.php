@@ -5,35 +5,34 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Mail\Engine;
 
-use App\Utils\Ninja;
-use App\Utils\Number;
-use App\Utils\Helpers;
+use App\DataMapper\EmailTemplateDefaults;
+use App\Jobs\Entity\CreateRawPdf;
 use App\Models\Account;
 use App\Models\Payment;
-use Illuminate\Support\Str;
-use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\MakesDates;
-use App\Jobs\Entity\CreateRawPdf;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Cache;
-use App\DataMapper\EmailTemplateDefaults;
 use App\Services\Template\TemplateAction;
+use App\Utils\Helpers;
+use App\Utils\Ninja;
+use App\Utils\Number;
+use App\Utils\Traits\MakesDates;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class PaymentEmailEngine extends BaseEmailEngine
 {
     use MakesDates;
     use MakesHash;
-    
+
     public $client;
 
-    /** @var \App\Models\Payment $payment */
+    /** @var \App\Models\Payment */
     public $payment;
 
     public $template_data;
@@ -102,8 +101,8 @@ class PaymentEmailEngine extends BaseEmailEngine
         if ($this->client->getSetting('pdf_email_attachment') !== false && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
 
             $template_in_use = false;
-            
-            if($this->is_refund && \App\Models\Design::where('id', $this->decodePrimaryKey($this->payment->client->getSetting('payment_refund_design_id')))->where('is_template', true)->exists()) {
+
+            if ($this->is_refund && \App\Models\Design::where('id', $this->decodePrimaryKey($this->payment->client->getSetting('payment_refund_design_id')))->where('is_template', true)->exists()) {
                 $pdf = (new TemplateAction(
                     [$this->payment->hashed_id],
                     $this->payment->client->getSetting('payment_refund_design_id'),
@@ -115,12 +114,12 @@ class PaymentEmailEngine extends BaseEmailEngine
                     false
                 ))->handle();
 
-                $file_name = ctrans('texts.payment_refund_receipt', ['number' => $this->payment->number ]) . '.pdf';
+                $file_name = ctrans('texts.payment_refund_receipt', ['number' => $this->payment->number]).'.pdf';
                 $file_name = str_replace(' ', '_', $file_name);
                 $this->setAttachments([['file' => base64_encode($pdf), 'name' => $file_name]]);
                 $template_in_use = true;
 
-            } elseif(!$this->is_refund && \App\Models\Design::where('id', $this->decodePrimaryKey($this->payment->client->getSetting('payment_receipt_design_id')))->where('is_template', true)->exists()) {
+            } elseif (! $this->is_refund && \App\Models\Design::where('id', $this->decodePrimaryKey($this->payment->client->getSetting('payment_receipt_design_id')))->where('is_template', true)->exists()) {
                 $pdf = (new TemplateAction(
                     [$this->payment->hashed_id],
                     $this->payment->client->getSetting('payment_receipt_design_id'),
@@ -132,7 +131,7 @@ class PaymentEmailEngine extends BaseEmailEngine
                     false
                 ))->handle();
 
-                $file_name = ctrans('texts.payment_receipt', ['number' => $this->payment->number ]) . '.pdf';
+                $file_name = ctrans('texts.payment_receipt', ['number' => $this->payment->number]).'.pdf';
                 $file_name = str_replace(' ', '_', $file_name);
                 $this->setAttachments([['file' => base64_encode($pdf), 'name' => $file_name]]);
                 $template_in_use = true;
@@ -141,7 +140,7 @@ class PaymentEmailEngine extends BaseEmailEngine
 
             $this->payment->invoices->each(function ($invoice) use ($template_in_use) {
 
-                if(!$template_in_use) {
+                if (! $template_in_use) {
                     $pdf = ((new CreateRawPdf($invoice->invitations->first()))->handle());
                     $file_name = $invoice->numberFormatter().'.pdf';
                     $this->setAttachments([['file' => base64_encode($pdf), 'name' => $file_name]]);
@@ -155,9 +154,9 @@ class PaymentEmailEngine extends BaseEmailEngine
                             $hash = Str::random(64);
                             Cache::put($hash, ['db' => $this->payment->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
-                            $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);
+                            $this->setAttachmentLinks(["<a class='doc_links' href='".URL::signedRoute('documents.hashed_download', ['hash' => $hash])."'>".$document->name.'</a>']);
                         } else {
-                            $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null, ]]);
+                            $this->setAttachments([['path' => $document->filePath(), 'name' => $document->name, 'mime' => null]]);
                         }
                     });
                 }
@@ -310,7 +309,7 @@ class PaymentEmailEngine extends BaseEmailEngine
         $data['$viewButton'] = &$data['$view_link'];
         $data['$viewLink'] = &$data['$view_link'];
         $data['$paymentLink'] = &$data['$view_link'];
-        $data['$portalButton'] = ['value' =>  $this->buildViewButton($this->payment->getPortalLink(), ctrans('texts.login')), 'label' => ''];
+        $data['$portalButton'] = ['value' => $this->buildViewButton($this->payment->getPortalLink(), ctrans('texts.login')), 'label' => ''];
         $data['$portal_url'] = &$data['$portalButton'];
 
         $data['$view_url'] = ['value' => $this->payment->getLink(), 'label' => ctrans('texts.view_payment')];
@@ -331,11 +330,10 @@ class PaymentEmailEngine extends BaseEmailEngine
         $data['$invoice_numbers'] = ['value' => $this->formatInvoiceNumbersRaw(), 'label' => ctrans('texts.invoices')];
 
         if ($this->payment->status_id == 4) {
-            $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> ' . ctrans('texts.paid') .'</div>', 'label' => ''];
+            $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> '.ctrans('texts.paid').'</div>', 'label' => ''];
         } else {
             $data['$status_logo'] = ['value' => '', 'label' => ''];
         }
-
 
         $arrKeysLength = array_map('strlen', array_keys($data));
         array_multisort($arrKeysLength, SORT_DESC, $data);
@@ -358,7 +356,7 @@ class PaymentEmailEngine extends BaseEmailEngine
                 $invoice_field = $this->translateDate($invoice_field, $this->client->date_format(), $this->client->locale());
             }
 
-            $invoicex .= ctrans('texts.invoice_number_short') . "{$invoice->number} {$invoice_field}";
+            $invoicex .= ctrans('texts.invoice_number_short')."{$invoice->number} {$invoice_field}";
         }
 
         return $invoicex;
@@ -406,14 +404,13 @@ class PaymentEmailEngine extends BaseEmailEngine
                 $invoice_list .= ctrans('texts.po_number')." {$invoice->po_number} <br>";
             }
 
-            $invoice_list .= ctrans('texts.invoice_number_short')." {$invoice->number} " . Number::formatMoney($invoice->pivot->amount, $this->client).', ';
+            $invoice_list .= ctrans('texts.invoice_number_short')." {$invoice->number} ".Number::formatMoney($invoice->pivot->amount, $this->client).', ';
 
         }
 
-        if(strlen($invoice_list) < 4) {
+        if (strlen($invoice_list) < 4) {
             $invoice_list = Number::formatMoney($this->payment->amount, $this->client) ?: '&nbsp;';
         }
-
 
         return $invoice_list;
 
@@ -459,8 +456,6 @@ class PaymentEmailEngine extends BaseEmailEngine
 
     /**
      * generateLabelsAndValues
-     *
-     * @return array
      */
     public function generateLabelsAndValues(): array
     {
@@ -478,17 +473,12 @@ class PaymentEmailEngine extends BaseEmailEngine
 
     /**
      * buildViewButton
-     *
-     * @param  string $link
-     * @param  string $text
-     * @return string
      */
     private function buildViewButton(string $link, string $text): string
     {
         if ($this->settings->email_style == 'plain') {
-            return '<a href="'. $link .'" target="_blank">'. $text .'</a>';
+            return '<a href="'.$link.'" target="_blank">'.$text.'</a>';
         }
-
 
         return '
 <div>
@@ -500,8 +490,8 @@ class PaymentEmailEngine extends BaseEmailEngine
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" >
         <tbody><tr>
         <td align="center" class="new_button" style="border-radius: 2px; background-color: '.$this->settings->primary_color.'">
-            <a href="'. $link . '" target="_blank" class="new_button" style="text-decoration: none; border: 1px solid '.$this->settings->primary_color.'; display: inline-block; border-radius: 2px; padding-top: 15px; padding-bottom: 15px; padding-left: 25px; padding-right: 25px; font-size: 20px; color: #fff">
-            <singleline label="cta button">'. $text .'</singleline>
+            <a href="'.$link.'" target="_blank" class="new_button" style="text-decoration: none; border: 1px solid '.$this->settings->primary_color.'; display: inline-block; border-radius: 2px; padding-top: 15px; padding-bottom: 15px; padding-left: 25px; padding-right: 25px; font-size: 20px; color: #fff">
+            <singleline label="cta button">'.$text.'</singleline>
             </a>
         </td>
         </tr>
@@ -515,12 +505,11 @@ class PaymentEmailEngine extends BaseEmailEngine
 </div>
         ';
 
-
         return '
             <table border="0" cellspacing="0" cellpadding="0" align="center">
                 <tr style="border: 0 !important; ">
                     <td class="new_button" style="padding: 12px 18px 12px 18px; border-radius:5px;" align="center"> 
-                    <a href="'. $link .'" target="_blank" style="border: 0 !important;font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; display: inline-block;">'. $text .'</a>
+                    <a href="'.$link.'" target="_blank" style="border: 0 !important;font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; display: inline-block;">'.$text.'</a>
                     </td>
                 </tr>
             </table>

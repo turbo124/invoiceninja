@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,14 +21,13 @@ class ValidateSignature
      * @var array<int, string>
      */
     protected $ignore = [
-        'q'
+        'q',
     ];
 
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $relative
      * @return \Illuminate\Http\Response
      *

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -16,13 +15,14 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers  App\Utils\Number
  */
 class CompareCollectionTest extends TestCase
 {
     use MakesHash;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,7 +51,7 @@ class CompareCollectionTest extends TestCase
 
         $invoice_ids = '';
 
-        $invoices = explode(",", $invoice_ids);
+        $invoices = explode(',', $invoice_ids);
 
         if (count($invoices) >= 1) {
             foreach ($invoices as $invoice) {

@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -18,7 +19,7 @@ return new class extends Migration {
 
         $xag = \App\Models\Currency::find(116);
 
-        if(!$xag) {
+        if (! $xag) {
 
             $xag = new \App\Models\Currency();
             $xag->id = 116;
@@ -33,7 +34,7 @@ return new class extends Migration {
 
         $xau = \App\Models\Currency::find(117);
 
-        if(!$xau) {
+        if (! $xau) {
 
             $xau = new \App\Models\Currency();
             $xau->id = 117;

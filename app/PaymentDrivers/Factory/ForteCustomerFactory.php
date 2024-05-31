@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -17,42 +16,42 @@ use App\Models\Company;
 
 class ForteCustomerFactory
 {
-
     public function convertToNinja(array $customer, Company $company): array
     {
-          return
+        return
         collect([
-            'name' => $customer['company_name'] ?? $customer['first_name'],
-            'contacts' => [
-                [
-                    'first_name' => $customer['first_name'],
-                    'last_name' => $customer['last_name'],
-                    'email' => $this->getBillingAddress($customer)['email'],
-                    'phone' => $this->getBillingAddress($customer)['phone'],
-                ]
-            ],
-            'settings' => [
-                'currency_id' => $company->settings->currency_id,
-            ],
+          'name' => $customer['company_name'] ?? $customer['first_name'],
+          'contacts' => [
+              [
+                  'first_name' => $customer['first_name'],
+                  'last_name' => $customer['last_name'],
+                  'email' => $this->getBillingAddress($customer)['email'],
+                  'phone' => $this->getBillingAddress($customer)['phone'],
+              ],
+          ],
+          'settings' => [
+              'currency_id' => $company->settings->currency_id,
+          ],
         ])->merge($this->getShippingAddress($customer))
-        ->merge($this->getBillingAddress($customer))
-        ->toArray();
+          ->merge($this->getBillingAddress($customer))
+          ->toArray();
 
     }
 
     // public function convertToGateway(Client $client): array
     // {
-        
+
     // }
 
     private function getBillingAddress(array $customer): array
     {
-        if(isset($customer['default_billing_address_token'])) {
+        if (isset($customer['default_billing_address_token'])) {
 
-            foreach($customer['addresses'] as $address) {
+            foreach ($customer['addresses'] as $address) {
 
-                if($address['address_token'] != $customer['default_billing_address_token'])
+                if ($address['address_token'] != $customer['default_billing_address_token']) {
                     continue;
+                }
 
                 return [
                     'address1' => $address['physical_address']['street_line1'],
@@ -69,7 +68,7 @@ class ForteCustomerFactory
 
         }
 
-        if(isset($customer['addresses'][0])) {
+        if (isset($customer['addresses'][0])) {
 
             $address = $customer['addresses'][0];
 
@@ -93,11 +92,11 @@ class ForteCustomerFactory
     private function getShippingAddress(array $customer): array
     {
 
-        if(isset($customer['default_shipping_address_token'])) {
+        if (isset($customer['default_shipping_address_token'])) {
 
-            foreach($customer['addresses'] as $address) {
+            foreach ($customer['addresses'] as $address) {
 
-                if($address['address_token'] != $customer['default_shipping_address_token']) {
+                if ($address['address_token'] != $customer['default_shipping_address_token']) {
                     continue;
                 }
 
@@ -114,8 +113,8 @@ class ForteCustomerFactory
 
         }
 
-        if(isset($customer['addresses'][1])){
-            
+        if (isset($customer['addresses'][1])) {
+
             $address = $customer['addresses'][1];
 
             return [

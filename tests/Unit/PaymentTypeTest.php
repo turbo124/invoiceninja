@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -17,12 +16,12 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Models\PaymentType
  */
 class PaymentTypeTest extends TestCase
 {
-
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +31,7 @@ class PaymentTypeTest extends TestCase
     {
         $payment_type_class = new PaymentType;
 
-        foreach($payment_type_class->type_names as $type) {
+        foreach ($payment_type_class->type_names as $type) {
             $this->assertTrue(Lang::has("texts.{$type}"));
         }
     }

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,8 +27,8 @@ use Stripe\Customer;
 
 class ImportCustomers
 {
-    use MakesHash;
     use GeneratesCounter;
+    use MakesHash;
 
     /** @var StripePaymentDriver */
     public $stripe;
@@ -64,7 +63,7 @@ class ImportCustomers
 
             $starting_after = isset(end($customers->data)['id']) ? end($customers->data)['id'] : false;
 
-            if (!$starting_after) {
+            if (! $starting_after) {
                 break;
             }
         } while ($customers->has_more);
@@ -79,10 +78,10 @@ class ImportCustomers
         }
 
         $existing_customer_token = $this->stripe
-                                  ->company_gateway
-                                  ->client_gateway_tokens()
-                                  ->where('gateway_customer_reference', $customer->id)
-                                  ->first();
+            ->company_gateway
+            ->client_gateway_tokens()
+            ->where('gateway_customer_reference', $customer->id)
+            ->first();
 
         if ($existing_customer_token) {
             nlog("Skipping - Customer exists: {$customer->email} just updating payment methods");

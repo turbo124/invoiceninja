@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,10 +34,10 @@ class SendReminders implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
     use MakesDates;
     use MakesReminders;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Create a new job instance.
@@ -74,11 +73,11 @@ class SendReminders implements ShouldQueue
     private function sendReminderEmails()
     {
         $invoices = Invoice::where('is_deleted', 0)
-                           ->where('balance', '>', 0)
-                           ->whereDate('next_send_date', '<=', now()->startOfDay())
-                           ->whereNotNull('next_send_date')
-                           ->with('client')
-                           ->cursor();
+            ->where('balance', '>', 0)
+            ->whereDate('next_send_date', '<=', now()->startOfDay())
+            ->whereNotNull('next_send_date')
+            ->with('client')
+            ->cursor();
 
         //we only need invoices that are payable
         $invoices->filter(function ($invoice) {
@@ -120,7 +119,7 @@ class SendReminders implements ShouldQueue
      * Create a collection of all possible reminder dates
      * and pass back the first one in chronology
      *
-     * @param  Invoice $invoice
+     * @param  Invoice  $invoice
      * @return Carbon $date
      */
     private function calculateNextSendDate($invoice)
@@ -177,10 +176,11 @@ class SendReminders implements ShouldQueue
 
     /**
      * Helper method which switches values based on the $schedule_reminder
-     * @param  Invoice $invoice
-     * @param  string $schedule_reminder
-     * @param  int $num_days_reminder
-     * @return Carbon  $date
+     *
+     * @param  Invoice  $invoice
+     * @param  string  $schedule_reminder
+     * @param  int  $num_days_reminder
+     * @return Carbon $date
      */
     private function calculateScheduledDate($invoice, $schedule_reminder, $num_days_reminder): ?Carbon
     {
@@ -205,9 +205,8 @@ class SendReminders implements ShouldQueue
     /**
      * Sends the reminder and/or late fee for the invoice.
      *
-     * @param  Invoice $invoice
-     * @param  string $template
-     * @return void
+     * @param  Invoice  $invoice
+     * @param  string  $template
      */
     private function sendReminder($invoice, $template): void
     {
@@ -220,7 +219,7 @@ class SendReminders implements ShouldQueue
 
                 EmailEntity::dispatch($invitation, $invitation->company, $template)->delay(10);
                 event(new InvoiceWasEmailed($invoice->invitations->first(), $invoice->company, Ninja::eventVars(), $template));
-                $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
+                $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, 'client');
             }
         });
 
@@ -237,9 +236,8 @@ class SendReminders implements ShouldQueue
     /**
      * Calculates the late if - if any - and rebuilds the invoice
      *
-     * @param  Invoice $invoice
-     * @param  string $template
-     * @return Invoice
+     * @param  Invoice  $invoice
+     * @param  string  $template
      */
     private function calcLateFee($invoice, $template): Invoice
     {
@@ -275,11 +273,9 @@ class SendReminders implements ShouldQueue
     /**
      * Applies the late fee to the invoice line items
      *
-     * @param Invoice $invoice
-     * @param float $amount  The fee amount
-     * @param float $percent The fee percentage amount
-     *
-     * @return Invoice
+     * @param  Invoice  $invoice
+     * @param  float  $amount  The fee amount
+     * @param  float  $percent  The fee percentage amount
      */
     private function setLateFee($invoice, $amount, $percent): Invoice
     {

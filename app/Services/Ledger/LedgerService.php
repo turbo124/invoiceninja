@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -14,7 +13,6 @@ namespace App\Services\Ledger;
 use App\Factory\CompanyLedgerFactory;
 use App\Jobs\Ledger\ClientLedgerBalanceUpdate;
 use App\Models\Activity;
-use App\Models\CompanyLedger;
 
 class LedgerService
 {
@@ -44,7 +42,7 @@ class LedgerService
     public function updateInvoiceBalance($adjustment, $notes = '')
     {
 
-        if($adjustment == 0) {
+        if ($adjustment == 0) {
             return $this;
         }
 

@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -66,6 +65,7 @@ class Wave extends BaseImport implements ImportInterface
 
         if (empty($data)) {
             $this->entity_count['clients'] = 0;
+
             return;
         }
 
@@ -117,8 +117,8 @@ class Wave extends BaseImport implements ImportInterface
 
         $this->transformer = new InvoiceTransformer($this->company);
 
-        foreach($data as $key => $invoice) {
-            if(!isset($invoice['Invoice Number']) || empty($invoice['Invoice Number'])) {
+        foreach ($data as $key => $invoice) {
+            if (! isset($invoice['Invoice Number']) || empty($invoice['Invoice Number'])) {
                 unset($data[$key]);
             }
         }
@@ -174,8 +174,9 @@ class Wave extends BaseImport implements ImportInterface
 
         $data = $this->getCsvData($entity_type);
 
-        if (!$data) {
+        if (! $data) {
             $this->entity_count['expense'] = 0;
+
             return;
         }
 
@@ -183,6 +184,7 @@ class Wave extends BaseImport implements ImportInterface
 
         if (empty($data)) {
             $this->entity_count['expense'] = 0;
+
             return;
         }
 
@@ -232,8 +234,8 @@ class Wave extends BaseImport implements ImportInterface
         $expenses = $this->groupExpenses($data);
 
         foreach ($expenses as $raw_expense) {
-                    
-            if(!is_array($raw_expense)) {
+
+            if (! is_array($raw_expense)) {
                 continue;
             }
 

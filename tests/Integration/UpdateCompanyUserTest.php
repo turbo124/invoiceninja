@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -20,21 +19,21 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Http\Controllers\CompanyUserController
  */
 class UpdateCompanyUserTest extends TestCase
 {
+    use DatabaseTransactions;
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
     }
-
 
     public function testUpdatingCompanyUserReactSettings()
     {
@@ -46,7 +45,7 @@ class UpdateCompanyUserTest extends TestCase
         $settings = [
             'react_settings' => [
                 'show_pdf_preview' => true,
-                'react_notification_link' => false
+                'react_notification_link' => false,
             ],
         ];
 
@@ -72,7 +71,7 @@ class UpdateCompanyUserTest extends TestCase
         $settings = [
             'react_settings' => [
                 'show_pdf_preview' => false,
-                'react_notification_link' => true
+                'react_notification_link' => true,
             ],
         ];
 
@@ -96,7 +95,6 @@ class UpdateCompanyUserTest extends TestCase
         $this->assertTrue($arr['data']['company_user']['react_settings']['react_notification_link']);
 
     }
-
 
     public function testUpdatingCompanyUserAsAdmin()
     {
@@ -130,6 +128,4 @@ class UpdateCompanyUserTest extends TestCase
 
         $this->assertEquals('ninja', $arr['data']['settings']['invoice']);
     }
-
-
 }

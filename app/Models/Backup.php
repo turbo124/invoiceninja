@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -26,6 +25,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $disk
  * @property-read \App\Models\Activity $activity
  * @property-read mixed $hashed_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|Backup newModelQuery()
@@ -40,6 +40,7 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|Backup whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Backup whereJsonBackup($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Backup whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Backup extends BaseModel
@@ -54,7 +55,7 @@ class Backup extends BaseModel
         return $this->belongsTo(Activity::class);
     }
 
-    public function storeRemotely(?string $html, Client | Vendor $client_or_vendor)
+    public function storeRemotely(?string $html, Client|Vendor $client_or_vendor)
     {
         if (! $html || strlen($html) == 0) {
             return;
@@ -74,7 +75,7 @@ class Backup extends BaseModel
     {
         nlog('deleting => '.$this->filename);
 
-        if (!$this->filename) {
+        if (! $this->filename) {
             return;
         }
 

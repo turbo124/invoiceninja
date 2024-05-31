@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -31,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $deleted_at
  * @property-read \App\Models\Company|null $company
  * @property-read string $hashed_id
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|Design filter(\App\Filters\QueryFilters $filters)
@@ -52,6 +52,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Design whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Design withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Design withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Design extends BaseModel

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -13,7 +12,6 @@ namespace App\Http\Requests\CompanyGateway;
 
 use App\Http\Requests\Request;
 use App\Utils\Traits\MakesHash;
-use Illuminate\Validation\Rule;
 
 class TestCompanyGatewayRequest extends Request
 {
@@ -21,8 +19,6 @@ class TestCompanyGatewayRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {

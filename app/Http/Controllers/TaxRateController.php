@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -52,30 +51,35 @@ class TaxRateController extends BaseController
      *      tags={"tax_rates"},
      *      summary="Gets a list of tax_rates",
      *      description="Lists tax rates",
+     *
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A list of tax_rates",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/TaxRate"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
 
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
-     *
-     *
-     * Display a listing of the resource.
      *
      * @return Response
      */
@@ -89,10 +93,7 @@ class TaxRateController extends BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateTaxRateRequest $request
      * @return Response
-     *
-     *
      *
      * @OA\Get(
      *      path="/api/v1/tax_rates/create",
@@ -100,25 +101,33 @@ class TaxRateController extends BaseController
      *      tags={"tax_rates"},
      *      summary="Gets a new blank Tax Rate object",
      *      description="Returns a blank object with default values",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="A blank Tax Rate object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/TaxRate"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -136,7 +145,6 @@ class TaxRateController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreTaxRateRequest $request
      * @return Response
      */
     public function store(StoreTaxRateRequest $request)
@@ -154,10 +162,7 @@ class TaxRateController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param ShowTaxRateRequest $request
-     * @param TaxRate $tax_rate
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/tax_rates/{id}",
@@ -165,6 +170,7 @@ class TaxRateController extends BaseController
      *      tags={"tax_rates"},
      *      summary="Shows a Tax Rate",
      *      description="Displays an TaxRate by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -173,28 +179,36 @@ class TaxRateController extends BaseController
      *          description="The TaxRate Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Tax Rate object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/TaxRate"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -207,10 +221,7 @@ class TaxRateController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditTaxRateRequest $request
-     * @param TaxRate $tax_rate
      * @return Response
-     *
      *
      * @OA\Get(
      *      path="/api/v1/tax_rates/{id}/edit",
@@ -218,6 +229,7 @@ class TaxRateController extends BaseController
      *      tags={"tax_rates"},
      *      summary="Shows a Tax Rate for editting",
      *      description="Displays a Tax Rate by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -226,28 +238,36 @@ class TaxRateController extends BaseController
      *          description="The TaxRate Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the Tax Rate object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/TaxRate"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -260,11 +280,7 @@ class TaxRateController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateTaxRateRequest $request
-     * @param TaxRate $tax_rate
      * @return Response
-     *
-     *
      *
      * @OA\Put(
      *      path="/api/v1/tax_rates/{id}",
@@ -272,6 +288,7 @@ class TaxRateController extends BaseController
      *      tags={"tax_rates"},
      *      summary="Updates a tax rate",
      *      description="Handles the updating of a tax rate by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -280,28 +297,36 @@ class TaxRateController extends BaseController
      *          description="The TaxRate Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns the TaxRate object",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/TaxRate"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -317,18 +342,17 @@ class TaxRateController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyTaxRateRequest $request
-     * @param TaxRate $tax_rate
      * @return Response
      *
-     *
      * @throws \Exception
+     *
      * @OA\Delete(
      *      path="/api/v1/tax_rates/{id}",
      *      operationId="deleteTaxRate",
      *      tags={"tax_rates"},
      *      summary="Deletes a TaxRate",
      *      description="Handles the deletion of an TaxRate by id",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(
@@ -337,27 +361,34 @@ class TaxRateController extends BaseController
      *          description="The TaxRate Hashed ID",
      *          example="D2J234DFA",
      *          required=true,
+     *
      *          @OA\Schema(
      *              type="string",
      *              format="string",
      *          ),
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Returns a HTTP status",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -376,23 +407,27 @@ class TaxRateController extends BaseController
      *
      * @return Response
      *
-     *
      * @OA\Post(
      *      path="/api/v1/tax_rates/bulk",
      *      operationId="bulkTaxRates",
      *      tags={"tax_rates"},
      *      summary="Performs bulk actions on an array of TaxRates",
      *      description="",
+     *
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/index"),
+     *
      *      @OA\RequestBody(
      *         description="Tax Rates",
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="application/json",
+     *
      *             @OA\Schema(
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="integer",
      *                     description="Array of hashed IDs to be bulk 'actioned",
@@ -401,22 +436,29 @@ class TaxRateController extends BaseController
      *             )
      *         )
      *     ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="The TaxRate List response",
+     *
      *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
      *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
      *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *
      *          @OA\JsonContent(ref="#/components/schemas/Webhook"),
      *       ),
+     *
      *       @OA\Response(
      *          response=422,
      *          description="Validation error",
+     *
      *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
      *       ),
+     *
      *       @OA\Response(
      *           response="default",
      *           description="Unexpected Error",
+     *
      *           @OA\JsonContent(ref="#/components/schemas/Error"),
      *       ),
      *     )
@@ -434,14 +476,14 @@ class TaxRateController extends BaseController
         $tax_rates->each(function ($tax_rate, $key) use ($action, $user) {
             if ($user->can('edit', $tax_rate)) {
 
-                if(in_array($action, ['archive','delete'])) {
+                if (in_array($action, ['archive', 'delete'])) {
                     $settings = $user->company()->settings;
 
-                    foreach(['tax_name1','tax_name2','tax_name3'] as $tax_name) {
+                    foreach (['tax_name1', 'tax_name2', 'tax_name3'] as $tax_name) {
 
-                        if($settings->{$tax_name} == $tax_rate->name) {
+                        if ($settings->{$tax_name} == $tax_rate->name) {
                             $settings->{$tax_name} = '';
-                            $settings->{str_replace("name", "rate", $tax_name)} = '';
+                            $settings->{str_replace('name', 'rate', $tax_name)} = '';
                         }
                     }
 

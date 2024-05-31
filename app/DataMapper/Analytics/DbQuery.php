@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -28,6 +27,7 @@ class DbQuery extends GenericMixedMetric
 
     /**
      * The name of the counter.
+     *
      * @var string
      */
     public $name = 'db.queries';
@@ -36,7 +36,6 @@ class DbQuery extends GenericMixedMetric
      * The datetime of the counter measurement.
      *
      * date("Y-m-d H:i:s")
-     *
      */
     public $datetime;
 
@@ -55,7 +54,7 @@ class DbQuery extends GenericMixedMetric
     public $string_metric8 = 'client_version';
 
     public $string_metric9 = 'platform';
-    
+
     /**
      * The counter
      * set to 1.

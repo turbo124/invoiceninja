@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -35,12 +34,14 @@ trait CompanySettingsSaver
         'besr_id',
         'gmail_sending_user_id',
     ];
+
     /**
      * Saves a setting object.
      *
      * Works for groups|clients|companies
-     * @param  array $settings The request input settings array
-     * @param  object $entity   The entity which the settings belongs to
+     *
+     * @param  array  $settings  The request input settings array
+     * @param  object  $entity  The entity which the settings belongs to
      * @return void
      */
     public function saveSettings($settings, $entity)
@@ -86,19 +87,17 @@ trait CompanySettingsSaver
 
         $entity->settings = $company_settings;
 
-        if($entity?->calculate_taxes && $company_settings->country_id == "840" && array_key_exists('settings', $entity->getDirty()) && !$entity?->account->isFreeHostedClient()) {
+        if ($entity?->calculate_taxes && $company_settings->country_id == '840' && array_key_exists('settings', $entity->getDirty()) && ! $entity?->account->isFreeHostedClient()) {
             $old_settings = $entity->getOriginal()['settings'];
 
             /** Monitor changes of the Postal code */
-            if($old_settings->postal_code != $company_settings->postal_code) {
+            if ($old_settings->postal_code != $company_settings->postal_code) {
                 CompanyTaxRate::dispatch($entity);
             }
 
-
-        } elseif($entity?->calculate_taxes && $company_settings->country_id == "840" && array_key_exists('calculate_taxes', $entity->getDirty()) && $entity->getOriginal('calculate_taxes') == 0 && !$entity?->account->isFreeHostedClient()) {
+        } elseif ($entity?->calculate_taxes && $company_settings->country_id == '840' && array_key_exists('calculate_taxes', $entity->getDirty()) && $entity->getOriginal('calculate_taxes') == 0 && ! $entity?->account->isFreeHostedClient()) {
             CompanyTaxRate::dispatch($entity);
         }
-
 
         $entity->save();
     }
@@ -109,8 +108,9 @@ trait CompanySettingsSaver
      *
      * Returns an array of errors, or boolean TRUE
      * on successful validation
-     * @param  array $settings The request() settings array
-     * @return array|bool      Array on failure, boolean TRUE on success
+     *
+     * @param  array  $settings  The request() settings array
+     * @return array|bool Array on failure, boolean TRUE on success
      */
     public function validateSettings($settings)
     {
@@ -136,7 +136,7 @@ trait CompanySettingsSaver
             elseif (substr($key, -3) == '_id' || substr($key, -14) == 'number_counter') {
                 $value = 'integer';
 
-                if(in_array($key, $this->string_ids)) {
+                if (in_array($key, $this->string_ids)) {
                     // if ($key == 'besr_id') {
                     $value = 'string';
                 }
@@ -174,8 +174,8 @@ trait CompanySettingsSaver
      * the object and will also settype() the property
      * so that it can be saved cleanly
      *
-     * @param  array $settings The settings request() array
-     * @return stdClass       stdClass object
+     * @param  array  $settings  The settings request() array
+     * @return stdClass stdClass object
      */
     private function checkSettingType($settings): stdClass
     {
@@ -205,7 +205,7 @@ trait CompanySettingsSaver
             if (substr($key, -3) == '_id' || substr($key, -14) == 'number_counter') {
                 $value = 'integer';
 
-                if(in_array($key, $this->string_ids)) {
+                if (in_array($key, $this->string_ids)) {
                     $value = 'string';
                 }
 
@@ -261,9 +261,10 @@ trait CompanySettingsSaver
 
     /**
      * Type checks a object property.
-     * @param  string $key   The type
-     * @param  string $value The object property
-     * @return bool        TRUE if the property is the expected type
+     *
+     * @param  string  $key  The type
+     * @param  string  $value  The object property
+     * @return bool TRUE if the property is the expected type
      */
     private function checkAttribute($key, $value): bool
     {

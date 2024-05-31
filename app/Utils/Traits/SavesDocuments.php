@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -33,7 +32,7 @@ trait SavesDocuments
             return false;
         }
 
-        if (!is_array($document_array)) {
+        if (! is_array($document_array)) {
             return;
         }
 

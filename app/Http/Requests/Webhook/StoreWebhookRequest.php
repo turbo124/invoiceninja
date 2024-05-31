@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -18,8 +17,6 @@ class StoreWebhookRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -34,7 +31,7 @@ class StoreWebhookRequest extends Request
         return [
             'target_url' => 'bail|required|url',
             'event_id' => 'bail|required',
-            'rest_method' => 'required|in:post,put'
+            'rest_method' => 'required|in:post,put',
         ];
     }
 
@@ -42,10 +39,10 @@ class StoreWebhookRequest extends Request
     {
         $input = $this->all();
 
-        if (!isset($input['rest_method'])) {
+        if (! isset($input['rest_method'])) {
             $input['rest_method'] = 'post';
         }
-        
+
         $this->replace($input);
     }
 }

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -27,8 +26,6 @@ class StorePaymentRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -44,22 +41,22 @@ class StorePaymentRequest extends Request
         $user = auth()->user();
 
         $rules = [
-            'client_id' => ['bail','required',Rule::exists('clients','id')->where('company_id',$user->company()->id)->where('is_deleted', 0)],
-            'invoices' => ['bail','sometimes', 'nullable', 'array', new ValidPayableInvoicesRule()],
-            'invoices.*.amount' => ['bail','required'],
-            'invoices.*.invoice_id' => ['bail','required','distinct', new ValidInvoicesRules($this->all()),Rule::exists('invoices','id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
-            'credits.*.credit_id' => ['bail','required','distinct', new ValidCreditsRules($this->all()),Rule::exists('credits','id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
-            'credits.*.amount' => ['bail','required', new CreditsSumRule($this->all())],
+            'client_id' => ['bail', 'required', Rule::exists('clients', 'id')->where('company_id', $user->company()->id)->where('is_deleted', 0)],
+            'invoices' => ['bail', 'sometimes', 'nullable', 'array', new ValidPayableInvoicesRule()],
+            'invoices.*.amount' => ['bail', 'required'],
+            'invoices.*.invoice_id' => ['bail', 'required', 'distinct', new ValidInvoicesRules($this->all()), Rule::exists('invoices', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
+            'credits.*.credit_id' => ['bail', 'required', 'distinct', new ValidCreditsRules($this->all()), Rule::exists('credits', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
+            'credits.*.amount' => ['bail', 'required', new CreditsSumRule($this->all())],
             'amount' => ['bail', 'numeric', new PaymentAmountsBalanceRule(), 'max:99999999999999'],
             'number' => ['bail', 'nullable',  Rule::unique('payments')->where('company_id', $user->company()->id)],
-            'idempotency_key' => ['nullable', 'bail', 'string','max:64', Rule::unique('payments')->where('company_id', $user->company()->id)],
+            'idempotency_key' => ['nullable', 'bail', 'string', 'max:64', Rule::unique('payments')->where('company_id', $user->company()->id)],
         ];
 
         if ($this->file('documents') && is_array($this->file('documents'))) {
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -71,7 +68,6 @@ class StorePaymentRequest extends Request
 
         return $rules;
     }
-
 
     public function prepareForValidation()
     {
@@ -135,6 +131,4 @@ class StorePaymentRequest extends Request
 
         $this->replace($input);
     }
-
-
 }

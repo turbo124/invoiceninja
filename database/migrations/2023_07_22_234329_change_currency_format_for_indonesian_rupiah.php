@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,7 +13,7 @@ return new class extends Migration {
     {
         $ir = \App\Models\Currency::query()->where('code', 'IDR')->first();
 
-        if($ir) {
+        if ($ir) {
             $ir->thousand_separator = '.';
             $ir->decimal_separator = ',';
             $ir->save();
@@ -20,7 +21,7 @@ return new class extends Migration {
 
         $ld = \App\Models\Currency::find(115);
 
-        if(!$ld) {
+        if (! $ld) {
             $ld = new \App\Models\Currency();
             $ld->id = 115;
             $ld->code = 'LYD';

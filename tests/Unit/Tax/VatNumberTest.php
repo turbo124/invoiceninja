@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -19,7 +18,7 @@ use Tests\TestCase;
  */
 class VatNumberTest extends TestCase
 {
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -27,8 +26,8 @@ class VatNumberTest extends TestCase
     public function testVatNumber()
     {
         // Usage example
-        $country_code = "IE"; // Ireland
-        $vat_number = "1234567L"; // Example VAT number
+        $country_code = 'IE'; // Ireland
+        $vat_number = '1234567L'; // Example VAT number
         $result = '';
 
         $vat_checker = new VatNumberCheck($vat_number, $country_code);
@@ -40,8 +39,8 @@ class VatNumberTest extends TestCase
     public function testValidVatNumber()
     {
         // Usage example
-        $country_code = "AT"; // Ireland
-        $vat_number = "U12345678"; // Example VAT number
+        $country_code = 'AT'; // Ireland
+        $vat_number = 'U12345678'; // Example VAT number
         $result = '';
 
         $vat_checker = new VatNumberCheck($vat_number, $country_code);

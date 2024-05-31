@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -40,7 +39,7 @@ class PaymentNotification implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param object $event
+     * @param  object  $event
      */
     public function handle($event)
     {
@@ -52,14 +51,13 @@ class PaymentNotification implements ShouldQueue
 
         $payment = $event->payment;
 
-
         /*Google Analytics Track Revenue*/
         if (isset($payment->company->google_analytics_key)) {
             $this->trackRevenue($event);
         }
 
         /* Manual Payment Notifications */
-        if($payment->is_manual) {
+        if ($payment->is_manual) {
 
             foreach ($payment->company->company_users as $company_user) {
                 $user = $company_user->user;
@@ -68,10 +66,10 @@ class PaymentNotification implements ShouldQueue
                     $payment,
                     $company_user,
                     [
-                    'payment_manual',
-                    'payment_manual_all',
-                    'payment_manual_user',
-                    'all_notifications', ]
+                        'payment_manual',
+                        'payment_manual_all',
+                        'payment_manual_user',
+                        'all_notifications', ]
                 );
 
                 if (($key = array_search('mail', $methods)) !== false) {
@@ -100,10 +98,10 @@ class PaymentNotification implements ShouldQueue
                 $payment,
                 $company_user,
                 [
-                'payment_success',
-                'payment_success_all',
-                'payment_success_user',
-                'all_notifications', ]
+                    'payment_success',
+                    'payment_success_all',
+                    'payment_success_user',
+                    'all_notifications', ]
             );
 
             if (($key = array_search('mail', $methods)) !== false) {
@@ -172,7 +170,7 @@ class PaymentNotification implements ShouldQueue
     }
 
     /**
-     * @param string $url
+     * @param  string  $url
      */
     private function sendAnalytics($url)
     {

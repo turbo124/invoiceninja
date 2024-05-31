@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -22,7 +21,6 @@ class StoreVendorRequest extends Request
 
     /**
      * Determine if the user is authorized to make this request.
-     *
      */
     public function authorize(): bool
     {
@@ -53,7 +51,6 @@ class StoreVendorRequest extends Request
             //'regex:/[@$!%*#?&.]/', // must contain a special character
         ];
 
-
         if (isset($this->number)) {
             $rules['number'] = Rule::unique('vendors')->where('company_id', $user->company()->id);
         }
@@ -64,7 +61,7 @@ class StoreVendorRequest extends Request
             $rules['documents.*'] = $this->fileValidation();
         } elseif ($this->file('documents')) {
             $rules['documents'] = $this->fileValidation();
-        }else {
+        } else {
             $rules['documents'] = 'bail|sometimes|array';
         }
 
@@ -87,7 +84,7 @@ class StoreVendorRequest extends Request
 
         $input = $this->all();
 
-        if (!array_key_exists('currency_id', $input) || empty($input['currency_id'])) {
+        if (! array_key_exists('currency_id', $input) || empty($input['currency_id'])) {
             $input['currency_id'] = $user->company()->settings->currency_id;
         }
 

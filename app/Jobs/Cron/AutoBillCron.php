@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -36,8 +35,6 @@ class AutoBillCron
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -50,16 +47,16 @@ class AutoBillCron
 
         if (! config('ninja.db.multi_db_enabled')) {
             $auto_bill_partial_invoices = Invoice::query()
-                                        ->whereDate('partial_due_date', '<=', now())
-                                        ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                                        ->where('auto_bill_enabled', true)
-                                        ->where('auto_bill_tries', '<', 3)
-                                        ->where('balance', '>', 0)
-                                        ->where('is_deleted', false)
-                                        ->whereHas('company', function ($query) {
-                                            $query->where('is_disabled', 0);
-                                        })
-                                        ->orderBy('id', 'DESC');
+                ->whereDate('partial_due_date', '<=', now())
+                ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
+                ->where('auto_bill_enabled', true)
+                ->where('auto_bill_tries', '<', 3)
+                ->where('balance', '>', 0)
+                ->where('is_deleted', false)
+                ->whereHas('company', function ($query) {
+                    $query->where('is_disabled', 0);
+                })
+                ->orderBy('id', 'DESC');
 
             nlog($auto_bill_partial_invoices->count().' partial invoices to auto bill');
 
@@ -72,16 +69,16 @@ class AutoBillCron
             });
 
             $auto_bill_invoices = Invoice::query()
-                                        ->whereDate('due_date', '<=', now())
-                                        ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                                        ->where('auto_bill_enabled', true)
-                                        ->where('auto_bill_tries', '<', 3)
-                                        ->where('balance', '>', 0)
-                                        ->where('is_deleted', false)
-                                        ->whereHas('company', function ($query) {
-                                            $query->where('is_disabled', 0);
-                                        })
-                                        ->orderBy('id', 'DESC');
+                ->whereDate('due_date', '<=', now())
+                ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
+                ->where('auto_bill_enabled', true)
+                ->where('auto_bill_tries', '<', 3)
+                ->where('balance', '>', 0)
+                ->where('is_deleted', false)
+                ->whereHas('company', function ($query) {
+                    $query->where('is_disabled', 0);
+                })
+                ->orderBy('id', 'DESC');
 
             nlog($auto_bill_invoices->count().' full invoices to auto bill');
 
@@ -98,16 +95,16 @@ class AutoBillCron
                 MultiDB::setDB($db);
 
                 $auto_bill_partial_invoices = Invoice::query()
-                                            ->whereDate('partial_due_date', '<=', now())
-                                            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                                            ->where('auto_bill_enabled', true)
-                                            ->where('auto_bill_tries', '<', 3)
-                                            ->where('balance', '>', 0)
-                                            ->where('is_deleted', false)
-                                            ->whereHas('company', function ($query) {
-                                                $query->where('is_disabled', 0);
-                                            })
-                                            ->orderBy('id', 'DESC');
+                    ->whereDate('partial_due_date', '<=', now())
+                    ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
+                    ->where('auto_bill_enabled', true)
+                    ->where('auto_bill_tries', '<', 3)
+                    ->where('balance', '>', 0)
+                    ->where('is_deleted', false)
+                    ->whereHas('company', function ($query) {
+                        $query->where('is_disabled', 0);
+                    })
+                    ->orderBy('id', 'DESC');
 
                 nlog($auto_bill_partial_invoices->count()." partial invoices to auto bill db = {$db}");
 
@@ -120,16 +117,16 @@ class AutoBillCron
                 });
 
                 $auto_bill_invoices = Invoice::query()
-                                            ->whereDate('due_date', '<=', now())
-                                            ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
-                                            ->where('auto_bill_enabled', true)
-                                            ->where('auto_bill_tries', '<', 3)
-                                            ->where('balance', '>', 0)
-                                            ->where('is_deleted', false)
-                                            ->whereHas('company', function ($query) {
-                                                $query->where('is_disabled', 0);
-                                            })
-                                            ->orderBy('id', 'DESC');
+                    ->whereDate('due_date', '<=', now())
+                    ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
+                    ->where('auto_bill_enabled', true)
+                    ->where('auto_bill_tries', '<', 3)
+                    ->where('balance', '>', 0)
+                    ->where('is_deleted', false)
+                    ->whereHas('company', function ($query) {
+                        $query->where('is_disabled', 0);
+                    })
+                    ->orderBy('id', 'DESC');
 
                 nlog($auto_bill_invoices->count()." full invoices to auto bill db = {$db}");
 

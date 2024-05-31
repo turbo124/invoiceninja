@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -76,10 +75,10 @@ class PurchaseOrderAcceptedObject
         $content = ctrans(
             'texts.notification_purchase_order_accepted',
             [
-                    'amount' => $this->getAmount(),
-                    'vendor' => $this->purchase_order->vendor->present()->name(),
-                    'purchase_order' => $this->purchase_order->number,
-                ]
+                'amount' => $this->getAmount(),
+                'vendor' => $this->purchase_order->vendor->present()->name(),
+                'purchase_order' => $this->purchase_order->number,
+            ]
         );
 
         $data = [

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -21,9 +20,6 @@ class ChartController extends BaseController
         parent::__construct();
     }
 
-    /**
-     * @param ShowChartRequest $request
-     */
     public function totals(ShowChartRequest $request)
     {
         /** @var \App\Models\User auth()->user() */
@@ -43,9 +39,6 @@ class ChartController extends BaseController
         return response()->json($cs->chart_summary($request->input('start_date'), $request->input('end_date')), 200);
     }
 
-    /**
-     * @param ShowChartRequest $request
-     */
     public function totalsV2(ShowChartRequest $request)
     {
         /** @var \App\Models\User auth()->user() */
@@ -64,6 +57,4 @@ class ChartController extends BaseController
 
         return response()->json($cs->chart_summary($request->input('start_date'), $request->input('end_date')), 200);
     }
-
-
 }

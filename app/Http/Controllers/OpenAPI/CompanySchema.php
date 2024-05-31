@@ -3,6 +3,7 @@
  * @OA\Schema(
  *   schema="Company",
  *   type="object",
+ *
  *       @OA\Property(property="id", type="string", example="WJxbojagwO", description="The company hash id"),
  *       @OA\Property(property="size_id", type="string", example="1", description="The company size ID"),
  *       @OA\Property(property="industry_id", type="string", example="1", description="The company industry ID"),

@@ -5,7 +5,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -25,6 +24,7 @@ use Tests\TestCase;
 
 /**
  * @test
+ *
  * @covers App\Import\Transformer\BaseTransformer
  */
 class BaseTransformerTest extends TestCase
@@ -32,7 +32,7 @@ class BaseTransformerTest extends TestCase
     use MakesHash;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 

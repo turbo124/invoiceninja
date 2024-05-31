@@ -6,7 +6,6 @@
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
@@ -108,9 +107,7 @@ trait DesignHelpers
     /**
      * Get specific section HTML.
      *
-     * @param string $section
-     * @param bool $id
-     * @return null|string
+     * @param  bool  $id
      */
     public function getSectionHTML(string $section, $id = true): ?string
     {
@@ -145,8 +142,7 @@ trait DesignHelpers
      * Logic below will help us calculate that & inject the result in the
      * global state of the $context (design state).
      *
-     * @param string $type "product" or "task"
-     * @return void
+     * @param  string  $type  "product" or "task"
      */
     public function processTaxColumns(string $type): void
     {
@@ -166,7 +162,6 @@ trait DesignHelpers
             $column_type = 'product_quote';
             $type = 'product';
         }
-
 
         // At the moment we pass "task" or "product" as type.
         // However, "pdf_variables" contains "$task.tax" or "$product.tax" <-- Notice the dollar sign.
@@ -206,9 +201,6 @@ trait DesignHelpers
 
     /**
      * Calculates the remaining colspans.
-     *
-     * @param int $taken
-     * @return int
      */
     public function calculateColspan(int $taken): int
     {
@@ -221,8 +213,7 @@ trait DesignHelpers
      * Return "true" or "false" based on null or empty check.
      * We need to return false as string because of HTML parsing.
      *
-     * @param mixed $property
-     * @return string
+     * @param  mixed  $property
      */
     public function toggleHiddenProperty($property): string
     {
@@ -260,7 +251,6 @@ trait DesignHelpers
             ['element' => 'script', 'content' => $html_decode],
         ]];
     }
-
 
     public function entityVariableCheck(string $variable): bool
     {
@@ -321,6 +311,7 @@ trait DesignHelpers
             $_variable = explode('.', $variable)[1];
         } catch (Exception $e) {
             nlog("Company settings seems to be broken. Could not resolve {$variable} type.");
+
             return 'collapse';
         }
 
@@ -403,6 +394,7 @@ trait DesignHelpers
 
     /**
      * @todo - this is being called directl, - not through the calling class!!!!
+     *
      * @design_flaw
      */
     public static function parseMarkdownToHtml(string $markdown): ?string

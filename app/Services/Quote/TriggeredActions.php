@@ -5,20 +5,19 @@
  * @link https://github.com/quoteninja/quoteninja source repository
  *
  * @copyright Copyright (c) 2022. Quote Ninja LLC (https://quoteninja.com)
- *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace App\Services\Quote;
 
-use App\Utils\Ninja;
+use App\Events\Quote\QuoteWasEmailed;
+use App\Jobs\Entity\EmailEntity;
 use App\Models\Quote;
 use App\Models\Webhook;
-use Illuminate\Http\Request;
-use App\Jobs\Entity\EmailEntity;
 use App\Services\AbstractService;
-use App\Events\Quote\QuoteWasEmailed;
+use App\Utils\Ninja;
 use App\Utils\Traits\GeneratesCounter;
+use Illuminate\Http\Request;
 
 class TriggeredActions extends AbstractService
 {
@@ -71,8 +70,6 @@ class TriggeredActions extends AbstractService
             $company->save();
         }
 
-
-
         return $this->quote;
     }
 
@@ -87,7 +84,7 @@ class TriggeredActions extends AbstractService
 
         if ($this->quote->invitations->count() > 0) {
             event(new QuoteWasEmailed($this->quote->invitations->first(), $this->quote->company, Ninja::eventVars(), 'quote'));
-            $this->quote->sendEvent(Webhook::EVENT_SENT_QUOTE, "client");
+            $this->quote->sendEvent(Webhook::EVENT_SENT_QUOTE, 'client');
 
         }
     }
