@@ -10,6 +10,7 @@
 
 namespace App\Notifications\Ninja;
 
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
 
@@ -30,7 +31,7 @@ class RenewalFailureNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['slack'];
     }
@@ -40,7 +41,7 @@ class RenewalFailureNotification extends Notification
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
     }
 
@@ -50,7 +51,7 @@ class RenewalFailureNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

@@ -35,7 +35,7 @@ class ChartCurrencyTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testRevenueValues()
+    public function testRevenueValues(): void
     {
         Invoice::factory()->create([
             'client_id' => $this->client->id,
@@ -66,7 +66,7 @@ class ChartCurrencyTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testgetCurrencyCodes()
+    public function testgetCurrencyCodes(): void
     {
         $settings = ClientSettings::defaults();
         $settings->currency_id = '1'; //USD
@@ -95,7 +95,7 @@ class ChartCurrencyTest extends TestCase
         $this->assertFalse(in_array('AUD', $cs->getCurrencyCodes()));
     }
 
-    public function testGetChartTotalsApi()
+    public function testGetChartTotalsApi(): void
     {
         $data = [
             'start_date' => now()->subDays(30)->format('Y-m-d'),
@@ -110,7 +110,7 @@ class ChartCurrencyTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientServiceDataSetBuild()
+    public function testClientServiceDataSetBuild(): void
     {
         $haystack = [
             [
@@ -139,7 +139,7 @@ class ChartCurrencyTest extends TestCase
     }
 
     /* coalesces the company currency with the null currencies */
-    public function testFindNullValueinArray()
+    public function testFindNullValueinArray(): void
     {
         $haystack = [
             [
@@ -181,7 +181,7 @@ class ChartCurrencyTest extends TestCase
         $this->assertEquals($haystack[$c_key]['amount'], 21);
     }
 
-    public function testCollectionMerging()
+    public function testCollectionMerging(): void
     {
         $currencies = collect([1, 2, 3, 4, 5, 6]);
 

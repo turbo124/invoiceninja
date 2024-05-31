@@ -48,7 +48,7 @@ class TaskRoundingTest extends TestCase
         Model::reguard();
     }
 
-    public function testRoundUp()
+    public function testRoundUp(): void
     {
         $start_time = 1714942800;
         $end_time = 1714943220; //7:07am
@@ -61,7 +61,7 @@ class TaskRoundingTest extends TestCase
 
     }
 
-    public function testRoundUp2()
+    public function testRoundUp2(): void
     {
 
         $start_time = 1715237056;
@@ -74,7 +74,7 @@ class TaskRoundingTest extends TestCase
 
     }
 
-    public function testRoundUp3()
+    public function testRoundUp3(): void
     {
 
         $start_time = 1715213100;
@@ -94,7 +94,7 @@ class TaskRoundingTest extends TestCase
 
     }
 
-    public function testRoundUp4()
+    public function testRoundUp4(): void
     {
 
         $start_time = 1715238000;
@@ -115,7 +115,7 @@ class TaskRoundingTest extends TestCase
 
     }
 
-    public function testRoundingViaBulkAction()
+    public function testRoundingViaBulkAction(): void
     {
 
         $this->company->settings->default_task_rate = 41;
@@ -171,7 +171,7 @@ class TaskRoundingTest extends TestCase
         $task = Task::find($this->decodePrimaryKey($i));
     }
 
-    public function testRoundDown()
+    public function testRoundDown(): void
     {
         $start_time = 1714942800;
         $end_time = 1714943220; //7:07am

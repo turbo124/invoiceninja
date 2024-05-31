@@ -18,12 +18,12 @@ use function auth;
 
 class ProcessQuotesInBulkRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_QUOTES;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'quotes' => ['array'],

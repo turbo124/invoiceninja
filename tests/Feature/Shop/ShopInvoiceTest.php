@@ -45,7 +45,7 @@ class ShopInvoiceTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testTokenSuccess()
+    public function testTokenSuccess(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();
@@ -64,7 +64,7 @@ class ShopInvoiceTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTokenFailure()
+    public function testTokenFailure(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();
@@ -79,7 +79,7 @@ class ShopInvoiceTest extends TestCase
         $arr = $response->json();
     }
 
-    public function testCompanyEnableShopApiBooleanWorks()
+    public function testCompanyEnableShopApiBooleanWorks(): void
     {
         try {
             $response = $this->withHeaders([
@@ -93,7 +93,7 @@ class ShopInvoiceTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function testGetByProductKey()
+    public function testGetByProductKey(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();
@@ -117,7 +117,7 @@ class ShopInvoiceTest extends TestCase
         $this->assertEquals($product->hashed_id, $arr['data']['id']);
     }
 
-    public function testGetByClientByContactKey()
+    public function testGetByClientByContactKey(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();
@@ -133,7 +133,7 @@ class ShopInvoiceTest extends TestCase
         $this->assertEquals($this->client->hashed_id, $arr['data']['id']);
     }
 
-    public function testCreateClientOnShopRoute()
+    public function testCreateClientOnShopRoute(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();
@@ -153,7 +153,7 @@ class ShopInvoiceTest extends TestCase
         $this->assertEquals('ShopClient', $arr['data']['name']);
     }
 
-    public function testCreateInvoiceOnShopRoute()
+    public function testCreateInvoiceOnShopRoute(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();

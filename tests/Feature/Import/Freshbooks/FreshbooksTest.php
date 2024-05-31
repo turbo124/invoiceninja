@@ -46,7 +46,7 @@ class FreshbooksTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testClientFreshbooksImport()
+    public function testClientFreshbooksImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/freshbooks_clients.csv'
@@ -94,7 +94,7 @@ class FreshbooksTest extends TestCase
         $this->assertEquals('867-5309', $client->phone);
     }
 
-    public function testInvoiceZohoImport()
+    public function testInvoiceZohoImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/freshbooks_clients.csv'

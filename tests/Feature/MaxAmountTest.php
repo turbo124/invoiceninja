@@ -43,7 +43,7 @@ class MaxAmountTest extends TestCase
 
     }
 
-    public function testInvoiceMaxAmount()
+    public function testInvoiceMaxAmount(): void
     {
         $item = new InvoiceItem();
         $item->cost = 10000000000000000;
@@ -73,7 +73,7 @@ class MaxAmountTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testCreditMaxAmount()
+    public function testCreditMaxAmount(): void
     {
         $item = new InvoiceItem();
         $item->cost = 10000000000000000;
@@ -103,7 +103,7 @@ class MaxAmountTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testQuoteMaxAmount()
+    public function testQuoteMaxAmount(): void
     {
         $item = new InvoiceItem();
         $item->cost = 10000000000000000;
@@ -133,7 +133,7 @@ class MaxAmountTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testPurchaseOrderMaxAmount()
+    public function testPurchaseOrderMaxAmount(): void
     {
         $item = new InvoiceItem();
         $item->cost = 10000000000000000;
@@ -163,7 +163,7 @@ class MaxAmountTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testRecurringInvoiceMaxAmount()
+    public function testRecurringInvoiceMaxAmount(): void
     {
         $item = new InvoiceItem();
         $item->cost = 10000000000000000;

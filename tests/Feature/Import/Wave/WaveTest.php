@@ -97,7 +97,7 @@ class WaveTest extends TestCase
 
     // }
 
-    public function testVendorAndExpenseWaveImport()
+    public function testVendorAndExpenseWaveImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/wave_vendors.csv'
@@ -207,7 +207,7 @@ class WaveTest extends TestCase
         $this->assertTrue($base_transformer->hasExpense('66'));
     }
 
-    public function testClientWaveImport()
+    public function testClientWaveImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/wave_clients.csv'
@@ -281,7 +281,7 @@ class WaveTest extends TestCase
         $this->assertEquals('555-867-5309', $client->contacts->first()->phone);
     }
 
-    public function testInvoiceWaveImport()
+    public function testInvoiceWaveImport(): void
     {
         //first import all the clients
 

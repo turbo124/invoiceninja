@@ -51,7 +51,7 @@ class EntityTest extends TestCase
         $this->invoice_calc = new InvoiceSum($this->invoice);
     }
 
-    public function testEntityNameResolution()
+    public function testEntityNameResolution(): void
     {
         $entity_type = $this->invoice->getEntityType();
 
@@ -66,7 +66,7 @@ class EntityTest extends TestCase
         $this->assertEquals('InvoiceInvitation', class_basename($invitation));
     }
 
-    public function testDocumentRelationExists()
+    public function testDocumentRelationExists(): void
     {
 
         $this->assertTrue(method_exists(Invoice::class, 'documents'));

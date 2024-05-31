@@ -48,7 +48,7 @@ class CompanyTokenApiTest extends TestCase
         );
     }
 
-    public function testCompanyTokenListFilter()
+    public function testCompanyTokenListFilter(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -61,7 +61,7 @@ class CompanyTokenApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyTokenList()
+    public function testCompanyTokenList(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -74,7 +74,7 @@ class CompanyTokenApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyTokenPost()
+    public function testCompanyTokenPost(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -91,7 +91,7 @@ class CompanyTokenApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyTokenPut()
+    public function testCompanyTokenPut(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -113,7 +113,7 @@ class CompanyTokenApiTest extends TestCase
         $this->assertEquals('newname', $arr['data']['name']);
     }
 
-    public function testCompanyTokenGet()
+    public function testCompanyTokenGet(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -128,7 +128,7 @@ class CompanyTokenApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyTokenNotArchived()
+    public function testCompanyTokenNotArchived(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 

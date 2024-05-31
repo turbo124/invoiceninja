@@ -20,7 +20,7 @@ class ShowStatementRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'start_date' => 'sometimes|nullable|date',

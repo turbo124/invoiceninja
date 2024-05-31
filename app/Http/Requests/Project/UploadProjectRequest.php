@@ -25,7 +25,7 @@ class UploadProjectRequest extends Request
         return $user->can('edit', $this->project);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

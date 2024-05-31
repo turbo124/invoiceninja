@@ -28,7 +28,7 @@ class UpdateGroupSettingRequest extends Request
         return $user->can('edit', $this->group_setting);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         return [

@@ -36,7 +36,7 @@ class CreditBalanceTest extends TestCase
         $this->buildCache(true);
     }
 
-    public function testCreditBalance()
+    public function testCreditBalance(): void
     {
         $credit = Credit::factory()->create([
             'user_id' => $this->user->id,
@@ -50,7 +50,7 @@ class CreditBalanceTest extends TestCase
         $this->assertEquals($this->client->service()->getCreditBalance(), 10);
     }
 
-    public function testExpiredCreditBalance()
+    public function testExpiredCreditBalance(): void
     {
         $credit = Credit::factory()->create([
             'user_id' => $this->user->id,
@@ -65,7 +65,7 @@ class CreditBalanceTest extends TestCase
         $this->assertEquals($this->client->service()->getCreditBalance(), 0);
     }
 
-    public function testCreditDeleteCheckClientBalance()
+    public function testCreditDeleteCheckClientBalance(): void
     {
         $credit = Credit::factory()->create([
             'user_id' => $this->user->id,

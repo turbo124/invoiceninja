@@ -73,7 +73,7 @@ class DemoMode extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         set_time_limit(0);
 

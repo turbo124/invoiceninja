@@ -34,7 +34,7 @@ class TaskSortingTest extends TestCase
         ]);
     }
 
-    public function testSorting()
+    public function testSorting(): void
     {
         $index = 3;
         $item = $this->collection->where('id', 7)->first();

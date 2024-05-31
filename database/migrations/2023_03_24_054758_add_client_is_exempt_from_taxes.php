@@ -20,7 +20,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('clients', function (Illuminate\Database\Schema\Blueprint $table) {
             $table->boolean('is_tax_exempt')->default(false);
@@ -241,7 +241,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
 
     }

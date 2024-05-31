@@ -24,7 +24,7 @@ class PdfMakerTest extends TestCase
         ],
     ];
 
-    public function testDesignLoadsCorrectly()
+    public function testDesignLoadsCorrectly(): void
     {
         $design = new Design('example', ['custom_path' => base_path('tests/Feature/PdfMaker/')]);
         $maker = new PdfMaker($this->state);
@@ -34,7 +34,7 @@ class PdfMakerTest extends TestCase
         $this->assertInstanceOf(Design::class, $maker->design);
     }
 
-    public function testHtmlDesignLoadsCorrectly()
+    public function testHtmlDesignLoadsCorrectly(): void
     {
         $design = new Design('example', ['custom_path' => base_path('tests/Feature/PdfMaker/')]);
 
@@ -47,7 +47,7 @@ class PdfMakerTest extends TestCase
         $this->assertStringContainsString('Template: Example', $maker->getCompiledHTML());
     }
 
-    public function testGetSectionUtility()
+    public function testGetSectionUtility(): void
     {
         $design = new Design('example', ['custom_path' => base_path('tests/Feature/PdfMaker/')]);
 
@@ -60,7 +60,7 @@ class PdfMakerTest extends TestCase
         $this->assertEquals('table', $maker->getSectionNode('product-table')->nodeName);
     }
 
-    public function testTableAttributesAreInjected()
+    public function testTableAttributesAreInjected(): void
     {
         $state = [
             'template' => [
@@ -91,7 +91,7 @@ class PdfMakerTest extends TestCase
         $this->assertStringContainsString('console.log(1)', $maker->getSection('product-table', 'script'));
     }
 
-    public function testVariablesAreReplaced()
+    public function testVariablesAreReplaced(): void
     {
         $state = [
             'template' => [
@@ -118,7 +118,7 @@ class PdfMakerTest extends TestCase
         $this->assertStringContainsString('Invoice Ninja', $maker->getSection('header'));
     }
 
-    public function testElementContentIsGenerated()
+    public function testElementContentIsGenerated(): void
     {
         $state = [
             'template' => [
@@ -167,7 +167,7 @@ class PdfMakerTest extends TestCase
         $this->assertStringContainsString($compiled, $maker->getCompiledHTML());
     }
 
-    public function testConditionalRenderingOfElements()
+    public function testConditionalRenderingOfElements(): void
     {
         $design1 = new Design('example', ['custom_path' => base_path('tests/Feature/PdfMaker/')]);
 
@@ -209,7 +209,7 @@ class PdfMakerTest extends TestCase
         $this->assertNotSame($output1, $output2);
     }
 
-    public function testGeneratingPdf()
+    public function testGeneratingPdf(): void
     {
         $state = [
             'template' => [
@@ -269,7 +269,7 @@ class PdfMakerTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testGetSectionHTMLWorks()
+    public function testGetSectionHTMLWorks(): void
     {
         $design = new Design('example', ['custom_path' => base_path('tests/Feature/PdfMaker/')]);
 
@@ -280,7 +280,7 @@ class PdfMakerTest extends TestCase
         $this->assertStringContainsString('id="product-table"', $html);
     }
 
-    public function testWrapperHTMLWorks()
+    public function testWrapperHTMLWorks(): void
     {
         $design = new Design('example', ['custom_path' => base_path('tests/Feature/PdfMaker/')]);
 

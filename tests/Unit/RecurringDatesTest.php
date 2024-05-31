@@ -43,7 +43,7 @@ class RecurringDatesTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testDailyFrequencyCalc6()
+    public function testDailyFrequencyCalc6(): void
     {
         $this->travelTo(now()->subHours(8));
 
@@ -135,7 +135,7 @@ class RecurringDatesTest extends TestCase
 
     }
 
-    public function testDailyFrequencyCalc5()
+    public function testDailyFrequencyCalc5(): void
     {
 
         $account = Account::factory()->create();
@@ -217,7 +217,7 @@ class RecurringDatesTest extends TestCase
 
     }
 
-    public function testDailyFrequencyCalc4()
+    public function testDailyFrequencyCalc4(): void
     {
 
         $account = Account::factory()->create();
@@ -299,7 +299,7 @@ class RecurringDatesTest extends TestCase
 
     }
 
-    public function testDailyFrequencyCalc3()
+    public function testDailyFrequencyCalc3(): void
     {
 
         $account = Account::factory()->create();
@@ -381,7 +381,7 @@ class RecurringDatesTest extends TestCase
 
     }
 
-    public function testDailyFrequencyCalc2()
+    public function testDailyFrequencyCalc2(): void
     {
         $account = Account::factory()->create();
 
@@ -462,7 +462,7 @@ class RecurringDatesTest extends TestCase
 
     }
 
-    public function testDailyFrequencyCalc()
+    public function testDailyFrequencyCalc(): void
     {
         $account = Account::factory()->create();
 
@@ -543,7 +543,7 @@ class RecurringDatesTest extends TestCase
 
     }
 
-    public function testRecurringDatesDraftInvoice()
+    public function testRecurringDatesDraftInvoice(): void
     {
         $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
         $recurring_invoice->line_items = $this->buildLineItems();
@@ -555,7 +555,7 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(0, count($recurring_invoice->recurringDates()));
     }
 
-    public function testRecurringDatesPendingInvoice()
+    public function testRecurringDatesPendingInvoice(): void
     {
         $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
         $recurring_invoice->line_items = $this->buildLineItems();
@@ -574,7 +574,7 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(5, count($recurring_invoice->recurringDates()));
     }
 
-    public function testRecurringDatesPendingInvoiceWithNoDueDate()
+    public function testRecurringDatesPendingInvoiceWithNoDueDate(): void
     {
         $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
         $recurring_invoice->line_items = $this->buildLineItems();
@@ -593,7 +593,7 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(5, count($recurring_invoice->recurringDates()));
     }
 
-    public function testCompareDatesLogic()
+    public function testCompareDatesLogic(): void
     {
         $date = now()->startOfDay()->format('Y-m-d');
 

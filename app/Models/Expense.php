@@ -10,6 +10,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -175,7 +177,7 @@ class Expense extends BaseModel
         return $this->belongsTo(User::class, 'assigned_user_id', 'id')->withTrashed();
     }
 
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
@@ -195,7 +197,7 @@ class Expense extends BaseModel
         return $this->belongsTo(Client::class);
     }
 
-    public function purchase_order()
+    public function purchase_order(): HasOne
     {
         return $this->hasOne(PurchaseOrder::class)->withTrashed();
     }

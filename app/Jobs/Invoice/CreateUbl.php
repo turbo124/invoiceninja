@@ -54,7 +54,7 @@ class CreateUbl implements ShouldQueue
      *
      * @return ?string
      */
-    public function handle()
+    public function handle(): ?string
     {
         $invoice = $this->invoice;
         $company = $invoice->company;

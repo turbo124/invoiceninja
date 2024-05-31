@@ -135,7 +135,7 @@ class LoginTest extends TestCase
     //    // $this->assertGuest();
     // }
 
-    public function testApiLogin()
+    public function testApiLogin(): void
     {
         Account::all()->each(function ($account) {
             $account->delete();

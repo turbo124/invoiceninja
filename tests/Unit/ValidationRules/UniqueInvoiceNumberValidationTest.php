@@ -38,7 +38,7 @@ class UniqueInvoiceNumberValidationTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testValidEmailRule()
+    public function testValidEmailRule(): void
     {
         auth()->login($this->user);
         auth()->user()->setCompany($this->company);

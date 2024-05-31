@@ -36,7 +36,7 @@ class EInvoiceTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testEInvoiceGenerates()
+    public function testEInvoiceGenerates(): void
     {
         $this->company->e_invoice_type = 'EN16931';
         $this->invoice->client->routing_id = 'DE123456789';
@@ -48,7 +48,7 @@ class EInvoiceTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testValidityofXMLFile()
+    public function testValidityofXMLFile(): void
     {
         $this->company->e_invoice_type = 'EN16931';
         $this->invoice->client->routing_id = 'DE123456789';

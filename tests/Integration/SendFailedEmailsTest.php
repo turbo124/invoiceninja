@@ -33,7 +33,7 @@ class SendFailedEmailsTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testReminderFires()
+    public function testReminderFires(): void
     {
         $invitation = $this->invoice->invitations->first();
         $reminder_template = $this->invoice->calculateTemplate('invoice');

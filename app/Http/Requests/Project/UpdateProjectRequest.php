@@ -30,7 +30,7 @@ class UpdateProjectRequest extends Request
         return $user->can('edit', $this->project);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */

@@ -27,7 +27,7 @@ class UpdateWebhookRequest extends Request
         return auth()->user()->can('edit', $this->webhook);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'target_url' => 'bail|required|url',

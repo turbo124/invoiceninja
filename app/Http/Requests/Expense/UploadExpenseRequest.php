@@ -25,7 +25,7 @@ class UploadExpenseRequest extends Request
         return $user->can('edit', $this->expense);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

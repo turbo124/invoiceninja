@@ -33,7 +33,7 @@ class InvoiceItemV2Test extends TestCase
         $this->makeTestData();
     }
 
-    public function testInvoiceItemTotalSimple()
+    public function testInvoiceItemTotalSimple(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -60,7 +60,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 10);
     }
 
-    public function testMultipleInvoiceItemTotalSimple()
+    public function testMultipleInvoiceItemTotalSimple(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -96,7 +96,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 20);
     }
 
-    public function testMultipleInvoiceItemsTotalSimpleWithDiscount()
+    public function testMultipleInvoiceItemsTotalSimpleWithDiscount(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -131,7 +131,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 16);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscount()
+    public function testInvoiceItemTotalSimpleWithDiscount(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -156,7 +156,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 8);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecision()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecision(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -179,7 +179,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 7.48);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleExcTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleExcTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -202,7 +202,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getTotalTaxes(), 0.80);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleExclusiveTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleExclusiveTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -223,7 +223,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getTotalTaxes(), 0.75);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleExcTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleExcTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -245,7 +245,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getTotalTaxes(), 2.20);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleExclusiveTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleExclusiveTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -270,7 +270,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getGroupedTaxes()->count(), 2);
     }
 
-    public function testInvoiceLevelDiscountIsAmountDiscountOnSubtotal()
+    public function testInvoiceLevelDiscountIsAmountDiscountOnSubtotal(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -293,7 +293,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 10);
     }
 
-    public function testInvoiceLevelDiscountIsPercentDiscountOnSubtotal()
+    public function testInvoiceLevelDiscountIsPercentDiscountOnSubtotal(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -316,7 +316,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 10);
     }
 
-    public function testMultiItemInvoiceLevelDiscountIsAmountDiscountOnSubtotal()
+    public function testMultiItemInvoiceLevelDiscountIsAmountDiscountOnSubtotal(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -349,7 +349,7 @@ class InvoiceItemV2Test extends TestCase
         $this->assertEquals($item_calc->getSubTotal(), 20);
     }
 
-    public function testMultiItemInvoiceLevelDiscountIsPercentDiscountOnSubtotal()
+    public function testMultiItemInvoiceLevelDiscountIsPercentDiscountOnSubtotal(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;

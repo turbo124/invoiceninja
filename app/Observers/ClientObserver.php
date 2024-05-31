@@ -55,7 +55,7 @@ class ClientObserver
      *
      * @return void
      */
-    public function created(Client $client)
+    public function created(Client $client): void
     {
         /** Fix Tax Data for Clients */
         if ($client->country_id == 840 && $client->company->calculate_taxes && ! $client->company->account->isFreeHostedClient()) {
@@ -81,7 +81,7 @@ class ClientObserver
      *
      * @return void
      */
-    public function updated(Client $client)
+    public function updated(Client $client): void
     {
 
         /** Monitor postal code changes for US based clients for tax calculations */
@@ -118,7 +118,7 @@ class ClientObserver
      *
      * @return void
      */
-    public function deleted(Client $client)
+    public function deleted(Client $client): void
     {
         if ($client->is_deleted) {
             return;

@@ -51,7 +51,7 @@ class UpdateOrCreateProduct implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         MultiDB::setDB($this->company->db);
 

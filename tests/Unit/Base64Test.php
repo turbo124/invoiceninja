@@ -29,27 +29,27 @@ class Base64Test extends TestCase
         parent::setUp();
     }
 
-    public function testBadBase64String()
+    public function testBadBase64String(): void
     {
         $this->assertFalse(Ninja::isBase64Encoded('x'));
     }
 
-    public function testCorrectBase64Encoding()
+    public function testCorrectBase64Encoding(): void
     {
         $this->assertTrue(Ninja::isBase64Encoded('MTIzNDU2'));
     }
 
-    public function testBadBase64StringScenaro1()
+    public function testBadBase64StringScenaro1(): void
     {
         $this->assertFalse(Ninja::isBase64Encoded('Matthies'));
     }
 
-    public function testBadBase64StringScenaro2()
+    public function testBadBase64StringScenaro2(): void
     {
         $this->assertFalse(Ninja::isBase64Encoded('Barthels'));
     }
 
-    public function testBadBase64StringScenaro3()
+    public function testBadBase64StringScenaro3(): void
     {
         $this->assertFalse(Ninja::isBase64Encoded('aaa'));
     }

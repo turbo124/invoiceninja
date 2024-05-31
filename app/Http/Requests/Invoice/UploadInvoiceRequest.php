@@ -25,7 +25,7 @@ class UploadInvoiceRequest extends Request
         return $user->can('edit', $this->invoice);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

@@ -50,7 +50,7 @@ class OpenApiYaml extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $path = base_path('openapi');
 

@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Libraries\MultiDB;
 use Closure;
 use Hashids\Hashids;
@@ -24,7 +25,7 @@ class SetInviteDb
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $error = [
             'message' => 'I could not find the database for this object.',

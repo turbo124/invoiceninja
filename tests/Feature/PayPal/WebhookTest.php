@@ -47,13 +47,13 @@ class WebhookTest extends TestCase
 
     }
 
-    public function testWebhooks()
+    public function testWebhooks(): void
     {
         $hook = json_decode($this->webhook_string, true);
         $this->assertIsArray($hook);
     }
 
-    public function testPaymentCreation()
+    public function testPaymentCreation(): void
     {
         $hook = json_decode($this->webhook_string, true);
 

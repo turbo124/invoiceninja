@@ -46,7 +46,7 @@ class InvoicelyTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testClientInvoicelyImport()
+    public function testClientInvoicelyImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/invoicely_clients.csv'
@@ -86,7 +86,7 @@ class InvoicelyTest extends TestCase
         $this->assertEquals('5558675309', $client->phone);
     }
 
-    public function testInvoiceInvoicelyImport()
+    public function testInvoiceInvoicelyImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/invoicely_clients.csv'

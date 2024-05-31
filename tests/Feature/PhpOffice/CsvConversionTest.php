@@ -21,7 +21,7 @@ class CsvConversionTest extends TestCase
         parent::setUp();
     }
 
-    public function testExample()
+    public function testExample(): void
     {
 
         $spreadsheet = new Spreadsheet();

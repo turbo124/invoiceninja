@@ -29,7 +29,7 @@ class SystemHealthTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testSystemHealthRouteAvailable()
+    public function testSystemHealthRouteAvailable(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

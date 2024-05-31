@@ -26,7 +26,7 @@ class BulkProductRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'ids' => ['required', 'bail', 'array', Rule::exists('products', 'id')->where('company_id', auth()->user()->company()->id)],

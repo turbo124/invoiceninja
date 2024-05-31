@@ -21,7 +21,7 @@ class LoginRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -31,7 +31,7 @@ class LoginRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         if (Ninja::isHosted()) {
             $email_rules = ['required', new EmailBlackListRule()];

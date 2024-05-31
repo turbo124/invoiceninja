@@ -10,6 +10,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 /**
  * App\Models\GatewayType
  *
@@ -95,12 +98,12 @@ class GatewayType extends StaticModel
 
     public const PAYPAL_ADVANCED_CARDS = 29;
 
-    public function gateway()
+    public function gateway(): BelongsTo
     {
         return $this->belongsTo(Gateway::class);
     }
 
-    public function payment_methods()
+    public function payment_methods(): HasMany
     {
         return $this->hasMany(PaymentType::class);
     }

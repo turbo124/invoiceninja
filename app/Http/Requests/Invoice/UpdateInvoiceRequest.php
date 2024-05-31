@@ -35,7 +35,7 @@ class UpdateInvoiceRequest extends Request
         return $user->can('edit', $this->invoice);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -119,7 +119,7 @@ class UpdateInvoiceRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'id' => ctrans('texts.locked_invoice'),

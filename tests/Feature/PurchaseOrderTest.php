@@ -45,7 +45,7 @@ class PurchaseOrderTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testExpensePurchaseOrderConversion()
+    public function testExpensePurchaseOrderConversion(): void
     {
 
         $p = PurchaseOrder::factory()->create([
@@ -62,7 +62,7 @@ class PurchaseOrderTest extends TestCase
 
     }
 
-    public function testPurchaseOrderHistory()
+    public function testPurchaseOrderHistory(): void
     {
         event(new PurchaseOrderWasUpdated($this->purchase_order, $this->company, Ninja::eventVars($this->company, $this->user)));
         event(new PurchaseOrderWasCreated($this->purchase_order, $this->company, Ninja::eventVars($this->company, $this->user)));
@@ -93,7 +93,7 @@ class PurchaseOrderTest extends TestCase
 
     }
 
-    public function testPurchaseOrderBulkActions()
+    public function testPurchaseOrderBulkActions(): void
     {
         $i = $this->purchase_order->invitations->first();
 
@@ -186,7 +186,7 @@ class PurchaseOrderTest extends TestCase
             ->assertStatus(302);
     }
 
-    public function testPurchaseOrderDownloadPDF()
+    public function testPurchaseOrderDownloadPDF(): void
     {
         $i = $this->purchase_order->invitations->first();
 
@@ -199,7 +199,7 @@ class PurchaseOrderTest extends TestCase
         $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
     }
 
-    public function testPurchaseOrderGetWithClientStatus()
+    public function testPurchaseOrderGetWithClientStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -209,7 +209,7 @@ class PurchaseOrderTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPostNewPurchaseOrderPdf()
+    public function testPostNewPurchaseOrderPdf(): void
     {
         $purchase_order = [
             'status_id' => 1,
@@ -247,7 +247,7 @@ class PurchaseOrderTest extends TestCase
 
     }
 
-    public function testPurchaseOrderRest()
+    public function testPurchaseOrderRest(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -276,7 +276,7 @@ class PurchaseOrderTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testPostNewPurchaseOrder()
+    public function testPostNewPurchaseOrder(): void
     {
         $purchase_order = [
             'status_id' => 1,
@@ -300,7 +300,7 @@ class PurchaseOrderTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testPurchaseOrderDelete()
+    public function testPurchaseOrderDelete(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -310,7 +310,7 @@ class PurchaseOrderTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPurchaseOrderUpdate()
+    public function testPurchaseOrderUpdate(): void
     {
         $data = [
             'status_id' => 1,

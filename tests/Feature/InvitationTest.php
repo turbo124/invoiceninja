@@ -42,7 +42,7 @@ class InvitationTest extends TestCase
         $this->faker = \Faker\Factory::create();
     }
 
-    public function testInvoiceCreationAfterInvoiceMarkedSent()
+    public function testInvoiceCreationAfterInvoiceMarkedSent(): void
     {
         $account = Account::factory()->create();
         $company = Company::factory()->create([

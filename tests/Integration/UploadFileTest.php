@@ -38,7 +38,7 @@ class UploadFileTest extends TestCase
         );
     }
 
-    public function testFileUploadWorks()
+    public function testFileUploadWorks(): void
     {
         $image = UploadedFile::fake()->image('avatar.jpg');
 

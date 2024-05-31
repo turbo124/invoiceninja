@@ -19,7 +19,7 @@ class ProposalObserver
      *
      * @return void
      */
-    public function created(Proposal $proposal)
+    public function created(Proposal $proposal): void
     {
         //
     }
@@ -29,7 +29,7 @@ class ProposalObserver
      *
      * @return void
      */
-    public function updated(Proposal $proposal)
+    public function updated(Proposal $proposal): void
     {
         //
     }
@@ -39,7 +39,7 @@ class ProposalObserver
      *
      * @return void
      */
-    public function deleted(Proposal $proposal)
+    public function deleted(Proposal $proposal): void
     {
         //
     }
@@ -49,7 +49,7 @@ class ProposalObserver
      *
      * @return void
      */
-    public function restored(Proposal $proposal)
+    public function restored(Proposal $proposal): void
     {
         //
     }
@@ -59,7 +59,7 @@ class ProposalObserver
      *
      * @return void
      */
-    public function forceDeleted(Proposal $proposal)
+    public function forceDeleted(Proposal $proposal): void
     {
         //
     }

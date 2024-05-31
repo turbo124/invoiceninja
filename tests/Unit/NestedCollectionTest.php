@@ -42,17 +42,17 @@ class NestedCollectionTest extends TestCase
         ];
     }
 
-    public function testPerPageAttribute()
+    public function testPerPageAttribute(): void
     {
         $this->assertEquals($this->map->client->datatable->per_page, 20);
     }
 
-    public function testNameAttributeVisibility()
+    public function testNameAttributeVisibility(): void
     {
         $this->assertEquals($this->map->client->datatable->column_visibility->name, true);
     }
 
-    public function testStringAsEntityProperty()
+    public function testStringAsEntityProperty(): void
     {
         $entity = 'client';
 

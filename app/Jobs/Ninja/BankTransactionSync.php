@@ -44,7 +44,7 @@ class BankTransactionSync implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if (config('ninja.db.multi_db_enabled')) {
 

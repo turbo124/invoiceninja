@@ -47,7 +47,7 @@ class ExpenseApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testTransactionIdClearedOnDelete()
+    public function testTransactionIdClearedOnDelete(): void
     {
         $bi = BankIntegration::factory()->create([
             'company_id' => $this->company->id,
@@ -75,7 +75,7 @@ class ExpenseApiTest extends TestCase
         $this->assertNull($e->transaction_id);
     }
 
-    public function testExpenseGetClientStatus()
+    public function testExpenseGetClientStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -85,7 +85,7 @@ class ExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testExpensePost()
+    public function testExpensePost(): void
     {
         $data = [
             'public_notes' => $this->faker->firstName(),
@@ -102,7 +102,7 @@ class ExpenseApiTest extends TestCase
         $this->assertNotEmpty($arr['data']['number']);
     }
 
-    public function testDuplicateNumberCatch()
+    public function testDuplicateNumberCatch(): void
     {
         $data = [
             'public_notes' => $this->faker->firstName(),
@@ -124,7 +124,7 @@ class ExpenseApiTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testExpensePut()
+    public function testExpensePut(): void
     {
         $data = [
             'public_notes' => $this->faker->firstName(),
@@ -153,7 +153,7 @@ class ExpenseApiTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testExpenseGet()
+    public function testExpenseGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -163,7 +163,7 @@ class ExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testExpenseGetSort()
+    public function testExpenseGetSort(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -173,7 +173,7 @@ class ExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testExpenseNotArchived()
+    public function testExpenseNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -185,7 +185,7 @@ class ExpenseApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testExpenseArchived()
+    public function testExpenseArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->expense->id)],
@@ -201,7 +201,7 @@ class ExpenseApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testExpenseRestored()
+    public function testExpenseRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->expense->id)],
@@ -217,7 +217,7 @@ class ExpenseApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testExpenseDeleted()
+    public function testExpenseDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->expense->id)],
@@ -233,7 +233,7 @@ class ExpenseApiTest extends TestCase
         $this->assertTrue($arr['data'][0]['is_deleted']);
     }
 
-    public function testExpenseBulkCategorize()
+    public function testExpenseBulkCategorize(): void
     {
 
         $e = Expense::factory()->create([
@@ -266,7 +266,7 @@ class ExpenseApiTest extends TestCase
         $this->assertEquals($ec->hashed_id, $arr['data'][0]['category_id']);
     }
 
-    public function testAddingExpense()
+    public function testAddingExpense(): void
     {
         $data = [
             'name' => $this->faker->firstName(),

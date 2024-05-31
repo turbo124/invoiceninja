@@ -47,7 +47,7 @@ class DesignApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testFindInSetQueries()
+    public function testFindInSetQueries(): void
     {
 
         $design = DesignFactory::create($this->company->id, $this->user->id);
@@ -123,7 +123,7 @@ class DesignApiTest extends TestCase
 
     }
 
-    public function testDesignTemplates()
+    public function testDesignTemplates(): void
     {
         $design = DesignFactory::create($this->company->id, $this->user->id);
         $design->is_template = true;
@@ -142,7 +142,7 @@ class DesignApiTest extends TestCase
         $this->assertCount(1, $arr['data']);
     }
 
-    public function testDesignTemplatesExcluded()
+    public function testDesignTemplatesExcluded(): void
     {
         $design = DesignFactory::create($this->company->id, $this->user->id);
         $design->is_template = true;
@@ -173,7 +173,7 @@ class DesignApiTest extends TestCase
 
     }
 
-    public function testDesignPost()
+    public function testDesignPost(): void
     {
 
         $design = [
@@ -255,7 +255,7 @@ class DesignApiTest extends TestCase
         $this->assertGreaterThan(0, $design->deleted_at);
     }
 
-    public function testDesignArchive()
+    public function testDesignArchive(): void
     {
 
         $design = [

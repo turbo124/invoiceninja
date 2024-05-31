@@ -43,7 +43,7 @@ class ReactBuilder extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->option('type') == 'local') {
 

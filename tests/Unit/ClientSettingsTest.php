@@ -34,7 +34,7 @@ class ClientSettingsTest extends TestCase
         $this->faker = \Faker\Factory::create();
     }
 
-    public function testClientValidSettingsWithBadProps()
+    public function testClientValidSettingsWithBadProps(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -146,7 +146,7 @@ class ClientSettingsTest extends TestCase
         // $this->assertEquals('1', $arr['data']['settings']['valid_until']);
     }
 
-    public function testClientBaseline()
+    public function testClientBaseline(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -171,7 +171,7 @@ class ClientSettingsTest extends TestCase
         $this->assertEquals('1', $arr['data']['settings']['currency_id']);
     }
 
-    public function testClientValidSettings()
+    public function testClientValidSettings(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -209,7 +209,7 @@ class ClientSettingsTest extends TestCase
         $this->assertEquals('1', $arr['data']['settings']['valid_until']);
     }
 
-    public function testClientIllegalCurrency()
+    public function testClientIllegalCurrency(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -234,7 +234,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testClientIllegalLanguage()
+    public function testClientIllegalLanguage(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -264,7 +264,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testClientIllegalPaymenTerms()
+    public function testClientIllegalPaymenTerms(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -294,7 +294,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testClientIllegalValidUntil()
+    public function testClientIllegalValidUntil(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -324,7 +324,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testClientIllegalDefaultTaskRate()
+    public function testClientIllegalDefaultTaskRate(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -357,7 +357,7 @@ class ClientSettingsTest extends TestCase
         $this->assertFalse(array_key_exists('default_task_rate', $arr));
     }
 
-    public function testClientIllegalSendReminderBool()
+    public function testClientIllegalSendReminderBool(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -387,7 +387,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testClientSettingBools()
+    public function testClientSettingBools(): void
     {
         $data = [
             'name' => $this->faker->firstName(),

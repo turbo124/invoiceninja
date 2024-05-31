@@ -28,7 +28,7 @@ class MakesDatesTest extends TestCase
      * work as expected at this point in time.
      */
 
-    public function testConvertClientDateToUTCDateTimeTickOverSameDay()
+    public function testConvertClientDateToUTCDateTimeTickOverSameDay(): void
     {
         $date_src = '2007-04-19 23:59';
         $client_timezone = 'Europe/Amsterdam'; // +1 UTC
@@ -39,7 +39,7 @@ class MakesDatesTest extends TestCase
         $this->assertEquals('2007-04-19 21:59', $date_time->format('Y-m-d H:i'));
     }
 
-    public function testConvertClientDateToUTCDateTimeSameDay()
+    public function testConvertClientDateToUTCDateTimeSameDay(): void
     {
         $date_src = '2007-04-19 21:59';
         $client_timezone = 'Europe/Amsterdam'; // +1 UTC
@@ -50,7 +50,7 @@ class MakesDatesTest extends TestCase
         $this->assertEquals($utc_date->format('Y-m-d'), '2007-04-19');
     }
 
-    public function testConvertClientDateToUTCDateTimeTickOverNextDay()
+    public function testConvertClientDateToUTCDateTimeTickOverNextDay(): void
     {
         $date_src = '2007-04-19 23:59';
         $client_timezone = 'Atlantic/Cape_Verde'; // -1 UTC
@@ -61,7 +61,7 @@ class MakesDatesTest extends TestCase
         $this->assertEquals('2007-04-20 00:59', $date_time->format('Y-m-d H:i'));
     }
 
-    public function testConvertClientDateToUTCDateTimeSameDayDiffTimeZone()
+    public function testConvertClientDateToUTCDateTimeSameDayDiffTimeZone(): void
     {
         $date_src = '2007-04-19 22:59';
         $client_timezone = 'Atlantic/Cape_Verde'; // -1 UTC
@@ -72,7 +72,7 @@ class MakesDatesTest extends TestCase
         $this->assertEquals('2007-04-19 23:59', $date_time->format('Y-m-d H:i'));
     }
 
-    public function testCreateClientDate()
+    public function testCreateClientDate(): void
     {
         $client_date_src = '2007-04-19 22:59';
         $client_timezone = 'Atlantic/Cape_Verde'; // -1 UTC
@@ -84,7 +84,7 @@ class MakesDatesTest extends TestCase
         $this->assertEquals('2007-04-19 22:59', $client_date->format('Y-m-d H:i'));
     }
 
-    public function testCreateClientDateWithFormat()
+    public function testCreateClientDateWithFormat(): void
     {
         $client_date_src = '2007-04-19';
         $client_timezone = 'Atlantic/Cape_Verde'; // -1 UTC

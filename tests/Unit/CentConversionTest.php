@@ -22,7 +22,7 @@ class CentConversionTest extends TestCase
         parent::setUp();
     }
 
-    public function testConversionOfDecimalValues()
+    public function testConversionOfDecimalValues(): void
     {
         $precision = 2;
 
@@ -42,7 +42,7 @@ class CentConversionTest extends TestCase
         $this->assertEquals(212, $amount);
     }
 
-    public function testBcMathWay()
+    public function testBcMathWay(): void
     {
         $amount = 64.99;
         $amount = bcmul($amount, 100);

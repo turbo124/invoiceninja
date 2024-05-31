@@ -22,7 +22,7 @@ class StoreDocumentRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'file' => 'required|max:10000|mimes:png,jpeg,gif,jpg,bmp,txt,doc,docx,xls,xlsx,pdf',

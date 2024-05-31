@@ -22,7 +22,7 @@ class ConnectNordigenBankIntegrationRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -32,7 +32,7 @@ class ConnectNordigenBankIntegrationRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
         ];

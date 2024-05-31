@@ -26,7 +26,7 @@ class ProfitLossRequest extends Request
         return $this->checkAuthority();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'start_date' => 'bail|nullable|required_if:date_range,custom|string|date',

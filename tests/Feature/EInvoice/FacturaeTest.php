@@ -34,7 +34,7 @@ class FacturaeTest extends TestCase
         );
     }
 
-    public function testInvoiceGeneration()
+    public function testInvoiceGeneration(): void
     {
 
         $f = new \App\Services\EDocument\Standards\FacturaEInvoice($this->invoice, '3.2.2');

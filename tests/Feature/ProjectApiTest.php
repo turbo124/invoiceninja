@@ -47,7 +47,7 @@ class ProjectApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testProjectIncludesZeroCount()
+    public function testProjectIncludesZeroCount(): void
     {
 
         $response = $this->withHeaders([
@@ -65,7 +65,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectIncludes()
+    public function testProjectIncludes(): void
     {
         $i = Invoice::factory()->create([
             'user_id' => $this->user->id,
@@ -103,7 +103,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectValidationForBudgetedHoursPut()
+    public function testProjectValidationForBudgetedHoursPut(): void
     {
 
         $data = $this->project->toArray();
@@ -118,7 +118,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectValidationForBudgetedHoursPutNull()
+    public function testProjectValidationForBudgetedHoursPutNull(): void
     {
 
         $data = $this->project->toArray();
@@ -133,7 +133,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectValidationForBudgetedHoursPutEmpty()
+    public function testProjectValidationForBudgetedHoursPutEmpty(): void
     {
 
         $data = $this->project->toArray();
@@ -148,7 +148,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectValidationForBudgetedHours()
+    public function testProjectValidationForBudgetedHours(): void
     {
 
         $data = [
@@ -167,7 +167,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectValidationForBudgetedHours2()
+    public function testProjectValidationForBudgetedHours2(): void
     {
 
         $data = [
@@ -186,7 +186,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectValidationForBudgetedHours3()
+    public function testProjectValidationForBudgetedHours3(): void
     {
 
         $data = [
@@ -205,7 +205,7 @@ class ProjectApiTest extends TestCase
 
     }
 
-    public function testProjectGetFilter()
+    public function testProjectGetFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -215,7 +215,7 @@ class ProjectApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testProjectGet()
+    public function testProjectGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -225,7 +225,7 @@ class ProjectApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testProjectPost()
+    public function testProjectPost(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -257,7 +257,7 @@ class ProjectApiTest extends TestCase
         }
     }
 
-    public function testProjectPostFilters()
+    public function testProjectPostFilters(): void
     {
         $data = [
             'name' => 'Sherlock',
@@ -281,7 +281,7 @@ class ProjectApiTest extends TestCase
         $this->assertEquals(1, count($arr['data']));
     }
 
-    public function testProjectPut()
+    public function testProjectPut(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -296,7 +296,7 @@ class ProjectApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testProjectNotArchived()
+    public function testProjectNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -308,7 +308,7 @@ class ProjectApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testProjectArchived()
+    public function testProjectArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->project->id)],
@@ -324,7 +324,7 @@ class ProjectApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testProjectRestored()
+    public function testProjectRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->project->id)],
@@ -340,7 +340,7 @@ class ProjectApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testProjectDeleted()
+    public function testProjectDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->project->id)],

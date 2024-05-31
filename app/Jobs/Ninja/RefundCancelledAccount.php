@@ -33,7 +33,7 @@ class RefundCancelledAccount implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         // if free plan, return
         if (Ninja::isSelfHost() || $this->account->isFreeHostedClient()) {

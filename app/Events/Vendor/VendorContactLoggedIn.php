@@ -38,7 +38,7 @@ class VendorContactLoggedIn
      *
      * @return Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
         return [];
     }

@@ -45,7 +45,7 @@ class CompareCollectionTest extends TestCase
         $this->is_not_admin = false;
     }
 
-    public function testCollectionCreation()
+    public function testCollectionCreation(): void
     {
         $collection = collect();
 
@@ -64,27 +64,27 @@ class CompareCollectionTest extends TestCase
         $this->assertEquals(0, $collection->count());
     }
 
-    public function testCompareResultOfComparison()
+    public function testCompareResultOfComparison(): void
     {
         $this->assertEquals(7, $this->map->count());
     }
 
-    public function testViewPermission()
+    public function testViewPermission(): void
     {
         $this->assertEquals(1, $this->checkPermissions($this->view_permission, $this->is_not_admin)->count());
     }
 
-    public function testViewAndEditPermission()
+    public function testViewAndEditPermission(): void
     {
         $this->assertEquals(2, $this->checkPermissions($this->edit_permission, $this->is_not_admin)->count());
     }
 
-    public function testAdminPermissions()
+    public function testAdminPermissions(): void
     {
         $this->assertEquals(7, $this->checkPermissions($this->view_permission, $this->is_admin)->count());
     }
 
-    public function testActionViewClientFilter()
+    public function testActionViewClientFilter(): void
     {
         $actions = [
             'view_client_client_id',
@@ -93,7 +93,7 @@ class CompareCollectionTest extends TestCase
         $this->assertEquals(1, $this->map->whereIn('action', $actions)->count());
     }
 
-    public function testNoActionClientFilter()
+    public function testNoActionClientFilter(): void
     {
         $actions = [
             '',
@@ -102,7 +102,7 @@ class CompareCollectionTest extends TestCase
         $this->assertEquals(0, $this->map->whereIn('action', $actions)->count());
     }
 
-    public function testActionsAndPermissionsFilter()
+    public function testActionsAndPermissionsFilter(): void
     {
         $actions = [
             'view_client_client_id',
@@ -114,7 +114,7 @@ class CompareCollectionTest extends TestCase
         $this->assertEquals(1, $this->checkPermissions($this->view_permission, $this->is_not_admin)->count());
     }
 
-    public function testActionAndPermissionsFilterFailure()
+    public function testActionAndPermissionsFilterFailure(): void
     {
         $actions = [
             'edit_client_client_id',
@@ -126,7 +126,7 @@ class CompareCollectionTest extends TestCase
         $this->assertEquals(0, $data->whereIn('permission', $this->view_permission)->count());
     }
 
-    public function testEditActionAndPermissionsFilter()
+    public function testEditActionAndPermissionsFilter(): void
     {
         $actions = [
             'edit_client_client_id',

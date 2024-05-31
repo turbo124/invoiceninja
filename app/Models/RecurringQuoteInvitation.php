@@ -100,7 +100,7 @@ class RecurringQuoteInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function recurring_quote()
+    public function recurring_quote(): BelongsTo
     {
         return $this->belongsTo(RecurringQuote::class)->withTrashed();
     }
@@ -108,7 +108,7 @@ class RecurringQuoteInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function contact()
+    public function contact(): BelongsTo
     {
         return $this->belongsTo(ClientContact::class, 'client_contact_id', 'id')->withTrashed();
     }
@@ -116,7 +116,7 @@ class RecurringQuoteInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
     }
@@ -124,7 +124,7 @@ class RecurringQuoteInvitation extends BaseModel
     /**
      * @return BelongsTo
      */
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }

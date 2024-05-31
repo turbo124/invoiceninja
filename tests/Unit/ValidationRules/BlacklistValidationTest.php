@@ -26,7 +26,7 @@ class BlacklistValidationTest extends TestCase
         parent::setUp();
     }
 
-    public function testValidEmailRule3()
+    public function testValidEmailRule3(): void
     {
         $rules = [
             'email' => [new EmailBlackListRule],
@@ -40,7 +40,7 @@ class BlacklistValidationTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testValidEmailRule2()
+    public function testValidEmailRule2(): void
     {
         $rules = [
             'email' => [new EmailBlackListRule],
@@ -54,7 +54,7 @@ class BlacklistValidationTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testValidEmailRule()
+    public function testValidEmailRule(): void
     {
         $rules = [
             'email' => [new BlackListRule],
@@ -68,7 +68,7 @@ class BlacklistValidationTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testInValidEmailRule()
+    public function testInValidEmailRule(): void
     {
         $rules = [
             'email' => [new BlackListRule],
@@ -82,7 +82,7 @@ class BlacklistValidationTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testInValidEmailRule2()
+    public function testInValidEmailRule2(): void
     {
         $rules = [
             'email' => [new BlackListRule],
@@ -96,7 +96,7 @@ class BlacklistValidationTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testInValidEmailRule3()
+    public function testInValidEmailRule3(): void
     {
         $rules = [
             'email' => [new BlackListRule],

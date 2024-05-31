@@ -26,7 +26,7 @@ class PdfGenerationTest extends TestCase
         parent::setUp();
     }
 
-    public function testPdfGeneration()
+    public function testPdfGeneration(): void
     {
         $pdf = new Snappdf();
 

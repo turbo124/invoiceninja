@@ -39,7 +39,7 @@ class InvoiceLinkTasksTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testMapCreation()
+    public function testMapCreation(): void
     {
         $temp_invoice_id = $this->invoice->id;
 

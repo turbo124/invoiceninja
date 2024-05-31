@@ -23,7 +23,7 @@ class StoreSubscriptionRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->can('create', Subscription::class) && auth()->user()->account->hasFeature(Account::FEATURE_API);
     }
@@ -33,7 +33,7 @@ class StoreSubscriptionRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'name' => ['required', Rule::unique('subscriptions')->where('company_id', auth()->user()->company()->id)],

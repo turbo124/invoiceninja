@@ -48,7 +48,7 @@ class PaymentTermsApiTest extends TestCase
         );
     }
 
-    public function testPaymentTermsGetWithFilter()
+    public function testPaymentTermsGetWithFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -58,7 +58,7 @@ class PaymentTermsApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentTermsGet()
+    public function testPaymentTermsGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -68,7 +68,7 @@ class PaymentTermsApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentTermsGetStatusActive()
+    public function testPaymentTermsGetStatusActive(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -78,7 +78,7 @@ class PaymentTermsApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentTermsGetStatusArchived()
+    public function testPaymentTermsGetStatusArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -88,7 +88,7 @@ class PaymentTermsApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentTermsGetStatusDeleted()
+    public function testPaymentTermsGetStatusDeleted(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -98,7 +98,7 @@ class PaymentTermsApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPostPaymentTerm()
+    public function testPostPaymentTerm(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -112,7 +112,7 @@ class PaymentTermsApiTest extends TestCase
         $this->hashed_id = $data['data']['id'];
     }
 
-    public function testPutPaymentTerms()
+    public function testPutPaymentTerms(): void
     {
         $payment_term = PaymentTermFactory::create($this->company->id, $this->user->id);
         $payment_term->num_days = 500;
@@ -126,7 +126,7 @@ class PaymentTermsApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testDeletePaymentTerm()
+    public function testDeletePaymentTerm(): void
     {
         $payment_term = PaymentTermFactory::create($this->company->id, $this->user->id);
         $payment_term->num_days = 500;

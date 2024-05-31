@@ -41,13 +41,13 @@ class CompanyGatewayTest extends TestCase
         }
     }
 
-    public function testGatewayExists()
+    public function testGatewayExists(): void
     {
         $company_gateway = CompanyGateway::first();
         $this->assertNotNull($company_gateway);
     }
 
-    public function testSetConfigFields()
+    public function testSetConfigFields(): void
     {
         $company_gateway = CompanyGateway::first();
 
@@ -63,7 +63,7 @@ class CompanyGatewayTest extends TestCase
 
     }
 
-    public function testFeesAndLimitsExists()
+    public function testFeesAndLimitsExists(): void
     {
         $data = [];
         $data[1]['min_limit'] = 234;
@@ -174,7 +174,7 @@ class CompanyGatewayTest extends TestCase
         $this->assertEquals(($balance + 1), $this->invoice->balance);
     }
 
-    public function testGatewayFeesAreClearedAppropriately()
+    public function testGatewayFeesAreClearedAppropriately(): void
     {
         $data = [];
         $data[1]['min_limit'] = -1;
@@ -220,7 +220,7 @@ class CompanyGatewayTest extends TestCase
         $this->assertEquals($wiped_balance, $i->balance);
     }
 
-    public function testMarkPaidAdjustsGatewayFeeAppropriately()
+    public function testMarkPaidAdjustsGatewayFeeAppropriately(): void
     {
         $data = [];
         $data[1]['min_limit'] = -1;
@@ -266,7 +266,7 @@ class CompanyGatewayTest extends TestCase
         $this->assertEquals($wiped_balance, $i->amount);
     }
 
-    public function testProRataGatewayFees()
+    public function testProRataGatewayFees(): void
     {
         $data = [];
         $data[1]['min_limit'] = -1;

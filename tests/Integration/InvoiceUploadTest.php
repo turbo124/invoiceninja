@@ -31,7 +31,7 @@ class InvoiceUploadTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testInvoiceUploadWorks()
+    public function testInvoiceUploadWorks(): void
     {
         $this->assertNotNull($this->invoice->service()->getInvoicePdf($this->invoice->client->primary_contact()->first()));
     }

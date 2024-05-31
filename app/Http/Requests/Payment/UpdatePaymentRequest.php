@@ -32,7 +32,7 @@ class UpdatePaymentRequest extends Request
         return $user->can('edit', $this->payment);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */
@@ -94,7 +94,7 @@ class UpdatePaymentRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'distinct' => 'Attemping duplicate payment on the same invoice Invoice',

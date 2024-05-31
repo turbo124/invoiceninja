@@ -23,7 +23,7 @@ class ShowDocumentRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
 
         /** @var \App\Models\VendorContact auth()->guard('vendor')->user() */
@@ -36,7 +36,7 @@ class ShowDocumentRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

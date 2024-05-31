@@ -34,7 +34,7 @@ class SystemLogApiTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testFilters()
+    public function testFilters(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -44,7 +44,7 @@ class SystemLogApiTest extends TestCase
 
     }
 
-    public function testSystemLogRoutes()
+    public function testSystemLogRoutes(): void
     {
         $sl = [
             'client_id' => $this->client->id,
@@ -93,7 +93,7 @@ class SystemLogApiTest extends TestCase
         ])->delete('/api/v1/system_logs/'.$hashed_id)->assertStatus(400);
     }
 
-    public function testStoreRouteFails()
+    public function testStoreRouteFails(): void
     {
         $sl = [
             'client_id' => $this->client->id,
@@ -111,7 +111,7 @@ class SystemLogApiTest extends TestCase
         ])->post('/api/v1/system_logs', $sl)->assertStatus(400);
     }
 
-    public function testCreateRouteFails()
+    public function testCreateRouteFails(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

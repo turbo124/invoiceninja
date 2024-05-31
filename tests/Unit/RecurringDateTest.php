@@ -30,7 +30,7 @@ class RecurringDateTest extends TestCase
         //$this->makeTestData();
     }
 
-    public function testNextDay()
+    public function testNextDay(): void
     {
         $trial = 60 * 60 * 24;
 
@@ -41,7 +41,7 @@ class RecurringDateTest extends TestCase
         $this->assertequals($trial_ends->format('Y-m-d'), '2021-12-03');
     }
 
-    public function testDateOverflowsForEndOfMonth()
+    public function testDateOverflowsForEndOfMonth(): void
     {
         $today = Carbon::parse('2022-01-31');
 

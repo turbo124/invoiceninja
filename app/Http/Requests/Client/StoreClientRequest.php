@@ -35,7 +35,7 @@ class StoreClientRequest extends Request
         return $user->can('create', Client::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -172,7 +172,7 @@ class StoreClientRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'contacts.*.email.required' => ctrans('validation.email', ['attribute' => 'email']),

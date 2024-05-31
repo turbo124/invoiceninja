@@ -44,7 +44,7 @@ class UnappliedPaymentDeleteTest extends TestCase
         );
     }
 
-    public function testUnappliedPaymentDelete()
+    public function testUnappliedPaymentDelete(): void
     {
         $data = [
             'amount' => 1000,
@@ -93,7 +93,7 @@ class UnappliedPaymentDeleteTest extends TestCase
         }
     }
 
-    public function testUnappliedPaymentWithPaidInvoice()
+    public function testUnappliedPaymentWithPaidInvoice(): void
     {
         $data = [
             'name' => 'A Nice Client',
@@ -205,7 +205,7 @@ class UnappliedPaymentDeleteTest extends TestCase
         $this->assertEquals(20, $client->fresh()->balance);
     }
 
-    public function testRefundPartialPaymentDeletion()
+    public function testRefundPartialPaymentDeletion(): void
     {
         $data = [
             'name' => 'A Nice Client',

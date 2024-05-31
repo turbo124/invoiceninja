@@ -19,7 +19,7 @@ class DocumentFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'is_default' => true,

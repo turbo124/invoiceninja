@@ -46,7 +46,7 @@ class PaymentTypesSeeder extends Seeder
 
     const GATEWAY_TYPE_CREDIT = 14;
 
-    public function run()
+    public function run(): void
     {
         Model::unguard();
 

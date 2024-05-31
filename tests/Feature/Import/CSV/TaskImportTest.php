@@ -45,7 +45,7 @@ class TaskImportTest extends TestCase
         auth()->login($this->user);
     }
 
-    public function testTaskImportWithGroupedTaskNumbers()
+    public function testTaskImportWithGroupedTaskNumbers(): void
     {
         Task::query()
             ->where('company_id', $this->company->id)
@@ -111,7 +111,7 @@ class TaskImportTest extends TestCase
 
     }
 
-    public function testTaskImport()
+    public function testTaskImport(): void
     {
         Task::query()
             ->where('company_id', $this->company->id)

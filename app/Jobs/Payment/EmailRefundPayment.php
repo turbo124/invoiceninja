@@ -54,7 +54,7 @@ class EmailRefundPayment implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->company->is_disabled) {
             return true;

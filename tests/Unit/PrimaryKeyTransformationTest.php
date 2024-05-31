@@ -27,7 +27,7 @@ class PrimaryKeyTransformationTest extends TestCase
         parent::setUp();
     }
 
-    public function testTransformationArray()
+    public function testTransformationArray(): void
     {
         $keys = [
             $this->encodePrimaryKey(310), $this->encodePrimaryKey(311),
@@ -40,7 +40,7 @@ class PrimaryKeyTransformationTest extends TestCase
         $this->assertEquals(311, $transformed_keys[1]);
     }
 
-    public function testTransformation()
+    public function testTransformation(): void
     {
         $keys = $this->encodePrimaryKey(310);
 

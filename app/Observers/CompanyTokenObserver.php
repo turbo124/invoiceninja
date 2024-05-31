@@ -19,7 +19,7 @@ class CompanyTokenObserver
      *
      * @return void
      */
-    public function created(CompanyToken $companyToken)
+    public function created(CompanyToken $companyToken): void
     {
         //
     }
@@ -29,7 +29,7 @@ class CompanyTokenObserver
      *
      * @return void
      */
-    public function updated(CompanyToken $companyToken)
+    public function updated(CompanyToken $companyToken): void
     {
         //
     }
@@ -39,7 +39,7 @@ class CompanyTokenObserver
      *
      * @return void
      */
-    public function deleted(CompanyToken $companyToken)
+    public function deleted(CompanyToken $companyToken): void
     {
         //
     }
@@ -49,7 +49,7 @@ class CompanyTokenObserver
      *
      * @return void
      */
-    public function restored(CompanyToken $companyToken)
+    public function restored(CompanyToken $companyToken): void
     {
         //
     }
@@ -59,7 +59,7 @@ class CompanyTokenObserver
      *
      * @return void
      */
-    public function forceDeleted(CompanyToken $companyToken)
+    public function forceDeleted(CompanyToken $companyToken): void
     {
         //
     }

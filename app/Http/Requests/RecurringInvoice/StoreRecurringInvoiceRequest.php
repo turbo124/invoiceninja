@@ -35,7 +35,7 @@ class StoreRecurringInvoiceRequest extends Request
         return $user->can('create', RecurringInvoice::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -177,7 +177,7 @@ class StoreRecurringInvoiceRequest extends Request
         return false;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [];
     }

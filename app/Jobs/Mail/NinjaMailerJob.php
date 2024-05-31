@@ -72,7 +72,7 @@ class NinjaMailerJob implements ShouldQueue
         return [rand(5, 29), rand(30, 59), rand(61, 100), rand(180, 500)];
     }
 
-    public function handle()
+    public function handle(): void
     {
         /*Set the correct database*/
         MultiDB::setDb($this->nmo->company->db);

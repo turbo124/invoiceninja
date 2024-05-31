@@ -57,7 +57,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testProductJsonExport()
+    public function testProductJsonExport(): void
     {
         \App\Models\Product::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -87,7 +87,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testPaymentJsonExport()
+    public function testPaymentJsonExport(): void
     {
         \App\Models\Payment::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -118,7 +118,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testPurchaseOrderItemJsonExport()
+    public function testPurchaseOrderItemJsonExport(): void
     {
         \App\Models\PurchaseOrder::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -151,7 +151,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testQuoteItemJsonExport()
+    public function testQuoteItemJsonExport(): void
     {
         \App\Models\Quote::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -184,7 +184,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testInvoiceItemJsonExport()
+    public function testInvoiceItemJsonExport(): void
     {
         \App\Models\Invoice::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -217,7 +217,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testPurchaseOrderJsonExport()
+    public function testPurchaseOrderJsonExport(): void
     {
         \App\Models\PurchaseOrder::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -248,7 +248,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testQuoteJsonExport()
+    public function testQuoteJsonExport(): void
     {
         \App\Models\Quote::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -279,7 +279,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testInvoiceJsonExport()
+    public function testInvoiceJsonExport(): void
     {
         \App\Models\Invoice::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -310,7 +310,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testExpenseJsonExport()
+    public function testExpenseJsonExport(): void
     {
         Expense::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -340,7 +340,7 @@ class ReportPreviewTest extends TestCase
         //nlog($r);
     }
 
-    public function testDocumentJsonExport()
+    public function testDocumentJsonExport(): void
     {
         Document::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -372,7 +372,7 @@ class ReportPreviewTest extends TestCase
         //nlog($r);
     }
 
-    public function testClientExportJson()
+    public function testClientExportJson(): void
     {
         $data = [
             'send_email' => false,
@@ -404,7 +404,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testClientContactExportJsonLimitedKeys()
+    public function testClientContactExportJsonLimitedKeys(): void
     {
 
         $data = [
@@ -437,7 +437,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testActivityCSVExportJson()
+    public function testActivityCSVExportJson(): void
     {
         $data = [
             'send_email' => false,
@@ -462,7 +462,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testCreditExportPreview()
+    public function testCreditExportPreview(): void
     {
 
         $data = [
@@ -482,7 +482,7 @@ class ReportPreviewTest extends TestCase
 
     }
 
-    public function testCreditPreview()
+    public function testCreditPreview(): void
     {
         $data = [
             'send_email' => false,

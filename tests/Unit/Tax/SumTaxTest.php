@@ -89,7 +89,7 @@ class SumTaxTest extends TestCase
     }
 
     /** Proves that we do not charge taxes automatically */
-    public function testCalcInvoiceNoTax()
+    public function testCalcInvoiceNoTax(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -146,7 +146,7 @@ class SumTaxTest extends TestCase
     }
 
     /** Proves that we do calc taxes automatically */
-    public function testCalcInvoiceTax()
+    public function testCalcInvoiceTax(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -201,7 +201,7 @@ class SumTaxTest extends TestCase
         $this->assertEquals(8.75, $line_items[0]->tax_rate1);
     }
 
-    public function testTaxOnCompany()
+    public function testTaxOnCompany(): void
     {
 
         $tax_class = new TaxData($this->response);
@@ -214,7 +214,7 @@ class SumTaxTest extends TestCase
 
     }
 
-    public function testTaxOnClient()
+    public function testTaxOnClient(): void
     {
         $c = Client::factory()->create([
             'user_id' => $this->user->id,
@@ -231,7 +231,7 @@ class SumTaxTest extends TestCase
 
     }
 
-    public function testTaxOnInvoice()
+    public function testTaxOnInvoice(): void
     {
 
         $i = Invoice::factory()->create([
@@ -250,14 +250,14 @@ class SumTaxTest extends TestCase
 
     }
 
-    public function testSumOfInvoice()
+    public function testSumOfInvoice(): void
     {
 
         $this->assertEquals('CA', $this->response->geoState);
 
     }
 
-    public function testSumOfTaxes()
+    public function testSumOfTaxes(): void
     {
         $sum =
             $this->response->stateSalesTax +

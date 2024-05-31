@@ -24,7 +24,7 @@ class CollectionMergingTest extends TestCase
         parent::setUp();
     }
 
-    public function testUniqueValues()
+    public function testUniqueValues(): void
     {
         $methods[] = [1 => 1];
         $methods[] = [1 => 2];
@@ -59,7 +59,7 @@ class CollectionMergingTest extends TestCase
         $this->assertEquals(11, $intersect->count());
     }
 
-    public function testExistenceInCollection()
+    public function testExistenceInCollection(): void
     {
         $items = InvoiceItemFactory::generate(5);
 
@@ -74,7 +74,7 @@ class CollectionMergingTest extends TestCase
         $this->assertTrue(collect($items)->contains('type_id', 3));
     }
 
-    public function testClientContactSendEmailExists()
+    public function testClientContactSendEmailExists(): void
     {
         $new_collection = collect();
 
@@ -91,7 +91,7 @@ class CollectionMergingTest extends TestCase
         $this->assertTrue($new_collection->contains('send_email', true));
     }
 
-    public function testClientContactSendEmailDoesNotExists()
+    public function testClientContactSendEmailDoesNotExists(): void
     {
         $new_collection = collect();
 

@@ -26,7 +26,7 @@ class StoreProductRequest extends Request
         return $user->can('create', Product::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         if ($this->file('documents') && is_array($this->file('documents'))) {
             $rules['documents.*'] = $this->fileValidation();

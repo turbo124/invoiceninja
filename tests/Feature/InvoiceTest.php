@@ -51,7 +51,7 @@ class InvoiceTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testMaxDiscount()
+    public function testMaxDiscount(): void
     {
 
         $line_items = [];
@@ -159,7 +159,7 @@ class InvoiceTest extends TestCase
 
     }
 
-    public function testInvoicePaymentLinkMutation()
+    public function testInvoicePaymentLinkMutation(): void
     {
 
         $s = Subscription::factory()
@@ -195,7 +195,7 @@ class InvoiceTest extends TestCase
 
     }
 
-    public function testPostNewInvoiceWithProjectButNoClient()
+    public function testPostNewInvoiceWithProjectButNoClient(): void
     {
 
         $p = Project::factory()->create([
@@ -229,7 +229,7 @@ class InvoiceTest extends TestCase
 
     }
 
-    public function testInvoiceGetDatesBetween()
+    public function testInvoiceGetDatesBetween(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -238,7 +238,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testInvoiceGetDatesBetween2()
+    public function testInvoiceGetDatesBetween2(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -247,7 +247,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testInvoiceGetDatesBetween3()
+    public function testInvoiceGetDatesBetween3(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -256,7 +256,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testInvoiceGetDatesBetween4()
+    public function testInvoiceGetDatesBetween4(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -265,7 +265,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testInvoiceGetDatesBetween5()
+    public function testInvoiceGetDatesBetween5(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -274,7 +274,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testInvoiceGetDatesBetween6()
+    public function testInvoiceGetDatesBetween6(): void
     {
         Invoice::factory()->count(10)->create([
             'company_id' => $this->company->id,
@@ -294,7 +294,7 @@ class InvoiceTest extends TestCase
         $this->assertCount(10, $arr['data']);
     }
 
-    public function testInvoiceGetPaidReversedInvoice()
+    public function testInvoiceGetPaidReversedInvoice(): void
     {
         $this->invoice->service()->handleReversal()->save();
 
@@ -311,7 +311,7 @@ class InvoiceTest extends TestCase
         $this->assertCount(1, $arr['data']);
     }
 
-    public function testInvoiceGetPaidInvoices()
+    public function testInvoiceGetPaidInvoices(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -320,7 +320,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testInvoiceArchiveAction()
+    public function testInvoiceArchiveAction(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -329,7 +329,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testMarkingDeletedInvoiceAsSent()
+    public function testMarkingDeletedInvoiceAsSent(): void
     {
         Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -382,7 +382,7 @@ class InvoiceTest extends TestCase
         $this->assertEquals(0, $invoice->balance);
     }
 
-    public function testInvoiceList()
+    public function testInvoiceList(): void
     {
         Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -411,7 +411,7 @@ class InvoiceTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testInvoiceRESTEndPoints()
+    public function testInvoiceRESTEndPoints(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -440,7 +440,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testPostNewInvoice()
+    public function testPostNewInvoice(): void
     {
         $invoice = [
             'status_id' => 1,
@@ -479,7 +479,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(302);
     }
 
-    public function testDeleteInvoice()
+    public function testDeleteInvoice(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -489,7 +489,7 @@ class InvoiceTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testUniqueNumberValidation()
+    public function testUniqueNumberValidation(): void
     {
         /* stub a invoice in the DB that we will use to test against later */
         $invoice = Invoice::factory()->create([
@@ -559,7 +559,7 @@ class InvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testClientedDeletedAttemptingToCreateInvoice()
+    public function testClientedDeletedAttemptingToCreateInvoice(): void
     {
         /* Test fire new invoice */
         $data = [

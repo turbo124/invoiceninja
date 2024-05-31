@@ -20,7 +20,7 @@ class AccountFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'default_company_id' => 1,

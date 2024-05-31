@@ -25,7 +25,7 @@ class UploadProductRequest extends Request
         return $user->can('edit', $this->product);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
         if ($this->file('documents') && is_array($this->file('documents'))) {

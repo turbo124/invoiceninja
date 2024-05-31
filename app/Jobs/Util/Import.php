@@ -190,7 +190,7 @@ class Import implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         set_time_limit(0);
 

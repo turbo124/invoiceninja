@@ -109,7 +109,7 @@ class ProfitAndLossReportTest extends TestCase
         ];
     }
 
-    public function testProfitLossInstance()
+    public function testProfitLossInstance(): void
     {
         $this->buildData();
 
@@ -120,7 +120,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testExpenseResolution()
+    public function testExpenseResolution(): void
     {
         $this->buildData();
 
@@ -148,7 +148,7 @@ class ProfitAndLossReportTest extends TestCase
 
     }
 
-    public function testMultiCurrencyInvoiceIncome()
+    public function testMultiCurrencyInvoiceIncome(): void
     {
         $this->buildData();
 
@@ -220,7 +220,7 @@ class ProfitAndLossReportTest extends TestCase
 
     }
 
-    public function testSimpleInvoiceIncome()
+    public function testSimpleInvoiceIncome(): void
     {
         $this->buildData();
 
@@ -259,7 +259,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleInvoiceIncomeWithInclusivesTaxes()
+    public function testSimpleInvoiceIncomeWithInclusivesTaxes(): void
     {
         $this->buildData();
 
@@ -298,7 +298,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleInvoiceIncomeWithForeignExchange()
+    public function testSimpleInvoiceIncomeWithForeignExchange(): void
     {
         $this->buildData();
 
@@ -342,7 +342,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleInvoicePaymentIncome()
+    public function testSimpleInvoicePaymentIncome(): void
     {
         $this->buildData();
 
@@ -399,7 +399,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleExpense()
+    public function testSimpleExpense(): void
     {
         $this->buildData();
 
@@ -422,7 +422,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleExpenseAmountTax()
+    public function testSimpleExpenseAmountTax(): void
     {
         $this->buildData();
 
@@ -446,7 +446,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleExpenseTaxRateExclusive()
+    public function testSimpleExpenseTaxRateExclusive(): void
     {
         $this->buildData();
 
@@ -471,7 +471,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleExpenseTaxRateInclusive()
+    public function testSimpleExpenseTaxRateInclusive(): void
     {
         $this->buildData();
 
@@ -496,7 +496,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleExpenseBreakdown()
+    public function testSimpleExpenseBreakdown(): void
     {
         $this->buildData();
 
@@ -521,7 +521,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleExpenseCategoriesBreakdown()
+    public function testSimpleExpenseCategoriesBreakdown(): void
     {
         $this->buildData();
 
@@ -565,7 +565,7 @@ class ProfitAndLossReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testCsvGeneration()
+    public function testCsvGeneration(): void
     {
         $this->buildData();
 

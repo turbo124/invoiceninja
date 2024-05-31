@@ -19,7 +19,7 @@ class BankIntegrationFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'integration_type' => null,

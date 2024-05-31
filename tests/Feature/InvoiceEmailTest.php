@@ -50,14 +50,14 @@ class InvoiceEmailTest extends TestCase
 
     }
 
-    public function testInvalidEmailParsing()
+    public function testInvalidEmailParsing(): void
     {
         $email = 'illegal@example.com';
 
         $this->assertTrue(strpos($email, '@example.com') !== false);
     }
 
-    public function testClientEmailHistory()
+    public function testClientEmailHistory(): void
     {
         $system_log = new SystemLog();
         $system_log->company_id = $this->company->id;
@@ -104,7 +104,7 @@ class InvoiceEmailTest extends TestCase
         $this->assertEquals(1, $count);
     }
 
-    public function testEntityEmailHistory()
+    public function testEntityEmailHistory(): void
     {
         $system_log = new SystemLog();
         $system_log->company_id = $this->company->id;
@@ -158,7 +158,7 @@ class InvoiceEmailTest extends TestCase
 
     }
 
-    public function testTemplateValidation()
+    public function testTemplateValidation(): void
     {
         $data = [
             'body' => "hey what's up",
@@ -184,7 +184,7 @@ class InvoiceEmailTest extends TestCase
 
     }
 
-    public function test_cc_email_implementation()
+    public function test_cc_email_implementation(): void
     {
         $data = [
             'template' => 'email_template_invoice',
@@ -209,7 +209,7 @@ class InvoiceEmailTest extends TestCase
 
     }
 
-    public function test_initial_email_send_emails()
+    public function test_initial_email_send_emails(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = now()->addDays(7);
@@ -237,7 +237,7 @@ class InvoiceEmailTest extends TestCase
 
     }
 
-    public function testTemplateThemes()
+    public function testTemplateThemes(): void
     {
         $settings = $this->company->settings;
         $settings->email_style = 'light';

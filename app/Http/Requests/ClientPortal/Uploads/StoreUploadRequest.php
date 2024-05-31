@@ -19,7 +19,7 @@ class StoreUploadRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return (bool) auth()->guard('contact')->user()->client->getSetting('client_portal_enable_uploads');
     }
@@ -29,7 +29,7 @@ class StoreUploadRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'file' => ['file', 'mimes:png,ai,jpeg,tiff,pdf,gif,psd,txt,doc,xls,ppt,xlsx,docx,pptx|max:20000'],

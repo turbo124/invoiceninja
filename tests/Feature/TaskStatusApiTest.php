@@ -44,7 +44,7 @@ class TaskStatusApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testSorting()
+    public function testSorting(): void
     {
         TaskStatus::factory()->count(5)->create([
             'company_id' => $this->company->id,
@@ -75,7 +75,7 @@ class TaskStatusApiTest extends TestCase
 
     }
 
-    public function testTaskStatusGetFilter()
+    public function testTaskStatusGetFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -85,7 +85,7 @@ class TaskStatusApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskStatusPost()
+    public function testTaskStatusPost(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -99,7 +99,7 @@ class TaskStatusApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskStatusPut()
+    public function testTaskStatusPut(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -113,7 +113,7 @@ class TaskStatusApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskStatusGet()
+    public function testTaskStatusGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -123,7 +123,7 @@ class TaskStatusApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskStatusNotArchived()
+    public function testTaskStatusNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -135,7 +135,7 @@ class TaskStatusApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testTaskStatusArchived()
+    public function testTaskStatusArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->task_status->id)],
@@ -151,7 +151,7 @@ class TaskStatusApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testTaskStatusRestored()
+    public function testTaskStatusRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->task_status->id)],
@@ -167,7 +167,7 @@ class TaskStatusApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testTaskStatusDeletedFromDELETEROute()
+    public function testTaskStatusDeletedFromDELETEROute(): void
     {
         // $data = [
         //     'ids' => [$this->encodePrimaryKey($this->task_status->id)],
@@ -184,7 +184,7 @@ class TaskStatusApiTest extends TestCase
         $this->assertTrue($arr['data']['is_deleted']);
     }
 
-    public function testTaskStatusDeleted()
+    public function testTaskStatusDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->task_status->id)],

@@ -37,7 +37,7 @@ class PreviewPurchaseOrderRequest extends Request
         return $user->hasIntersectPermissionsOrAdmin(['create_purchase_order', 'edit_purchase_order', 'view_purchase_order']);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

@@ -44,7 +44,7 @@ class PreviewInvoiceRequest extends Request
         return $user->hasIntersectPermissionsOrAdmin(['view_invoice', 'view_quote', 'view_recurring_invoice', 'view_credit', 'create_invoice', 'create_quote', 'create_recurring_invoice', 'create_credit', 'edit_invoice', 'edit_quote', 'edit_recurring_invoice', 'edit_credit']);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();

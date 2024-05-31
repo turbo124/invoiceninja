@@ -22,7 +22,7 @@ class ImportJsonRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'files' => 'file|mimes:zip',

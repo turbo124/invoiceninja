@@ -19,7 +19,7 @@ class GatewayFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'key' => '3b6621f970ab18887c4f6dca78d3f8bb',

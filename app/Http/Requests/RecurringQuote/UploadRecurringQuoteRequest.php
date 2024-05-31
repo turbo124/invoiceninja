@@ -22,7 +22,7 @@ class UploadRecurringQuoteRequest extends Request
         return auth()->user()->can('edit', $this->recurring_quote);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

@@ -29,27 +29,27 @@ class CompanySettingsTest extends TestCase
         $this->company_settings = CompanySettings::defaults();
     }
 
-    public function testTimezoneId()
+    public function testTimezoneId(): void
     {
         $this->assertEquals($this->company_settings->timezone_id, 1);
     }
 
-    public function testLanguageId()
+    public function testLanguageId(): void
     {
         $this->assertEquals($this->company_settings->language_id, 1);
     }
 
-    public function testPropertyIssetOk()
+    public function testPropertyIssetOk(): void
     {
         $this->assertTrue(isset($this->company_settings->custom_value1));
     }
 
-    public function testPropertyIsSet()
+    public function testPropertyIsSet(): void
     {
         $this->assertTrue(isset($this->company_settings->timezone_id));
     }
 
-    public function testSettingsArrayAgainstCastsArray()
+    public function testSettingsArrayAgainstCastsArray(): void
     {
         $company_settings = json_decode(json_encode(CompanySettings::defaults()), true);
         $casts = CompanySettings::$casts;
@@ -59,7 +59,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals(1, count($diff));
     }
 
-    public function testStringEquivalence()
+    public function testStringEquivalence(): void
     {
         $value = (strval(4) != strval(3));
 

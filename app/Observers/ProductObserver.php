@@ -23,7 +23,7 @@ class ProductObserver
      *
      * @return void
      */
-    public function created(Product $product)
+    public function created(Product $product): void
     {
         $subscriptions = Webhook::where('company_id', $product->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_PRODUCT)
@@ -39,7 +39,7 @@ class ProductObserver
      *
      * @return void
      */
-    public function updated(Product $product)
+    public function updated(Product $product): void
     {
         $event = Webhook::EVENT_UPDATE_PRODUCT;
 
@@ -65,7 +65,7 @@ class ProductObserver
      *
      * @return void
      */
-    public function deleted(Product $product)
+    public function deleted(Product $product): void
     {
         if ($product->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class ProductObserver
      *
      * @return void
      */
-    public function restored(Product $product)
+    public function restored(Product $product): void
     {
         //
     }
@@ -95,7 +95,7 @@ class ProductObserver
      *
      * @return void
      */
-    public function forceDeleted(Product $product)
+    public function forceDeleted(Product $product): void
     {
         //
     }

@@ -10,6 +10,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Jobs\Mail\NinjaMailer;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
@@ -207,7 +209,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function account()
+    public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
     }
@@ -217,7 +219,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function tokens()
+    public function tokens(): HasMany
     {
         return $this->hasMany(CompanyToken::class)->orderBy('id', 'ASC');
     }
@@ -309,7 +311,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->token()->cu;
     }
 
-    public function company_user()
+    public function company_user(): BelongsTo
     {
         if ($this->companyId()) {
             return $this->belongsTo(CompanyUser::class)->where('company_id', $this->companyId())->withTrashed();
@@ -637,7 +639,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return new UserService($this);
     }
 
-    public function language()
+    public function language(): BelongsTo
     {
         return $this->belongsTo(Language::class);
     }

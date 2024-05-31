@@ -31,7 +31,7 @@ class CheckRemindersTest extends TestCase
         $this->makeTestData();
     }
 
-    public function test_after_invoice_date_reminder()
+    public function test_after_invoice_date_reminder(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = Carbon::now()->addDays(30);
@@ -56,7 +56,7 @@ class CheckRemindersTest extends TestCase
         $this->assertEquals(0, Carbon::now()->addDays(7)->diffInDays($this->invoice->next_send_date));
     }
 
-    public function test_no_reminders_sent_to_paid_invoices()
+    public function test_no_reminders_sent_to_paid_invoices(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = Carbon::now()->addDays(30);
@@ -79,7 +79,7 @@ class CheckRemindersTest extends TestCase
         $this->assertEquals($this->invoice->next_send_date, null);
     }
 
-    public function test_before_due_date_reminder()
+    public function test_before_due_date_reminder(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = Carbon::now()->addDays(30);
@@ -102,7 +102,7 @@ class CheckRemindersTest extends TestCase
         $this->assertEquals(0, Carbon::parse($this->invoice->due_date)->subDays(29)->diffInDays($this->invoice->next_send_date));
     }
 
-    public function test_after_due_date_reminder()
+    public function test_after_due_date_reminder(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = Carbon::now()->addDays(30);
@@ -122,7 +122,7 @@ class CheckRemindersTest extends TestCase
         $this->assertEquals(0, Carbon::parse($this->invoice->due_date)->addDays(1)->diffInDays($this->invoice->next_send_date));
     }
 
-    public function test_turning_off_reminders()
+    public function test_turning_off_reminders(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = Carbon::now()->addDays(30);
@@ -145,7 +145,7 @@ class CheckRemindersTest extends TestCase
         $this->assertEquals($this->invoice->next_send_date, null);
     }
 
-    public function test_edge_case_num_days_equals_zero_reminders()
+    public function test_edge_case_num_days_equals_zero_reminders(): void
     {
         $this->invoice->date = now();
         $this->invoice->due_date = Carbon::now()->addDays(30);

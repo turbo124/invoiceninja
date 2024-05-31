@@ -25,7 +25,7 @@ class UpdateBankIntegrationRequest extends Request
         return auth()->user()->can('edit', $this->bank_integration);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /* Ensure we have a client name, and that all emails are unique*/
         $rules = [
@@ -36,7 +36,7 @@ class UpdateBankIntegrationRequest extends Request
         return $rules;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [];
     }

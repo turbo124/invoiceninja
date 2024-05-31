@@ -104,7 +104,7 @@ class CheckDb extends Command
         WebHook::class,
     ];
 
-    public function handle()
+    public function handle(): void
     {
         $this->LogMessage('Checking - V5_DB1');
 

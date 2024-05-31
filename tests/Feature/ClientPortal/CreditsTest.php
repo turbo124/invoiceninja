@@ -44,7 +44,7 @@ class CreditsTest extends TestCase
 
     }
 
-    public function testShowingOnlyCreditsWithDueDateLessOrEqualToNow()
+    public function testShowingOnlyCreditsWithDueDateLessOrEqualToNow(): void
     {
         $account = Account::factory()->create();
 
@@ -111,7 +111,7 @@ class CreditsTest extends TestCase
         $user->forceDelete();
     }
 
-    public function testShowingCreditsWithNullDueDate()
+    public function testShowingCreditsWithNullDueDate(): void
     {
         $account = Account::factory()->create();
 

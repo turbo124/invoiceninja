@@ -38,7 +38,7 @@ class SubscriptionsCalcTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCalcUpgradePrice()
+    public function testCalcUpgradePrice(): void
     {
         $subscription = Subscription::factory()->create([
             'company_id' => $this->company->id,
@@ -101,7 +101,7 @@ class SubscriptionsCalcTest extends TestCase
         // $this->assertEquals(3.23, $upgrade);
     }
 
-    public function testProrataDiscountRatioPercentage()
+    public function testProrataDiscountRatioPercentage(): void
     {
         $subscription = Subscription::factory()->create([
             'company_id' => $this->company->id,
@@ -155,7 +155,7 @@ class SubscriptionsCalcTest extends TestCase
         $this->assertEquals(.1, $ratio);
     }
 
-    public function testProrataDiscountRatioAmount()
+    public function testProrataDiscountRatioAmount(): void
     {
         $subscription = Subscription::factory()->create([
             'company_id' => $this->company->id,

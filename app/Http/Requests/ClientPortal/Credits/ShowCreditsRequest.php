@@ -16,12 +16,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ShowCreditsRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_CREDITS;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             //

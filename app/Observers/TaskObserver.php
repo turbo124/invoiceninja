@@ -23,7 +23,7 @@ class TaskObserver
      *
      * @return void
      */
-    public function created(Task $task)
+    public function created(Task $task): void
     {
         $subscriptions = Webhook::where('company_id', $task->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_TASK)
@@ -39,7 +39,7 @@ class TaskObserver
      *
      * @return void
      */
-    public function updated(Task $task)
+    public function updated(Task $task): void
     {
         $event = Webhook::EVENT_UPDATE_TASK;
 
@@ -65,7 +65,7 @@ class TaskObserver
      *
      * @return void
      */
-    public function deleted(Task $task)
+    public function deleted(Task $task): void
     {
         if ($task->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class TaskObserver
      *
      * @return void
      */
-    public function restored(Task $task)
+    public function restored(Task $task): void
     {
         //
     }
@@ -95,7 +95,7 @@ class TaskObserver
      *
      * @return void
      */
-    public function forceDeleted(Task $task)
+    public function forceDeleted(Task $task): void
     {
         //
     }

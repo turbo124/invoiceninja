@@ -103,7 +103,7 @@ class CompanyGatewayResolutionTest extends TestCase
     /**
      * @covers \App\Models\CompanyGateway::calcGatewayFee()
      */
-    public function testGatewayResolution()
+    public function testGatewayResolution(): void
     {
         $fee = $this->cg->calcGatewayFee(10, GatewayType::CREDIT_CARD, false);
         $this->assertEquals(0.2, $fee);
@@ -112,13 +112,13 @@ class CompanyGatewayResolutionTest extends TestCase
     /**
      * @covers \App|Models\Client::validGatewayForAmount()
      */
-    public function testValidationForGatewayAmount()
+    public function testValidationForGatewayAmount(): void
     {
         $this->assertTrue($this->client->validGatewayForAmount($this->cg->fees_and_limits->{1}, 10));
         $this->assertTrue($this->client->validGatewayForAmount($this->cg->fees_and_limits->{2}, 10));
     }
 
-    public function testAvailablePaymentMethodsCount()
+    public function testAvailablePaymentMethodsCount(): void
     {
         $amount = 10;
 
@@ -130,7 +130,7 @@ class CompanyGatewayResolutionTest extends TestCase
         $this->assertEquals(2, count($payment_methods));
     }
 
-    public function testRemoveMethods()
+    public function testRemoveMethods(): void
     {
         $amount = 10;
 
@@ -185,7 +185,7 @@ class CompanyGatewayResolutionTest extends TestCase
         $this->assertEquals(2, count($this->client->service()->getPaymentMethods($amount)));
     }
 
-    public function testEnableFeeAdjustment()
+    public function testEnableFeeAdjustment(): void
     {
         $data = [];
         $data[1]['min_limit'] = -1;

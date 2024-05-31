@@ -57,7 +57,7 @@ class SendRemindersCron extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         Invoice::where('next_send_date', '<=', now()->toDateTimeString())
             ->whereNull('deleted_at')

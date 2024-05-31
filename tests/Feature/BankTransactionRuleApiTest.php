@@ -59,7 +59,7 @@ class BankTransactionRuleApiTest extends TestCase
     if(isset($this->client_id))
         $rules['client_id'] = 'bail|sometimes|exists:clients,id,company_id,'.auth()->user()->company()->id.',is_deleted,0';
     */
-    public function testBankRuleCategoryIdValidation()
+    public function testBankRuleCategoryIdValidation(): void
     {
         $data = [
             'name' => 'The First Rule',
@@ -101,7 +101,7 @@ class BankTransactionRuleApiTest extends TestCase
         $this->assertEquals('DEBIT', $arr['data']['applies_to']);
     }
 
-    public function testBankRulePost()
+    public function testBankRulePost(): void
     {
         $data = [
             'name' => 'The First Rule',
@@ -123,7 +123,7 @@ class BankTransactionRuleApiTest extends TestCase
         $this->assertEquals('The First Rule', $arr['data']['name']);
     }
 
-    public function testBankRulePut()
+    public function testBankRulePut(): void
     {
         $data = [
             'name' => 'The First Rule',
@@ -164,7 +164,7 @@ class BankTransactionRuleApiTest extends TestCase
         $this->assertEquals('A New Name For The First Rule', $arr['data']['name']);
     }
 
-    public function testBankTransactionRuleGet()
+    public function testBankTransactionRuleGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -174,7 +174,7 @@ class BankTransactionRuleApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testBankTransactionRuleArchived()
+    public function testBankTransactionRuleArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_transaction_rule->id)],
@@ -190,7 +190,7 @@ class BankTransactionRuleApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testBankTransactionRuleRestored()
+    public function testBankTransactionRuleRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_transaction_rule->id)],
@@ -206,7 +206,7 @@ class BankTransactionRuleApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testBankTransactionRuleDeleted()
+    public function testBankTransactionRuleDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_transaction_rule->id)],

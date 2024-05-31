@@ -54,7 +54,7 @@ class GeneratesCounterTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testResetCounterGroup()
+    public function testResetCounterGroup(): void
     {
         $timezone = Timezone::find(1);
 
@@ -116,7 +116,7 @@ class GeneratesCounterTest extends TestCase
         $this->travelBack();
     }
 
-    public function testResetCounterClient()
+    public function testResetCounterClient(): void
     {
         $timezone = Timezone::find(1);
 
@@ -168,7 +168,7 @@ class GeneratesCounterTest extends TestCase
         $this->travelBack();
     }
 
-    public function testResetCounter()
+    public function testResetCounter(): void
     {
         $timezone = Timezone::find(1);
 
@@ -226,12 +226,12 @@ class GeneratesCounterTest extends TestCase
         $this->travelBack();
     }
 
-    public function testHasSharedCounter()
+    public function testHasSharedCounter(): void
     {
         $this->assertFalse($this->hasSharedCounter($this->client));
     }
 
-    public function testHasTrueSharedCounter()
+    public function testHasTrueSharedCounter(): void
     {
         $settings = $this->client->getMergedSettings();
         $settings->invoice_number_counter = 1;
@@ -251,7 +251,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertTrue($this->hasSharedCounter($this->client));
     }
 
-    public function testNoCounterBeingSpecifiedInCounterStringStub()
+    public function testNoCounterBeingSpecifiedInCounterStringStub(): void
     {
         $settings = $this->client->company->settings;
         $settings->invoice_number_counter = 1;
@@ -269,7 +269,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals('test-0001', $invoice_number);
     }
 
-    public function testNoCounterBeingSpecifiedInCounterStringWithFix()
+    public function testNoCounterBeingSpecifiedInCounterStringWithFix(): void
     {
         $settings = $this->client->company->settings;
         $settings->invoice_number_counter = 100;
@@ -287,7 +287,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals('test-0100', $invoice_number);
     }
 
-    public function testInvoiceNumberValue()
+    public function testInvoiceNumberValue(): void
     {
         $invoice_number = $this->getNextInvoiceNumber($this->client->fresh(), $this->invoice->fresh());
 
@@ -298,7 +298,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($invoice_number, '0003');
     }
 
-    public function testQuoteNumberValue()
+    public function testQuoteNumberValue(): void
     {
         $quote = Quote::factory()->create([
             'user_id' => $this->client->user_id,
@@ -311,7 +311,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($quote_number, 0002);
     }
 
-    public function testInvoiceNumberPattern()
+    public function testInvoiceNumberPattern(): void
     {
         $settings = $this->client->company->settings;
         $settings->invoice_number_counter = 1;
@@ -333,7 +333,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($this->client->company->settings->invoice_number_counter, 3);
     }
 
-    public function testQuoteNumberPattern()
+    public function testQuoteNumberPattern(): void
     {
         $settings = $this->client->company->settings;
         $settings->quote_number_counter = 1;
@@ -361,7 +361,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($this->client->company->settings->quote_number_counter, 3);
     }
 
-    public function testQuoteNumberPatternWithSharedCounter()
+    public function testQuoteNumberPatternWithSharedCounter(): void
     {
         $settings = $this->client->company->settings;
         $settings->quote_number_counter = 100;
@@ -392,7 +392,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($this->client->company->settings->quote_number_counter, 100);
     }
 
-    public function testInvoiceClientNumberPattern()
+    public function testInvoiceClientNumberPattern(): void
     {
         $settings = $this->company->settings;
         $settings->client_number_pattern = '{$year}-{$client_counter}';
@@ -423,7 +423,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($invoice_number, date('Y').'-0011');
     }
 
-    public function testInvoicePadding()
+    public function testInvoicePadding(): void
     {
         $settings = $this->company->settings;
         $settings->counter_padding = 5;
@@ -460,7 +460,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($invoice_number, '0000000007');
     }
 
-    public function testInvoicePrefix()
+    public function testInvoicePrefix(): void
     {
         $settings = $this->company->settings;
         $this->company->settings = $settings;
@@ -479,7 +479,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($invoice_number, '0003');
     }
 
-    public function testClientNumber()
+    public function testClientNumber(): void
     {
         $client_number = $this->getNextClientNumber($this->client);
 
@@ -490,7 +490,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($client_number, '0002');
     }
 
-    public function testClientNumberPrefix()
+    public function testClientNumberPrefix(): void
     {
         $settings = $this->company->settings;
         $this->company->settings = $settings;
@@ -509,7 +509,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($client_number, '0002');
     }
 
-    public function testClientNumberPattern()
+    public function testClientNumberPattern(): void
     {
         $settings = $this->company->settings;
         $settings->client_number_pattern = '{$year}-{$user_id}-{$counter}';
@@ -532,7 +532,7 @@ class GeneratesCounterTest extends TestCase
         $this->assertEquals($client_number, date('Y').'-'.str_pad($this->client->user_id, 2, '0', STR_PAD_LEFT).'-0002');
     }
 
-    public function testVendorNumberPattern()
+    public function testVendorNumberPattern(): void
     {
         $settings = $this->company->settings;
         $settings->vendor_number_pattern = '{$year}-{$user_id}-{$counter}';
@@ -588,7 +588,7 @@ class GeneratesCounterTest extends TestCase
             $this->assertEquals($this->getCounter(Credit::class), 2);
         }
 
-        public function testClientNumberPattern()
+        public function testClientNumberPattern(): void
         {
             $settings = $this->client->getSettingsByKey('client_number_pattern');
             $settings->client_number_pattern = '{$year}-{$counter}';

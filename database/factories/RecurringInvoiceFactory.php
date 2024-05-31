@@ -20,7 +20,7 @@ class RecurringInvoiceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'status_id' => RecurringInvoice::STATUS_ACTIVE,

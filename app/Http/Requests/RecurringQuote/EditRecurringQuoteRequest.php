@@ -19,12 +19,12 @@ class EditRecurringQuoteRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->can('edit', $this->recurring_quote);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

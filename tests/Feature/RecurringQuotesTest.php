@@ -51,7 +51,7 @@ class RecurringQuotesTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testRecurringQuoteList()
+    public function testRecurringQuoteList(): void
     {
         // Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
         //     ClientContact::factory()->create([
@@ -80,7 +80,7 @@ class RecurringQuotesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringQuoteRESTEndPoints()
+    public function testRecurringQuoteRESTEndPoints(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -137,7 +137,7 @@ class RecurringQuotesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSubscriptionIdPassesToQuote()
+    public function testSubscriptionIdPassesToQuote(): void
     {
         $recurring_invoice = QuoteToRecurringQuoteFactory::create($this->quote);
         $recurring_invoice->user_id = $this->user->id;
@@ -156,7 +156,7 @@ class RecurringQuotesTest extends TestCase
         $this->assertEquals(10, $invoice->subscription_id);
     }
 
-    public function testSubscriptionIdPassesToQuoteIfNull()
+    public function testSubscriptionIdPassesToQuoteIfNull(): void
     {
         $recurring_invoice = QuoteToRecurringQuoteFactory::create($this->quote);
         $recurring_invoice->user_id = $this->user->id;
@@ -174,7 +174,7 @@ class RecurringQuotesTest extends TestCase
         $this->assertEquals(null, $invoice->subscription_id);
     }
 
-    public function testSubscriptionIdPassesToQuoteIfNothingSet()
+    public function testSubscriptionIdPassesToQuoteIfNothingSet(): void
     {
         $recurring_invoice = QuoteToRecurringQuoteFactory::create($this->quote);
         $recurring_invoice->user_id = $this->user->id;

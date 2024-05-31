@@ -31,7 +31,7 @@ class PaymentLinkTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCalcUpgradePrice()
+    public function testCalcUpgradePrice(): void
     {
         $subscription = Subscription::factory()->create([
             'company_id' => $this->company->id,

@@ -21,7 +21,7 @@ class FeesAndLimitsTest extends TestCase
         parent::setUp();
     }
 
-    public function testFeesAndLimitsFunctionWorks()
+    public function testFeesAndLimitsFunctionWorks(): void
     {
         $data = [];
         $data['min_limit'] = 234;

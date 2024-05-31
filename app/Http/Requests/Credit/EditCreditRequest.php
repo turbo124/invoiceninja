@@ -19,7 +19,7 @@ class EditCreditRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->can('edit', $this->credit);
     }
@@ -29,7 +29,7 @@ class EditCreditRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

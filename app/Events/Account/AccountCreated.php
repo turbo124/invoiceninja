@@ -46,7 +46,7 @@ class AccountCreated
     //  *
     //  * @return Channel|array
     //  */
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
         return [];
         //  return new PrivateChannel('channel-name');

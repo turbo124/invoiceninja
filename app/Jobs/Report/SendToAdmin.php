@@ -49,7 +49,7 @@ class SendToAdmin implements ShouldQueue
         $this->file_name = $file_name;
     }
 
-    public function handle()
+    public function handle(): void
     {
         MultiDB::setDb($this->company->db);
         $export = new $this->report_class($this->company, $this->request);

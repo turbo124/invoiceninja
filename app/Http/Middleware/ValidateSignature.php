@@ -10,6 +10,8 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Closure;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 
@@ -33,7 +35,7 @@ class ValidateSignature
      *
      * @throws \Illuminate\Routing\Exceptions\InvalidSignatureException
      */
-    public function handle($request, Closure $next, $relative = null)
+    public function handle(Request $request, Closure $next, $relative = null): Response
     {
         $ignore = property_exists($this, 'except') ? $this->except : $this->ignore;
 

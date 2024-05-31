@@ -43,7 +43,7 @@ class HostedUsers extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         Company::on('db-ninja-01')->each(function ($company) {
             if (Ninja::isHosted()) {

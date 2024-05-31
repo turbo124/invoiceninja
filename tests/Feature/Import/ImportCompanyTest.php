@@ -112,7 +112,7 @@ class ImportCompanyTest extends TestCase
         });
     }
 
-    public function testBackupJsonRead()
+    public function testBackupJsonRead(): void
     {
         $backup_json_file_zip = base_path().'/tests/Feature/Import/backup.zip';
 
@@ -131,12 +131,12 @@ class ImportCompanyTest extends TestCase
         unlink($backup_json_file);
     }
 
-    public function testAppVersion()
+    public function testAppVersion(): void
     {
         $this->assertEquals('5.1.65', $this->backup_json_object->app_version);
     }
 
-    public function testImportUsers()
+    public function testImportUsers(): void
     {
         CompanyGateway::all()->each(function ($cg) {
             $cg->forceDelete();

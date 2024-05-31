@@ -35,7 +35,7 @@ class InvoiceItemTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testEdgeCasewithDiscountsPercentageAndTaxCalculations()
+    public function testEdgeCasewithDiscountsPercentageAndTaxCalculations(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -70,7 +70,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(22, $invoice->total_taxes);
     }
 
-    public function testDiscountsWithInclusiveTaxes()
+    public function testDiscountsWithInclusiveTaxes(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -98,7 +98,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(8.18, $invoice->total_taxes);
     }
 
-    public function testDiscountsWithInclusiveTaxesNegativeInvoice()
+    public function testDiscountsWithInclusiveTaxesNegativeInvoice(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -126,7 +126,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(-8.18, $invoice->total_taxes);
     }
 
-    public function testDicountsWithTaxes()
+    public function testDicountsWithTaxes(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -154,7 +154,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(9, $invoice->total_taxes);
     }
 
-    public function testDicountsWithTaxesNegativeInvoice()
+    public function testDicountsWithTaxesNegativeInvoice(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -182,7 +182,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(-9, $invoice->total_taxes);
     }
 
-    public function testDicountsWithTaxesPercentage()
+    public function testDicountsWithTaxesPercentage(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -210,7 +210,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(9, $invoice->total_taxes);
     }
 
-    public function testDicountsWithTaxesPercentageOnLine()
+    public function testDicountsWithTaxesPercentageOnLine(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -240,7 +240,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(7.36, $invoice->total_taxes);
     }
 
-    public function testDicountsWithExclusiveTaxesPercentageOnLine()
+    public function testDicountsWithExclusiveTaxesPercentageOnLine(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -270,7 +270,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(-12.1, $invoice->total_taxes);
     }
 
-    public function testDicountsWithTaxesNegativeInvoicePercentage()
+    public function testDicountsWithTaxesNegativeInvoicePercentage(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -299,7 +299,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(-11, $invoice->total_taxes);
     }
 
-    public function testDicountPercentageWithTaxes()
+    public function testDicountPercentageWithTaxes(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -327,7 +327,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals(9, $invoice->total_taxes);
     }
 
-    public function testInvoiceItemTotalSimple()
+    public function testInvoiceItemTotalSimple(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -346,7 +346,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getLineTotal(), 10);
     }
 
-    public function testInvoiceItemTotalSimpleWithGrossTaxes()
+    public function testInvoiceItemTotalSimpleWithGrossTaxes(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -367,7 +367,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getGrossLineTotal(), 11);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscount()
+    public function testInvoiceItemTotalSimpleWithDiscount(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -387,7 +387,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getLineTotal(), 8);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountAndGrossLineTotal()
+    public function testInvoiceItemTotalSimpleWithDiscountAndGrossLineTotal(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -409,7 +409,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getGrossLineTotal(), 8.8);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecision()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecision(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -429,7 +429,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getLineTotal(), 7.48);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleInclusiveTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleInclusiveTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -450,7 +450,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getTotalTaxes(), 0.80);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleExclusiveTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithSingleExclusiveTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -471,7 +471,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getTotalTaxes(), 0.75);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleInclusiveTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleInclusiveTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;
@@ -493,7 +493,7 @@ class InvoiceItemTest extends TestCase
         $this->assertEquals($item_calc->getTotalTaxes(), 2.06);
     }
 
-    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleExclusiveTax()
+    public function testInvoiceItemTotalSimpleWithDiscountWithPrecisionWithDoubleExclusiveTax(): void
     {
         $item = InvoiceItemFactory::create();
         $item->quantity = 1;

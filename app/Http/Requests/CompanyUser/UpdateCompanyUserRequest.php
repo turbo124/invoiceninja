@@ -28,7 +28,7 @@ class UpdateCompanyUserRequest extends Request
         return $auth_user->isAdmin() || ($auth_user->id == $this->user->id);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [];
     }

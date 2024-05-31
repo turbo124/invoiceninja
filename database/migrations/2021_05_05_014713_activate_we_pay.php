@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (Gateway::count() >= 1 && Ninja::isHosted()) {
             Gateway::query()->whereIn('id', [49])->update(['visible' => true]);
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }

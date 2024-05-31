@@ -37,7 +37,7 @@ class PdfmockTest extends TestCase
 
     }
 
-    public function testPdfInstance()
+    public function testPdfInstance(): void
     {
         $data = [
             'settings' => CompanySettings::defaults(),
@@ -64,7 +64,7 @@ class PdfmockTest extends TestCase
 
     }
 
-    public function testHtmlGeneration()
+    public function testHtmlGeneration(): void
     {
         $data = [
             'settings' => CompanySettings::defaults(),

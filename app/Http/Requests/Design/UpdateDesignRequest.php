@@ -40,7 +40,7 @@ class UpdateDesignRequest extends Request
         return $user->isAdmin() && $user->account->hasFeature(Account::FEATURE_API);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'is_template' => 'sometimes|boolean',

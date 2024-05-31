@@ -82,7 +82,7 @@ class MatchBankTransactions implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         MultiDB::setDb($this->db);
 

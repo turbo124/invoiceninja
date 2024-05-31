@@ -48,7 +48,7 @@ class BaseTransformerTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testGetString()
+    public function testGetString(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -61,7 +61,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals('value', $base_transformer->getString($data, $field));
     }
 
-    public function testGetCurrencyCode()
+    public function testGetCurrencyCode(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -72,7 +72,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals(1, $currency_id);
     }
 
-    public function testGetClient()
+    public function testGetClient(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -102,7 +102,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals($client->id, $base_transformer->getClientId('Magic '));
     }
 
-    public function testGetContact()
+    public function testGetContact(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -127,7 +127,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals($contact->id, $base_transformer->getContact('TeSt@gmaiL.com')->id);
     }
 
-    public function testHasClient()
+    public function testHasClient(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -143,7 +143,7 @@ class BaseTransformerTest extends TestCase
         $this->assertTrue($base_transformer->hasClient('Ma gi c '));
     }
 
-    public function testHasVendor()
+    public function testHasVendor(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -159,7 +159,7 @@ class BaseTransformerTest extends TestCase
         $this->assertTrue($base_transformer->hasVendor('Ma gi c '));
     }
 
-    public function testHasProduct()
+    public function testHasProduct(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -174,7 +174,7 @@ class BaseTransformerTest extends TestCase
         $this->assertTrue($base_transformer->hasProduct('  h i T '));
     }
 
-    public function testGetCountryId()
+    public function testGetCountryId(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -183,7 +183,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals(840, $base_transformer->getCountryId('United States'));
     }
 
-    public function testGetTaxRate()
+    public function testGetTaxRate(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -199,7 +199,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals(10, $base_transformer->getTaxRate('  gS t '));
     }
 
-    public function testGetTaxName()
+    public function testGetTaxName(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -215,7 +215,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals('VAT', $base_transformer->getTaxName('  va T '));
     }
 
-    public function testGetInvoiceId()
+    public function testGetInvoiceId(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -231,7 +231,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals($invoice->id, $base_transformer->getInvoiceId('  TRICK_number_123 '));
     }
 
-    public function testHasInvoiceWithNumber()
+    public function testHasInvoiceWithNumber(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -247,7 +247,7 @@ class BaseTransformerTest extends TestCase
         $this->assertTrue($base_transformer->hasInvoice('  TRICKY_number_123 '));
     }
 
-    public function testInvoiceClientId()
+    public function testInvoiceClientId(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 
@@ -263,7 +263,7 @@ class BaseTransformerTest extends TestCase
         $this->assertEquals($this->client->id, $base_transformer->getInvoiceClientId('  TRICKY_number_123 '));
     }
 
-    public function testGetVendorId()
+    public function testGetVendorId(): void
     {
         $base_transformer = new BaseTransformer($this->company);
 

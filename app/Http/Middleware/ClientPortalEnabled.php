@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,7 @@ class ClientPortalEnabled
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         /** @var \App\Models\ClientContact $client_contact */
         $client_contact = auth()->user();

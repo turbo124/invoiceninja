@@ -129,7 +129,7 @@ class CheckDataTest extends TestCase
 
     }
 
-    public function testDbQueriesRaw5()
+    public function testDbQueriesRaw5(): void
     {
         $this->buildData();
 
@@ -161,7 +161,7 @@ class CheckDataTest extends TestCase
 
     }
 
-    public function testDbQueriesRaw4()
+    public function testDbQueriesRaw4(): void
     {
         $this->buildData();
 
@@ -182,7 +182,7 @@ class CheckDataTest extends TestCase
 
     }
 
-    public function testDbQueriesRaw3()
+    public function testDbQueriesRaw3(): void
     {
         $this->buildData();
 
@@ -212,7 +212,7 @@ class CheckDataTest extends TestCase
         $this->assertEquals($user_count_refactor->count(), $user_count->count());
     }
 
-    public function testDbRawQueries1()
+    public function testDbRawQueries1(): void
     {
         $this->buildData();
 
@@ -230,7 +230,7 @@ class CheckDataTest extends TestCase
 
     }
 
-    public function testDbRawQueries2()
+    public function testDbRawQueries2(): void
     {
         $this->buildData();
 

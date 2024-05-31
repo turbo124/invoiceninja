@@ -26,7 +26,7 @@ class AccountEmailQuotaTest extends TestCase
         parent::setUp();
     }
 
-    public function testIfQuotaBreached()
+    public function testIfQuotaBreached(): void
     {
         config([
             'ninja.production' => true,
@@ -87,7 +87,7 @@ class AccountEmailQuotaTest extends TestCase
         Cache::forget('email_quota'.'123ifyouknowwhatimean');
     }
 
-    public function testQuotaValidRule()
+    public function testQuotaValidRule(): void
     {
         $account = Account::factory()->create([
             'hosted_client_count' => 1000,
@@ -108,7 +108,7 @@ class AccountEmailQuotaTest extends TestCase
         Cache::forget('email_quota'.'123ifyouknowwhatimean');
     }
 
-    public function testEmailSentCount()
+    public function testEmailSentCount(): void
     {
         $account = Account::factory()->create([
             'hosted_client_count' => 1000,

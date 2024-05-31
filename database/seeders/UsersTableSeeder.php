@@ -29,7 +29,7 @@ class UsersTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $this->command->info('Running UsersTableSeeder');
 

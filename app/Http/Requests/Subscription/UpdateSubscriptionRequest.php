@@ -24,7 +24,7 @@ class UpdateSubscriptionRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->can('edit', $this->subscription);
     }
@@ -34,7 +34,7 @@ class UpdateSubscriptionRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'name' => ['bail', 'sometimes', Rule::unique('subscriptions')->where('company_id', auth()->user()->company()->id)->ignore($this->subscription->id)],

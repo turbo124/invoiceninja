@@ -63,14 +63,14 @@ class ArrayFiltersTest extends TestCase
         parent::setUp();
     }
 
-    public function testPaymentFilterFactory()
+    public function testPaymentFilterFactory(): void
     {
         $p = Payment::factory()->make()->toArray();
 
         $this->assertIsArray($p);
     }
 
-    public function testPaymentUnsetProps()
+    public function testPaymentUnsetProps(): void
     {
         $p = Payment::factory()->make()->toArray();
 
@@ -101,7 +101,7 @@ class ArrayFiltersTest extends TestCase
         $this->assertEquals(4, $x->count());
     }
 
-    public function testPaymentUnsetPropsScenario2()
+    public function testPaymentUnsetPropsScenario2(): void
     {
         $p = Payment::factory()->make()->toArray();
 
@@ -147,7 +147,7 @@ class ArrayFiltersTest extends TestCase
         $this->assertEquals(2, $x->count());
     }
 
-    public function testWhenScenario()
+    public function testWhenScenario(): void
     {
         $p = Payment::factory()->make()->toArray();
 
@@ -171,7 +171,7 @@ class ArrayFiltersTest extends TestCase
         $this->assertEquals(3, $filters->count());
     }
 
-    public function testWhenScenario2()
+    public function testWhenScenario2(): void
     {
         $p = Payment::factory()->make()->toArray();
 
@@ -226,7 +226,7 @@ class ArrayFiltersTest extends TestCase
 
     }
 
-    public function testFilterArrayOne()
+    public function testFilterArrayOne(): void
     {
         $u = User::factory()->make()->toArray();
 

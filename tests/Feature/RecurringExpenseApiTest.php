@@ -47,7 +47,7 @@ class RecurringExpenseApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testRecurringExpenseGenerationWithCurrencyConversion()
+    public function testRecurringExpenseGenerationWithCurrencyConversion(): void
     {
         $r = \App\Models\RecurringExpense::factory()->create([
             'user_id' => $this->user->id,
@@ -76,7 +76,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseGenerationNullForeignCurrency()
+    public function testRecurringExpenseGenerationNullForeignCurrency(): void
     {
         $r = \App\Models\RecurringExpense::factory()->create([
             'user_id' => $this->user->id,
@@ -103,7 +103,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseGeneration()
+    public function testRecurringExpenseGeneration(): void
     {
         $r = \App\Models\RecurringExpense::factory()->create([
             'user_id' => $this->user->id,
@@ -128,7 +128,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseValidation()
+    public function testRecurringExpenseValidation(): void
     {
         $data = [
             'amount' => 10,
@@ -148,7 +148,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseValidation2()
+    public function testRecurringExpenseValidation2(): void
     {
         $data = [
             'amount' => 10,
@@ -168,7 +168,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseValidation3()
+    public function testRecurringExpenseValidation3(): void
     {
         $data = [
             'amount' => 10,
@@ -192,7 +192,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseValidation4()
+    public function testRecurringExpenseValidation4(): void
     {
         $data = [
             'amount' => 10,
@@ -216,7 +216,7 @@ class RecurringExpenseApiTest extends TestCase
 
     }
 
-    public function testRecurringExpenseGetFiltered()
+    public function testRecurringExpenseGetFiltered(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -226,7 +226,7 @@ class RecurringExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringExpenseGet()
+    public function testRecurringExpenseGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -236,7 +236,7 @@ class RecurringExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringExpenseGetSingleExpense()
+    public function testRecurringExpenseGetSingleExpense(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -246,7 +246,7 @@ class RecurringExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringExpensePost()
+    public function testRecurringExpensePost(): void
     {
         $data = [
             'amount' => 10,
@@ -279,7 +279,7 @@ class RecurringExpenseApiTest extends TestCase
         }
     }
 
-    public function testRecurringExpensePut()
+    public function testRecurringExpensePut(): void
     {
         $data = [
             'amount' => 20,
@@ -294,7 +294,7 @@ class RecurringExpenseApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringExpenseNotArchived()
+    public function testRecurringExpenseNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -306,7 +306,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testRecurringExpenseArchived()
+    public function testRecurringExpenseArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->recurring_expense->id)],
@@ -322,7 +322,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testRecurringExpenseRestored()
+    public function testRecurringExpenseRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->recurring_expense->id)],
@@ -338,7 +338,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testRecurringExpenseDeleted()
+    public function testRecurringExpenseDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->recurring_expense->id)],
@@ -354,7 +354,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertTrue($arr['data'][0]['is_deleted']);
     }
 
-    public function testRecurringExpenseStart()
+    public function testRecurringExpenseStart(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->recurring_expense->id)],
@@ -370,7 +370,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertEquals(RecurringInvoice::STATUS_ACTIVE, $arr['data'][0]['status_id']);
     }
 
-    public function testRecurringExpensePaused()
+    public function testRecurringExpensePaused(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->recurring_expense->id)],
@@ -391,7 +391,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertEquals(RecurringInvoice::STATUS_PAUSED, $arr['data'][0]['status_id']);
     }
 
-    public function testRecurringExpenseStartedWithTriggeredAction()
+    public function testRecurringExpenseStartedWithTriggeredAction(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->recurring_expense->id)],
@@ -416,7 +416,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertEquals(RecurringInvoice::STATUS_PAUSED, $arr['data']['status_id']);
     }
 
-    public function testRecurringExpensePostWithStartAction()
+    public function testRecurringExpensePostWithStartAction(): void
     {
         $data = [
             'amount' => 10,
@@ -438,7 +438,7 @@ class RecurringExpenseApiTest extends TestCase
         $this->assertEquals(RecurringInvoice::STATUS_ACTIVE, $arr['data']['status_id']);
     }
 
-    public function testRecurringExpensePostWithStopAction()
+    public function testRecurringExpensePostWithStopAction(): void
     {
         $data = [
             'amount' => 10,

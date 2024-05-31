@@ -49,7 +49,7 @@ class EncryptNinja extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
         if ($this->option('encrypt')) {
             return $this->encryptFiles();

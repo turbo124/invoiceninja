@@ -52,14 +52,14 @@ class AuthorizeTest extends TestCase
         }
     }
 
-    public function testUnpackingVars()
+    public function testUnpackingVars(): void
     {
         $vars = json_decode(config('ninja.testvars.authorize'));
 
         $this->assertTrue(property_exists($vars, 'apiLoginId'));
     }
 
-    public function testCreatePublicClientKey()
+    public function testCreatePublicClientKey(): void
     {
         error_reporting(E_ALL & ~E_DEPRECATED);
 
@@ -79,7 +79,7 @@ class AuthorizeTest extends TestCase
         $this->assertNotNull($response->getPublicClientKey());
     }
 
-    public function testProfileIdList()
+    public function testProfileIdList(): void
     {
         error_reporting(E_ALL & ~E_DEPRECATED);
 
@@ -109,7 +109,7 @@ class AuthorizeTest extends TestCase
         $this->assertNotNull($response);
     }
 
-    public function testCreateProfile()
+    public function testCreateProfile(): void
     {
         error_reporting(E_ALL & ~E_DEPRECATED);
 
@@ -183,7 +183,7 @@ class AuthorizeTest extends TestCase
         $this->assertNotNull($response);
     }
 
-    public function testGetCustomerProfileId()
+    public function testGetCustomerProfileId(): void
     {
         error_reporting(E_ALL & ~E_DEPRECATED);
 
@@ -209,7 +209,7 @@ class AuthorizeTest extends TestCase
         $this->assertNotNull($response);
     }
 
-    public function testCreateCustomerPaymentProfile()
+    public function testCreateCustomerPaymentProfile(): void
     {
         nlog('test create customer payment profile');
 
@@ -278,7 +278,7 @@ class AuthorizeTest extends TestCase
         $this->assertNotNull($response);
     }
 
-    public function testChargeCustomerProfile()
+    public function testChargeCustomerProfile(): void
     {
         error_reporting(E_ALL & ~E_DEPRECATED);
 

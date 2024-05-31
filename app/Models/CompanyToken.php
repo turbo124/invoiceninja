@@ -10,6 +10,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -92,7 +93,7 @@ class CompanyToken extends BaseModel
     /**
      * @return \Awobaz\Compoships\Database\Eloquent\Relations\HasOne
      */
-    public function cu()
+    public function cu(): HasOne
     {
         return $this->hasOne(CompanyUser::class, 'user_id', 'user_id')
             ->where('company_id', $this->company_id)

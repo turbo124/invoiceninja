@@ -24,7 +24,7 @@ class UpdateCompanyGatewayRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -32,7 +32,7 @@ class UpdateCompanyGatewayRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'fees_and_limits' => new ValidCompanyGatewayFeesAndLimitsRule(),

@@ -30,7 +30,7 @@ class DatesTest extends TestCase
         // $this->makeTestData();
     }
 
-    public function testLastFinancialYear3()
+    public function testLastFinancialYear3(): void
     {
         $this->travelTo(now()->createFromDate(2020, 6, 30));
 
@@ -51,7 +51,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testLastFinancialYear2()
+    public function testLastFinancialYear2(): void
     {
         $this->travelTo(now()->createFromDate(2020, 7, 1));
 
@@ -72,7 +72,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testLastFinancialYear()
+    public function testLastFinancialYear(): void
     {
         $this->travelTo(now()->createFromDate(2020, 12, 1));
 
@@ -93,7 +93,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testFinancialYearDates4()
+    public function testFinancialYearDates4(): void
     {
         $this->travelTo(now()->createFromDate(2020, 12, 1));
 
@@ -114,7 +114,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testFinancialYearDates3()
+    public function testFinancialYearDates3(): void
     {
         $this->travelTo(now()->createFromDate(2021, 12, 1));
 
@@ -135,7 +135,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testFinancialYearDates2()
+    public function testFinancialYearDates2(): void
     {
         $this->travelTo(now()->createFromDate(2021, 8, 1));
 
@@ -156,7 +156,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testFinancialYearDates()
+    public function testFinancialYearDates(): void
     {
         $this->travelTo(now()->createFromDate(2021, 1, 1));
 
@@ -177,7 +177,7 @@ class DatesTest extends TestCase
 
     }
 
-    public function testDaysDiff()
+    public function testDaysDiff(): void
     {
         $string_date = '2021-06-01';
 
@@ -189,7 +189,7 @@ class DatesTest extends TestCase
         $this->assertEquals(19, $diff_in_days);
     }
 
-    public function testDiffInDaysRange()
+    public function testDiffInDaysRange(): void
     {
         $now = Carbon::parse('2020-01-01');
 
@@ -198,7 +198,7 @@ class DatesTest extends TestCase
         $this->assertEquals(7, $x);
     }
 
-    public function testFourteenDaysFromNow()
+    public function testFourteenDaysFromNow(): void
     {
         $date_in_past = '2020-01-01';
 
@@ -207,7 +207,7 @@ class DatesTest extends TestCase
         $this->assertTrue($date_in_future->gt(Carbon::parse($date_in_past)->addDays(14)));
     }
 
-    public function testThirteenteenDaysFromNow()
+    public function testThirteenteenDaysFromNow(): void
     {
         $date_in_past = '2020-01-01';
 

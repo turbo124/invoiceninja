@@ -22,21 +22,21 @@ class UrlTest extends TestCase
         parent::setUp();
     }
 
-    public function testNoScheme()
+    public function testNoScheme(): void
     {
         $url = 'google.com';
 
         $this->assertEquals('https://google.com', $this->addScheme($url));
     }
 
-    public function testNoSchemeAndTrailingSlash()
+    public function testNoSchemeAndTrailingSlash(): void
     {
         $url = 'google.com/';
 
         $this->assertEquals('https://google.com', $this->addScheme($url));
     }
 
-    public function testNoSchemeAndTrailingSlashAndHttp()
+    public function testNoSchemeAndTrailingSlashAndHttp(): void
     {
         $url = 'http://google.com/';
 

@@ -42,7 +42,7 @@ class CreditTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCreditPaymentsPaidToDates()
+    public function testCreditPaymentsPaidToDates(): void
     {
         $c = Client::factory()->create([
             'company_id' => $this->company->id,
@@ -199,7 +199,7 @@ class CreditTest extends TestCase
 
     }
 
-    public function testApplicableFilters()
+    public function testApplicableFilters(): void
     {
         Credit::where('company_id', $this->company->id)->cursor()->each(function ($c) {
             $c->forceDelete();
@@ -304,7 +304,7 @@ class CreditTest extends TestCase
 
     }
 
-    public function testQuoteDownloadPDF()
+    public function testQuoteDownloadPDF(): void
     {
         $i = $this->credit->invitations->first();
 
@@ -317,7 +317,7 @@ class CreditTest extends TestCase
         $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
     }
 
-    public function testBulkActions()
+    public function testBulkActions(): void
     {
         $data = [
             'action' => 'archive',
@@ -352,7 +352,7 @@ class CreditTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testCreditGetClientStatus()
+    public function testCreditGetClientStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -362,7 +362,7 @@ class CreditTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCreditsList()
+    public function testCreditsList(): void
     {
         Client::factory()->count(3)->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -391,7 +391,7 @@ class CreditTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCreditRESTEndPoints()
+    public function testCreditRESTEndPoints(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -420,7 +420,7 @@ class CreditTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testPostNewCredit()
+    public function testPostNewCredit(): void
     {
         $credit = [
             'status_id' => 1,
@@ -445,7 +445,7 @@ class CreditTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testDeleteCredit()
+    public function testDeleteCredit(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -455,7 +455,7 @@ class CreditTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testDuplicateNumberCatch()
+    public function testDuplicateNumberCatch(): void
     {
         $data = [
             'status_id' => 1,
@@ -488,7 +488,7 @@ class CreditTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testCreditPut()
+    public function testCreditPut(): void
     {
         $data = [
             'status_id' => 1,

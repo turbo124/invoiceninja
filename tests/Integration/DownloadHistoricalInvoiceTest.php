@@ -39,7 +39,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
         }
     }
 
-    public function testDownloadInvoiceRoute()
+    public function testDownloadInvoiceRoute(): void
     {
 
         $response = $this->withHeaders([
@@ -52,7 +52,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
 
     }
 
-    public function testDownloadDeliveryRoute()
+    public function testDownloadDeliveryRoute(): void
     {
 
         $response = $this->withHeaders([
@@ -65,7 +65,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
 
     }
 
-    public function testDownloadInvoiceBulkActionRoute()
+    public function testDownloadInvoiceBulkActionRoute(): void
     {
         $data = [
             'action' => 'download',
@@ -82,7 +82,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
 
     }
 
-    public function testDownloadQuoteRoute()
+    public function testDownloadQuoteRoute(): void
     {
 
         $response = $this->withHeaders([
@@ -95,7 +95,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
 
     }
 
-    public function testDownloadQuoteBulkActionRoute()
+    public function testDownloadQuoteBulkActionRoute(): void
     {
         $data = [
             'action' => 'download',
@@ -123,7 +123,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
         $activity_repo->save($obj, $this->invoice, Ninja::eventVars());
     }
 
-    public function testActivityAccessible()
+    public function testActivityAccessible(): void
     {
         $this->mockActivity();
 

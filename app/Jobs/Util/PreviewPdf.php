@@ -35,7 +35,7 @@ class PreviewPdf implements ShouldQueue
     {
     }
 
-    public function handle()
+    public function handle(): void
     {
         $pdf = $this->makePdf(null, null, $this->design_string);
 

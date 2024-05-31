@@ -47,7 +47,7 @@ class ScheduleEntityTest extends TestCase
         );
     }
 
-    public function testSchedulerStore()
+    public function testSchedulerStore(): void
     {
 
         $data = [
@@ -70,7 +70,7 @@ class ScheduleEntityTest extends TestCase
 
     }
 
-    public function testSchedulerStore2()
+    public function testSchedulerStore2(): void
     {
 
         $data = [
@@ -93,7 +93,7 @@ class ScheduleEntityTest extends TestCase
 
     }
 
-    public function testSchedulerStore4()
+    public function testSchedulerStore4(): void
     {
 
         $data = [

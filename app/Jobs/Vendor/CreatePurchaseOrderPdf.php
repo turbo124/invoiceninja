@@ -84,7 +84,7 @@ class CreatePurchaseOrderPdf implements ShouldQueue
         $this->disk = $disk ?? config('filesystems.default');
     }
 
-    public function handle()
+    public function handle(): void
     {
         /** Testing this override to improve PDF generation performance */
         $ps = new PdfService($this->invitation, 'product', [

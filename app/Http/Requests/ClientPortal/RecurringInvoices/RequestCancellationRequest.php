@@ -7,12 +7,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RequestCancellationRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_RECURRING_INVOICES;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             //

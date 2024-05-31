@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Models\Account;
 use App\Utils\Ninja;
 use Closure;
@@ -23,7 +24,7 @@ class ContactAccount
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (! Ninja::isHosted()) {
             /** @var \App\Models\Account $account */

@@ -48,7 +48,7 @@ class EntityPaidToDateTest extends TestCase
         );
     }
 
-    public function testPaidToDateWithMarkPaidAction()
+    public function testPaidToDateWithMarkPaidAction(): void
     {
         $invoice = $this->bootNewInvoice();
 
@@ -64,7 +64,7 @@ class EntityPaidToDateTest extends TestCase
         $this->assertEquals($invoice->paid_to_date, 20);
     }
 
-    public function testPaidToDateWithInvoiceCancellation()
+    public function testPaidToDateWithInvoiceCancellation(): void
     {
         $invoice = $this->bootNewInvoice();
 

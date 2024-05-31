@@ -34,7 +34,7 @@ class PostmarkWebhookTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testDeliveryReport()
+    public function testDeliveryReport(): void
     {
         $invitation = $this->invoice->invitations->first();
         $invitation->message_id = '00000000-0000-0000-0000-000000000000';
@@ -62,7 +62,7 @@ class PostmarkWebhookTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testDeliveryJob()
+    public function testDeliveryJob(): void
     {
         $invitation = $this->invoice->invitations->first();
         $invitation->message_id = '00000000-0000-0000-0000-000000000000';
@@ -82,7 +82,7 @@ class PostmarkWebhookTest extends TestCase
         $this->assertEquals('delivered', $invitation->fresh()->email_status);
     }
 
-    public function testSpamReport()
+    public function testSpamReport(): void
     {
         $invitation = $this->invoice->invitations->first();
         $invitation->message_id = '00000000-0000-0000-0000-000000000001';
@@ -110,7 +110,7 @@ class PostmarkWebhookTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSpamJob()
+    public function testSpamJob(): void
     {
         $invitation = $this->invoice->invitations->first();
         $invitation->message_id = '00000000-0000-0000-0000-000000000001';

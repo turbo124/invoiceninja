@@ -36,7 +36,7 @@ class MailSentListener implements ShouldQueue
      *
      * @return void
      */
-    public function handle(MessageSent $event)
+    public function handle(MessageSent $event): void
     {
 
         try {

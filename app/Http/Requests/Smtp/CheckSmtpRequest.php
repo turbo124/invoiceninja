@@ -19,7 +19,7 @@ class CheckSmtpRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -32,7 +32,7 @@ class CheckSmtpRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'smtp_host' => 'sometimes|nullable|string|min:3',

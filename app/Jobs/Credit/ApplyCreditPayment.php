@@ -50,7 +50,7 @@ class ApplyCreditPayment implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         /* Update Pivot Record amount */
         $this->payment->credits->each(function ($cred) {

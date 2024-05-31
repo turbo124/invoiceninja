@@ -27,7 +27,7 @@ class BaseSettingsTest extends TestCase
         $this->settings = ClientSettings::defaults();
     }
 
-    public function testPropertyNamesExist()
+    public function testPropertyNamesExist(): void
     {
         $blank_object = new \stdClass;
 
@@ -36,7 +36,7 @@ class BaseSettingsTest extends TestCase
         $this->assertTrue(property_exists($updated_object, 'size_id'));
     }
 
-    public function testPropertyNamesNotExist()
+    public function testPropertyNamesNotExist(): void
     {
         $blank_object = new \stdClass;
 

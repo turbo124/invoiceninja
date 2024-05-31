@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Utils\Ninja;
 use Closure;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class ApiSecretCheck
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (! config('ninja.api_secret') || Ninja::isHosted()) {
             return $next($request);

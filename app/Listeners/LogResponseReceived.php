@@ -31,7 +31,7 @@ class LogResponseReceived
         //
     }
 
-    public function handle(ResponseReceived $event)
+    public function handle(ResponseReceived $event): void
     {
         nlog('Request');
         nlog($event->request->headers());

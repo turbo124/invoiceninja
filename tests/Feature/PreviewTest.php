@@ -41,7 +41,7 @@ class PreviewTest extends TestCase
 
     }
 
-    public function testPreviewRoute()
+    public function testPreviewRoute(): void
     {
         $data = $this->getData();
 
@@ -53,7 +53,7 @@ class PreviewTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPurchaseOrderPreviewRoute()
+    public function testPurchaseOrderPreviewRoute(): void
     {
         $data = $this->getData();
 
@@ -65,7 +65,7 @@ class PreviewTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPurchaseOrderPreviewHtmlResponse()
+    public function testPurchaseOrderPreviewHtmlResponse(): void
     {
         $data = $this->getData();
 
@@ -77,7 +77,7 @@ class PreviewTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPreviewHtmlResponse()
+    public function testPreviewHtmlResponse(): void
     {
         $data = $this->getData();
 

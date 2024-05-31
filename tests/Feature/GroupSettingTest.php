@@ -37,7 +37,7 @@ class GroupSettingTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCastingMagic()
+    public function testCastingMagic(): void
     {
 
         $settings = new \stdClass;
@@ -89,7 +89,7 @@ class GroupSettingTest extends TestCase
         // nlog(json_encode($settings));
     }
 
-    public function testTaxNameInGroupFilters()
+    public function testTaxNameInGroupFilters(): void
     {
         $settings = new \stdClass;
         $settings->currency_id = '1';
@@ -114,7 +114,7 @@ class GroupSettingTest extends TestCase
         $this->assertNotNull($arr['data']['settings']['tax_name1']);
     }
 
-    public function testAddGroupFilters()
+    public function testAddGroupFilters(): void
     {
         $settings = new \stdClass;
         $settings->currency_id = '1';
@@ -149,7 +149,7 @@ class GroupSettingTest extends TestCase
 
     }
 
-    public function testAddGroupSettings()
+    public function testAddGroupSettings(): void
     {
         $settings = new \stdClass;
         $settings->currency_id = '1';
@@ -172,7 +172,7 @@ class GroupSettingTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testArchiveGroupSettings()
+    public function testArchiveGroupSettings(): void
     {
         $settings = new \stdClass;
         $settings->currency_id = '1';

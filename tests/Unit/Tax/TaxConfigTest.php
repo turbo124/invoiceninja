@@ -50,7 +50,7 @@ class TaxConfigTest extends TestCase
         $this->tp = new TaxProvider($this->company, $client);
     }
 
-    public function testStateResolution()
+    public function testStateResolution(): void
     {
         //infer state from zip
         $client = Client::factory()->create([

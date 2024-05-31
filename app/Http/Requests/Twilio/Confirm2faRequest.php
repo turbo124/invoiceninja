@@ -23,7 +23,7 @@ class Confirm2faRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'code' => 'required',

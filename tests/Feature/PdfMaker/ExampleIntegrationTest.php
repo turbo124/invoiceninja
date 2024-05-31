@@ -28,7 +28,7 @@ class ExampleIntegrationTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testExample()
+    public function testExample(): void
     {
         // $this->markTestIncomplete();
 

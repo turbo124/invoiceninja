@@ -54,7 +54,7 @@ class SendReminders implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         nlog('Sending reminders '.Carbon::now()->format('Y-m-d h:i:s'));
 

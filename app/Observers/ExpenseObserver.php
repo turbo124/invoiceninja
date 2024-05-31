@@ -23,7 +23,7 @@ class ExpenseObserver
      *
      * @return void
      */
-    public function created(Expense $expense)
+    public function created(Expense $expense): void
     {
         $subscriptions = Webhook::where('company_id', $expense->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_EXPENSE)
@@ -39,7 +39,7 @@ class ExpenseObserver
      *
      * @return void
      */
-    public function updated(Expense $expense)
+    public function updated(Expense $expense): void
     {
         $event = Webhook::EVENT_UPDATE_EXPENSE;
 
@@ -65,7 +65,7 @@ class ExpenseObserver
      *
      * @return void
      */
-    public function deleted(Expense $expense)
+    public function deleted(Expense $expense): void
     {
         if ($expense->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class ExpenseObserver
      *
      * @return void
      */
-    public function restored(Expense $expense)
+    public function restored(Expense $expense): void
     {
         //
     }
@@ -95,7 +95,7 @@ class ExpenseObserver
      *
      * @return void
      */
-    public function forceDeleted(Expense $expense)
+    public function forceDeleted(Expense $expense): void
     {
         //
     }

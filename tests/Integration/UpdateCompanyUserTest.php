@@ -35,7 +35,7 @@ class UpdateCompanyUserTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testUpdatingCompanyUserReactSettings()
+    public function testUpdatingCompanyUserReactSettings(): void
     {
 
         $company_user = CompanyUser::whereUserId($this->user->id)->whereCompanyId($this->company->id)->first();
@@ -96,7 +96,7 @@ class UpdateCompanyUserTest extends TestCase
 
     }
 
-    public function testUpdatingCompanyUserAsAdmin()
+    public function testUpdatingCompanyUserAsAdmin(): void
     {
         // User::unguard();
 

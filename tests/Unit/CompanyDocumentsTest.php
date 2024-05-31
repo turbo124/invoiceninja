@@ -35,7 +35,7 @@ class CompanyDocumentsTest extends TestCase
         );
     }
 
-    public function testCompanyDocumentExists()
+    public function testCompanyDocumentExists(): void
     {
         $company_key = $this->company->company_key;
 

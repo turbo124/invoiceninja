@@ -19,7 +19,7 @@ class CheckMailRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true; /* Return something that will check if setup has been completed, like Ninja::hasCompletedSetup() */
     }
@@ -29,7 +29,7 @@ class CheckMailRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'mail_driver' => 'required',

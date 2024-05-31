@@ -23,7 +23,7 @@ class Generate2faRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'email' => 'required|exists:users,email',

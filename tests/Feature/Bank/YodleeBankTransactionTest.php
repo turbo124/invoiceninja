@@ -37,7 +37,7 @@ class YodleeBankTransactionTest extends TestCase
         );
     }
 
-    public function testDataMatching1()
+    public function testDataMatching1(): void
     {
         $this->invoice->number = 'super-funk-1234';
         $this->invoice->save();
@@ -69,7 +69,7 @@ class YodleeBankTransactionTest extends TestCase
         $this->assertTrue(BankTransaction::where('invoice_ids', $this->invoice->hashed_id)->exists());
     }
 
-    public function testDataMatching2()
+    public function testDataMatching2(): void
     {
         $this->invoice->number = 'super-funk-1234';
         $this->invoice->save();

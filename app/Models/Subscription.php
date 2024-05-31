@@ -10,6 +10,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\Subscription\PaymentLinkService;
 use App\Services\Subscription\SubscriptionCalculator;
 use App\Services\Subscription\SubscriptionService;
@@ -167,7 +168,7 @@ class Subscription extends BaseModel
         return $this->belongsTo(User::class)->withTrashed();
     }
 
-    public function group_settings()
+    public function group_settings(): BelongsTo
     {
         return $this->belongsTo(GroupSetting::class, 'group_id', 'id');
     }

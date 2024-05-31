@@ -25,7 +25,7 @@ class EmailBlacklistValidationTest extends TestCase
         parent::setUp();
     }
 
-    public function testValidEmailRule()
+    public function testValidEmailRule(): void
     {
         $email_rule = new EmailBlackListRule;
         $email_rule->blacklist = ['gimmy@gmail.com'];
@@ -42,7 +42,7 @@ class EmailBlacklistValidationTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testInValidEmailRule()
+    public function testInValidEmailRule(): void
     {
         $rules = [
             'email' => [new EmailBlackListRule],

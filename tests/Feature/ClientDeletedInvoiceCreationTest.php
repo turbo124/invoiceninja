@@ -42,7 +42,7 @@ class ClientDeletedInvoiceCreationTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testClientedDeletedAttemptingToCreateInvoice()
+    public function testClientedDeletedAttemptingToCreateInvoice(): void
     {
         /* Test fire new invoice */
         $data = [

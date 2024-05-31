@@ -18,7 +18,7 @@ class MollieAmountFormatTest extends TestCase
     /**
      * @covers \App\PaymentDrivers\MolliePaymentDriver::convertToMollieAmount()
      */
-    public function testFormatterIsWorkingCorrectly()
+    public function testFormatterIsWorkingCorrectly(): void
     {
         $this->assertEquals('1000.00', \number_format((float) 1000, 2, '.', ''));
 

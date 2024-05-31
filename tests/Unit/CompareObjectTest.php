@@ -41,7 +41,7 @@ class CompareObjectTest extends TestCase
         return $this->client_settings;
     }
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $build_client_settings = $this->buildClientSettings();
 
@@ -50,7 +50,7 @@ class CompareObjectTest extends TestCase
         $this->assertEquals($build_client_settings->payment_terms, '');
     }
 
-    public function testDirectClientSettingsBuild()
+    public function testDirectClientSettingsBuild(): void
     {
         $settings = ClientSettings::buildClientSettings(CompanySettings::defaults(), ClientSettings::defaults());
 

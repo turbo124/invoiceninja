@@ -27,7 +27,7 @@ class CurrencyApiTest extends TestCase
         parent::setUp();
     }
 
-    public function testConversionAudToEur()
+    public function testConversionAudToEur(): void
     {
         $converter = new CurrencyApi();
 
@@ -42,7 +42,7 @@ class CurrencyApiTest extends TestCase
 
     }
 
-    public function testCurrencyConversionWorking()
+    public function testCurrencyConversionWorking(): void
     {
         $converter = new CurrencyApi();
 
@@ -51,7 +51,7 @@ class CurrencyApiTest extends TestCase
         $this->assertIsFloat($converted_amount);
     }
 
-    public function testExchangeRate()
+    public function testExchangeRate(): void
     {
         $converter = new CurrencyApi();
 
@@ -60,7 +60,7 @@ class CurrencyApiTest extends TestCase
         $this->assertIsNumeric($exchange_rate);
     }
 
-    public function testExchangeRateWithDate()
+    public function testExchangeRateWithDate(): void
     {
         $date = Carbon::parse('2020-03-08');
 

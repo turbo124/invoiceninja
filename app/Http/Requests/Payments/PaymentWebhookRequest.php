@@ -23,12 +23,12 @@ class PaymentWebhookRequest extends Request
 {
     use MakesHash;
 
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             //

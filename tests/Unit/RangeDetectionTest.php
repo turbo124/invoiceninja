@@ -22,7 +22,7 @@ class RangeDetectionTest extends TestCase
         parent::setUp();
     }
 
-    public function test_range_detection()
+    public function test_range_detection(): void
     {
         $ranges = [];
         $ranges[] = [100, 105];

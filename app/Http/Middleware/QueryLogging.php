@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\DataMapper\Analytics\DbQuery;
 use App\Utils\Ninja;
 use Closure;
@@ -28,7 +29,7 @@ class QueryLogging
      *
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
 
         // Enable query logging for development

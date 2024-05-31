@@ -26,7 +26,7 @@ class StoreClientGatewayTokenRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         //ensure client is present
         $rules = [
@@ -48,7 +48,7 @@ class StoreClientGatewayTokenRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
         ];

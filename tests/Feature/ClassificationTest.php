@@ -34,7 +34,7 @@ class ClassificationTest extends TestCase
 
     }
 
-    public function testClientClassification()
+    public function testClientClassification(): void
     {
         $data = [
             'name' => 'Personal Company',
@@ -53,7 +53,7 @@ class ClassificationTest extends TestCase
         $this->assertEquals('individual', $arr['data']['classification']);
     }
 
-    public function testValidationClassification()
+    public function testValidationClassification(): void
     {
         $data = [
             'name' => 'Personal Company',
@@ -69,7 +69,7 @@ class ClassificationTest extends TestCase
 
     }
 
-    public function testValidation2Classification()
+    public function testValidation2Classification(): void
     {
         $this->client->classification = 'business';
 
@@ -85,7 +85,7 @@ class ClassificationTest extends TestCase
         $this->assertEquals('business', $arr['data']['classification']);
     }
 
-    public function testValidation3Classification()
+    public function testValidation3Classification(): void
     {
         $this->client->classification = 'this_is_not_validated';
 
@@ -98,7 +98,7 @@ class ClassificationTest extends TestCase
 
     }
 
-    public function testVendorClassification()
+    public function testVendorClassification(): void
     {
         $data = [
             'name' => 'Personal Company',
@@ -117,7 +117,7 @@ class ClassificationTest extends TestCase
         $this->assertEquals('individual', $arr['data']['classification']);
     }
 
-    public function testVendorValidationClassification()
+    public function testVendorValidationClassification(): void
     {
         $data = [
             'name' => 'Personal Company',
@@ -133,7 +133,7 @@ class ClassificationTest extends TestCase
 
     }
 
-    public function testVendorValidation2Classification()
+    public function testVendorValidation2Classification(): void
     {
         $this->vendor->classification = 'company';
 
@@ -149,7 +149,7 @@ class ClassificationTest extends TestCase
         $this->assertEquals('company', $arr['data']['classification']);
     }
 
-    public function testVendorValidation3Classification()
+    public function testVendorValidation3Classification(): void
     {
         $this->vendor->classification = 'this_is_not_validated';
 
@@ -162,7 +162,7 @@ class ClassificationTest extends TestCase
 
     }
 
-    public function testCompanyClassification()
+    public function testCompanyClassification(): void
     {
         $settings = $this->company->settings;
         $settings->classification = 'company';
@@ -181,7 +181,7 @@ class ClassificationTest extends TestCase
         $this->assertEquals('company', $arr['data']['settings']['classification']);
     }
 
-    public function testCompanyValidationClassification()
+    public function testCompanyValidationClassification(): void
     {
         $settings = $this->company->settings;
         $settings->classification = 545454;
@@ -197,7 +197,7 @@ class ClassificationTest extends TestCase
 
     }
 
-    public function testCompanyValidation2Classification()
+    public function testCompanyValidation2Classification(): void
     {
         $settings = $this->company->settings;
         $settings->classification = null;

@@ -44,7 +44,7 @@ class MobileLocalization extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $type = strtolower($this->option('type'));
 

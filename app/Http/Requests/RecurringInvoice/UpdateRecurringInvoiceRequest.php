@@ -34,7 +34,7 @@ class UpdateRecurringInvoiceRequest extends Request
         return $user->can('edit', $this->recurring_invoice);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User auth()->user() */
         $user = auth()->user();

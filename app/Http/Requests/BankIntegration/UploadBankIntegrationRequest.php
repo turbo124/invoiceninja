@@ -25,7 +25,7 @@ class UploadBankIntegrationRequest extends Request
         return $user->can('edit', $this->bank_integration);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

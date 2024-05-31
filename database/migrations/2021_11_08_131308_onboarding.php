@@ -12,7 +12,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasColumn('accounts', 'is_onboarding')) {
             Schema::table('accounts', function (Blueprint $table) {

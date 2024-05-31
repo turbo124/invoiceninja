@@ -12,7 +12,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         $countries = Country::query()->whereNull('thousand_separator')->update(['thousand_separator' => '']);
         $countries = Country::query()->whereNull('decimal_separator')->update(['decimal_separator' => '']);
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('countries', function (Blueprint $table) {
             //

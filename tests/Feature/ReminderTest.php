@@ -159,7 +159,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testDKRemindersNotSending()
+    public function testDKRemindersNotSending(): void
     {
 
         //Schedule
@@ -297,7 +297,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testForUtcEdgeCaseOnTheFirstOfMonth()
+    public function testForUtcEdgeCaseOnTheFirstOfMonth(): void
     {
 
         $this->travelTo(Carbon::parse('2024-03-01')->startOfDay());
@@ -335,7 +335,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testReminderInThePast()
+    public function testReminderInThePast(): void
     {
 
         $translations = new \stdClass;
@@ -373,7 +373,7 @@ class ReminderTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addMonthNoOverflow()->format('Y-m-d'), \Carbon\Carbon::parse($this->invoice->next_send_date)->startOfDay()->format('Y-m-d'));
     }
 
-    public function testsForTranslationsInReminders()
+    public function testsForTranslationsInReminders(): void
     {
 
         $translations = new \stdClass;
@@ -452,7 +452,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testForReminderFiringCorrectly()
+    public function testForReminderFiringCorrectly(): void
     {
         $this->invoice->status_id = 2;
         $this->invoice->amount = 10;
@@ -529,7 +529,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testForSingleEndlessReminder()
+    public function testForSingleEndlessReminder(): void
     {
         $this->invoice->next_send_date = null;
         $this->invoice->date = now()->format('Y-m-d');
@@ -571,7 +571,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testForClientTimezoneEdges()
+    public function testForClientTimezoneEdges(): void
     {
         $this->invoice->next_send_date = null;
         $this->invoice->date = now()->format('Y-m-d');
@@ -661,7 +661,7 @@ class ReminderTest extends TestCase
     //     $this->assertEquals(1, $invoices->count());
     // }
 
-    public function testReminderHits()
+    public function testReminderHits(): void
     {
         $this->invoice->date = now()->format('Y-m-d');
         $this->invoice->due_date = Carbon::now()->addDays(30)->format('Y-m-d');
@@ -685,7 +685,7 @@ class ReminderTest extends TestCase
 
     }
 
-    public function testReminderHitsScenarioH1()
+    public function testReminderHitsScenarioH1(): void
     {
         $this->invoice->date = now()->format('Y-m-d');
         $this->invoice->due_date = Carbon::now()->addDays(30)->format('Y-m-d');
@@ -710,7 +710,7 @@ class ReminderTest extends TestCase
     }
 
     /* Cant set a reminder in the past so need to skip reminder 2 and go straigh to reminder 3*/
-    public function testReminderNextSendRecalculation()
+    public function testReminderNextSendRecalculation(): void
     {
         $this->invoice->date = now()->subDays(2)->format('Y-m-d');
         $this->invoice->due_date = now()->addDays(30)->format('Y-m-d');
@@ -739,7 +739,7 @@ class ReminderTest extends TestCase
         $this->assertEquals(Carbon::parse($this->invoice->next_send_date)->format('Y-m-d'), now()->addDay()->format('Y-m-d'));
     }
 
-    public function testReminder3NextSendRecalculation()
+    public function testReminder3NextSendRecalculation(): void
     {
         $this->invoice->date = now()->subDays(3)->format('Y-m-d');
         $this->invoice->due_date = Carbon::now()->addDays(30)->format('Y-m-d');
@@ -766,7 +766,7 @@ class ReminderTest extends TestCase
         $this->assertEquals(Carbon::parse($this->invoice->next_send_date)->format('Y-m-d'), now()->format('Y-m-d'));
     }
 
-    public function testReminderIsSet()
+    public function testReminderIsSet(): void
     {
         $this->invoice->next_send_date = null;
         $this->invoice->date = now()->format('Y-m-d');

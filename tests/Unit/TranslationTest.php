@@ -23,21 +23,21 @@ class TranslationTest extends TestCase
         parent::setUp();
     }
 
-    public function testAddTranslation()
+    public function testAddTranslation(): void
     {
         Lang::set('texts.test_translation_string', 'test');
 
         $this->assertEquals('test', trans('texts.test_translation_string'));
     }
 
-    public function testReplaceTranslation()
+    public function testReplaceTranslation(): void
     {
         Lang::set('texts.invoice_number', 'test');
 
         $this->assertEquals('test', trans('texts.invoice_number'));
     }
 
-    public function testReplaceArray()
+    public function testReplaceArray(): void
     {
         $data = [
             'texts.invoice_number' => 'test',

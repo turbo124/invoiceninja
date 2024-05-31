@@ -31,7 +31,7 @@ class DesignWasUpdated
      *
      * @return PrivateChannel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
         return [];
     }

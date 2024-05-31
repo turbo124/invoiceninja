@@ -62,7 +62,7 @@ class PaymentTest extends TestCase
         );
     }
 
-    public function testInvoicesValidationProp()
+    public function testInvoicesValidationProp(): void
     {
 
         $data = [
@@ -87,7 +87,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testClientIdValidation()
+    public function testClientIdValidation(): void
     {
         $p = Payment::factory()->create([
             'company_id' => $this->company->id,
@@ -139,7 +139,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testNegativeAppliedAmounts()
+    public function testNegativeAppliedAmounts(): void
     {
         $p = Payment::factory()->create([
             'company_id' => $this->company->id,
@@ -207,7 +207,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testCompletedPaymentLogic()
+    public function testCompletedPaymentLogic(): void
     {
         $payment = Payment::factory()->create([
             'company_id' => $this->company->id,
@@ -240,7 +240,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPendingPaymentLogic()
+    public function testPendingPaymentLogic(): void
     {
         $payment = Payment::factory()->create([
             'company_id' => $this->company->id,
@@ -273,7 +273,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPaymentGetBetweenQuery1()
+    public function testPaymentGetBetweenQuery1(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -283,7 +283,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentGetBetweenQuery2()
+    public function testPaymentGetBetweenQuery2(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -293,7 +293,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentGetBetweenQuery3()
+    public function testPaymentGetBetweenQuery3(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -303,7 +303,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentGetBetweenQuery4()
+    public function testPaymentGetBetweenQuery4(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -313,7 +313,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentGetBetweenQuery5()
+    public function testPaymentGetBetweenQuery5(): void
     {
         Payment::factory()->count(10)->create([
             'user_id' => $this->user->id,
@@ -346,7 +346,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPaymentGetClientStatus()
+    public function testPaymentGetClientStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -356,7 +356,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testGetPaymentMatchList()
+    public function testGetPaymentMatchList(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -365,7 +365,7 @@ class PaymentTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testStorePaymentIdempotencyKeyIllegalLength()
+    public function testStorePaymentIdempotencyKeyIllegalLength(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -409,7 +409,7 @@ class PaymentTest extends TestCase
         // $this->assertFalse($response);
     }
 
-    public function testPaymentList()
+    public function testPaymentList(): void
     {
         Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -440,7 +440,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPaymentRESTEndPoints()
+    public function testPaymentRESTEndPoints(): void
     {
         $Payment = Payment::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
         $Payment->name = \Illuminate\Support\Str::random(54);
@@ -467,7 +467,7 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testStorePaymentWithoutClientId()
+    public function testStorePaymentWithoutClientId(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -510,7 +510,7 @@ class PaymentTest extends TestCase
         // }
     }
 
-    public function testStorePaymentWithClientId()
+    public function testStorePaymentWithClientId(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -574,7 +574,7 @@ class PaymentTest extends TestCase
         }
     }
 
-    public function testStorePaymentWithNoInvoiecs()
+    public function testStorePaymentWithNoInvoiecs(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -618,7 +618,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPartialPaymentAmount()
+    public function testPartialPaymentAmount(): void
     {
         $invoice = null;
 
@@ -684,7 +684,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPaymentGreaterThanPartial()
+    public function testPaymentGreaterThanPartial(): void
     {
         $invoice = null;
 
@@ -761,7 +761,7 @@ class PaymentTest extends TestCase
         $this->assertEquals($invoice->balance, 4);
     }
 
-    public function testPaymentLessThanPartialAmount()
+    public function testPaymentLessThanPartialAmount(): void
     {
         $invoice = null;
 
@@ -833,7 +833,7 @@ class PaymentTest extends TestCase
         $this->assertEquals($invoice->balance, 8);
     }
 
-    public function testPaymentValidationAmount()
+    public function testPaymentValidationAmount(): void
     {
         $invoice = null;
 
@@ -900,7 +900,7 @@ class PaymentTest extends TestCase
         // }
     }
 
-    public function testPaymentChangesBalancesCorrectly()
+    public function testPaymentChangesBalancesCorrectly(): void
     {
         $invoice = null;
 
@@ -965,7 +965,7 @@ class PaymentTest extends TestCase
         // }
     }
 
-    public function testUpdatePaymentValidationWorks()
+    public function testUpdatePaymentValidationWorks(): void
     {
         $invoice = null;
 
@@ -1023,7 +1023,7 @@ class PaymentTest extends TestCase
         // }
     }
 
-    public function testUpdatePaymentValidationPasses()
+    public function testUpdatePaymentValidationPasses(): void
     {
         $invoice = null;
 
@@ -1088,7 +1088,7 @@ class PaymentTest extends TestCase
         // }
     }
 
-    public function testDoublePaymentTestWithInvalidAmounts()
+    public function testDoublePaymentTestWithInvalidAmounts(): void
     {
         $invoice = null;
 
@@ -1192,7 +1192,7 @@ class PaymentTest extends TestCase
         }
     }
 
-    public function testDoublePaymentTestWithValidAmounts()
+    public function testDoublePaymentTestWithValidAmounts(): void
     {
         $invoice = null;
 
@@ -1249,7 +1249,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testStorePaymentWithNoAmountField()
+    public function testStorePaymentWithNoAmountField(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -1314,7 +1314,7 @@ class PaymentTest extends TestCase
         }
     }
 
-    public function testStorePaymentWithZeroAmountField()
+    public function testStorePaymentWithZeroAmountField(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -1373,7 +1373,7 @@ class PaymentTest extends TestCase
         $this->assertEquals(round($payment->applied, 2), $invoice->amount);
     }
 
-    public function testPaymentForInvoicesFromDifferentClients()
+    public function testPaymentForInvoicesFromDifferentClients(): void
     {
         $client1 = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -1447,7 +1447,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPaymentWithSameInvoiceMultipleTimes()
+    public function testPaymentWithSameInvoiceMultipleTimes(): void
     {
         $client1 = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -1498,7 +1498,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testStorePaymentWithCredits()
+    public function testStorePaymentWithCredits(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
         ClientContact::factory()->create([
@@ -1578,7 +1578,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testStorePaymentExchangeRate()
+    public function testStorePaymentExchangeRate(): void
     {
         $settings = ClientSettings::defaults();
         $settings->currency_id = '2';
@@ -1640,7 +1640,7 @@ class PaymentTest extends TestCase
 
     }
 
-    public function testPaymentActionArchive()
+    public function testPaymentActionArchive(): void
     {
         $invoice = null;
 
@@ -1724,7 +1724,7 @@ class PaymentTest extends TestCase
         $this->assertEquals(1, $arr['data'][0]['is_deleted']);
     }
 
-    public function testDeleteRefundedPayment()
+    public function testDeleteRefundedPayment(): void
     {
         $invoice = null;
 
@@ -1812,7 +1812,7 @@ class PaymentTest extends TestCase
         $this->assertEquals(10, $invoice->fresh()->balance);
     }
 
-    public function testUniquePaymentNumbers()
+    public function testUniquePaymentNumbers(): void
     {
         $data = [
             'amount' => $this->invoice->amount,

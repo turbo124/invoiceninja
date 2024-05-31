@@ -58,7 +58,7 @@ class ProcessBankTransactionsNordigen implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->bank_integration->integration_type != BankIntegration::INTEGRATION_TYPE_NORDIGEN) {
             throw new \Exception('Invalid BankIntegration Type');

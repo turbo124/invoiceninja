@@ -114,7 +114,7 @@ class ArSummaryReportTest extends TestCase
         ]);
     }
 
-    public function testUserSalesInstance()
+    public function testUserSalesInstance(): void
     {
         $this->buildData();
 
@@ -125,7 +125,7 @@ class ArSummaryReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleReport()
+    public function testSimpleReport(): void
     {
         $this->buildData();
 

@@ -47,7 +47,7 @@ class StoreSchedulerRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'name' => 'bail|sometimes|nullable|string',

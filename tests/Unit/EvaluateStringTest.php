@@ -18,7 +18,7 @@ use Tests\TestCase;
  */
 class EvaluateStringTest extends TestCase
 {
-    public function testNumericCleanup()
+    public function testNumericCleanup(): void
     {
         $string = '13/favicon.ico';
 
@@ -27,7 +27,7 @@ class EvaluateStringTest extends TestCase
         $this->assertEquals(13, $number);
     }
 
-    public function testClassNameResolution()
+    public function testClassNameResolution(): void
     {
         $this->assertEquals(class_basename(Client::class), 'Client');
     }

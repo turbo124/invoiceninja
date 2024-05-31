@@ -41,7 +41,7 @@ class YodleeApiTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testExpenseGenerationFromBankFeed()
+    public function testExpenseGenerationFromBankFeed(): void
     {
         $bi = BankIntegrationFactory::create($this->company->id, $this->user->id, $this->account->id);
         $bi->save();
@@ -71,7 +71,7 @@ class YodleeApiTest extends TestCase
         $this->assertEquals(10, (int) $expense->amount);
     }
 
-    public function testIncomeMatchingAndPaymentGeneration()
+    public function testIncomeMatchingAndPaymentGeneration(): void
     {
         $this->account->bank_integration_account_id = 'sbMem62e1e69547bfb2';
         $this->account->save();
@@ -136,7 +136,7 @@ class YodleeApiTest extends TestCase
         $this->assertEquals(1, $payment_count);
     }
 
-    public function testCategoryPropertyExists()
+    public function testCategoryPropertyExists(): void
     {
         $yodlee = new Yodlee('sbMem62e1e69547bfb2');
 
@@ -206,7 +206,7 @@ class YodleeApiTest extends TestCase
 
     //     }
 
-    public function testDataMatching()
+    public function testDataMatching(): void
     {
         $transaction = collect([
             (object) [
@@ -251,7 +251,7 @@ class YodleeApiTest extends TestCase
         $this->assertNotNull($invoice);
     }
 
-    public function testYodleeInstance()
+    public function testYodleeInstance(): void
     {
         $yodlee = new Yodlee();
 
@@ -260,7 +260,7 @@ class YodleeApiTest extends TestCase
         $this->assertInstanceOf(Yodlee::class, $yodlee);
     }
 
-    public function testAccessTokenGeneration()
+    public function testAccessTokenGeneration(): void
     {
         $yodlee = new Yodlee('sbMem62e1e69547bfb1');
 
@@ -440,7 +440,7 @@ class YodleeApiTest extends TestCase
                         [defaultHighLevelCategoryName] => Automotive Expenses
                     )
      */
-    public function testGetCategories()
+    public function testGetCategories(): void
     {
         $yodlee = new Yodlee('sbMem62e1e69547bfb2');
 
@@ -550,7 +550,7 @@ class YodleeApiTest extends TestCase
 
                     )
      */
-    public function testGetAccounts()
+    public function testGetAccounts(): void
     {
         $yodlee = new Yodlee('sbMem62e1e69547bfb1');
 
@@ -602,7 +602,7 @@ class YodleeApiTest extends TestCase
                         [checkNumber] => 998
                     )
      */
-    public function testGetTransactions()
+    public function testGetTransactions(): void
     {
         $yodlee = new Yodlee('sbMem62e1e69547bfb1');
 
@@ -611,7 +611,7 @@ class YodleeApiTest extends TestCase
         $this->assertIsArray($transactions);
     }
 
-    public function testGetTransactionsWithParams()
+    public function testGetTransactionsWithParams(): void
     {
         $yodlee = new Yodlee('sbMem62e1e69547bfb1');
 

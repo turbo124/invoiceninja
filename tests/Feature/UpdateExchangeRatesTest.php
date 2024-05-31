@@ -45,7 +45,7 @@ class UpdateExchangeRatesTest extends TestCase
         Model::reguard();
     }
 
-    public function testExchangeRate()
+    public function testExchangeRate(): void
     {
         if (! empty(config('ninja.currency_converter_api_key'))) {
             $cc_endpoint = sprintf('https://openexchangerates.org/api/latest.json?app_id=%s', config('ninja.currency_converter_api_key'));
@@ -69,7 +69,7 @@ class UpdateExchangeRatesTest extends TestCase
         }
     }
 
-    public function testExchangeRateConversion()
+    public function testExchangeRateConversion(): void
     {
         $usd = Currency::find(1);
         $gbp = Currency::find(2);
@@ -87,7 +87,7 @@ class UpdateExchangeRatesTest extends TestCase
         $this->assertEquals($convert_to_gbp, 5);
     }
 
-    public function testSyntheticExchangeRate()
+    public function testSyntheticExchangeRate(): void
     {
         $usd = Currency::find(1);
         $gbp = Currency::find(2);

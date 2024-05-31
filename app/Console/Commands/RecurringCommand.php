@@ -44,7 +44,7 @@ class RecurringCommand extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         (new RecurringInvoicesCron())->handle();
     }

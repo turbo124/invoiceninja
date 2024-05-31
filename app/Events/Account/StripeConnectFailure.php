@@ -28,7 +28,7 @@ class StripeConnectFailure
     {
     }
 
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
         return [];
     }

@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Events\Contact\ContactLoggedIn;
 use App\Models\ClientContact;
 use App\Utils\Ninja;
@@ -25,7 +26,7 @@ class ContactTokenAuth
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if ($request->header('X-API-TOKEN') && ($client_contact = ClientContact::with(['company'])->where('token', $request->header('X-API-TOKEN'))->first())) {
             $error = [

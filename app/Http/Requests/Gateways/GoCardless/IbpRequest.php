@@ -28,7 +28,7 @@ class IbpRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         MultiDB::findAndSetDbByCompanyKey($this->company_key);
 
@@ -40,7 +40,7 @@ class IbpRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

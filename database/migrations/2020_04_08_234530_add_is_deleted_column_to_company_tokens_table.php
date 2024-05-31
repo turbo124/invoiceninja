@@ -19,7 +19,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         /* add ability of companytokens to be deleted.*/
         Schema::table('company_tokens', function (Blueprint $table) {
@@ -53,7 +53,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
 };

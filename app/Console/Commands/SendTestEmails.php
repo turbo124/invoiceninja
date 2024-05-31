@@ -47,7 +47,7 @@ class SendTestEmails extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
 
         $to_user = User::first();

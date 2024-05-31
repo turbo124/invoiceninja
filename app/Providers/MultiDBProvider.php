@@ -21,7 +21,7 @@ class MultiDBProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
     }
 
@@ -30,7 +30,7 @@ class MultiDBProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
 
         $this->app['events']->listen(

@@ -34,7 +34,7 @@ class UpdateClientRequest extends Request
         return $user->can('edit', $this->client);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /* Ensure we have a client name, and that all emails are unique*/
         /** @var \App\Models\User $user */
@@ -80,7 +80,7 @@ class UpdateClientRequest extends Request
         return $rules;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'email' => ctrans('validation.email', ['attribute' => 'email']),

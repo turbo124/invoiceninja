@@ -18,17 +18,17 @@ use Tests\TestCase;
  */
 class SmsNumberTest extends TestCase
 {
-    public function testArrayHit()
+    public function testArrayHit(): void
     {
         $this->assertTrue(SMSNumbers::hasNumber('+461614222'));
     }
 
-    public function testArrayMiss()
+    public function testArrayMiss(): void
     {
         $this->assertFalse(SMSNumbers::hasNumber('+5485454'));
     }
 
-    public function testSmsArrayType()
+    public function testSmsArrayType(): void
     {
         $this->assertIsArray(SMSNumbers::getNumbers());
     }

@@ -37,7 +37,7 @@ class BankTransactionRuleTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testMatchingWithStripos()
+    public function testMatchingWithStripos(): void
     {
         $bt_value = strtolower(str_replace(' ', '', 'hello soldier'));
         $rule_value = strtolower(str_replace(' ', '', 'solider'));
@@ -47,7 +47,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertFalse(stripos($bt_value, $rule_value) !== false);
     }
 
-    public function testBankRuleBulkActions()
+    public function testBankRuleBulkActions(): void
     {
         $data = [
             'action' => 'archive',
@@ -82,7 +82,7 @@ class BankTransactionRuleTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testValidationContainsRule()
+    public function testValidationContainsRule(): void
     {
         $bi = BankIntegration::factory()->create([
             'company_id' => $this->company->id,
@@ -132,7 +132,7 @@ class BankTransactionRuleTest extends TestCase
         $bt = null;
     }
 
-    public function testUpdateValidationRules()
+    public function testUpdateValidationRules(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -183,7 +183,7 @@ class BankTransactionRuleTest extends TestCase
         }
     }
 
-    public function testMatchingBankTransactionExpenseAmountLessThanEqualTo()
+    public function testMatchingBankTransactionExpenseAmountLessThanEqualTo(): void
     {
         $bi = BankIntegration::factory()->create([
             'company_id' => $this->company->id,
@@ -228,7 +228,7 @@ class BankTransactionRuleTest extends TestCase
         $bt = null;
     }
 
-    public function testMatchingBankTransactionExpenseAmountLessThan()
+    public function testMatchingBankTransactionExpenseAmountLessThan(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -269,7 +269,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseAmountGreaterThan()
+    public function testMatchingBankTransactionExpenseAmountGreaterThan(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -310,7 +310,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseAmountMiss()
+    public function testMatchingBankTransactionExpenseAmountMiss(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -351,7 +351,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertEmpty($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseAmount()
+    public function testMatchingBankTransactionExpenseAmount(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -392,7 +392,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseIsEmpty()
+    public function testMatchingBankTransactionExpenseIsEmpty(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -435,7 +435,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseIsEmptyMiss()
+    public function testMatchingBankTransactionExpenseIsEmptyMiss(): void
     {
         $bi = BankIntegration::factory()->create([
             'company_id' => $this->company->id,
@@ -478,7 +478,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertEmpty($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseStartsWithMiss()
+    public function testMatchingBankTransactionExpenseStartsWithMiss(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -519,7 +519,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertEmpty($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseStartsWith()
+    public function testMatchingBankTransactionExpenseStartsWith(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -560,7 +560,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseContainsMiss()
+    public function testMatchingBankTransactionExpenseContainsMiss(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -601,7 +601,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertEmpty($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseContains()
+    public function testMatchingBankTransactionExpenseContains(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -642,7 +642,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpenseMiss()
+    public function testMatchingBankTransactionExpenseMiss(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -682,7 +682,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertEmpty($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionExpense()
+    public function testMatchingBankTransactionExpense(): void
     {
         $br = BankTransactionRule::factory()->create([
             'company_id' => $this->company->id,
@@ -722,7 +722,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
     }
 
-    public function testMatchingBankTransactionInvoice()
+    public function testMatchingBankTransactionInvoice(): void
     {
         $this->invoice->number = 'MUHMUH';
         $this->invoice->save();

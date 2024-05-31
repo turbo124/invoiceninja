@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Libraries\MultiDB;
 use App\Libraries\OAuth\Providers\Google;
 use Closure;
@@ -28,7 +29,7 @@ class PasswordProtection
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $error = [
             'message' => 'Invalid Password',

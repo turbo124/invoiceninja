@@ -33,7 +33,7 @@ class StoreInvoiceRequest extends Request
         return $user->can('create', Invoice::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

@@ -24,7 +24,7 @@ class EncryptionSettingsTest extends TestCase
         $this->settings = '{"publishable_key":"publish","23_apiKey":"client","enable_ach":"1","enable_sofort":"1","enable_apple_pay":"1","enable_alipay":"1"}';
     }
 
-    public function testDecryption()
+    public function testDecryption(): void
     {
         $this->settings = encrypt($this->settings);
 

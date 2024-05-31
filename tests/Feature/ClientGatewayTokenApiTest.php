@@ -101,7 +101,7 @@ class ClientGatewayTokenApiTest extends TestCase
         $this->cg->save();
     }
 
-    public function testClientGatewayPostPost()
+    public function testClientGatewayPostPost(): void
     {
         $data = [
             'client_id' => $this->client->hashed_id,
@@ -121,7 +121,7 @@ class ClientGatewayTokenApiTest extends TestCase
         $this->assertNotNull($arr['data']['token']);
     }
 
-    public function testClientPut()
+    public function testClientPut(): void
     {
         $data = [
             'client_id' => $this->client->hashed_id,
@@ -155,7 +155,7 @@ class ClientGatewayTokenApiTest extends TestCase
         $this->assertEquals('a_testy_token', $arr['data']['token']);
     }
 
-    public function testClientGet()
+    public function testClientGet(): void
     {
         $data = [
             'client_id' => $this->client->hashed_id,

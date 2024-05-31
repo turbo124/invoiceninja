@@ -22,7 +22,7 @@ class RetryWebhookRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'entity' => 'required|bail|in:client,credit,invoice,product,task,payment,quote,purchase_order,expense,project,vendor',

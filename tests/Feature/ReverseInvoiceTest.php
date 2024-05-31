@@ -53,7 +53,7 @@ class ReverseInvoiceTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testReverseInvoice()
+    public function testReverseInvoice(): void
     {
         $amount = $this->invoice->amount;
         $balance = $this->invoice->balance;
@@ -126,7 +126,7 @@ class ReverseInvoiceTest extends TestCase
         //create a ledger row for this with the resulting Credit ( also include an explanation in the notes section )
     }
 
-    public function testReversalViaAPI()
+    public function testReversalViaAPI(): void
     {
         $this->assertEquals($this->client->balance, $this->invoice->balance);
 
@@ -150,7 +150,7 @@ class ReverseInvoiceTest extends TestCase
         $this->assertEquals($this->client->paid_to_date, ($client_paid_to_date));
     }
 
-    public function testReversalNoPayment()
+    public function testReversalNoPayment(): void
     {
         $this->assertEquals($this->client->balance, $this->invoice->balance);
 

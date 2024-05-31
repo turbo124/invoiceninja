@@ -19,14 +19,14 @@ class PaymentNotificationWebhookRequest extends Request
 {
     use MakesHash;
 
-    public function authorize()
+    public function authorize(): bool
     {
         MultiDB::findAndSetDbByCompanyKey($this->company_key);
 
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             //

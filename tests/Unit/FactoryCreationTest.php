@@ -50,7 +50,7 @@ class FactoryCreationTest extends TestCase
      *
      * @covers      App\Factory\ProductFactory
      */
-    public function testProductionCreation()
+    public function testProductionCreation(): void
     {
         $product = ProductFactory::create($this->company->id, $this->user->id);
         $product->save();
@@ -65,7 +65,7 @@ class FactoryCreationTest extends TestCase
      *
      * @covers      App\Factory\InvoiceFactory
      */
-    public function testInvoiceCreation()
+    public function testInvoiceCreation(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
 
@@ -85,7 +85,7 @@ class FactoryCreationTest extends TestCase
      *
      * @covers App\Factory\CloneInvoiceFactory
      */
-    public function testCloneInvoiceCreation()
+    public function testCloneInvoiceCreation(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
 
@@ -112,7 +112,7 @@ class FactoryCreationTest extends TestCase
      *
      * @covers App\Factory\ClientFactory
      */
-    public function testClientCreate()
+    public function testClientCreate(): void
     {
         $cliz = ClientFactory::create($this->company->id, $this->user->id);
 
@@ -128,7 +128,7 @@ class FactoryCreationTest extends TestCase
      *
      * @covers App\Factory\ClientContactFactory
      */
-    public function testClientContactCreate()
+    public function testClientContactCreate(): void
     {
         $cliz = ClientFactory::create($this->company->id, $this->user->id);
 
@@ -144,7 +144,7 @@ class FactoryCreationTest extends TestCase
      *
      * @covers App\Factory\UserFactory
      */
-    public function testUserCreate()
+    public function testUserCreate(): void
     {
         $new_user = UserFactory::create($this->account->id);
         $new_user->email = $this->faker->freeEmail();

@@ -42,7 +42,7 @@ class CompanySizeCheck implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if (! config('ninja.db.multi_db_enabled')) {
             Company::where('is_large', false)->withCount(['invoices', 'clients', 'products', 'quotes'])->cursor()->each(function ($company) {

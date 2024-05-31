@@ -38,7 +38,7 @@ class CreateCompanyPaymentTerms
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $paymentTerms = [
             ['num_days' => 0, 'name' => 'Net 0', 'company_id' => $this->company->id, 'user_id' => $this->user->id, 'created_at' => now(), 'updated_at' => now()],

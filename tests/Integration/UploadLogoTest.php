@@ -36,7 +36,7 @@ class UploadLogoTest extends TestCase
         Company::reguard();
     }
 
-    public function testLogoUploadWorks()
+    public function testLogoUploadWorks(): void
     {
         Storage::fake('avatars');
 
@@ -61,7 +61,7 @@ class UploadLogoTest extends TestCase
         $this->assertNotNull($logo_file);
     }
 
-    public function testLogoUploadfailure()
+    public function testLogoUploadfailure(): void
     {
         Storage::fake('avatars');
 
@@ -80,7 +80,7 @@ class UploadLogoTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testLogoUploadNoAttribute()
+    public function testLogoUploadNoAttribute(): void
     {
         Storage::fake('avatars');
 

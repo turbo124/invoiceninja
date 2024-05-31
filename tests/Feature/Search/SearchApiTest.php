@@ -39,7 +39,7 @@ class SearchApiTest extends TestCase
 
     }
 
-    public function testActivityEntity()
+    public function testActivityEntity(): void
     {
 
         $response = false;

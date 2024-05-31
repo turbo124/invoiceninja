@@ -27,7 +27,7 @@ class PaymentTypeTest extends TestCase
 
     }
 
-    public function testTranslationsExist()
+    public function testTranslationsExist(): void
     {
         $payment_type_class = new PaymentType;
 

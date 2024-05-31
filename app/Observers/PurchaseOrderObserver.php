@@ -23,7 +23,7 @@ class PurchaseOrderObserver
      *
      * @return void
      */
-    public function created(PurchaseOrder $purchase_order)
+    public function created(PurchaseOrder $purchase_order): void
     {
         $subscriptions = Webhook::where('company_id', $purchase_order->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_PURCHASE_ORDER)
@@ -39,7 +39,7 @@ class PurchaseOrderObserver
      *
      * @return void
      */
-    public function updated(PurchaseOrder $purchase_order)
+    public function updated(PurchaseOrder $purchase_order): void
     {
         $event = Webhook::EVENT_UPDATE_PURCHASE_ORDER;
 
@@ -65,7 +65,7 @@ class PurchaseOrderObserver
      *
      * @return void
      */
-    public function deleted(PurchaseOrder $purchase_order)
+    public function deleted(PurchaseOrder $purchase_order): void
     {
         if ($purchase_order->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class PurchaseOrderObserver
      *
      * @return void
      */
-    public function restored(PurchaseOrder $purchase_order)
+    public function restored(PurchaseOrder $purchase_order): void
     {
         //
     }
@@ -95,7 +95,7 @@ class PurchaseOrderObserver
      *
      * @return void
      */
-    public function forceDeleted(PurchaseOrder $purchase_order)
+    public function forceDeleted(PurchaseOrder $purchase_order): void
     {
         //
     }

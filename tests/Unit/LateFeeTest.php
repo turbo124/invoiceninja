@@ -93,7 +93,7 @@ class LateFeeTest extends TestCase
         return $client;
     }
 
-    public function testAddLateFeeAppropriately()
+    public function testAddLateFeeAppropriately(): void
     {
         $invoice_item = new InvoiceItem;
         $invoice_item->type_id = '5';
@@ -116,7 +116,7 @@ class LateFeeTest extends TestCase
 
     }
 
-    public function testModelBehaviourInsideMap()
+    public function testModelBehaviourInsideMap(): void
     {
         $i = Invoice::factory()->count(5)
             ->create([
@@ -191,7 +191,7 @@ class LateFeeTest extends TestCase
 
     }
 
-    public function testCollectionPassesIsArray()
+    public function testCollectionPassesIsArray(): void
     {
         $line_items = collect($this->invoice->line_items);
         $this->assertTrue(is_array($this->invoice->line_items));
@@ -199,7 +199,7 @@ class LateFeeTest extends TestCase
         $this->assertFalse(is_array($line_items));
     }
 
-    public function testLineItemResiliency()
+    public function testLineItemResiliency(): void
     {
         $line_count = count($this->invoice->line_items);
         $this->assertGreaterThan(0, $line_count);
@@ -211,7 +211,7 @@ class LateFeeTest extends TestCase
         $this->assertCount($line_count, $this->invoice->line_items);
     }
 
-    public function testCollectionAsLineItemArray()
+    public function testCollectionAsLineItemArray(): void
     {
 
         $i = Invoice::factory()->create([
@@ -268,7 +268,7 @@ class LateFeeTest extends TestCase
 
     }
 
-    public function testLateFeeRemovals()
+    public function testLateFeeRemovals(): void
     {
 
         $data = [];
@@ -400,7 +400,7 @@ class LateFeeTest extends TestCase
 
     }
 
-    public function testLateFeeAdded()
+    public function testLateFeeAdded(): void
     {
 
         $this->travelTo(now()->subDays(15));
@@ -462,7 +462,7 @@ class LateFeeTest extends TestCase
 
     }
 
-    public function testLateFeeAddedToNewInvoiceWithLockedInvoiceConfig()
+    public function testLateFeeAddedToNewInvoiceWithLockedInvoiceConfig(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -516,7 +516,7 @@ class LateFeeTest extends TestCase
         $this->assertEquals(20, $client->fresh()->balance);
     }
 
-    public function testLateFeeBalances()
+    public function testLateFeeBalances(): void
     {
         $this->assertEquals(10, $this->client->balance);
         $this->assertEquals(10, $this->invoice->balance);

@@ -59,7 +59,7 @@ class ClientApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testBulkUpdates()
+    public function testBulkUpdates(): void
     {
         Client::factory()->count(3)->create([
             'company_id' => $this->company->id,
@@ -85,7 +85,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCountryCodeValidation()
+    public function testCountryCodeValidation(): void
     {
 
         $data = [
@@ -130,7 +130,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testIdNumberPutValidation()
+    public function testIdNumberPutValidation(): void
     {
 
         $data = [
@@ -169,7 +169,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testNumberPutValidation()
+    public function testNumberPutValidation(): void
     {
 
         $data = [
@@ -208,7 +208,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testNumberValidation()
+    public function testNumberValidation(): void
     {
         $data = [
             'name' => 'name of client',
@@ -260,7 +260,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCountryStore4()
+    public function testCountryStore4(): void
     {
         $data = [
             'name' => 'name of client',
@@ -278,7 +278,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCountryStore3()
+    public function testCountryStore3(): void
     {
         $data = [
             'name' => 'name of client',
@@ -292,7 +292,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCountryStore2()
+    public function testCountryStore2(): void
     {
         $data = [
             'name' => 'name of client',
@@ -306,7 +306,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCountryStore()
+    public function testCountryStore(): void
     {
         $data = [
             'name' => 'name of client',
@@ -324,7 +324,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores8()
+    public function testCurrencyStores8(): void
     {
         $data = [
             'name' => 'name of client',
@@ -344,7 +344,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores7()
+    public function testCurrencyStores7(): void
     {
         $data = [
             'name' => 'name of client',
@@ -364,7 +364,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores6()
+    public function testCurrencyStores6(): void
     {
         $data = [
             'name' => 'name of client',
@@ -384,7 +384,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores5()
+    public function testCurrencyStores5(): void
     {
         $data = [
             'name' => 'name of client',
@@ -404,7 +404,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores4()
+    public function testCurrencyStores4(): void
     {
         $data = [
             'name' => 'name of client',
@@ -424,7 +424,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores3()
+    public function testCurrencyStores3(): void
     {
         $data = [
             'name' => 'name of client',
@@ -444,7 +444,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores2()
+    public function testCurrencyStores2(): void
     {
         $data = [
             'name' => 'name of client',
@@ -464,7 +464,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCurrencyStores()
+    public function testCurrencyStores(): void
     {
         $data = [
             'name' => 'name of client',
@@ -482,7 +482,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testDocumentValidation()
+    public function testDocumentValidation(): void
     {
         $data = [
             'name' => 'name of client',
@@ -496,7 +496,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testDocumentValidationFails()
+    public function testDocumentValidationFails(): void
     {
         $data = [
             'name' => 'name of client',
@@ -520,7 +520,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testDocumentValidationPutFails()
+    public function testDocumentValidationPutFails(): void
     {
         $data = [
             'name' => 'name of client',
@@ -554,7 +554,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testClientDocumentQuery()
+    public function testClientDocumentQuery(): void
     {
 
         $d = \App\Models\Document::factory()->create([
@@ -684,7 +684,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testCrossCompanyBulkActionsFail()
+    public function testCrossCompanyBulkActionsFail(): void
     {
         $account = Account::factory()->create([
             'hosted_client_count' => 1000,
@@ -748,7 +748,7 @@ class ClientApiTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testClientBulkActionValidation()
+    public function testClientBulkActionValidation(): void
     {
         $data = [
             'action' => 'muppet',
@@ -785,7 +785,7 @@ class ClientApiTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testClientStatement()
+    public function testClientStatement(): void
     {
         $response = null;
 
@@ -809,7 +809,7 @@ class ClientApiTest extends TestCase
 
     }
 
-    public function testClientStatementEmail()
+    public function testClientStatementEmail(): void
     {
         $response = null;
 
@@ -839,7 +839,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCsvImportRepositoryPersistance()
+    public function testCsvImportRepositoryPersistance(): void
     {
         Client::unguard();
 
@@ -906,7 +906,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals('3', $c->settings->currency_id);
     }
 
-    public function testClientSettingsSave()
+    public function testClientSettingsSave(): void
     {
         $std = new \stdClass;
         $std->entity = \App\Models\Client::class;
@@ -919,7 +919,7 @@ class ClientApiTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testClientSettingsSave2()
+    public function testClientSettingsSave2(): void
     {
         $std = new \stdClass;
         $std->entity = \App\Models\Client::class;
@@ -934,7 +934,7 @@ class ClientApiTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testClientStoreValidation()
+    public function testClientStoreValidation(): void
     {
         auth()->login($this->user, false);
         auth()->user()->setCompany($this->company);
@@ -1006,7 +1006,7 @@ class ClientApiTest extends TestCase
         $this->assertFalse($validator->fails());
     }
 
-    public function testClientImportDataStructure()
+    public function testClientImportDataStructure(): void
     {
         $data = [
             'company_id' => $this->company->id,
@@ -1065,7 +1065,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals('3', $c->settings->currency_id);
     }
 
-    public function testClientCsvImport()
+    public function testClientCsvImport(): void
     {
         $settings = ClientSettings::defaults();
         $settings->currency_id = '840';
@@ -1108,7 +1108,7 @@ class ClientApiTest extends TestCase
         $c->saveQuietly();
     }
 
-    public function testIllegalPropertiesInClientSettings()
+    public function testIllegalPropertiesInClientSettings(): void
     {
         $settings = [
             'currency_id' => '1',
@@ -1140,7 +1140,7 @@ class ClientApiTest extends TestCase
         $this->assertFalse(array_key_exists('translations', $arr['data']['settings']));
     }
 
-    public function testClientLanguageCodeIllegal()
+    public function testClientLanguageCodeIllegal(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1167,7 +1167,7 @@ class ClientApiTest extends TestCase
         $this->assertFalse(array_key_exists('language_id', $arr['data']['settings']));
     }
 
-    public function testClientLanguageCodeValidationTrue()
+    public function testClientLanguageCodeValidationTrue(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1194,7 +1194,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals('3', $arr['data']['settings']['language_id']);
     }
 
-    public function testClientCountryCodeValidationTrue()
+    public function testClientCountryCodeValidationTrue(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1217,7 +1217,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientNoneValidation()
+    public function testClientNoneValidation(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1239,7 +1239,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientNullValidation()
+    public function testClientNullValidation(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1261,7 +1261,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientCountryCodeValidationTrueIso3()
+    public function testClientCountryCodeValidationTrueIso3(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1284,7 +1284,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientCountryCodeValidationFalse()
+    public function testClientCountryCodeValidationFalse(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1300,7 +1300,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientPost()
+    public function testClientPost(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1314,7 +1314,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testDuplicateNumberCatch()
+    public function testDuplicateNumberCatch(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1336,7 +1336,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testClientPut()
+    public function testClientPut(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1365,7 +1365,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testClientGet()
+    public function testClientGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -1375,7 +1375,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientNotArchived()
+    public function testClientNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -1387,7 +1387,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testClientArchived()
+    public function testClientArchived(): void
     {
         $data = [
             'ids' => [$this->client->hashed_id],
@@ -1410,7 +1410,7 @@ class ClientApiTest extends TestCase
         }
     }
 
-    public function testClientRestored()
+    public function testClientRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->client->id)],
@@ -1426,7 +1426,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testClientDeleted()
+    public function testClientDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->client->id)],
@@ -1442,7 +1442,7 @@ class ClientApiTest extends TestCase
         $this->assertTrue($arr['data'][0]['is_deleted']);
     }
 
-    public function testClientCurrencyCodeValidationTrue()
+    public function testClientCurrencyCodeValidationTrue(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1458,7 +1458,7 @@ class ClientApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientCurrencyCodeValidationFalse()
+    public function testClientCurrencyCodeValidationFalse(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -1476,7 +1476,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals($this->company->settings->country_id, $arr['data']['country_id']);
     }
 
-    public function testRoundingDecimalsTwo()
+    public function testRoundingDecimalsTwo(): void
     {
         $currency = $this->company;
 
@@ -1485,7 +1485,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.05, $x);
     }
 
-    public function testRoundingDecimalsThree()
+    public function testRoundingDecimalsThree(): void
     {
         $currency = $this->company;
 
@@ -1494,7 +1494,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.005, $x);
     }
 
-    public function testRoundingDecimalsFour()
+    public function testRoundingDecimalsFour(): void
     {
         $currency = $this->company;
 
@@ -1503,7 +1503,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.0005, $x);
     }
 
-    public function testRoundingDecimalsFive()
+    public function testRoundingDecimalsFive(): void
     {
         $currency = $this->company;
 
@@ -1512,7 +1512,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.00005, $x);
     }
 
-    public function testRoundingDecimalsSix()
+    public function testRoundingDecimalsSix(): void
     {
         $currency = $this->company;
 
@@ -1521,7 +1521,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.000005, $x);
     }
 
-    public function testRoundingDecimalsSeven()
+    public function testRoundingDecimalsSeven(): void
     {
         $currency = $this->company;
 
@@ -1530,7 +1530,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.0000005, $x);
     }
 
-    public function testRoundingDecimalsEight()
+    public function testRoundingDecimalsEight(): void
     {
         $currency = $this->company;
 
@@ -1539,7 +1539,7 @@ class ClientApiTest extends TestCase
         $this->assertEquals(0.00000005, $x);
     }
 
-    public function testRoundingPositive()
+    public function testRoundingPositive(): void
     {
         $currency = $this->company;
 

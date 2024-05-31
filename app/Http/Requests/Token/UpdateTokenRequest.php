@@ -25,7 +25,7 @@ class UpdateTokenRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => 'required',

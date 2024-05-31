@@ -42,7 +42,7 @@ class InventoryManagementTest extends TestCase
         }
     }
 
-    public function testInventoryMovements()
+    public function testInventoryMovements(): void
     {
         $product = Product::factory()->create([
             'user_id' => $this->user->id,

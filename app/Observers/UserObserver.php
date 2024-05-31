@@ -21,7 +21,7 @@ class UserObserver
      *
      * @return void
      */
-    public function created(User $user)
+    public function created(User $user): void
     {
         if (Ninja::isHosted() && isset($user->phone)) {
             VerifyPhone::dispatch($user);
@@ -33,7 +33,7 @@ class UserObserver
      *
      * @return void
      */
-    public function updated(User $user)
+    public function updated(User $user): void
     {
         if (Ninja::isHosted() && $user->isDirty('email') && $user->company_users()->where('is_owner', true)->exists()) {
             //ensure they are owner user and update email on file.
@@ -48,7 +48,7 @@ class UserObserver
      *
      * @return void
      */
-    public function deleted(User $user)
+    public function deleted(User $user): void
     {
         //
     }
@@ -58,7 +58,7 @@ class UserObserver
      *
      * @return void
      */
-    public function restored(User $user)
+    public function restored(User $user): void
     {
         //
     }
@@ -68,7 +68,7 @@ class UserObserver
      *
      * @return void
      */
-    public function forceDeleted(User $user)
+    public function forceDeleted(User $user): void
     {
         //
     }

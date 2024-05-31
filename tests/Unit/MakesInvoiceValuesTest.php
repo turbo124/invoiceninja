@@ -19,7 +19,7 @@ use Tests\TestCase;
  */
 class MakesInvoiceValuesTest extends TestCase
 {
-    public function testStrReplaceArray()
+    public function testStrReplaceArray(): void
     {
         $columns = ['custom_invoice_label3'];
 
@@ -39,7 +39,7 @@ class MakesInvoiceValuesTest extends TestCase
         $this->assertFalse(in_array('custom_invoice_value1', $columns));
     }
 
-    public function testFilteringItemTaxes()
+    public function testFilteringItemTaxes(): void
     {
         $taxes = collect();
 

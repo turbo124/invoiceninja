@@ -12,7 +12,7 @@ class ShowCreditRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return ! $this->credit->is_deleted
             && auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_CREDITS
@@ -24,7 +24,7 @@ class ShowCreditRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

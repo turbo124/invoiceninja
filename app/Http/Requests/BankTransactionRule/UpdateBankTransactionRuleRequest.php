@@ -25,7 +25,7 @@ class UpdateBankTransactionRuleRequest extends Request
         return auth()->user()->can('edit', $this->bank_transaction_rule);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /* Ensure we have a client name, and that all emails are unique*/
         $rules = [

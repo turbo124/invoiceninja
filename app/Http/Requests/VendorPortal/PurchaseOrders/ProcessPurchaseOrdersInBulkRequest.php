@@ -16,12 +16,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ProcessPurchaseOrdersInBulkRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('vendor')->user()->vendor->company->enabled_modules & PortalComposer::MODULE_PURCHASE_ORDERS;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'purchase_orders' => ['array'],

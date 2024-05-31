@@ -19,7 +19,7 @@ class AccountObserver
      *
      * @return void
      */
-    public function created(Account $account)
+    public function created(Account $account): void
     {
         //
     }
@@ -29,7 +29,7 @@ class AccountObserver
      *
      * @return void
      */
-    public function updated(Account $account)
+    public function updated(Account $account): void
     {
         //
     }
@@ -39,7 +39,7 @@ class AccountObserver
      *
      * @return void
      */
-    public function deleted(Account $account)
+    public function deleted(Account $account): void
     {
         //
     }
@@ -49,7 +49,7 @@ class AccountObserver
      *
      * @return void
      */
-    public function restored(Account $account)
+    public function restored(Account $account): void
     {
         //
     }
@@ -59,7 +59,7 @@ class AccountObserver
      *
      * @return void
      */
-    public function forceDeleted(Account $account)
+    public function forceDeleted(Account $account): void
     {
         //
     }

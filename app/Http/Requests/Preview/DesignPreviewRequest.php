@@ -39,7 +39,7 @@ class DesignPreviewRequest extends Request
                $user->can('create', PurchaseOrder::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'entity_type' => 'bail|required|in:invoice,quote,credit,purchase_order,statement,payment_receipt,payment_refund,delivery_note',

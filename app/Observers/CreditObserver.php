@@ -24,7 +24,7 @@ class CreditObserver
      *
      * @return void
      */
-    public function created(Credit $credit)
+    public function created(Credit $credit): void
     {
         $subscriptions = Webhook::where('company_id', $credit->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_CREDIT)
@@ -40,7 +40,7 @@ class CreditObserver
      *
      * @return void
      */
-    public function updated(Credit $credit)
+    public function updated(Credit $credit): void
     {
         $event = Webhook::EVENT_UPDATE_CREDIT;
 
@@ -66,7 +66,7 @@ class CreditObserver
      *
      * @return void
      */
-    public function deleted(Credit $credit)
+    public function deleted(Credit $credit): void
     {
         if ($credit->is_deleted) {
             return;
@@ -86,7 +86,7 @@ class CreditObserver
      *
      * @return void
      */
-    public function restored(Credit $credit)
+    public function restored(Credit $credit): void
     {
         //
     }
@@ -96,7 +96,7 @@ class CreditObserver
      *
      * @return void
      */
-    public function forceDeleted(Credit $credit)
+    public function forceDeleted(Credit $credit): void
     {
         //
     }

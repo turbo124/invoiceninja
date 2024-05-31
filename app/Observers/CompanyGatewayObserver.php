@@ -12,7 +12,7 @@ class CompanyGatewayObserver
      *
      * @return void
      */
-    public function created(CompanyGateway $company_gateway)
+    public function created(CompanyGateway $company_gateway): void
     {
         /* Set company gateway if not exists*/
         if (! $company_gateway->label) {
@@ -26,7 +26,7 @@ class CompanyGatewayObserver
      *
      * @return void
      */
-    public function updated(CompanyGateway $company_gateway)
+    public function updated(CompanyGateway $company_gateway): void
     {
         //
     }
@@ -36,7 +36,7 @@ class CompanyGatewayObserver
      *
      * @return void
      */
-    public function deleted(CompanyGateway $company_gateway)
+    public function deleted(CompanyGateway $company_gateway): void
     {
         //when we soft delete a gateway - we also soft delete the tokens
         $company_gateway->client_gateway_tokens()->delete();
@@ -47,7 +47,7 @@ class CompanyGatewayObserver
      *
      * @return void
      */
-    public function restored(CompanyGateway $company_gateway)
+    public function restored(CompanyGateway $company_gateway): void
     {
         //When we restore the gateway, bring back the tokens!
         ClientGatewayToken::query()->where('company_gateway_id', $company_gateway->id)
@@ -61,7 +61,7 @@ class CompanyGatewayObserver
      *
      * @return void
      */
-    public function forceDeleted(CompanyGateway $company_gateway)
+    public function forceDeleted(CompanyGateway $company_gateway): void
     {
         //
     }

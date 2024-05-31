@@ -25,7 +25,7 @@ class UploadClientRequest extends Request
         return $user->can('edit', $this->client);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

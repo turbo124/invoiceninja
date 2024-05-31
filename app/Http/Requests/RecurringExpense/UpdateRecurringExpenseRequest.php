@@ -28,7 +28,7 @@ class UpdateRecurringExpenseRequest extends Request
         return auth()->user()->can('edit', $this->recurring_expense);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /* Ensure we have a client name, and that all emails are unique*/
 
@@ -60,7 +60,7 @@ class UpdateRecurringExpenseRequest extends Request
         return $this->globalRules($rules);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'unique' => ctrans('validation.unique', ['attribute' => 'email']),

@@ -23,7 +23,7 @@ class VendorObserver
      *
      * @return void
      */
-    public function created(Vendor $vendor)
+    public function created(Vendor $vendor): void
     {
         $subscriptions = Webhook::where('company_id', $vendor->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_VENDOR)
@@ -39,7 +39,7 @@ class VendorObserver
      *
      * @return void
      */
-    public function updated(Vendor $vendor)
+    public function updated(Vendor $vendor): void
     {
         $event = Webhook::EVENT_UPDATE_VENDOR;
 
@@ -65,7 +65,7 @@ class VendorObserver
      *
      * @return void
      */
-    public function deleted(Vendor $vendor)
+    public function deleted(Vendor $vendor): void
     {
         if ($vendor->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class VendorObserver
      *
      * @return void
      */
-    public function restored(Vendor $vendor)
+    public function restored(Vendor $vendor): void
     {
         //
     }
@@ -95,7 +95,7 @@ class VendorObserver
      *
      * @return void
      */
-    public function forceDeleted(Vendor $vendor)
+    public function forceDeleted(Vendor $vendor): void
     {
         //
     }

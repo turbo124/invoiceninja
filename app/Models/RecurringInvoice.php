@@ -10,6 +10,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use App\Helpers\Invoice\InvoiceSum;
 use App\Helpers\Invoice\InvoiceSumInclusive;
 use App\Models\Presenters\RecurringInvoicePresenter;
@@ -288,12 +290,12 @@ class RecurringInvoice extends BaseModel
         return $this->belongsTo(Vendor::class);
     }
 
-    public function activities()
+    public function activities(): HasMany
     {
         return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);
     }
 
-    public function history()
+    public function history(): HasManyThrough
     {
         return $this->hasManyThrough(Backup::class, Activity::class);
     }

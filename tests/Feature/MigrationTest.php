@@ -42,7 +42,7 @@ class MigrationTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCompanyExists()
+    public function testCompanyExists(): void
     {
         $co = Company::find($this->company->id);
 
@@ -50,7 +50,7 @@ class MigrationTest extends TestCase
         $this->assertNotNull($co);
     }
 
-    public function testThatCompanyDeletesCompletely()
+    public function testThatCompanyDeletesCompletely(): void
     {
         $company_id = $this->company->id;
 
@@ -63,7 +63,7 @@ class MigrationTest extends TestCase
         $this->assertNull($co);
     }
 
-    public function testCompanyChildDeletes()
+    public function testCompanyChildDeletes(): void
     {
         $this->makeTestData();
 

@@ -23,7 +23,7 @@ class InvoiceObserver
      *
      * @return void
      */
-    public function created(Invoice $invoice)
+    public function created(Invoice $invoice): void
     {
         $subscriptions = Webhook::where('company_id', $invoice->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_INVOICE)
@@ -39,7 +39,7 @@ class InvoiceObserver
      *
      * @return void
      */
-    public function updated(Invoice $invoice)
+    public function updated(Invoice $invoice): void
     {
         $event = Webhook::EVENT_UPDATE_INVOICE;
 
@@ -65,7 +65,7 @@ class InvoiceObserver
      *
      * @return void
      */
-    public function deleted(Invoice $invoice)
+    public function deleted(Invoice $invoice): void
     {
         if ($invoice->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class InvoiceObserver
      *
      * @return void
      */
-    public function restored(Invoice $invoice)
+    public function restored(Invoice $invoice): void
     {
         //
     }
@@ -95,7 +95,7 @@ class InvoiceObserver
      *
      * @return void
      */
-    public function forceDeleted(Invoice $invoice)
+    public function forceDeleted(Invoice $invoice): void
     {
         //
     }

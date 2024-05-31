@@ -16,13 +16,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ShowQuoteRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('contact')->user()->client->id === (int) $this->quote->client_id
              && auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_QUOTES;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             //

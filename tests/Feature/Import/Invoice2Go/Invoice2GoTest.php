@@ -46,7 +46,7 @@ class Invoice2GoTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testInvoice2GoImport()
+    public function testInvoice2GoImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/i2g_invoices.csv'

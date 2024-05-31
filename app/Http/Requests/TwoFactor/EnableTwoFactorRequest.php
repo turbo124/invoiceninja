@@ -23,7 +23,7 @@ class EnableTwoFactorRequest extends Request
 
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'secret' => 'bail|required|string',

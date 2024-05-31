@@ -33,7 +33,7 @@ class UnlinkFile implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         /* Do not delete files if we are on the sync queue*/
         if (config('queue.default') == 'sync') {

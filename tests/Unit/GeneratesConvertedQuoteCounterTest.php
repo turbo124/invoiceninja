@@ -52,7 +52,7 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
         Model::reguard();
     }
 
-    public function testCounterExtraction()
+    public function testCounterExtraction(): void
     {
         $this->account = Account::factory()->create([
             'hosted_client_count' => 1000,

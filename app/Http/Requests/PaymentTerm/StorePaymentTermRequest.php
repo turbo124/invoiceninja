@@ -32,7 +32,7 @@ class StorePaymentTermRequest extends Request
         $this->replace($input);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
 

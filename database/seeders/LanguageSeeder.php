@@ -16,7 +16,7 @@ use Illuminate\Database\Seeder;
 
 class LanguageSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         Model::unguard();
 

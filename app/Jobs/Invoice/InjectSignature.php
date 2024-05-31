@@ -28,7 +28,7 @@ class InjectSignature implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $invitation = false;
 

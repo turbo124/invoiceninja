@@ -15,7 +15,7 @@ use Illuminate\Translation\TranslationServiceProvider;
 
 class NinjaTranslationServiceProvider extends TranslationServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         /*
          * To reset the translator instance we call

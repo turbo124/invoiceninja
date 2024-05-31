@@ -23,7 +23,7 @@ class ClientContactObserver
      *
      * @return void
      */
-    public function created(ClientContact $clientContact)
+    public function created(ClientContact $clientContact): void
     {
         //
     }
@@ -33,7 +33,7 @@ class ClientContactObserver
      *
      * @return void
      */
-    public function updated(ClientContact $clientContact)
+    public function updated(ClientContact $clientContact): void
     {
         //
     }
@@ -43,7 +43,7 @@ class ClientContactObserver
      *
      * @return void
      */
-    public function deleted(ClientContact $clientContact)
+    public function deleted(ClientContact $clientContact): void
     {
         $client_contact_id = $clientContact->id;
 
@@ -84,7 +84,7 @@ class ClientContactObserver
      *
      * @return void
      */
-    public function restored(ClientContact $clientContact)
+    public function restored(ClientContact $clientContact): void
     {
     }
 
@@ -93,7 +93,7 @@ class ClientContactObserver
      *
      * @return void
      */
-    public function forceDeleted(ClientContact $clientContact)
+    public function forceDeleted(ClientContact $clientContact): void
     {
         //
     }

@@ -25,7 +25,7 @@ class SettingsSaverTest extends TestCase
         parent::setUp();
     }
 
-    public function testNullValueForStringTest()
+    public function testNullValueForStringTest(): void
     {
         $key = 'show_all_tasks_client_portal';
         $value = null;

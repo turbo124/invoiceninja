@@ -44,7 +44,7 @@ class PlanTest extends TestCase
         Model::reguard();
     }
 
-    public function testTrialFeatures()
+    public function testTrialFeatures(): void
     {
         config(['ninja.production' => true]);
 
@@ -64,7 +64,7 @@ class PlanTest extends TestCase
         $this->assertTrue($this->account->hasFeature(Account::FEATURE_CUSTOM_URL));
     }
 
-    public function testTrialFilter()
+    public function testTrialFilter(): void
     {
         $plans = collect(['trial_pro', 'trial_enterprise', 'no_freebies']);
 
@@ -75,7 +75,7 @@ class PlanTest extends TestCase
         $this->assertEquals($filtered_plans->count(), 2);
     }
 
-    public function testSubscriptionDateIncrement()
+    public function testSubscriptionDateIncrement(): void
     {
         $subscription = SubscriptionFactory::create($this->company->id, $this->user->id);
         $subscription->frequency_id = RecurringInvoice::FREQUENCY_MONTHLY;
@@ -88,7 +88,7 @@ class PlanTest extends TestCase
         $this->assertEquals($date->addMonthNoOverflow()->startOfDay(), $next_date->startOfDay());
     }
 
-    public function testLicense()
+    public function testLicense(): void
     {
         $this->markTestSkipped();
 

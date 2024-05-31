@@ -26,7 +26,7 @@ class RedisVsDatabaseTest extends TestCase
         // $this->markTestSkipped('Skip test no company gateways installed');
     }
 
-    public function testRedisSpeed()
+    public function testRedisSpeed(): void
     {
         $start = microtime(true);
 
@@ -43,7 +43,7 @@ class RedisVsDatabaseTest extends TestCase
         //0.0012960433959961
     }
 
-    public function testDbSpeed()
+    public function testDbSpeed(): void
     {
         $start = microtime(true);
 

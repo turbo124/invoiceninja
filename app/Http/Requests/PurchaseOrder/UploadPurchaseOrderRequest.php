@@ -25,7 +25,7 @@ class UploadPurchaseOrderRequest extends Request
         return $user->can('edit', $this->purchase_order);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

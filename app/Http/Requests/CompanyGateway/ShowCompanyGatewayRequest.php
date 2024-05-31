@@ -19,12 +19,12 @@ class ShowCompanyGatewayRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

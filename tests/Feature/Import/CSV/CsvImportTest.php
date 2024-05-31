@@ -48,7 +48,7 @@ class CsvImportTest extends TestCase
         auth()->login($this->user);
     }
 
-    public function testRecurringInvoiceImport()
+    public function testRecurringInvoiceImport(): void
     {
         /*Need to import clients first*/
         $csv = file_get_contents(
@@ -132,7 +132,7 @@ class CsvImportTest extends TestCase
 
     }
 
-    public function testExpenseCsvImport()
+    public function testExpenseCsvImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/expenses.csv'
@@ -163,7 +163,7 @@ class CsvImportTest extends TestCase
         $this->assertTrue($base_transformer->hasProject('officiis'));
     }
 
-    public function testVendorCsvImport()
+    public function testVendorCsvImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/vendors.csv'
@@ -198,7 +198,7 @@ class CsvImportTest extends TestCase
         $this->assertTrue($base_transformer->hasVendor('Ludwig Krajcik DVM'));
     }
 
-    public function testProductImport()
+    public function testProductImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/products.csv'
@@ -230,7 +230,7 @@ class CsvImportTest extends TestCase
         $this->assertTrue($base_transformer->hasProduct('officiis'));
     }
 
-    public function testClientImport()
+    public function testClientImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/clients.csv'
@@ -282,7 +282,7 @@ class CsvImportTest extends TestCase
         $this->assertEquals($client_id, $c->id);
     }
 
-    public function testInvoiceImport()
+    public function testInvoiceImport(): void
     {
         /*Need to import clients first*/
         $csv = file_get_contents(

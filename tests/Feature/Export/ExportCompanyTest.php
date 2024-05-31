@@ -43,7 +43,7 @@ class ExportCompanyTest extends TestCase
         }
     }
 
-    public function testCompanyExport()
+    public function testCompanyExport(): void
     {
         $res = (new CompanyExport($this->company, $this->company->users->first(), '123'))->handle();
 

@@ -40,7 +40,7 @@ class ClientModelTest extends TestCase
         }
     }
 
-    public function testPaymentMethodsWithCreditsEnforced()
+    public function testPaymentMethodsWithCreditsEnforced(): void
     {
         $amount = 40;
 

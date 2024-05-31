@@ -47,7 +47,7 @@ class MarkOpened implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $invitation = $this->entity::with('user', 'contact')
             ->whereMessageId($this->message_id)

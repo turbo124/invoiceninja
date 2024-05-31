@@ -46,7 +46,7 @@ class BankTransactionApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testBankTransactionCreate()
+    public function testBankTransactionCreate(): void
     {
         nlog('creeeeate');
 
@@ -58,7 +58,7 @@ class BankTransactionApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testBankTransactionGetClientStatus()
+    public function testBankTransactionGetClientStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -68,7 +68,7 @@ class BankTransactionApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testBankTransactionGet()
+    public function testBankTransactionGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -78,7 +78,7 @@ class BankTransactionApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testBankTransactionArchived()
+    public function testBankTransactionArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_transaction->id)],
@@ -94,7 +94,7 @@ class BankTransactionApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testBankTransactionRestored()
+    public function testBankTransactionRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_transaction->id)],
@@ -110,7 +110,7 @@ class BankTransactionApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testBankTransactionDeleted()
+    public function testBankTransactionDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_transaction->id)],
@@ -126,7 +126,7 @@ class BankTransactionApiTest extends TestCase
         $this->assertTrue($arr['data'][0]['is_deleted']);
     }
 
-    public function testBankTransactionUnlink()
+    public function testBankTransactionUnlink(): void
     {
         BankTransaction::truncate();
 

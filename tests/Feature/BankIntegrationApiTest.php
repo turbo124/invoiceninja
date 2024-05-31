@@ -41,7 +41,7 @@ class BankIntegrationApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testBankIntegrationPost()
+    public function testBankIntegrationPost(): void
     {
         $data = [
             'bank_account_name' => 'Nuevo Banko',
@@ -54,7 +54,7 @@ class BankIntegrationApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testBankIntegrationGet()
+    public function testBankIntegrationGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -64,7 +64,7 @@ class BankIntegrationApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testBankIntegrationArchived()
+    public function testBankIntegrationArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_integration->id)],
@@ -80,7 +80,7 @@ class BankIntegrationApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testBankIntegrationRestored()
+    public function testBankIntegrationRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_integration->id)],
@@ -96,7 +96,7 @@ class BankIntegrationApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testBankIntegrationDeleted()
+    public function testBankIntegrationDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->bank_integration->id)],

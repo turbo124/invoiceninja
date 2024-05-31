@@ -23,7 +23,7 @@ class PaymentObserver
      *
      * @return void
      */
-    public function created(Payment $payment)
+    public function created(Payment $payment): void
     {
         $subscriptions = Webhook::where('company_id', $payment->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_PAYMENT)
@@ -39,7 +39,7 @@ class PaymentObserver
      *
      * @return void
      */
-    public function updated(Payment $payment)
+    public function updated(Payment $payment): void
     {
         $event = Webhook::EVENT_UPDATE_PAYMENT;
 
@@ -65,7 +65,7 @@ class PaymentObserver
      *
      * @return void
      */
-    public function deleted(Payment $payment)
+    public function deleted(Payment $payment): void
     {
         if ($payment->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class PaymentObserver
      *
      * @return void
      */
-    public function restored(Payment $payment)
+    public function restored(Payment $payment): void
     {
         //
     }
@@ -95,7 +95,7 @@ class PaymentObserver
      *
      * @return void
      */
-    public function forceDeleted(Payment $payment)
+    public function forceDeleted(Payment $payment): void
     {
         //
     }

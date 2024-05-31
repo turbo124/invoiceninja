@@ -19,7 +19,7 @@ class RecurringExpenseFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'amount' => $this->faker->numberBetween(1, 10),

@@ -77,7 +77,7 @@ class StartMigration implements ShouldQueue
      *
      * @return bool
      */
-    public function handle()
+    public function handle(): bool
     {
         nlog('Inside Migration Job');
 

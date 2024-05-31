@@ -98,7 +98,7 @@ class GoCardlessInstantBankPaymentTest extends TestCase
         );
     }
 
-    public function testWebhookProcessingWithGoCardless()
+    public function testWebhookProcessingWithGoCardless(): void
     {
         $this->assertIsArray($this->mock);
 
@@ -113,7 +113,7 @@ class GoCardlessInstantBankPaymentTest extends TestCase
         // mock the invoice and the payment hash
     }
 
-    public function testInvoiceDelayedNotificationPayment()
+    public function testInvoiceDelayedNotificationPayment(): void
     {
         $gocardlesspayment = new \stdClass;
         $links = new \stdClass;

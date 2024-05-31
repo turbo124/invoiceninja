@@ -34,7 +34,7 @@ class StoreRecurringQuoteRequest extends Request
         return $user->can('create', RecurringQuote::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User auth()->user() */
@@ -94,7 +94,7 @@ class StoreRecurringQuoteRequest extends Request
         return false;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [];
     }

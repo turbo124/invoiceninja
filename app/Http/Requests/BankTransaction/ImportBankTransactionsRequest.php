@@ -22,7 +22,7 @@ class ImportBankTransactionsRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'transactions' => 'bail|array',

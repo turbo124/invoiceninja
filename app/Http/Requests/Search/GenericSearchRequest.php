@@ -22,7 +22,7 @@ class GenericSearchRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'search' => 'bail|sometimes|string',

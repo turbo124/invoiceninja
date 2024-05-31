@@ -25,7 +25,7 @@ class UploadQuoteRequest extends Request
         return $user->can('edit', $this->quote);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

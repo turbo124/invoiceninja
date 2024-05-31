@@ -20,7 +20,7 @@ use Tests\TestCase;
  */
 class NumberTest extends TestCase
 {
-    public function testRangeOfNumberFormats()
+    public function testRangeOfNumberFormats(): void
     {
 
         $floatvals = [
@@ -71,7 +71,7 @@ class NumberTest extends TestCase
 
     }
 
-    public function testThreeDecimalFloatAsTax()
+    public function testThreeDecimalFloatAsTax(): void
     {
 
         $value = '9.975';
@@ -82,7 +82,7 @@ class NumberTest extends TestCase
 
     }
 
-    public function testNegativeFloatParse()
+    public function testNegativeFloatParse(): void
     {
 
         $value = '-22,00';
@@ -113,7 +113,7 @@ class NumberTest extends TestCase
 
     }
 
-    public function testConvertDecimalCommaFloats()
+    public function testConvertDecimalCommaFloats(): void
     {
         $value = '22,00';
 
@@ -141,7 +141,7 @@ class NumberTest extends TestCase
 
     }
 
-    public function testFloatPrecision()
+    public function testFloatPrecision(): void
     {
         $value = 1.1;
 
@@ -152,7 +152,7 @@ class NumberTest extends TestCase
         $this->assertEquals(1.1, $result);
     }
 
-    public function testFloatPrecision1()
+    public function testFloatPrecision1(): void
     {
         $value = '1.1';
 
@@ -163,7 +163,7 @@ class NumberTest extends TestCase
         $this->assertEquals(1.1, $result);
     }
 
-    public function testFloatPrecision2()
+    public function testFloatPrecision2(): void
     {
         $value = 9.975;
 
@@ -174,7 +174,7 @@ class NumberTest extends TestCase
         $this->assertEquals(9.975, $result);
     }
 
-    public function testFloatPrecision3()
+    public function testFloatPrecision3(): void
     {
         $value = '9.975';
 
@@ -185,28 +185,28 @@ class NumberTest extends TestCase
         $this->assertEquals(9.975, $result);
     }
 
-    public function testRoundingThreeLow()
+    public function testRoundingThreeLow(): void
     {
         $rounded = Number::roundValue(3.144444444444, 3);
 
         $this->assertEquals(3.144, $rounded);
     }
 
-    public function testRoundingThreeHigh()
+    public function testRoundingThreeHigh(): void
     {
         $rounded = Number::roundValue(3.144944444444, 3);
 
         $this->assertEquals(3.145, $rounded);
     }
 
-    public function testRoundingTwoLow()
+    public function testRoundingTwoLow(): void
     {
         $rounded = Number::roundValue(2.145);
 
         $this->assertEquals(2.15, $rounded);
     }
 
-    public function testParsingStringCurrency()
+    public function testParsingStringCurrency(): void
     {
         $amount = '€7,99';
 
@@ -215,7 +215,7 @@ class NumberTest extends TestCase
         $this->assertEquals(7.99, $converted_amount);
     }
 
-    public function testMultiCommaNumber()
+    public function testMultiCommaNumber(): void
     {
         $amount = '100,100.00';
 
@@ -224,7 +224,7 @@ class NumberTest extends TestCase
         $this->assertEquals(100100, $converted_amount);
     }
 
-    public function testMultiDecimalNumber()
+    public function testMultiDecimalNumber(): void
     {
         $amount = '100.1000.000,00';
 

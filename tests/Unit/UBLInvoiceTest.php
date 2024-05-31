@@ -36,7 +36,7 @@ class UBLInvoiceTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testUblGenerates()
+    public function testUblGenerates(): void
     {
         $ubl = (new CreateUbl($this->invoice))->handle();
         $this->assertNotNull($ubl);

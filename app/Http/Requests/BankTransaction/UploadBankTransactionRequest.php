@@ -25,7 +25,7 @@ class UploadBankTransactionRequest extends Request
         return $user->can('edit', $this->bank_transaction);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

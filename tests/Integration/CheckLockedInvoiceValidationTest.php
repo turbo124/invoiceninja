@@ -32,7 +32,7 @@ class CheckLockedInvoiceValidationTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testValidationWorksForLockedInvoiceWhenOff()
+    public function testValidationWorksForLockedInvoiceWhenOff(): void
     {
         $invoice_update = [
             'po_number' => 'test',

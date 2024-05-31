@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,7 @@ class PhantomSecret
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (config('ninja.phantomjs_secret') && $request->has('phantomjs_secret') && (config('ninja.phantomjs_secret') == $request->input('phantomjs_secret'))) {
             return $next($request);

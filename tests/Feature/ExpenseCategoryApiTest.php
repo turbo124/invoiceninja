@@ -41,7 +41,7 @@ class ExpenseCategoryApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testExpenseCategoryPost()
+    public function testExpenseCategoryPost(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -55,7 +55,7 @@ class ExpenseCategoryApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testExpenseCategoryPut()
+    public function testExpenseCategoryPut(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -69,7 +69,7 @@ class ExpenseCategoryApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testExpenseCategoryGet()
+    public function testExpenseCategoryGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -79,7 +79,7 @@ class ExpenseCategoryApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testExpenseCategoryNotArchived()
+    public function testExpenseCategoryNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -91,7 +91,7 @@ class ExpenseCategoryApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testExpenseCategoryArchived()
+    public function testExpenseCategoryArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->expense_category->id)],
@@ -107,7 +107,7 @@ class ExpenseCategoryApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testExpenseCategoryRestored()
+    public function testExpenseCategoryRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->expense_category->id)],
@@ -123,7 +123,7 @@ class ExpenseCategoryApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testExpenseCategoryDeleted()
+    public function testExpenseCategoryDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->expense_category->id)],

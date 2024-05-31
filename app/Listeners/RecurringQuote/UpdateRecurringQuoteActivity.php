@@ -34,7 +34,7 @@ class UpdateRecurringQuoteActivity implements ShouldQueue
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle($event): void
     {
         MultiDB::setDB($event->company->db);
 

@@ -32,7 +32,7 @@ class PasswordTimeoutTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testFalseResponse()
+    public function testFalseResponse(): void
     {
 
         $response = $this->withHeaders([
@@ -43,7 +43,7 @@ class PasswordTimeoutTest extends TestCase
 
     }
 
-    public function testTrueResponse()
+    public function testTrueResponse(): void
     {
         Cache::put($this->user->hashed_id.'_'.$this->user->account_id.'_logged_in', true, 3600);
 

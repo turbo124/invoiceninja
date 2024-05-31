@@ -64,7 +64,7 @@ class InvoiceInclusiveTest extends TestCase
         return $line_items;
     }
 
-    public function testInvoiceTotals()
+    public function testInvoiceTotals(): void
     {
 
         $this->invoice_calc = new InvoiceSumInclusive($this->invoice);
@@ -74,7 +74,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getTotal(), 20);
     }
 
-    public function testInvoiceTotalsWithDiscount()
+    public function testInvoiceTotalsWithDiscount(): void
     {
         $this->invoice->discount = 5;
 
@@ -86,7 +86,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getBalance(), 15);
     }
 
-    public function testInvoiceTotalsWithDiscountWithSurcharge()
+    public function testInvoiceTotalsWithDiscountWithSurcharge(): void
     {
         $this->invoice->discount = 5;
         $this->invoice->custom_surcharge1 = 5;
@@ -99,7 +99,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getBalance(), 20);
     }
 
-    public function testInvoiceTotalsWithDiscountWithSurchargeWithInclusiveTax()
+    public function testInvoiceTotalsWithDiscountWithSurchargeWithInclusiveTax(): void
     {
         $this->invoice->discount = 5;
         $this->invoice->custom_surcharge1 = 5;
@@ -117,7 +117,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($calc->getBalance(), 20);
     }
 
-    public function testInvoiceTotalsWithPercentDiscountWithSurchargeWithInclusiveTax()
+    public function testInvoiceTotalsWithPercentDiscountWithSurchargeWithInclusiveTax(): void
     {
         $this->invoice->discount = 5;
         $this->invoice->custom_surcharge1 = 5;
@@ -133,7 +133,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getTotal(), 24);
     }
 
-    public function testInvoiceTotalsWithDiscountWithSurchargeWithExclusiveTax()
+    public function testInvoiceTotalsWithDiscountWithSurchargeWithExclusiveTax(): void
     {
         $this->invoice->discount = 5;
         $this->invoice->custom_surcharge1 = 5;
@@ -151,7 +151,7 @@ class InvoiceInclusiveTest extends TestCase
         //$this->assertEquals($this->invoice_calc->getTotalTaxes(), 1.5);
     }
 
-    public function testInvoiceTotalsWithDiscountWithSurchargeWithDoubleExclusiveTax()
+    public function testInvoiceTotalsWithDiscountWithSurchargeWithDoubleExclusiveTax(): void
     {
         $this->invoice->discount = 5;
         $this->invoice->custom_surcharge1 = 5;
@@ -170,7 +170,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getTotalTaxes(), 2.72);
     }
 
-    public function testLineItemTaxRatesInclusiveTaxes()
+    public function testLineItemTaxRatesInclusiveTaxes(): void
     {
         $line_items = [];
 
@@ -213,7 +213,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getBalance(), 20);
     }
 
-    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxes()
+    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxes(): void
     {
         $line_items = [];
 
@@ -255,7 +255,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getBalance(), 20);
     }
 
-    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxesAndDiscounts()
+    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxesAndDiscounts(): void
     {
         $line_items = [];
 
@@ -305,7 +305,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getBalance(), 18.05);
     }
 
-    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxesAndAmountDiscounts()
+    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxesAndAmountDiscounts(): void
     {
         $line_items = [];
 
@@ -353,7 +353,7 @@ class InvoiceInclusiveTest extends TestCase
         $this->assertEquals($this->invoice_calc->getBalance(), 5);
     }
 
-    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxesAndAmountDiscountsWithLargeCosts()
+    public function testLineItemTaxRatesInclusiveTaxesWithInvoiceTaxesAndAmountDiscountsWithLargeCosts(): void
     {
         $line_items = [];
 

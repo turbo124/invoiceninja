@@ -46,7 +46,7 @@ class DesignUpdate extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         //always return state to first DB
 

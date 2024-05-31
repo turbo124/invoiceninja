@@ -19,7 +19,7 @@ class UpdateAccountRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return (auth()->user()->isAdmin() || auth()->user()->isOwner()) && ($this->account->id == auth()->user()->token()->account_id);
     }
@@ -29,7 +29,7 @@ class UpdateAccountRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'set_react_as_default_ap' => 'required|bail|bool',

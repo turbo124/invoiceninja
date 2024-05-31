@@ -31,7 +31,7 @@ class ShopProfileTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testProfileDisplays()
+    public function testProfileDisplays(): void
     {
         $this->company->enable_shop_api = true;
         $this->company->save();

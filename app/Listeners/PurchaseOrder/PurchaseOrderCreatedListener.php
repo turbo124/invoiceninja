@@ -35,7 +35,7 @@ class PurchaseOrderCreatedListener implements ShouldQueue
      *
      * @return void
      */
-    public function handle(PurchaseOrderWasCreated $event)
+    public function handle(PurchaseOrderWasCreated $event): void
     {
         MultiDB::setDb($event->company->db);
 

@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class SentryTest extends TestCase
 {
-    public function testSentryFiresAppropriately()
+    public function testSentryFiresAppropriately(): void
     {
         $e = new \Exception('Test Fire');
         app('sentry')->captureException($e);

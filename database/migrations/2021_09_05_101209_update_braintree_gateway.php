@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if ($gateway = Gateway::find(50)) {
             $fields = json_decode($gateway->fields);

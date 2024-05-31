@@ -10,6 +10,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Events\Invoice\InvoiceReminderWasEmailed;
 use App\Events\Invoice\InvoiceWasEmailed;
 use App\Helpers\Invoice\InvoiceSum;
@@ -264,7 +266,7 @@ class Invoice extends BaseModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Company>
      */
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
@@ -346,7 +348,7 @@ class Invoice extends BaseModel
         return $this->morphMany(CompanyLedger::class, 'company_ledgerable');
     }
 
-    public function activities()
+    public function activities(): HasMany
     {
         return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);
     }

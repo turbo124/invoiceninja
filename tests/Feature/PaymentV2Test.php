@@ -56,7 +56,7 @@ class PaymentV2Test extends TestCase
         );
     }
 
-    public function testUsingDraftCreditsForPayments()
+    public function testUsingDraftCreditsForPayments(): void
     {
 
         $invoice = Invoice::factory()->create([
@@ -128,7 +128,7 @@ class PaymentV2Test extends TestCase
 
     }
 
-    public function testStorePaymentWithCreditsThenDeletingInvoices()
+    public function testStorePaymentWithCreditsThenDeletingInvoices(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id, 'balance' => 20, 'paid_to_date' => 0]);
         ClientContact::factory()->create([
@@ -261,7 +261,7 @@ class PaymentV2Test extends TestCase
 
     }
 
-    public function testStorePaymentWithCreditsThenDeletingInvoicesAndThenPayments()
+    public function testStorePaymentWithCreditsThenDeletingInvoicesAndThenPayments(): void
     {
         $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id, 'balance' => 100, 'paid_to_date' => 0]);
         ClientContact::factory()->create([

@@ -25,7 +25,7 @@ class AdjustClientLedgerRequest extends Request
         return auth()->user()->can('edit', $this->client);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /* Ensure we have a client name, and that all emails are unique*/
 
@@ -34,7 +34,7 @@ class AdjustClientLedgerRequest extends Request
         return $rules;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
         ];

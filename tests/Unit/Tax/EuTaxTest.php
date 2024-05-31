@@ -44,7 +44,7 @@ class EuTaxTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testEuToUsTaxCalculation()
+    public function testEuToUsTaxCalculation(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -120,7 +120,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testEuToBrazilTaxCalculations()
+    public function testEuToBrazilTaxCalculations(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -194,7 +194,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testEuToAuTaxCalculationExemptProduct()
+    public function testEuToAuTaxCalculationExemptProduct(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -268,7 +268,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testEuToAuTaxCalculationExemptClient()
+    public function testEuToAuTaxCalculationExemptClient(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -342,7 +342,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testEuToAuTaxCalculation()
+    public function testEuToAuTaxCalculation(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -416,7 +416,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testInvoiceTaxCalcDetoBeNoVat()
+    public function testInvoiceTaxCalcDetoBeNoVat(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -480,7 +480,7 @@ class EuTaxTest extends TestCase
         $this->assertEquals(121, $invoice->amount);
     }
 
-    public function testInvoiceTaxCalcDetoBe()
+    public function testInvoiceTaxCalcDetoBe(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -543,7 +543,7 @@ class EuTaxTest extends TestCase
         $this->assertEquals(100, $invoice->amount);
     }
 
-    public function testInvoiceTaxCalcDetoDe()
+    public function testInvoiceTaxCalcDetoDe(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -607,7 +607,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testCorrectRuleInit()
+    public function testCorrectRuleInit(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -659,7 +659,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testEuCorrectRuleInit()
+    public function testEuCorrectRuleInit(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -713,7 +713,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testForeignCorrectRuleInit()
+    public function testForeignCorrectRuleInit(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -769,7 +769,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testSubThresholdCorrectRate()
+    public function testSubThresholdCorrectRate(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -820,7 +820,7 @@ class EuTaxTest extends TestCase
     }
 
     //tests with valid vat.
-    public function testDeWithValidVat()
+    public function testDeWithValidVat(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -869,7 +869,7 @@ class EuTaxTest extends TestCase
     }
 
     //tests with valid vat.
-    public function testDeToEUWithValidVat()
+    public function testDeToEUWithValidVat(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -917,7 +917,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testTaxExemptionDeSellerBeBuyer()
+    public function testTaxExemptionDeSellerBeBuyer(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -966,7 +966,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testTaxExemptionDeSellerDeBuyer()
+    public function testTaxExemptionDeSellerDeBuyer(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
@@ -1015,7 +1015,7 @@ class EuTaxTest extends TestCase
 
     }
 
-    public function testTaxExemption3()
+    public function testTaxExemption3(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany

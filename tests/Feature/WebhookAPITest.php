@@ -45,7 +45,7 @@ class WebhookAPITest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testWebhookRetry()
+    public function testWebhookRetry(): void
     {
 
         $data = [
@@ -78,7 +78,7 @@ class WebhookAPITest extends TestCase
 
     }
 
-    public function testWebhookGetFilter()
+    public function testWebhookGetFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -88,7 +88,7 @@ class WebhookAPITest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testWebhookGetRoute()
+    public function testWebhookGetRoute(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -98,7 +98,7 @@ class WebhookAPITest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testWebhookPostRoute()
+    public function testWebhookPostRoute(): void
     {
         $data = [
             'target_url' => 'http://hook.com',

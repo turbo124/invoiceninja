@@ -23,7 +23,7 @@ class AmountValidationRuleTest extends TestCase
         parent::setUp();
     }
 
-    public function testSimpleAmountValid()
+    public function testSimpleAmountValid(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -37,7 +37,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testInvalidAmountValid()
+    public function testInvalidAmountValid(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -51,7 +51,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testIllegalChars()
+    public function testIllegalChars(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -65,7 +65,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testIllegalCharsNaked()
+    public function testIllegalCharsNaked(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -79,7 +79,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testinValidScenario1()
+    public function testinValidScenario1(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -93,7 +93,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testValidScenario2()
+    public function testValidScenario2(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -107,7 +107,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testValidScenario3()
+    public function testValidScenario3(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],
@@ -121,7 +121,7 @@ class AmountValidationRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testInValidScenario4()
+    public function testInValidScenario4(): void
     {
         $rules = [
             'amount' => [new ValidAmount()],

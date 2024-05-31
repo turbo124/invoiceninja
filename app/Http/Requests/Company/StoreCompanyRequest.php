@@ -34,7 +34,7 @@ class StoreCompanyRequest extends Request
         return $user->can('create', Company::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $input = $this->all();
 

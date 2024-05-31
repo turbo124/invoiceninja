@@ -43,7 +43,7 @@ class LiveDesignTest extends TestCase
         }
     }
 
-    public function testSyntheticInvitations()
+    public function testSyntheticInvitations(): void
     {
         $this->assertGreaterThanOrEqual(1, $this->client->contacts->count());
 
@@ -67,7 +67,7 @@ class LiveDesignTest extends TestCase
         nlog($data);
     }
 
-    public function testDesignRoute200()
+    public function testDesignRoute200(): void
     {
         $data = [
             'entity_type' => 'invoice',
@@ -83,7 +83,7 @@ class LiveDesignTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testDesignWithCustomDesign()
+    public function testDesignWithCustomDesign(): void
     {
 
         $d = Design::find(1);

@@ -26,19 +26,19 @@ class GroupTest extends TestCase
         $this->settings = ClientSettings::buildClientSettings(CompanySettings::defaults(), ClientSettings::defaults());
     }
 
-    public function testGroupsPropertiesExistsResponses()
+    public function testGroupsPropertiesExistsResponses(): void
     {
         $this->assertTrue(property_exists($this->settings, 'timezone_id'));
     }
 
-    public function testPropertyValueAccessors()
+    public function testPropertyValueAccessors(): void
     {
         $this->settings->translations = (object) ['hello' => 'world'];
 
         $this->assertEquals('world', $this->settings->translations->hello);
     }
 
-    public function testPropertyIsSet()
+    public function testPropertyIsSet(): void
     {
         $this->assertFalse(isset($this->settings->translations->nope));
     }

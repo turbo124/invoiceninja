@@ -32,7 +32,7 @@ class InvoiceBalanceTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testInvoiceBalances()
+    public function testInvoiceBalances(): void
     {
 
         $item = new InvoiceItem();
@@ -106,7 +106,7 @@ class InvoiceBalanceTest extends TestCase
 
     }
 
-    public function testInvoiceBalancesWithNegatives()
+    public function testInvoiceBalancesWithNegatives(): void
     {
 
         $item = new InvoiceItem();
@@ -159,7 +159,7 @@ class InvoiceBalanceTest extends TestCase
         $this->assertEquals(-30.37, $i->paid_to_date);
     }
 
-    public function testPurchaseOrderBalances()
+    public function testPurchaseOrderBalances(): void
     {
 
         $item = new InvoiceItem();

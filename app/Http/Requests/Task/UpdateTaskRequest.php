@@ -38,7 +38,7 @@ class UpdateTaskRequest extends Request
         return $user->can('edit', $this->task);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();

@@ -42,7 +42,7 @@ class UserEmailChanged implements ShouldQueue
         $this->settings = $this->company->settings;
     }
 
-    public function handle()
+    public function handle(): void
     {
         //Set DB
         MultiDB::setDb($this->company->db);

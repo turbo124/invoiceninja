@@ -54,7 +54,7 @@ class RelationExistsTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testAssignedUserRelationExists()
+    public function testAssignedUserRelationExists(): void
     {
         foreach ($this->models as $model) {
             $class = new $model;

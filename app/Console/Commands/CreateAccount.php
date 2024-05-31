@@ -51,7 +51,7 @@ class CreateAccount extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info(date('r').' Create Single Account...');
 

@@ -40,7 +40,7 @@ class ActivityApiTest extends TestCase
 
     }
 
-    public function testActivityEntity()
+    public function testActivityEntity(): void
     {
 
         $invoice = $this->company->invoices()->first();
@@ -68,7 +68,7 @@ class ActivityApiTest extends TestCase
 
     }
 
-    public function testActivityGet()
+    public function testActivityGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -78,7 +78,7 @@ class ActivityApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testActivityGetWithReact()
+    public function testActivityGetWithReact(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

@@ -25,7 +25,7 @@ class BulkBankIntegrationRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'ids' => 'required|bail|array',

@@ -22,7 +22,7 @@ class UploadRecurringExpenseRequest extends Request
         return auth()->user()->can('edit', $this->recurring_expense);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

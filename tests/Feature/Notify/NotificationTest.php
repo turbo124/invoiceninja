@@ -43,7 +43,7 @@ class NotificationTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testEntityViewedNotificationWithEntityLate()
+    public function testEntityViewedNotificationWithEntityLate(): void
     {
         // ['all_notifications', 'all_user_notifications', 'invoice_created_user', 'invoice_sent_user', 'invoice_viewed_user', 'invoice_late_user'];
         $u = User::factory()->create([
@@ -99,7 +99,7 @@ class NotificationTest extends TestCase
         $this->assertCount(0, $methods);
     }
 
-    public function testNotificationFound()
+    public function testNotificationFound(): void
     {
         $notifications = new \stdClass;
         $notifications->email = ['inventory_all'];
@@ -123,7 +123,7 @@ class NotificationTest extends TestCase
         $this->assertCount(0, $notification_users->toArray());
     }
 
-    public function testAllNotificationsFires()
+    public function testAllNotificationsFires(): void
     {
         $notifications = new \stdClass;
         $notifications->email = ['all_notifications'];
@@ -139,7 +139,7 @@ class NotificationTest extends TestCase
         $this->assertCount(1, $notification_users->toArray());
     }
 
-    public function testAllNotificationsFiresForUser()
+    public function testAllNotificationsFiresForUser(): void
     {
         $notifications = new \stdClass;
         $notifications->email = ['all_user_notifications'];
@@ -155,7 +155,7 @@ class NotificationTest extends TestCase
         $this->assertCount(1, $notification_users->toArray());
     }
 
-    public function testAllNotificationsDoesNotFiresForUser()
+    public function testAllNotificationsDoesNotFiresForUser(): void
     {
         $u = User::factory()->create([
             'account_id' => $this->account->id,

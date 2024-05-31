@@ -31,7 +31,7 @@ class StoreGroupSettingRequest extends Request
         return $user->can('create', GroupSetting::class) && $user->account->hasFeature(Account::FEATURE_API);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -56,7 +56,7 @@ class StoreGroupSettingRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'settings' => 'settings must be a valid json structure',

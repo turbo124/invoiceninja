@@ -45,12 +45,12 @@ class StorePaymentValidationTest extends TestCase
         );
     }
 
-    public function testNumericParse()
+    public function testNumericParse(): void
     {
         $this->assertFalse(is_numeric('2760.0,139.14'));
     }
 
-    public function testNoAmountGiven()
+    public function testNoAmountGiven(): void
     {
         $data = [
             // 'amount' => 0,
@@ -85,7 +85,7 @@ class StorePaymentValidationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testInValidPaymentAmount()
+    public function testInValidPaymentAmount(): void
     {
         $data = [
             'amount' => '10,33',
@@ -110,7 +110,7 @@ class StorePaymentValidationTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testValidPayment()
+    public function testValidPayment(): void
     {
         $data = [
             'amount' => 0,
@@ -135,7 +135,7 @@ class StorePaymentValidationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testValidPaymentWithAmount()
+    public function testValidPaymentWithAmount(): void
     {
         $data = [
             'amount' => 0,
@@ -170,7 +170,7 @@ class StorePaymentValidationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testValidPaymentWithInvalidData()
+    public function testValidPaymentWithInvalidData(): void
     {
         $data = [
             'amount' => 0,

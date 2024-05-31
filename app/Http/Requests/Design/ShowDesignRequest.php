@@ -27,7 +27,7 @@ class ShowDesignRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

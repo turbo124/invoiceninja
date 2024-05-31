@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Utils\Ninja;
 use Closure;
@@ -32,7 +33,7 @@ class UserVerified
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (Ninja::isSelfHost()) {
             return $next($request);

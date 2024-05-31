@@ -31,7 +31,7 @@ class StoreCompanyGatewayRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'gateway_key' => ['bail', 'required', 'alpha_num', Rule::exists('gateways', 'key')],

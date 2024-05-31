@@ -397,7 +397,7 @@ class BaseApiTest extends TestCase
     /**
      * Tests admin/owner facing routes respond with the correct status and/or data set
      */
-    public function testOwnerRoutes()
+    public function testOwnerRoutes(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -423,7 +423,7 @@ class BaseApiTest extends TestCase
         });
     }
 
-    public function testOwnerAccessCompany()
+    public function testOwnerAccessCompany(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -432,7 +432,7 @@ class BaseApiTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testAdminRoutes()
+    public function testAdminRoutes(): void
     {
         $this->owner_cu = CompanyUser::where('user_id', $this->owner_cu->user_id)->where('company_id', $this->owner_cu->company_id)->first();
         $this->owner_cu->is_owner = false;
@@ -465,7 +465,7 @@ class BaseApiTest extends TestCase
         });
     }
 
-    public function testAdminAccessCompany()
+    public function testAdminAccessCompany(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -474,7 +474,7 @@ class BaseApiTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testAdminLockedRoutes()
+    public function testAdminLockedRoutes(): void
     {
         $this->owner_cu = CompanyUser::where('user_id', $this->owner_cu->user_id)->where('company_id', $this->owner_cu->company_id)->first();
         $this->owner_cu->is_owner = false;
@@ -501,7 +501,7 @@ class BaseApiTest extends TestCase
         });
     }
 
-    public function testAdminLockedCompany()
+    public function testAdminLockedCompany(): void
     {
         $this->owner_cu = CompanyUser::where('user_id', $this->owner_cu->user_id)->where('company_id', $this->owner_cu->company_id)->first();
         $this->owner_cu->is_owner = false;
@@ -520,7 +520,7 @@ class BaseApiTest extends TestCase
     /**
      * Tests user facing routes respond with the correct status and/or data set
      */
-    public function testRestrictedUserRoute()
+    public function testRestrictedUserRoute(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

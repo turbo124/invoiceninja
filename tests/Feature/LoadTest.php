@@ -52,7 +52,7 @@ class LoadTest extends TestCase
         $this->markTestSkipped('Skip test not needed in this environment');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $account = Account::factory()->create();
         $company = Company::factory()->create([

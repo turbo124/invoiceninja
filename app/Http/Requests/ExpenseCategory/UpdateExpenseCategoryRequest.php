@@ -30,7 +30,7 @@ class UpdateExpenseCategoryRequest extends Request
         return $user->can('edit', $this->expense_category);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */

@@ -36,7 +36,7 @@ class StoreShopClientRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         if ($this->input('documents') && is_array($this->input('documents'))) {
             $documents = count($this->input('documents'));
@@ -143,7 +143,7 @@ class StoreShopClientRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'unique' => ctrans('validation.unique', ['attribute' => 'email']),

@@ -33,7 +33,7 @@ class DiskCleanup implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         nlog('Cleaning Storage');
 

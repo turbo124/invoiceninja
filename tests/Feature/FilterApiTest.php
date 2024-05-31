@@ -36,7 +36,7 @@ class FilterApiTest extends TestCase
         );
     }
 
-    public function testActivityGet()
+    public function testActivityGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

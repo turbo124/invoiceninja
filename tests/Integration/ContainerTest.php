@@ -30,7 +30,7 @@ class ContainerTest extends TestCase
         app()->instance(Company::class, $this->company);
     }
 
-    public function testBindingWorks()
+    public function testBindingWorks(): void
     {
         $resolved_company = resolve(Company::class);
 

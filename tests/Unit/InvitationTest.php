@@ -37,7 +37,7 @@ class InvitationTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testInvitationSanity()
+    public function testInvitationSanity(): void
     {
         $this->assertEquals($this->invoice->invitations->count(), 2);
 

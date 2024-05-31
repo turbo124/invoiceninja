@@ -10,6 +10,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Awobaz\Compoships\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -148,7 +150,7 @@ class CompanyUser extends Pivot
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
     }
@@ -156,7 +158,7 @@ class CompanyUser extends Pivot
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
@@ -164,7 +166,7 @@ class CompanyUser extends Pivot
     /**
      * @return HasMany
      */
-    public function users()
+    public function users(): HasMany
     {
         return $this->hasMany(User::class)->withTrashed();
     }
@@ -172,7 +174,7 @@ class CompanyUser extends Pivot
     /**
      * @return HasMany
      */
-    public function token()
+    public function token(): HasMany
     {
         return $this->hasMany(CompanyToken::class, 'user_id', 'user_id');
     }
@@ -180,7 +182,7 @@ class CompanyUser extends Pivot
     /**
      * @return HasMany
      */
-    public function tokens()
+    public function tokens(): HasMany
     {
         return $this->hasMany(CompanyToken::class, 'user_id', 'user_id');
     }

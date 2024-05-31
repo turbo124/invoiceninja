@@ -23,7 +23,7 @@ class RecurringDueDatesTest extends TestCase
 {
     use HasRecurrence;
 
-    public function testFirstDate()
+    public function testFirstDate(): void
     {
         $date = Carbon::parse('2020-02-15');
 
@@ -32,7 +32,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-03-01', $due_date->format('Y-m-d'));
     }
 
-    public function testFirstOfMonthOnFirst()
+    public function testFirstOfMonthOnFirst(): void
     {
         $date = Carbon::parse('2020-02-01');
 
@@ -41,7 +41,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-03-01', $due_date->format('Y-m-d'));
     }
 
-    public function testFirstOfMonthOnLast()
+    public function testFirstOfMonthOnLast(): void
     {
         $date = Carbon::parse('2020-03-31');
 
@@ -50,7 +50,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-04-01', $due_date->format('Y-m-d'));
     }
 
-    public function testLastOfMonth()
+    public function testLastOfMonth(): void
     {
         $date = Carbon::parse('2020-02-15');
 
@@ -59,7 +59,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-02-29', $due_date->format('Y-m-d'));
     }
 
-    public function testLastOfMonthOnFirst()
+    public function testLastOfMonthOnFirst(): void
     {
         $date = Carbon::parse('2020-02-1');
 
@@ -68,7 +68,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-02-29', $due_date->format('Y-m-d'));
     }
 
-    public function testLastOfMonthOnLast()
+    public function testLastOfMonthOnLast(): void
     {
         $date = Carbon::parse('2020-02-29');
 
@@ -77,7 +77,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-03-31', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonth()
+    public function testDayOfMonth(): void
     {
         $date = Carbon::parse('2020-02-01');
 
@@ -86,7 +86,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-02-15', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthInFuture()
+    public function testDayOfMonthInFuture(): void
     {
         $date = Carbon::parse('2020-02-16');
 
@@ -95,7 +95,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-03-15', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthSameDay()
+    public function testDayOfMonthSameDay(): void
     {
         $date = Carbon::parse('2020-02-01');
 
@@ -104,7 +104,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-03-01', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthWithOverflow()
+    public function testDayOfMonthWithOverflow(): void
     {
         $date = Carbon::parse('2020-1-31');
 
@@ -113,7 +113,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-02-29', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthWithOverflow2()
+    public function testDayOfMonthWithOverflow2(): void
     {
         $date = Carbon::parse('2020-02-29');
 
@@ -122,7 +122,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-03-31', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthWithOverflow3()
+    public function testDayOfMonthWithOverflow3(): void
     {
         $date = Carbon::parse('2020-01-30');
 
@@ -131,7 +131,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2020-02-29', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthWithOverflow4()
+    public function testDayOfMonthWithOverflow4(): void
     {
         $date = Carbon::parse('2019-02-28');
 
@@ -140,7 +140,7 @@ class RecurringDueDatesTest extends TestCase
         $this->assertEquals('2019-03-31', $due_date->format('Y-m-d'));
     }
 
-    public function testDayOfMonthWithOverflow5()
+    public function testDayOfMonthWithOverflow5(): void
     {
         $date = Carbon::parse('2019-1-31');
 

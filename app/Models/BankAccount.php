@@ -74,7 +74,7 @@ class BankAccount extends BaseModel
     /**
      * @return BelongsTo
      */
-    public function bank()
+    public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
     }
@@ -82,7 +82,7 @@ class BankAccount extends BaseModel
     /**
      * @return HasMany
      */
-    public function bank_subaccounts()
+    public function bank_subaccounts(): HasMany
     {
         return $this->hasMany(BankSubaccount::class);
     }

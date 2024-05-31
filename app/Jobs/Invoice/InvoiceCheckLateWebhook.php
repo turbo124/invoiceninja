@@ -40,7 +40,7 @@ class InvoiceCheckLateWebhook implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         nlog('sending overdue webhooks for invoices');
 

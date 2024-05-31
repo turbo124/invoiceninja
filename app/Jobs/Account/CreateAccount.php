@@ -45,7 +45,7 @@ class CreateAccount
         $this->client_ip = $client_ip;
     }
 
-    public function handle()
+    public function handle(): void
     {
         if (config('ninja.environment') == 'selfhost' && Account::count() == 0) {
             return $this->create();

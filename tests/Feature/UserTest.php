@@ -108,7 +108,7 @@ class UserTest extends TestCase
 
     }
 
-    public function testUserLocale()
+    public function testUserLocale(): void
     {
         $this->user->language_id = '13';
         $this->user->save();
@@ -124,7 +124,7 @@ class UserTest extends TestCase
 
     }
 
-    public function testUserResponse()
+    public function testUserResponse(): void
     {
         $company_token = $this->mockAccount();
 
@@ -217,7 +217,7 @@ class UserTest extends TestCase
 
     }
 
-    public function testUserAttemptingtToDeleteThemselves()
+    public function testUserAttemptingtToDeleteThemselves(): void
     {
 
         $account = Account::factory()->create([
@@ -277,7 +277,7 @@ class UserTest extends TestCase
 
     }
 
-    public function testDisconnectUserOauthMailer()
+    public function testDisconnectUserOauthMailer(): void
     {
         $user =
         User::factory()->create([
@@ -300,7 +300,7 @@ class UserTest extends TestCase
 
     }
 
-    public function testUserFiltersWith()
+    public function testUserFiltersWith(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -311,7 +311,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testUserList()
+    public function testUserList(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -322,7 +322,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testValidationRulesPhoneIsNull()
+    public function testValidationRulesPhoneIsNull(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -347,7 +347,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testValidationRulesPhoneIsBlankString()
+    public function testValidationRulesPhoneIsBlankString(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -396,7 +396,7 @@ class UserTest extends TestCase
         ])->putJson('/api/v1/users/'.$user->hashed_id.'?include=company_user', $data);
     }
 
-    public function testUserStore()
+    public function testUserStore(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -425,7 +425,7 @@ class UserTest extends TestCase
         $this->assertNotNull($arr['data']['company_user']);
     }
 
-    public function testUserAttachAndDetach()
+    public function testUserAttachAndDetach(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -473,7 +473,7 @@ class UserTest extends TestCase
         $this->assertNotNull($user);
     }
 
-    public function testAttachUserToMultipleCompanies()
+    public function testAttachUserToMultipleCompanies(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 

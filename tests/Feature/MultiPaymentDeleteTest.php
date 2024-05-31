@@ -41,7 +41,7 @@ class MultiPaymentDeleteTest extends TestCase
         $this->faker = \Faker\Factory::create();
     }
 
-    public function testComplexRefundDeleteScenario()
+    public function testComplexRefundDeleteScenario(): void
     {
         $account = Account::factory()->create();
         $company = Company::factory()->create([

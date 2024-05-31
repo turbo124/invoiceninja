@@ -41,7 +41,7 @@ class UnappliedPaymentRefundTest extends TestCase
         );
     }
 
-    public function testUnappliedPaymentRefund()
+    public function testUnappliedPaymentRefund(): void
     {
         $data = [
             'amount' => 1000,

@@ -19,7 +19,7 @@ class BankTransactionFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'transaction_id' => $this->faker->randomNumber(9, true),

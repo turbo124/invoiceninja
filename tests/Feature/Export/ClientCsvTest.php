@@ -36,7 +36,7 @@ class ClientCsvTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testRecurringInvoiceExportCsv()
+    public function testRecurringInvoiceExportCsv(): void
     {
         $data = [
             'date_range' => 'this_year',
@@ -52,7 +52,7 @@ class ClientCsvTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testVendorExportCsv()
+    public function testVendorExportCsv(): void
     {
         $data = [
             'date_range' => 'this_year',
@@ -68,7 +68,7 @@ class ClientCsvTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testPurchaseOrderExportCsv()
+    public function testPurchaseOrderExportCsv(): void
     {
         $data = [
             'date_range' => 'this_year',
@@ -84,7 +84,7 @@ class ClientCsvTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientExportCsv()
+    public function testClientExportCsv(): void
     {
         $data = [
             'date_range' => 'this_year',
@@ -100,7 +100,7 @@ class ClientCsvTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testContactExportCsv()
+    public function testContactExportCsv(): void
     {
         $data = [
             'date_range' => 'this_year',
@@ -116,7 +116,7 @@ class ClientCsvTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testActivityExportCsv()
+    public function testActivityExportCsv(): void
     {
         $data = [
             'date_range' => 'this_year',

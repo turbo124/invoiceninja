@@ -31,7 +31,7 @@ class UpdateCompanyLedgerTest extends TestCase
     /**
      * @test
      */
-    public function testPaymentIsPresentInLedger()
+    public function testPaymentIsPresentInLedger(): void
     {
         $invoice = $this->invoice->service()->markPaid()->save();
 
@@ -47,7 +47,7 @@ class UpdateCompanyLedgerTest extends TestCase
     /**
      * @test
      */
-    public function testInvoiceIsPresentInLedger()
+    public function testInvoiceIsPresentInLedger(): void
     {
         $invoice = $this->invoice->service()->markPaid()->save();
 

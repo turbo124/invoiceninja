@@ -37,7 +37,7 @@ class InvoiceAmountPaymentTest extends TestCase
         );
     }
 
-    public function testPaymentAmountForInvoice()
+    public function testPaymentAmountForInvoice(): void
     {
         $data = [
             'name' => 'A Nice Client',
@@ -110,7 +110,7 @@ class InvoiceAmountPaymentTest extends TestCase
         $this->assertEquals(10, $payment->amount);
     }
 
-    public function testMarkPaidRemovesUnpaidGatewayFees()
+    public function testMarkPaidRemovesUnpaidGatewayFees(): void
     {
         $data = [
             'name' => 'A Nice Client',

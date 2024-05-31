@@ -47,7 +47,7 @@ class CompanyGatewayApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testBulkActions()
+    public function testBulkActions(): void
     {
         $cg = CompanyGatewayFactory::create($this->company->id, $this->user->id);
         $cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
@@ -86,7 +86,7 @@ class CompanyGatewayApiTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testCompanyGatewayEndPointsWithIncorrectFields()
+    public function testCompanyGatewayEndPointsWithIncorrectFields(): void
     {
         $data = [
             'config' => 'random config',
@@ -102,7 +102,7 @@ class CompanyGatewayApiTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testCompanyGatewayEndPointsWithInvalidFields()
+    public function testCompanyGatewayEndPointsWithInvalidFields(): void
     {
         $data = [
             'config' => 'random config',
@@ -118,7 +118,7 @@ class CompanyGatewayApiTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testCompanyGatewayEndPoints()
+    public function testCompanyGatewayEndPoints(): void
     {
         $data = [
             'config' => 'random config',
@@ -159,7 +159,7 @@ class CompanyGatewayApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyGatewayFeesAndLimitsSuccess()
+    public function testCompanyGatewayFeesAndLimitsSuccess(): void
     {
         $fee = new FeesAndLimits;
 
@@ -219,7 +219,7 @@ class CompanyGatewayApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyGatewayFeesAndLimitsFails()
+    public function testCompanyGatewayFeesAndLimitsFails(): void
     {
         $fee_and_limit['bank_transfer'] = new FeesAndLimits;
 
@@ -240,7 +240,7 @@ class CompanyGatewayApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCompanyGatewayArrayBuilder()
+    public function testCompanyGatewayArrayBuilder(): void
     {
         $arr = [
             'min_limit' => 1,
@@ -255,7 +255,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertTrue(array_key_exists('fee_amount', $new_arr));
     }
 
-    public function testFeesAndLimitsFeeAmountCalcuation()
+    public function testFeesAndLimitsFeeAmountCalcuation(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -288,7 +288,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(10, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD));
     }
 
-    public function testFeesAndLimitsFeePercentCalcuation()
+    public function testFeesAndLimitsFeePercentCalcuation(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -321,7 +321,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(0.2, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountCalcuation()
+    public function testFeesAndLimitsFeePercentAndAmountCalcuation(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -354,7 +354,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(10.2, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountCalcuationOneHundredPercent()
+    public function testFeesAndLimitsFeePercentAndAmountCalcuationOneHundredPercent(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -388,7 +388,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(10, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountCalcuationOneHundredPercentVariationOne()
+    public function testFeesAndLimitsFeePercentAndAmountCalcuationOneHundredPercentVariationOne(): void
     {
         $fee = new FeesAndLimits;
         $fee->fee_amount = 0;
@@ -418,7 +418,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(1, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountAndTaxCalcuation()
+    public function testFeesAndLimitsFeePercentAndAmountAndTaxCalcuation(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -451,7 +451,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(11, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD, true));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountAndTaxCalcuationInclusiveTaxes()
+    public function testFeesAndLimitsFeePercentAndAmountAndTaxCalcuationInclusiveTaxes(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -484,7 +484,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(10, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountAndDoubleTaxCalcuation()
+    public function testFeesAndLimitsFeePercentAndAmountAndDoubleTaxCalcuation(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;
@@ -519,7 +519,7 @@ class CompanyGatewayApiTest extends TestCase
         $this->assertEquals(12, $company_gateway->calcGatewayFee(10, GatewayType::CREDIT_CARD, true));
     }
 
-    public function testFeesAndLimitsFeePercentAndAmountAndDoubleTaxCalcuationWithFeeCap()
+    public function testFeesAndLimitsFeePercentAndAmountAndDoubleTaxCalcuationWithFeeCap(): void
     {
         //{"1":{"min_limit":1,"max_limit":1000000,"fee_amount":10,"fee_percent":2,"fee_tax_name1":"","fee_tax_name2":"","fee_tax_name3":"","fee_tax_rate1":0,"fee_tax_rate2":0,"fee_tax_rate3":0,"fee_cap":10,"adjust_fee_percent":true}}
         $fee = new FeesAndLimits;

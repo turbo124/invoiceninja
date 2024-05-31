@@ -40,7 +40,7 @@ class UpdateCompanyRequest extends Request
         return $user->can('edit', $this->company);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $input = $this->all();
 

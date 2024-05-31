@@ -32,7 +32,7 @@ class StoreQuoteRequest extends Request
         return $user->can('create', Quote::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();

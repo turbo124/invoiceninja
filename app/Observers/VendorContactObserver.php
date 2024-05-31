@@ -20,7 +20,7 @@ class VendorContactObserver
      *
      * @return void
      */
-    public function created(VendorContact $vendorContact)
+    public function created(VendorContact $vendorContact): void
     {
         //
     }
@@ -30,7 +30,7 @@ class VendorContactObserver
      *
      * @return void
      */
-    public function updated(VendorContact $vendorContact)
+    public function updated(VendorContact $vendorContact): void
     {
         //
     }
@@ -40,7 +40,7 @@ class VendorContactObserver
      *
      * @return void
      */
-    public function deleted(VendorContact $vendorContact)
+    public function deleted(VendorContact $vendorContact): void
     {
         $vendor_contact_id = $vendorContact->id;
 
@@ -58,7 +58,7 @@ class VendorContactObserver
      *
      * @return void
      */
-    public function restored(VendorContact $vendorContact)
+    public function restored(VendorContact $vendorContact): void
     {
     }
 
@@ -67,7 +67,7 @@ class VendorContactObserver
      *
      * @return void
      */
-    public function forceDeleted(VendorContact $vendorContact)
+    public function forceDeleted(VendorContact $vendorContact): void
     {
         //
     }

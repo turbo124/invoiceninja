@@ -28,7 +28,7 @@ class UpdateDocumentRequest extends Request
         return $user->can('edit', $this->document);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => 'sometimes',

@@ -31,7 +31,7 @@ class StoreProjectRequest extends Request
         return $user->can('create', Project::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */

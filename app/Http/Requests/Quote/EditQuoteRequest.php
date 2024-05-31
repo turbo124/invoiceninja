@@ -19,7 +19,7 @@ class EditQuoteRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->can('edit', $this->quote);
     }

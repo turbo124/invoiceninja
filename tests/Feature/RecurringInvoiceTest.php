@@ -60,7 +60,7 @@ class RecurringInvoiceTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testDateValidations()
+    public function testDateValidations(): void
     {
         $data = [
             'client_id' => $this->client->hashed_id,
@@ -76,7 +76,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testLinkingSubscription()
+    public function testLinkingSubscription(): void
     {
         $s = Subscription::factory()
             ->create(['company_id' => $this->company->id, 'user_id' => $this->user->id]);
@@ -111,7 +111,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testStartDate()
+    public function testStartDate(): void
     {
         $line_items = [];
 
@@ -156,7 +156,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testNextSendDateCatch()
+    public function testNextSendDateCatch(): void
     {
         $line_items = [];
 
@@ -199,7 +199,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testBulkIncreasePriceWithJob()
+    public function testBulkIncreasePriceWithJob(): void
     {
 
         $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
@@ -228,7 +228,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testBulkUpdateWithJob()
+    public function testBulkUpdateWithJob(): void
     {
         $p = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -264,7 +264,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testBulkUpdatePrices()
+    public function testBulkUpdatePrices(): void
     {
         $p = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -312,7 +312,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testBulkUpdateMultiPrices()
+    public function testBulkUpdateMultiPrices(): void
     {
         $p1 = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -392,7 +392,7 @@ class RecurringInvoiceTest extends TestCase
 
     }
 
-    public function testRecurringGetStatus()
+    public function testRecurringGetStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -401,7 +401,7 @@ class RecurringInvoiceTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testPostRecurringInvoiceWithPlaceholderVariables()
+    public function testPostRecurringInvoiceWithPlaceholderVariables(): void
     {
         $line_items = [];
 
@@ -446,7 +446,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertTrue(str_contains($notes, ':MONTH'));
     }
 
-    public function testPostRecurringInvoice()
+    public function testPostRecurringInvoice(): void
     {
         $data = [
             'frequency_id' => 1,
@@ -476,7 +476,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals(RecurringInvoice::STATUS_DRAFT, $arr['data']['status_id']);
     }
 
-    public function testPostRecurringInvoiceWithStartAndStop()
+    public function testPostRecurringInvoiceWithStartAndStop(): void
     {
         $data = [
             'frequency_id' => 1,
@@ -516,7 +516,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals(RecurringInvoice::STATUS_PAUSED, $arr['data']['status_id']);
     }
 
-    public function testRecurringInvoiceList()
+    public function testRecurringInvoiceList(): void
     {
         Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -545,7 +545,7 @@ class RecurringInvoiceTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringInvoiceRESTEndPoints()
+    public function testRecurringInvoiceRESTEndPoints(): void
     {
         Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -621,7 +621,7 @@ class RecurringInvoiceTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSubscriptionIdPassesToInvoice()
+    public function testSubscriptionIdPassesToInvoice(): void
     {
         $recurring_invoice = InvoiceToRecurringInvoiceFactory::create($this->invoice);
         $recurring_invoice->user_id = $this->user->id;
@@ -640,7 +640,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals(10, $invoice->subscription_id);
     }
 
-    public function testRecurringDatePassesToInvoice()
+    public function testRecurringDatePassesToInvoice(): void
     {
         $noteText = 'Hello this is for :MONTH_AFTER';
         $recurringDate = \Carbon\Carbon::now()->timezone($this->client->timezone()->name)->subDays(10);
@@ -670,7 +670,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals($expectedNote, $invoice->line_items[0]->notes);
     }
 
-    public function testSubscriptionIdPassesToInvoiceIfNull()
+    public function testSubscriptionIdPassesToInvoiceIfNull(): void
     {
         $recurring_invoice = InvoiceToRecurringInvoiceFactory::create($this->invoice);
         $recurring_invoice->user_id = $this->user->id;
@@ -688,7 +688,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals(null, $invoice->subscription_id);
     }
 
-    public function testSubscriptionIdPassesToInvoiceIfNothingSet()
+    public function testSubscriptionIdPassesToInvoiceIfNothingSet(): void
     {
         $recurring_invoice = InvoiceToRecurringInvoiceFactory::create($this->invoice);
         $recurring_invoice->user_id = $this->user->id;
@@ -706,7 +706,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals(null, $invoice->subscription_id);
     }
 
-    public function testFilterProductKey()
+    public function testFilterProductKey(): void
     {
         $p1 = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -789,7 +789,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals('2', $arr['meta']['pagination']['total']);
     }
 
-    public function testFilterFrequency()
+    public function testFilterFrequency(): void
     {
         $p1 = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -864,7 +864,7 @@ class RecurringInvoiceTest extends TestCase
         $this->assertEquals('1', $arr['meta']['pagination']['total']);
     }
 
-    public function testFilterNextDateBetween()
+    public function testFilterNextDateBetween(): void
     {
         $p1 = Product::factory()->create([
             'company_id' => $this->company->id,

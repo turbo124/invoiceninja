@@ -20,7 +20,7 @@ class ClientPortalServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         app()->bind('customMessage', function () {
             return new CustomMessage();
@@ -33,7 +33,7 @@ class ClientPortalServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
 
     }

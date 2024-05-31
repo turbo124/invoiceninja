@@ -34,7 +34,7 @@ class FileUploadValidationTest extends TestCase
 
     }
 
-    public function testIteratingThroughAllEntities()
+    public function testIteratingThroughAllEntities(): void
     {
 
         Storage::fake('local');
@@ -78,7 +78,7 @@ class FileUploadValidationTest extends TestCase
 
     }
 
-    public function testFileUploadIsPublicSetsAppropriately()
+    public function testFileUploadIsPublicSetsAppropriately(): void
     {
         Storage::fake('local');
 
@@ -120,7 +120,7 @@ class FileUploadValidationTest extends TestCase
 
     }
 
-    public function testMultiFileUploadIsPublicSetsAppropriately()
+    public function testMultiFileUploadIsPublicSetsAppropriately(): void
     {
         Storage::fake('local');
 

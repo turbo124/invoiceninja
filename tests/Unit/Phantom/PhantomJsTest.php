@@ -24,7 +24,7 @@ class PhantomJsTest extends TestCase
         parent::setUp();
     }
 
-    public function testValidPdfMime()
+    public function testValidPdfMime(): void
     {
         $pdf = file_get_contents(base_path('/tests/Unit/Phantom/valid.pdf'));
 
@@ -33,7 +33,7 @@ class PhantomJsTest extends TestCase
         $this->assertEquals('application/pdf; charset=binary', $finfo->buffer($pdf));
     }
 
-    public function testInValidPdfMime()
+    public function testInValidPdfMime(): void
     {
         $pdf = file_get_contents(base_path('/tests/Unit/Phantom/invalid.pdf'));
 

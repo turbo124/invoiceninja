@@ -30,7 +30,7 @@ class DependencyTest extends TestCase
 
     }
 
-    public function testDependencyOrder()
+    public function testDependencyOrder(): void
     {
         $results = StepService::check([
             RegisterOrLogin::class,
@@ -54,7 +54,7 @@ class DependencyTest extends TestCase
         $this->assertCount(0, $results);
     }
 
-    public function testSorting()
+    public function testSorting(): void
     {
         $results = $this->sort([
             Methods::class,

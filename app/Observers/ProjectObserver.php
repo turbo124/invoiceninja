@@ -23,7 +23,7 @@ class ProjectObserver
      *
      * @return void
      */
-    public function created(Project $project)
+    public function created(Project $project): void
     {
         $subscriptions = Webhook::where('company_id', $project->company_id)
             ->where('event_id', Webhook::EVENT_PROJECT_CREATE)
@@ -39,7 +39,7 @@ class ProjectObserver
      *
      * @return void
      */
-    public function updated(Project $project)
+    public function updated(Project $project): void
     {
         $event = Webhook::EVENT_PROJECT_UPDATE;
 
@@ -65,7 +65,7 @@ class ProjectObserver
      *
      * @return void
      */
-    public function deleted(Project $project)
+    public function deleted(Project $project): void
     {
         if ($project->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class ProjectObserver
      *
      * @return void
      */
-    public function restored(Project $project)
+    public function restored(Project $project): void
     {
         //
     }
@@ -95,7 +95,7 @@ class ProjectObserver
      *
      * @return void
      */
-    public function forceDeleted(Project $project)
+    public function forceDeleted(Project $project): void
     {
         //
     }

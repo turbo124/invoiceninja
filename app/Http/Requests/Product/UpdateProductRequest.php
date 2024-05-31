@@ -29,7 +29,7 @@ class UpdateProductRequest extends Request
         return $user->can('edit', $this->product);
     }
 
-    public function rules()
+    public function rules(): array
     {
         if ($this->file('documents') && is_array($this->file('documents'))) {
             $rules['documents.*'] = $this->fileValidation();

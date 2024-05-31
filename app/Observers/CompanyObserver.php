@@ -21,7 +21,7 @@ class CompanyObserver
      *
      * @return void
      */
-    public function created(Company $company)
+    public function created(Company $company): void
     {
         //
     }
@@ -31,7 +31,7 @@ class CompanyObserver
      *
      * @return void
      */
-    public function updated(Company $company)
+    public function updated(Company $company): void
     {
         if (Ninja::isHosted() && $company->portal_mode == 'domain' && $company->isDirty('portal_domain')) {
             \Modules\Admin\Jobs\Domain\CustomDomain::dispatch($company->getOriginal('portal_domain'), $company)->onQueue('domain');
@@ -44,7 +44,7 @@ class CompanyObserver
      *
      * @return void
      */
-    public function deleted(Company $company)
+    public function deleted(Company $company): void
     {
         event(new CompanyDocumentsDeleted($company));
     }
@@ -54,7 +54,7 @@ class CompanyObserver
      *
      * @return void
      */
-    public function restored(Company $company)
+    public function restored(Company $company): void
     {
         //
     }
@@ -64,7 +64,7 @@ class CompanyObserver
      *
      * @return void
      */
-    public function forceDeleted(Company $company)
+    public function forceDeleted(Company $company): void
     {
         //
     }

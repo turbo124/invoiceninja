@@ -50,7 +50,7 @@ class CompanyTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testEnsureStrReplace()
+    public function testEnsureStrReplace(): void
     {
         $x = '**********';
 
@@ -59,7 +59,7 @@ class CompanyTest extends TestCase
         $this->assertEquals(0, strlen($new_string));
     }
 
-    public function testCompanyTaxInit()
+    public function testCompanyTaxInit(): void
     {
         TaxRate::query()->delete();
 
@@ -72,7 +72,7 @@ class CompanyTest extends TestCase
         $this->assertEquals(1, TaxRate::count());
     }
 
-    public function testCompanyLogoInline()
+    public function testCompanyLogoInline(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -84,7 +84,7 @@ class CompanyTest extends TestCase
 
     }
 
-    public function testUpdateCompanyPropertyInvoiceTaskHours()
+    public function testUpdateCompanyPropertyInvoiceTaskHours(): void
     {
         $company_update = [
             'invoice_task_hours' => true,
@@ -116,7 +116,7 @@ class CompanyTest extends TestCase
         $this->assertFalse($arr['data']['invoice_task_hours']);
     }
 
-    public function testCompanyList()
+    public function testCompanyList(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 

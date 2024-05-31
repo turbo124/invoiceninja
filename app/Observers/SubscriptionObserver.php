@@ -19,7 +19,7 @@ class SubscriptionObserver
      *
      * @return void
      */
-    public function created(Subscription $subscription)
+    public function created(Subscription $subscription): void
     {
         //
     }
@@ -29,7 +29,7 @@ class SubscriptionObserver
      *
      * @return void
      */
-    public function updated(Subscription $subscription)
+    public function updated(Subscription $subscription): void
     {
         //
     }
@@ -39,7 +39,7 @@ class SubscriptionObserver
      *
      * @return void
      */
-    public function deleted(Subscription $subscription)
+    public function deleted(Subscription $subscription): void
     {
         //
     }
@@ -49,7 +49,7 @@ class SubscriptionObserver
      *
      * @return void
      */
-    public function restored(Subscription $subscription)
+    public function restored(Subscription $subscription): void
     {
         //
     }
@@ -59,7 +59,7 @@ class SubscriptionObserver
      *
      * @return void
      */
-    public function forceDeleted(Subscription $subscription)
+    public function forceDeleted(Subscription $subscription): void
     {
         //
     }

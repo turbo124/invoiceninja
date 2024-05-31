@@ -40,7 +40,7 @@ class VendorExpenseNotify implements ShouldQueue
     {
     }
 
-    public function handle()
+    public function handle(): void
     {
         MultiDB::setDB($this->db);
 

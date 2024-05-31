@@ -32,7 +32,7 @@ class PdfServiceTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testPdfGeneration()
+    public function testPdfGeneration(): void
     {
 
         if (config('ninja.testvars.travis')) {
@@ -47,7 +47,7 @@ class PdfServiceTest extends TestCase
 
     }
 
-    public function testHtmlGeneration()
+    public function testHtmlGeneration(): void
     {
 
         $invitation = $this->invoice->invitations->first();
@@ -58,7 +58,7 @@ class PdfServiceTest extends TestCase
 
     }
 
-    public function testInitOfClass()
+    public function testInitOfClass(): void
     {
 
         $invitation = $this->invoice->invitations->first();
@@ -69,7 +69,7 @@ class PdfServiceTest extends TestCase
 
     }
 
-    public function testEntityResolution()
+    public function testEntityResolution(): void
     {
 
         $invitation = $this->invoice->invitations->first();
@@ -80,7 +80,7 @@ class PdfServiceTest extends TestCase
 
     }
 
-    public function testDefaultDesign()
+    public function testDefaultDesign(): void
     {
         $invitation = $this->invoice->invitations->first();
 
@@ -90,7 +90,7 @@ class PdfServiceTest extends TestCase
 
     }
 
-    public function testHtmlIsArray()
+    public function testHtmlIsArray(): void
     {
         $invitation = $this->invoice->invitations->first();
 
@@ -100,7 +100,7 @@ class PdfServiceTest extends TestCase
 
     }
 
-    public function testTemplateResolution()
+    public function testTemplateResolution(): void
     {
         $invitation = $this->invoice->invitations->first();
 

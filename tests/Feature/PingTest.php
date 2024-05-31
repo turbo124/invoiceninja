@@ -35,7 +35,7 @@ class PingTest extends TestCase
         );
     }
 
-    public function testPingEndPoint()
+    public function testPingEndPoint(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -45,7 +45,7 @@ class PingTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testHealthCheck()
+    public function testHealthCheck(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

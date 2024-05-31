@@ -22,7 +22,7 @@ class ActionTaskStatusRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'ids' => 'required|bail|array',

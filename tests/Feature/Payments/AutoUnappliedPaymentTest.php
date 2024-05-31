@@ -49,7 +49,7 @@ class AutoUnappliedPaymentTest extends TestCase
         );
     }
 
-    public function testUnappliedPaymentsAreEnabled()
+    public function testUnappliedPaymentsAreEnabled(): void
     {
 
         $settings = ClientSettings::defaults();
@@ -110,7 +110,7 @@ class AutoUnappliedPaymentTest extends TestCase
 
     }
 
-    public function testUnappliedPaymentsAreDisabled()
+    public function testUnappliedPaymentsAreDisabled(): void
     {
 
         $settings = ClientSettings::defaults();

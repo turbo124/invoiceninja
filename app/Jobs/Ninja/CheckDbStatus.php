@@ -39,7 +39,7 @@ class CheckDbStatus implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         (new DbStatus('db-ninja-01', 'db.status.db-ninja-01'))->handle();
         (new DbStatus('db-ninja-02', 'db.status.db-ninja-02'))->handle();

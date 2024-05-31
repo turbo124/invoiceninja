@@ -43,7 +43,7 @@ class InvoiceWorkflowSettings implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->client = $this->invoice->client;
 

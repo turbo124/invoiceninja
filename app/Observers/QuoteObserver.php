@@ -23,7 +23,7 @@ class QuoteObserver
      *
      * @return void
      */
-    public function created(Quote $quote)
+    public function created(Quote $quote): void
     {
         $subscriptions = Webhook::where('company_id', $quote->company_id)
             ->where('event_id', Webhook::EVENT_CREATE_QUOTE)
@@ -39,7 +39,7 @@ class QuoteObserver
      *
      * @return void
      */
-    public function updated(Quote $quote)
+    public function updated(Quote $quote): void
     {
         $event = Webhook::EVENT_UPDATE_QUOTE;
 
@@ -65,7 +65,7 @@ class QuoteObserver
      *
      * @return void
      */
-    public function deleted(Quote $quote)
+    public function deleted(Quote $quote): void
     {
         if ($quote->is_deleted) {
             return;
@@ -85,7 +85,7 @@ class QuoteObserver
      *
      * @return void
      */
-    public function restored(Quote $quote)
+    public function restored(Quote $quote): void
     {
         //
     }
@@ -95,7 +95,7 @@ class QuoteObserver
      *
      * @return void
      */
-    public function forceDeleted(Quote $quote)
+    public function forceDeleted(Quote $quote): void
     {
         //
     }

@@ -25,7 +25,7 @@ class ImportRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'import_type' => 'required',

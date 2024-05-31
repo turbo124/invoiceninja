@@ -32,7 +32,7 @@ class GoogleAnalyticsTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testGoogleAnalyticsLogic()
+    public function testGoogleAnalyticsLogic(): void
     {
 
         $analytics_id = 'analytics_id';

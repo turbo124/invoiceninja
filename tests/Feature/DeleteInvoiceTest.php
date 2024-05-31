@@ -41,7 +41,7 @@ class DeleteInvoiceTest extends TestCase
         );
     }
 
-    public function testDeleteAndRestoreInvoice()
+    public function testDeleteAndRestoreInvoice(): void
     {
         //create an invoice for 36000 with a partial of 6000
 
@@ -184,7 +184,7 @@ class DeleteInvoiceTest extends TestCase
         $this->assertNull($payment->deleted_at);
     }
 
-    public function testInvoiceDeletionAfterCancellation()
+    public function testInvoiceDeletionAfterCancellation(): void
     {
         $data = [
             'name' => 'A Nice Client',
@@ -302,7 +302,7 @@ class DeleteInvoiceTest extends TestCase
     /**
      * @covers App\Services\Invoice\MarkInvoiceDeleted
      */
-    public function testInvoiceDeletion()
+    public function testInvoiceDeletion(): void
     {
         $data = [
             'name' => 'A Nice Client',
@@ -410,7 +410,7 @@ class DeleteInvoiceTest extends TestCase
     /**
      * @covers App\Services\Invoice\HandleRestore
      */
-    public function testInvoiceDeletionAndRestoration()
+    public function testInvoiceDeletionAndRestoration(): void
     {
         //create new client
 

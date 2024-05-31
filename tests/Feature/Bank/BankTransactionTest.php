@@ -39,7 +39,7 @@ class BankTransactionTest extends TestCase
         );
     }
 
-    public function testLinkMultipleExpensesWithDeleteToTransaction()
+    public function testLinkMultipleExpensesWithDeleteToTransaction(): void
     {
         $data = [];
 
@@ -133,7 +133,7 @@ class BankTransactionTest extends TestCase
 
     }
 
-    public function testLinkMultipleExpensesToTransaction()
+    public function testLinkMultipleExpensesToTransaction(): void
     {
         $data = [];
 
@@ -197,7 +197,7 @@ class BankTransactionTest extends TestCase
 
     }
 
-    public function testBankTransactionBulkActions()
+    public function testBankTransactionBulkActions(): void
     {
         $data = [
             'ids' => [$this->bank_integration->hashed_id],
@@ -233,7 +233,7 @@ class BankTransactionTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testLinkExpenseToTransaction()
+    public function testLinkExpenseToTransaction(): void
     {
         $data = [];
 
@@ -275,7 +275,7 @@ class BankTransactionTest extends TestCase
         $this->assertEquals(BankTransaction::STATUS_CONVERTED, $bt->status_id);
     }
 
-    public function testLinkingManuallyPaidInvoices()
+    public function testLinkingManuallyPaidInvoices(): void
     {
         $invoice = InvoiceFactory::create($this->company->id, $this->user->id);
         $invoice->client_id = $this->client->id;
@@ -333,7 +333,7 @@ class BankTransactionTest extends TestCase
         $this->assertEquals($invoice->hashed_id, $bt->invoice_ids);
     }
 
-    public function testLinkPaymentToTransaction()
+    public function testLinkPaymentToTransaction(): void
     {
         $data = [];
 
@@ -371,7 +371,7 @@ class BankTransactionTest extends TestCase
         $this->assertEquals(BankTransaction::STATUS_CONVERTED, $bt->status_id);
     }
 
-    public function testMatchBankTransactionsValidationShouldFail()
+    public function testMatchBankTransactionsValidationShouldFail(): void
     {
         $data = [];
 
@@ -387,7 +387,7 @@ class BankTransactionTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testMatchBankTransactionValidationShouldPass()
+    public function testMatchBankTransactionValidationShouldPass(): void
     {
         if (config('ninja.testvars.travis') !== false) {
             $this->markTestSkipped('Skip test for Github Actions');

@@ -20,7 +20,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::raw('SET GLOBAL innodb_file_per_table=1;')->getValue(DB::connection()->getQueryGrammar());
         DB::raw('SET GLOBAL innodb_file_format=Barracuda;')->getValue(DB::connection()->getQueryGrammar());
@@ -1391,7 +1391,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
 };

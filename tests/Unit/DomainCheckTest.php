@@ -22,7 +22,7 @@ class DomainCheckTest extends TestCase
         parent::setUp();
     }
 
-    public function testDomainCheck()
+    public function testDomainCheck(): void
     {
 
         $this->assertTrue(in_array('yopmail.com', \App\DataProviders\Domains::getDomains()));
@@ -30,7 +30,7 @@ class DomainCheckTest extends TestCase
 
     }
 
-    public function testSubdomainValidation()
+    public function testSubdomainValidation(): void
     {
         $this->assertFalse($this->checker('invoiceninja'));
         $this->assertFalse($this->checker('hello'));

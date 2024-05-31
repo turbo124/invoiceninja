@@ -24,7 +24,7 @@ class GenericReportRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'date_range' => 'bail|required|string',

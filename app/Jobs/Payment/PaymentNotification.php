@@ -45,7 +45,7 @@ class PaymentNotification implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         //notification for the payment.
         //

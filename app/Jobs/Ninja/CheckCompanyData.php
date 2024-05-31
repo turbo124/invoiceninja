@@ -53,7 +53,7 @@ class CheckCompanyData implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->is_valid = true;
 

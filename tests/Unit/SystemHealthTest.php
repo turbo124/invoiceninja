@@ -25,7 +25,7 @@ class SystemHealthTest extends TestCase
         parent::setUp();
     }
 
-    public function testVariables()
+    public function testVariables(): void
     {
         $results = SystemHealth::check();
 

@@ -26,7 +26,7 @@ class ReportPreviewRequest extends Request
         return $this->checkAuthority();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
         ];

@@ -47,7 +47,7 @@ class MethodDeleted
      *
      * @return Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
         return [];
     }

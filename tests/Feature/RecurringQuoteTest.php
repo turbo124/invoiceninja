@@ -49,7 +49,7 @@ class RecurringQuoteTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testRecurringQuoteListFilter()
+    public function testRecurringQuoteListFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -59,7 +59,7 @@ class RecurringQuoteTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringQuoteList()
+    public function testRecurringQuoteList(): void
     {
         RecurringQuote::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 
@@ -71,7 +71,7 @@ class RecurringQuoteTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testRecurringQuoteRESTEndPoints()
+    public function testRecurringQuoteRESTEndPoints(): void
     {
         RecurringQuote::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 

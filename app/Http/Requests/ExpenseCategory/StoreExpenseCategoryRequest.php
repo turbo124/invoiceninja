@@ -27,7 +27,7 @@ class StoreExpenseCategoryRequest extends Request
         return $user->can('create', ExpenseCategory::class) || $user->can('create', Expense::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */

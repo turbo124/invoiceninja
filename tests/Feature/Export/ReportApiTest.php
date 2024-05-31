@@ -40,7 +40,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testActivityCSVExport()
+    public function testActivityCSVExport(): void
     {
         $data = [
             'send_email' => false,
@@ -56,7 +56,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testUserSalesReportApiRoute()
+    public function testUserSalesReportApiRoute(): void
     {
         $data = [
             'send_email' => false,
@@ -72,7 +72,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testTaxSummaryReportApiRoute()
+    public function testTaxSummaryReportApiRoute(): void
     {
         $data = [
             'send_email' => false,
@@ -88,7 +88,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testClientSalesReportApiRoute()
+    public function testClientSalesReportApiRoute(): void
     {
         $data = [
             'send_email' => false,
@@ -104,7 +104,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testArDetailReportApiRoute()
+    public function testArDetailReportApiRoute(): void
     {
         $data = [
             'send_email' => false,
@@ -120,7 +120,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testArSummaryReportApiRoute()
+    public function testArSummaryReportApiRoute(): void
     {
         $data = [
             'send_email' => false,
@@ -136,7 +136,7 @@ class ReportApiTest extends TestCase
 
     }
 
-    public function testClientBalanceReportApiRoute()
+    public function testClientBalanceReportApiRoute(): void
     {
         $data = [
             'send_email' => false,

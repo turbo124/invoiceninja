@@ -29,7 +29,7 @@ class ProductSalesReportRequest extends Request
         return $this->checkAuthority();
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */

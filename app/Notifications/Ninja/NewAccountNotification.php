@@ -10,6 +10,7 @@
 
 namespace App\Notifications\Ninja;
 
+use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Account;
 use App\Models\Client;
 use Illuminate\Notifications\Messages\SlackMessage;
@@ -38,7 +39,7 @@ class NewAccountNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['slack'];
     }
@@ -48,7 +49,7 @@ class NewAccountNotification extends Notification
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
     }
 
@@ -58,7 +59,7 @@ class NewAccountNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

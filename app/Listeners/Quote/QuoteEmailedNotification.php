@@ -34,7 +34,7 @@ class QuoteEmailedNotification implements ShouldQueue
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle($event): void
     {
         MultiDB::setDb($event->company->db);
 

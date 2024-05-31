@@ -45,7 +45,7 @@ class RefundUnitTest extends TestCase
     //     $this->assertEquals(0.82, $refund);
     // }
 
-    public function testDiffInDays()
+    public function testDiffInDays(): void
     {
         $this->assertEquals(30, Carbon::parse('2021-01-01')->diffInDays(Carbon::parse('2021-01-31')));
     }

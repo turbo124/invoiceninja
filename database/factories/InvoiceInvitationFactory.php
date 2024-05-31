@@ -20,7 +20,7 @@ class InvoiceInvitationFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'key' => Str::random(40),

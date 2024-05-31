@@ -22,7 +22,7 @@ class BulkWebhookRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         if (! $this->has('action')) {
             return false;
@@ -40,7 +40,7 @@ class BulkWebhookRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         $rules = $this->getGlobalRules();
 

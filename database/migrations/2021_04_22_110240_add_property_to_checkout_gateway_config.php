@@ -14,7 +14,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         $gateway = Gateway::query()->where('key', '3758e7f7c6f4cecf0f4f348b9a00f456')->first();
 
@@ -45,7 +45,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
 };

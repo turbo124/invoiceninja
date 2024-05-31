@@ -25,7 +25,7 @@ class UploadPaymentRequest extends Request
         return $user->can('edit', $this->payment);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

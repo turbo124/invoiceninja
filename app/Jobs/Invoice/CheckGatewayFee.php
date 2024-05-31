@@ -37,7 +37,7 @@ class CheckGatewayFee implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
 
         MultiDB::setDb($this->db);

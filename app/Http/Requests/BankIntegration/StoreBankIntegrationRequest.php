@@ -26,7 +26,7 @@ class StoreBankIntegrationRequest extends Request
         return auth()->user()->can('create', BankIntegration::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'bank_account_name' => 'required|min:3',
@@ -47,7 +47,7 @@ class StoreBankIntegrationRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [];
     }

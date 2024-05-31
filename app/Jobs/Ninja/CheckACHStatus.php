@@ -41,7 +41,7 @@ class CheckACHStatus implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         //multiDB environment, need to
         foreach (MultiDB::$dbs as $db) {

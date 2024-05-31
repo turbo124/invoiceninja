@@ -13,7 +13,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('company_ledgers', function (Blueprint $table) {
             $table->decimal('balance', 20, 6)->change();
@@ -152,7 +152,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }

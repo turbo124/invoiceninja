@@ -296,7 +296,7 @@ class CompanyImport implements ShouldQueue
         return $json;
     }
 
-    public function handle()
+    public function handle(): void
     {
         MultiDB::setDb($this->company->db);
 

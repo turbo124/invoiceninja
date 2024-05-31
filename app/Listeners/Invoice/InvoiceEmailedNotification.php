@@ -34,7 +34,7 @@ class InvoiceEmailedNotification implements ShouldQueue
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle($event): void
     {
         nlog($event->template);
 

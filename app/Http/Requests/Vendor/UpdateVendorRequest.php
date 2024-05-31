@@ -31,7 +31,7 @@ class UpdateVendorRequest extends Request
         return $user->can('edit', $this->vendor);
     }
 
-    public function rules()
+    public function rules(): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -78,7 +78,7 @@ class UpdateVendorRequest extends Request
         return $rules;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'email' => ctrans('validation.email', ['attribute' => 'email']),

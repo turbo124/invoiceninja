@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Models\Account;
 use App\Models\Company;
 use App\Utils\Ninja;
@@ -16,7 +17,7 @@ class ContactRegister
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $domain_name = $request->getHost();
 

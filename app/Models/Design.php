@@ -10,6 +10,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\Template\TemplateService;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -78,7 +79,7 @@ class Design extends BaseModel
         ];
     }
 
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }

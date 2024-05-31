@@ -46,7 +46,7 @@ class DeletePaymentTest extends TestCase
         );
     }
 
-    public function testRegularPayment()
+    public function testRegularPayment(): void
     {
         Invoice::factory()
             ->count(10)

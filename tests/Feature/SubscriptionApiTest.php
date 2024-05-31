@@ -56,7 +56,7 @@ class SubscriptionApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testSubscriptionCronLocalization()
+    public function testSubscriptionCronLocalization(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -294,7 +294,7 @@ class SubscriptionApiTest extends TestCase
 
     }
 
-    public function testAssignInvoice()
+    public function testAssignInvoice(): void
     {
         $i = Invoice::factory()
             ->create([
@@ -330,7 +330,7 @@ class SubscriptionApiTest extends TestCase
 
     }
 
-    public function testAssignRecurringInvoice()
+    public function testAssignRecurringInvoice(): void
     {
         $i = RecurringInvoice::factory()
             ->create([
@@ -366,7 +366,7 @@ class SubscriptionApiTest extends TestCase
 
     }
 
-    public function testSubscriptionFilter()
+    public function testSubscriptionFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -375,7 +375,7 @@ class SubscriptionApiTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testSubscriptionsGet()
+    public function testSubscriptionsGet(): void
     {
         $product = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -398,7 +398,7 @@ class SubscriptionApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSubscriptionsPost()
+    public function testSubscriptionsPost(): void
     {
         $product = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -414,7 +414,7 @@ class SubscriptionApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSubscriptionPut()
+    public function testSubscriptionPut(): void
     {
         $product = Product::factory()->create([
             'company_id' => $this->company->id,
@@ -440,7 +440,7 @@ class SubscriptionApiTest extends TestCase
         $this->assertNotEquals($response1['data']['allow_cancellation'], $response2['data']['allow_cancellation']);
     }
 
-    public function testSubscriptionDeleted()
+    public function testSubscriptionDeleted(): void
     {
         $product = Product::factory()->create([
             'company_id' => $this->company->id,

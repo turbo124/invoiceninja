@@ -61,7 +61,7 @@ class RefundTest extends TestCase
         // $this->withoutExceptionHandling();
     }
 
-    public function testRefundAndAppliedAmounts()
+    public function testRefundAndAppliedAmounts(): void
     {
 
         $data = [
@@ -190,7 +190,7 @@ class RefundTest extends TestCase
      * Test that a simple payment of $50
      * is able to be refunded.
      */
-    public function testBasicRefundValidation()
+    public function testBasicRefundValidation(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -270,7 +270,7 @@ class RefundTest extends TestCase
      * Should produce a validation error if
      * no invoices are specified in the refund
      */
-    public function testRefundValidationNoInvoicesProvided()
+    public function testRefundValidationNoInvoicesProvided(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -356,7 +356,7 @@ class RefundTest extends TestCase
      * Test that a refund with invoices provided
      * passes.
      */
-    public function testRefundValidationWithValidInvoiceProvided()
+    public function testRefundValidationWithValidInvoiceProvided(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -451,7 +451,7 @@ class RefundTest extends TestCase
     /**
      * Test Validation with incorrect invoice refund amounts.
      */
-    public function testRefundValidationWithInValidInvoiceRefundedAmount()
+    public function testRefundValidationWithInValidInvoiceRefundedAmount(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -544,7 +544,7 @@ class RefundTest extends TestCase
      * Tests refund when providing an invoice
      * not related to the payment.
      */
-    public function testRefundValidationWithInValidInvoiceProvided()
+    public function testRefundValidationWithInValidInvoiceProvided(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -661,7 +661,7 @@ class RefundTest extends TestCase
      * payment.applied = 10
      * credit.balance = 0
      */
-    public function testRefundWhereCreditsArePresent()
+    public function testRefundWhereCreditsArePresent(): void
     {
         $client = ClientFactory::create($this->company->id, $this->user->id);
         $client->save();
@@ -771,7 +771,7 @@ class RefundTest extends TestCase
 
     /*Additional scenarios*/
 
-    public function testRefundsWhenCreditsArePresent()
+    public function testRefundsWhenCreditsArePresent(): void
     {
         $cl = Client::factory()->create([
             'company_id' => $this->company->id,
@@ -886,7 +886,7 @@ class RefundTest extends TestCase
 
     }
 
-    public function testRefundsWithSplitCreditAndPaymentRefund()
+    public function testRefundsWithSplitCreditAndPaymentRefund(): void
     {
         $i = Invoice::factory()->create([
             'company_id' => $this->company->id,

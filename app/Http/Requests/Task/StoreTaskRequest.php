@@ -31,7 +31,7 @@ class StoreTaskRequest extends Request
         return $user->can('create', Task::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */

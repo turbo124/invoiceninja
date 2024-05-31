@@ -31,7 +31,7 @@ class LogRequestSending
         //
     }
 
-    public function handle(RequestSending $event)
+    public function handle(RequestSending $event): void
     {
         nlog('Request');
         nlog($event->request->headers());

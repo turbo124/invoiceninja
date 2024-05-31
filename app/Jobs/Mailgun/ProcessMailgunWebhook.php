@@ -82,7 +82,7 @@ class ProcessMailgunWebhook implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         nlog($this->request);
 

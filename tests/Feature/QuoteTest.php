@@ -54,7 +54,7 @@ class QuoteTest extends TestCase
         );
     }
 
-    public function testQuoteDueDateInjectionValidationLayer()
+    public function testQuoteDueDateInjectionValidationLayer(): void
     {
 
         $data = [
@@ -76,7 +76,7 @@ class QuoteTest extends TestCase
 
     }
 
-    public function testNullDueDates()
+    public function testNullDueDates(): void
     {
 
         $data = [
@@ -108,7 +108,7 @@ class QuoteTest extends TestCase
 
     }
 
-    public function testNonNullDueDates()
+    public function testNonNullDueDates(): void
     {
 
         $data = [
@@ -140,7 +140,7 @@ class QuoteTest extends TestCase
 
     }
 
-    public function testPartialDueDates()
+    public function testPartialDueDates(): void
     {
 
         $data = [
@@ -196,7 +196,7 @@ class QuoteTest extends TestCase
 
     }
 
-    public function testQuoteToProjectConversion2()
+    public function testQuoteToProjectConversion2(): void
     {
         $settings = ClientSettings::defaults();
         $settings->default_task_rate = 41;
@@ -254,14 +254,14 @@ class QuoteTest extends TestCase
 
     }
 
-    public function testQuoteToProjectConversion()
+    public function testQuoteToProjectConversion(): void
     {
         $project = $this->quote->service()->convertToProject();
 
         $this->assertInstanceOf(\App\Models\Project::class, $project);
     }
 
-    public function testQuoteConversion()
+    public function testQuoteConversion(): void
     {
         $invoice = $this->quote->service()->convertToInvoice();
 
@@ -273,7 +273,7 @@ class QuoteTest extends TestCase
 
     }
 
-    public function testQuoteDownloadPDF()
+    public function testQuoteDownloadPDF(): void
     {
         $i = $this->quote->invitations->first();
 
@@ -286,7 +286,7 @@ class QuoteTest extends TestCase
         $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
     }
 
-    public function testQuoteListApproved()
+    public function testQuoteListApproved(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -296,7 +296,7 @@ class QuoteTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testQuoteConvertToProject()
+    public function testQuoteConvertToProject(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -314,7 +314,7 @@ class QuoteTest extends TestCase
         $this->assertEquals($project->name, ctrans('texts.quote_number_short').' '.$this->quote->number." [{$this->quote->client->present()->name()}]");
     }
 
-    public function testQuoteList()
+    public function testQuoteList(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -324,7 +324,7 @@ class QuoteTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testQuoteRESTEndPoints()
+    public function testQuoteRESTEndPoints(): void
     {
         $response = null;
 

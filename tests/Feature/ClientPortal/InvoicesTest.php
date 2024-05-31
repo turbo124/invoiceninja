@@ -39,7 +39,7 @@ class InvoicesTest extends TestCase
         $this->buildCache(true);
     }
 
-    public function testInvoiceTableFilters()
+    public function testInvoiceTableFilters(): void
     {
         $account = Account::factory()->create();
 

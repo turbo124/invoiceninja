@@ -30,14 +30,14 @@ class CheckCacheTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testWarmedUpCache()
+    public function testWarmedUpCache(): void
     {
         $date_formats = Cache::get('date_formats');
 
         $this->assertNotNull($date_formats);
     }
 
-    public function testCacheCount()
+    public function testCacheCount(): void
     {
         $date_formats = Cache::get('date_formats');
 

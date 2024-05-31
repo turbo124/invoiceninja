@@ -10,6 +10,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -65,7 +66,7 @@ class License extends StaticModel
         return $this->created_at->addYear()->format('Y-m-d');
     }
 
-    public function recurring_invoice()
+    public function recurring_invoice(): BelongsTo
     {
         return $this->belongsTo(RecurringInvoice::class);
     }

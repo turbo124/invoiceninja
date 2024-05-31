@@ -25,7 +25,7 @@ class UploadRecurringInvoiceRequest extends Request
         return $user->can('edit', $this->recurring_invoice);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

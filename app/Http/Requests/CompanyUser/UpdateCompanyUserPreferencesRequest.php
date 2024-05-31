@@ -25,7 +25,7 @@ class UpdateCompanyUserPreferencesRequest extends Request
         return auth()->user()->id == $this->user->id;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'react_settings' => 'required',

@@ -25,7 +25,7 @@ class UpdatePaymentTermRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'num_days' => 'required',

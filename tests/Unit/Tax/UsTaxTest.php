@@ -147,7 +147,7 @@ class UsTaxTest extends TestCase
         return $invoice;
     }
 
-    public function testTaxAuNoExemption()
+    public function testTaxAuNoExemption(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -219,7 +219,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testTaxAuClientExemption()
+    public function testTaxAuClientExemption(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -291,7 +291,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testTaxAuProductExemption()
+    public function testTaxAuProductExemption(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -363,7 +363,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testTaxAuProductOverride()
+    public function testTaxAuProductOverride(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -435,7 +435,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testInterstateFreightNoTaxWithProductTax()
+    public function testInterstateFreightNoTaxWithProductTax(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -519,7 +519,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testInterstateFreightProductNoTax()
+    public function testInterstateFreightProductNoTax(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -589,7 +589,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testInterstateServiceProductNoTax()
+    public function testInterstateServiceProductNoTax(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -659,7 +659,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testInterstateWithNoTax()
+    public function testInterstateWithNoTax(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -729,7 +729,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testSameSubregionAndExemptProduct()
+    public function testSameSubregionAndExemptProduct(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -801,7 +801,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testSameSubregionAndExemptClient()
+    public function testSameSubregionAndExemptClient(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -872,7 +872,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testForeignTaxesEnabledWithExemptProduct()
+    public function testForeignTaxesEnabledWithExemptProduct(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
@@ -941,7 +941,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testForeignTaxesDisabled()
+    public function testForeignTaxesDisabled(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
@@ -1009,7 +1009,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testForeignTaxesEnabled()
+    public function testForeignTaxesEnabled(): void
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
@@ -1078,7 +1078,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testCompanyTaxAllOffButTaxUSRegion()
+    public function testCompanyTaxAllOffButTaxUSRegion(): void
     {
 
         $invoice = $this->invoiceStub('92582');
@@ -1102,7 +1102,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testCompanyTaxAllOff()
+    public function testCompanyTaxAllOff(): void
     {
 
         $invoice = $this->invoiceStub('92582');
@@ -1126,7 +1126,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testThresholdLevelsAreMet()
+    public function testThresholdLevelsAreMet(): void
     {
 
         $invoice = $this->invoiceStub('92582');
@@ -1150,7 +1150,7 @@ class UsTaxTest extends TestCase
 
     }
 
-    public function testHasValidVatMakesNoDifferenceToTaxCalc()
+    public function testHasValidVatMakesNoDifferenceToTaxCalc(): void
     {
 
         $invoice = $this->invoiceStub('92582');
@@ -1164,7 +1164,7 @@ class UsTaxTest extends TestCase
         $this->assertEquals(108.75, $invoice->amount);
     }
 
-    public function testTaxExemption()
+    public function testTaxExemption(): void
     {
         $invoice = $this->invoiceStub('92582');
         $client = $invoice->client;
@@ -1177,7 +1177,7 @@ class UsTaxTest extends TestCase
         $this->assertEquals(100, $invoice->amount);
     }
 
-    public function testBasicTaxCalculation()
+    public function testBasicTaxCalculation(): void
     {
 
         $invoice = $this->invoiceStub();

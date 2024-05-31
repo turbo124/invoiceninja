@@ -46,7 +46,7 @@ class AdjustProductInventory implements ShouldQueue
      *
      * @return false
      */
-    public function handle()
+    public function handle(): bool
     {
         MultiDB::setDb($this->company->db);
 

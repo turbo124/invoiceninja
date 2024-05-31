@@ -181,7 +181,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testPurchaseOrderDataParse()
+    public function testPurchaseOrderDataParse(): void
     {
         $data = [];
 
@@ -200,7 +200,7 @@ class TemplateTest extends TestCase
         $this->assertIsArray($ts->getData());
     }
 
-    public function testTaskDataParse()
+    public function testTaskDataParse(): void
     {
         $data = [];
 
@@ -219,7 +219,7 @@ class TemplateTest extends TestCase
         $this->assertIsArray($ts->getData());
     }
 
-    public function testQuoteDataParse()
+    public function testQuoteDataParse(): void
     {
         $data = [];
 
@@ -239,7 +239,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testProjectDataParse()
+    public function testProjectDataParse(): void
     {
         $data = [];
 
@@ -259,7 +259,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testNegativeDivAttribute()
+    public function testNegativeDivAttribute(): void
     {
         $dom = new \DOMDocument();
         @$dom->loadHTML(mb_convert_encoding($this->stack, 'HTML-ENTITIES', 'UTF-8'));
@@ -271,7 +271,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testStackResolutionWithLabels()
+    public function testStackResolutionWithLabels(): void
     {
 
         $dom = new \DOMDocument();
@@ -284,7 +284,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testStackResolution()
+    public function testStackResolution(): void
     {
 
         $partials['design']['includes'] = '';
@@ -309,7 +309,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testDataMaps()
+    public function testDataMaps(): void
     {
         $start = microtime(true);
 
@@ -526,7 +526,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testVariableResolutionViaTransformersForPaymentsInStatements()
+    public function testVariableResolutionViaTransformersForPaymentsInStatements(): void
     {
         Invoice::factory()->count(20)->create([
             'company_id' => $this->company->id,
@@ -587,7 +587,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testDoubleEntityNestedDataTemplateServiceBuild()
+    public function testDoubleEntityNestedDataTemplateServiceBuild(): void
     {
         $design_model = Design::find(2);
 
@@ -620,7 +620,7 @@ class TemplateTest extends TestCase
         $this->assertNotNull($ts->getHtml());
     }
 
-    public function testDoubleEntityTemplateServiceBuild()
+    public function testDoubleEntityTemplateServiceBuild(): void
     {
         $design_model = Design::find(2);
 
@@ -653,7 +653,7 @@ class TemplateTest extends TestCase
         $this->assertNotNull($ts->getHtml());
     }
 
-    public function testTemplateServiceBuild()
+    public function testTemplateServiceBuild(): void
     {
         $design_model = Design::find(2);
         $replicated_design = $design_model->replicate();
@@ -675,7 +675,7 @@ class TemplateTest extends TestCase
         $this->assertNotNull($ts->getHtml());
     }
 
-    public function testTemplateService()
+    public function testTemplateService(): void
     {
         $design_model = Design::find(2);
 
@@ -692,7 +692,7 @@ class TemplateTest extends TestCase
         $this->assertInstanceOf(TemplateService::class, $replicated_design->service());
     }
 
-    public function testTimingOnCleanDesign()
+    public function testTimingOnCleanDesign(): void
     {
         $design_model = Design::find(2);
 
@@ -732,7 +732,7 @@ class TemplateTest extends TestCase
 
     }
 
-    public function testStaticPdfGeneration()
+    public function testStaticPdfGeneration(): void
     {
         $start = microtime(true);
 
@@ -745,7 +745,7 @@ class TemplateTest extends TestCase
         nlog('Plain PDF Gen Time: '.$end - $start);
     }
 
-    public function testTemplateGeneration()
+    public function testTemplateGeneration(): void
     {
         $entity_obj = $this->invoice;
 

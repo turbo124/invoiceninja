@@ -28,7 +28,7 @@ class TestCompanyGatewayRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         return [

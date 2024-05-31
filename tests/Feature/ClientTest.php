@@ -70,7 +70,7 @@ class ClientTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testBulkGroupAssignment()
+    public function testBulkGroupAssignment(): void
     {
         Client::factory()->count(5)->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -109,7 +109,7 @@ class ClientTest extends TestCase
         }
     }
 
-    public function testClientExchangeRateCalculation()
+    public function testClientExchangeRateCalculation(): void
     {
         $settings = ClientSettings::defaults();
         $settings->currency_id = 12;
@@ -137,7 +137,7 @@ class ClientTest extends TestCase
 
     }
 
-    public function testStoreClientFixes2()
+    public function testStoreClientFixes2(): void
     {
         $data = [
             'contacts' => [
@@ -163,7 +163,7 @@ class ClientTest extends TestCase
 
     }
 
-    public function testStoreClientFixes()
+    public function testStoreClientFixes(): void
     {
         $data = [
             'contacts' => [
@@ -190,7 +190,7 @@ class ClientTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testClientMergeContactDrop()
+    public function testClientMergeContactDrop(): void
     {
 
         $c = Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id]);
@@ -258,7 +258,7 @@ class ClientTest extends TestCase
         return $line_items;
     }
 
-    public function testCreditBalance()
+    public function testCreditBalance(): void
     {
         $this->client->credit_balance = 0;
         $this->client->save();
@@ -333,7 +333,7 @@ class ClientTest extends TestCase
         $this->assertEquals(30, $credit->client->fresh()->credit_balance);
     }
 
-    public function testStoreClientUsingCountryCode()
+    public function testStoreClientUsingCountryCode(): void
     {
         $data = [
             'name' => 'Country Code Name',
@@ -387,7 +387,7 @@ class ClientTest extends TestCase
         $this->assertEquals(12, $client->settings->currency_id);
     }
 
-    public function testClientList()
+    public function testClientList(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -400,7 +400,7 @@ class ClientTest extends TestCase
     /*
      * @covers ClientController
      */
-    public function testClientRestEndPoints()
+    public function testClientRestEndPoints(): void
     {
         Client::factory()->count(3)->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
             ClientContact::factory()->create([
@@ -470,7 +470,7 @@ class ClientTest extends TestCase
             ->assertStatus(400);
     }
 
-    public function testDefaultTimeZoneFromClientModel()
+    public function testDefaultTimeZoneFromClientModel(): void
     {
         $account = Account::factory()->create();
         $company = Company::factory()->create([
@@ -536,7 +536,7 @@ class ClientTest extends TestCase
         $this->assertEquals($this->client->contacts->count(), 3);
     }
 
-    public function testClientCreationWithIllegalContactObject()
+    public function testClientCreationWithIllegalContactObject(): void
     {
         $account = Account::factory()->create();
         $company = Company::factory()->create([
@@ -591,7 +591,7 @@ class ClientTest extends TestCase
         }
     }
 
-    public function testCreatingClientAndContacts()
+    public function testCreatingClientAndContacts(): void
     {
         $account = Account::factory()->create();
         $company = Company::factory()->create([

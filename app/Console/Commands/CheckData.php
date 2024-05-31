@@ -98,7 +98,7 @@ class CheckData extends Command
 
     protected $wrong_paid_status = 0;
 
-    public function handle()
+    public function handle(): void
     {
         $time_start = microtime(true);
 

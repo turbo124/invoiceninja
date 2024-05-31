@@ -105,7 +105,7 @@ class RecurringInvoiceInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function recurring_invoice()
+    public function recurring_invoice(): BelongsTo
     {
         return $this->belongsTo(RecurringInvoice::class)->withTrashed();
     }
@@ -113,7 +113,7 @@ class RecurringInvoiceInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function entity()
+    public function entity(): BelongsTo
     {
         return $this->belongsTo(RecurringInvoice::class)->withTrashed();
     }
@@ -121,7 +121,7 @@ class RecurringInvoiceInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function contact()
+    public function contact(): BelongsTo
     {
         return $this->belongsTo(ClientContact::class, 'client_contact_id', 'id')->withTrashed();
     }
@@ -129,7 +129,7 @@ class RecurringInvoiceInvitation extends BaseModel
     /**
      * @return mixed
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
     }
@@ -137,7 +137,7 @@ class RecurringInvoiceInvitation extends BaseModel
     /**
      * @return BelongsTo
      */
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }

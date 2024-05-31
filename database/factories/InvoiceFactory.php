@@ -21,7 +21,7 @@ class InvoiceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'status_id' => Invoice::STATUS_SENT,

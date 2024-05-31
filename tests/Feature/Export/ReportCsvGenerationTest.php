@@ -267,7 +267,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testContactProps()
+    public function testContactProps(): void
     {
         Invoice::factory()->count(5)->create(
             [
@@ -303,7 +303,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testForcedInsertionOfMandatoryColumns()
+    public function testForcedInsertionOfMandatoryColumns(): void
     {
         $forced = ['client.name'];
 
@@ -330,7 +330,7 @@ class ReportCsvGenerationTest extends TestCase
         return $response;
     }
 
-    public function testProductJsonFiltering()
+    public function testProductJsonFiltering(): void
     {
 
         $query = Invoice::query();
@@ -412,7 +412,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testProductKeyFilterQueries()
+    public function testProductKeyFilterQueries(): void
     {
 
         $item = InvoiceItemFactory::create();
@@ -482,7 +482,7 @@ class ReportCsvGenerationTest extends TestCase
         });
     }
 
-    public function testVendorCsvGeneration()
+    public function testVendorCsvGeneration(): void
     {
 
         $vendor =
@@ -559,7 +559,7 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals('address1', $this->traverseJson($data, '0.0.display_value'));
     }
 
-    public function testVendorCustomColumnCsvGeneration()
+    public function testVendorCustomColumnCsvGeneration(): void
     {
 
         \App\Models\Vendor::query()->cursor()->each(function ($t) {
@@ -627,7 +627,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testTaskCustomColumnsCsvGeneration()
+    public function testTaskCustomColumnsCsvGeneration(): void
     {
 
         $invoice = \App\Models\Invoice::factory()->create([
@@ -756,7 +756,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testTasksCsvGeneration()
+    public function testTasksCsvGeneration(): void
     {
 
         \App\Models\Task::query()->cursor()->each(function ($t) {
@@ -809,7 +809,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testProductsCsvGeneration()
+    public function testProductsCsvGeneration(): void
     {
 
         \App\Models\Product::factory()->create([
@@ -872,7 +872,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testPaymentCsvGeneration()
+    public function testPaymentCsvGeneration(): void
     {
 
         $invoice = \App\Models\Invoice::factory()->create([
@@ -990,7 +990,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testPaymentCustomFieldsCsvGeneration()
+    public function testPaymentCustomFieldsCsvGeneration(): void
     {
 
         \App\Models\Payment::factory()->create([
@@ -1031,7 +1031,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testClientCsvGeneration()
+    public function testClientCsvGeneration(): void
     {
 
         $data = [
@@ -1070,7 +1070,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testClientCustomColumnsCsvGeneration()
+    public function testClientCustomColumnsCsvGeneration(): void
     {
 
         $data = [
@@ -1103,7 +1103,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testCreditJsonReport()
+    public function testCreditJsonReport(): void
     {
 
         Credit::factory()->create([
@@ -1145,7 +1145,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testCreditCustomColumnsCsvGeneration()
+    public function testCreditCustomColumnsCsvGeneration(): void
     {
 
         Credit::factory()->create([
@@ -1203,7 +1203,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testInvoiceCustomColumnsCsvGeneration()
+    public function testInvoiceCustomColumnsCsvGeneration(): void
     {
 
         \App\Models\Invoice::factory()->create([
@@ -1267,7 +1267,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testRecurringInvoiceCustomColumnsCsvGeneration()
+    public function testRecurringInvoiceCustomColumnsCsvGeneration(): void
     {
 
         \App\Models\RecurringInvoice::factory()->create([
@@ -1320,7 +1320,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testRecurringInvoiceColumnsCsvGeneration()
+    public function testRecurringInvoiceColumnsCsvGeneration(): void
     {
 
         \App\Models\RecurringInvoice::factory()->create([
@@ -1366,7 +1366,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testInvoiceItemsCustomColumnsCsvGeneration()
+    public function testInvoiceItemsCustomColumnsCsvGeneration(): void
     {
 
         \App\Models\Invoice::factory()->create([
@@ -1471,7 +1471,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testQuoteItemsCustomColumnsCsvGeneration()
+    public function testQuoteItemsCustomColumnsCsvGeneration(): void
     {
 
         $q = \App\Models\Quote::factory()->create([
@@ -1553,7 +1553,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testPurchaseOrderCsvGeneration()
+    public function testPurchaseOrderCsvGeneration(): void
     {
 
         $vendor =
@@ -1609,7 +1609,7 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals('Terms', $this->getFirstValueByColumn($csv, 'Purchase Order Terms'));
     }
 
-    public function testPurchaseOrderItemsCustomColumnsCsvGeneration()
+    public function testPurchaseOrderItemsCustomColumnsCsvGeneration(): void
     {
 
         $vendor =
@@ -1690,7 +1690,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testQuoteCustomColumnsCsvGeneration()
+    public function testQuoteCustomColumnsCsvGeneration(): void
     {
 
         \App\Models\Quote::factory()->create([
@@ -1746,7 +1746,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testInvoicePaidCustomColumnsCsvGeneration()
+    public function testInvoicePaidCustomColumnsCsvGeneration(): void
     {
 
         $invoice = \App\Models\Invoice::factory()->create([
@@ -1795,7 +1795,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testClientContactCsvGeneration()
+    public function testClientContactCsvGeneration(): void
     {
 
         $data = [
@@ -1857,7 +1857,7 @@ class ReportCsvGenerationTest extends TestCase
         return $res[1];
     }
 
-    public function testCreditCsvGeneration()
+    public function testCreditCsvGeneration(): void
     {
 
         Credit::factory()->create([
@@ -1929,7 +1929,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testInvoiceCsvGeneration()
+    public function testInvoiceCsvGeneration(): void
     {
 
         Invoice::factory()->create([
@@ -2012,7 +2012,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testRecurringInvoiceCsvGeneration()
+    public function testRecurringInvoiceCsvGeneration(): void
     {
 
         \App\Models\RecurringInvoice::factory()->create([
@@ -2093,7 +2093,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testQuoteCsvGeneration()
+    public function testQuoteCsvGeneration(): void
     {
 
         \App\Models\Quote::factory()->create([
@@ -2174,7 +2174,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testExpenseCsvGeneration()
+    public function testExpenseCsvGeneration(): void
     {
         Expense::factory()->create([
             'user_id' => $this->user->id,
@@ -2224,7 +2224,7 @@ class ReportCsvGenerationTest extends TestCase
 
     }
 
-    public function testExpenseCustomColumnsCsvGeneration()
+    public function testExpenseCustomColumnsCsvGeneration(): void
     {
         $vendor =
         \App\Models\Vendor::factory()->create(

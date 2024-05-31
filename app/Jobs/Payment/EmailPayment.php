@@ -52,7 +52,7 @@ class EmailPayment implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->company->is_disabled || (! $this->contact?->email ?? false)) {
             nlog('company disabled - or - contact email not found');

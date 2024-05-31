@@ -17,7 +17,7 @@ use Illuminate\Database\Seeder;
 
 class ConstantsSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         Size::create(['id' => 1, 'name' => '1 - 3']);
         Size::create(['id' => 2, 'name' => '4 - 10']);

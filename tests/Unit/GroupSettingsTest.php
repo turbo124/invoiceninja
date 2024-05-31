@@ -44,7 +44,7 @@ class GroupSettingsTest extends TestCase
         $this->client_settings = ClientSettings::buildClientSettings($this->company_settings, ClientSettings::defaults());
     }
 
-    public function testCompanyDefaults()
+    public function testCompanyDefaults(): void
     {
         $this->company_settings->timezone_id = 'fluffy';
         $this->company->settings = $this->company_settings;
@@ -61,7 +61,7 @@ class GroupSettingsTest extends TestCase
         $this->assertEquals($this->company->settings->timezone_id, 'fluffy');
     }
 
-    public function testGroupDefaults()
+    public function testGroupDefaults(): void
     {
         $cs = $this->company->settings;
         $cs->timezone_id = '';
@@ -88,7 +88,7 @@ class GroupSettingsTest extends TestCase
         $this->assertEquals($this->client->getMergedSettings()->timezone_id, 'SPOCK');
     }
 
-    public function testClientDefaults()
+    public function testClientDefaults(): void
     {
         $cs = $this->client->company->settings;
         $cs->timezone_id = null;
@@ -117,7 +117,7 @@ class GroupSettingsTest extends TestCase
         $this->assertEquals($this->client->getMergedSettings()->timezone_id, 'SCOTTY');
     }
 
-    public function testClientPriority()
+    public function testClientPriority(): void
     {
         $cs = $this->client->company->settings;
         $cs->timezone_id = 'COMPANY';
@@ -147,7 +147,7 @@ class GroupSettingsTest extends TestCase
     /**
      * @covers ::getMergedSettings
      */
-    public function testGroupPriority()
+    public function testGroupPriority(): void
     {
         $cs = $this->client->company->settings;
         $cs->timezone_id = 'COMPANY';
@@ -177,7 +177,7 @@ class GroupSettingsTest extends TestCase
     /**
      * @covers ::getSetting
      */
-    public function testCompanyFallBackPriority()
+    public function testCompanyFallBackPriority(): void
     {
         $cs = $this->client->company->settings;
         $cs->timezone_id = 'COMPANY';
@@ -204,7 +204,7 @@ class GroupSettingsTest extends TestCase
         $this->assertEquals($this->client->getMergedSettings()->timezone_id, 'COMPANY');
     }
 
-    public function testDiscardingUnsetProperties()
+    public function testDiscardingUnsetProperties(): void
     {
         $this->settings = $this->company->settings;
 

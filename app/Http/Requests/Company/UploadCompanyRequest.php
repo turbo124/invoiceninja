@@ -22,7 +22,7 @@ class UploadCompanyRequest extends Request
         return auth()->user()->can('edit', $this->company);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

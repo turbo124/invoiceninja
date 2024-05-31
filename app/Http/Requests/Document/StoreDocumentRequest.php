@@ -26,7 +26,7 @@ class StoreDocumentRequest extends Request
         return $user->can('create', Document::class) || ($user->hasIntersectPermissions(['edit_all', 'create_all']));
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'is_public' => 'sometimes|boolean',

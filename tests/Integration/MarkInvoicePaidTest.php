@@ -30,12 +30,12 @@ class MarkInvoicePaidTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testClientExists()
+    public function testClientExists(): void
     {
         $this->assertNotNull($this->client);
     }
 
-    public function testMarkInvoicePaidInvoice()
+    public function testMarkInvoicePaidInvoice(): void
     {
         $invoice = Invoice::find($this->invoice->id);
         $invoice_balance = $invoice->balance;

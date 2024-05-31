@@ -38,7 +38,7 @@ class BankSubaccount extends BaseModel
     /**
      * @return BelongsTo
      */
-    public function bank_account()
+    public function bank_account(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class);
     }

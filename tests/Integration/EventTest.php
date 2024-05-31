@@ -111,7 +111,7 @@ class EventTest extends TestCase
         );
     }
 
-    public function testExpenseEvents()
+    public function testExpenseEvents(): void
     {
         Event::fake();
 
@@ -167,7 +167,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testVendorEvents()
+    public function testVendorEvents(): void
     {
         Event::fake();
 
@@ -224,7 +224,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testTaskEvents()
+    public function testTaskEvents(): void
     {
         /* Test fire new invoice */
         $data = [
@@ -283,7 +283,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testCreditEvents()
+    public function testCreditEvents(): void
     {
         /* Test fire new invoice */
         $data = [
@@ -342,7 +342,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testQuoteEvents()
+    public function testQuoteEvents(): void
     {
         /* Test fire new invoice */
         $data = [
@@ -416,7 +416,7 @@ class EventTest extends TestCase
     //@TODO paymentwasvoided
     //@TODO paymentwasrefunded
 
-    public function testPaymentEvents()
+    public function testPaymentEvents(): void
     {
         Event::fake();
 
@@ -481,7 +481,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testInvoiceEvents()
+    public function testInvoiceEvents(): void
     {
         /* Test fire new invoice */
         $data = [
@@ -540,7 +540,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testRecurringInvoiceEvents()
+    public function testRecurringInvoiceEvents(): void
     {
         /* Test fire new invoice */
         $data = [
@@ -606,7 +606,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testClientEvents()
+    public function testClientEvents(): void
     {
         Event::fake();
 
@@ -663,7 +663,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testUserEvents()
+    public function testUserEvents(): void
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
@@ -744,7 +744,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testSubscriptionEvents()
+    public function testSubscriptionEvents(): void
     {
         Event::fake();
 
@@ -803,7 +803,7 @@ class EventTest extends TestCase
 
     }
 
-    public function testPurchaseOrderEvents()
+    public function testPurchaseOrderEvents(): void
     {
         /* Test fire new invoice */
         $data = [

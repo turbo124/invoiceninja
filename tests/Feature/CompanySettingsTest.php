@@ -45,7 +45,7 @@ class CompanySettingsTest extends TestCase
         Model::reguard();
     }
 
-    public function testClientNumberCantBeModified()
+    public function testClientNumberCantBeModified(): void
     {
         $settings = $this->company->settings;
 
@@ -73,7 +73,7 @@ class CompanySettingsTest extends TestCase
         }
     }
 
-    public function testNullValuesInSettings()
+    public function testNullValuesInSettings(): void
     {
         $settings = $this->company->settings;
 
@@ -100,7 +100,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals($arr['data']['settings']['reset_counter_date'], '');
     }
 
-    public function testIntegerEdgeCases()
+    public function testIntegerEdgeCases(): void
     {
         $settings = $this->company->settings;
 
@@ -126,7 +126,7 @@ class CompanySettingsTest extends TestCase
         $this->assertTrue(is_int($arr['data']['settings']['credit_number_counter']));
     }
 
-    public function testFloatEdgeCases()
+    public function testFloatEdgeCases(): void
     {
         $settings = $this->company->settings;
 
@@ -152,7 +152,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals($arr['data']['settings']['tax_rate3'], 10.5);
     }
 
-    public function testBoolEdgeCases()
+    public function testBoolEdgeCases(): void
     {
         $settings = $this->company->settings;
 
@@ -180,7 +180,7 @@ class CompanySettingsTest extends TestCase
         $this->assertFalse($arr['data']['settings']['enable_client_portal_tasks']);
     }
 
-    public function testCompanyNullValueMatrixPOST()
+    public function testCompanyNullValueMatrixPOST(): void
     {
 
         $settings = CompanySettings::defaults();
@@ -199,7 +199,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals($arr['data'][0]['company']['settings']['reset_counter_date'], '');
     }
 
-    public function testCompanyWrongValueMatrixPOST()
+    public function testCompanyWrongValueMatrixPOST(): void
     {
         $settings = CompanySettings::defaults();
         $settings->reset_counter_date = 1;
@@ -217,7 +217,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals($arr['data'][0]['company']['settings']['reset_counter_date'], '');
     }
 
-    public function testCompanyWrong2ValueMatrixPOST()
+    public function testCompanyWrong2ValueMatrixPOST(): void
     {
         $settings = CompanySettings::defaults();
         $settings->reset_counter_date = '1';
@@ -235,7 +235,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals($arr['data'][0]['company']['settings']['reset_counter_date'], '1');
     }
 
-    public function testCompanyrightValueMatrixPOST()
+    public function testCompanyrightValueMatrixPOST(): void
     {
         $settings = CompanySettings::defaults();
         $settings->reset_counter_date = '1/1/2000';

@@ -42,7 +42,7 @@ class BulkInvoiceJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {   //only the reminder should mark the reminder sent field
 
         $this->invoice->service()->markSent()->save();

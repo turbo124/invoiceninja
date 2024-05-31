@@ -43,7 +43,7 @@ class EntityTranslationTest extends TestCase
         $this->faker = \Faker\Factory::create();
     }
 
-    public function testTranslations()
+    public function testTranslations(): void
     {
         $account = Account::factory()->create([
             'hosted_client_count' => 1000,

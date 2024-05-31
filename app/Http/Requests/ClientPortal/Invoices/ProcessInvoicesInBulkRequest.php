@@ -16,12 +16,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ProcessInvoicesInBulkRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_INVOICES;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'invoices' => ['array'],

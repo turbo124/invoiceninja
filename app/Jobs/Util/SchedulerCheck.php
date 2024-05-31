@@ -36,7 +36,7 @@ class SchedulerCheck implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         set_time_limit(0);
 

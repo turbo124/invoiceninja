@@ -34,14 +34,14 @@ class InvoiceActionsTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testInvoiceIsDeletable()
+    public function testInvoiceIsDeletable(): void
     {
         $this->assertFalse($this->invoiceDeletable($this->invoice));
         $this->assertTrue($this->invoiceReversable($this->invoice));
         $this->assertTrue($this->invoiceCancellable($this->invoice));
     }
 
-    public function testInvoiceIsReversable()
+    public function testInvoiceIsReversable(): void
     {
 
         $this->invoice = $this->invoice->service()->markPaid()->save();
@@ -51,7 +51,7 @@ class InvoiceActionsTest extends TestCase
         $this->assertFalse($this->invoiceCancellable($this->invoice));
     }
 
-    public function testInvoiceIsCancellable()
+    public function testInvoiceIsCancellable(): void
     {
 
         $payment = PaymentFactory::create($this->invoice->company_id, $this->invoice->user_id);
@@ -69,7 +69,7 @@ class InvoiceActionsTest extends TestCase
         $this->assertTrue($this->invoiceCancellable($this->invoice));
     }
 
-    public function testInvoiceUnactionable()
+    public function testInvoiceUnactionable(): void
     {
 
         $this->invoice->delete();

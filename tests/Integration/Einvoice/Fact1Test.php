@@ -79,7 +79,7 @@ class Fact1Test extends TestCase
         $this->makeTestData();
     }
 
-    public function testRoBuild()
+    public function testRoBuild(): void
     {
         $settings = $this->company->settings;
         $settings->currency_id = '42';

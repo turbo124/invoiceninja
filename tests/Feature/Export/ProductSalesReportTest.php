@@ -121,7 +121,7 @@ class ProductSalesReportTest extends TestCase
         ]);
     }
 
-    public function testProductSalesInstance()
+    public function testProductSalesInstance(): void
     {
         $this->buildData();
 
@@ -132,7 +132,7 @@ class ProductSalesReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleReport()
+    public function testSimpleReport(): void
     {
         $this->buildData();
 

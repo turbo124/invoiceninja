@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Libraries\MultiDB;
 use Closure;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class SetEmailDb
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $error = [
             'message' => 'Email not set or not found',

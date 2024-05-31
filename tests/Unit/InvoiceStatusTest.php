@@ -38,7 +38,7 @@ class InvoiceStatusTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testSentStatus()
+    public function testSentStatus(): void
     {
         $this->invoice->due_date = now()->addMonth();
         $this->invoice->status_id = Invoice::STATUS_SENT;
@@ -46,7 +46,7 @@ class InvoiceStatusTest extends TestCase
         $this->assertEquals(Invoice::STATUS_UNPAID, $this->invoice->getStatusAttribute());
     }
 
-    public function testPartialStatus()
+    public function testPartialStatus(): void
     {
         $this->invoice->partial_due_date = now()->addMonth();
         $this->invoice->status_id = Invoice::STATUS_SENT;

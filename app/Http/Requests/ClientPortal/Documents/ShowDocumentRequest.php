@@ -23,7 +23,7 @@ class ShowDocumentRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->guard('contact')->user()->client_id == $this->document->documentable_id
             || $this->document->company_id == auth()->guard('contact')->user()->company_id;
@@ -34,7 +34,7 @@ class ShowDocumentRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

@@ -30,7 +30,7 @@ class StoreRecurringExpenseRequest extends Request
         return $user->can('create', RecurringExpense::class);
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         /** @var \App\Models\User $user */
@@ -97,7 +97,7 @@ class StoreRecurringExpenseRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'unique' => ctrans('validation.unique', ['attribute' => 'email']),

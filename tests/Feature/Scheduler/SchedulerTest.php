@@ -58,7 +58,7 @@ class SchedulerTest extends TestCase
         // $this->withoutExceptionHandling();
     }
 
-    public function testReportValidationRules()
+    public function testReportValidationRules(): void
     {
         $data = [
             'name' => 'A test product sales scheduler',
@@ -85,7 +85,7 @@ class SchedulerTest extends TestCase
 
     }
 
-    public function testProductSalesReportGenerationOneClientSeparateParam()
+    public function testProductSalesReportGenerationOneClientSeparateParam(): void
     {
         $data = [
             'name' => 'A test product sales scheduler',
@@ -132,7 +132,7 @@ class SchedulerTest extends TestCase
 
     }
 
-    public function testProductSalesReportGenerationOneClient()
+    public function testProductSalesReportGenerationOneClient(): void
     {
         $data = [
             'name' => 'A test product sales scheduler',
@@ -177,7 +177,7 @@ class SchedulerTest extends TestCase
 
     }
 
-    public function testProductSalesReportGeneration()
+    public function testProductSalesReportGeneration(): void
     {
         $data = [
             'name' => 'A test product sales scheduler',
@@ -219,7 +219,7 @@ class SchedulerTest extends TestCase
 
     }
 
-    public function testProductSalesReportStore()
+    public function testProductSalesReportStore(): void
     {
         $data = [
             'name' => 'A test product sales scheduler',
@@ -241,7 +241,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSchedulerGet3()
+    public function testSchedulerGet3(): void
     {
 
         $scheduler = SchedulerFactory::create($this->company->id, $this->user->id);
@@ -266,7 +266,7 @@ class SchedulerTest extends TestCase
 
     }
 
-    public function testSchedulerGet2()
+    public function testSchedulerGet2(): void
     {
 
         $scheduler = SchedulerFactory::create($this->company->id, $this->user->id);
@@ -279,7 +279,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCustomDateRanges()
+    public function testCustomDateRanges(): void
     {
         $data = [
             'name' => 'A test statement scheduler',
@@ -305,7 +305,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testCustomDateRangesFails()
+    public function testCustomDateRangesFails(): void
     {
         $data = [
             'name' => 'A test statement scheduler',
@@ -401,7 +401,7 @@ class SchedulerTest extends TestCase
 
     }
 
-    public function testClientCountResolution()
+    public function testClientCountResolution(): void
     {
         $c = Client::factory()->create([
             'company_id' => $this->company->id,
@@ -458,7 +458,7 @@ class SchedulerTest extends TestCase
         $this->assertCount(2, $q);
     }
 
-    public function testClientsValidationInScheduledTask()
+    public function testClientsValidationInScheduledTask(): void
     {
         $c = Client::factory()->create([
             'company_id' => $this->company->id,
@@ -547,7 +547,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testCalculateNextRun()
+    public function testCalculateNextRun(): void
     {
         $scheduler = SchedulerFactory::create($this->company->id, $this->user->id);
 
@@ -575,7 +575,7 @@ class SchedulerTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addMonthNoOverflow()->addSeconds($offset)->format('Y-m-d'), $scheduler->next_run->format('Y-m-d'));
     }
 
-    public function testCalculateStartAndEndDates()
+    public function testCalculateStartAndEndDates(): void
     {
         $this->travelTo(Carbon::parse('2023-01-01'));
 
@@ -612,7 +612,7 @@ class SchedulerTest extends TestCase
         $this->assertEqualsCanonicalizing(['2022-12-01', '2022-12-31'], $method);
     }
 
-    public function testCalculateStatementProperties()
+    public function testCalculateStatementProperties(): void
     {
         $scheduler = SchedulerFactory::create($this->company->id, $this->user->id);
 
@@ -644,7 +644,7 @@ class SchedulerTest extends TestCase
         $this->assertEquals('paid', $method['status']);
     }
 
-    public function testGetThisMonthRange()
+    public function testGetThisMonthRange(): void
     {
         $this->travelTo(Carbon::parse('2023-01-14'));
 
@@ -676,7 +676,7 @@ class SchedulerTest extends TestCase
         };
     }
 
-    public function testClientStatementGeneration()
+    public function testClientStatementGeneration(): void
     {
         $data = [
             'name' => 'A test statement scheduler',
@@ -700,7 +700,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testDeleteSchedule()
+    public function testDeleteSchedule(): void
     {
         $data = [
             'ids' => [$this->scheduler->hashed_id],
@@ -723,7 +723,7 @@ class SchedulerTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testRestoreSchedule()
+    public function testRestoreSchedule(): void
     {
         $data = [
             'ids' => [$this->scheduler->hashed_id],
@@ -746,7 +746,7 @@ class SchedulerTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testArchiveSchedule()
+    public function testArchiveSchedule(): void
     {
         $data = [
             'ids' => [$this->scheduler->hashed_id],
@@ -759,7 +759,7 @@ class SchedulerTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testSchedulerPost()
+    public function testSchedulerPost(): void
     {
         $data = [
             'name' => 'A different Name',
@@ -777,7 +777,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSchedulerPut()
+    public function testSchedulerPut(): void
     {
         $data = [
             'name' => 'A different Name',
@@ -795,7 +795,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSchedulerGet()
+    public function testSchedulerGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -805,7 +805,7 @@ class SchedulerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testSchedulerCreate()
+    public function testSchedulerCreate(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

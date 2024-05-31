@@ -131,7 +131,7 @@ class CompanyLedgerTest extends TestCase
         ]);
     }
 
-    public function testLedgerAdjustments()
+    public function testLedgerAdjustments(): void
     {
         $c = Client::factory()->create([
             'user_id' => $this->user->id,
@@ -201,14 +201,14 @@ class CompanyLedgerTest extends TestCase
 
     }
 
-    public function testBaseLine()
+    public function testBaseLine(): void
     {
         $this->assertEquals($this->company->invoices->count(), 0);
         $this->assertEquals($this->company->clients->count(), 1);
         $this->assertEquals($this->client->balance, 0);
     }
 
-    public function testLedger()
+    public function testLedger(): void
     {
         $this->markTestSkipped();
 

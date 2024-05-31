@@ -10,6 +10,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Libraries\MultiDB;
 use App\Models\Vendor;
 use App\Models\VendorContact;
@@ -31,7 +32,7 @@ class VendorContactKeyLogin
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (Auth::guard('vendor')->check()) {
             Auth::guard('vendor')->logout();

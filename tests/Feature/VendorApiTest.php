@@ -47,7 +47,7 @@ class VendorApiTest extends TestCase
         Model::reguard();
     }
 
-    public function testVendorContactCreation()
+    public function testVendorContactCreation(): void
     {
         $data = [
             'name' => 'hewwo',
@@ -64,7 +64,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals(1, count($arr['data']['contacts']));
     }
 
-    public function testVendorLoggedInEvents()
+    public function testVendorLoggedInEvents(): void
     {
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
@@ -87,7 +87,7 @@ class VendorApiTest extends TestCase
 
     }
 
-    public function testVendorLocale()
+    public function testVendorLocale(): void
     {
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
@@ -97,7 +97,7 @@ class VendorApiTest extends TestCase
         $this->assertNotNull($v->locale());
     }
 
-    public function testVendorLocaleEn()
+    public function testVendorLocaleEn(): void
     {
         $v = \App\Models\Vendor::factory()->create([
             'user_id' => $this->user->id,
@@ -108,7 +108,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals('en', $v->locale());
     }
 
-    public function testVendorLocaleEnCompanyFallback()
+    public function testVendorLocaleEnCompanyFallback(): void
     {
         $settings = $this->company->settings;
         $settings->language_id = '2';
@@ -126,7 +126,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals('it', $v->locale());
     }
 
-    public function testVendorGetFilter()
+    public function testVendorGetFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -136,7 +136,7 @@ class VendorApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testAddVendorLanguage200()
+    public function testAddVendorLanguage200(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -169,7 +169,7 @@ class VendorApiTest extends TestCase
 
     }
 
-    public function testAddVendorLanguage422()
+    public function testAddVendorLanguage422(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -183,7 +183,7 @@ class VendorApiTest extends TestCase
 
     }
 
-    public function testAddVendorLanguage()
+    public function testAddVendorLanguage(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -201,7 +201,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals('1', $arr['data']['language_id']);
     }
 
-    public function testAddVendorToInvoice()
+    public function testAddVendorToInvoice(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -235,7 +235,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals($arr['data']['vendor_id'], $vendor_id);
     }
 
-    public function testAddVendorToRecurringInvoice()
+    public function testAddVendorToRecurringInvoice(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -269,7 +269,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals($arr['data']['vendor_id'], $vendor_id);
     }
 
-    public function testAddVendorToQuote()
+    public function testAddVendorToQuote(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -302,7 +302,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals($arr['data']['vendor_id'], $vendor_id);
     }
 
-    public function testAddVendorToCredit()
+    public function testAddVendorToCredit(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -335,7 +335,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals($arr['data']['vendor_id'], $vendor_id);
     }
 
-    public function testVendorPost()
+    public function testVendorPost(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -349,7 +349,7 @@ class VendorApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testVendorPut()
+    public function testVendorPut(): void
     {
         $data = [
             'name' => $this->faker->firstName(),
@@ -386,7 +386,7 @@ class VendorApiTest extends TestCase
         }
     }
 
-    public function testVendorGet()
+    public function testVendorGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -396,7 +396,7 @@ class VendorApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testVendorNotArchived()
+    public function testVendorNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -408,7 +408,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testVendorArchived()
+    public function testVendorArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->vendor->id)],
@@ -424,7 +424,7 @@ class VendorApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testVendorRestored()
+    public function testVendorRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->vendor->id)],
@@ -440,7 +440,7 @@ class VendorApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testVendorDeleted()
+    public function testVendorDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->vendor->id)],

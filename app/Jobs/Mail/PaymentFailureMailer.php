@@ -66,7 +66,7 @@ class PaymentFailureMailer implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         //Set DB
         MultiDB::setDb($this->company->db);

@@ -25,7 +25,7 @@ class PreImportRequest extends Request
         return $user->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'files.*' => 'file|mimetypes:text/csv,text/plain,application/octet-stream',

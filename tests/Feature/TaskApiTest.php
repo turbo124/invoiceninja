@@ -104,7 +104,7 @@ class TaskApiTest extends TestCase
         }
     }
 
-    public function testTimeLogWithSameStartAndStopTimes()
+    public function testTimeLogWithSameStartAndStopTimes(): void
     {
         $settings = ClientSettings::defaults();
         $settings->default_task_rate = 41;
@@ -131,7 +131,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testRoundingViaApi()
+    public function testRoundingViaApi(): void
     {
 
         $data = [
@@ -153,7 +153,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testRoundingToNearestXXX()
+    public function testRoundingToNearestXXX(): void
     {
 
         $time = 1680036807;
@@ -170,7 +170,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testKsortPerformance()
+    public function testKsortPerformance(): void
     {
         $logs = [
             [1680035007, 1680036807, '', true],
@@ -189,7 +189,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testRequestRuleParsing()
+    public function testRequestRuleParsing(): void
     {
 
         $data = [
@@ -211,7 +211,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testUserFilters()
+    public function testUserFilters(): void
     {
 
         $response = $this->withHeaders([
@@ -255,7 +255,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testEmptyTimeLogArray()
+    public function testEmptyTimeLogArray(): void
     {
 
         $data = [
@@ -319,7 +319,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testFaultyTimeLogArray()
+    public function testFaultyTimeLogArray(): void
     {
 
         $data = [
@@ -339,7 +339,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testTaskClientRateSet()
+    public function testTaskClientRateSet(): void
     {
         $settings = ClientSettings::defaults();
         $settings->default_task_rate = 41;
@@ -367,7 +367,7 @@ class TaskApiTest extends TestCase
         $this->assertEquals(41, $arr['data']['rate']);
     }
 
-    public function testTaskTimelogParse()
+    public function testTaskTimelogParse(): void
     {
         $data = [
             'description' => 'xx',
@@ -385,7 +385,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testTaskProjectRateSet()
+    public function testTaskProjectRateSet(): void
     {
 
         $p = Project::factory()->create([
@@ -416,7 +416,7 @@ class TaskApiTest extends TestCase
         $this->assertEquals(101, $arr['data']['rate']);
     }
 
-    public function testStatusSet()
+    public function testStatusSet(): void
     {
 
         $data = [
@@ -438,7 +438,7 @@ class TaskApiTest extends TestCase
         $this->assertNotEmpty($arr['data']['status_id']);
     }
 
-    public function testStartDate()
+    public function testStartDate(): void
     {
         $x = [];
 
@@ -452,7 +452,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testMultiSortArray()
+    public function testMultiSortArray(): void
     {
 
         $logs = [
@@ -476,7 +476,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testStartStopSanity()
+    public function testStartStopSanity(): void
     {
 
         $task = Task::factory()->create([
@@ -532,7 +532,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testStoppingTaskWithDescription()
+    public function testStoppingTaskWithDescription(): void
     {
         $task = Task::factory()->create([
             'client_id' => $this->client->id,
@@ -554,7 +554,7 @@ class TaskApiTest extends TestCase
         $this->assertCount(2, $last);
     }
 
-    public function testMultiDimensionArrayOfTimes()
+    public function testMultiDimensionArrayOfTimes(): void
     {
         $logs = [
             '[[1680302433,1680387960,"",true]]',
@@ -569,7 +569,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testArrayOfTimes()
+    public function testArrayOfTimes(): void
     {
         $logs = [
             '[[1675275148,1675277829]]',
@@ -592,7 +592,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testTimeLogChecker1()
+    public function testTimeLogChecker1(): void
     {
         $log = [
             [50, 0],
@@ -601,7 +601,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker2()
+    public function testTimeLogChecker2(): void
     {
         $log = [
             [4, 5],
@@ -611,7 +611,7 @@ class TaskApiTest extends TestCase
         $this->assertFalse($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker3()
+    public function testTimeLogChecker3(): void
     {
         $log = [
             [4, 5],
@@ -621,7 +621,7 @@ class TaskApiTest extends TestCase
         $this->assertFalse($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker4()
+    public function testTimeLogChecker4(): void
     {
         $log = [
             [4, 5],
@@ -631,7 +631,7 @@ class TaskApiTest extends TestCase
         $this->assertFalse($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker5()
+    public function testTimeLogChecker5(): void
     {
         $log = [
             [4, 5],
@@ -641,7 +641,7 @@ class TaskApiTest extends TestCase
         $this->assertFalse($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker6()
+    public function testTimeLogChecker6(): void
     {
         $log = [
             [4, 5],
@@ -651,7 +651,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker7()
+    public function testTimeLogChecker7(): void
     {
         $log = [
             [1, 3],
@@ -661,7 +661,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker8()
+    public function testTimeLogChecker8(): void
     {
         $log = [
             [1, 3],
@@ -671,7 +671,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker9()
+    public function testTimeLogChecker9(): void
     {
         $log = [
             [4, 5, 'bb'],
@@ -681,7 +681,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker10()
+    public function testTimeLogChecker10(): void
     {
         $log = [
             [4, 5, '5'],
@@ -691,7 +691,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker11()
+    public function testTimeLogChecker11(): void
     {
         $log = [
             [1, 2, 'a'],
@@ -701,7 +701,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTimeLogChecker12()
+    public function testTimeLogChecker12(): void
     {
         $log = [
             [1, 2, 'a', true],
@@ -711,7 +711,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($this->checkTimeLog($log));
     }
 
-    public function testTaskListWithProjects()
+    public function testTaskListWithProjects(): void
     {
 
         $project = Project::factory()->create([
@@ -739,7 +739,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testTaskListClientStatus()
+    public function testTaskListClientStatus(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -748,7 +748,7 @@ class TaskApiTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testTaskLockingGate()
+    public function testTaskLockingGate(): void
     {
         $data = [
             'timelog' => [[1, 2, 'a'], [3, 4, 'd']],
@@ -824,7 +824,7 @@ class TaskApiTest extends TestCase
 
     // }
 
-    public function testTimeLogValidation()
+    public function testTimeLogValidation(): void
     {
         $data = [
             'time_log' => $this->faker->firstName(),
@@ -839,7 +839,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testTimeLogValidation1()
+    public function testTimeLogValidation1(): void
     {
         $data = [
             'timelog' => [[1, 2], [3, 4]],
@@ -854,7 +854,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTimeLogValidation2()
+    public function testTimeLogValidation2(): void
     {
         $data = [
             'timelog' => [],
@@ -869,7 +869,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTimeLogValidation3()
+    public function testTimeLogValidation3(): void
     {
         $data = [
             'time_log' => [['a', 'b', 'd'], ['c', 'd', 'd']],
@@ -884,7 +884,7 @@ class TaskApiTest extends TestCase
 
     }
 
-    public function testTimeLogValidation4()
+    public function testTimeLogValidation4(): void
     {
         $data = [
             'timelog' => [[1, 2, 'd'], [3, 0, 'd']],
@@ -899,7 +899,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testStartTask()
+    public function testStartTask(): void
     {
         $log = [
             [2, 1, 'd'],
@@ -928,7 +928,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($last[1] !== 0);
     }
 
-    public function testTaskPost()
+    public function testTaskPost(): void
     {
         $data = [
             'description' => $this->faker->firstName(),
@@ -968,7 +968,7 @@ class TaskApiTest extends TestCase
         $this->assertNotEmpty($arr['data']['number']);
     }
 
-    public function testTaskPostNoDefinedTaskNumber()
+    public function testTaskPostNoDefinedTaskNumber(): void
     {
         $data = [
             'description' => $this->faker->firstName(),
@@ -984,7 +984,7 @@ class TaskApiTest extends TestCase
         $this->assertNotEmpty($arr['data']['number']);
     }
 
-    public function testTaskWithBadClientId()
+    public function testTaskWithBadClientId(): void
     {
         $data = [
             'client_id' => $this->faker->firstName(),
@@ -1001,7 +1001,7 @@ class TaskApiTest extends TestCase
         }
     }
 
-    public function testTaskPostWithActionStart()
+    public function testTaskPostWithActionStart(): void
     {
         $data = [
             'description' => $this->faker->firstName(),
@@ -1016,7 +1016,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskPut()
+    public function testTaskPut(): void
     {
         $data = [
             'description' => $this->faker->firstName(),
@@ -1030,7 +1030,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTasksGet()
+    public function testTasksGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -1040,7 +1040,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskGet()
+    public function testTaskGet(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -1050,7 +1050,7 @@ class TaskApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testTaskNotArchived()
+    public function testTaskNotArchived(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -1062,7 +1062,7 @@ class TaskApiTest extends TestCase
         $this->assertEquals(0, $arr['data']['archived_at']);
     }
 
-    public function testTaskArchived()
+    public function testTaskArchived(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->task->id)],
@@ -1078,7 +1078,7 @@ class TaskApiTest extends TestCase
         $this->assertNotNull($arr['data'][0]['archived_at']);
     }
 
-    public function testTaskRestored()
+    public function testTaskRestored(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->task->id)],
@@ -1094,7 +1094,7 @@ class TaskApiTest extends TestCase
         $this->assertEquals(0, $arr['data'][0]['archived_at']);
     }
 
-    public function testTaskDeleted()
+    public function testTaskDeleted(): void
     {
         $data = [
             'ids' => [$this->encodePrimaryKey($this->task->id)],
@@ -1110,7 +1110,7 @@ class TaskApiTest extends TestCase
         $this->assertTrue($arr['data'][0]['is_deleted']);
     }
 
-    public function testTaskPostWithStartAction()
+    public function testTaskPostWithStartAction(): void
     {
         $data = [
             'description' => $this->faker->firstName(),
@@ -1129,7 +1129,7 @@ class TaskApiTest extends TestCase
         $this->assertGreaterThan(5, strlen($arr['data']['time_log']));
     }
 
-    public function testTaskPostWithStopAction()
+    public function testTaskPostWithStopAction(): void
     {
         $data = [
             'description' => $this->faker->firstName(),

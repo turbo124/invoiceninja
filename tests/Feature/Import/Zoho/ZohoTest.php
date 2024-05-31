@@ -49,7 +49,7 @@ class ZohoTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testClientZohoImport()
+    public function testClientZohoImport(): void
     {
         $csv = file_get_contents(
             base_path().'/tests/Feature/Import/zoho_contacts.csv'
@@ -139,7 +139,7 @@ class ZohoTest extends TestCase
         $this->assertEquals('888-867-5309', $client->phone);
     }
 
-    public function testInvoiceZohoImport()
+    public function testInvoiceZohoImport(): void
     {
         //first import all the clients
         $csv = file_get_contents(

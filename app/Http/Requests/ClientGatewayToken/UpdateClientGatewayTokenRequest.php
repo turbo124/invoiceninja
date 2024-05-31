@@ -25,7 +25,7 @@ class UpdateClientGatewayTokenRequest extends Request
         return auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
         /* Ensure we have a client name, and that all emails are unique*/
         $rules = [];
@@ -33,7 +33,7 @@ class UpdateClientGatewayTokenRequest extends Request
         return $rules;
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
         ];

@@ -22,7 +22,7 @@ class S3CleanupTest extends TestCase
         parent::setUp();
     }
 
-    public function testMergeCollections()
+    public function testMergeCollections(): void
     {
         $c1 = collect(['1', '2', '3', '4']);
         $c2 = collect(['5', '6', '7', '8']);

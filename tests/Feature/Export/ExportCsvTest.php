@@ -39,7 +39,7 @@ class ExportCsvTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testExportCsv()
+    public function testExportCsv(): void
     {
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
 

@@ -39,7 +39,7 @@ class HtmlGenerationTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testHtmlOutput()
+    public function testHtmlOutput(): void
     {
         $this->client->fresh();
 

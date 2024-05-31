@@ -94,12 +94,12 @@ class UniqueEmailTest extends TestCase
         }
     }
 
-    public function test_unique_emails_detected_on_database()
+    public function test_unique_emails_detected_on_database(): void
     {
         $this->assertFalse($this->rule->passes('email', 'user@example.com'));
     }
 
-    public function test_no_unique_emails_detected()
+    public function test_no_unique_emails_detected(): void
     {
         $this->assertTrue($this->rule->passes('email', 'nohit@example.com'));
     }

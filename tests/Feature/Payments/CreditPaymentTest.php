@@ -52,7 +52,7 @@ class CreditPaymentTest extends TestCase
         );
     }
 
-    public function testRegularPayment()
+    public function testRegularPayment(): void
     {
         $invoice = Invoice::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 
@@ -107,7 +107,7 @@ class CreditPaymentTest extends TestCase
         $this->assertEquals($payment->applied, 10);
     }
 
-    public function testCreditPayments()
+    public function testCreditPayments(): void
     {
         $invoice = Invoice::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 

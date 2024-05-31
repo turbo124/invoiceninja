@@ -22,7 +22,7 @@ class UploadVendorRequest extends Request
         return auth()->user()->can('edit', $this->vendor);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

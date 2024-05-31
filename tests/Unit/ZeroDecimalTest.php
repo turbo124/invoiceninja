@@ -20,17 +20,17 @@ class ZeroDecimalTest extends TestCase
     {
     }
 
-    public function testCurrencyHit()
+    public function testCurrencyHit(): void
     {
         $this->assertTrue(in_array('KRW', $this->currencies));
     }
 
-    public function testCurrencyMiss()
+    public function testCurrencyMiss(): void
     {
         $this->assertFalse(in_array('USD', $this->currencies));
     }
 
-    public function testCurrencyNotexist()
+    public function testCurrencyNotexist(): void
     {
         $this->assertFalse(in_array('USDddd', $this->currencies));
     }

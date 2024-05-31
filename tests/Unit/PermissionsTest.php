@@ -79,7 +79,7 @@ class PermissionsTest extends TestCase
         $company_token->save();
     }
 
-    public function testClientOverviewPermissions()
+    public function testClientOverviewPermissions(): void
     {
         $u = User::factory()->create([
             'account_id' => $this->company->account_id,
@@ -127,7 +127,7 @@ class PermissionsTest extends TestCase
 
     }
 
-    public function testHasExcludedPermissions()
+    public function testHasExcludedPermissions(): void
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
@@ -143,7 +143,7 @@ class PermissionsTest extends TestCase
 
     }
 
-    public function testHasExcludedPermissions2()
+    public function testHasExcludedPermissions2(): void
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client","edit_all"]';
@@ -171,7 +171,7 @@ class PermissionsTest extends TestCase
 
     }
 
-    public function testIntersectPermissions()
+    public function testIntersectPermissions(): void
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
@@ -202,7 +202,7 @@ class PermissionsTest extends TestCase
         $this->assertTrue($this->user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction']));
     }
 
-    public function testViewClientPermission()
+    public function testViewClientPermission(): void
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
@@ -256,7 +256,7 @@ class PermissionsTest extends TestCase
         $this->assertTrue($this->user->hasPermission('view_recurring_invoice'));
     }
 
-    public function testPermissionResolution()
+    public function testPermissionResolution(): void
     {
         $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(Invoice::class)));
 
@@ -303,13 +303,13 @@ class PermissionsTest extends TestCase
         $this->assertEquals('recurring_invoice', \Illuminate\Support\Str::snake(class_basename(RecurringInvoice::class)));
     }
 
-    public function testExactPermissions()
+    public function testExactPermissions(): void
     {
         $this->assertTrue($this->user->hasExactPermissionAndAll('view_client'));
         $this->assertFalse($this->user->hasExactPermissionAndAll('view_all'));
     }
 
-    public function testMissingPermissions()
+    public function testMissingPermissions(): void
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '[""]';
@@ -319,7 +319,7 @@ class PermissionsTest extends TestCase
         $this->assertFalse($this->user->hasExactPermissionAndAll('view_all'));
     }
 
-    public function testViewAllValidPermissions()
+    public function testViewAllValidPermissions(): void
     {
         $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_all"]';
@@ -329,7 +329,7 @@ class PermissionsTest extends TestCase
         $this->assertTrue($this->user->hasExactPermissionAndAll('view_all'));
     }
 
-    public function testReturnTypesOfStripos()
+    public function testReturnTypesOfStripos(): void
     {
         $this->assertEquals(0, stripos('view_client', ''));
 

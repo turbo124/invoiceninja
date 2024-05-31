@@ -93,7 +93,7 @@ class TranslationsExport extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $type = $this->option('type') ?? 'export';
 

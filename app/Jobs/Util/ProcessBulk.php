@@ -59,7 +59,7 @@ class ProcessBulk implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         foreach ($this->data as $resource) {
             $this->repo->{$this->method}($resource);

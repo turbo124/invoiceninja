@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Models\PaymentHash;
 use Closure;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class VerifyHash
      * @param  Request  $request
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if ($request->has('payment_hash')) {
             $ph = PaymentHash::query()->with('fee_invoice')->where('hash', $request->payment_hash)->first();

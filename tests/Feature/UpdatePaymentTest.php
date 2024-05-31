@@ -51,7 +51,7 @@ class UpdatePaymentTest extends TestCase
         );
     }
 
-    public function testUpdatingPaymentableDates()
+    public function testUpdatingPaymentableDates(): void
     {
         $this->invoice = $this->invoice->service()->markPaid()->save();
 
@@ -79,7 +79,7 @@ class UpdatePaymentTest extends TestCase
 
     }
 
-    public function testUpdatePaymentClientPaidToDate()
+    public function testUpdatePaymentClientPaidToDate(): void
     {
         //Create new client
         $client = Client::factory()->create([

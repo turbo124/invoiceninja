@@ -46,7 +46,7 @@ class ClientMergeTest extends TestCase
         $this->buildCache(true);
     }
 
-    public function testSearchingForContacts()
+    public function testSearchingForContacts(): void
     {
         $account = Account::factory()->create();
 
@@ -94,7 +94,7 @@ class ClientMergeTest extends TestCase
         }));
     }
 
-    public function testMergeClients()
+    public function testMergeClients(): void
     {
         $account = Account::factory()->create();
 

@@ -19,12 +19,12 @@ class EditPaymentRequest extends Request
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->user()->can('edit', $this->payment);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

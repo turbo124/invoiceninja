@@ -17,7 +17,7 @@ use Illuminate\Database\Seeder;
 
 class DesignSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         Model::unguard();
 

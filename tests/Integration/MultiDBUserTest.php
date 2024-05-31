@@ -131,41 +131,41 @@ class MultiDBUserTest extends TestCase
         User::unguard(false);
     }
 
-    public function test_oauth_user_db2_exists()
+    public function test_oauth_user_db2_exists(): void
     {
         $user = MultiDB::hasUser(['email' => 'db2@example.com', 'oauth_user_id' => 'abc']);
 
         $this->assertEquals($user->email, 'db2@example.com');
     }
 
-    public function test_oauth_user_db1_exists()
+    public function test_oauth_user_db1_exists(): void
     {
         $user = MultiDB::hasUser(['email' => 'db1@example.com', 'oauth_user_id' => '123']);
 
         $this->assertEquals($user->email, 'db1@example.com');
     }
 
-    public function test_check_user_exists()
+    public function test_check_user_exists(): void
     {
         $this->assertTrue(MultiDB::checkUserEmailExists('db1@example.com'));
     }
 
-    public function test_check_user_does_not_exist()
+    public function test_check_user_does_not_exist(): void
     {
         $this->assertFalse(MultiDB::checkUserEmailExists('bademail@example.com'));
     }
 
-    public function test_check_that_set_db_by_email_works()
+    public function test_check_that_set_db_by_email_works(): void
     {
         $this->assertTrue(MultiDB::userFindAndSetDb('db1@example.com'));
     }
 
-    public function test_check_that_set_db_by_email_works_db_2()
+    public function test_check_that_set_db_by_email_works_db_2(): void
     {
         $this->assertTrue(MultiDB::userFindAndSetDb('db2@example.com'));
     }
 
-    public function test_check_that_set_db_by_email_works_db_3()
+    public function test_check_that_set_db_by_email_works_db_3(): void
     {
         $this->assertFalse(MultiDB::userFindAndSetDb('bademail@example.com'));
     }
@@ -173,12 +173,12 @@ class MultiDBUserTest extends TestCase
     /*
      * This is what you do when you demand 100% code coverage :/
      */
-    public function test_set_db_invokes()
+    public function test_set_db_invokes(): void
     {
         $this->expectNotToPerformAssertions(MultiDB::setDB('db-ninja-01'));
     }
 
-    public function test_cross_db_user_linking_fails_appropriately()
+    public function test_cross_db_user_linking_fails_appropriately(): void
     {
         //$this->withoutExceptionHandling();
 

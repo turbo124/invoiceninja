@@ -53,7 +53,7 @@ class ProductTest extends TestCase
 
     }
 
-    public function testProductCostMigration()
+    public function testProductCostMigration(): void
     {
         $items = [];
 
@@ -118,7 +118,7 @@ class ProductTest extends TestCase
 
     }
 
-    public function testSetTaxId()
+    public function testSetTaxId(): void
     {
         $p = Product::factory()->create([
             'user_id' => $this->user->id,
@@ -151,7 +151,7 @@ class ProductTest extends TestCase
 
     }
 
-    public function testProductGetProductKeyFilter()
+    public function testProductGetProductKeyFilter(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
@@ -160,7 +160,7 @@ class ProductTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testProductList()
+    public function testProductList(): void
     {
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),

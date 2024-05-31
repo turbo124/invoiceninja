@@ -33,7 +33,7 @@ class StoreShopInvoiceRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

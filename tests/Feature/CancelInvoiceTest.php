@@ -46,7 +46,7 @@ class CancelInvoiceTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testCancelInvoice()
+    public function testCancelInvoice(): void
     {
         $this->assertTrue($this->invoice->invoiceCancellable($this->invoice));
 

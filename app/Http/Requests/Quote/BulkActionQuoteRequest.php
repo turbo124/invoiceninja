@@ -23,7 +23,7 @@ class BulkActionQuoteRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         $input = $this->all();
 

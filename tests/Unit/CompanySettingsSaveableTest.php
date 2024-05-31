@@ -25,7 +25,7 @@ class CompanySettingsSaveableTest extends TestCase
         parent::setUp();
     }
 
-    public function testSettingsSaverWithFreePlan()
+    public function testSettingsSaverWithFreePlan(): void
     {
         $filtered = $this->filterSaver(CompanySettings::defaults());
 

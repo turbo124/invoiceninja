@@ -25,7 +25,7 @@ class UpdateContactRequest extends Request
         return $this->encodePrimaryKey(auth()->user()->id) === request()->segment(3);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'first_name' => 'required',

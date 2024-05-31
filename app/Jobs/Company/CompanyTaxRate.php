@@ -38,7 +38,7 @@ class CompanyTaxRate implements ShouldQueue
     {
     }
 
-    public function handle()
+    public function handle(): void
     {
 
         MultiDB::setDB($this->company->db);

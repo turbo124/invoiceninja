@@ -24,7 +24,7 @@ class DisconnectUserMailerRequest extends Request
         return auth()->user()->id == $this->user->id || auth()->user()->isAdmin();
     }
 
-    public function rules()
+    public function rules(): array
     {
 
         $rules = [

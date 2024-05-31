@@ -31,7 +31,7 @@ class ClientPresenterTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCompanyName()
+    public function testCompanyName(): void
     {
         $settings = $this->client->company->settings;
 
@@ -49,7 +49,7 @@ class ClientPresenterTest extends TestCase
         $this->assertEquals('test', $name);
     }
 
-    public function testCompanyAddress()
+    public function testCompanyAddress(): void
     {
         $this->assertNotNull($this->client->present()->company_address());
     }

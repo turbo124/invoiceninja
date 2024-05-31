@@ -56,7 +56,7 @@ class RandomDataSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
 
         $this->buildCache(true);

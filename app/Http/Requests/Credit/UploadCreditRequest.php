@@ -25,7 +25,7 @@ class UploadCreditRequest extends Request
         return $user->can('edit', $this->credit);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [];
 

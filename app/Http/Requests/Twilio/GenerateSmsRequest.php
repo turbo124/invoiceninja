@@ -22,7 +22,7 @@ class GenerateSmsRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'phone' => 'required|regex:^\+[1-9]\d{1,14}$^',

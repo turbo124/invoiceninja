@@ -119,7 +119,7 @@ class ArDetailReportTest extends TestCase
         ]);
     }
 
-    public function testUserSalesInstance()
+    public function testUserSalesInstance(): void
     {
         $this->buildData();
 
@@ -130,7 +130,7 @@ class ArDetailReportTest extends TestCase
         $this->account->delete();
     }
 
-    public function testSimpleReport()
+    public function testSimpleReport(): void
     {
         $this->buildData();
 

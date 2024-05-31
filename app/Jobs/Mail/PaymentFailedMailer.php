@@ -65,7 +65,7 @@ class PaymentFailedMailer implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if (! is_string($this->error) || strlen($this->error) <= 1) {
             $this->error = '';

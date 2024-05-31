@@ -31,7 +31,7 @@ class CloneQuoteToInvoiceFactoryTest extends TestCase
         $this->makeTestData();
     }
 
-    public function testCloneProperties()
+    public function testCloneProperties(): void
     {
         $invoice = CloneQuoteToInvoiceFactory::create($this->quote, $this->quote->user_id);
 
@@ -40,7 +40,7 @@ class CloneQuoteToInvoiceFactoryTest extends TestCase
         $this->assertNull($invoice->number);
     }
 
-    public function testQuoteToInvoiceConversionService()
+    public function testQuoteToInvoiceConversionService(): void
     {
         $invoice = $this->quote->service()->convertToInvoice();
 

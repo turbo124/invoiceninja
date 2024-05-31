@@ -47,7 +47,7 @@ class FatturaPATest extends TestCase
         );
     }
 
-    public function testInvoiceBoot()
+    public function testInvoiceBoot(): void
     {
 
         $settings = CompanySettings::defaults();

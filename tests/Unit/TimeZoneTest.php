@@ -139,7 +139,7 @@ class TimeZoneTest extends TestCase
         parent::setUp();
     }
 
-    public function testTimezoneCompatibility()
+    public function testTimezoneCompatibility(): void
     {
 
         foreach ($this->timezones as $timezone) {

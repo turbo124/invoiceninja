@@ -23,7 +23,7 @@ class VatNumberTest extends TestCase
         parent::setUp();
     }
 
-    public function testVatNumber()
+    public function testVatNumber(): void
     {
         // Usage example
         $country_code = 'IE'; // Ireland
@@ -36,7 +36,7 @@ class VatNumberTest extends TestCase
         $this->assertFalse($result->isValid());
     }
 
-    public function testValidVatNumber()
+    public function testValidVatNumber(): void
     {
         // Usage example
         $country_code = 'AT'; // Ireland

@@ -25,7 +25,7 @@ class ShowActivityRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'entity' => 'bail|required|in:invoice,quote,credit,purchase_order,payment,client,vendor,expense,task,project,subscription,recurring_invoice,',

@@ -24,7 +24,7 @@ class ActionPurchaseOrderRequest extends Request
         return auth()->user()->can('edit', $this->purchase_order);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'action' => 'required',
@@ -44,7 +44,7 @@ class ActionPurchaseOrderRequest extends Request
         $this->replace($input);
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'action' => $this->error_msg,
