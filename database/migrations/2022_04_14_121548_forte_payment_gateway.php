@@ -4,7 +4,7 @@ use App\Models\Gateway;
 use App\Models\GatewayType;
 use Illuminate\Database\Migrations\Migration;
 
-class FortePaymentGateway extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -44,4 +44,4 @@ class FortePaymentGateway extends Migration
     {
         //
     }
-}
+};

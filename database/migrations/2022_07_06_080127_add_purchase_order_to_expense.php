@@ -14,7 +14,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPurchaseOrderToExpense extends Migration
+return new class extends Migration
 {
     use AppSetup;
 
@@ -49,4 +49,4 @@ class AddPurchaseOrderToExpense extends Migration
     public function down()
     {
     }
-}
+};

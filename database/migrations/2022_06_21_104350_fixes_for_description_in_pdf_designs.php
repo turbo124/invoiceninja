@@ -9,7 +9,7 @@
  */
 use Illuminate\Database\Migrations\Migration;
 
-class FixesForDescriptionInPdfDesigns extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class FixesForDescriptionInPdfDesigns extends Migration
     public function down()
     {
     }
-}
+};

@@ -3,7 +3,7 @@
 use App\Models\Language;
 use Illuminate\Database\Migrations\Migration;
 
-class AddHebrewLanguage extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -49,4 +49,4 @@ class AddHebrewLanguage extends Migration
     {
         //
     }
-}
+};
