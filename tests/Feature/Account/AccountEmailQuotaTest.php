@@ -12,19 +12,24 @@
 
 namespace Tests\Feature\Account;
 
-use App\DataMapper\ClientRegistrationFields;
-use App\DataMapper\CompanySettings;
+use Tests\TestCase;
+use App\Utils\Ninja;
 use App\Models\Account;
 use App\Models\Company;
-use App\Utils\Ninja;
+use App\DataMapper\CompanySettings;
+use App\Factory\CompanyUserFactory;
 use Illuminate\Support\Facades\Cache;
-use Tests\TestCase;
+use App\DataMapper\ClientRegistrationFields;
 
 class AccountEmailQuotaTest extends TestCase
 {
+    protected $faker;
     protected function setUp(): void
     {
         parent::setUp();
+        
+        $this->faker = \Faker\Factory::create();
+
     }
 
 
@@ -51,7 +56,6 @@ class AccountEmailQuotaTest extends TestCase
         ]);
 
         $company->client_registration_fields = ClientRegistrationFields::generate();
-
         $settings = CompanySettings::defaults();
 
         $settings->company_logo = 'https://pdf.invoicing.co/favicon-v2.png';
@@ -77,6 +81,18 @@ class AccountEmailQuotaTest extends TestCase
         $account->default_company_id = $company->id;
         $account->save();
 
+        
+        $user = \App\Models\User::factory()->create([
+            'account_id' => $account->id,
+            'email' => $this->faker->safeEmail()
+        ]);
+
+                
+        $cu = \App\Factory\CompanyUserFactory::create($user->id, $company->id, $account->id);
+        $cu->is_owner = true;
+        $cu->is_admin = true;
+        $cu->is_locked = false;
+        $cu->save();
 
         Cache::put("email_quota".$account->key, 3000);
 

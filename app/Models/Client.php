@@ -410,9 +410,9 @@ class Client extends BaseModel implements HasLocalePreference
     {
         $date_formats = app('date_formats');
 
-        return $date_formats->filter(function ($item) {
+        return $date_formats->first(function ($item) {
             return $item->id == $this->getSetting('date_format_id');
-        })->first()->format;
+        })->format;
     }
 
     public function currency()
