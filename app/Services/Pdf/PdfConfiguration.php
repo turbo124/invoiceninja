@@ -459,13 +459,9 @@ class PdfConfiguration
     {
         $date_formats = app('date_formats');
 
-        if (! $date_formats) {
-            
-        }
-
-        $this->date_format = $date_formats->filter(function ($item) {
+        $this->date_format = $date_formats->first(function ($item) {
             return $item->id == $this->settings->date_format_id;
-        })->first()->format;
+        })->format;
 
         return $this;
     }

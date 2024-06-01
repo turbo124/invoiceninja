@@ -923,9 +923,9 @@ class HtmlEngine
         }
 
         if ($countries) {
-            $country = $countries->filter(function ($item) {
+            $country = $countries->first(function ($item) {
                 return $item->id == $this->settings->country_id;
-            })->first();
+            });
         } else {
             $country = Country::find($this->settings->country_id);
         }

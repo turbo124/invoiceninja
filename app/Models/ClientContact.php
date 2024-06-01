@@ -273,13 +273,9 @@ class ClientContact extends Authenticatable implements HasLocalePreference
     {
         $languages = app('languages');
 
-        if (! $languages) {
-            
-        }
-
-        return $languages->filter(function ($item) {
+        return $languages->first(function ($item) {
             return $item->id == $this->client->getSetting('language_id');
-        })->first()->locale;
+        })->locale;
     }
 
     public function routeNotificationForMail($notification)

@@ -176,9 +176,9 @@ class ChartService
     {
         $currency_id = str_replace('"', '', $currency_id);
 
-        $currency = $currencies->filter(function ($item) use ($currency_id) {
+        $currency = $currencies->first(function ($item) use ($currency_id) {
             return $item->id == $currency_id;
-        })->first();
+        });
 
         if ($currency) {
             return $currency->code;

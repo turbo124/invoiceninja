@@ -179,17 +179,13 @@ class Vendor extends BaseModel
     {
         $currencies = app('currencies');
 
-        if (! $currencies) {
-            
-        }
-
         if (! $this->currency_id) {
             return $this->company->currency();
         }
 
-        return $currencies->filter(function ($item) {
+        return $currencies->first(function ($item) {
             return $item->id == $this->currency_id;
-        })->first();
+        });
     }
 
     public function timezone()

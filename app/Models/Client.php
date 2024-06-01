@@ -735,9 +735,9 @@ class Client extends BaseModel implements HasLocalePreference
             
         }
 
-        return $languages->filter(function ($item) {
+        return $languages->first(function ($item) {
             return $item->id == $this->getSetting('language_id');
-        })->first()->locale;
+        })->locale;
     }
 
     public function backup_path(): string
