@@ -33,7 +33,7 @@ class RecurringExpenseCloneTest extends TestCase
     {
         parent::setUp();
         $this->faker = \Faker\Factory::create();
-        $this->buildCache(true);
+        
 
     }
 

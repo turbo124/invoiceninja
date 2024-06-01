@@ -111,7 +111,7 @@ class SelfUpdateController extends BaseController
         Artisan::call('migrate', ['--force' => true]);
         Artisan::call('config:clear');
 
-        $this->buildCache(true);
+        
 
         $this->runModelChecks();
 

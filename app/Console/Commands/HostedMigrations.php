@@ -62,7 +62,7 @@ class HostedMigrations extends Command
      */
     public function handle()
     {
-        $this->buildCache();
+        
 
         if (! MultiDB::userFindAndSetDb($this->option('email'))) {
             $this->info('Could not find a user with that email address');

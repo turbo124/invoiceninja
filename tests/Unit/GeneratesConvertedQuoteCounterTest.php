@@ -124,7 +124,8 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
         $settings->quote_number_pattern = 'Q{$counter}';
         $settings->shared_invoice_quote_counter = 1;
         $settings->timezone_id = '31';
-
+        $settings->currency_id = '1';
+        
         $this->company->settings = $settings;
 
         $this->company->save();

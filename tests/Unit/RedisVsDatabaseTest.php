@@ -31,7 +31,7 @@ class RedisVsDatabaseTest extends TestCase
     {
         $start = microtime(true);
 
-        $currencies = Cache::get('currencies');
+        $currencies = app('currencies');
 
         $currencies->filter(function ($item) {
             return $item->id == 17;

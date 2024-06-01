@@ -11,6 +11,7 @@
 
 namespace App\Factory;
 
+use App\Models\DateFormat;
 use App\Models\Expense;
 use App\Models\RecurringExpense;
 use Illuminate\Support\Carbon;
@@ -82,9 +83,7 @@ class RecurringExpenseToExpenseFactory
         } else {
             $locale = $recurring_expense->company->locale();
 
-            $date_formats = Cache::get('date_formats');
-
-            $date_format = $date_formats->filter(function ($item) use ($recurring_expense) {
+            $date_format = app('date_formats')->filter(function ($item) use ($recurring_expense) {
                 return $item->id == $recurring_expense->company->settings->date_format_id;
             })->first()->format;
         }

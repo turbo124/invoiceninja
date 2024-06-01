@@ -93,7 +93,7 @@ class SubscriptionPurchaseController extends Controller
      */
     private function setLocale(string $locale): void
     {
-        $record = Cache::get('languages')->filter(function ($item) use ($locale) {
+        $record = app('languages')->filter(function ($item) use ($locale) {
             return $item->locale == $locale;
         })->first();
 

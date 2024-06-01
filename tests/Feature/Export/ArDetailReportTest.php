@@ -46,7 +46,7 @@ class ArDetailReportTest extends TestCase
 
         $this->withoutExceptionHandling();
         
-        $this->buildCache(true);
+        
 
     }
 

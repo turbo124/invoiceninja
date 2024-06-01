@@ -1157,7 +1157,7 @@ class BaseController extends Controller
 
             $data['path'] = $this->setBuild();
 
-            $this->buildCache();
+            
 
             if (Ninja::isSelfHost() && $account->set_react_as_default_ap) {
                 return response()->view('react.index', $data)->header('X-Frame-Options', 'SAMEORIGIN', false);

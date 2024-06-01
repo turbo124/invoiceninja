@@ -140,7 +140,7 @@ class UpdateClientRequest extends Request
 
     private function getCountryCode($country_code)
     {
-        $countries = Cache::get('countries');
+        $countries = app('countries');
 
         $country = $countries->filter(function ($item) use ($country_code) {
             return $item->iso_3166_2 == $country_code || $item->iso_3166_3 == $country_code;
@@ -155,7 +155,7 @@ class UpdateClientRequest extends Request
 
     private function getLanguageId($language_code)
     {
-        $languages = Cache::get('languages');
+        $languages = app('languages');
 
         $language = $languages->filter(function ($item) use ($language_code) {
             return $item->locale == $language_code;

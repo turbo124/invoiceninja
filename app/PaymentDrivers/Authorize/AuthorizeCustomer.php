@@ -161,7 +161,7 @@ class AuthorizeCustomer
 
     private function getCountryCode($country_code)
     {
-        $countries = Cache::get('countries');
+        $countries = app('countries');
 
         $country = $countries->filter(function ($item) use ($country_code) {
             return $item->iso_3166_2 == $country_code || $item->iso_3166_3 == $country_code;

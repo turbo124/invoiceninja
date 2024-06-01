@@ -177,10 +177,10 @@ class Vendor extends BaseModel
 
     public function currency()
     {
-        $currencies = Cache::get('currencies');
+        $currencies = app('currencies');
 
         if (! $currencies) {
-            $this->buildCache(true);
+            
         }
 
         if (! $this->currency_id) {

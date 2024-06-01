@@ -59,7 +59,7 @@ class RandomDataSeeder extends Seeder
     public function run()
     {
 
-        $this->buildCache(true);
+        
 
         $this->command->info('Running RandomDataSeeder');
 

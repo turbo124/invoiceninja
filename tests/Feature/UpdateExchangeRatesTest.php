@@ -57,7 +57,7 @@ class UpdateExchangeRatesTest extends TestCase
 
             UpdateExchangeRates::dispatchSync();
 
-            $currencies = Cache::get('currencies');
+            $currencies = app('currencies');
 
             $gbp_currency = $currencies->filter(function ($item) {
                 return $item->id == 2;

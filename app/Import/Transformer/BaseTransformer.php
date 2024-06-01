@@ -119,7 +119,7 @@ class BaseTransformer
     {
         $code = array_key_exists($key, $data) ? $data[$key] : false;
 
-        $currencies = Cache::get('currencies');
+        $currencies = app('currencies');
 
         $currency = $currencies
             ->filter(function ($item) use ($code) {

@@ -16,6 +16,8 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Industry;
 use App\Models\Language;
+use App\Models\Timezone;
+use App\Models\DateFormat;
 use App\Models\PaymentTerm;
 use Illuminate\Support\ServiceProvider;
 use App\DataMapper\EmailTemplateDefaults;
@@ -52,6 +54,14 @@ class StaticServiceProvider extends ServiceProvider
 
         app()->singleton('banks', function ($app){
             return Bank::query()->orderBy('name')->get();
+        });
+                
+        app()->singleton('date_formats', function ($app) {
+            return DateFormat::query()->orderBy('id')->get();
+        });
+
+        app()->singleton('timezones', function ($app) {
+            return Timezone::query()->orderBy('id')->get();
         });
 
         app()->singleton('templates', function ($app){

@@ -457,10 +457,10 @@ class PdfConfiguration
      */
     public function setDateFormat(): self
     {
-        $date_formats = Cache::get('date_formats');
+        $date_formats = app('date_formats');
 
         if (! $date_formats) {
-            $this->buildCache(true);
+            
         }
 
         $this->date_format = $date_formats->filter(function ($item) {

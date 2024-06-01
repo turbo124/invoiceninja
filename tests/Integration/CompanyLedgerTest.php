@@ -57,7 +57,7 @@ class CompanyLedgerTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->artisan('db:seed --force');
-        $this->buildCache(true);
+        
         
         $this->faker = \Faker\Factory::create();
         $fake_email = $this->faker->email();

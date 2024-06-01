@@ -62,10 +62,6 @@ class UpdateExchangeRates implements ShouldQueue
                     $currency->save();
                 });
 
-                /* Rebuild the cache */
-                $currencies = Currency::orderBy('name')->get();
-
-                Cache::forever('currencies', $currencies);
             }
         } else {
             $client = new Client();
@@ -79,10 +75,6 @@ class UpdateExchangeRates implements ShouldQueue
                 $currency->save();
             });
 
-            /* Rebuild the cache */
-            $currencies = Currency::orderBy('name')->get();
-
-            Cache::forever('currencies', $currencies);
         }
     }
 }

@@ -33,14 +33,14 @@ class CheckCacheTest extends TestCase
 
     public function testWarmedUpCache()
     {
-        $date_formats = Cache::get('date_formats');
+        $date_formats = app('date_formats');
 
         $this->assertNotNull($date_formats);
     }
 
     public function testCacheCount()
     {
-        $date_formats = Cache::get('date_formats');
+        $date_formats = app('date_formats');
 
         $this->assertEquals(14, count($date_formats));
     }

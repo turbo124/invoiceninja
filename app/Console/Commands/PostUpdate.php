@@ -86,7 +86,7 @@ class PostUpdate extends Command
 
         info('queue restarted');
 
-        $this->buildCache(true);
+        
 
         VersionCheck::dispatch();
 

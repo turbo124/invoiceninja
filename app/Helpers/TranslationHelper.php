@@ -13,7 +13,6 @@
  * Returns a custom translation string
  * falls back on defaults if no string exists.
  *
- * //Cache::forever($custom_company_translated_string, 'mogly');
  *
  * @param string $string
  * @param array $replace

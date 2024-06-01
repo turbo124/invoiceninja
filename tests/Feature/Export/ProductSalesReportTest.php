@@ -48,7 +48,7 @@ class ProductSalesReportTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $this->buildCache(true);
+        
     }
 
     public $company;

@@ -183,7 +183,7 @@ class VendorContact extends Authenticatable implements HasLocalePreference
 
     public function preferredLocale()
     {
-        $languages = Cache::get('languages');
+        $languages = app('languages');
 
         return $languages->filter(function ($item) {
             return $item->id == $this->company->getSetting('language_id');

@@ -567,12 +567,12 @@ class VendorHtmlEngine
 
     private function getCountryName(): string
     {
-        $countries = Cache::get('countries');
+        $countries = app('countries');
 
         if (! $countries) {
-            $this->buildCache(true);
+            
 
-            $countries = Cache::get('countries');
+            $countries = app('countries');
         }
 
         if ($countries) {

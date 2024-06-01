@@ -636,12 +636,12 @@ class Company extends BaseModel
 
     public function country()
     {
-        $companies = Cache::get('countries');
+        $companies = app('countries');
 
         if (! $companies) {
-            $this->buildCache(true);
+            
 
-            $companies = Cache::get('countries');
+            $companies = app('countries');
         }
 
         return $companies->filter(function ($item) {
@@ -659,17 +659,12 @@ class Company extends BaseModel
 
     public function timezone()
     {
-        $timezones = Cache::get('timezones');
-
-        if (! $timezones) {
-            $this->buildCache(true);
-        }
+        $timezones = app('timezones');
 
         return $timezones->filter(function ($item) {
             return $item->id == $this->settings->timezone_id;
         })->first();
 
-        // return Timezone::find($this->settings->timezone_id);
     }
 
     public function designs()
@@ -694,12 +689,12 @@ class Company extends BaseModel
 
     public function language()
     {
-        $languages = Cache::get('languages');
+        $languages = app('languages');
 
         //build cache and reinit
         if (! $languages) {
-            $this->buildCache(true);
-            $languages = Cache::get('languages');
+            
+            $languages = app('languages');
         }
 
         //if the cache is still dead, get from DB
@@ -750,7 +745,7 @@ class Company extends BaseModel
 
     public function currency()
     {
-        $currencies = Cache::get('currencies');
+        $currencies = app('currencies');
 
         return $currencies->filter(function ($item) {
             return $item->id == $this->settings->currency_id;
@@ -967,10 +962,10 @@ class Company extends BaseModel
 
     public function date_format()
     {
-        $date_formats = Cache::get('date_formats');
+        $date_formats = app('date_formats');
 
         if (! $date_formats) {
-            $this->buildCache(true);
+            
         }
 
         return $date_formats->filter(function ($item) {

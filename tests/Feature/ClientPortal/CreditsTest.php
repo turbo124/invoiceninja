@@ -40,7 +40,7 @@ class CreditsTest extends TestCase
         parent::setUp();
 
         $this->faker = Factory::create();
-        $this->buildCache(true);
+        
         
     }
 

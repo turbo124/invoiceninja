@@ -256,7 +256,7 @@ class RegisterOrLogin extends Component
 
     public function render()
     {
-        $countries = Cache::get('countries');
+        $countries = app('countries');
 
         return view('billing-portal.v3.authentication.register-or-login', [
             'countries' => $countries,

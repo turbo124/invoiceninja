@@ -376,10 +376,10 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function language()
     {
-        $languages = Cache::get('languages');
+        $languages = app('languages');
 
         if (! $languages) {
-            $this->buildCache(true);
+            
         }
 
         return $languages->filter(function ($item) {
@@ -408,11 +408,7 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function date_format()
     {
-        $date_formats = Cache::get('date_formats');
-
-        if (! $date_formats) {
-            $this->buildCache(true);
-        }
+        $date_formats = app('date_formats');
 
         return $date_formats->filter(function ($item) {
             return $item->id == $this->getSetting('date_format_id');
@@ -421,11 +417,7 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function currency()
     {
-        $currencies = Cache::get('currencies');
-
-        if (! $currencies) {
-            $this->buildCache(true);
-        }
+        $currencies = app('currencies');
 
         return $currencies->filter(function ($item) {
             return $item->id == $this->getSetting('currency_id');
@@ -737,10 +729,10 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function preferredLocale()
     {
-        $languages = Cache::get('languages');
+        $languages = app('languages');
 
         if (! $languages) {
-            $this->buildCache(true);
+            
         }
 
         return $languages->filter(function ($item) {

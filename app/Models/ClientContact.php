@@ -271,10 +271,10 @@ class ClientContact extends Authenticatable implements HasLocalePreference
 
     public function preferredLocale()
     {
-        $languages = Cache::get('languages');
+        $languages = app('languages');
 
         if (! $languages) {
-            $this->buildCache(true);
+            
         }
 
         return $languages->filter(function ($item) {

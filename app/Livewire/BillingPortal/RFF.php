@@ -66,7 +66,7 @@ class RFF extends Component
     public function render()
     {
         $gateway = CompanyGateway::find($this->context['form']['company_gateway_id']);
-        $countries = Cache::get('countries');
+        $countries = app('countries');
 
         if ($gateway === null) {
             return view('billing-portal.v3.rff-basic');

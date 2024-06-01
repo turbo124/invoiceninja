@@ -34,7 +34,7 @@ return new class extends Migration {
                 $record->save();
             }
 
-            $this->buildCache(true);
+            
         }
     }
 
