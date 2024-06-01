@@ -13,6 +13,7 @@ namespace App\Providers;
 
 use App\Models\Bank;
 use App\Models\Country;
+use App\Models\Gateway;
 use App\Models\Currency;
 use App\Models\Industry;
 use App\Models\Language;
@@ -21,6 +22,7 @@ use App\Models\DateFormat;
 use App\Models\PaymentTerm;
 use Illuminate\Support\ServiceProvider;
 use App\DataMapper\EmailTemplateDefaults;
+use App\Models\Size;
 
 class StaticServiceProvider extends ServiceProvider
 {
@@ -62,6 +64,23 @@ class StaticServiceProvider extends ServiceProvider
 
         app()->singleton('timezones', function ($app) {
             return Timezone::query()->orderBy('id')->get();
+        });
+        
+        app()->singleton('gateways', function ($app) {
+            return Gateway::query()->orderBy('id')->get();
+        });
+        
+        app()->singleton('industries', function ($app) {
+            return Industry::query()->orderBy('id')->get();
+        });
+
+        app()->singleton('sizes', function ($app) {
+            return Size::query()->orderBy('id')->get();
+        });
+        
+        /** @deprecated */
+        app()->singleton('banks', function ($app) {
+            return Bank::query()->orderBy('id')->get();
         });
 
         app()->singleton('templates', function ($app){

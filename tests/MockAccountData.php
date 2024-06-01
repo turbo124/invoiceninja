@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -202,12 +202,9 @@ trait MockAccountData
 
     public function makeTestData()
     {
-        // config(['database.default' => config('ninja.db.default')]);
 
-        // /* Warm up the cache !*/
-        // $cached_tables = config('ninja.cached_tables');
+        $c = app('currencies');
 
-        $c = Currency::all();
         $this->assertGreaterThan(0, $c->count());
 
         Artisan::call('db:seed', [

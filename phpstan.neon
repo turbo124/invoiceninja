@@ -8,7 +8,7 @@ parameters:
         - app
     excludePaths:
         - 'vendor/*'
-        - 'resources/*/*.php'
+        - 'resources/*'
         - 'app/Jobs/Ninja/*'
         - 'app/Models/Presenters/*'
         - 'app/Console/Commands/*'

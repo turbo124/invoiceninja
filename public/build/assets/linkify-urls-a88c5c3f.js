@@ -3,7 +3,7 @@ import{g as m}from"./_commonjsHelpers-725317a4.js";const l=e=>e.replace(/&/g,"&a
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license 
  */document.querySelectorAll("[data-ref=entity-terms]").forEach(e=>{o==="function"&&(e.innerHTML=o(e.innerText,{attributes:{target:"_blank",class:"text-primary"}}))});

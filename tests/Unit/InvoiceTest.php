@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -90,6 +90,7 @@ class InvoiceTest extends TestCase
 
         $this->assertEquals(10, $ii->amount);
 
+        /** @var \App\Models\Invoice $ii */
         $ii->service()->markSent()->save();
 
         $this->assertEquals(10, $c->fresh()->balance);
@@ -135,6 +136,8 @@ class InvoiceTest extends TestCase
 
         $this->assertEquals(10.10, round($ii->amount,2));
 
+
+        /** @var \App\Models\Invoice $ii */
         $ii->service()->markSent()->save();
 
         $this->assertEquals(10.10, $c->fresh()->balance);

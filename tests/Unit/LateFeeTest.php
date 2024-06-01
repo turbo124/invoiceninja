@@ -4,26 +4,27 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 namespace Tests\Unit;
 
-use App\DataMapper\CompanySettings;
-use App\DataMapper\InvoiceItem;
-use App\Factory\ClientGatewayTokenFactory;
-use App\Factory\InvoiceItemFactory;
-use App\Jobs\Util\ReminderJob;
-use App\Models\Account;
+use Tests\TestCase;
+use App\Models\User;
 use App\Models\Client;
+use App\Models\Account;
 use App\Models\Company;
 use App\Models\Invoice;
-use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\MockAccountData;
-use Tests\TestCase;
+use App\Jobs\Util\ReminderJob;
+use App\DataMapper\InvoiceItem;
+use App\DataMapper\CompanySettings;
+use App\Factory\InvoiceItemFactory;
+use App\Factory\ClientGatewayTokenFactory;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test

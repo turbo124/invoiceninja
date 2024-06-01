@@ -319,7 +319,6 @@ class Activity extends StaticModel
         return $this->belongsTo(Invoice::class)->withTrashed();
     }
 
-
     public function vendor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Vendor::class)->withTrashed();
@@ -437,6 +436,10 @@ class Activity extends StaticModel
 
         if($this->activity_type_id == 4 && $this->recurring_invoice) {
             $replacements['recurring_invoice'] = ['label' => $this?->recurring_invoice?->number ?? '', 'hashed_id' => $this->recurring_invoice->hashed_id ?? ''];
+        }
+        
+        if($this->activity_type_id == 4 && $this->invoice) {
+            $replacements['invoice'] = ['label' => $this?->invoice?->number ?? '', 'hashed_id' => $this->invoice->hashed_id ?? ''];
         }
 
         $replacements['activity_type_id'] = $this->activity_type_id;

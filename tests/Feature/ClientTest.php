@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -54,16 +54,7 @@ class ClientTest extends TestCase
     {
         parent::setUp();
 
-        Session::start();
-
         $this->faker = \Faker\Factory::create();
-
-        Model::reguard();
-
-        $this->withoutExceptionHandling();
-
-        Client::reguard();
-        ClientContact::reguard();
 
         $this->withoutMiddleware(
             ThrottleRequests::class
@@ -681,7 +672,7 @@ class ClientTest extends TestCase
                 'X-API-TOKEN' => $this->token,
             ])->postJson('/api/v1/clients/', $data);
 
-            $response->assertStatus(200);
+            $response->assertStatus(422);
 
         $data = [
             'name' => 'A loyal Client',

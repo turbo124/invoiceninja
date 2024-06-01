@@ -104,11 +104,11 @@ return [
         'ninja_official_contact' => env('NINJA_OFFICIAL_CONTACT', 'contact@invoiceninja.com'),
     ],
     'cached_tables' => [
-        'banks' => App\Models\Bank::class,
+        // 'banks' => App\Models\Bank::class,
         'countries' => App\Models\Country::class,
         'currencies' => App\Models\Currency::class,
         'date_formats' => App\Models\DateFormat::class,
-        'datetime_formats' => App\Models\DatetimeFormat::class,
+        // 'datetime_formats' => App\Models\DatetimeFormat::class,
         'gateways' => App\Models\Gateway::class,
         //'gateway_types' => App\Models\GatewayType::class,
         'industries' => App\Models\Industry::class,
