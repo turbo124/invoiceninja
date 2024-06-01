@@ -25,7 +25,7 @@ use Tests\TestCase;
 class CreditTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

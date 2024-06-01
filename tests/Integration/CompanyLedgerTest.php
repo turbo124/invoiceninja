@@ -34,7 +34,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 /** @test*/
 class CompanyLedgerTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MakesHash;
     use AppSetup;
     

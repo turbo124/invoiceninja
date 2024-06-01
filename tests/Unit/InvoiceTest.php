@@ -28,7 +28,7 @@ use Tests\TestCase;
 class InvoiceTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $invoice;
 

@@ -36,7 +36,7 @@ class SchedulerTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected $faker;
 

@@ -30,7 +30,7 @@ use Tests\TestCase;
 
 class CreditsTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use AppSetup;
 
     private $faker;

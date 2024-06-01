@@ -26,7 +26,7 @@ use Tests\TestCase;
 class DeletePaymentTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockUnitData;
 
     protected function setUp() :void

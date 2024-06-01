@@ -32,7 +32,7 @@ use Tests\TestCase;
 class InvitationTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     // use RefreshDatabase;
 
     protected function setUp() :void

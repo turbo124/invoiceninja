@@ -23,7 +23,7 @@ use Tests\TestCase;
 class ClientModelTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

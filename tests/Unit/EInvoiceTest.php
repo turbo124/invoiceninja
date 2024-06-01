@@ -24,7 +24,7 @@ use Tests\TestCase;
 class EInvoiceTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

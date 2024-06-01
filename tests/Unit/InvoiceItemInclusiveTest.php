@@ -24,7 +24,7 @@ use Tests\TestCase;
 class InvoiceItemInclusiveTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

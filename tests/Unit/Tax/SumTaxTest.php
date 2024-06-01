@@ -32,7 +32,7 @@ use Tests\TestCase;
 class SumTaxTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     
     public Response $response;
     

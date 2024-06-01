@@ -40,7 +40,7 @@ use Tests\TestCase;
 class ClientApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
     use ClientGroupSettingsSaver;
 

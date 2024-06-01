@@ -26,7 +26,7 @@ use Tests\TestCase;
 class StorePaymentValidationTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp() :void

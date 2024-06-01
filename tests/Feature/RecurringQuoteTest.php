@@ -27,7 +27,7 @@ use Tests\TestCase;
 class RecurringQuoteTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

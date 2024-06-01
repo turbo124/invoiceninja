@@ -32,7 +32,7 @@ use Tests\TestCase;
 class CreditPaymentTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockUnitData;
 
     protected function setUp() :void

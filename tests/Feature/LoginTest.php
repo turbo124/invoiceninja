@@ -27,7 +27,7 @@ use Tests\TestCase;
  */
 class LoginTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

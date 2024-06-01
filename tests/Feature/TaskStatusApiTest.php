@@ -26,7 +26,7 @@ use Tests\TestCase;
 class TaskStatusApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

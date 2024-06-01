@@ -32,7 +32,7 @@ use Invoiceninja\Einvoice\Models\FatturaPA\FatturaElettronicaHeaderType\FatturaE
  */
 class FatturaPATest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp(): void

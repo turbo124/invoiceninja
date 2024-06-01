@@ -28,7 +28,7 @@ use Tests\TestCase;
  */
 class GoCardlessInstantBankPaymentTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
     use MakesHash;
 

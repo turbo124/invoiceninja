@@ -30,7 +30,7 @@ use Tests\TestCase;
 class EuTaxTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     
     protected function setUp() :void
     {

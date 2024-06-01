@@ -34,7 +34,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class InvoiceTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

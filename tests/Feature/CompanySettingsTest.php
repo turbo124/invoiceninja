@@ -27,7 +27,7 @@ use Tests\TestCase;
 class CompanySettingsTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
     // use RefreshDatabase;
 

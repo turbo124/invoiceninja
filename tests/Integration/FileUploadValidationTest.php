@@ -24,7 +24,7 @@ use Tests\TestCase;
 class FileUploadValidationTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MakesHash;
 
     protected function setUp() :void

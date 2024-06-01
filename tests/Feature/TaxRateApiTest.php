@@ -27,7 +27,7 @@ use Tests\TestCase;
 class TaxRateApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

@@ -29,7 +29,7 @@ use Tests\TestCase;
 class UsTaxTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     private array $mock_response = [
                 "geoPostalCode" => "92582",

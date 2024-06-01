@@ -43,7 +43,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ClientTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;
@@ -490,7 +490,7 @@ class ClientTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([
@@ -556,7 +556,7 @@ class ClientTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
 
         ]);
 
@@ -587,15 +587,12 @@ class ClientTest extends TestCase
             'contacts' => $this->faker->unique()->safeEmail(),
         ];
 
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            $this->assertNotNull($message);
-        }
+            ])->postJson('/api/v1/clients/', $data);
+
+            $response->assertStatus(422);
     }
 
     public function testCreatingClientAndContacts()
@@ -611,7 +608,7 @@ class ClientTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
 
         ]);
 
@@ -679,15 +676,12 @@ class ClientTest extends TestCase
 
         $response = null;
 
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            $this->assertNotNull($message);
-        }
+            ])->postJson('/api/v1/clients/', $data);
+
+            $response->assertStatus(200);
 
         $data = [
             'name' => 'A loyal Client',
@@ -701,14 +695,10 @@ class ClientTest extends TestCase
 
         $response = null;
 
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-        }
+            ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -728,15 +718,10 @@ class ClientTest extends TestCase
 
         $response = null;
 
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            $this->assertNotNull($message);
-        }
+            ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -765,15 +750,10 @@ class ClientTest extends TestCase
 
         $response = null;
 
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            $this->assertNotNull($message);
-        }
+            ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -798,16 +778,10 @@ class ClientTest extends TestCase
         ];
 
         $response = null;
-
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            $this->assertNotNull($message);
-        }
+            ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -834,15 +808,11 @@ class ClientTest extends TestCase
 
         $response = null;
 
-        try {
             $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
-            ])->put('/api/v1/clients/'.$this->client->hashed_id, $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            $this->assertNotNull($message);
-        }
+            ])->putJson('/api/v1/clients/'.$this->client->hashed_id, $data);
+        
 
         $response->assertStatus(200);
 

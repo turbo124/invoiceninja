@@ -25,7 +25,7 @@ use Tests\TestCase;
 class GroupSettingsTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use ClientGroupSettingsSaver;
 
     public $company_settings;

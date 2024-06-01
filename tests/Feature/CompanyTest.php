@@ -33,7 +33,7 @@ class CompanyTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $faker;
 

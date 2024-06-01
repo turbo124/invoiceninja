@@ -26,7 +26,7 @@ class UpdateCompanyUserTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

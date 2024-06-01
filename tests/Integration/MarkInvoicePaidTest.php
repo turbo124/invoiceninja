@@ -22,7 +22,7 @@ use Tests\TestCase;
 class MarkInvoicePaidTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

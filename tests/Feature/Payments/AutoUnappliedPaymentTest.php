@@ -33,7 +33,7 @@ use Tests\TestCase;
 class AutoUnappliedPaymentTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockUnitData;
 
     protected function setUp() :void

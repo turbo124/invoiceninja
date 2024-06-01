@@ -23,7 +23,7 @@ use Tests\TestCase;
 class InvoiceStatusTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $invoice;
 

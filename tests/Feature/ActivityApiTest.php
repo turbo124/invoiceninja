@@ -23,7 +23,7 @@ use Tests\TestCase;
  */
 class ActivityApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp() :void

@@ -31,7 +31,7 @@ use Tests\TestCase;
  */
 class MultiPaymentDeleteTest extends TestCase
 {
-    use DatabaseTransactions, MakesHash;
+    //use DatabaseTransactions, MakesHash;
 
     private $faker;
 

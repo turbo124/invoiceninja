@@ -22,7 +22,7 @@ use Tests\TestCase;
 class ShopProfileTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

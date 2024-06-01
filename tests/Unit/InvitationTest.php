@@ -22,7 +22,7 @@ use Tests\TestCase;
 class InvitationTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MakesHash;
 
     protected function setUp() :void

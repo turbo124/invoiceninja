@@ -58,7 +58,7 @@ use Tests\TestCase;
 class ImportCompanyTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $account;
 

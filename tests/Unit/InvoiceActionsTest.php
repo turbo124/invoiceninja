@@ -24,7 +24,7 @@ use Tests\TestCase;
 class InvoiceActionsTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use ActionsInvoice;
 
     protected function setUp() :void

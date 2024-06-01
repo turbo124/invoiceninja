@@ -22,7 +22,6 @@ use Tests\TestCase;
 class ClassificationTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
     use MockUnitData;
 
     protected function setUp() :void

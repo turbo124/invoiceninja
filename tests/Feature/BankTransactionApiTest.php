@@ -28,7 +28,7 @@ use Tests\TestCase;
 class BankTransactionApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

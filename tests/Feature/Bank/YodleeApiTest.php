@@ -30,7 +30,7 @@ use Tests\TestCase;
 
 class YodleeApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp(): void

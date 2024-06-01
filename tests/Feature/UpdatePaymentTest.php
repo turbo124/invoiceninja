@@ -30,7 +30,7 @@ use Tests\TestCase;
 class UpdatePaymentTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

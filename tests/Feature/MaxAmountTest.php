@@ -29,7 +29,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
  */
 class MaxAmountTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp() :void

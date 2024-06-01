@@ -25,7 +25,7 @@ use Tests\TestCase;
 class UploadLogoTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MakesHash;
 
     protected function setUp() :void

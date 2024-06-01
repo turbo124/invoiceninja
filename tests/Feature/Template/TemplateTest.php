@@ -38,7 +38,7 @@ use Tests\TestCase;
  */
 class TemplateTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
     use MakesDates;
 

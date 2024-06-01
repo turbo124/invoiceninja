@@ -25,7 +25,7 @@ use Tests\TestCase;
 class TaxConfigTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     
     protected function setUp() :void
     {

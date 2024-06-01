@@ -20,7 +20,7 @@ use Tests\TestCase;
 
 class YodleeBankTransactionTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp() :void

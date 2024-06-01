@@ -34,7 +34,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class EntityTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $invoice;
 

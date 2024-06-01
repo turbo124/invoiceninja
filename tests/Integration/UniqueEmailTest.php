@@ -26,7 +26,7 @@ use Tests\TestCase;
  */
 class UniqueEmailTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected $rule;
 

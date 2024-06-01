@@ -30,7 +30,7 @@ use Tests\TestCase;
  */
 class LateFeeTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

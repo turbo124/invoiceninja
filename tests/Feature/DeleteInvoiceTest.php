@@ -27,7 +27,7 @@ use Tests\TestCase;
  */
 class DeleteInvoiceTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
     use MakesHash;
 

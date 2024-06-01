@@ -37,7 +37,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ReminderTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

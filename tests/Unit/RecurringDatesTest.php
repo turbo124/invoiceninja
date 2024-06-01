@@ -34,13 +34,17 @@ class RecurringDatesTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
+
+    protected $faker;
 
     protected function setUp() :void
     {
         parent::setUp();
 
         $this->makeTestData();
+    
+        $this->faker = \Faker\Factory::create();
     }
 
 
@@ -65,7 +69,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([
@@ -159,7 +163,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([
@@ -244,7 +248,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([
@@ -328,7 +332,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([
@@ -410,7 +414,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([
@@ -491,7 +495,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => 'whiz@gmail.com',
+            'email' => $this->faker->safeEmail(),
         ]);
 
         $userPermissions = collect([

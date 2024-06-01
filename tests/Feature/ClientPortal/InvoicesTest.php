@@ -27,7 +27,6 @@ use Tests\TestCase;
 
 class InvoicesTest extends TestCase
 {
-    use DatabaseTransactions;
     use AppSetup;
 
     public $faker;

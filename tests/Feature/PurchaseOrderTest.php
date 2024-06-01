@@ -28,7 +28,7 @@ use Tests\TestCase;
 class PurchaseOrderTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

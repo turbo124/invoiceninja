@@ -32,7 +32,7 @@ use Tests\TestCase;
 class QuoteTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

@@ -23,7 +23,7 @@ use Tests\TestCase;
 class GoogleAnalyticsTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

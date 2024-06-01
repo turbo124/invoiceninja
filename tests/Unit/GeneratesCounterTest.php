@@ -37,7 +37,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class GeneratesCounterTest extends TestCase
 {
     use GeneratesCounter;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MakesHash;
     use MockAccountData;
 

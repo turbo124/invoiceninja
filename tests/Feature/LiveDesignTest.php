@@ -25,7 +25,7 @@ use Tests\TestCase;
  */
 class LiveDesignTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp() :void

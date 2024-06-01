@@ -226,15 +226,6 @@ trait MockAccountData
         $this->account->num_users = 3;
         $this->account->save();
 
-        $this->company = Company::factory()->create([
-            'account_id' => $this->account->id,
-        ]);
-
-        $this->company->client_registration_fields = ClientRegistrationFields::generate();
-
-        Storage::makeDirectory($this->company->company_key.'/documents', 0755, true);
-        Storage::makeDirectory($this->company->company_key.'/images', 0755, true);
-
         $settings = CompanySettings::defaults();
 
         $settings->company_logo = 'https://pdf.invoicing.co/favicon-v2.png';
@@ -253,10 +244,17 @@ trait MockAccountData
         $settings->timezone_id = '1';
         $settings->entity_send_time = 0;
         $settings->currency_id = '1';
-        
-        $this->company->track_inventory = true;
-        $this->company->settings = $settings;
-        $this->company->save();
+
+
+        $this->company = Company::factory()->create([
+            'account_id' => $this->account->id,
+            'track_inventory' => true,
+            'settings' => $settings,
+            'client_registration_fields' =>  ClientRegistrationFields::generate(),
+        ]);
+
+        Storage::makeDirectory($this->company->company_key.'/documents', 0755, true);
+        Storage::makeDirectory($this->company->company_key.'/images', 0755, true);
 
         $this->account->default_company_id = $this->company->id;
         $this->account->plan = 'pro';
@@ -519,7 +517,6 @@ trait MockAccountData
         $this->quote->setRelation('company', $this->company);
 
         $this->quote->save();
-
 
         $this->credit = Credit::factory()->create([
             'user_id' => $user_id,

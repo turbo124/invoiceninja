@@ -23,7 +23,7 @@ use Tests\TestCase;
 class CompanyDocumentsTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp(): void
     {

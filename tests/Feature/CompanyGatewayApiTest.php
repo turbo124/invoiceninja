@@ -30,7 +30,7 @@ use Tests\TestCase;
 class CompanyGatewayApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
     use CompanyGatewayFeesAndLimitsSaver;
 

@@ -29,7 +29,7 @@ use Tests\TestCase;
 class ExpenseApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;

@@ -32,7 +32,7 @@ class TaskRoundingTest extends TestCase
     public bool $task_round_up = true;
 
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     private $faker;

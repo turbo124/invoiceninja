@@ -18,7 +18,7 @@ use Tests\TestCase;
 class ImportTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $migration_array;
 

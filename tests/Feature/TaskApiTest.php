@@ -30,7 +30,7 @@ use Tests\TestCase;
 class TaskApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     private $faker;

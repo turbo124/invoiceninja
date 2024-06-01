@@ -70,7 +70,7 @@ use Invoiceninja\Einvoice\Models\FACT1\TaxCategoryType\TaxCategory;
 class Fact1Test extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp(): void
     {

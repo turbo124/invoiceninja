@@ -23,7 +23,7 @@ use Tests\TestCase;
 class CloneQuoteToInvoiceFactoryTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     protected function setUp() :void
     {

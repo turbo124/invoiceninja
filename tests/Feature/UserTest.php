@@ -34,7 +34,7 @@ use Tests\TestCase;
 class UserTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     private $default_email = 'attach@gmail.com';
 

@@ -29,7 +29,7 @@ use Tests\TestCase;
 class InvoiceEmailTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use GeneratesCounter;
 
     public $faker;

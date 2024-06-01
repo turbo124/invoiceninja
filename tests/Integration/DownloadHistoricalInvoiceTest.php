@@ -25,7 +25,7 @@ use Tests\TestCase;
 class DownloadHistoricalInvoiceTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MakesHash;
 
     protected function setUp() :void

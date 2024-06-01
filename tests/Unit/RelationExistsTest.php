@@ -32,7 +32,7 @@ use Tests\TestCase;
 class RelationExistsTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     private $models = [
         Invoice::class,

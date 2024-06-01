@@ -92,7 +92,7 @@ class EventTest extends TestCase
 {
     use MockAccountData;
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     public $faker;
 

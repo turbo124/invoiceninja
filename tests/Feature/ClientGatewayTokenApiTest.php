@@ -27,7 +27,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ClientGatewayTokenApiTest extends TestCase
 {
     use MakesHash;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected $faker;

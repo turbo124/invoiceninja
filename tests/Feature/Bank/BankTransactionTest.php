@@ -26,7 +26,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class BankTransactionTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     use MockAccountData;
 
     protected function setUp() :void

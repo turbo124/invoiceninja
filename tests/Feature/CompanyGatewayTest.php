@@ -27,7 +27,7 @@ use Tests\TestCase;
 class CompanyGatewayTest extends TestCase
 {
     use MockAccountData;
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     // use RefreshDatabase;
 
     protected function setUp() :void
