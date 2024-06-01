@@ -157,9 +157,9 @@ class StoreShopClientRequest extends Request
     {
         $countries = app('countries');
 
-        $country = $countries->filter(function ($item) use ($country_code) {
+        $country = $countries->first(function ($item) use ($country_code) {
             return $item->iso_3166_2 == $country_code || $item->iso_3166_3 == $country_code;
-        })->first();
+        });
 
         return (string) $country->id;
     }
@@ -168,9 +168,9 @@ class StoreShopClientRequest extends Request
     {
         $currencies = app('currencies');
 
-        $currency = $currencies->filter(function ($item) use ($code) {
+        $currency = $currencies->first(function ($item) use ($code) {
             return $item->code == $code;
-        })->first();
+        });
 
         return (string) $currency->id;
     }

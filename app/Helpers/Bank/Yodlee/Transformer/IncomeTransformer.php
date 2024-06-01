@@ -177,9 +177,9 @@ class IncomeTransformer implements BankRevenueInterface
             
         }
 
-        $currency = $currencies->filter(function ($item) use ($code) {
+        $currency = $currencies->first(function ($item) use ($code) {
             return $item->code == $code;
-        })->first();
+        });
 
         if ($currency) {
             return $currency->id;

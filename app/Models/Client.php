@@ -382,9 +382,9 @@ class Client extends BaseModel implements HasLocalePreference
             
         }
 
-        return $languages->filter(function ($item) {
+        return $languages->first(function ($item) {
             return $item->id == $this->getSetting('language_id');
-        })->first();
+        });
     }
 
     public function industry(): BelongsTo
@@ -419,9 +419,9 @@ class Client extends BaseModel implements HasLocalePreference
     {
         $currencies = app('currencies');
 
-        return $currencies->filter(function ($item) {
+        return $currencies->first(function ($item) {
             return $item->id == $this->getSetting('currency_id');
-        })->first();
+        });
     }
 
     public function service(): ClientService

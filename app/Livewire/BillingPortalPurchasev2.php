@@ -676,17 +676,17 @@ class BillingPortalPurchasev2 extends Component
         }
 
         if (array_key_exists('currency_id', $this->request_data)) {
-            $currency = app('currencies')->filter(function ($item) {
+            $currency = app('currencies')->first(function ($item) {
                 return $item->id == $this->request_data['currency_id'];
-            })->first();
+            });
 
             if ($currency) {
                 $data['settings']->currency_id = $currency->id;
             }
         } elseif ($this->subscription->group_settings && property_exists($this->subscription->group_settings->settings, 'currency_id')) {
-            $currency = app('currencies')->filter(function ($item) {
+            $currency = app('currencies')->first(function ($item) {
                 return $item->id == $this->subscription->group_settings->settings->currency_id;
-            })->first();
+            });
 
             if ($currency) {
                 $data['settings']->currency_id = $currency->id;
@@ -696,9 +696,9 @@ class BillingPortalPurchasev2 extends Component
         if (array_key_exists('locale', $this->request_data)) {
             $request = $this->request_data;
 
-            $record = app('languages')->filter(function ($item) use ($request) {
+            $record = app('languages')->first(function ($item) use ($request) {
                 return $item->locale == $request['locale'];
-            })->first();
+            });
 
             if ($record) {
                 $data['settings']['language_id'] = (string)$record->id;

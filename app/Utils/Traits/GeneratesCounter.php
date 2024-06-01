@@ -720,6 +720,7 @@ trait GeneratesCounter
         $replace[] = $counter;
 
         $search[] = '{$year}';
+
         $replace[] = Carbon::now($entity->company->timezone()->name)->format('Y');
 
         if (strstr($pattern, '{$user_id}') || strstr($pattern, '{$userId}')) {

@@ -644,12 +644,10 @@ class Company extends BaseModel
             $companies = app('countries');
         }
 
-        return $companies->filter(function ($item) {
+        return $companies->first(function ($item) {
             return $item->id == $this->getSetting('country_id');
-        })->first();
+        });
 
-        //        return $this->belongsTo(Country::class);
-        // return Country::find($this->settings->country_id);
     }
 
     public function group_settings()
@@ -661,10 +659,11 @@ class Company extends BaseModel
     {
         $timezones = app('timezones');
 
-        return $timezones->filter(function ($item) {
+        $tz = $timezones->first(function ($item) {
             return $item->id == $this->settings->timezone_id;
-        })->first();
+        });
 
+        return $tz;
     }
 
     public function designs()
@@ -702,9 +701,9 @@ class Company extends BaseModel
             return Language::find($this->settings->language_id);
         }
 
-        return $languages->filter(function ($item) {
+        return $languages->first(function ($item) {
             return $item->id == $this->settings->language_id;
-        })->first();
+        });
     }
 
     public function getLocale()
@@ -747,9 +746,9 @@ class Company extends BaseModel
     {
         $currencies = app('currencies');
 
-        return $currencies->filter(function ($item) {
+        return $currencies->first(function ($item) {
             return $item->id == $this->settings->currency_id;
-        })->first();
+        });
     }
 
     /**
@@ -968,9 +967,9 @@ class Company extends BaseModel
             
         }
 
-        return $date_formats->filter(function ($item) {
+        return $date_formats->first(function ($item) {
             return $item->id == $this->getSetting('date_format_id');
-        })->first()->format;
+        })->format;
     }
 
     public function getInvoiceCert()

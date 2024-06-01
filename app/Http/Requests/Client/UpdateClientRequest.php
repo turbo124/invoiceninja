@@ -142,9 +142,9 @@ class UpdateClientRequest extends Request
     {
         $countries = app('countries');
 
-        $country = $countries->filter(function ($item) use ($country_code) {
+        $country = $countries->first(function ($item) use ($country_code) {
             return $item->iso_3166_2 == $country_code || $item->iso_3166_3 == $country_code;
-        })->first();
+        });
 
         if ($country) {
             return (string) $country->id;
@@ -157,9 +157,9 @@ class UpdateClientRequest extends Request
     {
         $languages = app('languages');
 
-        $language = $languages->filter(function ($item) use ($language_code) {
+        $language = $languages->first(function ($item) use ($language_code) {
             return $item->locale == $language_code;
-        })->first();
+        });
 
         if ($language) {
             return (string) $language->id;

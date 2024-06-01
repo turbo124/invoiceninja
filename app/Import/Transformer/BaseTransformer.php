@@ -122,10 +122,9 @@ class BaseTransformer
         $currencies = app('currencies');
 
         $currency = $currencies
-            ->filter(function ($item) use ($code) {
+            ->first(function ($item) use ($code) {
                 return $item->code == $code;
-            })
-            ->first();
+            });
 
         return $currency
             ? $currency->id

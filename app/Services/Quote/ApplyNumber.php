@@ -11,6 +11,7 @@
 
 namespace App\Services\Quote;
 
+use App\Models\Client;
 use App\Models\Quote;
 use App\Utils\Traits\GeneratesCounter;
 use Illuminate\Database\QueryException;
@@ -19,13 +20,10 @@ class ApplyNumber
 {
     use GeneratesCounter;
 
-    private $client;
-
     private bool $completed = true;
 
-    public function __construct($client)
+    public function __construct(public Client $client)
     {
-        $this->client = $client;
     }
 
     public function run($quote)
