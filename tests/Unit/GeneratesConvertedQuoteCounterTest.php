@@ -11,19 +11,20 @@
 
 namespace Tests\Unit;
 
-use App\Models\Account;
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Quote;
 use App\Models\Client;
-use App\Models\ClientContact;
+use App\Models\Account;
 use App\Models\Company;
 use App\Models\Invoice;
-use App\Models\Quote;
-use App\Models\User;
-use App\Utils\Traits\GeneratesConvertedQuoteCounter;
+use App\Models\ClientContact;
 use App\Utils\Traits\MakesHash;
+use App\DataMapper\CompanySettings;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Session;
-use Tests\TestCase;
+use App\Utils\Traits\GeneratesConvertedQuoteCounter;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -73,8 +74,11 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
 
         $user_id = $user->id;
 
+        $settings = CompanySettings::defaults();
+        $settings->currency_id = '1';
         $this->company = Company::factory()->create([
             'account_id' => $this->account->id,
+            'settings' => $settings,
         ]);
 
         $this->client = Client::factory()->create([
