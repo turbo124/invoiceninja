@@ -21,9 +21,9 @@ class UpdateCompanyLedgerTest extends TestCase
 {
     use MockAccountData;
     use DatabaseTransactions;
+
     protected function tearDown(): void
     {
-
         $this->account->forceDelete();
         parent::tearDown();
     }
@@ -31,7 +31,6 @@ class UpdateCompanyLedgerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->makeTestData();
     }
 
