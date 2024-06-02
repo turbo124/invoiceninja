@@ -23,7 +23,11 @@ use Tests\TestCase;
 class InvoiceStatusTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public $invoice;
 
@@ -31,7 +35,7 @@ class InvoiceStatusTest extends TestCase
 
     public $settings;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 

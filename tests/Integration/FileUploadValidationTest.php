@@ -11,12 +11,13 @@
 
 namespace Tests\Integration;
 
-use App\Utils\Traits\MakesHash;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use Tests\MockAccountData;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -24,24 +25,31 @@ use Tests\TestCase;
 class FileUploadValidationTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
     use MakesHash;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
+
+
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
 
     }
 
     public function testIteratingThroughAllEntities()
     {
-     
+
+        $this->makeTestData();
+
         Storage::fake('local');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
+
         $data = [
             'documents' => [$file],
             'is_public' => false,
@@ -71,20 +79,27 @@ class FileUploadValidationTest extends TestCase
             ])->postJson("/api/v1/{$value}/{$this->{$key}->hashed_id}/upload", $data);
 
             $acc = $response->json();
+
             $response->assertStatus(200);
 
             $this->assertCount(1, $acc['data']['documents']);
             $this->assertFalse($acc['data']['documents'][0]['is_public']);
         }
-    
+
+
+        //$this->account->forceDelete();
+
     }
 
     public function testFileUploadIsPublicSetsAppropriately()
     {
+
+        $this->makeTestData();
+
         Storage::fake('local');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
+
         $data = [
             'documents' => [$file],
             'is_public' => false,
@@ -119,14 +134,18 @@ class FileUploadValidationTest extends TestCase
         $this->assertCount(2, $acc['data']['documents']);
         $this->assertTrue($acc['data']['documents'][1]['is_public']);
 
+        //$this->account->forceDelete();
+
     }
 
     public function testMultiFileUploadIsPublicSetsAppropriately()
     {
+        $this->makeTestData();
+
         Storage::fake('local');
 
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
+
         $data = [
             'documents' => [$file, $file],
             'is_public' => false,
@@ -144,6 +163,8 @@ class FileUploadValidationTest extends TestCase
         $this->assertCount(2, $acc['data']['documents']);
         $this->assertFalse($acc['data']['documents'][0]['is_public']);
         $this->assertFalse($acc['data']['documents'][1]['is_public']);
+
+        //$this->account->forceDelete();
 
     }
 

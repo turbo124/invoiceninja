@@ -27,12 +27,16 @@ use Tests\TestCase;
 class TaxRateApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 

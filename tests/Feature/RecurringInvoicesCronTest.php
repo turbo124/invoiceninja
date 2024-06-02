@@ -23,16 +23,16 @@ use Tests\TestCase;
  */
 class RecurringInvoicesCronTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
-
-        RecurringInvoice::all()->each(function ($ri) {
-            $ri->forceDelete();
-        });
 
         $this->makeTestData();
     }
@@ -40,9 +40,10 @@ class RecurringInvoicesCronTest extends TestCase
     public function testCountCorrectNumberOfRecurringInvoicesDue()
     {
         //spin up 5 valid and 1 invalid recurring invoices
-        $recurring_invoices = RecurringInvoice::where('next_send_date', '<=', Carbon::now()->addMinutes(30))->get();
+        $recurring_invoices = RecurringInvoice::where('company_id', $this->company->id)
+                    ->where('next_send_date', '<=', Carbon::now()->addMinutes(30))->get();
 
-        $recurring_all = RecurringInvoice::all();
+        $recurring_all = RecurringInvoice::where('company_id', $this->company->id)->get();
 
         $this->assertEquals(5, $recurring_invoices->count());
 

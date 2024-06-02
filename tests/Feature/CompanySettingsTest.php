@@ -8,17 +8,19 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 namespace Tests\Feature;
 
-use App\DataMapper\CompanySettings;
+use Tests\TestCase;
+use Tests\MockAccountData;
 use App\Utils\Traits\MakesHash;
+use App\DataMapper\CompanySettings;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -27,21 +29,59 @@ use Tests\TestCase;
 class CompanySettingsTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
-    use MockAccountData;
-    // use RefreshDatabase;
 
-    public function setUp() :void
+    public $company;
+    public $token;
+    public $user;
+    public $faker;
+    public $bank_transaction;
+    public $account;
+    public $payment;
+    public $invoice;
+    public $expense;
+    public $expense_category;
+    public $vendor;
+    public $bank_transaction_rule;
+    public $client;
+    public $quote;
+    public $settings;
+    public $credit;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
 
-        Session::start();
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->user = $data->user;
+        $this->bank_transaction = $data->bank_transaction;
+        $this->account = $data->account;
+        $this->payment = $data->payment;
+        $this->invoice = $data->invoice;
+        $this->expense = $data->expense;
+        $this->expense_category = $data->expense_category;
+        $this->vendor = $data->vendor;
+        $this->bank_transaction_rule = $data->bank_transaction_rule;
+        $this->client = $data->client;
+        $this->quote = $data->quote;
+        $this->credit = $data->credit;
+
+        $this->withoutMiddleware(
+            ThrottleRequests::class
+        );
 
         $this->faker = \Faker\Factory::create();
+
         $this->withoutExceptionHandling();
-        Model::reguard();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->account->forceDelete();
     }
 
     public function testClientNumberCantBeModified()
@@ -52,24 +92,18 @@ class CompanySettingsTest extends TestCase
 
         $this->company->saveSettings($settings, $this->company);
 
-        $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-Token' => $this->token,
-            ])->putJson('/api/v1/companies/'.$this->encodePrimaryKey($this->company->id), $this->company->toArray());
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-Token' => $this->token,
+        ])->putJson('/api/v1/companies/'.$this->encodePrimaryKey($this->company->id), $this->company->toArray());
 
-        if ($response) {
-            $response->assertStatus(200);
+        $response->assertStatus(200);
 
-            $arr = $response->json();
+        $arr = $response->json();
 
-            $this->assertEquals($arr['data']['settings']['timezone_id'], 1);
-        }
+        $this->assertEquals($arr['data']['settings']['timezone_id'], 1);
+
     }
 
     public function testNullValuesInSettings()
@@ -81,16 +115,11 @@ class CompanySettingsTest extends TestCase
         $this->company->saveSettings($settings, $this->company);
 
         $response = false;
-        
-        try {
-            $response = $this->withHeaders([
-                    'X-API-SECRET' => config('ninja.api_secret'),
-                    'X-API-Token' => $this->token,
-                ])->putJson('/api/v1/companies/'.$this->encodePrimaryKey($this->company->id), $this->company->toArray());
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+
+        $response = $this->withHeaders([
+                'X-API-SECRET' => config('ninja.api_secret'),
+                'X-API-Token' => $this->token,
+            ])->putJson('/api/v1/companies/'.$this->encodePrimaryKey($this->company->id), $this->company->toArray());
 
         $response->assertStatus(200);
 

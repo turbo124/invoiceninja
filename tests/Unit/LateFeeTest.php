@@ -31,7 +31,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
  */
 class LateFeeTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
 
     public $faker;
@@ -42,7 +41,7 @@ class LateFeeTest extends TestCase
 
     public $client;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,6 +57,12 @@ class LateFeeTest extends TestCase
 
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
+
     private function buildData($settings)
     {
         $this->account = Account::factory()->create([
@@ -71,7 +76,7 @@ class LateFeeTest extends TestCase
         $this->user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => 'xyz123',
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $this->company = Company::factory()->create([
@@ -82,7 +87,7 @@ class LateFeeTest extends TestCase
         $this->company->settings = $settings;
         $this->company->save();
 
-        $settings = new \stdClass;
+        $settings = new \stdClass();
         $settings->currency_id = '1';
 
         $client = Client::factory()->create([
@@ -97,7 +102,7 @@ class LateFeeTest extends TestCase
 
     public function testAddLateFeeAppropriately()
     {
-        $invoice_item = new InvoiceItem;
+        $invoice_item = new InvoiceItem();
         $invoice_item->type_id = '5';
         $invoice_item->product_key = trans('texts.fee');
         $invoice_item->notes = ctrans('texts.late_fee_added', ['date' => 'xyz']);
@@ -108,7 +113,7 @@ class LateFeeTest extends TestCase
         $invoice_items[] = $invoice_item;
 
         $this->invoice->line_items = $invoice_items;
-        
+
         $this->assertGreaterThan(1, count($this->invoice->line_items));
 
         /**Refresh Invoice values*/
@@ -152,10 +157,10 @@ class LateFeeTest extends TestCase
         $ids = $invoices->pluck('id');
 
         $invoices = $i->map(function ($invoice) {
-            
+
             $line_items = $invoice->line_items;
 
-            $item = new InvoiceItem;
+            $item = new InvoiceItem();
             $item->type_id = '3';
             $item->product_key = trans('texts.fee');
             $item->quantity = 1;
@@ -163,7 +168,7 @@ class LateFeeTest extends TestCase
 
             $line_items[] = $item;
 
-            $item = new InvoiceItem;
+            $item = new InvoiceItem();
             $item->type_id = '5';
             $item->product_key = trans('texts.fee');
             $item->quantity = 1;
@@ -178,7 +183,7 @@ class LateFeeTest extends TestCase
 
         $invoices = Invoice::whereIn('id', $ids)->cursor()->map(function ($invoice) {
             $this->assertGreaterThan(0, count($invoice->line_items));
-            
+
             $invoice->service()->removeUnpaidGatewayFees();
             $invoice = $invoice->fresh();
             $this->assertGreaterThan(0, count($invoice->line_items));
@@ -208,7 +213,7 @@ class LateFeeTest extends TestCase
         $this->invoice->service()->removeUnpaidGatewayFees();
 
         $this->invoice = $this->invoice->fresh();
-        
+
         $this->assertCount($line_count, $this->invoice->line_items);
     }
 
@@ -237,7 +242,7 @@ class LateFeeTest extends TestCase
 
         $line_items[] = $item;
 
-        $item = new InvoiceItem;
+        $item = new InvoiceItem();
         $item->type_id = '5';
         $item->product_key = trans('texts.fee');
         $item->quantity = 1;
@@ -287,7 +292,7 @@ class LateFeeTest extends TestCase
         $data[1]['fee_cap'] = 0;
         $data[1]['is_enabled'] = true;
 
-        $cg = new \App\Models\CompanyGateway;
+        $cg = new \App\Models\CompanyGateway();
         $cg->company_id = $this->company->id;
         $cg->user_id = $this->user->id;
         $cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
@@ -330,7 +335,7 @@ class LateFeeTest extends TestCase
 
         $line_items[] = $item;
 
-        $item = new InvoiceItem;
+        $item = new InvoiceItem();
         $item->type_id = '5';
         $item->product_key = trans('texts.fee');
         $item->quantity = 1;
@@ -380,7 +385,7 @@ class LateFeeTest extends TestCase
 
         $line_items = $i->line_items;
 
-        $item = new InvoiceItem;
+        $item = new InvoiceItem();
         $item->type_id = '5';
         $item->product_key = trans('texts.fee');
         $item->quantity = 1;
@@ -451,7 +456,7 @@ class LateFeeTest extends TestCase
 
         $this->assertEquals(10, $i->amount);
         $this->assertEquals(10, $i->balance);
-        
+
         $reflectionMethod = new \ReflectionMethod(ReminderJob::class, 'sendReminderForInvoice');
         $reflectionMethod->setAccessible(true);
         $reflectionMethod->invokeArgs(new ReminderJob(), [$i]);
@@ -503,7 +508,7 @@ class LateFeeTest extends TestCase
 
         $i = $i->calc()->getInvoice();
         $i->service()->applyNumber()->createInvitations()->markSent()->save();
-        
+
         $this->assertEquals(10, $i->amount);
         $this->assertEquals(10, $i->balance);
         $this->assertEquals(10, $client->fresh()->balance);
@@ -530,7 +535,7 @@ class LateFeeTest extends TestCase
         $this->assertEquals(15, $this->invoice->fresh()->balance);
     }
 
-    private function setLateFee($invoice, $amount, $percent) :Invoice
+    private function setLateFee($invoice, $amount, $percent): Invoice
     {
         $temp_invoice_balance = $invoice->balance;
 
@@ -546,7 +551,7 @@ class LateFeeTest extends TestCase
             $fee += round($invoice->balance * $percent / 100, 2);
         }
 
-        $invoice_item = new InvoiceItem;
+        $invoice_item = new InvoiceItem();
         $invoice_item->type_id = '5';
         $invoice_item->product_key = trans('texts.fee');
         $invoice_item->notes = ctrans('texts.late_fee_added', ['date' => now()]);

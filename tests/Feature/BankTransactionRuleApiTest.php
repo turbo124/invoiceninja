@@ -25,22 +25,50 @@ use Tests\TestCase;
 class BankTransactionRuleApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
-    use MockAccountData;
 
-    protected function setUp() :void
+
+    public $company;
+    public $token;
+    public $user;
+    public $faker;
+    public $bank_transaction;
+    public $account;
+    public $payment;
+    public $invoice;
+    public $expense;
+    public $expense_category;
+    public $vendor;
+    public $bank_transaction_rule;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
 
-        Session::start();
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->user = $data->user;
+        $this->bank_transaction = $data->bank_transaction;
+        $this->account = $data->account;
+        $this->payment = $data->payment;
+        $this->invoice = $data->invoice;
+        $this->expense = $data->expense;
+        $this->expense_category = $data->expense_category;
+        $this->vendor = $data->vendor;
+        $this->bank_transaction_rule = $data->bank_transaction_rule;
 
         $this->faker = \Faker\Factory::create();
 
         Model::reguard();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     /*
     $rules = [
         'name' => 'bail|required|string',

@@ -30,20 +30,26 @@ use Tests\TestCase;
 class FactoryCreationTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+
     use MockAccountData;
 
-    protected function setUp() :void
+    protected $faker;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Session::start();
 
         $this->faker = \Faker\Factory::create();
 
-        Model::reguard();
 
         $this->makeTestData();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     /**
@@ -148,5 +154,7 @@ class FactoryCreationTest extends TestCase
         $this->assertNotNull($new_user);
 
         $this->assertIsInt($new_user->id);
+
+        $new_user->forceDelete();
     }
 }

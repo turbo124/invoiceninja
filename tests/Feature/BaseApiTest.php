@@ -48,6 +48,7 @@ use App\Models\TaxRate;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorContact;
+use App\Utils\Traits\MakesHash;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -60,7 +61,8 @@ use Tests\TestCase;
  */
 class BaseApiTest extends TestCase
 {
-    use MockAccountData;
+    // use MockAccountData;
+    use MakesHash;
 
     public CompanyUser $owner_cu;
 
@@ -104,11 +106,44 @@ class BaseApiTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
+    }
+
+
+    public $company;
+    public $token;
+    public $user;
+    public $bank_transaction;
+    public $account;
+    public $payment;
+    public $invoice;
+    public $expense;
+    public $expense_category;
+    public $vendor;
+    public $bank_transaction_rule;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
+
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->user = $data->user;
+        $this->bank_transaction = $data->bank_transaction;
+        $this->account = $data->account;
+        $this->payment = $data->payment;
+        $this->invoice = $data->invoice;
+        $this->expense = $data->expense;
+        $this->expense_category = $data->expense_category;
+        $this->vendor = $data->vendor;
+        $this->bank_transaction_rule = $data->bank_transaction_rule;
 
         $this->withoutMiddleware(
             ThrottleRequests::class
@@ -147,7 +182,7 @@ class BaseApiTest extends TestCase
         $owner_user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' =>  $this->faker->safeEmail(),
+            'email' =>  \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $this->owner_cu = CompanyUserFactory::create($owner_user->id, $company->id, $this->account->id);
@@ -161,7 +196,7 @@ class BaseApiTest extends TestCase
 
         $user_id = $owner_user->id;
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $owner_user->id;
         $company_token->company_id = $company->id;
         $company_token->account_id = $this->account->id;
@@ -174,7 +209,7 @@ class BaseApiTest extends TestCase
         $lower_permission_user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' =>  $this->faker->safeEmail(),
+            'email' =>  \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $this->low_cu = CompanyUserFactory::create($lower_permission_user->id, $company->id, $this->account->id);
@@ -186,7 +221,7 @@ class BaseApiTest extends TestCase
 
         $this->low_token = \Illuminate\Support\Str::random(64);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $lower_permission_user->id;
         $company_token->company_id = $this->company->id;
         $company_token->account_id = $this->account->id;
@@ -326,7 +361,7 @@ class BaseApiTest extends TestCase
             'company_id' => $company->id,
         ]);
 
-        $gs = new GroupSetting;
+        $gs = new GroupSetting();
         $gs->name = 'Test';
         $gs->company_id = $client->company_id;
         $gs->settings = ClientSettings::buildClientSettings($company->settings, $client->settings);
@@ -372,7 +407,7 @@ class BaseApiTest extends TestCase
             'company_id' => $company->id,
         ]);
 
-        $cg = new CompanyGateway;
+        $cg = new CompanyGateway();
         $cg->company_id = $company->id;
         $cg->user_id = $user_id;
         $cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
@@ -397,7 +432,7 @@ class BaseApiTest extends TestCase
 
 
     // }
-    
+
     /**
      * Tests admin/owner facing routes respond with the correct status and/or data set
      */

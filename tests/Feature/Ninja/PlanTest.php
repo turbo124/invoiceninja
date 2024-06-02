@@ -29,10 +29,14 @@ use Tests\TestCase;
 class PlanTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -92,8 +96,8 @@ class PlanTest extends TestCase
     public function testLicense()
     {
         $this->markTestSkipped();
-        
-        $license = new License;
+
+        $license = new License();
         $license->license_key = "1234";
         $license->product_id = "3";
         $license->email = 'test@gmail.com';
@@ -104,9 +108,9 @@ class PlanTest extends TestCase
 
         $response = $this->get("/claim_license?license_key=1234&product_id=3")
                     ->assertStatus(200);
-                    
+
         $response = $this->get("/claim_license?license_key=12345&product_id=3")
                     ->assertStatus(400);
-        
+
     }
 }

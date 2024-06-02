@@ -23,7 +23,11 @@ use Tests\TestCase;
 class CompanyDocumentsTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     protected function setUp(): void
     {
@@ -62,6 +66,8 @@ class CompanyDocumentsTest extends TestCase
         $this->company->delete();
 
         $this->assertEquals(0, Document::whereCompanyId($this->company->id)->count());
+
+        $this->account->delete();
 
     }
 

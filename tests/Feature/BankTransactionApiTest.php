@@ -28,28 +28,48 @@ use Tests\TestCase;
 class BankTransactionApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
-    use MockAccountData;
 
+    public $company;
+    public $token;
+    public $user;
     public $faker;
+    public $bank_transaction;
+    public $account;
+    public $payment;
+    public $invoice;
+    public $expense;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
 
-        Session::start();
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->user = $data->user;
+        $this->bank_transaction = $data->bank_transaction;
+        $this->account = $data->account;
+        $this->payment = $data->payment;
+        $this->invoice = $data->invoice;
+        $this->expense = $data->expense;
 
         $this->faker = \Faker\Factory::create();
 
-        Model::reguard();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
     }
 
     public function testBankTransactionCreate()
     {
         nlog("creeeeate");
-        
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
@@ -129,8 +149,7 @@ class BankTransactionApiTest extends TestCase
 
     public function testBankTransactionUnlink()
     {
-        BankTransaction::truncate();
-        
+
         $bi = BankIntegration::factory()->create([
             'account_id' => $this->account->id,
             'company_id' => $this->company->id,
@@ -150,7 +169,7 @@ class BankTransactionApiTest extends TestCase
             'expense_id' => "{$this->expense->hashed_id},{$e->hashed_id}",
             'invoice_ids' => $this->invoice->hashed_id,
         ]);
-        
+
         $e->transaction_id = $bank_transaction->id;
         $e->save();
 

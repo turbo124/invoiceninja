@@ -31,12 +31,11 @@ use Tests\TestCase;
  */
 class MultiPaymentDeleteTest extends TestCase
 {
-    //use DatabaseTransactions, 
     use MakesHash;
 
     private $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +55,7 @@ class MultiPaymentDeleteTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => '11',
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $cu = CompanyUserFactory::create($user->id, $company->id, $account->id);
@@ -64,7 +63,7 @@ class MultiPaymentDeleteTest extends TestCase
         $cu->is_admin = true;
         $cu->save();
 
-        $token = new CompanyToken;
+        $token = new CompanyToken();
         $token->user_id = $user->id;
         $token->company_id = $company->id;
         $token->account_id = $account->id;
@@ -361,5 +360,7 @@ class MultiPaymentDeleteTest extends TestCase
         $this->assertEquals(0, $invoice->fresh()->balance);
         $this->assertEquals(0, $invoice->client->fresh()->balance);
         $this->assertEquals(0, $invoice->client->fresh()->paid_to_date);
+
+        $user->account->forceDelete();
     }
 }

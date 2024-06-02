@@ -32,10 +32,9 @@ use Tests\TestCase;
 class SumTaxTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
-    
+
     public Response $response;
-    
+
     public array $resp = [
             "geoPostalCode" => "92582",
             "geoCity" => "SAN JACINTO",
@@ -74,7 +73,7 @@ class SumTaxTest extends TestCase
         ];
 
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -88,6 +87,12 @@ class SumTaxTest extends TestCase
 
         $this->response = new Response($this->resp);
 
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     /** Proves that we do not charge taxes automatically */
@@ -184,7 +189,7 @@ class SumTaxTest extends TestCase
 
         $line_items = [];
 
-        $line_item = new InvoiceItem;
+        $line_item = new InvoiceItem();
         $line_item->quantity = 1;
         $line_item->cost = 10;
         $line_item->product_key = 'Test';
@@ -206,7 +211,7 @@ class SumTaxTest extends TestCase
 
     public function testTaxOnCompany()
     {
-        
+
         $tax_class = new TaxData($this->response);
 
         $this->company->tax_data = $tax_class;
@@ -214,7 +219,7 @@ class SumTaxTest extends TestCase
 
         $this->assertEquals("92582", $this->company->tax_data->origin->geoPostalCode);
         $this->assertEquals(0.0875, $this->company->tax_data->origin->taxSales);
-        
+
     }
 
     public function testTaxOnClient()
@@ -223,7 +228,7 @@ class SumTaxTest extends TestCase
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
         ]);
-    
+
         $tax_class = new TaxData($this->response, $this->response);
 
         $c->tax_data = $tax_class;
@@ -231,7 +236,7 @@ class SumTaxTest extends TestCase
 
         $this->assertEquals("92582", $c->tax_data->origin->geoPostalCode);
         $this->assertEquals(0.0875, $c->tax_data->origin->taxSales);
-        
+
     }
 
     public function testTaxOnInvoice()

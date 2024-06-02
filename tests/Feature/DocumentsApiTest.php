@@ -27,12 +27,12 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class DocumentsApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+
     use MockAccountData;
 
     protected $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,9 +45,14 @@ class DocumentsApiTest extends TestCase
         Model::reguard();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public function testDocumentFilters()
     {
-        Document::query()->withTrashed()->cursor()->each(function ($d){
+        Document::query()->withTrashed()->cursor()->each(function ($d) {
             $d->forceDelete();
         });
 
@@ -73,7 +78,7 @@ class DocumentsApiTest extends TestCase
 
     public function testDocumentFilters2()
     {
-        Document::query()->withTrashed()->cursor()->each(function ($d){
+        Document::query()->withTrashed()->cursor()->each(function ($d) {
             $d->forceDelete();
         });
 
@@ -98,7 +103,7 @@ class DocumentsApiTest extends TestCase
 
     public function testDocumentFilters3()
     {
-        Document::query()->withTrashed()->cursor()->each(function ($d){
+        Document::query()->withTrashed()->cursor()->each(function ($d) {
             $d->forceDelete();
         });
 
@@ -114,9 +119,9 @@ class DocumentsApiTest extends TestCase
             'user_id' => $this->user->id,
             'client_id' => $this->client->id,
         ]);
-        
+
         $t->documents()->save($d);
-        
+
         $dd = Document::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -141,7 +146,7 @@ class DocumentsApiTest extends TestCase
         ])->get("/api/v1/documents?client_id={$this->client->hashed_id}&filter=craycray");
 
         $response->assertStatus(200);
-        
+
         $this->assertCount(0, $response->json()['data']);
 
         $response = $this->withHeaders([

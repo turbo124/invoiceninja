@@ -43,25 +43,61 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ClientTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
-    use MockAccountData;
-
-    public $faker;
-
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public $client_id;
-    
-    protected function setUp() :void
+
+    public $company;
+    public $token;
+    public $user;
+    public $faker;
+    public $bank_transaction;
+    public $account;
+    public $payment;
+    public $invoice;
+    public $expense;
+    public $expense_category;
+    public $vendor;
+    public $bank_transaction_rule;
+    public $client;
+    public $quote;
+    public $settings;
+    public $credit;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->faker = \Faker\Factory::create();
+
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->user = $data->user;
+        $this->bank_transaction = $data->bank_transaction;
+        $this->account = $data->account;
+        $this->payment = $data->payment;
+        $this->invoice = $data->invoice;
+        $this->expense = $data->expense;
+        $this->expense_category = $data->expense_category;
+        $this->vendor = $data->vendor;
+        $this->bank_transaction_rule = $data->bank_transaction_rule;
+        $this->client = $data->client;
+        $this->quote = $data->quote;
+        $this->credit = $data->credit;
 
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
 
-        $this->makeTestData();
+        $this->faker = \Faker\Factory::create();
+
+        $this->withoutExceptionHandling();
     }
+
 
     public function testBulkGroupAssignment()
     {
@@ -96,8 +132,8 @@ class ClientTest extends TestCase
             $this->assertEquals($gs->id, $c->group_settings_id);
         });
 
-        foreach($arr['data'] as $client_response){
-            
+        foreach($arr['data'] as $client_response) {
+
             $this->assertEquals($gs->hashed_id, $client_response['group_settings_id']);
         }
     }
@@ -119,14 +155,14 @@ class ClientTest extends TestCase
 
         $this->company->saveSettings($settings, $this->company);
 
-        $client_exchange_rate = round($c->setExchangeRate(),2);
+        $client_exchange_rate = round($c->setExchangeRate(), 2);
 
         $aud_currency = Currency::find(12);
         $eur_currency = Currency::find(3);
 
         $synthetic_exchange = $aud_currency->exchange_rate / $eur_currency->exchange_rate;
 
-        $this->assertEquals($client_exchange_rate, round($synthetic_exchange,2));
+        $this->assertEquals($client_exchange_rate, round($synthetic_exchange, 2));
 
     }
 
@@ -226,7 +262,7 @@ class ClientTest extends TestCase
             'company_id' => $this->company->id,
             'email' => ''
         ]);
-          
+
 
         $this->assertEquals(2, $c->contacts->count());
         $this->assertEquals(3, $c1->contacts->count());
@@ -245,7 +281,7 @@ class ClientTest extends TestCase
     {
         $line_items = [];
 
-        for ($x=0; $x<$number; $x++) {
+        for ($x = 0; $x < $number; $x++) {
             $item = InvoiceItemFactory::create();
             $item->quantity = 1;
             $item->cost = 10;
@@ -481,7 +517,7 @@ class ClientTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -532,6 +568,9 @@ class ClientTest extends TestCase
 
         /* Make sure NULL settings return the correct count (0) instead of throwing an exception*/
         $this->assertEquals($this->client->contacts->count(), 3);
+
+        $account->forceDelete();
+
     }
 
     public function testClientCreationWithIllegalContactObject()
@@ -547,7 +586,7 @@ class ClientTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
 
         ]);
 
@@ -561,7 +600,7 @@ class ClientTest extends TestCase
             'is_locked' => 0,
         ]);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $user->id;
         $company_token->company_id = $company->id;
         $company_token->account_id = $account->id;
@@ -575,15 +614,17 @@ class ClientTest extends TestCase
 
         $data = [
             'name' => 'A loyal Client',
-            'contacts' => $this->faker->unique()->safeEmail(),
+            'contacts' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ];
 
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/clients/', $data);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
-            $response->assertStatus(422);
+        $response->assertStatus(422);
+
+        $account->forceDelete();
     }
 
     public function testCreatingClientAndContacts()
@@ -599,7 +640,7 @@ class ClientTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
 
         ]);
 
@@ -613,7 +654,7 @@ class ClientTest extends TestCase
             'is_locked' => 0,
         ]);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $user->id;
         $company_token->company_id = $company->id;
         $company_token->account_id = $account->id;
@@ -627,7 +668,7 @@ class ClientTest extends TestCase
         $data = [
             'name' => 'A loyal Client',
             'contacts' => [
-                ['email' => $this->faker->unique()->safeEmail()],
+                ['email' => \Illuminate\Support\Str::random(16)."@gmail.com"],
             ],
         ];
 
@@ -643,7 +684,7 @@ class ClientTest extends TestCase
             'name' => 'A loyal Client',
             'contacts' => [
                 [
-                    'email' => $this->faker->unique()->safeEmail(),
+                    'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
                     'password' => '*****',
                 ],
             ],
@@ -659,7 +700,7 @@ class ClientTest extends TestCase
             'name' => 'A loyal Client',
             'contacts' => [
                 [
-                    'email' => $this->faker->unique()->safeEmail(),
+                    'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
                     'password' => '1',
                 ],
             ],
@@ -667,18 +708,18 @@ class ClientTest extends TestCase
 
         $response = null;
 
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/clients/', $data);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
-            $response->assertStatus(422);
+        $response->assertStatus(422);
 
         $data = [
             'name' => 'A loyal Client',
             'contacts' => [
                 [
-                    'email' => $this->faker->unique()->safeEmail(),
+                    'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
                     'password' => '1Qajsj...33',
                 ],
             ],
@@ -686,10 +727,10 @@ class ClientTest extends TestCase
 
         $response = null;
 
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/clients/', $data);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -697,11 +738,11 @@ class ClientTest extends TestCase
             'name' => 'A loyal Client',
             'contacts' => [
                 [
-                    'email' => $this->faker->unique()->safeEmail(),
+                    'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
                     'password' => '1Qajsj...33',
                 ],
                 [
-                    'email' => $this->faker->unique()->safeEmail(),
+                    'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
                     'password' => '1234AAAAAaaaaa',
                 ],
             ],
@@ -709,10 +750,10 @@ class ClientTest extends TestCase
 
         $response = null;
 
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/clients/', $data);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -727,7 +768,7 @@ class ClientTest extends TestCase
 
         $arr = $response->json();
 
-        $safe_email = $this->faker->unique()->safeEmail();
+        $safe_email = \Illuminate\Support\Str::random(16)."@gmail.com";
 
         $data = [
             'name' => 'A loyal Client',
@@ -741,10 +782,10 @@ class ClientTest extends TestCase
 
         $response = null;
 
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/clients/', $data);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -756,7 +797,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(0, strlen($contact->password));
 
-        $safe_email = $this->faker->unique()->safeEmail();
+        $safe_email = \Illuminate\Support\Str::random(16)."@gmail.com";
 
         $data = [
             'name' => 'A loyal Client',
@@ -769,10 +810,10 @@ class ClientTest extends TestCase
         ];
 
         $response = null;
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/clients/', $data);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -799,11 +840,11 @@ class ClientTest extends TestCase
 
         $response = null;
 
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->putJson('/api/v1/clients/'.$this->client->hashed_id, $data);
-        
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/clients/'.$this->client->hashed_id, $data);
+
 
         $response->assertStatus(200);
 
@@ -815,5 +856,7 @@ class ClientTest extends TestCase
         $contact = $this->client->contacts()->whereEmail($safe_email)->first();
 
         $this->assertEquals($password, $contact->password);
+
+        $account->forceDelete();
     }
 }

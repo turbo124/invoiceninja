@@ -16,6 +16,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Validation\ValidationException;
 use Tests\MockAccountData;
 use Tests\TestCase;
+use Tests\TestDataProvider;
 
 /**
  * @test
@@ -23,26 +24,35 @@ use Tests\TestCase;
  */
 class ActivityApiTest extends TestCase
 {
-    //use DatabaseTransactions;
-    use MockAccountData;
+    public $company;
+    public $token;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
 
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-        
+
         $this->withoutExceptionHandling();
 
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->company->account->forceDelete();
+    }
+
     public function testActivityEntity()
     {
-    
+
         $invoice = $this->company->invoices()->first();
 
         $invoice->service()->markSent()->markPaid()->markDeleted()->handleRestore()->save();
@@ -54,18 +64,13 @@ class ActivityApiTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/activities/entity', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/activities/entity', $data);
+
 
         $response->assertStatus(200);
-
 
     }
 

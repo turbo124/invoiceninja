@@ -28,10 +28,14 @@ use Tests\TestCase;
 class UnappliedPaymentDeleteTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockUnitData;
-    
-    protected function setUp() :void
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 

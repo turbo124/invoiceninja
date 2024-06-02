@@ -33,10 +33,14 @@ use Tests\TestCase;
 class AutoUnappliedPaymentTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockUnitData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +60,7 @@ class AutoUnappliedPaymentTest extends TestCase
 
     public function testUnappliedPaymentsAreEnabled()
     {
-        
+
         $settings = ClientSettings::defaults();
         $settings->use_unapplied_payment = 'always';
 
@@ -82,7 +86,7 @@ class AutoUnappliedPaymentTest extends TestCase
             'user_id' => $this->user->id,
             'client_id' => $client->id,
             'amount' => 100,
-            'applied' => 0, 
+            'applied' => 0,
             'refunded' => 0,
             'status_id' => Payment::STATUS_COMPLETED,
             'is_deleted' => 0,
@@ -94,10 +98,9 @@ class AutoUnappliedPaymentTest extends TestCase
 
         nlog($invoice->balance);
 
-        try{
+        try {
             $invoice->service()->autoBill()->save();
-        }
-        catch(\Exception $e){
+        } catch(\Exception $e) {
 
         }
 
@@ -110,7 +113,7 @@ class AutoUnappliedPaymentTest extends TestCase
         $this->assertEquals($payment->applied, $invoice->paid_to_date);
         $this->assertGreaterThan(2, $invoice->status_id);
         $this->assertGreaterThan(0, $payment->applied);
-        
+
         // $this->assertEquals(Invoice::STATUS_PAID, $invoice->status_id);
         // $this->assertEquals(0, $invoice->balance);
 
@@ -119,7 +122,7 @@ class AutoUnappliedPaymentTest extends TestCase
 
     public function testUnappliedPaymentsAreDisabled()
     {
-        
+
         $settings = ClientSettings::defaults();
         $settings->use_unapplied_payment = 'off';
 
@@ -146,7 +149,7 @@ class AutoUnappliedPaymentTest extends TestCase
             'user_id' => $this->user->id,
             'client_id' => $client->id,
             'amount' => 100,
-            'applied' => 0, 
+            'applied' => 0,
             'refunded' => 0,
             'status_id' => Payment::STATUS_COMPLETED
         ]);
@@ -154,12 +157,11 @@ class AutoUnappliedPaymentTest extends TestCase
         $invoice->service()->markSent()->save();
 
         $this->assertGreaterThan(0, $invoice->balance);
-        
+
         try {
             $invoice->service()->autoBill()->save();
-        }
-        catch(\Exception $e) {
-        
+        } catch(\Exception $e) {
+
         }
 
         $invoice = $invoice->fresh();

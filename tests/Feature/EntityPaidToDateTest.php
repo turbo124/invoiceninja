@@ -28,10 +28,12 @@ use Tests\TestCase;
 class EntityPaidToDateTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+
+    protected $faker;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -49,6 +51,11 @@ class EntityPaidToDateTest extends TestCase
         );
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public function testPaidToDateWithMarkPaidAction()
     {
         $invoice = $this->bootNewInvoice();

@@ -27,13 +27,17 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ClientGatewayTokenApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected $faker;
     protected CompanyGateway $cg;
-    
-    protected function setUp() :void
+    protected $faker;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -87,7 +91,7 @@ class ClientGatewayTokenApiTest extends TestCase
         //disable ach here
         $json_config = json_decode(config('ninja.testvars.stripe'));
 
-        $this->cg = new CompanyGateway;
+        $this->cg = new CompanyGateway();
         $this->cg->company_id = $this->company->id;
         $this->cg->user_id = $this->user->id;
         $this->cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';

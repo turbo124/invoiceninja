@@ -37,7 +37,7 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
 
     protected $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,18 +55,13 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
         $account->num_users = 3;
         $account->save();
 
-        $fake_email = $this->faker->email();
-
-        $user = User::where('email',$fake_email)->first();
-
-        if (! $user) {
-            $user = User::factory()->create([
-                'account_id' => $account->id,
-                'confirmation_code' => 'xxsd',
-                // 'confirmation_code' => $this->createDbHash(config('database.default')),
-                'email' => $fake_email,
-            ]);
-        }
+        $fake_email = \Illuminate\Support\Str::random(16)."@gmail.com";
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+            'confirmation_code' => 'xxsd',
+            // 'confirmation_code' => $this->createDbHash(config('database.default')),
+            'email' => $fake_email,
+        ]);
 
         $user_id = $user->id;
 
@@ -123,7 +118,7 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
         $settings->shared_invoice_quote_counter = 1;
         $settings->timezone_id = '31';
         $settings->currency_id = '1';
-        
+
         $company->settings = $settings;
         $company->save();
 

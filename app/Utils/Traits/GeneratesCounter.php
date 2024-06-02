@@ -613,7 +613,12 @@ trait GeneratesCounter
     {
         $timezone = Timezone::find($company->settings->timezone_id);
 
-        $reset_date = Carbon::parse($company->settings->reset_counter_date, $timezone->name);
+        try{
+            $reset_date = Carbon::parse($company->settings->reset_counter_date, $timezone->name);
+        }
+        catch(\Exception $e){
+            return false;
+        }
 
         if (! $reset_date->lte(now()) || ! $company->settings->reset_counter_date) {
             return false;

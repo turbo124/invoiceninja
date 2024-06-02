@@ -31,10 +31,14 @@ use Tests\TestCase;
 class RecurringQuotesTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,25 +57,6 @@ class RecurringQuotesTest extends TestCase
 
     public function testRecurringQuoteList()
     {
-        // Client::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id])->each(function ($c) {
-        //     ClientContact::factory()->create([
-        //         'user_id' => $this->user->id,
-        //         'client_id' => $c->id,
-        //         'company_id' => $this->company->id,
-        //         'is_primary' => 1,
-        //     ]);
-
-        //     ClientContact::factory()->create([
-        //         'user_id' => $this->user->id,
-        //         'client_id' => $c->id,
-        //         'company_id' => $this->company->id,
-        //     ]);
-        // });
-
-        // $client = Client::all()->first();
-
-        // RecurringQuote::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
-
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,

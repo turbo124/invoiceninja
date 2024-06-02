@@ -38,9 +38,13 @@ use Tests\TestCase;
  */
 class TemplateTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
     use MakesDates;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     private string $body = '
             
@@ -169,7 +173,7 @@ class TemplateTest extends TestCase
 
     private string $stack = '<html><div id="company-details" labels="true"></div></html>';
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -178,14 +182,14 @@ class TemplateTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-        
+
     }
 
 
     public function testPurchaseOrderDataParse()
     {
         $data = [];
-        
+
         $p = \App\Models\PurchaseOrder::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -204,7 +208,7 @@ class TemplateTest extends TestCase
     public function testTaskDataParse()
     {
         $data = [];
-        
+
         $p = \App\Models\Task::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -223,7 +227,7 @@ class TemplateTest extends TestCase
     public function testQuoteDataParse()
     {
         $data = [];
-        
+
         $p = \App\Models\Quote::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -243,7 +247,7 @@ class TemplateTest extends TestCase
     public function testProjectDataParse()
     {
         $data = [];
-        
+
         $p = Project::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -298,7 +302,7 @@ class TemplateTest extends TestCase
         $tm->init();
 
         $variables = $tm->variables[0];
-        
+
         $ts = new TemplateService();
         $x = $ts->setTemplate($partials)
             ->setCompany($this->company)
@@ -380,7 +384,7 @@ class TemplateTest extends TestCase
         $this->assertIsArray($data);
 
         $start = microtime(true);
-        
+
         \DB::enableQueryLog();
 
         $invoices = Invoice::with('client', 'payments.client', 'payments.paymentables', 'payments.credits', 'credits.client')
@@ -461,7 +465,7 @@ class TemplateTest extends TestCase
     {
 
         $data = [];
-                        
+
         $credits = $payment->credits->map(function ($credit) use ($payment) {
             return [
                 'credit' => $credit->number,
@@ -524,7 +528,7 @@ class TemplateTest extends TestCase
             ],
             'paymentables' => $pivot,
         ];
-                    
+
         return $data;
 
 
@@ -569,7 +573,7 @@ class TemplateTest extends TestCase
                 shuffle($rand);
                 $p->type_id = $rand[0];
                 $p->save();
-                    
+
             });
         });
 
@@ -582,13 +586,13 @@ class TemplateTest extends TestCase
         $design->body .= $this->payments_body;
         $replicated_design->design = $design;
         $replicated_design->is_custom = true;
-        $replicated_design->is_template =true;
+        $replicated_design->is_template = true;
         $replicated_design->entities = 'client';
         $replicated_design->save();
 
         $data['invoices'] = $invoices;
         $ts = $replicated_design->service()->build($data);
-        
+
         $this->assertNotNull($ts->getHtml());
 
     }
@@ -620,7 +624,7 @@ class TemplateTest extends TestCase
         $data['invoices'] = collect([$this->invoice, $i2]);
 
         $ts = $replicated_design->service()->build($data);
-        
+
         // nlog("results = ");
         // nlog($ts->getHtml());
         $this->assertNotNull($ts->getHtml());
@@ -653,7 +657,7 @@ class TemplateTest extends TestCase
         $data['invoices'] = collect([$this->invoice, $i2]);
 
         $ts = $replicated_design->service()->build($data);
-        
+
         // nlog("results = ");
         // nlog($ts->getHtml());
         $this->assertNotNull($ts->getHtml());
@@ -675,7 +679,7 @@ class TemplateTest extends TestCase
         $data['invoices'] = collect([$this->invoice]);
 
         $ts = $replicated_design->service()->build($data);
-        
+
         // nlog("results = ");
         // nlog($ts->getHtml());
         $this->assertNotNull($ts->getHtml());
@@ -734,7 +738,7 @@ class TemplateTest extends TestCase
 
         $this->assertNotNull($pdf);
 
-        nlog("Twig + PDF Gen Time: " . $end-$start);
+        nlog("Twig + PDF Gen Time: " . $end - $start);
 
     }
 
@@ -748,13 +752,13 @@ class TemplateTest extends TestCase
 
         $this->assertNotNull($pdf);
 
-        nlog("Plain PDF Gen Time: " . $end-$start);
+        nlog("Plain PDF Gen Time: " . $end - $start);
     }
 
     public function testTemplateGeneration()
     {
         $entity_obj = $this->invoice;
-        
+
         $design = new Design();
         $design->design = json_decode(json_encode($this->invoice->company->settings->pdf_variables), true);
         $design->name = 'test';
@@ -764,7 +768,7 @@ class TemplateTest extends TestCase
         $design->user_id = $this->invoice->user_id;
         $design->company_id = $this->invoice->company_id;
 
-        $design_object = new \stdClass;
+        $design_object = new \stdClass();
         $design_object->includes = '';
         $design_object->header = '';
         $design_object->body = $this->body;
@@ -789,7 +793,7 @@ class TemplateTest extends TestCase
             'custom_partials' => json_decode(json_encode($design->design), true),
         ];
         $template = new PdfMakerDesign(PdfDesignModel::CUSTOM, $options);
-    
+
         $variables = $html->generateLabelsAndValues();
 
         $state = [
@@ -823,7 +827,7 @@ class TemplateTest extends TestCase
 
         $this->assertNotNull($html);
         $this->assertStringContainsStringIgnoringCase($this->company->settings->name, $html);
- 
+
         nlog("Twig Solo Gen Time: ". $end - $start);
     }
 

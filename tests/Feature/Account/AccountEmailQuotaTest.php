@@ -27,7 +27,7 @@ class AccountEmailQuotaTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->faker = \Faker\Factory::create();
 
     }
@@ -81,13 +81,13 @@ class AccountEmailQuotaTest extends TestCase
         $account->default_company_id = $company->id;
         $account->save();
 
-        
+
         $user = \App\Models\User::factory()->create([
             'account_id' => $account->id,
-            'email' => $this->faker->safeEmail()
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com"
         ]);
 
-                
+
         $cu = \App\Factory\CompanyUserFactory::create($user->id, $company->id, $account->id);
         $cu->is_owner = true;
         $cu->is_admin = true;
@@ -104,6 +104,8 @@ class AccountEmailQuotaTest extends TestCase
         $this->assertTrue($account->emailQuotaExceeded());
 
         Cache::forget("email_quota".'123ifyouknowwhatimean');
+
+        $account->forceDelete();
     }
 
     public function testQuotaValidRule()
@@ -125,6 +127,8 @@ class AccountEmailQuotaTest extends TestCase
         $this->assertFalse($account->emailQuotaExceeded());
 
         Cache::forget("email_quota".'123ifyouknowwhatimean');
+
+        $account->forceDelete();
     }
 
     public function testEmailSentCount()
@@ -149,5 +153,7 @@ class AccountEmailQuotaTest extends TestCase
         $this->assertEquals(3000, $count);
 
         Cache::forget("email_quota".'123ifyouknowwhatimean');
+
+        $account->forceDelete();
     }
 }

@@ -22,7 +22,12 @@ class CompareCollectionTest extends TestCase
 {
     use MakesHash;
 
-    protected function setUp() :void
+    public $map;
+    public $view_permission;
+    public $is_admin;
+    public $is_not_admin;
+
+    protected function setUp(): void
     {
         parent::setUp();
 

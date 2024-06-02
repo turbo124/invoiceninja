@@ -25,10 +25,14 @@ use Tests\TestCase;
 class DownloadHistoricalInvoiceTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
     use MakesHash;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,6 +42,8 @@ class DownloadHistoricalInvoiceTest extends TestCase
             $this->markTestSkipped('Skip test for Travis');
         }
     }
+
+
 
     public function testDownloadInvoiceRoute()
     {
@@ -115,7 +121,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
     {
         $activity_repo = new ActivityRepository();
 
-        $obj = new \stdClass;
+        $obj = new \stdClass();
         $obj->invoice_id = $this->invoice->id;
         $obj->user_id = $this->invoice->user_id;
         $obj->company_id = $this->company->id;

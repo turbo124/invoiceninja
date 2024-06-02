@@ -29,12 +29,16 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ProductTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     protected $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -147,7 +151,7 @@ class ProductTest extends TestCase
             ])->post('/api/v1/products/bulk', $update)
             ->assertStatus(200);
         } catch(\Exception $e) {
-            
+
         }
 
         $p = $p->fresh();

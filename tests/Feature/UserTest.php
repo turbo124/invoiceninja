@@ -34,13 +34,17 @@ use Tests\TestCase;
 class UserTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     private $default_email = 'attach@gmail.com';
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +78,7 @@ class UserTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => 'xyz123',
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
             'password' => \Illuminate\Support\Facades\Hash::make('ALongAndBriliantPassword'),
         ]);
 
@@ -208,7 +212,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
-        
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $company_token->token,
@@ -218,7 +222,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(0, $response->json()['data']);
 
-
+        $company_token->account()->forceDelete();
     }
 
     public function testUserAttemptingtToDeleteThemselves()
@@ -235,7 +239,7 @@ class UserTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => 'xyz123',
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
             'password' => \Illuminate\Support\Facades\Hash::make('ALongAndBriliantPassword'),
         ]);
 
@@ -276,10 +280,10 @@ class UserTest extends TestCase
             'X-API-PASSWORD' => 'ALongAndBriliantPassword',
         ])->postJson('/api/v1/users/bulk?action=delete', $data);
 
-        nlog($response);
 
         $response->assertStatus(401);
 
+        $account->forceDelete();
     }
 
     public function testDisconnectUserOauthMailer()
@@ -287,7 +291,7 @@ class UserTest extends TestCase
         $user =
         User::factory()->create([
             'account_id' => $this->account->id,
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
             'oauth_user_id' => '123456789',
             'oauth_provider_id' => '123456789',
         ]);
@@ -303,6 +307,7 @@ class UserTest extends TestCase
         $this->assertNull($user->oauth_user_token);
         $this->assertNull($user->oauth_user_refresh_token);
 
+        $user->forceDelete();
     }
 
     public function testUserFiltersWith()
@@ -400,6 +405,8 @@ class UserTest extends TestCase
             'X-API-TOKEN' => $this->token,
             'X-API-PASSWORD' => 'ALongAndBriliantPassword',
         ])->putJson('/api/v1/users/'.$user->hashed_id.'?include=company_user', $data);
+
+        $user->forceDelete();
     }
 
     public function testUserStore()
@@ -441,20 +448,13 @@ class UserTest extends TestCase
             'email' => $this->default_email,
         ];
 
-        $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-                'X-API-PASSWORD' => 'ALongAndBriliantPassword',
-            ])->post('/api/v1/users?include=company_user', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-            var_dump($message);
-            $this->assertNotNull($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+            'X-API-PASSWORD' => 'ALongAndBriliantPassword',
+        ])->postJson('/api/v1/users?include=company_user', $data);
+
 
         $response->assertStatus(200);
 
@@ -477,6 +477,8 @@ class UserTest extends TestCase
         $this->assertNull($cu);
         $this->assertNull($ct);
         $this->assertNotNull($user);
+
+        $user->account->forceDelete();
     }
 
     public function testAttachUserToMultipleCompanies()
@@ -488,7 +490,7 @@ class UserTest extends TestCase
             'account_id' => $this->account->id,
         ]);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $this->user->id;
         $company_token->company_id = $company2->id;
         $company_token->account_id = $this->account->id;
@@ -580,5 +582,7 @@ class UserTest extends TestCase
         $this->assertTrue($arr['data']['company_user']['is_admin']);
         $this->assertFalse($arr['data']['company_user']['is_owner']);
         $this->assertEquals($arr['data']['company_user']['permissions'], 'create_invoice,create_invoice');
+
+        $cu->account->forceDelete();
     }
 }

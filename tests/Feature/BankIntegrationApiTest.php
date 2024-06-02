@@ -25,22 +25,38 @@ use Tests\TestCase;
 class BankIntegrationApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
-    use MockAccountData;
 
-    protected function setUp() :void
+    // use MockAccountData;
+
+    protected $faker;
+
+    protected $token;
+
+    public $company;
+
+    public $bank_integration;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
 
-        Session::start();
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->bank_integration = $data->bank_integration;
 
         $this->faker = \Faker\Factory::create();
-
-        Model::reguard();
     }
 
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
+    }
 
     public function testBankIntegrationPost()
     {

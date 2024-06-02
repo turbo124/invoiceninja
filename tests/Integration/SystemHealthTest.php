@@ -20,10 +20,14 @@ use Tests\TestCase;
  */
 class SystemHealthTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 

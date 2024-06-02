@@ -11,39 +11,38 @@
 
 namespace Tests\Unit;
 
-use App\Factory\CompanyUserFactory;
-use App\Models\Account;
-use App\Models\Client;
-use App\Models\Company;
-use App\Models\CompanyToken;
-use App\Models\CompanyUser;
-use App\Models\Invoice;
-use App\Models\RecurringInvoice;
-use App\Models\User;
 use Tests\TestCase;
+use App\Models\CompanyUser;
+use App\Factory\CompanyUserFactory;
 
 /**
  * @test
  */
 class PermissionsTest extends TestCase
 {
-    public User $user;
+    public \App\Models\User $user;
 
-    public CompanyUser $cu;
+    public \App\Models\CompanyUser $cu;
 
-    public Company $company;
+    public \App\Models\Company $company;
 
     public $faker;
 
     public $token;
 
-    protected function setUp() :void
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->company->account->forceDelete();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->faker = \Faker\Factory::create();
 
-        $account = Account::factory()->create([
+        $account = \App\Models\Account::factory()->create([
             'hosted_client_count' => 1000,
             'hosted_company_count' => 1000,
         ]);
@@ -51,14 +50,14 @@ class PermissionsTest extends TestCase
         $account->num_users = 3;
         $account->save();
 
-        $this->company = Company::factory()->create([
+        $this->company = \App\Models\Company::factory()->create([
             'account_id' => $account->id,
         ]);
 
-        $this->user = User::factory()->create([
+        $this->user = \App\Models\User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => '123',
-            'email' =>  $this->faker->safeEmail(),
+            'email' =>  \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $this->cu = CompanyUserFactory::create($this->user->id, $this->company->id, $account->id);
@@ -70,7 +69,7 @@ class PermissionsTest extends TestCase
 
         $this->token = \Illuminate\Support\Str::random(64);
 
-        $company_token = new CompanyToken;
+        $company_token = new \App\Models\CompanyToken();
         $company_token->user_id = $this->user->id;
         $company_token->company_id = $this->company->id;
         $company_token->account_id = $account->id;
@@ -82,38 +81,38 @@ class PermissionsTest extends TestCase
 
     public function testClientOverviewPermissions()
     {
-        $u = User::factory()->create([
+        $u = \App\Models\User::factory()->create([
             'account_id' => $this->company->account_id,
             'confirmation_code' => '123',
-            'email' =>  $this->faker->safeEmail(),
+            'email' =>  \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
-        $c = Client::factory()->create([
+        $c = \App\Models\Client::factory()->create([
             'company_id' => $this->company->id,
             'user_id' => $u->id,
         ]);
 
-        Invoice::factory()->create([
+        \App\Models\Invoice::factory()->create([
             'company_id' => $this->company->id,
             'client_id' => $c->id,
             'user_id' => $u->id,
             'status_id' => 2
         ]);
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_client","create_client","create_invoice","edit_invoice","create_quote","edit_quote"]';
         $low_cu->save();
 
-    
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/invoices');
-        
+
         $response->assertStatus(200);
 
         $data = $response->json();
-        
+
         $this->assertEquals(2, count($data));
 
         $response = $this->withHeaders([
@@ -132,42 +131,42 @@ class PermissionsTest extends TestCase
 
     public function testHasExcludedPermissions()
     {
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
         $low_cu->save();
 
         $this->assertTrue($this->user->hasExcludedPermissions(["view_client"]));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client';
         $low_cu->save();
 
         $this->assertTrue($this->user->hasExcludedPermissions(["view_client"]));
-    
+
     }
 
     public function testHasExcludedPermissions2()
     {
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client","edit_all"]';
         $low_cu->save();
 
         $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['edit_all']));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client,edit_all';
         $low_cu->save();
 
         $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['edit_all']));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client,view_all';
         $low_cu->save();
 
         $this->assertFalse($this->user->hasExcludedPermissions(["view_client"], ['view_all']));
 
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = 'view_client,view_invoice';
         $low_cu->save();
 
@@ -177,7 +176,7 @@ class PermissionsTest extends TestCase
 
     public function testIntersectPermissions()
     {
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
         $low_cu->save();
 
@@ -185,7 +184,7 @@ class PermissionsTest extends TestCase
         $this->assertTrue($this->user->hasIntersectPermissions(["view_client"]));
 
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_all"]';
         $low_cu->save();
 
@@ -195,7 +194,7 @@ class PermissionsTest extends TestCase
         $this->assertFalse($this->user->hasIntersectPermissions(["viewbank_transaction"]));
         $this->assertTrue($this->user->hasIntersectPermissions(["view_bank_transaction"]));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["create_all"]';
         $low_cu->save();
 
@@ -209,7 +208,7 @@ class PermissionsTest extends TestCase
 
     public function testViewClientPermission()
     {
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_client"]';
         $low_cu->save();
 
@@ -218,26 +217,26 @@ class PermissionsTest extends TestCase
         // this is aberrant
         $this->assertFalse($this->user->hasPermission("view____client"));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_client"]';
         $low_cu->save();
 
         $this->assertTrue($this->user->hasPermission("view_client"));
 
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_all"]';
         $low_cu->save();
 
         $this->assertTrue($this->user->hasPermission("view_client"));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["view_all"]';
         $low_cu->save();
 
         $this->assertFalse($this->user->hasPermission("edit_client"));
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_all"]';
         $low_cu->save();
 
@@ -256,7 +255,7 @@ class PermissionsTest extends TestCase
         $this->assertTrue($this->user->hasPermission('view_bank_transaction'));
 
 
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '["edit_recurring_invoice"]';
         $low_cu->save();
 
@@ -265,49 +264,49 @@ class PermissionsTest extends TestCase
 
     public function testPermissionResolution()
     {
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(Invoice::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Invoice::class)));
 
         $this->assertEquals('view_invoice', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(Client::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Client::class)));
         $this->assertEquals('view_client', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(RecurringInvoice::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\RecurringInvoice::class)));
         $this->assertEquals('view_recurring_invoice', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Product::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Product::class)));
         $this->assertEquals('view_product', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Payment::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Payment::class)));
         $this->assertEquals('view_payment', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Quote::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Quote::class)));
         $this->assertEquals('view_quote', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Credit::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Credit::class)));
         $this->assertEquals('view_credit', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Project::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Project::class)));
         $this->assertEquals('view_project', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Task::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Task::class)));
         $this->assertEquals('view_task', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Vendor::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Vendor::class)));
         $this->assertEquals('view_vendor', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\PurchaseOrder::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\PurchaseOrder::class)));
         $this->assertEquals('view_purchase_order', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\Expense::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\Expense::class)));
         $this->assertEquals('view_expense', $class);
 
-        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(App\Models\BankTransaction::class)));
+        $class = 'view'.lcfirst(class_basename(\Illuminate\Support\Str::snake(\App\Models\BankTransaction::class)));
         $this->assertEquals('view_bank_transaction', $class);
 
-        $this->assertEquals('invoice', \Illuminate\Support\Str::snake(class_basename(Invoice::class)));
+        $this->assertEquals('invoice', \Illuminate\Support\Str::snake(class_basename(\App\Models\Invoice::class)));
 
-        $this->assertEquals('recurring_invoice', \Illuminate\Support\Str::snake(class_basename(RecurringInvoice::class)));
+        $this->assertEquals('recurring_invoice', \Illuminate\Support\Str::snake(class_basename(\App\Models\RecurringInvoice::class)));
     }
 
     public function testExactPermissions()
@@ -318,7 +317,7 @@ class PermissionsTest extends TestCase
 
     public function testMissingPermissions()
     {
-        $low_cu = CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
+        $low_cu = \App\Models\CompanyUser::where(['company_id' => $this->company->id, 'user_id' => $this->user->id])->first();
         $low_cu->permissions = '[""]';
         $low_cu->save();
 
@@ -348,13 +347,13 @@ class PermissionsTest extends TestCase
         $all_permission = ' ';
         $this->assertFalse(stripos($all_permission, "view_client") !== false);
         $this->assertFalse(is_int(stripos($all_permission, "view_client")));
-        
+
         $all_permission = "";//problems are empty strings
         $this->assertTrue(empty($all_permission));
 
         $this->assertFalse(stripos($all_permission, "view_client") !== false);
         $this->assertFalse(is_int(stripos($all_permission, "view_client")));
-        
+
         $all_permission = 'view';//will always pass currently
         $this->assertFalse(stripos($all_permission, "view_client") !== false);
         $this->assertFalse(is_int(stripos($all_permission, "view_client")));

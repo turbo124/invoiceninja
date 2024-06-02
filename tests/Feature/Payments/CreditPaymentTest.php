@@ -32,10 +32,14 @@ use Tests\TestCase;
 class CreditPaymentTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockUnitData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -167,7 +171,7 @@ class CreditPaymentTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/payments/', $data);
-    
+
         $response->assertStatus(200);
 
         $arr = $response->json();

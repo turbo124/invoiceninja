@@ -22,10 +22,14 @@ use Tests\TestCase;
 class InvitationTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
     use MakesHash;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -86,7 +90,7 @@ class InvitationTest extends TestCase
 
         /** @phpstan-ignore-next-line **/
         $this->invoice->invitations = $invitations->toArray();
-        
+
         $this->invoice->line_items = [];
 
         $response = $this->withHeaders([

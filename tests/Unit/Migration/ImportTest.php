@@ -18,7 +18,11 @@ use Tests\TestCase;
 class ImportTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public $migration_array;
 

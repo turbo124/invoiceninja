@@ -29,12 +29,16 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ProjectApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     protected $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +78,7 @@ class ProjectApiTest extends TestCase
             'project_id' => $this->project->id,
         ]);
 
-        
+
         $e = Expense::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -82,7 +86,7 @@ class ProjectApiTest extends TestCase
             'project_id' => $this->project->id,
         ]);
 
-        
+
         $q = Quote::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,

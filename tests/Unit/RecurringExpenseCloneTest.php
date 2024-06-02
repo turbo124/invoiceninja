@@ -29,18 +29,18 @@ class RecurringExpenseCloneTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->faker = \Faker\Factory::create();
-        
+
 
     }
 
     public function testBadBase64String()
     {
         $account = Account::factory()->create();
-        $user = User::factory()->create(['account_id' => $account->id, 'email' => $this->faker->unique()->safeEmail()]);
+        $user = User::factory()->create(['account_id' => $account->id, 'email' => \Illuminate\Support\Str::random(16)."@gmail.com"]);
         $company = Company::factory()->create(['account_id' => $account->id]);
 
         $client = Client::factory()->create([

@@ -31,7 +31,11 @@ class Invoice2GoTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     protected function setUp(): void
     {

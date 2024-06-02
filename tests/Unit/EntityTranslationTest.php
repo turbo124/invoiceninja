@@ -37,7 +37,7 @@ class EntityTranslationTest extends TestCase
 {
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +56,7 @@ class EntityTranslationTest extends TestCase
         ]);
 
         $u = User::factory()->create([
-            'email' => $this->faker->email(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
             'account_id' => $account->id,
         ]);
 
@@ -175,5 +175,7 @@ class EntityTranslationTest extends TestCase
         $this->assertEquals(str_replace(" ", "_", ctrans('texts.invoice')) . "_xxx", $invoice->numberFormatter());
         $this->assertEquals(str_replace(" ", "_", ctrans('texts.quote')) . "_xxx", $quote->numberFormatter());
         $this->assertEquals(str_replace(" ", "_", ctrans('texts.purchase_order')) . "_xxx", $po->numberFormatter());
+
+        $account->forceDelete();
     }
 }

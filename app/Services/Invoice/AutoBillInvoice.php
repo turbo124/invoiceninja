@@ -91,7 +91,7 @@ class AutoBillInvoice extends AbstractService
             return $this->invoice;
         }
 
-        info("Auto Bill - balance remains to be paid!! - {$amount}");
+        nlog("Auto Bill - balance remains to be paid!! - {$amount}");
 
         /* Retrieve the Client Gateway Token */
         /** @var \App\Models\ClientGatewayToken $gateway_token */

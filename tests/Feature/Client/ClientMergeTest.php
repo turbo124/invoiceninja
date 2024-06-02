@@ -24,8 +24,12 @@ use Tests\TestCase;
 
 class ClientMergeTest extends TestCase
 {
-    //use DatabaseTransactions;
     use AppSetup;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     private $user;
 
@@ -38,13 +42,13 @@ class ClientMergeTest extends TestCase
     private $primary_contact;
 
     public $faker;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->faker = Factory::create();
-        
+
     }
 
     public function testSearchingForContacts()
@@ -53,7 +57,7 @@ class ClientMergeTest extends TestCase
 
         $this->user = User::factory()->create([
             'account_id' => $account->id,
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $this->company = Company::factory()->create([
@@ -93,6 +97,8 @@ class ClientMergeTest extends TestCase
         $this->assertFalse($this->client->contacts->contains(function ($contact) {
             return $contact->email == 'false@gmail.com';
         }));
+
+        $account->forceDelete();
     }
 
     public function testMergeClients()
@@ -101,7 +107,7 @@ class ClientMergeTest extends TestCase
 
         $user = User::factory()->create([
             'account_id' => $account->id,
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $company = Company::factory()->create([
@@ -165,7 +171,6 @@ class ClientMergeTest extends TestCase
 
         $client = $client->service()->merge($mergable_client)->save();
 
-        // nlog($client->contacts->fresh()->toArray());
-        // $this->assertEquals(7, $client->fresh()->contacts->count());
+        $account->forceDelete();
     }
 }

@@ -21,7 +21,9 @@ use Tests\TestCase;
  */
 class CompareObjectTest extends TestCase
 {
-    protected function setUp() :void
+    public $client_settings;
+    public $company_settings;
+    protected function setUp(): void
     {
         parent::setUp();
 

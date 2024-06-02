@@ -11,9 +11,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use Tests\MockAccountData;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -21,14 +22,59 @@ use Tests\TestCase;
  */
 class ClientPresenterTest extends TestCase
 {
-    use MockAccountData;
-    //use DatabaseTransactions;
+    public $company;
+    public $token;
+    public $user;
+    public $faker;
+    public $bank_transaction;
+    public $account;
+    public $payment;
+    public $invoice;
+    public $expense;
+    public $expense_category;
+    public $vendor;
+    public $bank_transaction_rule;
+    public $client;
+    public $quote;
+    public $settings;
+    public $credit;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->makeTestData();
+
+        $data = (new \Tests\TestDataProvider())->init();
+
+        $this->company = $data->company;
+        $this->token = $data->token;
+        $this->user = $data->user;
+        $this->bank_transaction = $data->bank_transaction;
+        $this->account = $data->account;
+        $this->payment = $data->payment;
+        $this->invoice = $data->invoice;
+        $this->expense = $data->expense;
+        $this->expense_category = $data->expense_category;
+        $this->vendor = $data->vendor;
+        $this->bank_transaction_rule = $data->bank_transaction_rule;
+        $this->client = $data->client;
+        $this->quote = $data->quote;
+        $this->credit = $data->credit;
+
+        $this->withoutMiddleware(
+            ThrottleRequests::class
+        );
+
+        $this->faker = \Faker\Factory::create();
+
+        $this->withoutExceptionHandling();
+    }
+
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->account->forceDelete();
     }
 
     public function testCompanyName()

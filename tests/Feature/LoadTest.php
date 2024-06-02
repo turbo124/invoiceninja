@@ -46,7 +46,7 @@ class LoadTest extends TestCase
 
     public int $count = 1;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,17 +64,14 @@ class LoadTest extends TestCase
         $account->default_company_id = $company->id;
         $account->save();
 
-        $user = User::whereEmail('small@example.com')->first();
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+            'email' =>  \Illuminate\Support\Str::random(16)."@gmail.com",
+            'confirmation_code' => $this->createDbHash(config('database.default')),
+        ]);
 
-        if (! $user) {
-            $user = User::factory()->create([
-                'account_id' => $account->id,
-                'email' => 'small@example.com',
-                'confirmation_code' => $this->createDbHash(config('database.default')),
-            ]);
-        }
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $user->id;
         $company_token->company_id = $company->id;
         $company_token->account_id = $account->id;
@@ -140,6 +137,8 @@ class LoadTest extends TestCase
 
             $this->createProject($client);
         }
+
+        $account->forceDelete();
     }
 
     private function createClient($company, $user)

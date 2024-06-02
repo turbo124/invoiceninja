@@ -26,9 +26,13 @@ use Tests\TestCase;
 class ChartCurrencyTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +48,7 @@ class ChartCurrencyTest extends TestCase
             'paid_to_date' => 100,
             'status_id' => 4,
             'date' => now(),
-            'due_date'=> now(),
+            'due_date' => now(),
             'number' => 'db_record',
         ]);
 

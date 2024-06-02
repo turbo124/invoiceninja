@@ -22,11 +22,10 @@ use Tests\TestCase;
 class ClientSettingsTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,6 +34,13 @@ class ClientSettingsTest extends TestCase
         $this->faker = \Faker\Factory::create();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
+
+    }
 
     public function testClientValidSettingsWithBadProps()
     {
@@ -64,7 +70,7 @@ class ClientSettingsTest extends TestCase
                 'custom_value3' => null,
                 'custom_value4' => null,
                 'invoice_terms' => null,
-                'quote_terms' =>null,
+                'quote_terms' => null,
                 'quote_footer' => null,
                 'credit_terms' => null,
                 'credit_footer' => null,
@@ -81,7 +87,7 @@ class ClientSettingsTest extends TestCase
         $response->assertStatus(200);
 
         $arr = $response->json();
-        
+
         $this->assertEquals('frank', $arr['data']['settings']['name']);
 
         $client_id = $arr['data']['id'];
@@ -124,7 +130,7 @@ class ClientSettingsTest extends TestCase
                 'custom_value3' => null,
                 'custom_value4' => null,
                 'invoice_terms' => null,
-                'quote_terms' =>null,
+                'quote_terms' => null,
                 'quote_footer' => null,
                 'credit_terms' => null,
                 'credit_footer' => null,
@@ -141,12 +147,6 @@ class ClientSettingsTest extends TestCase
         $arr = $response->json();
         $this->assertEquals('white', $arr['data']['settings']['name']);
 
-        // $this->assertEquals('1', $arr['data']['settings']['currency_id']);
-        // $this->assertEquals('1', $arr['data']['settings']['language_id']);
-        // $this->assertEquals('1', $arr['data']['settings']['payment_terms']);
-        // $this->assertEquals(10, $arr['data']['settings']['default_task_rate']);
-        // $this->assertEquals(true, $arr['data']['settings']['send_reminders']);
-        // $this->assertEquals('1', $arr['data']['settings']['valid_until']);
     }
 
 
@@ -160,20 +160,20 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
         $arr = $response->json();
 
         $this->assertEquals('1', $arr['data']['settings']['currency_id']);
+
+
+
+
     }
 
     public function testClientValidSettings()
@@ -193,14 +193,10 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
 
@@ -231,12 +227,12 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/clients/', $data);
-        
+
 
         $response->assertStatus(422);
     }
@@ -258,17 +254,13 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            // nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
-        $response->assertStatus(302);
+
+        $response->assertStatus(422);
     }
 
     public function testClientIllegalPaymenTerms()
@@ -288,17 +280,12 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
-        $response->assertStatus(302);
+        $response->assertStatus(422);
     }
 
     public function testClientIllegalValidUntil()
@@ -318,17 +305,13 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
-        $response->assertStatus(302);
+
+        $response->assertStatus(422);
     }
 
     public function testClientIllegalDefaultTaskRate()
@@ -348,15 +331,11 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
+
 
         $response->assertStatus(200);
         $arr = $response->json();
@@ -381,17 +360,13 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
-        $response->assertStatus(302);
+
+        $response->assertStatus(422);
     }
 
     public function testClientSettingBools()
@@ -411,15 +386,10 @@ class ClientSettingsTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->post('/api/v1/clients/', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/clients/', $data);
 
         $response->assertStatus(200);
     }

@@ -25,9 +25,13 @@ use Tests\TestCase;
 class TaxConfigTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
-    
-    protected function setUp() :void
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -70,7 +74,7 @@ class TaxConfigTest extends TestCase
         $this->bootApi($client);
 
         $this->tp->updateClientTaxData();
-        
+
     }
 
 }

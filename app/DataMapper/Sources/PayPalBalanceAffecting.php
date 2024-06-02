@@ -105,7 +105,8 @@ class PayPalBalanceAffecting
     public $discount;
     public $creditTransactionalFee;
     public $originalInvoiceId;
-
+    public $referenceTxId;
+    
     public function __construct(private array $import_row){}
 
     public function run(): self

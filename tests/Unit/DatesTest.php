@@ -21,14 +21,9 @@ use Tests\TestCase;
  */
 class DatesTest extends TestCase
 {
-    use MockAccountData;
-    //use DatabaseTransactions;
-
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
-
-        // $this->makeTestData();
     }
 
     public function testLastFinancialYear3()
@@ -44,7 +39,7 @@ class DatesTest extends TestCase
         if(now()->subYear()->lt($fin_year_start)) {
             $fin_year_start->subYearNoOverflow();
         }
-                    
+
         $this->assertEquals('2018-07-01', $fin_year_start->format('Y-m-d'));
         $this->assertEquals('2019-06-30', $fin_year_start->copy()->addYear()->subDay()->format('Y-m-d'));
 
@@ -65,7 +60,7 @@ class DatesTest extends TestCase
         if(now()->subYear()->lt($fin_year_start)) {
             $fin_year_start->subYearNoOverflow();
         }
-                    
+
         $this->assertEquals('2019-07-01', $fin_year_start->format('Y-m-d'));
         $this->assertEquals('2020-06-30', $fin_year_start->copy()->addYear()->subDay()->format('Y-m-d'));
 
@@ -86,7 +81,7 @@ class DatesTest extends TestCase
         if(now()->subYear()->lt($fin_year_start)) {
             $fin_year_start->subYearNoOverflow();
         }
-                    
+
         $this->assertEquals('2019-07-01', $fin_year_start->format('Y-m-d'));
         $this->assertEquals('2020-06-30', $fin_year_start->copy()->addYear()->subDay()->format('Y-m-d'));
 
@@ -112,7 +107,7 @@ class DatesTest extends TestCase
         $this->assertEquals('2021-06-30', $fin_year_end->format('Y-m-d'));
 
         $this->travelBack();
-        
+
     }
 
     public function testFinancialYearDates3()
@@ -133,7 +128,7 @@ class DatesTest extends TestCase
         $this->assertEquals('2022-06-30', $fin_year_end->format('Y-m-d'));
 
         $this->travelBack();
-        
+
     }
 
     public function testFinancialYearDates2()
@@ -154,7 +149,7 @@ class DatesTest extends TestCase
         $this->assertEquals('2022-06-30', $fin_year_end->format('Y-m-d'));
 
         $this->travelBack();
-        
+
     }
 
 

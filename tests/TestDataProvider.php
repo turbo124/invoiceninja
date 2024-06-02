@@ -66,9 +66,9 @@ use App\Jobs\Company\CreateCompanyTaskStatuses;
 use App\Factory\InvoiceToRecurringInvoiceFactory;
 
 /**
- * Class MockAccountData.
+ * Class MockUnitData.
  */
-trait MockAccountData
+class TestDataProvider
 {
     use MakesHash;
     use GeneratesCounter;
@@ -200,12 +200,18 @@ trait MockAccountData
 
     public $recurring_invoice;
 
-    public function makeTestData()
+    protected $faker;
+
+    public $invoice_calc;
+
+    public $quote_calc;
+
+    public $credit_calc;
+
+    public function init(): self
     {
 
         $c = app('currencies');
-
-        $this->assertGreaterThan(0, $c->count());
 
         Artisan::call('db:seed', [
         '--force' => true
@@ -837,6 +843,8 @@ trait MockAccountData
         ]);
 
         $this->scheduler->save();
+
+        return $this;
     }
 
     /**

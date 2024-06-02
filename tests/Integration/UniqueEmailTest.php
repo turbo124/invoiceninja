@@ -26,11 +26,20 @@ use Tests\TestCase;
  */
 class UniqueEmailTest extends TestCase
 {
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     protected $rule;
 
-    protected function setUp() :void
+    public $user;
+    public $user2;
+    public $account;
+    public $account2;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,10 +54,10 @@ class UniqueEmailTest extends TestCase
         $ac = Account::factory()->make();
         $ac->setHidden(['hashed_id']);
 
-        $account = Account::on('db-ninja-01')->create($ac->toArray());
+        $this->account = Account::on('db-ninja-01')->create($ac->toArray());
 
         $company = Company::factory()->make([
-            'account_id' => $account->id,
+            'account_id' => $this->account->id,
         ]);
 
         $company->setHidden(['settings', 'settings_object', 'hashed_id']);
@@ -57,10 +66,10 @@ class UniqueEmailTest extends TestCase
 
         $ac2 = Account::factory()->make();
         $ac2->setHidden(['hashed_id']);
-        $account2 = Account::on('db-ninja-02')->create($ac2->toArray());
+        $this->account2 = Account::on('db-ninja-02')->create($ac2->toArray());
 
         $company2 = Company::factory()->make([
-            'account_id' => $account2->id,
+            'account_id' => $this->account2->id,
         ]);
 
         $company2->setHidden(['settings', 'settings_object', 'hashed_id']);
@@ -71,14 +80,14 @@ class UniqueEmailTest extends TestCase
             'first_name' => 'user_db_1',
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
-            'account_id' => $account->id,
+            'account_id' => $this->account->id,
         ];
 
         $user2 = [
             'first_name' => 'user_db_2',
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
-            'account_id' => $account2->id,
+            'account_id' => $this->account2->id,
         ];
 
         $user_find = User::on('db-ninja-01')->where('email', 'user@example.com')->first();
@@ -104,9 +113,4 @@ class UniqueEmailTest extends TestCase
         $this->assertTrue($this->rule->passes('email', 'nohit@example.com'));
     }
 
-    protected function tearDown() :void
-    {
-        DB::connection('db-ninja-01')->table('users')->delete();
-        DB::connection('db-ninja-02')->table('users')->delete();
-    }
 }

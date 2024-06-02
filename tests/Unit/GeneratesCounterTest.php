@@ -37,13 +37,17 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class GeneratesCounterTest extends TestCase
 {
     use GeneratesCounter;
-    //use DatabaseTransactions;
     use MakesHash;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +64,7 @@ class GeneratesCounterTest extends TestCase
 
         $date_formatted = now($timezone->name)->format('Ymd');
 
-        $gs = new GroupSetting;        
+        $gs = new GroupSetting();
         $gs->name = 'Test';
         $gs->company_id = $this->client->company_id;
         $gs->settings = ClientSettings::buildClientSettings($this->company->settings, $this->client->settings);
@@ -72,7 +76,7 @@ class GeneratesCounterTest extends TestCase
         $settings = $gs->settings;
         // $settings = $this->client->settings;
         $settings->invoice_number_pattern = '{$date:Ymd}-{$group_counter}';
-        $settings->timezone_id = 1;        
+        $settings->timezone_id = 1;
         $gs->settings = $settings;
         $gs->save();
 
@@ -370,7 +374,7 @@ class GeneratesCounterTest extends TestCase
         $settings->quote_number_pattern = '{$year}-{$counter}';
         $settings->shared_invoice_quote_counter = true;
 
-$settings->timezone_id = '31';
+        $settings->timezone_id = '31';
 
         $this->client->company->settings = $settings;
         $this->client->company->save();
@@ -399,7 +403,7 @@ $settings->timezone_id = '31';
         $settings->client_number_pattern = '{$year}-{$client_counter}';
         $settings->client_number_counter = 10;
 
-$settings->timezone_id = '31';
+        $settings->timezone_id = '31';
 
         $this->company->settings = $settings;
         $this->company->save();
@@ -430,8 +434,8 @@ $settings->timezone_id = '31';
         $settings->counter_padding = 5;
         $settings->invoice_number_counter = 7;
         //$this->client->settings = $settings;
-        
-$settings->timezone_id = '31';
+
+        $settings->timezone_id = '31';
 
         $this->company->settings = $settings;
         $this->company->save();
@@ -514,8 +518,8 @@ $settings->timezone_id = '31';
     {
         $settings = $this->company->settings;
         $settings->client_number_pattern = '{$year}-{$user_id}-{$counter}';
-        
-$settings->timezone_id = '31';
+
+        $settings->timezone_id = '31';
 
         $this->company->settings = $settings;
         $this->company->save();
@@ -537,8 +541,8 @@ $settings->timezone_id = '31';
     {
         $settings = $this->company->settings;
         $settings->vendor_number_pattern = '{$year}-{$user_id}-{$counter}';
-        
-$settings->timezone_id = '31';
+
+        $settings->timezone_id = '31';
 
         $this->company->settings = $settings;
         $this->company->save();

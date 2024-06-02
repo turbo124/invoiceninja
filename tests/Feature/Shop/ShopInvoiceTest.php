@@ -28,7 +28,8 @@ class ShopInvoiceTest extends TestCase
     use MakesHash;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected $faker;
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,16 +51,10 @@ class ShopInvoiceTest extends TestCase
         $this->company->enable_shop_api = true;
         $this->company->save();
 
-        $response = null;
-
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-COMPANY-KEY' => $this->company->company_key,
-            ])->get('api/v1/shop/products');
-        } catch (ValidationException $e) {
-            $this->assertNotNull($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-COMPANY-KEY' => $this->company->company_key,
+        ])->getJson('api/v1/shop/products');
 
         $response->assertStatus(200);
     }
@@ -81,14 +76,10 @@ class ShopInvoiceTest extends TestCase
 
     public function testCompanyEnableShopApiBooleanWorks()
     {
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-COMPANY-KEY' => $this->company->company_key,
-            ])->get('api/v1/shop/products');
-        } catch (ValidationException $e) {
-            $this->assertNotNull($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-COMPANY-KEY' => $this->company->company_key,
+        ])->getJson('api/v1/shop/products');
 
         $response->assertStatus(403);
     }
@@ -97,8 +88,6 @@ class ShopInvoiceTest extends TestCase
     {
         $this->company->enable_shop_api = true;
         $this->company->save();
-
-        Product::truncate();
 
         $product = Product::factory()->create([
             'user_id' => $this->user->id,

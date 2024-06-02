@@ -25,20 +25,25 @@ use Tests\TestCase;
 class CreditTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+
     use MockAccountData;
 
-    public $faker;
-    
+
+    protected $faker;
+
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        Session::start();
-
         $this->faker = \Faker\Factory::create();
-
-        Model::reguard();
 
         $this->makeTestData();
     }
@@ -73,7 +78,7 @@ class CreditTest extends TestCase
             ],
             'status_id' => 1,
         ]);
-        
+
         $i->save();
 
         $i->calc()->getInvoice();
@@ -97,7 +102,7 @@ class CreditTest extends TestCase
             'status_id' => 1,
         ]);
 
-        
+
         $cr->calc()->getCredit();
 
         $cr->service()->markSent()->save();
@@ -157,10 +162,10 @@ class CreditTest extends TestCase
         $this->assertEquals(0, $c->balance);
 
         $p = \App\Models\Payment::find($this->decodePrimaryKey($p_id));
-    
+
         $this->assertEquals(0, $p->amount);
         $this->assertEquals(0, $p->applied);
-                    
+
         $response = $this->withHeaders([
                     'X-API-SECRET' => config('ninja.api_secret'),
                     'X-API-TOKEN' => $this->token,
@@ -185,7 +190,7 @@ class CreditTest extends TestCase
         $this->assertEquals(100, $c->balance);
         $this->assertEquals(0, $c->paid_to_date);
 
-            
+
         $response = $this->withHeaders([
                     'X-API-SECRET' => config('ninja.api_secret'),
                     'X-API-TOKEN' => $this->token,
@@ -195,7 +200,7 @@ class CreditTest extends TestCase
 
         $cr = $cr->fresh();
 
-        $this->assertEquals(true, $cr->is_deleted); 
+        $this->assertEquals(true, $cr->is_deleted);
 
         $this->assertEquals(100, $c->balance);
         $this->assertEquals(0, $c->paid_to_date);
@@ -288,7 +293,7 @@ class CreditTest extends TestCase
         $response->assertStatus(200);
         $arr = $response->json();
         $this->assertCount(1, $arr['data']);
-        
+
         $c->status_id = Credit::STATUS_APPLIED;
         $c->amount = 20;
         $c->balance = 20;
@@ -385,8 +390,6 @@ class CreditTest extends TestCase
                 'company_id' => $this->company->id,
             ]);
         });
-
-        $client = Client::all()->first();
 
         Credit::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 

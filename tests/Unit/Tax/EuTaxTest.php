@@ -30,9 +30,9 @@ use Tests\TestCase;
 class EuTaxTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
-    
-    protected function setUp() :void
+
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,6 +45,11 @@ class EuTaxTest extends TestCase
         $this->makeTestData();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public function testEuToUsTaxCalculation()
     {
@@ -115,7 +120,7 @@ class EuTaxTest extends TestCase
                 'taxSales' => 0.07,
             ]),
         ]);
-       
+
         $invoice = $invoice->calc()->getInvoice()->service()->markSent()->save();
 
         $this->assertEquals(107, $invoice->amount);
@@ -428,7 +433,7 @@ class EuTaxTest extends TestCase
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
-        
+
         $tax_data = new TaxModel();
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
@@ -492,7 +497,7 @@ class EuTaxTest extends TestCase
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
-        
+
         $tax_data = new TaxModel();
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
@@ -556,7 +561,7 @@ class EuTaxTest extends TestCase
     {
         $settings = CompanySettings::defaults();
         $settings->country_id = '276'; // germany
-        
+
         $tax_data = new TaxModel();
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
@@ -627,7 +632,7 @@ class EuTaxTest extends TestCase
         $tax_data->seller_subregion = 'DE';
         $tax_data->regions->EU->has_sales_above_threshold = true;
         $tax_data->regions->EU->tax_all_subregions = true;
-        
+
         $company = Company::factory()->create([
             'account_id' => $this->account->id,
             'settings' => $settings,
@@ -669,7 +674,7 @@ class EuTaxTest extends TestCase
 
 
     }
-    
+
     public function testEuCorrectRuleInit()
     {
 
@@ -912,7 +917,7 @@ class EuTaxTest extends TestCase
             'shipping_country_id' => 56,
             'has_valid_vat_number' => true,
         ]);
-        
+
         $invoice = Invoice::factory()->create([
            'company_id' => $company->id,
            'client_id' => $client->id,

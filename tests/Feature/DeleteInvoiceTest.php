@@ -27,11 +27,10 @@ use Tests\TestCase;
  */
 class DeleteInvoiceTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
     use MakesHash;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,6 +41,11 @@ class DeleteInvoiceTest extends TestCase
         );
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public function testDeleteAndRestoreInvoice()
     {
         //create an invoice for 36000 with a partial of 6000

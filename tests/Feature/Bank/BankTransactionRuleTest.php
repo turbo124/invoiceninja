@@ -12,20 +12,25 @@
 
 namespace Tests\Feature\Bank;
 
+use Tests\TestCase;
+use Tests\MockAccountData;
 use App\Models\BankIntegration;
 use App\Models\BankTransaction;
 use App\Models\BankTransactionRule;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Validation\ValidationException;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class BankTransactionRuleTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -109,7 +114,7 @@ class BankTransactionRuleTest extends TestCase
             'applies_to' => 'DEBIT',
             'client_id' => $this->client->id,
             'vendor_id' => $this->vendor->id,
-            'category_id' =>$this->expense_category->id,
+            'category_id' => $this->expense_category->id,
             'rules' => [
                 [
                     'search_key' => 'description',
@@ -122,7 +127,7 @@ class BankTransactionRuleTest extends TestCase
         $bt = $bt->refresh();
 
         $debit_rules = $bt->company->debit_rules();
-   
+
         $bt->service()->processRules();
 
         $bt = $bt->fresh();
@@ -130,7 +135,7 @@ class BankTransactionRuleTest extends TestCase
         $this->assertNotNull($bt->expense_id);
         // $this->assertNotNull($bt->expense->category_id);
         // $this->assertNotNull($bt->expense->vendor_id);
-        
+
         $bt = null;
     }
 
@@ -170,22 +175,13 @@ class BankTransactionRuleTest extends TestCase
 
         $response = null;
 
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/bank_transaction_rules/'. $br->hashed_id. '?include=expense_category', $data);
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->putJson('/api/v1/bank_transaction_rules/'. $br->hashed_id. '?include=expense_category', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response->assertStatus(200);
 
-        if ($response) {
-            $arr = $response->json();
-           
-            $response->assertStatus(200);
-        }
     }
 
     public function testMatchingBankTransactionExpenseAmountLessThanEqualTo()
@@ -221,8 +217,8 @@ class BankTransactionRuleTest extends TestCase
                 ]
             ]
         ]);
-        
-    
+
+
         $bt->company->refresh();
 
         $bt->refresh()->service()->processRules();
@@ -231,7 +227,7 @@ class BankTransactionRuleTest extends TestCase
 
         $this->assertNotNull($bt->expense_id);
 
-        $bt=null;
+        $bt = null;
     }
 
 
@@ -268,7 +264,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 99
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -310,7 +306,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 101
         ]);
-    
+
 
         $bt->refresh()->service()->processRules();
 
@@ -353,7 +349,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 101
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -395,7 +391,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 100
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -438,7 +434,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 100
         ]);
-    
+
         $bt = $bt->refresh();
 
         $bt->service()->processRules();
@@ -483,7 +479,7 @@ class BankTransactionRuleTest extends TestCase
             ]
         ]);
 
-    
+
         $bt->load('company');
 
         $bt->service()->processRules();
@@ -527,7 +523,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 100
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -571,7 +567,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 100
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -614,7 +610,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 100
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -657,7 +653,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'DEBIT',
             'amount' => 100
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -698,7 +694,7 @@ class BankTransactionRuleTest extends TestCase
             'description' => 'Wall',
             'base_type' => 'DEBIT',
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -739,7 +735,7 @@ class BankTransactionRuleTest extends TestCase
             'description' => 'WallABy',
             'base_type' => 'DEBIT',
         ]);
-    
+
 
         $bt->service()->processRules();
 
@@ -785,7 +781,7 @@ class BankTransactionRuleTest extends TestCase
             'base_type' => 'CREDIT',
             'amount' => 100
         ]);
-    
+
 
         $bt->service()->processRules();
 

@@ -11,10 +11,11 @@
 
 namespace Tests\Unit;
 
-use App\Models\Credit;
-use App\Utils\Traits\AppSetup;
-use Tests\MockUnitData;
 use Tests\TestCase;
+use App\Models\Client;
+use App\Models\Credit;
+use Tests\MockUnitData;
+use App\Utils\Traits\AppSetup;
 
 /**
  * @test
@@ -24,54 +25,80 @@ class CreditBalanceTest extends TestCase
     use MockUnitData;
     use AppSetup;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Credit::all()->each(function ($credit) {
-            $credit->forceDelete();
-        });
-
         $this->makeTestData();
 
-        
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     public function testCreditBalance()
     {
+        $client = Client::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'balance' => 0,
+            'credit_balance' => 0
+        ]);
+
         $credit = Credit::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
-            'client_id' => $this->client->id,
+            'client_id' => $client->id,
             'balance' => 10,
             'number' => 'testing-number-01',
             'status_id' => Credit::STATUS_SENT,
         ]);
 
-        $this->assertEquals($this->client->service()->getCreditBalance(), 10);
+        $this->assertEquals($client->service()->getCreditBalance(), 10);
     }
 
     public function testExpiredCreditBalance()
     {
+
+        $client = Client::factory()->create([
+           'user_id' => $this->user->id,
+           'company_id' => $this->company->id,
+           'balance' => 0,
+           'credit_balance' => 0
+       ]);
+
+
         $credit = Credit::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
-            'client_id' => $this->client->id,
+            'client_id' => $client->id,
             'balance' => 10,
             'due_date' => now()->addDays(5),
             'number' => 'testing-number-02',
             'status_id' => Credit::STATUS_SENT,
         ]);
 
-        $this->assertEquals($this->client->service()->getCreditBalance(), 0);
+        $this->assertEquals($client->service()->getCreditBalance(), 0);
     }
 
     public function testCreditDeleteCheckClientBalance()
     {
+
+        $client = Client::factory()->create([
+                   'user_id' => $this->user->id,
+                   'company_id' => $this->company->id,
+                   'balance' => 0,
+                   'credit_balance' => 0
+               ]);
+
+
         $credit = Credit::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
-            'client_id' => $this->client->id,
+            'client_id' => $client->id,
             'balance' => 10,
             'number' => 'testing-number-01',
             'status_id' => Credit::STATUS_SENT,

@@ -27,24 +27,30 @@ use Tests\TestCase;
 class DesignApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+
     use MockAccountData;
 
     public $id;
 
-    public $faker;
 
-    protected function setUp() :void
+    protected $faker;
+
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
 
-        Session::start();
-
         $this->faker = \Faker\Factory::create();
 
-        Model::reguard();
     }
 
     public function testFindInSetQueries()
@@ -61,7 +67,7 @@ class DesignApiTest extends TestCase
         $q = Design::query()
               ->where('is_template', true)
               ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
-        
+
         $this->assertEquals(1, $q->count());
 
         $response = $this->withHeaders([
@@ -104,7 +110,7 @@ class DesignApiTest extends TestCase
         $q = Design::query()
             ->where('is_template', true)
             ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
-                
+
         $this->assertEquals(0, $q->count());
 
         $design = DesignFactory::create($this->company->id, $this->user->id);
@@ -118,7 +124,7 @@ class DesignApiTest extends TestCase
         $q = Design::query()
             ->where('is_template', true)
             ->whereRaw('FIND_IN_SET( ? ,entities)', [$searchable]);
-                        
+
         $this->assertEquals(0, $q->count());
 
 
@@ -131,7 +137,7 @@ class DesignApiTest extends TestCase
         $design->is_template = true;
         $design->name = 'Test Template';
         $design->save();
-        
+
         $response = $this->withHeaders([
           'X-API-SECRET' => config('ninja.api_secret'),
           'X-API-TOKEN' => $this->token,
@@ -140,7 +146,7 @@ class DesignApiTest extends TestCase
         $response->assertStatus(200);
 
         $arr = $response->json();
-        
+
         $this->assertCount(1, $arr['data']);
     }
 
@@ -150,7 +156,7 @@ class DesignApiTest extends TestCase
         $design->is_template = true;
         $design->name = 'Test Template';
         $design->save();
-        
+
         $response = $this->withHeaders([
           'X-API-SECRET' => config('ninja.api_secret'),
           'X-API-TOKEN' => $this->token,
@@ -159,7 +165,7 @@ class DesignApiTest extends TestCase
         $response->assertStatus(200);
 
         $arr = $response->json();
-        
+
         $this->assertCount(11, $arr['data']);
 
         $response = $this->withHeaders([
@@ -170,7 +176,7 @@ class DesignApiTest extends TestCase
         $response->assertStatus(200);
 
         $arr = $response->json();
-                
+
         $this->assertCount(12, $arr['data']);
 
 

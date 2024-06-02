@@ -32,10 +32,16 @@ use Tests\TestCase;
 class InvitationTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     // use RefreshDatabase;
 
-    protected function setUp() :void
+    protected $faker;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,17 +58,18 @@ class InvitationTest extends TestCase
         $account->default_company_id = $company->id;
         $account->save();
 
-        $fake_email = $this->faker->email();
 
-        $user = User::where('email', $fake_email)->first();
+        $fake_email = \Illuminate\Support\Str::random(16)."@gmail.com";
 
-        if (! $user) {
-            $user = User::factory()->create([
-                'email' => $fake_email,
-                'account_id' => $account->id,
-                'confirmation_code' => $this->createDbHash(config('database.default')),
-            ]);
-        }
+        // $user = User::where('email', $fake_email)->first();
+
+        // if (! $user) {
+        $user = User::factory()->create([
+            'email' => $fake_email,
+            'account_id' => $account->id,
+            'confirmation_code' => $this->createDbHash(config('database.default')),
+        ]);
+        // }
 
         $userPermissions = collect([
             'view_invoice',
@@ -117,5 +124,7 @@ class InvitationTest extends TestCase
         $i->save();
 
         $this->assertNotNull($invoice->invitations);
+
+        $account->forceDelete();
     }
 }

@@ -30,13 +30,13 @@ class InvoicesTest extends TestCase
     use AppSetup;
 
     public $faker;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->faker = Factory::create();
-        
+
     }
 
     public function testInvoiceTableFilters()
@@ -44,7 +44,7 @@ class InvoicesTest extends TestCase
         $account = Account::factory()->create();
 
         $user = User::factory()->create(
-            ['account_id' => $account->id, 'email' => $this->faker->safeEmail()]
+            ['account_id' => $account->id, 'email' => \Illuminate\Support\Str::random(16)."@gmail.com"]
         );
 
         $company = Company::factory()->create(['account_id' => $account->id]);
@@ -105,7 +105,7 @@ class InvoicesTest extends TestCase
             ->assertSee($paid->number)
             ->assertDontSee($unpaid->number);
 
-        $account->delete();
+        $account->forceDelete();
 
     }
 }

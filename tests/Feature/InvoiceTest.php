@@ -34,20 +34,25 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class InvoiceTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+
     use MockAccountData;
 
-    public $faker;
+    protected $faker;
 
-    protected function setUp() :void
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        //$this->account->forceDelete();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 
-        Session::start();
 
         $this->faker = \Faker\Factory::create();
 
-        Model::reguard();
 
         $this->makeTestData();
     }
@@ -84,7 +89,7 @@ class InvoiceTest extends TestCase
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->postJson('/api/v1/invoices?mark_sent=true',$data)
+        ])->postJson('/api/v1/invoices?mark_sent=true', $data)
             ->assertStatus(200);
 
         $arr = $response->json();
@@ -212,7 +217,7 @@ class InvoiceTest extends TestCase
             'company_id' => $this->company->id,
             'client_id' => $this->client->id,
         ]);
-        
+
         $invoice = [
             'status_id' => 1,
             'number' => 'dfdfd',
@@ -298,7 +303,7 @@ class InvoiceTest extends TestCase
             'X-API-TOKEN' => $this->token,
         ])->get('/api/v1/invoices?date_range=1971-01-01,1971-01-03', )
         ->assertStatus(200);
-        
+
         $arr = $response->json();
 
         $this->assertCount(10, $arr['data']);
@@ -357,8 +362,6 @@ class InvoiceTest extends TestCase
             ]);
         });
 
-        $client = Client::all()->first();
-
         $invoice = Invoice::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
         $invoice->status_id = Invoice::STATUS_DRAFT;
 
@@ -409,8 +412,6 @@ class InvoiceTest extends TestCase
                 'company_id' => $this->company->id,
             ]);
         });
-
-        $client = Client::all()->first();
 
         Invoice::factory()->create(['user_id' => $this->user->id, 'company_id' => $this->company->id, 'client_id' => $this->client->id]);
 

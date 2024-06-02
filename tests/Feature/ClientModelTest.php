@@ -23,9 +23,8 @@ use Tests\TestCase;
 class ClientModelTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,6 +37,12 @@ class ClientModelTest extends TestCase
         if (! config('ninja.testvars.stripe')) {
             $this->markTestSkipped('Skip test no company gateways installed');
         }
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     public function testPaymentMethodsWithCreditsEnforced()

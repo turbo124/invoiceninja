@@ -26,10 +26,14 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class BankTransactionTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -124,7 +128,7 @@ class BankTransactionTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertNotNull($e2->refresh()->transaction_id);
-        
+
         $this->assertEquals("{$this->expense->hashed_id},{$e->hashed_id},{$e2->hashed_id}", $bt->fresh()->expense_id);
 
         $expense_repo = app('App\Repositories\ExpenseRepository');
@@ -383,7 +387,7 @@ class BankTransactionTest extends TestCase
     public function testMatchBankTransactionsValidationShouldFail()
     {
         $data = [];
-        
+
         $data['transactions'][] = [
             'bad_key' => 10,
         ];

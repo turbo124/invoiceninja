@@ -34,16 +34,20 @@ class RecurringDatesTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     protected $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
-    
+
         $this->faker = \Faker\Factory::create();
     }
 
@@ -69,7 +73,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -138,14 +142,12 @@ class RecurringDatesTest extends TestCase
 
         $this->travelBack();
 
+        $account->forceDelete();
     }
-
-
-
 
     public function testDailyFrequencyCalc5()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -163,7 +165,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -225,12 +227,14 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
 
+
+        $account->forceDelete();
     }
 
 
     public function testDailyFrequencyCalc4()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -248,7 +252,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -310,11 +314,13 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
 
+        $account->forceDelete();
+
     }
 
     public function testDailyFrequencyCalc3()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -332,7 +338,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -392,6 +398,8 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
 
+        $account->forceDelete();
+
 
     }
 
@@ -414,7 +422,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -474,6 +482,8 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
 
+        $account->forceDelete();
+
     }
 
     public function testDailyFrequencyCalc()
@@ -495,7 +505,7 @@ class RecurringDatesTest extends TestCase
         $user = User::factory()->create([
             'account_id' => $account->id,
             'confirmation_code' => $this->createDbHash(config('database.default')),
-            'email' => $this->faker->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $userPermissions = collect([
@@ -555,6 +565,8 @@ class RecurringDatesTest extends TestCase
         $this->assertEquals(now()->startOfDay()->addDay()->addSeconds($client->timezone_offset()), Carbon::parse($recurring_invoice->next_send_date));
         $this->assertEquals(now()->addDay()->format('Y-m-d'), Carbon::parse($recurring_invoice->next_send_date_client)->format('Y-m-d'));
 
+
+        $account->forceDelete();
 
 
     }

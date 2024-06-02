@@ -23,13 +23,17 @@ use Tests\TestCase;
 class CloneQuoteToInvoiceFactoryTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
-
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     public function testCloneProperties()

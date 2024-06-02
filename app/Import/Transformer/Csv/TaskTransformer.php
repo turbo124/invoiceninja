@@ -117,7 +117,7 @@ class TaskTransformer extends BaseTransformer
             return $stub_start_date->timestamp;
         } catch (\Exception $e) {
             nlog("fall back failed too" . $e->getMessage());
-            // return $this->stubbed_timestamp;
+
         }
 
 

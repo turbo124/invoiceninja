@@ -28,8 +28,12 @@ use Tests\TestCase;
 class PurchaseOrderTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public $faker;
 
@@ -60,9 +64,9 @@ class PurchaseOrderTest extends TestCase
 
         $this->assertEquals($expense->project_id, $this->project->id);
         $this->assertEquals($expense->client_id, $p->project->client_id);
-        
+
     }
-    
+
 
     public function testPurchaseOrderHistory()
     {
@@ -70,7 +74,7 @@ class PurchaseOrderTest extends TestCase
         event(new PurchaseOrderWasCreated($this->purchase_order, $this->company, Ninja::eventVars($this->company, $this->user)));
 
         $ar = new ActivityRepository();
-        $fields = new \stdClass;
+        $fields = new \stdClass();
         $fields->user_id = $this->purchase_order->user_id;
         $fields->vendor_id = $this->purchase_order->vendor_id;
         $fields->company_id = $this->purchase_order->company_id;
@@ -100,7 +104,7 @@ class PurchaseOrderTest extends TestCase
         $i = $this->purchase_order->invitations->first();
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'archive',
         ];
 
@@ -111,7 +115,7 @@ class PurchaseOrderTest extends TestCase
         ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'restore',
         ];
 
@@ -122,7 +126,7 @@ class PurchaseOrderTest extends TestCase
         ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'delete',
         ];
 
@@ -134,7 +138,7 @@ class PurchaseOrderTest extends TestCase
 
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'restore',
         ];
 
@@ -145,7 +149,7 @@ class PurchaseOrderTest extends TestCase
         ->assertStatus(200);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'download',
         ];
 
@@ -156,7 +160,7 @@ class PurchaseOrderTest extends TestCase
         ->assertStatus(200);
 
         $data = [
-            'ids' =>[],
+            'ids' => [],
             'action' => 'archive',
         ];
 
@@ -167,7 +171,7 @@ class PurchaseOrderTest extends TestCase
         ->assertStatus(302);
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => '',
         ];
 
@@ -179,7 +183,7 @@ class PurchaseOrderTest extends TestCase
 
 
         $data = [
-            'ids' =>[$this->purchase_order->hashed_id],
+            'ids' => [$this->purchase_order->hashed_id],
             'action' => 'molly',
         ];
 

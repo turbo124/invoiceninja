@@ -32,7 +32,11 @@ use Tests\TestCase;
 class RelationExistsTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     private $models = [
         Invoice::class,
@@ -48,7 +52,7 @@ class RelationExistsTest extends TestCase
         Vendor::class,
     ];
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +62,7 @@ class RelationExistsTest extends TestCase
     public function testAssignedUserRelationExists()
     {
         foreach ($this->models as $model) {
-            $class = new $model;
+            $class = new $model();
 
             $this->assertTrue(method_exists($class, 'assigned_user'));
         }

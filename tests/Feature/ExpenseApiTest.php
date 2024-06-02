@@ -29,24 +29,26 @@ use Tests\TestCase;
 class ExpenseApiTest extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
+
     use MockAccountData;
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
 
-        Session::start();
-
         $this->faker = \Faker\Factory::create();
 
-        Model::reguard();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public function testTransactionIdClearedOnDelete()
     {
         $bi = BankIntegration::factory()->create([
@@ -66,7 +68,7 @@ class ExpenseApiTest extends TestCase
             'user_id' => $this->user->id,
             'transaction_id' => $bt->id,
         ]);
-        
+
         $this->assertNotNull($e->transaction_id);
 
         $expense_repo = app('App\Repositories\ExpenseRepository');

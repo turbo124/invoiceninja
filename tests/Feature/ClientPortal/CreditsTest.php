@@ -25,23 +25,28 @@ use App\Utils\Traits\AppSetup;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
-use function now;
 use Tests\TestCase;
+
+use function now;
 
 class CreditsTest extends TestCase
 {
-    //use DatabaseTransactions;
     use AppSetup;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     private $faker;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->faker = Factory::create();
-        
-        
+
+
     }
 
     public function testShowingOnlyCreditsWithDueDateLessOrEqualToNow()
@@ -49,7 +54,7 @@ class CreditsTest extends TestCase
         $account = Account::factory()->create();
 
         $user = User::factory()->create(
-            ['account_id' => $account->id, 'email' => $this->faker->safeEmail()]
+            ['account_id' => $account->id, 'email' => \Illuminate\Support\Str::random(16)."@gmail.com"]
         );
 
         $company = Company::factory()->create(['account_id' => $account->id]);
@@ -108,7 +113,7 @@ class CreditsTest extends TestCase
             ->assertSee('testing-number-02')
             ->assertSee('testing-number-03');
 
-        $user->forceDelete();
+        $user->account->forceDelete();
     }
 
     public function testShowingCreditsWithNullDueDate()
@@ -116,7 +121,7 @@ class CreditsTest extends TestCase
         $account = Account::factory()->create();
 
         $user = User::factory()->create(
-            ['account_id' => $account->id, 'email' => $this->faker->safeEmail()]
+            ['account_id' => $account->id, 'email' => \Illuminate\Support\Str::random(16)."@gmail.com"]
         );
 
         $company = Company::factory()->create(['account_id' => $account->id]);
@@ -177,7 +182,7 @@ class CreditsTest extends TestCase
             ->assertSee('testing-number-02')
             ->assertSee('testing-number-03');
 
-        $account->delete();
+        $account->forceDelete();
 
     }
 }

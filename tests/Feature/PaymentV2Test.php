@@ -33,12 +33,16 @@ use Tests\TestCase;
 class PaymentV2Test extends TestCase
 {
     use MakesHash;
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
     public $faker;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -130,7 +134,7 @@ class PaymentV2Test extends TestCase
 
     public function testStorePaymentWithCreditsThenDeletingInvoices()
     {
-        $client = Client::factory()->create(['company_id' =>$this->company->id, 'user_id' => $this->user->id, 'balance' => 20, 'paid_to_date' => 0]);
+        $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id, 'balance' => 20, 'paid_to_date' => 0]);
         ClientContact::factory()->create([
             'user_id' => $this->user->id,
             'client_id' => $client->id,
@@ -263,7 +267,7 @@ class PaymentV2Test extends TestCase
 
     public function testStorePaymentWithCreditsThenDeletingInvoicesAndThenPayments()
     {
-        $client = Client::factory()->create(['company_id' =>$this->company->id, 'user_id' => $this->user->id, 'balance' => 100, 'paid_to_date' => 0]);
+        $client = Client::factory()->create(['company_id' => $this->company->id, 'user_id' => $this->user->id, 'balance' => 100, 'paid_to_date' => 0]);
         ClientContact::factory()->create([
             'user_id' => $this->user->id,
             'client_id' => $client->id,
@@ -362,7 +366,7 @@ class PaymentV2Test extends TestCase
         $this->assertEquals(0, $credit->balance);
 
         $invoice = $invoice->fresh();
-        
+
         //delete the invoice
 
         $data = [

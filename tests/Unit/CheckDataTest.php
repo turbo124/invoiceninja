@@ -43,16 +43,22 @@ class CheckDataTest extends TestCase
      *
      * No method can guarantee against false positives.
      */
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->faker = \Faker\Factory::create();
 
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
 
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     private function buildData()
@@ -68,7 +74,7 @@ class CheckDataTest extends TestCase
         $this->user = User::factory()->create([
             'account_id' => $this->account->id,
             'confirmation_code' => 'xyz123',
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(26)."@gmail.com",
         ]);
 
         $settings = CompanySettings::defaults();
@@ -91,7 +97,7 @@ class CheckDataTest extends TestCase
 
         $this->token = \Illuminate\Support\Str::random(64);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $this->user->id;
         $company_token->company_id = $this->company->id;
         $company_token->account_id = $this->account->id;
@@ -127,13 +133,13 @@ class CheckDataTest extends TestCase
     {
         $this->buildData();
 
-        $i = Invoice::factory()->count(5)->create([
+        Invoice::factory()->count(5)->create([
             'user_id' => $this->user->id,
             'client_id' => $this->client->id,
             'company_id' => $this->company->id,
         ]);
 
-        Invoice::where('status_id', 2)->cursor()->each(function ($i) {
+        Invoice::where('status_id', 2)->where('company_id', $this->company->id)->cursor()->each(function ($i) {
 
             $i->service()->markPaid()->save();
 
@@ -143,7 +149,7 @@ class CheckDataTest extends TestCase
             $this->assertNotNull($payment->paymentables()->where('paymentable_type', \App\Models\Credit::class)->get()
             ->sum(\DB::raw('amount')->getValue(\DB::connection()->getQueryGrammar())));
         });
-     
+
         Payment::with('paymentables')->cursor()->each(function ($payment) {
             $this->assertNotNull($payment->paymentables()->where('paymentable_type', \App\Models\Credit::class)->get()
             ->sum('amount'));
@@ -152,7 +158,7 @@ class CheckDataTest extends TestCase
         $amount = Paymentable::first()->payment->paymentables()->where('paymentable_type', 'invnoices')->get()->sum('amount');
 
         $this->assertNotNull($amount);
-
+        // //$this->account->forceDelete();
     }
 
     public function testDbQueriesRaw4()
@@ -174,6 +180,8 @@ class CheckDataTest extends TestCase
         // $this->assertNotNull($clients);
         $this->assertNotNull($clients_refactor);
 
+        // //$this->account->forceDelete();
+
     }
 
     public function testDbQueriesRaw3()
@@ -182,12 +190,12 @@ class CheckDataTest extends TestCase
 
         User::factory()->create([
             'account_id' => $this->account->id,
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
-        
+
         User::factory()->create([
             'account_id' => $this->account->id,
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => \Illuminate\Support\Str::random(16)."@gmail.com",
         ]);
 
         $user_hash = 'a';
@@ -205,6 +213,8 @@ class CheckDataTest extends TestCase
 
 
         $this->assertEquals($user_count_refactor->count(), $user_count->count());
+
+        // //$this->account->forceDelete();
     }
 
     public function testDbRawQueries1()
@@ -215,7 +225,7 @@ class CheckDataTest extends TestCase
             SELECT count(clients.id) as count
             FROM clients
         ")->getValue(\DB::connection()->getQueryGrammar()));
-    
+
 
         $refactored = \DB::select("
             SELECT count(clients.id) as count
@@ -223,6 +233,8 @@ class CheckDataTest extends TestCase
         ");
 
         $this->assertEquals($refactored[0]->count, $results[0]->count);
+
+        // //$this->account->forceDelete();
 
     }
 
@@ -242,10 +254,8 @@ class CheckDataTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        Invoice::where('status_id', 2)->cursor()->each(function ($i) {
-
+        Invoice::where('status_id', 2)->where('company_id', $this->company->id)->cursor()->each(function ($i) {
             $i->service()->markPaid()->save();
-
         });
 
         $results = \DB::select(\DB::raw("
@@ -261,7 +271,7 @@ class CheckDataTest extends TestCase
                 AND payments.is_deleted = 0
                 AND payments.client_id = ?;
                 ")->getValue(\DB::connection()->getQueryGrammar()), ['invoices', $this->client->id]);
-            
+
         $refactored = \DB::select("
                 SELECT 
                 SUM(payments.amount) as amount
@@ -277,6 +287,8 @@ class CheckDataTest extends TestCase
                 ", ['invoices', $this->client->id]);
 
         $this->assertEquals($refactored[0]->amount, $results[0]->amount);
+
+        // //$this->account->forceDelete();
 
     }
 

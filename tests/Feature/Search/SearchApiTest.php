@@ -22,10 +22,14 @@ use Tests\TestCase;
  */
 class SearchApiTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +38,7 @@ class SearchApiTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-        
+
         $this->withoutExceptionHandling();
 
     }
@@ -43,7 +47,7 @@ class SearchApiTest extends TestCase
     {
 
         $response = false;
-        
+
         $data = [];
 
         $response = $this->withHeaders([
@@ -54,7 +58,7 @@ class SearchApiTest extends TestCase
         $response->assertStatus(200);
 
         nlog($response->json());
-        
+
     }
 
 }

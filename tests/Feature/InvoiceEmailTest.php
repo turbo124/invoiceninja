@@ -29,12 +29,12 @@ use Tests\TestCase;
 class InvoiceEmailTest extends TestCase
 {
     use MockAccountData;
-    //use DatabaseTransactions;
+
     use GeneratesCounter;
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,13 +50,18 @@ class InvoiceEmailTest extends TestCase
 
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public function testInvalidEmailParsing()
     {
         $email = 'illegal@example.com';
 
         $this->assertTrue(strpos($email, '@example.com') !== false);
     }
-    
+
 
     public function testClientEmailHistory()
     {
@@ -83,7 +88,7 @@ class InvoiceEmailTest extends TestCase
                 ],
             ]
         ];
-                
+
         $system_log->save();
 
 
@@ -131,7 +136,7 @@ class InvoiceEmailTest extends TestCase
                 ],
             ]
         ];
-                
+
         $system_log->save();
 
         $data = [
@@ -166,9 +171,9 @@ class InvoiceEmailTest extends TestCase
         $data = [
             "body" => "hey what's up",
             "entity" => 'invoice',
-            "entity_id"=> $this->invoice->hashed_id,
-            "subject"=> 'Reminder $number',
-            "template"=> "first_custom"
+            "entity_id" => $this->invoice->hashed_id,
+            "subject" => 'Reminder $number',
+            "template" => "first_custom"
         ];
 
         $response = false;
@@ -264,7 +269,7 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
+
                 Bus::assertDispatched(EmailEntity::class);
 
             }
@@ -295,7 +300,7 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
+
                 Bus::assertDispatched(EmailEntity::class);
 
             }
@@ -321,7 +326,7 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
+
                 Bus::assertDispatched(EmailEntity::class);
 
             }

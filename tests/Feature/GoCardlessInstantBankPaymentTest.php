@@ -28,7 +28,6 @@ use Tests\TestCase;
  */
 class GoCardlessInstantBankPaymentTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
     use MakesHash;
 
@@ -97,7 +96,7 @@ class GoCardlessInstantBankPaymentTest extends TestCase
 ];
 
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -106,6 +105,12 @@ class GoCardlessInstantBankPaymentTest extends TestCase
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
     }
 
     public function testWebhookProcessingWithGoCardless()
@@ -125,8 +130,8 @@ class GoCardlessInstantBankPaymentTest extends TestCase
 
     public function testInvoiceDelayedNotificationPayment()
     {
-        $gocardlesspayment = new \stdClass;
-        $links = new \stdClass;
+        $gocardlesspayment = new \stdClass();
+        $links = new \stdClass();
         $links->mandate = "my_mandate";
         $gocardlesspayment->links = $links;
         $gocardlesspayment->id = "gocardless_payment_id";
@@ -172,7 +177,7 @@ class GoCardlessInstantBankPaymentTest extends TestCase
         $this->assertEquals($invoice->balance, $test_invoice_object->amount);
 
 
-        $cg = new CompanyGateway;
+        $cg = new CompanyGateway();
         $cg->company_id = $this->company->id;
         $cg->user_id = $this->user->id;
         $cg->gateway_key = 'b9886f9257f0c6ee7c302f1c74475f6c';

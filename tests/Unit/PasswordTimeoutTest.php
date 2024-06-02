@@ -22,16 +22,19 @@ use Tests\TestCase;
  */
 class PasswordTimeoutTest extends TestCase
 {
-    //use DatabaseTransactions;
     use MockAccountData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
     }
-
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        //$this->account->forceDelete();
+    }
     public function testFalseResponse()
     {
 
