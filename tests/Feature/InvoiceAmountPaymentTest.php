@@ -25,6 +25,7 @@ use Tests\TestCase;
 class InvoiceAmountPaymentTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {
@@ -39,8 +40,9 @@ class InvoiceAmountPaymentTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     public function testPaymentAmountForInvoice()
     {

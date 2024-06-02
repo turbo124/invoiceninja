@@ -29,10 +29,12 @@ use Tests\TestCase;
 class UsTaxTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private array $mock_response = [

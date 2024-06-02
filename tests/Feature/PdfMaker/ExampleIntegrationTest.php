@@ -11,17 +11,19 @@
 
 namespace Tests\Feature\PdfMaker;
 
+use Tests\TestCase;
+use App\Utils\HtmlEngine;
+use Tests\MockAccountData;
 use App\Services\PdfMaker\Design;
 use App\Services\PdfMaker\PdfMaker;
-use App\Utils\HtmlEngine;
 use App\Utils\Traits\MakesInvoiceValues;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ExampleIntegrationTest extends TestCase
 {
     use MakesInvoiceValues;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

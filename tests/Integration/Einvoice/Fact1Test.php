@@ -70,10 +70,12 @@ use Invoiceninja\Einvoice\Models\FACT1\TaxCategoryType\TaxCategory;
 class Fact1Test extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

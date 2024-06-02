@@ -57,8 +57,9 @@ class CheckDataTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private function buildData()

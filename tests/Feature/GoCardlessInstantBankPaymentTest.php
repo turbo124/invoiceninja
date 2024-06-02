@@ -29,6 +29,7 @@ use Tests\TestCase;
 class GoCardlessInstantBankPaymentTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
 
     private array $mock = [
@@ -109,8 +110,9 @@ class GoCardlessInstantBankPaymentTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testWebhookProcessingWithGoCardless()

@@ -25,6 +25,7 @@ use Tests\TestCase;
 class InvoiceBalanceTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

@@ -11,11 +11,12 @@
 
 namespace Tests\Feature\Export;
 
-use App\Jobs\Company\CompanyExport;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use Tests\MockAccountData;
+use App\Utils\Traits\MakesHash;
+use App\Jobs\Company\CompanyExport;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -24,6 +25,7 @@ class ExportCompanyTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

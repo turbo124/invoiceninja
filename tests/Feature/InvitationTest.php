@@ -34,8 +34,8 @@ class InvitationTest extends TestCase
     use MakesHash;
     protected function tearDown(): void
     {
+
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     // use RefreshDatabase;
 

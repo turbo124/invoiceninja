@@ -39,10 +39,12 @@ class GeneratesCounterTest extends TestCase
     use GeneratesCounter;
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public $faker;

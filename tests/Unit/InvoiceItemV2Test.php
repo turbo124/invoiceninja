@@ -24,6 +24,7 @@ use Tests\TestCase;
 class InvoiceItemV2Test extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
@@ -33,8 +34,9 @@ class InvoiceItemV2Test extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testInvoiceItemTotalSimple()

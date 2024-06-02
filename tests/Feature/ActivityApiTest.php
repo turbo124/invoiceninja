@@ -46,8 +46,9 @@ class ActivityApiTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         $this->company->account->forceDelete();
+        parent::tearDown();
+
     }
 
     public function testActivityEntity()

@@ -11,10 +11,11 @@
 
 namespace Tests\Feature\Export;
 
+use Tests\TestCase;
+use Tests\MockAccountData;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Routing\Middleware\ThrottleRequests;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -23,6 +24,7 @@ class ClientCsvTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

@@ -11,13 +11,14 @@
 
 namespace Tests\Feature\Scheduler;
 
-use App\Models\RecurringInvoice;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Support\Facades\Session;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use Tests\MockAccountData;
+use App\Utils\Traits\MakesHash;
+use App\Models\RecurringInvoice;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -27,6 +28,7 @@ class ScheduleEntityTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     public $faker;
 

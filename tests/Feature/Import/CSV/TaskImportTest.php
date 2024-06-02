@@ -11,15 +11,16 @@
 
 namespace Tests\Feature\Import\CSV;
 
-use App\Import\Providers\Csv;
-use App\Import\Transformer\BaseTransformer;
-use App\Models\Task;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use App\Models\Task;
+use Tests\MockAccountData;
+use Illuminate\Support\Str;
+use App\Import\Providers\Csv;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Support\Facades\Cache;
+use App\Import\Transformer\BaseTransformer;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -29,6 +30,7 @@ class TaskImportTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

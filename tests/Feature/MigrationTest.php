@@ -27,10 +27,14 @@ use Tests\TestCase;
 class MigrationTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
+    protected $faker;
+
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

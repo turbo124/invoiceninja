@@ -11,13 +11,14 @@
 
 namespace Tests\Feature\Export;
 
-use App\Models\Invoice;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Support\Facades\Storage;
-use League\Csv\Writer;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use League\Csv\Writer;
+use App\Models\Invoice;
+use Tests\MockAccountData;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -26,6 +27,7 @@ class ExportCsvTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

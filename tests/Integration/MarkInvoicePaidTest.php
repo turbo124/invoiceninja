@@ -22,8 +22,7 @@ use Tests\TestCase;
 class MarkInvoicePaidTest extends TestCase
 {
     // use MockAccountData;
-
-
+    use DatabaseTransactions;
     public $company;
     public $token;
     public $user;
@@ -60,8 +59,14 @@ class MarkInvoicePaidTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
+        $this->account->null;
+
         parent::tearDown();
-        // $this->account->forceDelete();
+
+
+
     }
 
     public function testClientExists()

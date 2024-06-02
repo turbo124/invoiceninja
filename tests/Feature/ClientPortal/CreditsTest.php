@@ -35,7 +35,6 @@ class CreditsTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private $faker;
@@ -45,8 +44,6 @@ class CreditsTest extends TestCase
         parent::setUp();
 
         $this->faker = Factory::create();
-
-
     }
 
     public function testShowingOnlyCreditsWithDueDateLessOrEqualToNow()

@@ -27,8 +27,9 @@ class ClientMergeTest extends TestCase
     use AppSetup;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private $user;

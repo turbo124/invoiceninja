@@ -32,6 +32,7 @@ use Tests\TestCase;
 class SumTaxTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     public Response $response;
 
@@ -91,8 +92,9 @@ class SumTaxTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     /** Proves that we do not charge taxes automatically */

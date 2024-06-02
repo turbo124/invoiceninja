@@ -39,11 +39,13 @@ use Tests\TestCase;
 class TemplateTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesDates;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private string $body = '

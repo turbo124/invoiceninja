@@ -34,10 +34,12 @@ use Tests\TestCase;
 class UserTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private $default_email = 'attach@gmail.com';

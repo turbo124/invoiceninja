@@ -33,10 +33,12 @@ use Invoiceninja\Einvoice\Models\FatturaPA\FatturaElettronicaHeaderType\FatturaE
 class FatturaPATest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

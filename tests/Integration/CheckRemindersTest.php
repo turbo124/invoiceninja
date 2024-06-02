@@ -23,6 +23,7 @@ use Tests\TestCase;
 class CheckRemindersTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
 
     protected function setUp(): void
@@ -34,8 +35,9 @@ class CheckRemindersTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function test_after_invoice_date_reminder()

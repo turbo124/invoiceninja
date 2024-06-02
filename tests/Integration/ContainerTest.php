@@ -11,9 +11,10 @@
 
 namespace Tests\Integration;
 
+use Tests\TestCase;
 use App\Models\Company;
 use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -21,6 +22,7 @@ use Tests\TestCase;
 class ContainerTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

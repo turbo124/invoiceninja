@@ -32,10 +32,12 @@ use Tests\TestCase;
 class RelationExistsTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private $models = [

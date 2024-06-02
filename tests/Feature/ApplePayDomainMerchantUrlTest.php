@@ -46,8 +46,8 @@ class ApplePayDomainMerchantUrlTest extends TestCase
 
     protected function tearDown(): void
     {
+        $this->company->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     public function testMerchantFieldGet()
     {

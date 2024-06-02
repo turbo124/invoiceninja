@@ -25,11 +25,13 @@ use Tests\TestCase;
 class UploadLogoTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

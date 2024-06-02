@@ -34,10 +34,12 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class EntityTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public $invoice;

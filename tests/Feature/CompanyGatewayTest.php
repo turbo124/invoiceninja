@@ -27,6 +27,7 @@ use Tests\TestCase;
 class CompanyGatewayTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     // use RefreshDatabase;
 
     protected function setUp(): void
@@ -42,8 +43,8 @@ class CompanyGatewayTest extends TestCase
 
     protected function tearDown(): void
     {
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     public function testGatewayExists()
     {

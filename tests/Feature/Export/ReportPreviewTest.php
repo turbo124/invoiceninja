@@ -11,26 +11,27 @@
 
 namespace Tests\Feature\Export;
 
-use App\Export\CSV\ActivityExport;
+use Tests\TestCase;
+use App\Models\Client;
+use App\Models\Expense;
+use App\Models\Document;
+use Tests\MockAccountData;
+use App\Export\CSV\QuoteExport;
+use App\Utils\Traits\MakesHash;
 use App\Export\CSV\ClientExport;
-use App\Export\CSV\ContactExport;
 use App\Export\CSV\CreditExport;
-use App\Export\CSV\DocumentExport;
+use App\Export\CSV\ContactExport;
 use App\Export\CSV\ExpenseExport;
 use App\Export\CSV\InvoiceExport;
 use App\Export\CSV\PaymentExport;
 use App\Export\CSV\ProductExport;
-use App\Export\CSV\PurchaseOrderExport;
-use App\Export\CSV\QuoteExport;
+use App\Export\CSV\ActivityExport;
+use App\Export\CSV\DocumentExport;
 use App\Jobs\Report\PreviewReport;
-use App\Models\Client;
-use App\Models\Document;
-use App\Models\Expense;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Cache;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use App\Export\CSV\PurchaseOrderExport;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -39,6 +40,7 @@ class ReportPreviewTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     public $faker;
 

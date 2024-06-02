@@ -24,6 +24,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class BankTransactionRuleTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function tearDown(): void
     {

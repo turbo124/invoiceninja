@@ -27,6 +27,7 @@ class BankIntegrationApiTest extends TestCase
     use MakesHash;
 
     // use MockAccountData;
+    use DatabaseTransactions;
 
     protected $faker;
 
@@ -53,9 +54,11 @@ class BankIntegrationApiTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->company->account->forceDelete();
+
         parent::tearDown();
 
-        //$this->account->forceDelete();
     }
 
     public function testBankIntegrationPost()

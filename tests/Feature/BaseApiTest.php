@@ -11,49 +11,50 @@
 
 namespace Tests\Feature;
 
-use App\DataMapper\ClientRegistrationFields;
-use App\DataMapper\ClientSettings;
-use App\DataMapper\CompanySettings;
-use App\Factory\ClientGatewayTokenFactory;
-use App\Factory\CompanyUserFactory;
-use App\Factory\WebhookFactory;
-use App\Models\BankIntegration;
-use App\Models\BankTransaction;
-use App\Models\BankTransactionRule;
+use Tests\TestCase;
+use App\Models\Task;
+use App\Models\User;
+use App\Models\Quote;
 use App\Models\Client;
-use App\Models\ClientContact;
-use App\Models\Company;
-use App\Models\CompanyGateway;
-use App\Models\CompanyToken;
-use App\Models\CompanyUser;
 use App\Models\Credit;
-use App\Models\Document;
+use App\Models\Vendor;
+use App\Models\Company;
 use App\Models\Expense;
-use App\Models\ExpenseCategory;
-use App\Models\GroupSetting;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Project;
+use App\Models\TaxRate;
+use App\Models\Document;
+use App\Models\Scheduler;
+use App\Models\TaskStatus;
+use Tests\MockAccountData;
+use App\Models\CompanyUser;
+use Illuminate\Support\Str;
+use App\Models\CompanyToken;
+use App\Models\GroupSetting;
+use App\Models\Subscription;
+use App\Models\ClientContact;
 use App\Models\PurchaseOrder;
-use App\Models\Quote;
+use App\Models\VendorContact;
+use App\Models\CompanyGateway;
+use App\Models\RecurringQuote;
+use App\Factory\WebhookFactory;
+use App\Models\BankIntegration;
+use App\Models\BankTransaction;
+use App\Models\ExpenseCategory;
+use App\Utils\Traits\MakesHash;
 use App\Models\RecurringExpense;
 use App\Models\RecurringInvoice;
-use App\Models\RecurringQuote;
-use App\Models\Scheduler;
-use App\Models\Subscription;
-use App\Models\Task;
-use App\Models\TaskStatus;
-use App\Models\TaxRate;
-use App\Models\User;
-use App\Models\Vendor;
-use App\Models\VendorContact;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Support\Str;
+use App\DataMapper\ClientSettings;
+use App\DataMapper\CompanySettings;
+use App\Factory\CompanyUserFactory;
+use App\Models\BankTransactionRule;
+use App\Factory\ClientGatewayTokenFactory;
+use App\DataMapper\ClientRegistrationFields;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -62,6 +63,7 @@ use Tests\TestCase;
 class BaseApiTest extends TestCase
 {
     // use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
 
     public CompanyUser $owner_cu;
@@ -108,9 +110,11 @@ class BaseApiTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
+
         parent::tearDown();
 
-        //$this->account->forceDelete();
     }
 
 

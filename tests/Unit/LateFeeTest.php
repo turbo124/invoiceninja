@@ -32,6 +32,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class LateFeeTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     public $faker;
 
@@ -59,8 +60,9 @@ class LateFeeTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private function buildData($settings)

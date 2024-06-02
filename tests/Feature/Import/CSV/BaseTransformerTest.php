@@ -11,17 +11,18 @@
 
 namespace Tests\Feature\Import\CSV;
 
-use App\Import\Transformer\BaseTransformer;
+use Tests\TestCase;
 use App\Models\Client;
-use App\Models\ClientContact;
+use App\Models\Vendor;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\TaxRate;
-use App\Models\Vendor;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Tests\MockAccountData;
-use Tests\TestCase;
+use App\Models\ClientContact;
+use App\Utils\Traits\MakesHash;
+use App\Import\Transformer\BaseTransformer;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -31,6 +32,7 @@ class BaseTransformerTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

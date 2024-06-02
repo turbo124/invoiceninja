@@ -30,6 +30,7 @@ use Tests\TestCase;
 class EuTaxTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
 
     protected function setUp(): void
@@ -47,8 +48,9 @@ class EuTaxTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testEuToUsTaxCalculation()

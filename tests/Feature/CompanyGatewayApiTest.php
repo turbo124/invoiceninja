@@ -31,6 +31,7 @@ class CompanyGatewayApiTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
     use CompanyGatewayFeesAndLimitsSaver;
 
     protected $faker;
@@ -38,9 +39,11 @@ class CompanyGatewayApiTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
+
         parent::tearDown();
 
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

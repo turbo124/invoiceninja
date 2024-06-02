@@ -36,8 +36,9 @@ class AutoUnappliedPaymentTest extends TestCase
     use MockUnitData;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

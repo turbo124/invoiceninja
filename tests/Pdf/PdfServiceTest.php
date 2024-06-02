@@ -12,10 +12,11 @@
 
 namespace Tests\Pdf;
 
-use App\Services\Pdf\PdfConfiguration;
-use App\Services\Pdf\PdfService;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use Tests\MockAccountData;
+use App\Services\Pdf\PdfService;
+use App\Services\Pdf\PdfConfiguration;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -24,6 +25,7 @@ use Tests\TestCase;
 class PdfServiceTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

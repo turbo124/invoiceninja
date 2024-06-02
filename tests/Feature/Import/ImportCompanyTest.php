@@ -70,21 +70,19 @@ class ImportCompanyTest extends TestCase
 
     protected function testDown(): void
     {
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        Artisan::call('db:seed');
+        // Artisan::call('db:seed');
 
         $this->withoutMiddleware(
             ThrottleRequests::class
         );
-
-        $this->withoutExceptionHandling();
 
         $this->account = Account::factory()->create();
         $this->company = Company::factory()->create(['account_id' => $this->account->id]);
@@ -150,6 +148,7 @@ class ImportCompanyTest extends TestCase
                 array_merge($user_array, ['account_id' => $this->account->id]),
             );
 
+            $new_user->account_id = $this->account->id;
             $new_user->save(['timestamps' => false]);
 
             $this->ids['users']["{$user->hashed_id}"] = $new_user->id;
@@ -157,7 +156,7 @@ class ImportCompanyTest extends TestCase
 
         User::reguard();
 
-        $this->assertEquals(2, User::count());
+        $this->assertEquals(2, User::withTrashed()->where('account_id', $this->account->id)->count());
         /***************************** Users *****************************/
 
         /***************************** Company Users *****************************/

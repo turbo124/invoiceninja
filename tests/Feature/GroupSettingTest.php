@@ -11,17 +11,19 @@
 
 namespace Tests\Feature;
 
-use App\DataMapper\Settings\SettingsData;
+use Tests\TestCase;
+use Tests\MockAccountData;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Session;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use App\DataMapper\Settings\SettingsData;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class GroupSettingTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
 
     protected $faker;
@@ -29,9 +31,9 @@ class GroupSettingTest extends TestCase
 
     protected function tearDown(): void
     {
+        $this->account->forceDelete();
         parent::tearDown();
 
-        // $this->account->forceDelete();
     }
 
     protected function setUp(): void

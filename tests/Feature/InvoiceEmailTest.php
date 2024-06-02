@@ -29,6 +29,7 @@ use Tests\TestCase;
 class InvoiceEmailTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     use GeneratesCounter;
 
@@ -52,8 +53,9 @@ class InvoiceEmailTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     public function testInvalidEmailParsing()
     {

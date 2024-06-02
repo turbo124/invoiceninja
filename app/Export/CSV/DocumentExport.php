@@ -14,6 +14,7 @@ namespace App\Export\CSV;
 use App\Libraries\MultiDB;
 use App\Models\Company;
 use App\Models\Document;
+use App\Models\Invoice;
 use App\Transformers\DocumentTransformer;
 use App\Utils\Ninja;
 use Illuminate\Database\Eloquent\Builder;
@@ -129,9 +130,6 @@ class DocumentExport extends BaseExport
         if (in_array('record_type', $this->input['report_keys'])) {
             $entity['record_type'] = class_basename($document->documentable);
         }
-
-        // if(in_array('record_name', $this->input['report_keys']))
-        //     $entity['record_name'] = $document->hashed_id;
 
         return $entity;
     }

@@ -28,6 +28,7 @@ use Tests\TestCase;
 class InvoiceTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     public $invoice;
 
@@ -50,8 +51,9 @@ class InvoiceTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testRappenRounding()

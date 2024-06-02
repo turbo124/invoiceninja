@@ -25,11 +25,13 @@ use Tests\TestCase;
 class GroupSettingsTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use ClientGroupSettingsSaver;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public $company_settings;

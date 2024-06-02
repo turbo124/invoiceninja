@@ -72,8 +72,9 @@ class CancelInvoiceTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         $this->company->account->forceDelete();
+        parent::tearDown();
+
     }
 
 

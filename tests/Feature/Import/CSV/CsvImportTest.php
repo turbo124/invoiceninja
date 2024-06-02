@@ -11,18 +11,19 @@
 
 namespace Tests\Feature\Import\CSV;
 
-use App\Import\Providers\Csv;
-use App\Import\Transformer\BaseTransformer;
-use App\Models\Client;
-use App\Models\Invoice;
-use App\Models\Vendor;
-use App\Utils\Traits\MakesHash;
-use App\Utils\TruthSource;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use Tests\MockAccountData;
 use Tests\TestCase;
+use App\Models\Client;
+use App\Models\Vendor;
+use App\Models\Invoice;
+use App\Utils\TruthSource;
+use Tests\MockAccountData;
+use Illuminate\Support\Str;
+use App\Import\Providers\Csv;
+use App\Utils\Traits\MakesHash;
+use Illuminate\Support\Facades\Cache;
+use App\Import\Transformer\BaseTransformer;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -32,6 +33,7 @@ class CsvImportTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

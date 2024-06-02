@@ -29,14 +29,13 @@ class LoginTest extends TestCase
 {
     protected function tearDown(): void
     {
+
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        Session::start();
     }
 
     // public function testLoginFormDisplayed()

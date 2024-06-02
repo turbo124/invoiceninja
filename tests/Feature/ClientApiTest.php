@@ -42,6 +42,7 @@ class ClientApiTest extends TestCase
 {
     use MakesHash;
     // use MockAccountData;
+    use DatabaseTransactions;
     use ClientGroupSettingsSaver;
 
 
@@ -96,9 +97,9 @@ class ClientApiTest extends TestCase
 
     protected function tearDown(): void
     {
+        $this->company->account->forceDelete();
         parent::tearDown();
 
-        $this->company->account->forceDelete();
     }
 
     public function testBulkUpdates()

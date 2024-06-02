@@ -25,6 +25,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class FileUploadValidationTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
 
     protected function setUp(): void

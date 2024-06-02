@@ -22,11 +22,13 @@ use Tests\TestCase;
 class InvitationTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     protected function setUp(): void

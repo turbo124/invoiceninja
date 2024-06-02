@@ -103,6 +103,7 @@ use App\Models\Vendor;
 class EventTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
     // use DatabaseTransactions;
 

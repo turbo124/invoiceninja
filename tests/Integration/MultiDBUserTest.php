@@ -31,6 +31,12 @@ use Tests\TestCase;
  */
 class MultiDBUserTest extends TestCase
 {
+    public string $token;
+
+    public CompanyToken $company_token;
+
+    public array $accounts = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -49,6 +55,9 @@ class MultiDBUserTest extends TestCase
 
         $account = Account::on('db-ninja-01')->create($ac->toArray());
         $account2 = Account::on('db-ninja-02')->create($ac->toArray());
+
+        $this->accounts[] = $account->id;
+        $this->accounts[] = $account2->id;
 
         $company = Company::factory()->make([
             'account_id' => $account->id,
@@ -94,11 +103,6 @@ class MultiDBUserTest extends TestCase
 
         $user = User::on('db-ninja-01')->create($user);
 
-        // $cu = CompanyUserFactory::create($user->id, $coco->id, $account->id);
-        // $cu->is_owner = true;
-        // $cu->is_admin = true;
-        // $cu->setConnection('db-ninja-01');
-        // $cu->save();
 
         CompanyUser::on('db-ninja-01')->create([
             'company_id' => $coco->id,
@@ -205,9 +209,20 @@ class MultiDBUserTest extends TestCase
 
     protected function tearDown(): void
     {
-        DB::connection('db-ninja-01')->table('users')->delete();
-        DB::connection('db-ninja-02')->table('users')->delete();
+        // DB::connection('db-ninja-01')->table('users')->delete();
+        // DB::connection('db-ninja-02')->table('users')->delete();
+
+        Account::on('db-ninja-01')->whereIn('id', $this->accounts)->cursor()->each(function ($a) {
+            $a->delete();
+        });
+
+
+        Account::on('db-ninja-02')->whereIn('id', $this->accounts)->cursor()->each(function ($a) {
+            $a->delete();
+        });
 
         config(['database.default' => config('ninja.db.default')]);
+
+        parent::tearDown();
     }
 }

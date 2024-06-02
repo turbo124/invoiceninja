@@ -27,6 +27,7 @@ class ExpenseCategoryApiTest extends TestCase
     use MakesHash;
 
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected $faker;
 
@@ -45,8 +46,9 @@ class ExpenseCategoryApiTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testExpenseCategoryPost()

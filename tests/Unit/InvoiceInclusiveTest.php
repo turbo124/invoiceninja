@@ -24,6 +24,7 @@ use Tests\TestCase;
 class InvoiceInclusiveTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
 
     public $invoice;
@@ -47,8 +48,9 @@ class InvoiceInclusiveTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
 

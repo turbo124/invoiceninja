@@ -78,14 +78,14 @@ class CompanyTest extends TestCase
 
         $this->faker = \Faker\Factory::create();
 
-        $this->withoutExceptionHandling();
     }
 
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     public function testEnsureStrReplace()
     {
@@ -159,9 +159,6 @@ class CompanyTest extends TestCase
     {
         $this->withoutMiddleware(PasswordProtection::class);
 
-        // $cc = Company::first();
-        // $cc->delete();
-
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
@@ -172,7 +169,7 @@ class CompanyTest extends TestCase
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post(
+        ])->postJson(
             '/api/v1/companies?include=company',
             [
                 'name' => 'A New Company',
@@ -186,14 +183,14 @@ class CompanyTest extends TestCase
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post(
+        ])->postJson(
             '/api/v1/companies/',
             [
                 'name' => 'A New Company',
                 'company_logo' => UploadedFile::fake()->create('avatar.pdf', 100),
             ]
         )
-        ->assertStatus(302);
+        ->assertStatus(422);
 
         //  Log::error($company);
 

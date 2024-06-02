@@ -32,6 +32,7 @@ class FactoryCreationTest extends TestCase
     use MakesHash;
 
     use MockAccountData;
+    use DatabaseTransactions;
 
     protected $faker;
 
@@ -48,8 +49,9 @@ class FactoryCreationTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     /**

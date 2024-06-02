@@ -23,6 +23,7 @@ use Tests\TestCase;
 class CloneQuoteToInvoiceFactoryTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,8 +33,9 @@ class CloneQuoteToInvoiceFactoryTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testCloneProperties()

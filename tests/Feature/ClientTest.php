@@ -45,8 +45,8 @@ class ClientTest extends TestCase
     use MakesHash;
     protected function tearDown(): void
     {
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
     public $client_id;
 
@@ -95,7 +95,7 @@ class ClientTest extends TestCase
 
         $this->faker = \Faker\Factory::create();
 
-        $this->withoutExceptionHandling();
+        // $this->withoutExceptionHandling();
     }
 
 

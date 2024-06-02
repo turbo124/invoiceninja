@@ -28,14 +28,16 @@ class TaskRoundingTest extends TestCase
 {
     use MakesHash;
     use MockAccountData;
+    use DatabaseTransactions;
 
     public int $task_round_to_nearest = 1;
 
     public bool $task_round_up = true;
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     private $faker;

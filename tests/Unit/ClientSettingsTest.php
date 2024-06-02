@@ -22,6 +22,7 @@ use Tests\TestCase;
 class ClientSettingsTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     public $faker;
 

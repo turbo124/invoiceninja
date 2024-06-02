@@ -11,27 +11,28 @@
 
 namespace Tests\Integration\PaymentDrivers;
 
+use Tests\TestCase;
+use Tests\MockAccountData;
 use net\authorize\api\contract\v1 as AnetAPI;
-use net\authorize\api\contract\v1\CreateCustomerPaymentProfileRequest;
-use net\authorize\api\contract\v1\CreateTransactionRequest;
+use net\authorize\api\contract\v1\PaymentType;
 use net\authorize\api\contract\v1\CreditCardType;
+use net\authorize\api\contract\v1\PaymentProfileType;
 use net\authorize\api\contract\v1\CustomerAddressType;
+use net\authorize\api\contract\v1\CustomerProfileType;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use net\authorize\api\contract\v1\TransactionRequestType;
+use net\authorize\api\contract\v1\CreateTransactionRequest;
+use net\authorize\api\contract\v1\GetCustomerProfileRequest;
 use net\authorize\api\contract\v1\CustomerPaymentProfileType;
 use net\authorize\api\contract\v1\CustomerProfilePaymentType;
-use net\authorize\api\contract\v1\CustomerProfileType;
-use net\authorize\api\contract\v1\GetCustomerProfileIdsRequest;
-use net\authorize\api\contract\v1\GetCustomerProfileRequest;
-use net\authorize\api\contract\v1\PaymentProfileType;
-use net\authorize\api\contract\v1\PaymentType;
-use net\authorize\api\contract\v1\TransactionRequestType;
-use net\authorize\api\controller\CreateCustomerPaymentProfileController;
-use net\authorize\api\controller\CreateCustomerProfileController;
 use net\authorize\api\controller\CreateTransactionController;
 use net\authorize\api\controller\GetCustomerProfileController;
-use net\authorize\api\controller\GetCustomerProfileIdsController;
 use net\authorize\api\controller\GetMerchantDetailsController;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use net\authorize\api\contract\v1\GetCustomerProfileIdsRequest;
+use net\authorize\api\controller\CreateCustomerProfileController;
+use net\authorize\api\controller\GetCustomerProfileIdsController;
+use net\authorize\api\contract\v1\CreateCustomerPaymentProfileRequest;
+use net\authorize\api\controller\CreateCustomerPaymentProfileController;
 
 /**
  * @test
@@ -39,6 +40,7 @@ use Tests\TestCase;
 class AuthorizeTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
     public $customer_profile_id = 1512373273;
 

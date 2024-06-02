@@ -22,6 +22,7 @@ use Tests\TestCase;
 class ShopProfileTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
 
 
     protected function setUp(): void
@@ -33,8 +34,9 @@ class ShopProfileTest extends TestCase
 
     protected function tearDown(): void
     {
+
+        $this->account->forceDelete();
         parent::tearDown();
-        //$this->account->forceDelete();
     }
 
     public function testProfileDisplays()

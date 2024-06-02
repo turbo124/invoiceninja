@@ -80,8 +80,9 @@ class CompanySettingsTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         $this->account->forceDelete();
+        parent::tearDown();
+
     }
 
     public function testClientNumberCantBeModified()

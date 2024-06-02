@@ -11,19 +11,20 @@
 
 namespace Tests\Integration;
 
+use Tests\TestCase;
+use App\Models\Quote;
 use App\Models\Credit;
 use App\Models\Design;
 use App\Models\Invoice;
+use App\Utils\HtmlEngine;
+use Tests\MockAccountData;
 use App\Models\PurchaseOrder;
-use App\Models\Quote;
+use App\Utils\Traits\MakesHash;
 use App\Models\RecurringInvoice;
 use App\Services\PdfMaker\Design as PdfDesignModel;
 use App\Services\PdfMaker\Design as PdfMakerDesign;
 use App\Services\PdfMaker\PdfMaker as PdfMakerService;
-use App\Utils\HtmlEngine;
-use App\Utils\Traits\MakesHash;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @test
@@ -31,6 +32,7 @@ use Tests\TestCase;
 class HtmlGenerationTest extends TestCase
 {
     use MockAccountData;
+    use DatabaseTransactions;
     use MakesHash;
 
     protected function setUp(): void
