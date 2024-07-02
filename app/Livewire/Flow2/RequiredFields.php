@@ -12,19 +12,15 @@
 
 namespace App\Livewire\Flow2;
 
+use App\Utils\Traits\WithSecureContext;
 use Livewire\Component;
 
 class RequiredFields extends Component
 {
-    public $context;
-
-    public function mount()
-    {
-        
-    }
+    use WithSecureContext;
 
     public function render()
     {
-        return render('components.livewire.required-fields', ['contact' => $this->context['contact'], 'fields' => $this->context['fields']]);
+        return render('components.livewire.required-fields', ['contact' => $this->getContext()['contact'], 'fields' => $this->getContext()['fields']]);
     }
 }
