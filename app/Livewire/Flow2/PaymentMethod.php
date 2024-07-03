@@ -61,9 +61,9 @@ class PaymentMethod extends Component
         }
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
         //If there is only one payment method, skip display and push straight to the form!!
-        return render('components.livewire.payment_method-flow2', ['methods' => $this->methods]);
+        return render('flow2.payment-method', ['methods' => $this->methods]);
     }
 }

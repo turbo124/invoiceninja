@@ -111,17 +111,14 @@ class ProcessPayment extends Component
 
     }
 
-    public function boot()
+    public function render(): \Illuminate\Contracts\View\Factory|string|\Illuminate\View\View
     {
+        if ($this->isLoading) {
+            return <<<'HTML'
+            <template></template>
+        HTML;
+        }
 
-         nlog($this->isLoading);
-
-    }
-
-    public function render()
-    {
-
-        if(!$this->isLoading)
-            return render('gateways.stripe.credit_card.livewire_pay', $this->payment_data_payload);
+        return render('gateways.stripe.credit_card.livewire_pay', $this->payment_data_payload);
     }
 }

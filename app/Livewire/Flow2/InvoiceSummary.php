@@ -10,7 +10,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace App\Livewire;
+namespace App\Livewire\Flow2;
 
 use App\Utils\Traits\WithSecureContext;
 use Livewire\Attributes\On;
@@ -36,9 +36,9 @@ class InvoiceSummary extends Component
         $this->invoice = $this->getContext()['invitation']->invoice;
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
-        return render('components.livewire.invoice-summary', [
+        return render('flow2.invoice-summary', [
             'invoice' => $this->invoice
         ]);
     }

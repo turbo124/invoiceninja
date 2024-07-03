@@ -10,26 +10,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace App\Livewire;
+namespace App\Livewire\Flow2;
 
-use App\Utils\Number;
-use App\Models\Invoice;
-use App\Utils\Traits\WithSecureContext;
-use Livewire\Component;
-use App\Utils\HtmlEngine;
 use App\Libraries\MultiDB;
-use Livewire\Attributes\On;
-use App\Livewire\Flow2\Terms;
 use App\Models\CompanyGateway;
-use App\Utils\Traits\MakesHash;
+use App\Models\Invoice;
+use App\Utils\Number;
 use App\Utils\Traits\MakesDates;
-use App\Livewire\Flow2\Signature;
+use App\Utils\Traits\MakesHash;
+use App\Utils\Traits\WithSecureContext;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Reactive;
-use App\Livewire\Flow2\PaymentMethod;
-use App\Livewire\Flow2\ProcessPayment;
-use App\Livewire\Flow2\RequiredFields;
-use App\Livewire\Flow2\UnderOverPayment;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 class InvoicePay extends Component
 {
@@ -37,7 +29,7 @@ class InvoicePay extends Component
     use MakesHash;
     use WithSecureContext;
 
-     private $mappings = [
+    private $mappings = [
         'client_name' => 'name',
         'client_website' => 'website',
         'client_phone' => 'phone',
@@ -102,8 +94,6 @@ class InvoicePay extends Component
 
     public $required_fields = false;
 
-    public array $context = [];
-
     #[On('update.context')]
     public function handleContext(string $property, $value): self
     {
@@ -117,7 +107,7 @@ class InvoicePay extends Component
     {
         nlog("Terms accepted");
         // $this->invite = \App\Models\InvoiceInvitation::withTrashed()->find($this->invitation_id)->withoutRelations();
-        $this->terms_accepted =true;
+        $this->terms_accepted = true;
     }
 
     #[On('signature-captured')]
@@ -144,14 +134,6 @@ class InvoicePay extends Component
     #[On('payment-method-selected')]
     public function paymentMethodSelected($company_gateway_id, $gateway_type_id, $amount)
     {
-        //@TODO only handles single invoice scenario
-        // $this->context['company_gateway_id'] = $company_gateway_id;
-        // $this->context['gateway_type_id'] = $gateway_type_id;
-        // $this->context['amount'] = $amount;
-        // $this->context['pre_payment'] = false;
-        // $this->context['is_recurring'] = false;
-        // $this->context['invitation_id'] = $this->invitation_id;
-
         $this->setContext('company_gateway_id', $company_gateway_id);
         $this->setContext('gateway_type_id', $gateway_type_id);
         $this->setContext('amount', $amount);
@@ -164,7 +146,6 @@ class InvoicePay extends Component
         $company_gateway = CompanyGateway::find($company_gateway_id);
 
         $this->checkRequiredFields($company_gateway);
-
     }
 
     #[On('required-fields')]
@@ -180,7 +161,7 @@ class InvoicePay extends Component
 
         $this->setContext('fields', $fields); // $this->context['fields'] = $fields;
 
-        if($company_gateway->always_show_required_fields){
+        if ($company_gateway->always_show_required_fields) {
             return $this->required_fields = true;
         }
 
@@ -190,8 +171,9 @@ class InvoicePay extends Component
             $_field = $this->mappings[$field['name']];
 
             if (\Illuminate\Support\Str::startsWith($field['name'], 'client_')) {
-                if (empty($contact->client->{$_field})
-                || is_null($contact->client->{$_field})
+                if (
+                    empty($contact->client->{$_field})
+                    || is_null($contact->client->{$_field})
                 ) {
 
                     return $this->required_fields = true;
@@ -211,20 +193,25 @@ class InvoicePay extends Component
     #[Computed()]
     public function component(): string
     {
-        if(!$this->terms_accepted)
+        if (!$this->terms_accepted) {
             return Terms::class;
+        }
 
-        if(!$this->signature_accepted)
+        if (!$this->signature_accepted) {
             return Signature::class;
+        }
 
-        if($this->under_over_payment)
+        if ($this->under_over_payment) {
             return UnderOverPayment::class;
+        }
 
-        if(!$this->payment_method_accepted)
+        if (!$this->payment_method_accepted) {
             return PaymentMethod::class;
+        }
 
-        if($this->required_fields)
+        if ($this->required_fields) {
             return RequiredFields::class;
+        }
 
         return ProcessPayment::class;
     }
@@ -232,7 +219,7 @@ class InvoicePay extends Component
     #[Computed()]
     public function componentUniqueId(): string
     {
-        return "purchase-".md5(microtime());
+        return "purchase-" . md5(microtime());
     }
 
     public function mount()
@@ -242,7 +229,7 @@ class InvoicePay extends Component
         MultiDB::setDb($this->db);
 
         // @phpstan-ignore-next-line
-        $invite = \App\Models\InvoiceInvitation::with('contact.client','company')->withTrashed()->find($this->invitation_id);
+        $invite = \App\Models\InvoiceInvitation::with('contact.client', 'company')->withTrashed()->find($this->invitation_id);
         $client = $invite->contact->client;
         $settings = $client->getMergedSettings();
         $this->setContext('contact', $invite->contact); // $this->context['contact'] = $invite->contact;
@@ -250,15 +237,14 @@ class InvoicePay extends Component
         $this->setContext('db', $this->db); // $this->context['db'] = $this->db;
 
         $invoices = Invoice::find($this->transformKeys($this->invoices));
-        $invoices = $invoices->filter(function ($i){
-
+        
+        $invoices = $invoices->filter(function ($i) {
             $i = $i->service()
                 ->markSent()
                 ->removeUnpaidGatewayFees()
                 ->save();
 
             return $i->isPayable();
-
         });
 
         //under-over / payment
@@ -274,7 +260,7 @@ class InvoicePay extends Component
         $this->setContext('settings', $settings); // $this->context['settings'] = $settings;
         $this->setContext('invitation', $invite); // $this->context['invitation'] = $invite;
 
-        $payable_invoices = $invoices->map(function ($i){
+        $payable_invoices = $invoices->map(function ($i) {
             return [
                 'invoice_id' => $i->hashed_id,
                 'amount' => $i->partial > 0 ? $i->partial : $i->balance,
@@ -287,8 +273,8 @@ class InvoicePay extends Component
         $this->setContext('payable_invoices', $payable_invoices);
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
-         return render('components.livewire.invoice-pay');
+        return render('flow2.invoice-pay');
     }
 }

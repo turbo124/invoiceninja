@@ -1,13 +1,14 @@
-<div x-data="{ payableInvoices: @entangle('payableInvoices'), errors: @entangle('errors') }" class="px-4 py-5 bg-white sm:gap-4 sm:px-6">
-    
+<div x-data="{ payableInvoices: @entangle('payableInvoices'), errors: @entangle('errors') }" class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden px-4 py-5 bg-white sm:gap-4 sm:px-6">
+
     <dt class="text-sm font-medium leading-5 text-gray-500 mb-3">
         {{ ctrans('texts.payment_amount') }}
     </dt>
+
     <dd class="text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 flex flex-col">
 
 
     <template x-for="(invoice, index) in payableInvoices" :key="index">
-            
+
         <div class="flex items-center mb-2">
             <label>
                 <span x-text="'{{ ctrans('texts.invoice') }} ' + invoice.number" class="mt-2"></span>
@@ -21,7 +22,7 @@
             </label>
         </div>
     </template>
-        
+
     <template x-if="errors.length > 0">
         <div x-text="errors" class="alert alert-failure mb-4"></div>
     </template>
@@ -30,10 +31,10 @@
         <span class="mt-1 text-sm text-gray-800">{{ ctrans('texts.minimum_payment') }}: {{ $settings->client_portal_under_payment_minimum }}</span>
     @endif
     </dd>
-    
+
     <div class="bg-white px-4 py-5 flex w-full justify-end">
-        <button 
-            class="button button-primary bg-primary payment-method flex items-center justify-center relative py-4" 
+        <button
+            class="button button-primary bg-primary payment-method flex items-center justify-center relative py-4"
             wire:click="checkValue(payableInvoices)">
             <svg class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

@@ -21,6 +21,6 @@ class RequiredFields extends Component
 
     public function render()
     {
-        return render('components.livewire.required-fields', ['contact' => $this->getContext()['contact'], 'fields' => $this->getContext()['fields']]);
+        return render('flow2.required-fields', ['contact' => $this->getContext()['contact'], 'fields' => $this->getContext()['fields']]);
     }
 }

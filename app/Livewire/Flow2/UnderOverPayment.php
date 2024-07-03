@@ -72,8 +72,8 @@ class UnderOverPayment extends Component
         }
     }
 
-    public function render()
+    public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
-        return render('components.livewire.under-over-payments');
+        return render('flow2.under-over-payments');
     }
 }

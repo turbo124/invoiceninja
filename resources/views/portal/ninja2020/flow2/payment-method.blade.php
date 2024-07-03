@@ -1,4 +1,4 @@
-<div class="flex flex-col space-y-4 p-4" x-data="{ isLoading: @entangle('isLoading') }">
+<div class="flex flex-col space-y-4 p-4 rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden px-4 py-5 bg-white sm:gap-4 sm:px-6" x-data="{ isLoading: @entangle('isLoading') }">
      
     <div x-show="isLoading" class="flex items-center justify-center min-h-screen">
         <svg class="animate-spin h-10 w-10 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -1,4 +1,4 @@
-<div x-data="{ fields: @entangle('fields'), contact: @entangle('contact') }" class="px-4 py-5 bg-white sm:gap-4 sm:px-6">
+<div x-data="{ fields: @entangle('fields'), contact: @entangle('contact') }" class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden px-4 py-5 bg-white sm:gap-4 sm:px-6px-4 sm:px-6">
     @foreach($fields as $field)
 
         @component('portal.ninja2020.components.general.card-element', ['title' => $field['label']])
