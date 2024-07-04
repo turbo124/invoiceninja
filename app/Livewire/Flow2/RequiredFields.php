@@ -143,6 +143,8 @@ class RequiredFields extends Component
         'contact_email' => '',
     ];
 
+    public bool $is_loading = true;
+
     public function mount(): void
     {
         MultiDB::setDB(
@@ -181,6 +183,10 @@ class RequiredFields extends Component
 
         if ($this->unfilled_fields === 0) {
             $this->dispatch('required-fields');
+        }
+
+        if ($this->unfilled_fields > 0) {
+            $this->is_loading = false;
         }
     }
 

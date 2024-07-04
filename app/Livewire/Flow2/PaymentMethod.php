@@ -63,7 +63,6 @@ class PaymentMethod extends Component
 
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
-        //If there is only one payment method, skip display and push straight to the form!!
         return render('flow2.payment-method', ['methods' => $this->methods]);
     }
 }
