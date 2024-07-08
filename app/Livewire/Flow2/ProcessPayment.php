@@ -18,7 +18,6 @@ use Livewire\Component;
 use App\Libraries\MultiDB;
 use App\Models\CompanyGateway;
 use App\Models\InvoiceInvitation;
-use App\Services\ClientPortal\InstantPayment;
 use App\Services\ClientPortal\LivewireInstantPayment;
 
 class ProcessPayment extends Component
@@ -64,51 +63,8 @@ class ProcessPayment extends Component
                 ->setPaymentMethod($data['payment_method_id'])
                 ->setPaymentHash($responder_data['payload']['ph']);
 
-        $this->payment_data_payload = $driver->payment_method->paymentData($responder_data['payload']);
         $this->payment_view = $driver->livewirePaymentView();
-
-        $payment_data = $driver->processPaymentViewData($responder_data['payload']);
-
-        if (array_key_exists('intent', $payment_data)) {
-            $payment_data['client_secret'] = $payment_data['intent']->client_secret;
-        }
-        
-        unset($payment_data['intent']);
-
-        $token_billing_string = 'true';
-
-        if($company_gateway->token_billing == 'off' || $company_gateway->token_billing == 'optin') {
-            $token_billing_string = 'false';
-        }
-
-        if (isset($data['pre_payment']) && $data['pre_payment'] == '1' && isset($data['is_recurring']) && $data['is_recurring'] == '1') {
-            $token_billing_string = 'true';
-        }
-
-        $payment_data['token_billing_string'] = $token_billing_string;
-
-        $this->payment_data_payload = $payment_data;
-        // $this->payment_data_payload['company_gateway'] = $company_gateway;
-
-        $this->payment_data_payload =
-        [
-            'stripe_account_id' => $this->payment_data_payload['company_gateway']->getConfigField('account_id'),
-            'publishable_key' => $this->payment_data_payload['company_gateway']->getPublishableKey(),
-            'require_postal_code' => $this->payment_data_payload['company_gateway']->require_postal_code,
-            'gateway' => $this->payment_data_payload['gateway'],
-            'client' => $this->payment_data_payload['client'],
-            'payment_method_id' => $this->payment_data_payload['payment_method_id'],
-            'token_billing_string' => $this->payment_data_payload['token_billing_string'],
-            'tokens' => $this->payment_data_payload['tokens'],
-            'client_secret' => $this->payment_data_payload['client_secret'],
-            'payment_hash' => $this->payment_data_payload['payment_hash'],
-            'total' => $this->payment_data_payload['total'],
-            'invoices' => $this->payment_data_payload['invoices'],
-            'amount_with_fee' => $this->payment_data_payload['amount_with_fee'],
-            'pre_payment' => $this->payment_data_payload['pre_payment'],
-            'is_recurring' => $this->payment_data_payload['is_recurring'],
-            'company_gateway' => $this->payment_data_payload['company_gateway'],
-        ];
+        $this->payment_data_payload = $driver->processPaymentViewData($responder_data['payload']);
 
         $this->isLoading = false;
 
