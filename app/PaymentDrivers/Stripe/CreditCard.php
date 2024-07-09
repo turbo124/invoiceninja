@@ -58,14 +58,7 @@ class CreditCard implements LivewireMethodInterface
         return redirect()->route('client.payment_methods.index');
     }
 
-    public function paymentData(array $data)
-    {
-        $data = $this->getData($data);
-        
-        return $data;
-    }
-
-    private function getData(array $data): array
+    public function paymentData(array $data): array
     {
         $description = $this->stripe->getDescription(false);
 
@@ -90,14 +83,14 @@ class CreditCard implements LivewireMethodInterface
 
     public function paymentView(array $data)
     {
-        $data = $this->getData($data);
+        $data = $this->paymentData($data);
 
         return render('gateways.stripe.credit_card.pay', $data);
     }
 
     public function livewirePaymentView(): string
     {
-        return 'gateways.stripe.credit_card.livewire_pay';
+        return 'gateways.stripe.credit_card.pay_livewire';
     }
 
     public function paymentResponse(PaymentResponseRequest $request)
