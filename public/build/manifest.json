@@ -127,7 +127,7 @@
     "src": "resources/js/clients/payments/stripe-acss.js"
   },
   "resources/js/clients/payments/stripe-alipay.js": {
-    "file": "assets/stripe-alipay-00a4a19f.js",
+    "file": "assets/stripe-alipay-010d5388.js",
     "isEntry": true,
     "src": "resources/js/clients/payments/stripe-alipay.js"
   },
