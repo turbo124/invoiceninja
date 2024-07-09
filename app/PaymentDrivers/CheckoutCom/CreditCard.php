@@ -141,7 +141,7 @@ class CreditCard implements MethodInterface, LivewireMethodInterface
         }
     }
 
-    private function getData(array $data): array
+    private function paymentData(array $data): array
     {
         $data['gateway'] = $this->checkout;
         $data['company_gateway'] = $this->checkout->company_gateway;
@@ -154,19 +154,12 @@ class CreditCard implements MethodInterface, LivewireMethodInterface
         return $data;
     }
     
-    public function paymentData(array $data)
-    {
-        $data = $this->getData($data);
-        
-        return $data;
-    }
-
     public function paymentView($data, $livewire = false)
     {
-        $data = $this->getData($data);
+        $data = $this->paymentData($data);
 
         if ($livewire) {
-            return render('gateways.checkout.credit_card.livewire_pay', $data);
+            return render('gateways.checkout.credit_card.pay_livewire', $data);
         }
 
         return render('gateways.checkout.credit_card.pay', $data);
