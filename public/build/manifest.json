@@ -116,6 +116,14 @@
     "isEntry": true,
     "src": "resources/js/clients/payments/square-credit-card.js"
   },
+  "resources/js/clients/payments/stripe-ach-pay.js": {
+    "file": "assets/stripe-ach-pay-99dd45c9.js",
+    "imports": [
+      "_wait-d71d9fed.js"
+    ],
+    "isEntry": true,
+    "src": "resources/js/clients/payments/stripe-ach-pay.js"
+  },
   "resources/js/clients/payments/stripe-ach.js": {
     "file": "assets/stripe-ach-fe366ca7.js",
     "isEntry": true,
@@ -141,13 +149,24 @@
     "isEntry": true,
     "src": "resources/js/clients/payments/stripe-bancontact.js"
   },
+  "resources/js/clients/payments/stripe-bank-transfer.js": {
+    "file": "assets/stripe-bank-transfer-94b38372.js",
+    "imports": [
+      "_wait-d71d9fed.js"
+    ],
+    "isEntry": true,
+    "src": "resources/js/clients/payments/stripe-bank-transfer.js"
+  },
   "resources/js/clients/payments/stripe-becs.js": {
     "file": "assets/stripe-becs-4d1494ed.js",
     "isEntry": true,
     "src": "resources/js/clients/payments/stripe-becs.js"
   },
   "resources/js/clients/payments/stripe-browserpay.js": {
-    "file": "assets/stripe-browserpay-ac78fb26.js",
+    "file": "assets/stripe-browserpay-a9799dd6.js",
+    "imports": [
+      "_wait-d71d9fed.js"
+    ],
     "isEntry": true,
     "src": "resources/js/clients/payments/stripe-browserpay.js"
   },
@@ -180,7 +199,10 @@
     "src": "resources/js/clients/payments/stripe-ideal.js"
   },
   "resources/js/clients/payments/stripe-klarna.js": {
-    "file": "assets/stripe-klarna-e45c946d.js",
+    "file": "assets/stripe-klarna-317b3d70.js",
+    "imports": [
+      "_wait-d71d9fed.js"
+    ],
     "isEntry": true,
     "src": "resources/js/clients/payments/stripe-klarna.js"
   },
