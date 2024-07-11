@@ -185,7 +185,7 @@ class SEPA implements LivewireMethodInterface
         return $data;
     }
 
-    public function livewirePaymentView(): string 
+    public function livewirePaymentView(array $data): string 
     {
         return 'gateways.stripe.sepa.pay_livewire';
     }

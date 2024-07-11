@@ -590,7 +590,7 @@ class ACH implements LivewireMethodInterface
         }
     }
 
-    public function livewirePaymentView(): string
+    public function livewirePaymentView(array $data): string
     {
         return 'gateways.stripe.ach.pay_livewire';
     }

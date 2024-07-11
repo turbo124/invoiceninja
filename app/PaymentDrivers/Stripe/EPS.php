@@ -151,7 +151,7 @@ class EPS implements LivewireMethodInterface
         return $data;
     }
 
-    public function livewirePaymentView(): string
+    public function livewirePaymentView(array $data): string
     {
         return 'gateways.stripe.eps.pay_livewire';
     }

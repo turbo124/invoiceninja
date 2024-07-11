@@ -241,7 +241,7 @@ class BrowserPay implements MethodInterface, LivewireMethodInterface
         return str_replace(['https://', '/public'], '', $domain);
     }
 
-    public function livewirePaymentView(): string 
+    public function livewirePaymentView(array $data): string 
     {
         return 'gateways.stripe.browser_pay.pay_livewire';
     }

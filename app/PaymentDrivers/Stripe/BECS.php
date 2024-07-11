@@ -170,7 +170,7 @@ class BECS implements LivewireMethodInterface
         return $data;
     }
 
-    public function livewirePaymentView(): string 
+    public function livewirePaymentView(array $data): string 
     {
         return 'gateways.stripe.becs.pay_livewire';
     }
