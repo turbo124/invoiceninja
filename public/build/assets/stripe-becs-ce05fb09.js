@@ -1,4 +1,4 @@
-var a=Object.defineProperty;var c=(n,t,e)=>t in n?a(n,t,{enumerable:!0,configurable:!0,writable:!0,value:e}):n[t]=e;var o=(n,t,e)=>(c(n,typeof t!="symbol"?t+"":t,e),e);import{w as r}from"./wait-d71d9fed.js";/**
+var a=Object.defineProperty;var c=(n,t,e)=>t in n?a(n,t,{enumerable:!0,configurable:!0,writable:!0,value:e}):n[t]=e;var o=(n,t,e)=>(c(n,typeof t!="symbol"?t+"":t,e),e);import{w as r}from"./wait-8f4ae121.js";/**
  * Invoice Ninja (https://invoiceninja.com)
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
