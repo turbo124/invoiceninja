@@ -48,6 +48,12 @@ class PayPalRestPaymentDriver extends PayPalBasePaymentDriver
         $data['guid'] = $this->risk_guid;
         $data['identifier'] = "s:INN_ACDC_CHCK";
         $data['pp_client_reference'] = $this->getClientHash();
+        $data['data_user_id'] = $this->getUserIdToken();
+        // $data['nonce'] = Str::random(32);
+
+        // $nonce = base64_encode($data['nonce']);
+        // $nonce =$data['nonce'];
+        // header("Content-Security-Policy: script-src 'self' 'nonce-$nonce'");
 
         if($this->gateway_type_id == 29) {
             return render('gateways.paypal.ppcp.card', $data);

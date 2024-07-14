@@ -14,10 +14,10 @@
     
 @endphp
 @section('gateway_head')
-    <meta http-equiv="Content-Security-Policy" content="
+    <!-- <meta http-equiv="Content-Security-Policy" content="
         img-src 'self' https://c.paypal.com https://b.stats.paypal.com; 
         frame-src 'self' https://c.paypal.com; 
-        script-src 'self' https://c.paypal.com;">
+        script-src 'self' https://c.paypal.com;"> -->
 @endsection
 
 @section('gateway_content')
@@ -79,55 +79,41 @@
 
 
 @push('footer')
-<script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
-    {
-        "f":"{{ $guid }}",
-        "s":"{{ $identifier }}"        // unique ID for each web page
-    }
-</script>
-
-<script type="text/javascript" src="https://c.paypal.com/da/r/fb.js"></script>
 
 @if(isset($merchantId))
-<script src="https://www.paypal.com/sdk/js?client-id={!! $client_id !!}&merchant-id={!! $merchantId !!}&components=card-fields" data-partner-attribution-id="invoiceninja_SP_PPCP"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={!! $client_id !!}&merchant-id={!! $merchantId !!}&components=card-fields,buttons" data-partner-attribution-id="invoiceninja_SP_PPCP" data-user-id-token="{!! $pp_client_reference !!}"></script>
 @else
-<script src="https://www.paypal.com/sdk/js?client-id={!! $client_id !!}&components=card-fields" data-partner-attribution-id="invoiceninja_SP_PPCP"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={!! $client_id !!}&components=card-fields,buttons" data-partner-attribution-id="invoiceninja_SP_PPCP" data-user-id-token="{!! $pp_client_reference !!}"></script>
 @endif
 <script>
 
     const clientId = "{{ $client_id }}";
     const orderId = "{!! $order_id !!}";
 
-    const cardField = paypal.CardFields({
+
+    const buttons = paypal.Buttons({
         client: clientId,
         createOrder: function(data, actions) {
             return orderId;  
         },
         onApprove: function(data, actions) {
-
             const { liabilityShift, orderID } = data;
              if(liabilityShift) {
               
               /* Handle liability shift. More information in 3D Secure response parameters */
               if(liabilityShift == 'NO') {
-
                 document.getElementById('errors').textContent = `Sorry, your transaction could not be processed, Please try a different payment method.`;
                 document.getElementById('errors').hidden = false;
                 return;
               }
-
             }
-
             let storeCard = document.querySelector('input[name=token-billing-checkbox]:checked');
-
             if (storeCard) {
                 document.getElementById("store_card").value = storeCard.value;
             }
-
             document.getElementById("gateway_response").value =JSON.stringify( data );  
             
             formData = JSON.stringify(Object.fromEntries(new FormData(document.getElementById("server_response")))),
-
             fetch('{{ route('client.payments.response') }}', {
                 method: 'POST',
                 headers: {
@@ -144,18 +130,14 @@
                 return response.json();
             })
             .then(data => {
-
                 var errorDetail = Array.isArray(data.details) && data.details[0];
-
                 if (errorDetail && ['INSTRUMENT_DECLINED', 'PAYER_ACTION_REQUIRED'].includes(errorDetail.issue)) {
                     return actions.restart();
                 }
-
                 if(data.redirect){
                     window.location.href = data.redirect;
                     return;
                 }
-
                 document.getElementById("gateway_response").value =JSON.stringify( data );
                 document.getElementById("server_response").submit();
             })
@@ -164,118 +146,29 @@
                 
                 document.getElementById('errors').textContent = `Sorry, your transaction could not be processed...\n\n${error.message}`;
                 document.getElementById('errors').hidden = false;
-
             });
-
         },
         onCancel: function() {
-
             window.location.href = "/client/invoices/";
         },
         // onError: function(error) {
-
-
         // console.log("submit catch");
         // const errorM = parseError(error);
-
         // console.log(errorM);
-
         // const msg = handle422Error(errorM);
-
         //     document.getElementById('errors').textContent = `Sorry, your transaction could not be processed...\n\n${msg.description}`;
         //     document.getElementById('errors').hidden = false;
-
         // },
         onClick: function (){
            
         }
     
     });
+    
+    // @if(strlen($data_user_id) > 1)
+        buttons.render('#paypal-button-container');
+    // @endif
 
-  // Render each field after checking for eligibility
-  if (cardField.isEligible()) {
-      
-    //   const nameField = cardField.NameField();
-    //   nameField.render("#card-name-field-container");
-
-      const numberField = cardField.NumberField({
-        inputEvents: {
-            onChange: (event)=> {
-            }
-        },
-      });
-      
-      numberField.render("#card-number-field-container");
-
-      const cvvField = cardField.CVVField({
-        inputEvents: {
-            onChange: (event)=> {
-            }
-        },
-      });
-      cvvField.render("#card-cvv-field-container");
-
-      const expiryField = cardField.ExpiryField({
-        inputEvents: {
-            onChange: (event)=> {
-            }
-        },
-      });
-      expiryField.render("#card-expiry-field-container");
-
-      document.getElementById("pay-now").addEventListener('click', (e) => {
-        document.getElementById('errors').textContent = '';
-        document.getElementById('errors').hidden = true;
-        
-        document.getElementById('pay-now').disabled = true;
-        document.querySelector('#pay-now > svg').classList.remove('hidden');
-        document.querySelector('#pay-now > svg').classList.add('justify-center');
-
-        document.querySelector('#pay-now > svg').classList.add('mx-auto');
-        document.querySelector('#pay-now > svg').classList.add('item-center');
-
-        document.querySelector('#pay-now > span').classList.add('hidden');
-
-        cardField.submit().then(() => {
-
-        }).catch((error) => {
-
-            console.log(error);
-            
-            let msg;
-
-            if(!['INVALID_NUMBER','INVALID_CVV','INVALID_EXPIRY'].includes(error.message))
-            {
-                const errorM = parseError(error.message);
-                msg = handle422Error(errorM);
-            }
-
-            document.getElementById('pay-now').disabled = false;
-            document.querySelector('#pay-now > svg').classList.add('hidden');
-            document.querySelector('#pay-now > span').classList.remove('hidden');
-            
-            if(error.message == 'INVALID_NUMBER'){
-              document.getElementById('errors').textContent = "{{ ctrans('texts.invalid_card_number') }}";
-            }
-            else if(error.message == 'INVALID_CVV') {
-              document.getElementById('errors').textContent = "{{ ctrans('texts.invalid_cvv') }}";
-            }
-            else if(error.message == 'INVALID_EXPIRY') {
-              document.getElementById('errors').textContent = "{{ ctrans('texts.invalid_cvv') }}";
-            }
-            else if(msg.description){
-                document.getElementById('errors').textContent = msg?.description;
-            }
-            document.getElementById('errors').hidden = false;
-
-        });
-
-      });
-
-    }
-  else {
-
-  }
 
     function handle422Error(errorData) {
         const errorDetails = errorData.details || [];

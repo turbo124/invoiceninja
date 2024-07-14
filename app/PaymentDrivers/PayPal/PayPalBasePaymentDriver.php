@@ -13,6 +13,7 @@ namespace App\PaymentDrivers\PayPal;
 
 use Str;
 use Carbon\Carbon;
+use App\Utils\Ninja;
 use App\Models\Invoice;
 use App\Models\SystemLog;
 use App\Models\GatewayType;
@@ -193,7 +194,7 @@ class PayPalBasePaymentDriver extends BaseDriver
     //@todo turn this back on when PayPal.....
     public function getClientHash()
     {
-        return '';
+        // return '';
 
         /** @var ?\App\Models\ClientGatewayToken $cgt */
         $cgt = ClientGatewayToken::where('company_gateway_id', $this->company_gateway->id)
@@ -223,6 +224,26 @@ class PayPalBasePaymentDriver extends BaseDriver
 
         return '';
     }
+
+    public function getUserIdToken()
+    {
+        
+        $secret = Ninja::isHosted() ? config('ninja.paypal.secret') : $this->company_gateway->getConfigField('secret');
+        $client_id = Ninja::isHosted() ? config('ninja.paypal.client_id') : $this->company_gateway->getConfigField('clientId');
+
+        $response = Http::withBasicAuth($client_id, $secret)
+                                    ->withHeaders(['Content-Type' => 'application/x-www-form-urlencoded'])
+                                    ->withQueryParameters(['grant_type' => 'client_credentials', 'response_type' => 'id_token'])
+                                    ->post("{$this->api_endpoint_url}/v1/oauth2/token");
+
+        if($response->successful()) {
+            return $response->json()['id_token'];
+        } else {
+            throw new \Exception('There was a problem communicating with PayPal', 401);
+        }
+
+    }
+
 
     public function handleDuplicateInvoiceId(string $orderID)
     {
@@ -529,6 +550,7 @@ class PayPalBasePaymentDriver extends BaseDriver
 
     public function createNinjaPayment($request, $response)
     {
+        nlog($request->all());
 
         $data = [
             'payment_type' => $this->getPaymentMethod($request->gateway_type_id),
