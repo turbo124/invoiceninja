@@ -74,7 +74,7 @@ inset: 6px;
     100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}
 }
 </style>
-<script src="https://www.paypal.com/sdk/js?client-id={!! $client_id !!}&currency={!! $currency !!}&components=buttons,funding-eligibility&intent=capture&enable-funding={!! $funding_source !!}"  data-partner-attribution-id="invoiceninja_SP_PPCP"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={!! $client_id !!}&currency={!! $currency !!}&components=buttons,funding-eligibility&intent=capture&enable-funding={!! $funding_source !!}"  data-partner-attribution-id="invoiceninja_SP_PPCP" data-user-id-token="{!! $pp_client_reference !!}"></script>
 
 <script>
 //&buyer-country=US&currency=USD&enable-funding=venmo
@@ -85,7 +85,7 @@ inset: 6px;
 
     paypal.Buttons({
         env: environment,
-        fundingSource: fundingSource,
+        // fundingSource: fundingSource,
         client: clientId,
         createOrder: function(data, actions) {
             return orderId;  
@@ -150,6 +150,8 @@ inset: 6px;
             document.getElementById("server_response").submit();
         },
         onClick: function (){
+
+            console.log(this);
 
             if(fundingSource != 'card')
               document.getElementById('paypal-button-container').hidden = true;

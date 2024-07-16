@@ -73,6 +73,8 @@ class PayPalRestPaymentDriver extends PayPalBasePaymentDriver
         nlog("response");
         $this->init();
         $r = false;
+        
+        nlog($request->all());
 
         $request['gateway_response'] = str_replace("Error: ", "", $request['gateway_response']);
         $response = json_decode($request['gateway_response'], true);
@@ -218,6 +220,8 @@ class PayPalRestPaymentDriver extends PayPalBasePaymentDriver
         if(isset($data['payment_source'])) {
             $order['payment_source'] = $data['payment_source'];
         }
+
+        nlog($order);
 
         $r = $this->gatewayRequest('/v2/checkout/orders', 'post', $order);
 

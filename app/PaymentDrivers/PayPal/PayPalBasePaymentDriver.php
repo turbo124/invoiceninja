@@ -211,7 +211,7 @@ class PayPalBasePaymentDriver extends BaseDriver
 
         $response = Http::withBasicAuth($client_id, $secret)
                                    ->withHeaders(['Content-Type' => 'application/x-www-form-urlencoded'])
-                                   ->withQueryParameters(['grant_type' => 'client_credentials','response_type' => 'id_token', 'target_customer_id' => $client_reference])
+                                   ->withQueryParameters(['grant_type' => 'client_credentials', 'response_type' => 'id_token', 'target_customer_id' => $client_reference])
                                    ->post("{$this->api_endpoint_url}/v1/oauth2/token");
 
         if($response->successful()) {
@@ -605,4 +605,13 @@ class PayPalBasePaymentDriver extends BaseDriver
 
     }
 
+    public function getPaypalPaymentMethods($customer_id)
+    {
+        $url = '/v3/vault/payment-tokens';
+    
+        $r = $this->gatewayRequest($url, 'get', ['customer_id' => $customer_id]);
+
+        return $r->body();
+
+    }
 }
