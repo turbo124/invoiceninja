@@ -67,7 +67,42 @@ class Nordigen
             throw new \Exception('invalid institutionId while in test-mode');
         }
 
-        return $this->client->requisition->createRequisition($redirect, $initutionId, null, $reference, $userLanguage);
+        return $this->client->requisition->createRequisition($redirect, $initutionId, $this->getExtendedEndUserAggreementId($initutionId), $reference, $userLanguage);
+    }
+
+    private function getExtendedEndUserAggreementId(string $institutionId): string|null
+    {
+
+        $endUserAggreements = $this->client->endUserAgreement->getEndUserAgreements();
+
+        $endUserAgreement = null;
+        foreach ($endUserAggreements as $row) {
+            if ($row["institution_id"] != $institutionId)
+                continue;
+
+            $endUserAgreement = $row;
+            break;
+        }
+
+        // try to create an endUserAgreement
+        if (!$endUserAgreement)
+            try {
+                $endUserAgreement = $this->client->endUserAgreement->createEndUserAgreement($institutionId, ['details', 'balances', 'transactions'], 90, 180);
+            } catch (\Exception $e) { // not able to create this for this institution
+
+                return null;
+            }
+
+        // try to accept the endUserAgreement when not already accepted
+        if (!$endUserAgreement["accepted"] == null)
+            try {
+                $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
+            } catch (\Exception $e) { // not able to accept it
+
+                return null;
+            }
+
+        return $endUserAgreement->id;
     }
 
     public function getRequisition(string $requisitionId)
@@ -152,7 +187,7 @@ class Nordigen
     {
         $cache_key = "email_quota:{$bank_integration->company->company_key}:{$bank_integration->id}";
 
-        if(Cache::has($cache_key)) {
+        if (Cache::has($cache_key)) {
             return;
         }
 
