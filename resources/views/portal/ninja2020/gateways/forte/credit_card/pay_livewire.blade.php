@@ -1,10 +1,6 @@
 <div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden py-5 bg-white sm:gap-4"
     id="forte-credit-card-payment">
     <meta name="forte-api-login-id" content="{{$gateway->company_gateway->getConfigField("apiLoginId")}}">
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="{{ asset('js/clients/payments/forte-card-js.min.js') }}"></script>
-
-    <link href="{{ asset('css/card-js.min.css') }}" rel="stylesheet" type="text/css">
 
     <form action="{{ route('client.payments.response') }}" method="post" id="server_response">
         @csrf
@@ -45,23 +41,3 @@
     
     @vite('resources/js/clients/payments/forte-credit-card-payment.js')
 @endassets
-
-@script
-<script defer>
- 
-$(function() {
-
-    document.getElementsByClassName("expiry")[0].addEventListener('change', function() {
-
-    str = document.getElementsByClassName("expiry")[0].value.replace(/\s/g, '');
-    const expiryArray = str.split("/");
-
-    document.getElementsByName('expiry-month')[0].value = expiryArray[0];
-    document.getElementsByName('expiry-year')[0].value = expiryArray[1];
-
-    });
-
-});
-
-</script>
-@endscript
