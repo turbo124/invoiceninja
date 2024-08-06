@@ -38,8 +38,6 @@ class ForteAuthorizeCard {
             cvv: this.sc.value('cvv')?.replace(/[^\d]/g, ''),
         };
 
-        console.log(data);
-
         let payNowButton = document.getElementById('pay-now');
 
         if (payNowButton) {
