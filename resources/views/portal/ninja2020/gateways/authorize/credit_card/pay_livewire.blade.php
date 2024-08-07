@@ -4,8 +4,6 @@
     <meta name="authorize-login-id" content="{{ $api_login_id }}">
     <meta name="authnet-require-cvv" content="{{ $gateway->company_gateway->require_cvv }}">
 
-    <meta name="card-js-url" content="{{ asset('build/public/js/card-js.min.js/card-js.min.js') }}" /> 
-
     <form action="{{ route('client.payments.response') }}" method="post" id="server_response">
         @csrf
         <input type="hidden" name="payment_hash" value="{{ $payment_hash }}">
@@ -59,12 +57,6 @@
 </div>
 
 @assets
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-
-    <link href="{{ asset('build/public/css/card-js.min.css/card-js.min.css') }}" rel="stylesheet" type="text/css">
-    
-    <script src="{{ asset('build/public/js/card-js.min.js/card-js.min.js') }}"></script>
-
     @if($gateway->company_gateway->getConfigField('testMode'))
         <script src="https://jstest.authorize.net/v1/Accept.js" charset="utf-8"></script>
     @else

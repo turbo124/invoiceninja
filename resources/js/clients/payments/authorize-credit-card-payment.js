@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { SimpleCard } from '@invoiceninja/simple-card';
 import { wait, instant } from '../wait';
 
 class AuthorizeAuthorizeCard {
@@ -15,15 +16,36 @@ class AuthorizeAuthorizeCard {
         this.publicKey = publicKey;
         this.loginId = loginId;
         this.cardHolderName = document.getElementById('cardholder_name');
+
+        this.sc = new SimpleCard({
+            fields: {
+                card: {
+                    number: '#number',
+                    date: '#date',
+                    cvv: '#cvv',
+                },
+            },
+        });
+
+        this.sc.mount();
+
+        this.cvvRequired = document.querySelector(
+            'meta[name="authnet-require-cvv"]'
+        ).content;
+    
     }
 
     handleAuthorization = () => {
         if (
-            cvvRequired == '1' &&
+            this.cvvRequired == '1' &&
             document.getElementById('cvv').value.length < 3
         ) {
-            var $errors = $('#errors');
-            $errors.show().html('<p>CVV is required</p>');
+            const $errors = document.getElementById('errors');
+            
+            if ($errors) {
+                $errors.innerText = 'CVV is required';
+                $errors.style.display = 'block';
+            }
 
             document.getElementById('pay-now').disabled = false;
             document.querySelector('#pay-now > svg').classList.add('hidden');
@@ -33,19 +55,15 @@ class AuthorizeAuthorizeCard {
             return;
         }
 
-        var myCard = $('#my-card');
-
         var authData = {};
         authData.clientKey = this.publicKey;
         authData.apiLoginID = this.loginId;
 
         var cardData = {};
-        cardData.cardNumber = myCard.CardJs('cardNumber').replace(/[^\d]/g, '');
-        cardData.month = myCard.CardJs('expiryMonth').replace(/[^\d]/g, '');
-        cardData.year = myCard.CardJs('expiryYear').replace(/[^\d]/g, '');
-        cardData.cardCode = document
-            .getElementById('cvv')
-            .value.replace(/[^\d]/g, '');
+        cardData.cardNumber = this.sc.value('number')?.replace(/[^\d]/g, '');
+        cardData.month = this.sc.value('month')?.replace(/[^\d]/g, '');
+        cardData.year = `20${this.sc.value('year')?.replace(/[^\d]/g, '')}`;
+        cardData.cardCode = this.sc.value('cvv')?.replace(/[^\d]/g, '');
 
         var secureData = {};
         secureData.authData = authData;
@@ -80,16 +98,12 @@ class AuthorizeAuthorizeCard {
         if (response.messages.resultCode === 'Error') {
             var i = 0;
 
-            var $errors = $('#errors'); // get the reference of the div
-            $errors
-                .show()
-                .html(
-                    '<p>' +
-                        response.messages.message[i].code +
-                        ': ' +
-                        response.messages.message[i].text +
-                        '</p>'
-                );
+            const $errors = document.getElementById('errors'); // get the reference of the div
+
+            if ($errors) {
+                $errors.innerText = `${response.messages.message[i].code}: ${response.messages.message[i].text}`;
+                $errors.style.display = 'block';
+            }
 
             document.getElementById('pay-now').disabled = false;
             document.querySelector('#pay-now > svg').classList.add('hidden');
@@ -164,23 +178,6 @@ class AuthorizeAuthorizeCard {
 }
 
 function boot() {
-    // The following code was showing syntax error:
-
-    // document
-    //     .getElementsByClassName('expiry')[0]
-    //     .addEventListener('change', function () {
-    //         str = document
-    //             .getElementsByClassName('expiry')[0]
-    //             .value.replace(/\s/g, '');
-    //         const expiryArray = str.split('/');
-
-    //         document.getElementsByName('expiry-month')[0].value =
-    //             expiryArray[0];
-    //         document.getElementsByName('expiry-year')[0].value = expiryArray[1];
-    //     });
-
-    console.log('boot');
-
     const publicKey = document.querySelector(
         'meta[name="authorize-public-key"]'
     ).content;
@@ -189,29 +186,9 @@ function boot() {
         'meta[name="authorize-login-id"]'
     ).content;
 
-    const cvvRequired = document.querySelector(
-        'meta[name="authnet-require-cvv"]'
-    ).content;
-
     /** @handle */
     new AuthorizeAuthorizeCard(publicKey, loginId).handle();
 }
 
-if (instant()) {
-    boot();
-} else {
-    wait('#authorize-net-credit-card-payment', 'meta[name='card-js-url']').then(() => {
-        const jquery = document.createElement('script');
+instant() ? boot() : wait('#authorize-net-credit-card-payment').then(() => boot());
 
-        jquery.src = 'https://code.jquery.com/jquery-1.11.3.min.js';
-    
-        const cardjs = document.createElement('script');
-    
-        cardjs.src = document.querySelector("meta[name='card-js-url']").content;
-    
-        document.body.appendChild(jquery);
-        document.body.appendChild(cardjs);
-    
-        boot();
-    })
-}
