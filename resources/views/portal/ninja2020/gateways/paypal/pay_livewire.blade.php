@@ -1,4 +1,4 @@
-<div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden py-5 bg-white sm:gap-4"
+<div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden p-5 bg-white sm:gap-4"
     id="paypal-payment">
     <style type="text/css">
         .loader {
@@ -76,6 +76,13 @@
     <div id="is_working" class="flex mt-4 place-items-center hidden">
         <span class="loader m-auto"></span>
     </div>
+
+    <script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
+        {
+            "f":"{{ $guid }}",
+            "s":"paypal.pay"        // unique ID for each web page
+        }
+    </script>
 </div>
 
 @assets
@@ -84,15 +91,7 @@
 @endassets
 
 @script
-<script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
-    {
-        "f":"{{ $guid }}",
-        "s":"paypal.pay"        // unique ID for each web page
-    }
-</script>
-
 <script>
-//&buyer-country=US&currency=USD&enable-funding=venmo
     const fundingSource = "{!! $funding_source !!}";
     const clientId = "{{ $client_id }}";
     const orderId = "{!! $order_id !!}";
@@ -171,7 +170,7 @@
 
             document.getElementById('is_working').classList.remove('hidden');
 
-            document.querySelector('div[data-ref="required-fields-container').classList.add('hidden');
+            // document.querySelector('div[data-ref="required-fields-container').classList.add('hidden');
             
         },
         onInit: function (){
