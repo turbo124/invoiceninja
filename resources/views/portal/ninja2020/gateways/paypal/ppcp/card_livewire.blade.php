@@ -308,10 +308,10 @@
     }
 
 </script>
+@endscript
 
-
+@script
 <script>
-
   Array
       .from(document.getElementsByClassName('toggle-payment-with-token'))
       .forEach((element) => element.addEventListener('click', (e) => {
@@ -342,6 +342,8 @@
               document
                   .getElementById('token').value = null;
           });
+
+    payWithCreditCardToggle.click();
   }
 
   let payNowButton = document.getElementById('pay-now-token');
