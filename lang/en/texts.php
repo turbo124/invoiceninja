@@ -5286,7 +5286,9 @@ $lang = array(
     'remind_quote' => 'Remind Quote',
     'end_of_month' => 'End Of Month',
     'tax_currency_mismatch' => 'Tax currency is different from invoice currency',
-    'edocument_import_already_exists' => '\nThe invoice has already been imported on :date'
+    'edocument_import_already_exists' => '\nThe invoice has already been imported on :date',
+    'payment_flow' => 'Payment Flow',
+    'payment_flow_help' => 'Select either the standard payment flow or the new, streamlined (smooth) version.',
 );
 
 return $lang;
