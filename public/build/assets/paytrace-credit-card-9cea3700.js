@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/paytrace-credit-card-7f87b811.js
-import{i as o,w as i}from"./wait-8f4ae121.js";/**
-========
 /**
->>>>>>>> upstream/v5-develop:public/build/assets/paytrace-credit-card-9cea3700.js
  * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository

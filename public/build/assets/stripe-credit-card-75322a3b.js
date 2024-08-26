@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/stripe-credit-card-5487be17.js
-import{i as c,w as u}from"./wait-8f4ae121.js";/**
-========
 /**
->>>>>>>> upstream/v5-develop:public/build/assets/stripe-credit-card-75322a3b.js
  * Invoice Ninja (https://invoiceninja.com)
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository

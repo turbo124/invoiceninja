@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/stripe-bacs-c9a61b93.js
-var a=Object.defineProperty;var c=(n,e,t)=>e in n?a(n,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):n[e]=t;var s=(n,e,t)=>(c(n,typeof e!="symbol"?e+"":e,t),t);import{i as d,w as u}from"./wait-8f4ae121.js";/**
-========
 var a=Object.defineProperty;var c=(n,e,t)=>e in n?a(n,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):n[e]=t;var s=(n,e,t)=>(c(n,typeof e!="symbol"?e+"":e,t),t);/**
->>>>>>>> upstream/v5-develop:public/build/assets/stripe-bacs-38c8b975.js
  * Invoice Ninja (https://invoiceninja.com)
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository

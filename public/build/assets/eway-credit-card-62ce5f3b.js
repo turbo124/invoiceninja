@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/eway-credit-card-0119725d.js
-import{i as d,w as n}from"./wait-8f4ae121.js";/**
-========
 /**
->>>>>>>> upstream/v5-develop:public/build/assets/eway-credit-card-62ce5f3b.js
  * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository

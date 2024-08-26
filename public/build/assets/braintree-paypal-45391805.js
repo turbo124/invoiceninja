@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/braintree-paypal-16e2f577.js
-import{i as l,w as s}from"./wait-8f4ae121.js";/**
-========
 /**
->>>>>>>> upstream/v5-develop:public/build/assets/braintree-paypal-45391805.js
  * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository

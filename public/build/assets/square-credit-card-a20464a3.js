@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:public/build/assets/square-credit-card-2fc5c3fa.js
-import{i,w as d}from"./wait-8f4ae121.js";/**
-========
 /**
->>>>>>>> upstream/v5-develop:public/build/assets/square-credit-card-a20464a3.js
  * Invoice Ninja (https://invoiceninja.com).
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
