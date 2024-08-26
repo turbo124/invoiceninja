@@ -41,7 +41,7 @@ class ActivityRepository extends BaseRepository
      * Save the Activity.
      *
      * @param \stdClass $fields The fields
-     * @param \App\Models\Invoice | \App\Models\Quote | \App\Models\Credit | \App\Models\PurchaseOrder | \App\Models\Expense $entity
+     * @param \App\Models\Invoice | \App\Models\Quote | \App\Models\Credit | \App\Models\PurchaseOrder | \App\Models\Expense | \App\Models\Payment $entity
      * @param array $event_vars
      */
     public function save($fields, $entity, $event_vars)
@@ -82,7 +82,7 @@ class ActivityRepository extends BaseRepository
         }
 
         $entity = $entity->fresh();
-        
+
         if (get_class($entity) == Invoice::class
             || get_class($entity) == Quote::class
             || get_class($entity) == Credit::class

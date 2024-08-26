@@ -114,8 +114,8 @@ class InvitationController extends Controller
                             'invitation_key' => $invitation_key
                         ]);
             }
-            
-            if(!auth()->guard('contact')->check()){
+
+            if(!auth()->guard('contact')->check()) {
                 $this->middleware('auth:contact');
                 return redirect()->route('client.login', ['intended' => route('client.'.$entity.'.show', [$entity => $this->encodePrimaryKey($invitation->{$key}), 'silent' => $is_silent])]);
             }
@@ -146,7 +146,7 @@ class InvitationController extends Controller
 
     }
 
-    
+
     private function fireEntityViewedEvent($invitation, $entity_string)
     {
         switch ($entity_string) {
@@ -300,7 +300,9 @@ class InvitationController extends Controller
                 'signature' => false,
                 'contact_first_name' => $invitation->contact->first_name ?? '',
                 'contact_last_name' => $invitation->contact->last_name ?? '',
-                'contact_email' => $invitation->contact->email ?? ''
+                'contact_email' => $invitation->contact->email ?? '',
+                'client_city' => $invitation->client->city ?? '',
+                'client_postal_code' => $invitation->client->postal_code ?? '',
             ];
 
             $request->replace($data);

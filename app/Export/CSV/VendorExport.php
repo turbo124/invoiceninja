@@ -90,6 +90,8 @@ class VendorExport extends BaseExport
 
         $report = $query->cursor()
                 ->map(function ($resource) {
+
+                    /** @var \App\Models\Vendor $resource */
                     $row = $this->buildRow($resource);
                     return $this->processMetaData($row, $resource);
                 })->toArray();
@@ -107,6 +109,8 @@ class VendorExport extends BaseExport
 
         $query->cursor()
               ->each(function ($vendor) {
+
+                  /** @var \App\Models\Vendor $vendor */
                   $this->csv->insertOne($this->buildRow($vendor));
               });
 

@@ -12,7 +12,6 @@
 
 namespace App\PaymentDrivers;
 
-use App\PaymentDrivers\Common\LivewireMethodInterface;
 use Exception;
 use App\Models\Company;
 use App\Models\Invoice;
@@ -407,14 +406,16 @@ class CheckoutComPaymentDriver extends BaseDriver
             $response = $this->gateway->getPaymentsClient()->requestPayment($paymentRequest);
 
             if ($response['status'] == 'Authorized') {
-                $this->confirmGatewayFee($request);
-
+                
                 $data = [
                     'payment_method' => $response['source']['id'],
                     'payment_type' => PaymentType::parseCardType(strtolower($response['source']['scheme'])),
                     'amount' => $amount,
                     'transaction_reference' => $response['id'],
+                    'gateway_type_id' => GatewayType::CREDIT_CARD,
                 ];
+
+                $this->confirmGatewayFee($data);
 
                 $payment = $this->createPayment($data, Payment::STATUS_COMPLETED);
 
@@ -593,7 +594,7 @@ class CheckoutComPaymentDriver extends BaseDriver
                  foreach($customer['instruments'] as $card) {
                      if(
                          $card['type'] != 'card' ||
-                         Carbon::createFromDate($card['expiry_year'], $card['expiry_month'], '1')->lt(now()) ||
+                         Carbon::createFromDate($card['expiry_year'], $card['expiry_month'], '1')->lt(now()) || //@phpstan-ignore-line
                          $this->getToken($card['id'], $customer['id'])
                      ) {
                          continue;

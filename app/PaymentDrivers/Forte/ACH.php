@@ -19,12 +19,11 @@ use App\Models\Payment;
 use App\Models\PaymentHash;
 use App\Models\PaymentType;
 use App\Models\SystemLog;
-use App\PaymentDrivers\Common\LivewireMethodInterface;
 use App\PaymentDrivers\FortePaymentDriver;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Support\Facades\Validator;
 
-class ACH implements LivewireMethodInterface
+class ACH
 {
     use MakesHash;
 
@@ -80,8 +79,10 @@ class ACH implements LivewireMethodInterface
 
     public function paymentView(array $data)
     {
-        $data = $this->paymentData($data);
+        $this->forte->payment_hash->data = array_merge((array) $this->forte->payment_hash->data, $data);
+        $this->forte->payment_hash->save();
 
+        $data['gateway'] = $this->forte;
         return render('gateways.forte.ach.pay', $data);
     }
 
@@ -169,27 +170,9 @@ class ACH implements LivewireMethodInterface
         ];
 
         $payment = $this->forte->createPayment($data, Payment::STATUS_COMPLETED);
-        return redirect('client/invoices')->withSuccess('Invoice paid.');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function livewirePaymentView(array $data): string 
-    {
-        return 'gateways.forte.ach.pay_livewire';
-    }
+        // return redirect('client/invoices')->withSuccess('Invoice paid.');
     
-    /**
-     * @inheritDoc
-     */
-    public function paymentData(array $data): array 
-    {
-        $this->forte->payment_hash->data = array_merge((array) $this->forte->payment_hash->data, $data);
-        $this->forte->payment_hash->save();
+        return redirect()->route('client.payments.show', ['payment' => $payment->hashed_id]);
 
-        $data['gateway'] = $this->forte;
-
-        return $data;
     }
 }

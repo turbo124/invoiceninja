@@ -46,7 +46,7 @@ class UpdateReminder extends AbstractService
 
         if (is_null($this->quote->reminder1_sent) &&
             $this->settings->quote_schedule_reminder1 == 'after_quote_date') {
-            $reminder_date = Carbon::parse($this->quote->date)->startOfDay()->addDays($this->settings->quote_num_days_reminder1);
+            $reminder_date = Carbon::parse($this->quote->date)->startOfDay()->addDays((int)$this->settings->quote_num_days_reminder1);
 
             if ($reminder_date->gt(now())) {
                 $date_collection->push($reminder_date);
@@ -57,7 +57,7 @@ class UpdateReminder extends AbstractService
             ($this->quote->partial_due_date || $this->quote->due_date) &&
             $this->settings->quote_schedule_reminder1 == 'before_valid_until_date') {
             $partial_or_due_date = ($this->quote->partial > 0 && isset($this->quote->partial_due_date)) ? $this->quote->partial_due_date : $this->quote->due_date;
-            $reminder_date = Carbon::parse($partial_or_due_date)->startOfDay()->subDays($this->settings->quote_num_days_reminder1);
+            $reminder_date = Carbon::parse($partial_or_due_date)->startOfDay()->subDays((int)$this->settings->quote_num_days_reminder1);
             // nlog("1. {$reminder_date->format('Y-m-d')}");
 
             if ($reminder_date->gt(now())) {
@@ -70,7 +70,7 @@ class UpdateReminder extends AbstractService
             $this->settings->quote_schedule_reminder1 == 'after_valid_until_date') {
 
             $partial_or_due_date = ($this->quote->partial > 0 && isset($this->quote->partial_due_date)) ? $this->quote->partial_due_date : $this->quote->due_date;
-            $reminder_date = Carbon::parse($partial_or_due_date)->startOfDay()->addDays($this->settings->quote_num_days_reminder1);
+            $reminder_date = Carbon::parse($partial_or_due_date)->startOfDay()->addDays((int)$this->settings->quote_num_days_reminder1);
             // nlog("2. {$reminder_date->format('Y-m-d')}");
 
             if ($reminder_date->gt(now())) {
@@ -171,39 +171,39 @@ class UpdateReminder extends AbstractService
         return $this->quote;
     }
 
-    private function addTimeInterval($date, $endless_reminder_frequency_id): ?Carbon
-    {
-        if (! $date) {
-            return null;
-        }
+    // private function addTimeInterval($date, $endless_reminder_frequency_id): ?Carbon
+    // {
+    //     if (! $date) {
+    //         return null;
+    //     }
 
-        switch ($endless_reminder_frequency_id) {
-            case RecurringInvoice::FREQUENCY_DAILY:
-                return Carbon::parse($date)->addDay()->startOfDay();
-            case RecurringInvoice::FREQUENCY_WEEKLY:
-                return Carbon::parse($date)->addWeek()->startOfDay();
-            case RecurringInvoice::FREQUENCY_TWO_WEEKS:
-                return Carbon::parse($date)->addWeeks(2)->startOfDay();
-            case RecurringInvoice::FREQUENCY_FOUR_WEEKS:
-                return Carbon::parse($date)->addWeeks(4)->startOfDay();
-            case RecurringInvoice::FREQUENCY_MONTHLY:
-                return Carbon::parse($date)->addMonthNoOverflow()->startOfDay();
-            case RecurringInvoice::FREQUENCY_TWO_MONTHS:
-                return Carbon::parse($date)->addMonthsNoOverflow(2)->startOfDay();
-            case RecurringInvoice::FREQUENCY_THREE_MONTHS:
-                return Carbon::parse($date)->addMonthsNoOverflow(3)->startOfDay();
-            case RecurringInvoice::FREQUENCY_FOUR_MONTHS:
-                return Carbon::parse($date)->addMonthsNoOverflow(4)->startOfDay();
-            case RecurringInvoice::FREQUENCY_SIX_MONTHS:
-                return Carbon::parse($date)->addMonthsNoOverflow(6)->startOfDay();
-            case RecurringInvoice::FREQUENCY_ANNUALLY:
-                return Carbon::parse($date)->addYear()->startOfDay();
-            case RecurringInvoice::FREQUENCY_TWO_YEARS:
-                return Carbon::parse($date)->addYears(2)->startOfDay();
-            case RecurringInvoice::FREQUENCY_THREE_YEARS:
-                return Carbon::parse($date)->addYears(3)->startOfDay();
-            default:
-                return null;
-        }
-    }
+    //     switch ($endless_reminder_frequency_id) {
+    //         case RecurringInvoice::FREQUENCY_DAILY:
+    //             return Carbon::parse($date)->addDay()->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_WEEKLY:
+    //             return Carbon::parse($date)->addWeek()->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_TWO_WEEKS:
+    //             return Carbon::parse($date)->addWeeks(2)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_FOUR_WEEKS:
+    //             return Carbon::parse($date)->addWeeks(4)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_MONTHLY:
+    //             return Carbon::parse($date)->addMonthNoOverflow()->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_TWO_MONTHS:
+    //             return Carbon::parse($date)->addMonthsNoOverflow(2)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_THREE_MONTHS:
+    //             return Carbon::parse($date)->addMonthsNoOverflow(3)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_FOUR_MONTHS:
+    //             return Carbon::parse($date)->addMonthsNoOverflow(4)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_SIX_MONTHS:
+    //             return Carbon::parse($date)->addMonthsNoOverflow(6)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_ANNUALLY:
+    //             return Carbon::parse($date)->addYear()->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_TWO_YEARS:
+    //             return Carbon::parse($date)->addYears(2)->startOfDay();
+    //         case RecurringInvoice::FREQUENCY_THREE_YEARS:
+    //             return Carbon::parse($date)->addYears(3)->startOfDay();
+    //         default:
+    //             return null;
+    //     }
+    // }
 }

@@ -29,7 +29,7 @@ class TaskExport extends BaseExport
 {
     private $entity_transformer;
 
-    public string $date_key = 'created_at';
+    public string $date_key = 'calculated_start_date';
 
     private string $date_format = 'Y-m-d';
 
@@ -106,6 +106,8 @@ class TaskExport extends BaseExport
 
         $query->cursor()
               ->each(function ($entity) {
+
+                  /** @var \App\Models\Task $entity*/
                   $this->buildRow($entity);
               });
 
@@ -128,6 +130,7 @@ class TaskExport extends BaseExport
         $query->cursor()
                 ->each(function ($resource) {
 
+                    /** @var \App\Models\Task $resource*/
                     $this->buildRow($resource);
 
                     foreach($this->storage_array as $row) {
@@ -153,7 +156,7 @@ class TaskExport extends BaseExport
                 $entity[$key] = $transformed_entity[$parts[1]];
             } elseif (array_key_exists($key, $transformed_entity)) {
                 $entity[$key] = $transformed_entity[$key];
-            } elseif (in_array($key, ['task.start_date', 'task.end_date', 'task.duration'])) {
+            } elseif (in_array($key, ['task.start_date', 'task.end_date', 'task.duration', 'task.billable', 'task.item_notes', 'task.time_log'])) {
                 $entity[$key] = '';
             } else {
                 $entity[$key] = $this->decorator->transform($key, $task);
@@ -161,7 +164,7 @@ class TaskExport extends BaseExport
 
         }
 
-        if (is_null($task->time_log) || (is_array(json_decode($task->time_log, 1)) && count(json_decode($task->time_log, 1)) == 0)) {
+        if (is_null($task->time_log) || (is_array(json_decode($task->time_log, true)) && count(json_decode($task->time_log, true)) == 0)) {
             $this->storage_array[] = $entity;
         } else {
             $this->iterateLogs($task, $entity);
@@ -172,13 +175,13 @@ class TaskExport extends BaseExport
     private function iterateLogs(Task $task, array $entity)
     {
         $timezone = Timezone::find($task->company->settings->timezone_id);
-        $timezone_name = 'US/Eastern';
+        $timezone_name = 'America/New_York';
 
         if ($timezone) {
             $timezone_name = $timezone->name;
         }
 
-        $logs = json_decode($task->time_log, 1);
+        $logs = json_decode($task->time_log, true);
 
         $date_format_default = $this->date_format;
 
@@ -204,6 +207,17 @@ class TaskExport extends BaseExport
                 $seconds = $task->calcDuration();
                 $entity['task.duration'] = $seconds;
                 $entity['task.duration_words'] =  $seconds > 86400 ? CarbonInterval::seconds($seconds)->locale($this->company->locale())->cascade()->forHumans() : now()->startOfDay()->addSeconds($seconds)->format('H:i:s');
+
+                $entity['task.time_log'] = (isset($item[1]) && $item[1] != 0) ? $item[1] - $item[0] : ctrans('texts.is_running');
+
+            }
+
+            if (in_array('task.billable', $this->input['report_keys']) || in_array('billable', $this->input['report_keys'])) {
+                $entity['task.billable'] = isset($item[3]) && $item[3] == 'true' ? ctrans('texts.yes') : ctrans('texts.no');
+            }
+
+            if (in_array('task.item_notes', $this->input['report_keys']) || in_array('item_notes', $this->input['report_keys'])) {
+                $entity['task.item_notes'] = isset($item[2]) ? (string)$item[2] : '';
             }
 
             $entity = $this->decorateAdvancedFields($task, $entity);
@@ -216,6 +230,8 @@ class TaskExport extends BaseExport
             $entity['task.end_time'] = '';
             $entity['task.duration'] = '';
             $entity['task.duration_words'] = '';
+            $entity['task.billable'] = '';
+            $entity['task.item_notes'] = '';
 
         }
 

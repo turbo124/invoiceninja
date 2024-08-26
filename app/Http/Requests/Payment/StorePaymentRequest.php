@@ -46,7 +46,7 @@ class StorePaymentRequest extends Request
 
         $rules = [
             'client_id' => ['bail','required',Rule::exists('clients', 'id')->where('company_id', $user->company()->id)->where('is_deleted', 0)],
-            'invoices' => ['bail','sometimes', 'nullable', 'array', new ValidPayableInvoicesRule()],
+            'invoices' => ['bail', 'sometimes', 'nullable', 'array', new ValidPayableInvoicesRule()],
             'invoices.*.amount' => ['bail','required'],
             'invoices.*.invoice_id' => ['bail','required','distinct', new ValidInvoicesRules($this->all()),Rule::exists('invoices', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
             'credits.*.credit_id' => ['bail','required','distinct', new ValidCreditsRules($this->all()),Rule::exists('credits', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
@@ -80,11 +80,12 @@ class StorePaymentRequest extends Request
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if(\Illuminate\Support\Facades\Cache::has($this->ip()."|".$this->input('amount', 0)."|".$this->input('client_id', '')."|".$user->company()->company_key))
+        if(\Illuminate\Support\Facades\Cache::has($this->ip()."|".$this->input('amount', 0)."|".$this->input('client_id', '')."|".$user->company()->company_key)) {
             throw new DuplicatePaymentException('Duplicate request.', 429);
+        }
 
         \Illuminate\Support\Facades\Cache::put(($this->ip()."|".$this->input('amount', 0)."|".$this->input('client_id', '')."|".$user->company()->company_key), true, 1);
-        
+
         $input = $this->all();
 
         $invoices_total = 0;

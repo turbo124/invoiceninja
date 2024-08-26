@@ -108,7 +108,8 @@ class CompanyExport implements ShouldQueue
 
 
         $this->export_data['users'] = $this->company->users()->withTrashed()->cursor()->map(function ($user) {
-            $user->account_id = $this->encodePrimaryKey($user->account_id);
+            /** @var \App\Models\User $user */
+            $user->account_id = $this->encodePrimaryKey($user->account_id); //@phpstan-ignore-line
             return $user;
         })->all();
 
@@ -467,7 +468,7 @@ class CompanyExport implements ShouldQueue
         $x->addItems($this->export_data['subscriptions']);
         $this->export_data = null;
 
-        
+
         $this->export_data['system_logs'] = $this->company->system_logs->map(function ($log) {
             $log->client_id = $this->encodePrimaryKey($log->client_id);/** @phpstan-ignore-line */
             $log->company_id = $this->encodePrimaryKey($log->company_id);/** @phpstan-ignore-line */
@@ -694,7 +695,7 @@ class CompanyExport implements ShouldQueue
 
         $url = Cache::get($this->hash);
 
-        Cache::put($this->hash, $storage_path, now()->addHour());
+        Cache::put($this->hash, $storage_path, 3600);
 
         App::forgetInstance('translator');
         $t = app('translator');

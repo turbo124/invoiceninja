@@ -125,7 +125,7 @@ class PreviewController extends BaseController
 
         $response = Response::make($pdf, 200);
         $response->header('Content-Type', 'application/pdf');
-        $response->header('Server-Timing', microtime(true) - $start);
+        $response->header('Server-Timing', (string) (microtime(true) - $start));
 
         return $response;
     }
@@ -288,7 +288,7 @@ class PreviewController extends BaseController
         /** @var \App\Models\Company $company */
         $company = $user->company();
 
-        $design_object = json_decode(json_encode(request()->input('design')), 1);
+        $design_object = json_decode(json_encode(request()->input('design')), true);
 
         $ts = (new TemplateService());
 
@@ -297,6 +297,8 @@ class PreviewController extends BaseController
                 ->setTemplate($design_object)
                 ->mock();
         } catch(SyntaxError $e) {
+        } catch(\Exception $e) {
+            return response()->json(['message' => 'invalid data access', 'errors' => ['design.design.body' => $e->getMessage()]], 422);
         }
 
         if (request()->query('html') == 'true') {

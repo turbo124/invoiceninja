@@ -271,7 +271,7 @@ class ClientContact extends Authenticatable implements HasLocalePreference
 
     public function preferredLocale()
     {
-        
+
         /** @var \Illuminate\Support\Collection<\App\Models\Language> */
         $languages = app('languages');
 
@@ -351,9 +351,9 @@ class ClientContact extends Authenticatable implements HasLocalePreference
 
     public function showRff(): bool
     {
-        if (\strlen($this->first_name) === 0 || \strlen($this->last_name) === 0 || \strlen($this->email) === 0) {
-            return true;
-        }
+        // if (\strlen($this->first_name ?? '') === 0 || \strlen($this->last_name ?? '') === 0 || \strlen($this->email ?? '') === 0) {
+        //     return true;
+        // }
 
         return false;
     }

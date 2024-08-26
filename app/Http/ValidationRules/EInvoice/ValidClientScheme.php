@@ -11,6 +11,7 @@
 
 namespace App\Http\ValidationRules\EInvoice;
 
+use App\Services\EDocument\Standards\Validation\Peppol\ClientLevel;
 use Closure;
 use InvoiceNinja\EInvoice\EInvoice;
 use Illuminate\Validation\Validator;
@@ -19,11 +20,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 
 /**
- * Class BlackListRule.
+ * Class ValidClientScheme.
  */
-class ValidScheme implements ValidationRule, ValidatorAwareRule
+class ValidClientScheme implements ValidationRule, ValidatorAwareRule
 {
- 
     /**
      * The validator instance.
      *
@@ -34,27 +34,27 @@ class ValidScheme implements ValidationRule, ValidatorAwareRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 
-        $r = new EInvoice();
-        $errors = $r->validateRequest($value['Invoice'], Invoice::class);
-        
-        foreach ($errors as $key => $msg) {
+        if(isset($value['Invoice'])) {
+            $r = new EInvoice();
+            $errors = $r->validateRequest($value['Invoice'], ClientLevel::class);
 
-            $this->validator->errors()->add(
-                "e_invoice.{$key}",
-                "{$key} - {$msg}"
-            );
+            foreach ($errors as $key => $msg) {
 
+                $this->validator->errors()->add(
+                    "e_invoice.{$key}",
+                    "{$key} - {$msg}"
+                );
+
+            }
         }
-
     }
- 
+
     /**
      * Set the current validator.
      */
     public function setValidator(Validator $validator): static
     {
         $this->validator = $validator;
- 
         return $this;
     }
 

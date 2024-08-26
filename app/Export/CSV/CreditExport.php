@@ -52,6 +52,8 @@ class CreditExport extends BaseExport
 
         $report = $query->cursor()
                 ->map(function ($credit) {
+
+                    /** @var \App\Models\Credit $credit */
                     $row = $this->buildRow($credit);
                     return $this->processMetaData($row, $credit);
                 })->toArray();
@@ -139,6 +141,7 @@ class CreditExport extends BaseExport
 
         $query->cursor()
             ->each(function ($credit) {
+                /** @var \App\Models\Credit $credit */
                 $this->csv->insertOne($this->buildRow($credit));
             });
 
@@ -241,7 +244,7 @@ class CreditExport extends BaseExport
         }
 
         if (in_array('credit.user_id', $this->input['report_keys'])) {
-            $entity['credit.user_id'] = $credit->user ? $credit->user->present()->name() : '';
+            $entity['credit.user_id'] = $credit->user ? $credit->user->present()->name() : ''; //@phpstan-ignore-line
         }
 
         return $entity;

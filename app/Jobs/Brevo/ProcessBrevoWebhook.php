@@ -55,7 +55,7 @@ class ProcessBrevoWebhook implements ShouldQueue
         'events' => [],
     ];
 
-    
+
     /** @var ?\App\Models\Company $company*/
     private ?Company $company = null;
 
@@ -93,8 +93,7 @@ class ProcessBrevoWebhook implements ShouldQueue
     {
         MultiDB::findAndSetDbByCompanyKey($this->request['tags'][0]);
 
-        /** @phpstan-ignore-next-line */
-        $this->company = Company::where('company_key', $this->request['tags'][0])->first();
+        $this->company = Company::query()->where('company_key', $this->request['tags'][0])->first();
 
         $this->invitation = $this->discoverInvitation($this->request['message-id']);
 

@@ -11,35 +11,36 @@
 
 namespace App\PaymentDrivers;
 
-use App\Events\Invoice\InvoiceWasPaid;
-use App\Events\Payment\PaymentWasCreated;
-use App\Exceptions\PaymentFailed;
-use App\Factory\PaymentFactory;
-use App\Jobs\Mail\NinjaMailer;
-use App\Jobs\Mail\NinjaMailerJob;
-use App\Jobs\Mail\NinjaMailerObject;
-use App\Jobs\Mail\PaymentFailedMailer;
-use App\Jobs\Util\SystemLogger;
-use App\Mail\Admin\ClientPaymentFailureObject;
-use App\Models\Client;
-use App\Models\ClientContact;
-use App\Models\ClientGatewayToken;
-use App\Models\CompanyGateway;
-use App\Models\GatewayType;
-use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\PaymentHash;
-use App\Models\SystemLog;
-use App\Services\Subscription\SubscriptionService;
-use App\Utils\Helpers;
 use App\Utils\Ninja;
 use App\Utils\Number;
-use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\SystemLogTrait;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
+use App\Models\Client;
+use App\Utils\Helpers;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\SystemLog;
+use App\Models\GatewayType;
+use App\Models\PaymentHash;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\ClientContact;
+use App\Jobs\Mail\NinjaMailer;
+use App\Models\CompanyGateway;
+use Illuminate\Support\Carbon;
+use App\DataMapper\InvoiceItem;
+use App\Factory\PaymentFactory;
+use App\Jobs\Util\SystemLogger;
+use App\Utils\Traits\MakesHash;
+use App\Exceptions\PaymentFailed;
+use App\Jobs\Mail\NinjaMailerJob;
+use App\Models\ClientGatewayToken;
+use Illuminate\Support\Facades\App;
+use App\Jobs\Mail\NinjaMailerObject;
+use App\Utils\Traits\SystemLogTrait;
+use App\Events\Invoice\InvoiceWasPaid;
+use App\Jobs\Mail\PaymentFailedMailer;
+use App\Events\Payment\PaymentWasCreated;
+use App\Mail\Admin\ClientPaymentFailureObject;
+use App\Services\Subscription\SubscriptionService;
 
 /**
  * Class BaseDriver.
@@ -231,7 +232,7 @@ class BaseDriver extends AbstractPaymentDriver
      *
      * @param ClientGatewayToken $cgt The client gateway token object
      * @param PaymentHash $payment_hash The Payment hash containing the payment meta data
-     * @return void The payment response
+     * @return ?Payment|bool  The payment response
      */
     public function tokenBilling(ClientGatewayToken $cgt, PaymentHash $payment_hash)
     {
@@ -304,7 +305,7 @@ class BaseDriver extends AbstractPaymentDriver
     public function createPayment($data, $status = Payment::STATUS_COMPLETED): Payment
     {
         if (in_array($status, [Payment::STATUS_COMPLETED, Payment::STATUS_PENDING])) {
-            $this->confirmGatewayFee();
+            $this->confirmGatewayFee($data);
         }
 
         /*Never create a payment with a duplicate transaction reference*/
@@ -374,6 +375,7 @@ class BaseDriver extends AbstractPaymentDriver
             // To access campaign data => Cache::get(CAMPAIGN_HASH)
             // To access utm data => session()->get('utm-' . CAMPAIGN_HASH);
 
+            /** @var \App\Models\Subscription $billing_subscription */
             (new SubscriptionService($billing_subscription))->completePurchase($this->payment_hash);
         }
 
@@ -386,22 +388,78 @@ class BaseDriver extends AbstractPaymentDriver
      *
      * @return void                            Success/Failure
      */
-    public function confirmGatewayFee(): void
+    public function confirmGatewayFee($data = []): void
     {
-        /*Payment invoices*/
-        $payment_invoices = $this->payment_hash->invoices();
+        nlog("confirming gateway fee");
 
         /*Fee charged at gateway*/
         $fee_total = $this->payment_hash->fee_total;
 
-        /*Hydrate invoices*/
-        $invoices = Invoice::query()->whereIn('id', $this->transformKeys(array_column($payment_invoices, 'invoice_id')))->withTrashed()->get();
+        if(!$fee_total || $fee_total == 0)
+            return;
 
-        $invoices->each(function ($invoice) {
-            if (collect($invoice->line_items)->contains('type_id', '3')) {
-                $invoice->service()->toggleFeesPaid()->save();
+        $invoice = $this->payment_hash->fee_invoice;
+
+        $fee_count = collect($invoice->line_items)
+                        ->whereIn('type_id', ['3','4'])
+                        ->where('gross_line_total', $fee_total)
+                        ->count();
+
+        if($invoice && $fee_count == 0){
+
+            nlog("apparently no fee, so injecting here!");
+
+            $balance = $invoice->balance;
+
+            App::forgetInstance('translator');
+            $t = app('translator');
+            $t->replace(Ninja::transformTranslations($invoice->company->settings));
+            App::setLocale($invoice->client->locale());
+
+            $invoice_item = new InvoiceItem();
+            $invoice_item->type_id = '4';
+            $invoice_item->product_key = ctrans('texts.surcharge');
+            $invoice_item->notes = ctrans('texts.online_payment_surcharge');
+            $invoice_item->quantity = 1;
+            $invoice_item->cost = (float)$fee_total;
+
+            $invoice_items = (array) $invoice->line_items;
+            $invoice_items[] = $invoice_item;
+
+                if (isset($data['gateway_type_id']) && $fees_and_limits = $this->company_gateway->getFeesAndLimits($data['gateway_type_id'])) {
+                    $invoice_item->tax_rate1 = $fees_and_limits->fee_tax_rate1;
+                    $invoice_item->tax_name1 = $fees_and_limits->fee_tax_name1;
+                    $invoice_item->tax_rate2 = $fees_and_limits->fee_tax_rate2;
+                    $invoice_item->tax_name2 = $fees_and_limits->fee_tax_name2;
+                    $invoice_item->tax_rate3 = $fees_and_limits->fee_tax_rate3;
+                    $invoice_item->tax_name3 = $fees_and_limits->fee_tax_name3;
+                    $invoice_item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_OVERRIDE_TAX;
+                }
+
+            $invoice->line_items = $invoice_items;
+
+            /**Refresh Invoice values*/
+            $invoice = $invoice->calc()->getInvoice();
+
+            $new_balance = $invoice->balance;
+
+            if (floatval($new_balance) - floatval($balance) != 0) {
+                $adjustment = $new_balance - $balance;
+
+                $invoice
+                ->ledger()
+                ->updateInvoiceBalance($adjustment, 'Adjustment for adding gateway fee');
+
+                $invoice->client->service()->calculateBalance();
             }
-        });
+
+        }
+        else {
+            
+            $invoice->service()->toggleFeesPaid()->save();              
+            
+        }
+            
     }
 
     /**
@@ -413,11 +471,8 @@ class BaseDriver extends AbstractPaymentDriver
      */
     public function unWindGatewayFees(PaymentHash $payment_hash)
     {
-        $invoices = Invoice::query()->whereIn('id', $this->transformKeys(array_column($payment_hash->invoices(), 'invoice_id')))->withTrashed()->get();
-
-        $invoices->each(function ($invoice) {
-            $invoice->service()->removeUnpaidGatewayFees();
-        });
+        if($payment_hash->fee_invoice)
+            $payment_hash->fee_invoice->service()->removeUnpaidGatewayFees();
     }
 
     /**
@@ -501,7 +556,7 @@ class BaseDriver extends AbstractPaymentDriver
             $error = 'Payment Aborted';
         }
 
-        if (! is_null($this->payment_hash)) {
+        if (! is_null($this->payment_hash)) { //@phpstan-ignore-line
             $this->unWindGatewayFees($this->payment_hash);
         }
 
@@ -526,10 +581,6 @@ class BaseDriver extends AbstractPaymentDriver
             $nmo->settings = $this->client->company->settings;
 
             $invoices = Invoice::query()->whereIn('id', $this->transformKeys(array_column($this->payment_hash->invoices(), 'invoice_id')))->withTrashed()->get();
-
-            // $invoices->each(function ($invoice) {
-            //     $invoice->service()->deletePdf();
-            // });
 
             $invoices->first()->invitations->each(function ($invitation) use ($nmo) {
                 if ((bool) $invitation->contact->send_email !== false && $invitation->contact->email) {
@@ -772,7 +823,7 @@ class BaseDriver extends AbstractPaymentDriver
         }
 
         $invoices_string = \implode(', ', collect($this->payment_hash->invoices())->pluck('invoice_number')->toArray()) ?: null;
-        $amount = Number::formatMoney($this->payment_hash?->amount_with_fee() ?? 0, $this->client);
+        $amount = Number::formatMoney($this->payment_hash?->amount_with_fee() ?? 0, $this->client); // @phpstan-ignore-line
 
         if($abbreviated && $invoices_string) {
             return $invoices_string;
@@ -815,15 +866,5 @@ class BaseDriver extends AbstractPaymentDriver
     public function importCustomers()
     {
 
-    }
-
-    public function livewirePaymentView(array $data): string 
-    {
-        return $this->payment_method->livewirePaymentView($data);
-    }
-
-    public function processPaymentViewData(array $data): array
-    {
-        return $this->payment_method->paymentData($data); 
     }
 }

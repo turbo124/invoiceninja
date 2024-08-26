@@ -88,7 +88,7 @@ class SubscriptionService
 
 
         // if we have a recurring product - then generate a recurring invoice
-        if (strlen($this->subscription->recurring_product_ids) >= 1) {
+        if (strlen($this->subscription->recurring_product_ids ?? '') >= 1) {
             if (isset($payment_hash->data->billing_context->bundle)) {
                 $recurring_invoice = $this->convertInvoiceToRecurringBundle($payment_hash->payment->client_id, $payment_hash->data->billing_context->bundle);
             } else {
@@ -145,7 +145,7 @@ class SubscriptionService
 
             /* 06-04-2022 */
             /* We may not be in a state where the user is present */
-            if (auth()->guard('contact')) {
+            if (auth()->guard('contact')->user()) {
                 return $this->handleRedirect('/client/invoices/'.$this->encodePrimaryKey($payment_hash->fee_invoice_id));
             }
         }
@@ -200,7 +200,7 @@ class SubscriptionService
         $license->first_name = $contact ? $contact->first_name : ' ';
         $license->last_name = $contact ? $contact->last_name : ' ';
         $license->is_claimed = 1;
-        $license->transaction_reference = $payment_hash?->payment?->transaction_reference ?: ' ';
+        $license->transaction_reference = $payment_hash?->payment?->transaction_reference ?: ' '; //@phpstan-ignore-line
         $license->product_id = self::WHITE_LABEL;
         $license->recurring_invoice_id = $recurring_invoice->id;
 
@@ -428,7 +428,7 @@ class SubscriptionService
     /**
      * We refund unused days left.
      *
-     * @param  Invoice $invoice
+     * @param  \App\Models\Invoice | \App\Models\Credit $invoice
      * @return float
      */
     private function calculateProRataRefund($invoice, $subscription = null): float
@@ -1024,10 +1024,10 @@ class SubscriptionService
         $invoice->subscription_id = $this->subscription->id;
         $invoice->is_proforma = true;
 
-        if (strlen($data['coupon']) >= 1 && ($data['coupon'] == $this->subscription->promo_code) && $this->subscription->promo_discount > 0) {
+        if (strlen($data['coupon'] ?? '') >= 1 && ($data['coupon'] == $this->subscription->promo_code) && $this->subscription->promo_discount > 0) {
             $invoice->discount = $this->subscription->promo_discount;
             $invoice->is_amount_discount = $this->subscription->is_amount_discount;
-        } elseif (strlen($this->subscription->promo_code) == 0 && $this->subscription->promo_discount > 0) {
+        } elseif (strlen($this->subscription->promo_code ?? '') == 0 && $this->subscription->promo_discount > 0) {
             $invoice->discount = $this->subscription->promo_discount;
             $invoice->is_amount_discount = $this->subscription->is_amount_discount;
         }
@@ -1118,7 +1118,7 @@ class SubscriptionService
      */
     public function triggerWebhook($context)
     {
-        if (empty($this->subscription->webhook_configuration['post_purchase_url']) || is_null($this->subscription->webhook_configuration['post_purchase_url']) || strlen($this->subscription->webhook_configuration['post_purchase_url']) < 1) {
+        if (empty($this->subscription->webhook_configuration['post_purchase_url']) || is_null($this->subscription->webhook_configuration['post_purchase_url']) || strlen($this->subscription->webhook_configuration['post_purchase_url'] ?? '') < 1) { //@phpstan-ignore-line
             return ["message" => "Success", "status_code" => 200];
         }
 
@@ -1260,6 +1260,7 @@ class SubscriptionService
         return Subscription::query()
                             ->where('company_id', $this->subscription->company_id)
                             ->where('group_id', $this->subscription->group_id)
+                            ->whereNotNull('group_id')
                             ->where('id', '!=', $this->subscription->id)
                             ->get();
     }
@@ -1436,7 +1437,7 @@ class SubscriptionService
      */
     public function handleNoPaymentFlow(Invoice $invoice, $bundle, ClientContact $contact)
     {
-        if (strlen($this->subscription->recurring_product_ids) >= 1) {
+        if (strlen($this->subscription->recurring_product_ids ?? '') >= 1) {
             $recurring_invoice = $this->convertInvoiceToRecurringBundle($contact->client_id, collect($bundle)->map(function ($bund) {
                 return (object) $bund;
             }));
@@ -1492,7 +1493,7 @@ class SubscriptionService
      */
     private function handleRedirect($default_redirect)
     {
-        if (array_key_exists('return_url', $this->subscription->webhook_configuration) && strlen($this->subscription->webhook_configuration['return_url']) >= 1) {
+        if (array_key_exists('return_url', $this->subscription->webhook_configuration) && strlen($this->subscription->webhook_configuration['return_url'] ?? '') >= 1) {
             return method_exists(redirect(), "send") ? redirect($this->subscription->webhook_configuration['return_url'])->send() : redirect($this->subscription->webhook_configuration['return_url']);
         }
 

@@ -129,7 +129,7 @@ class BaseModel extends Model
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $query->where('company_id', $user->companyId());
+        $query->where("{$query->getQuery()->from}.company_id", $user->companyId());
 
         return $query;
     }
@@ -374,10 +374,9 @@ class BaseModel extends Model
 
         $files->push($company_docs);
 
-        try{
+        try {
             $pdf = (new PdfMerge($files->flatten()->toArray()))->run();
-        }
-        catch(\Exception $e){
+        } catch(\Exception $e) {
             nlog("Exception:: BaseModel:: PdfMerge::" . $e->getMessage());
         }
 
