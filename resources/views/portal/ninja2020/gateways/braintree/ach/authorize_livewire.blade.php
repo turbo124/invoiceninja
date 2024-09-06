@@ -1,11 +1,7 @@
-@extends('portal.ninja2020.layout.payments', ['gateway_title' => 'ACH', 'card_title' => 'ACH'])
+<div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden py-5 bg-white sm:gap-4"
+    id="braintree-ach-authorize">
+    <meta name="client-token" content="{{ $client_token ?? '' }}"/>
 
-@section('gateway_head')
-    <meta name="client-token" content="{{ $client_token ?? '' }}" />
-    <meta name="instant-payment" content="yes" />
-@endsection
-
-@section('gateway_content')
     @if(session()->has('ach_error'))
         <div class="alert alert-failure mb-4">
             <p>{{ session('ach_error') }}</p>
@@ -88,11 +84,11 @@
     @component('portal.ninja2020.gateways.includes.pay_now', ['id' => 'authorize-bank-account'])
         {{ ctrans('texts.add_payment_method') }}
     @endcomponent
-@endsection
+</div>
 
-@section('gateway_footer')
+@assets
     <script src="https://js.braintreegateway.com/web/3.81.0/js/client.min.js"></script>
     <script src="https://js.braintreegateway.com/web/3.81.0/js/us-bank-account.min.js"></script>
     
-    @vite('resources/js/clients/payment_methods/braintree-ach.js')
-@endsection
+    @vite('js/clients/payment_methods/braintree-ach.js')
+@endassets

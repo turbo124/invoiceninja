@@ -100,6 +100,10 @@ class ACH implements MethodInterface, LivewireMethodInterface
     {
         $data = $this->paymentData($data);
 
+        if (array_key_exists('authorize_then_redirect', $data)) {
+            return render('gateways.braintree.ach.authorize', array_merge($data));
+        }
+
         return render('gateways.braintree.ach.pay', $data);
     }
 
@@ -184,6 +188,10 @@ class ACH implements MethodInterface, LivewireMethodInterface
      */
     public function livewirePaymentView(array $data): string 
     {
+        if (array_key_exists('authorize_then_redirect', $data)) {
+            return 'gateways.braintree.ach.authorize_livewire';
+        }
+
         return 'gateways.braintree.ach.pay_livewire';
     }
     
@@ -196,6 +204,10 @@ class ACH implements MethodInterface, LivewireMethodInterface
         $data['currency'] = $this->braintree->client->getCurrencyCode();
         $data['payment_method_id'] = GatewayType::BANK_TRANSFER;
         $data['amount'] = $this->braintree->payment_hash->data->amount_with_fee;
+
+        if (count($data['tokens']) === 0) {
+            $data['authorize_then_redirect'] = true;
+        }
 
         return $data;
     }
