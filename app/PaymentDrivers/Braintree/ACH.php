@@ -12,11 +12,14 @@
 namespace App\PaymentDrivers\Braintree;
 
 use App\Exceptions\PaymentFailed;
+use App\Http\Controllers\ClientPortal\InvoiceController;
+use App\Http\Requests\ClientPortal\Invoices\ProcessInvoicesInBulkRequest;
 use App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest;
 use App\Jobs\Util\SystemLogger;
 use App\Models\ClientGatewayToken;
 use App\Models\GatewayType;
 use App\Models\Payment;
+use App\Models\PaymentHash;
 use App\Models\PaymentType;
 use App\Models\SystemLog;
 use App\PaymentDrivers\BraintreePaymentDriver;
@@ -53,7 +56,7 @@ class ACH implements MethodInterface, LivewireMethodInterface
     }
 
     public function authorizeResponse(Request $request)
-    {
+    {   
         $request->validate([
             'nonce' => ['required'],
             'gateway_type_id' => ['required'],
@@ -87,7 +90,19 @@ class ACH implements MethodInterface, LivewireMethodInterface
 
                 $this->braintree->storeGatewayToken($data, ['gateway_customer_reference' => $customer->id]);
 
-                return redirect()->route('client.payment_methods.index')->withMessage(ctrans('texts.payment_method_added'));
+                $this->braintree->payment_hash = PaymentHash::where('hash', $request->payment_hash)->firstOrFail();
+
+                $data = [
+                    'invoices' => collect($this->braintree->payment_hash->data->invoices)->map(fn ($invoice) => $invoice->invoice_id)->toArray(),
+                    'action' => 'payment',
+                ];
+
+                $request = new ProcessInvoicesInBulkRequest();
+                $request->replace($data);
+
+                session()->flash('message', ctrans('texts.payment_method_added'));
+
+                return app(InvoiceController::class)->bulk($request);
             } catch (\Exception $e) {
                 return $this->braintree->processInternallyFailedPayment($this->braintree, $e);
             }
@@ -204,6 +219,8 @@ class ACH implements MethodInterface, LivewireMethodInterface
         $data['currency'] = $this->braintree->client->getCurrencyCode();
         $data['payment_method_id'] = GatewayType::BANK_TRANSFER;
         $data['amount'] = $this->braintree->payment_hash->data->amount_with_fee;
+        $data['client_token'] = $this->braintree->gateway->clientToken()->generate();
+        $data['payment_hash'] = $this->braintree->payment_hash->hash;
 
         if (count($data['tokens']) === 0) {
             $data['authorize_then_redirect'] = true;

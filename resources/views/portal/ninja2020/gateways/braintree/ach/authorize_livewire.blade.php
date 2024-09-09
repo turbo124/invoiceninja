@@ -16,7 +16,8 @@
         <input type="hidden" name="gateway_type_id" value="2">
         <input type="hidden" name="gateway_response" id="gateway_response">
         <input type="hidden" name="is_default" id="is_default">
-        <input type="hidden" name="nonce" hidden>
+        <input type="hidden" name="nonce" hidden />
+        <input type="hidden" name="payment_hash" value="{{ $payment_hash }}" />
     </form>
 
     <div class="alert alert-failure mb-4" hidden id="errors"></div>
@@ -90,5 +91,5 @@
     <script src="https://js.braintreegateway.com/web/3.81.0/js/client.min.js"></script>
     <script src="https://js.braintreegateway.com/web/3.81.0/js/us-bank-account.min.js"></script>
     
-    @vite('js/clients/payment_methods/braintree-ach.js')
+    @vite('resources/js/clients/payment_methods/braintree-ach.js')
 @endassets

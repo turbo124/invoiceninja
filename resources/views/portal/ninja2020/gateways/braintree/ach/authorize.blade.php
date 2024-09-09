@@ -20,7 +20,8 @@
         <input type="hidden" name="gateway_type_id" value="2">
         <input type="hidden" name="gateway_response" id="gateway_response">
         <input type="hidden" name="is_default" id="is_default">
-        <input type="hidden" name="nonce" hidden>
+        <input type="hidden" name="nonce" hidden />
+        <input type="hidden" name="payment_hash" value="{{ $payment_hash }}" />
     </form>
 
     <div class="alert alert-failure mb-4" hidden id="errors"></div>
