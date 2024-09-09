@@ -90,19 +90,23 @@ class ACH implements MethodInterface, LivewireMethodInterface
 
                 $this->braintree->storeGatewayToken($data, ['gateway_customer_reference' => $customer->id]);
 
-                $this->braintree->payment_hash = PaymentHash::where('hash', $request->payment_hash)->firstOrFail();
+                if ($request->authorize_then_redirect) {
+                    $this->braintree->payment_hash = PaymentHash::where('hash', $request->payment_hash)->firstOrFail();
 
-                $data = [
-                    'invoices' => collect($this->braintree->payment_hash->data->invoices)->map(fn ($invoice) => $invoice->invoice_id)->toArray(),
-                    'action' => 'payment',
-                ];
+                    $data = [
+                        'invoices' => collect($this->braintree->payment_hash->data->invoices)->map(fn ($invoice) => $invoice->invoice_id)->toArray(),
+                        'action' => 'payment',
+                    ];
 
-                $request = new ProcessInvoicesInBulkRequest();
-                $request->replace($data);
+                    $request = new ProcessInvoicesInBulkRequest();
+                    $request->replace($data);
 
-                session()->flash('message', ctrans('texts.payment_method_added'));
+                    session()->flash('message', ctrans('texts.payment_method_added'));
 
-                return app(InvoiceController::class)->bulk($request);
+                    return app(InvoiceController::class)->bulk($request);
+                }
+
+                return redirect()->route('client.payment_methods.index')->withMessage(ctrans('texts.payment_method_added'));
             } catch (\Exception $e) {
                 return $this->braintree->processInternallyFailedPayment($this->braintree, $e);
             }
