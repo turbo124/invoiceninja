@@ -65,7 +65,7 @@
         </ul>
     @endcomponent
 
-    <div id="powerboard-payment-container" class="w-full">
+    <div id="powerboard-payment-container" class="w-full p-4" style="background-color: rgb(249, 249, 249);">
         <div id="widget" style="block" class="hidden"></div>
         <div id="widget-3dsecure"></div>
     </div>

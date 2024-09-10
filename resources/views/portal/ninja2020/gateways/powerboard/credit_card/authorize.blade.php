@@ -18,7 +18,7 @@
 
     <div class="alert alert-failure mb-4" hidden id="errors"></div>
 
-    <div id="powerboard-payment-container" class="w-full">
+    <div id="powerboard-payment-container" class="w-full p-4" style="background-color: rgb(249, 249, 249);">
         <div id="widget" style="block"></div>
         <div id="widget-3dsecure"></div>
     </div>  
