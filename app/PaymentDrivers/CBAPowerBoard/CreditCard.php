@@ -39,9 +39,9 @@ class CreditCard implements LivewireMethodInterface
     public function authorizeView(array $data)
     {
         $data['payment_method_id'] = GatewayType::CREDIT_CARD;
+        $data['threeds'] = $this->powerboard->company_gateway->getConfigField('threeds');
 
-        $view = $this->powerboard->company_gateway->getConfigField('threeds') ? 'gateways.powerboard.credit_card.authorize' : 'gateways.powerboard.credit_card.authorize_no_3ds';
-        return render($view, $this->paymentData($data));
+        return render('gateways.powerboard.credit_card.authorize', $this->paymentData($data));
     }
 
     public function authorizeResponse($request)
@@ -93,7 +93,7 @@ class CreditCard implements LivewireMethodInterface
 
             $payload = [
                 '_3ds' => [
-                    'id' => $charge_request['charge_3ds_id'],
+                    'id' => array_key_exists('charge_3ds_id', $charge_request) ? $charge_request['charge_3ds_id'] : $charge_request['_3ds']['id'],
                 ],
                 "capture" => false,
                 "authorization" => true,
@@ -353,7 +353,7 @@ class CreditCard implements LivewireMethodInterface
 
             $payload = [
                 '_3ds' => [
-                    'id' => $charge_request['charge_3ds_id'],
+                    'id' => array_key_exists('charge_3ds_id', $charge_request) ? $charge_request['charge_3ds_id'] : $charge_request['_3ds']['id'],
                 ],
                 "amount"=> $this->powerboard->payment_hash->data->amount_with_fee,
                 "currency"=> $this->powerboard->client->currency()->code,
