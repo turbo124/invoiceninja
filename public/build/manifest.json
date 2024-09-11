@@ -49,7 +49,7 @@
     "src": "resources/js/clients/payment_methods/authorize-checkout-card.js"
   },
   "resources/js/clients/payment_methods/authorize-powerboard-card.js": {
-    "file": "assets/authorize-powerboard-card-e89a988b.js",
+    "file": "assets/authorize-powerboard-card-d561a2d1.js",
     "imports": [
       "_wait-8f4ae121.js"
     ],

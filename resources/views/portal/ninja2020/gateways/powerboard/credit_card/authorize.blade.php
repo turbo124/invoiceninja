@@ -25,11 +25,6 @@
         <div id="widget" style="block"></div>
         <div id="widget-3dsecure"></div>
     </div>  
-    
-    @component('portal.ninja2020.gateways.includes.pay_now', ['id' => 'authorize-card'])
-        {{ ctrans('texts.add_payment_method') }}
-    @endcomponent
-
 @endsection
 
 @section('gateway_footer')

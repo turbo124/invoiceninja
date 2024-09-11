@@ -163,19 +163,6 @@ export function authorize() {
         process3ds();
     });
 
-    const authorizeCard = document.getElementById('authorize-card');
-
-    authorizeCard.addEventListener('click', () => {
-        if (widget.isValidForm()) {
-            authorizeCard.disabled = widget;
-
-            authorizeCard.querySelector('svg').classList.remove('hidden');
-            authorizeCard.querySelector('span').classList.add('hidden');
-        }
-
-        document.getElementById('stub').click();
-    });
-
     const first = document.querySelector('input[name="payment-type"]');
 
     if (first) {
