@@ -72,23 +72,49 @@ export async function get3dsToken() {
 export async function process3ds() {
     try {
         const resource = await get3dsToken();
-        console.log('3DS Token:', resource);
 
-        if (
-            resource.status != 'pre-authenticated' ||
-            resource.status != 'authentication_not_supported'
-        )
+        if (resource.status === 'not_authenticated') {
             throw new Error(
                 'There was an issue authenticating this payment method.'
             );
+        }
 
-        console.log('pre canvas');
-        console.log(resource._3ds.token);
+        if (resource.status === 'authentication_not_supported') {
+            document.querySelector('input[name="browser_details"]').value =
+                null;
 
-        const canvas = new cba.Canvas3ds('#widget-3dsecure', resource._3ds.token);
+            document.querySelector('input[name="charge"]').value =
+                JSON.stringify(resource);
+
+            return document.getElementById('server-response').submit();
+        }
+
+        const canvas = new cba.Canvas3ds(
+            '#widget-3dsecure',
+            resource._3ds.token
+        );
+
+        canvas.on('chargeAuthSuccess', function (data) {
+            document.querySelector('input[name="browser_details"]').value =
+                null;
+
+            document.querySelector('input[name="charge"]').value =
+                JSON.stringify(data);
+
+            document.getElementById('server-response').submit();
+        });
+
+        canvas.on('chargeAuthReject', function (data) {
+            document.getElementById(
+                'errors'
+            ).textContent = `Sorry, your transaction could not be processed...`;
+            document.getElementById('errors').hidden = false;
+        });
+
         canvas.load();
 
         let widget = document.getElementById('widget');
+
         widget.classList.add('hidden');
     } catch (error) {
         console.error('Error fetching 3DS Token:', error);
@@ -98,36 +124,6 @@ export async function process3ds() {
         ).textContent = `Sorry, your transaction could not be processed...\n\n${error}`;
         document.getElementById('errors').hidden = false;
     }
-
-    canvas.on('chargeAuthSuccess', function (data) {
-        console.log(data);
-
-        document.querySelector('input[name="browser_details"]').value = null;
-
-        document.querySelector('input[name="charge"]').value =
-            JSON.stringify(data);
-
-        let storeCard = document.querySelector(
-            'input[name=token-billing-checkbox]:checked'
-        );
-
-        if (storeCard) {
-            document.getElementById('store_card').value = storeCard.value;
-        }
-
-        document.getElementById('server-response').submit();
-    });
-
-    canvas.on('chargeAuthReject', function (data) {
-        console.log(data);
-
-        document.getElementById(
-            'errors'
-        ).textContent = `Sorry, your transaction could not be processed...`;
-        document.getElementById('errors').hidden = false;
-    });
-
-    canvas.load();
 }
 
 export function authorize() {
@@ -143,7 +139,7 @@ export function authorize() {
 
     widget.setEnv(environment.content);
     widget.useAutoResize();
-    widget.interceptSubmitForm('#server-response');
+    // widget.interceptSubmitForm('#server-response');
     widget.onFinishInsert('input[name="gateway_response"]', 'payment_source');
     widget.load();
 
@@ -164,51 +160,7 @@ export function authorize() {
     widget.on('finish', async function (data) {
         document.getElementById('errors').hidden = true;
 
-        console.log('finish', data);
-
-        try {
-            const resource = await get3dsToken();
-
-            console.log('3DS Token:', resource);
-
-            console.log('pre canvas');
-            console.log(resource._3ds.token);
-
-            const canvas = new cba.Canvas3ds(
-                '#widget-3dsecure',
-                resource._3ds.token
-            );
-            canvas.load();
-
-            let widget = document.getElementById('widget');
-
-            widget.classList.add('hidden');
-
-            canvas.on('chargeAuthSuccess', function (data) {
-                console.log(data);
-
-                document.querySelector('input[name="browser_details"]').value =
-                    null;
-
-                document.querySelector('input[name="charge"]').value =
-                    JSON.stringify(data);
-
-                document.getElementById('server-response').submit();
-            });
-
-            canvas.on('chargeAuthReject', function (data) {
-                console.log(data);
-
-                document.getElementById(
-                    'errors'
-                ).textContent = `Sorry, your transaction could not be processed...`;
-                document.getElementById('errors').hidden = false;
-            });
-
-            canvas.load();
-        } catch (error) {
-            console.error('Error fetching 3DS Token:', error);
-        }
+        process3ds();
     });
 
     const authorizeCard = document.getElementById('authorize-card');
