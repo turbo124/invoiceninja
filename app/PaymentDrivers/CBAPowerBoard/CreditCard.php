@@ -458,12 +458,7 @@ class CreditCard implements LivewireMethodInterface
     }
     public function processUnsuccessfulPayment($response)
     {
-      
-        $error_payload = $this->getErrorFromResponse($response);
-
-        return response()->json(['message' => $error_payload[0], 'code' => $error_payload[1]], $error_payload[1]);
-
-
+        $error = $this->getErrorFromResponse($response);
 
         // $this->stripe->sendFailureMail($server_response->cancellation_reason);
 
@@ -472,16 +467,16 @@ class CreditCard implements LivewireMethodInterface
         //     'data' => $this->stripe->payment_hash->data,
         // ];
 
-        // SystemLogger::dispatch(
-        //     $message,
-        //     SystemLog::CATEGORY_GATEWAY_RESPONSE,
-        //     SystemLog::EVENT_GATEWAY_FAILURE,
-        //     SystemLog::TYPE_STRIPE,
-        //     $this->stripe->client,
-        //     $this->stripe->client->company,
-        // );
+        SystemLogger::dispatch(
+            $error[0],
+            SystemLog::CATEGORY_GATEWAY_RESPONSE,
+            SystemLog::EVENT_GATEWAY_FAILURE,
+            SystemLog::TYPE_POWERBOARD,
+            $this->powerboard->client,
+            $this->powerboard->client->company,
+        );
 
-        // throw new PaymentFailed('Failed to process the payment.', 500);
+        throw new PaymentFailed('Failed to process the payment.', $error[1]);
     }
 
 }
