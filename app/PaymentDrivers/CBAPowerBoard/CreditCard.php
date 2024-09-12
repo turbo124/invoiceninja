@@ -215,6 +215,8 @@ class CreditCard implements LivewireMethodInterface
 
     public function paymentData(array $data): array
     {
+        $this->powerboard->init();
+
         if($this->cba_gateway->verification_status != "completed")
             throw new PaymentFailed("This payment method is not configured as yet. Reference Powerboard portal for further information", 400);
 
