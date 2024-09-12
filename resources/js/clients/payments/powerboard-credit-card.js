@@ -85,6 +85,10 @@ function pay() {
             document.getElementById('save-card--container').style.display =
                 'grid';
             document.querySelector('input[name=token]').value = '';
+
+            document
+                .querySelector('#powerboard-payment-container')
+                ?.classList.remove('hidden');
         });
 
     Array.from(
@@ -96,6 +100,10 @@ function pay() {
                 'none';
             document.querySelector('input[name=token]').value =
                 element.target.dataset.token;
+
+            document
+                .querySelector('#powerboard-payment-container')
+                ?.classList.add('hidden');
         })
     );
 }
