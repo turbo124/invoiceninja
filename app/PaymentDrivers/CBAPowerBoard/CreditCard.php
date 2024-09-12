@@ -460,7 +460,7 @@ class CreditCard implements LivewireMethodInterface
     {
         $error = $this->getErrorFromResponse($response);
 
-        // $this->stripe->sendFailureMail($server_response->cancellation_reason);
+        $this->powerboard->sendFailureMail($error[0]);
 
         // $message = [
         //     'server_response' => $server_response,
