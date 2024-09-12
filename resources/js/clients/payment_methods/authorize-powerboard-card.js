@@ -28,8 +28,7 @@ async function get3dsToken() {
         ...Object.fromEntries(
             new FormData(document.getElementById('server-response'))
         ),
-        gateway_response: document.querySelector('input[name=gateway_response]')
-            .value,
+        gateway_response: Array.from(document.querySelectorAll('input[name=gateway_response]')).find(input => input.value).value,
     });
 
     const paymentsRoute = document.querySelector('meta[name=store_route]');
@@ -114,6 +113,9 @@ async function process3ds() {
                 'errors'
             ).textContent = `Sorry, your transaction could not be processed...`;
             document.getElementById('errors').hidden = false;
+
+            reload();
+            setup();
         });
 
         canvas.load();
@@ -127,10 +129,10 @@ async function process3ds() {
     }
 }
 
-export function authorize() {
+function setup() {
     const publicKey = document.querySelector('meta[name=public_key]');
     const gatewayId = document.querySelector('meta[name=gateway_id]');
-    const environment = document.querySelector('meta[name=environment]');
+    const env = document.querySelector('meta[name=environment]');
 
     const widget = new cba.HtmlWidget(
         '#widget',
@@ -138,11 +140,32 @@ export function authorize() {
         gatewayId?.content
     );
 
-    widget.setEnv(environment.content);
+    widget.setEnv(env?.content);
     widget.useAutoResize();
     widget.interceptSubmitForm('#stepone');
-    widget.onFinishInsert('input[name="gateway_response"]', 'payment_source');
+    widget.onFinishInsert(
+        '#server-response input[name="gateway_response"]',
+        'payment_source'
+    );
     widget.load();
+
+    let payNow = document.getElementById('authorize-card');
+
+    payNow.disabled = false;
+    payNow.querySelector('svg').classList.add('hidden');
+    payNow.querySelector('span').classList.remove('hidden');
+
+    return widget;
+}
+
+function reload() {
+    document.querySelector('#widget').innerHTML = '';
+    document.querySelector('#widget')?.classList.remove('hidden');
+    document.querySelector('#widget-3dsecure').innerHTML = '';
+}
+
+export function authorize() {
+    const widget = setup();
 
     function handleTrigger() {
         let payNow = document.getElementById('pay-now');
