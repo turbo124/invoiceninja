@@ -10,7 +10,7 @@
 
 import { instant, wait } from '../wait';
 
-export async function get3dsToken() {
+async function get3dsToken() {
     const browserDetails = {
         name: navigator.userAgent.substring(0, 100), // The full user agent string, which contains the browser name and version
         java_enabled: navigator.javaEnabled() ? 'true' : 'false', // Indicates if Java is enabled in the browser
@@ -24,29 +24,30 @@ export async function get3dsToken() {
     document.querySelector('input[name="browser_details"]').value =
         JSON.stringify(browserDetails);
 
-    const formData = JSON.stringify(
-        Object.fromEntries(
+    const formData = JSON.stringify({
+        ...Object.fromEntries(
             new FormData(document.getElementById('server-response'))
-        )
-    );
+        ),
+        gateway_response: document.querySelector('input[name=gateway_response]')
+            .value,
+    });
+
+    const paymentsRoute = document.querySelector('meta[name=store_route]');
 
     try {
         // Return the fetch promise to handle it externally
-        const response = await fetch(
-            document.querySelector('meta[name=store_route]').content,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    Accept: 'application/json',
-                    'X-CSRF-Token': document.querySelector(
-                        'meta[name="csrf-token"]'
-                    ).content,
-                },
-                body: formData,
-            }
-        );
+        const response = await fetch(paymentsRoute.content, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                Accept: 'application/json',
+                'X-CSRF-Token': document.querySelector(
+                    'meta[name="csrf-token"]'
+                ).content,
+            },
+            body: formData,
+        });
 
         if (!response.ok) {
             return await response.json().then((errorData) => {
@@ -69,7 +70,7 @@ export async function get3dsToken() {
     }
 }
 
-export async function process3ds() {
+async function process3ds() {
     try {
         const resource = await get3dsToken();
 
@@ -93,6 +94,10 @@ export async function process3ds() {
             '#widget-3dsecure',
             resource._3ds.token
         );
+        canvas.load();
+
+        let widget = document.getElementById('widget');
+        widget.classList.add('hidden');
 
         canvas.on('chargeAuthSuccess', function (data) {
             document.querySelector('input[name="browser_details"]').value =
@@ -112,10 +117,6 @@ export async function process3ds() {
         });
 
         canvas.load();
-
-        let widget = document.getElementById('widget');
-
-        widget.classList.add('hidden');
     } catch (error) {
         console.error('Error fetching 3DS Token:', error);
 
@@ -139,7 +140,7 @@ export function authorize() {
 
     widget.setEnv(environment.content);
     widget.useAutoResize();
-    // widget.interceptSubmitForm('#server-response');
+    widget.interceptSubmitForm('#stepone');
     widget.onFinishInsert('input[name="gateway_response"]', 'payment_source');
     widget.load();
 
@@ -157,7 +158,7 @@ export function authorize() {
         document.getElementById('errors').hidden = true;
     });
 
-    widget.on('finish', async function (data) {
+    widget.on('finish', function (data) {
         document.getElementById('errors').hidden = true;
 
         process3ds();
@@ -168,6 +169,32 @@ export function authorize() {
     if (first) {
         first.click();
     }
+
+    let authorizeCard = document.getElementById('authorize-card');
+
+    authorizeCard.addEventListener('click', () => {
+        const div = document.getElementById('widget');
+
+        widget.getValidationState();
+
+        if (!widget.isValidForm() && div.offsetParent !== null) {
+            authorizeCard.disabled = false;
+            authorizeCard.querySelector('svg').classList.add('hidden');
+            authorizeCard.querySelector('span').classList.remove('hidden');
+
+            return;
+        }
+
+        authorizeCard.disabled = true;
+        authorizeCard.querySelector('svg').classList.remove('hidden');
+        authorizeCard.querySelector('span').classList.add('hidden');
+
+        if (div.offsetParent !== null) {
+            document.getElementById('stepone_submit').click();
+        } else {
+            document.getElementById('server-response').submit();
+        }
+    });
 }
 
-instant() ? authorize() : wait('#foo').then(authorize);
+instant() ? authorize() : wait('#').then(authorize);

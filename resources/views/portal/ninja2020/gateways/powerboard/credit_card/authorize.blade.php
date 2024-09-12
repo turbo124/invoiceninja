@@ -9,6 +9,11 @@
 @endsection
 
 @section('gateway_content')
+    <form action="javascript:void(0);" id="stepone">
+        <input type="hidden" name="gateway_response">
+        <button type="submit" class="hidden" id="stepone_submit">Submit</button>
+    </form>
+
     <form action="{{ route('client.payment_methods.store', ['method' => App\Models\GatewayType::CREDIT_CARD]) }}" method="post" id="server-response">
         @csrf
         <input type="hidden" name="gateway_response">
@@ -25,6 +30,10 @@
         <div id="widget" style="block"></div>
         <div id="widget-3dsecure"></div>
     </div>  
+
+    @component('portal.ninja2020.gateways.includes.pay_now', ['id' => 'authorize-card'])
+        {{ ctrans('texts.add_payment_method') }}
+    @endcomponent
 @endsection
 
 @section('gateway_footer')
