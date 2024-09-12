@@ -10,7 +10,7 @@
 
 import { instant, wait } from '../wait';
 
-function pay() {
+function setup() {
     const publicKey = document.querySelector('meta[name=public_key]');
     const gatewayId = document.querySelector('meta[name=gateway_id]');
     const env = document.querySelector('meta[name=environment]');
@@ -20,6 +20,7 @@ function pay() {
         publicKey?.content,
         gatewayId?.content
     );
+
     widget.setEnv(env?.content);
     widget.useAutoResize();
     widget.interceptSubmitForm('#stepone');
@@ -29,10 +30,36 @@ function pay() {
     );
     widget.load();
 
+    let payNow = document.getElementById('pay-now');
+
+    payNow.disabled = false;
+    payNow.querySelector('svg').classList.add('hidden');
+    payNow.querySelector('span').classList.remove('hidden');
+
+    return widget;
+}
+
+function reload() {
+    document.querySelector('#widget').innerHTML = '';
+    document.querySelector('#widget')?.classList.remove('hidden');
+    document.querySelector('#widget-3dsecure').innerHTML = '';
+}
+
+function pay() {
+    const widget = setup();
+
     widget.on('finish', function (data) {
         document.getElementById('errors').hidden = true;
 
         process3ds();
+    });
+
+    widget.on('systemError', (data) => {
+        console.log('systemError', data);
+    });
+
+    widget.on('finish', (data) => {
+        console.log('finish', data);
     });
 
     widget.on('submit', function (data) {
@@ -81,7 +108,9 @@ function pay() {
         .getElementById('toggle-payment-with-credit-card')
         .addEventListener('click', (element) => {
             let widget = document.getElementById('widget');
+
             widget.classList.remove('hidden');
+
             document.getElementById('save-card--container').style.display =
                 'grid';
             document.querySelector('input[name=token]').value = '';
@@ -164,10 +193,15 @@ async function process3ds() {
         });
 
         canvas.on('chargeAuthReject', function (data) {
+            console.log('chargeAuthReject', data);
+
             document.getElementById(
                 'errors'
             ).textContent = `Sorry, your transaction could not be processed...`;
             document.getElementById('errors').hidden = false;
+
+            reload();
+            setup();
         });
 
         canvas.load();
