@@ -1,6 +1,5 @@
 <div class="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden py-5 bg-white sm:gap-4"
     id="powerboard-credit-card-payment">
-    <meta name="instant-payment" content="yes" />
     <meta name="public_key" content="{{ $public_key }}" />
     <meta name="gateway_id" content="{{ $gateway_id }}" />
     <meta name="environment" content="{{ $environment }}">
@@ -8,7 +7,7 @@
 
     <form action="javascript:void(0);" id="stepone">
         <input type="hidden" name="gateway_response">
-        <button type="submit" class="hidden" id="stepone_submit">Submit</button>
+        <button type="submit"   class="hidden" id="stepone_submit">Submit</button>
     </form>
 
     <form action="{{ route('client.payments.response') }}" method="post" id="server-response">

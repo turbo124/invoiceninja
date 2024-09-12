@@ -50,7 +50,7 @@ function pay() {
             payNow.disabled = false;
             payNow.querySelector('svg').classList.add('hidden');
             payNow.querySelector('span').classList.remove('hidden');
-            
+
             return;
         }
 
@@ -231,4 +231,4 @@ async function get3dsToken() {
     }
 }
 
-instant() ? pay() : wait('#powerboard-credit-card-payment').then(pay);
+instant() ? pay() : wait('#powerboard-credit-card-payment').then(() => pay());
