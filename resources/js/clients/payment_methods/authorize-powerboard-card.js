@@ -93,6 +93,7 @@ async function process3ds() {
             '#widget-3dsecure',
             resource._3ds.token
         );
+
         canvas.load();
 
         let widget = document.getElementById('widget');
@@ -147,6 +148,9 @@ function setup() {
         '#server-response input[name="gateway_response"]',
         'payment_source'
     );
+
+    widget.setFormFields(['card_name*']);
+
     widget.load();
 
     let payNow = document.getElementById('authorize-card');
