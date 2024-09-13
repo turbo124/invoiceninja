@@ -28,6 +28,9 @@ function setup() {
         '#server-response input[name="gateway_response"]',
         'payment_source'
     );
+
+    widget.setFormFields(['card_name*']);
+
     widget.load();
 
     let payNow = document.getElementById('pay-now');
@@ -48,18 +51,10 @@ function reload() {
 function pay() {
     const widget = setup();
 
-    widget.on('finish', function (data) {
+    widget.on('finish', () => {
         document.getElementById('errors').hidden = true;
 
         process3ds();
-    });
-
-    widget.on('systemError', (data) => {
-        console.log('systemError', data);
-    });
-
-    widget.on('finish', (data) => {
-        console.log('finish', data);
     });
 
     widget.on('submit', function (data) {
