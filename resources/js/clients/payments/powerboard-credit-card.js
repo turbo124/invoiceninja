@@ -60,8 +60,6 @@ function pay() {
     widget.on('finish', () => {
         document.getElementById('errors').hidden = true;
 
-        console.log('finish.. calling process3ds');
-
         process3ds();
     });
 
@@ -141,12 +139,8 @@ function pay() {
 }
 
 async function process3ds() {
-    console.log('requesting 3ds');
-
     try {
         const resource = await get3dsToken();
-
-        console.log('3ds resource', resource);
 
         if (resource.status === 'not_authenticated') {
             throw new Error(
@@ -200,8 +194,6 @@ async function process3ds() {
         });
 
         canvas.on('chargeAuthReject', function (data) {
-            console.log('chargeAuthReject', data);
-
             document.getElementById(
                 'errors'
             ).textContent = `Sorry, your transaction could not be processed...`;
@@ -212,8 +204,6 @@ async function process3ds() {
 
         canvas.load();
     } catch (error) {
-        console.error('Error fetching 3DS Token:', error);
-
         document.getElementById(
             'errors'
         ).textContent = `Sorry, your transaction could not be processed...\n\n${error}`;

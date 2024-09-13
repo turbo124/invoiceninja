@@ -122,8 +122,7 @@ async function process3ds() {
             ).textContent = `Sorry, your transaction could not be processed...`;
             document.getElementById('errors').hidden = false;
 
-            reload();
-            setup();
+            authorize();
         });
 
         canvas.load();
@@ -144,6 +143,8 @@ async function process3ds() {
 }
 
 function setup() {
+    reload();
+
     const publicKey = document.querySelector('meta[name=public_key]');
     const gatewayId = document.querySelector('meta[name=gateway_id]');
     const env = document.querySelector('meta[name=environment]');
