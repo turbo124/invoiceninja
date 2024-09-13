@@ -64,6 +64,13 @@ async function get3dsToken() {
         ).textContent = `Sorry, your transaction could not be processed...\n\n${error.message}`;
         document.getElementById('errors').hidden = false;
 
+
+        let payNow = document.getElementById('authorize-card');
+
+        payNow.disabled = false;
+        payNow.querySelector('svg').classList.add('hidden');
+        payNow.querySelector('span').classList.remove('hidden');
+
         console.error('Fetch error:', error); // Log error for debugging
         throw error; //
     }
@@ -127,6 +134,12 @@ async function process3ds() {
             'errors'
         ).textContent = `Sorry, your transaction could not be processed...\n\n${error}`;
         document.getElementById('errors').hidden = false;
+
+        let payNow = document.getElementById('authorize-card');
+
+        payNow.disabled = false;
+        payNow.querySelector('svg').classList.add('hidden');
+        payNow.querySelector('span').classList.remove('hidden');
     }
 }
 
@@ -180,10 +193,6 @@ export function authorize() {
     widget.trigger('tab', handleTrigger);
     widget.trigger('submit_form', handleTrigger);
     widget.trigger('tab', handleTrigger);
-
-    widget.on('submit', async function (data) {
-        document.getElementById('errors').hidden = true;
-    });
 
     widget.on('finish', function (data) {
         document.getElementById('errors').hidden = true;
