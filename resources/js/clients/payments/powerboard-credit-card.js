@@ -30,8 +30,7 @@ function setup() {
     );
 
     widget.setFormFields(['card_name*']);
-
-    widget.load();
+    widget.reload();
 
     let payNow = document.getElementById('pay-now');
 
@@ -39,20 +38,29 @@ function setup() {
     payNow.querySelector('svg').classList.add('hidden');
     payNow.querySelector('span').classList.remove('hidden');
 
+    document.querySelector(
+        '#server-response input[name="gateway_response"]'
+    ).value = '';
+
     return widget;
 }
 
 function reload() {
-    document.querySelector('#widget').innerHTML = '';
+    document.querySelector('#widget')?.replaceChildren();
     document.querySelector('#widget')?.classList.remove('hidden');
-    document.querySelector('#widget-3dsecure').innerHTML = '';
+
+    document.querySelector('#widget-3dsecure')?.replaceChildren();
 }
 
 function pay() {
+    reload();
+
     const widget = setup();
 
     widget.on('finish', () => {
         document.getElementById('errors').hidden = true;
+
+        console.log('finish.. calling process3ds');
 
         process3ds();
     });
@@ -133,8 +141,12 @@ function pay() {
 }
 
 async function process3ds() {
+    console.log('requesting 3ds');
+
     try {
         const resource = await get3dsToken();
+
+        console.log('3ds resource', resource);
 
         if (resource.status === 'not_authenticated') {
             throw new Error(
@@ -195,8 +207,7 @@ async function process3ds() {
             ).textContent = `Sorry, your transaction could not be processed...`;
             document.getElementById('errors').hidden = false;
 
-            reload();
-            setup();
+            pay();
         });
 
         canvas.load();
