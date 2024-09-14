@@ -147,7 +147,7 @@
     "src": "resources/js/clients/payments/paytrace-credit-card.js"
   },
   "resources/js/clients/payments/powerboard-credit-card.js": {
-    "file": "assets/powerboard-credit-card-b8677a7d.js",
+    "file": "assets/powerboard-credit-card-c7c30b4d.js",
     "imports": [
       "_wait-8f4ae121.js"
     ],
@@ -361,7 +361,7 @@
     "src": "resources/js/setup/setup.js"
   },
   "resources/sass/app.scss": {
-    "file": "assets/app-106dcc58.css",
+    "file": "assets/app-23f93261.css",
     "isEntry": true,
     "src": "resources/sass/app.scss"
   }
