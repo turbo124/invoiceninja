@@ -49,7 +49,7 @@
     "src": "resources/js/clients/payment_methods/authorize-checkout-card.js"
   },
   "resources/js/clients/payment_methods/authorize-powerboard-card.js": {
-    "file": "assets/authorize-powerboard-card-80a63b15.js",
+    "file": "assets/authorize-powerboard-card-9db77713.js",
     "imports": [
       "_wait-8f4ae121.js"
     ],
@@ -147,11 +147,7 @@
     "src": "resources/js/clients/payments/paytrace-credit-card.js"
   },
   "resources/js/clients/payments/powerboard-credit-card.js": {
-<<<<<<< HEAD
-    "file": "assets/powerboard-credit-card-c7c30b4d.js",
-=======
-    "file": "assets/powerboard-credit-card-4448687c.js",
->>>>>>> 1e30981d29fe34e980140e3d361b2aeba9f79ebf
+    "file": "assets/powerboard-credit-card-127361fb.js",
     "imports": [
       "_wait-8f4ae121.js"
     ],

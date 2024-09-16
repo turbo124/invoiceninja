@@ -99,12 +99,6 @@ function pay() {
         else document.getElementById('server-response').submit();
     });
 
-    const first = document.querySelector('input[name="payment-type"]');
-
-    if (first) {
-        first.click();
-    }
-
     document
         .getElementById('toggle-payment-with-credit-card')
         .addEventListener('click', (element) => {
@@ -136,13 +130,21 @@ function pay() {
                 ?.classList.add('hidden');
         })
     );
+
+    const first = document.querySelector('input[name="payment-type"]');
+
+    if (first) {
+        first.click();
+    }
 }
 
 async function process3ds() {
     try {
         const resource = await get3dsToken();
 
-        if (resource.status === 'not_authenticated') {
+        if (resource.status === 'not_authenticated' || resource === 'not_authenticated') {
+            pay();
+
             throw new Error(
                 'There was an issue authenticating this payment method.'
             );

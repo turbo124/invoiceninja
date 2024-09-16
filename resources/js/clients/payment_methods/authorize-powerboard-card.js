@@ -80,7 +80,9 @@ async function process3ds() {
     try {
         const resource = await get3dsToken();
 
-        if (resource.status === 'not_authenticated') {
+        if (resource.status === 'not_authenticated' || resource === 'not_authenticated') {
+            authorize();
+            
             throw new Error(
                 'There was an issue authenticating this payment method.'
             );
