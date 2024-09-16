@@ -475,6 +475,10 @@ class CreditCard implements LivewireMethodInterface
             $this->powerboard->client->company,
         );
 
+        if (request()->wantsJson()) {
+            return response()->json($error[0], 200);
+        }
+
         throw new PaymentFailed('Failed to process the payment.', $error[1]);
     }
 
