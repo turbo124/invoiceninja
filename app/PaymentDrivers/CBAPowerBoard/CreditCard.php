@@ -396,6 +396,9 @@ class CreditCard implements LivewireMethodInterface
 
         }
 
+        session()->flash('message', ctrans('texts.payment_token_not_found'));
+
+        return redirect()->back();
     }
 
     public function processSuccessfulPayment(Charge $charge)
