@@ -168,6 +168,10 @@ class ProcessMailgunInboundWebhook implements ShouldQueue
      */
     public function handle()
     {
+
+        if(!$this->company->expense_mailbox_active)
+            return;
+        
         $from = $this->sender;//explode("|", $this->input)[0];
         $to = $this->recipient; //explode("|", $this->input)[1];
         // $messageId = explode("|", $this->input)[2]; // used as base in download function

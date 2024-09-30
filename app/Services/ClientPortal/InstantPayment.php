@@ -77,7 +77,7 @@ class InstantPayment
         $invoices->each(function ($invoice) {
             $invoice->service()
                     ->markSent()
-                    ->removeUnpaidGatewayFees()
+                    // ->removeUnpaidGatewayFees()
                     ->save();
         });
 
@@ -214,7 +214,7 @@ class InstantPayment
          * by adding it as a line item, and then subtract
          * the starting and finishing amounts of the invoice.
          */
-        $fee_totals = $first_invoice->balance - $starting_invoice_amount;
+        // $fee_totals = $first_invoice->balance - $starting_invoice_amount;
         $fee_totals = $first_invoice->gateway_fee;
 
         if ($gateway) {

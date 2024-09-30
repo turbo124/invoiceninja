@@ -42,7 +42,6 @@ class InvoiceService
      */
     public function markPaid(?string $reference = null)
     {
-        $this->removeUnpaidGatewayFees();
 
         $this->invoice = (new MarkPaid($this->invoice, $reference))->run();
 
@@ -232,8 +231,6 @@ class InvoiceService
 
     public function handleCancellation()
     {
-        $this->removeUnpaidGatewayFees();
-
         $this->invoice = (new HandleCancellation($this->invoice))->run();
 
         return $this;
@@ -241,8 +238,6 @@ class InvoiceService
 
     public function markDeleted()
     {
-        $this->removeUnpaidGatewayFees();
-
         $this->invoice = (new MarkInvoiceDeleted($this->invoice))->run();
 
         return $this;
@@ -257,8 +252,6 @@ class InvoiceService
 
     public function reverseCancellation()
     {
-        $this->removeUnpaidGatewayFees();
-
         $this->invoice = (new HandleCancellation($this->invoice))->reverse();
 
         return $this;

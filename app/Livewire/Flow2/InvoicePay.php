@@ -249,7 +249,7 @@ class InvoicePay extends Component
         $invoices = $this->invoices->filter(function ($i) {
             $i = $i->service()
                 ->markSent()
-                ->removeUnpaidGatewayFees()
+                // ->removeUnpaidGatewayFees()
                 ->save();
 
             return $i->isPayable();

@@ -42,27 +42,66 @@ class CompanyGatewayTest extends TestCase
         }
     }
 
-    public function testGatewayExists()
+    public function testNewFeeStructureWithDiscountAndOverpayment()
     {
-        $company_gateway = CompanyGateway::first();
-        $this->assertNotNull($company_gateway);
+                
+        $data = [];
+        $data[1]['min_limit'] = -1;
+        $data[1]['max_limit'] = -1;
+        $data[1]['fee_amount'] = 0.30;
+        $data[1]['fee_percent'] = 5.000;
+        $data[1]['fee_tax_name1'] = '';
+        $data[1]['fee_tax_rate1'] = 0;
+        $data[1]['fee_tax_name2'] = '';
+        $data[1]['fee_tax_rate2'] = 0;
+        $data[1]['fee_tax_name3'] = '';
+        $data[1]['fee_tax_rate3'] = 0;
+        $data[1]['adjust_fee_percent'] = false;
+        $data[1]['fee_cap'] = 0;
+        $data[1]['is_enabled'] = true;
+
+        $cg = new CompanyGateway();
+        $cg->company_id = $this->company->id;
+        $cg->user_id = $this->user->id;
+        $cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
+        $cg->require_cvv = true;
+        $cg->require_billing_address = true;
+        $cg->require_shipping_address = true;
+        $cg->update_details = true;
+        $cg->config = encrypt(config('ninja.testvars.stripe'));
+        $cg->fees_and_limits = $data;
+        $cg->save();
+
+        $item = new InvoiceItem();
+        $item->cost = 100;
+        $item->quantity = 1;
+        $item->notes = 'product';
+        $item->product_key = 'key';
+
+        $i = Invoice::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'status_id' => 1,
+            'discount' => 0,
+            'is_amount_discount' => true,
+            'tax_rate1' => 0,
+            'tax_rate2' => 0,
+            'tax_rate3' => 0,
+            'tax_name1' => '',
+            'tax_name2' => '',
+            'tax_name3' => '',
+            'line_items' => [$item]
+        ]);
+
+        $i->calc()->getInvoice()->service()->markSent()->save();
+        $i->service()->addGatewayFee($cg, 1, 190)->save();
+
+        $this->assertEquals(9.8, $i->gateway_fee);
+
     }
 
-    public function testSetConfigFields()
-    {
-        $company_gateway = CompanyGateway::first();
 
-        $this->assertNotNull($company_gateway->getConfig());
-
-        $company_gateway->setConfigField('test', 'test');
-
-        $this->assertEquals('test', $company_gateway->getConfigField('test'));
-
-        $company_gateway->setConfigField('signatureKey', 'hero');
-
-        $this->assertEquals('hero', $company_gateway->getConfigField('signatureKey'));
-
-    }
 
     public function testNewFeeStructureStandardInvoice()
     {
@@ -245,7 +284,27 @@ class CompanyGatewayTest extends TestCase
 
     }
 
+    public function testGatewayExists()
+    {
+        $company_gateway = CompanyGateway::first();
+        $this->assertNotNull($company_gateway);
+    }
 
+    public function testSetConfigFields()
+    {
+        $company_gateway = CompanyGateway::first();
+
+        $this->assertNotNull($company_gateway->getConfig());
+
+        $company_gateway->setConfigField('test', 'test');
+
+        $this->assertEquals('test', $company_gateway->getConfigField('test'));
+
+        $company_gateway->setConfigField('signatureKey', 'hero');
+
+        $this->assertEquals('hero', $company_gateway->getConfigField('signatureKey'));
+
+    }
 
     public function testNewFeeStructureStandardInvoiceWithPercentDiscountAndPartialPayment()     
     {

@@ -419,6 +419,9 @@ class CompanyGateway extends BaseModel
     {
         $fees_and_limits = $this->getFeesAndLimits($gateway_type_id);
 
+        nlog($fees_and_limits); 
+        nlog((bool)$include_taxes);
+
         if (! $fees_and_limits) {
             return false;
         }
@@ -462,7 +465,8 @@ class CompanyGateway extends BaseModel
         $pre_tax_fee = $fee;
 
         /**/
-        if ($include_taxes) {
+        if (!$include_taxes) {
+
             if ($fees_and_limits->fee_tax_rate1) {
                 $fee += round(($pre_tax_fee * $fees_and_limits->fee_tax_rate1 / 100), 2);
             }

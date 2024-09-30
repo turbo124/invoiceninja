@@ -163,7 +163,8 @@ class LivewireInstantPayment
         * by adding it as a line item, and then subtract
         * the starting and finishing amounts of the invoice.
         */
-        $fee_totals = $first_invoice->balance - $starting_invoice_amount;
+        // $fee_totals = $first_invoice->balance - $starting_invoice_amount;
+        $fee_totals = $first_invoice->gateway_fee;
 
         if ($company_gateway) {
             $tokens = $client->gateway_tokens()

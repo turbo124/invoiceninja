@@ -65,7 +65,7 @@ class CleanStaleInvoiceOrder implements ShouldQueue
                    ->whereJsonContains('line_items', ['type_id' => '3'])
                    ->cursor()
                    ->each(function ($invoice) {
-                       $invoice->service()->removeUnpaidGatewayFees();
+                    //    $invoice->service()->removeUnpaidGatewayFees();
                    });
 
             return;
@@ -93,7 +93,7 @@ class CleanStaleInvoiceOrder implements ShouldQueue
                 ->whereJsonContains('line_items', ['type_id' => '3'])
                 ->cursor()
                 ->each(function ($invoice) {
-                    $invoice->service()->removeUnpaidGatewayFees();
+                    // $invoice->service()->removeUnpaidGatewayFees();
                 });
 
             \DB::connection($db)->table('password_resets')->where('created_at', '<', now()->subHours(12))->delete();

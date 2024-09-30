@@ -73,7 +73,7 @@ class InvoiceController extends Controller
         $variables = ($invitation && auth()->guard('contact')->user()->client->getSetting('show_accept_invoice_terms')) ? (new HtmlEngine($invitation))->generateLabelsAndValues() : false;
 
         $data = [
-            'invoice' => $invoice->service()->removeUnpaidGatewayFees()->save(),
+            'invoice' => $invoice,
             'invitation' => $invitation ?: $invoice->invitations->first(),
             'key' => $invitation ? $invitation->key : false,
             'hash' => $hash,
@@ -197,7 +197,7 @@ class InvoiceController extends Controller
         $invoices->each(function ($invoice) {
             $invoice->service()
                     ->markSent()
-                    ->removeUnpaidGatewayFees()
+                    // ->removeUnpaidGatewayFees()
                     ->save();
         });
 

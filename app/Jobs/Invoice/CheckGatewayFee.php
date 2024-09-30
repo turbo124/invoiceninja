@@ -54,7 +54,7 @@ class CheckGatewayFee implements ShouldQueue
         }
 
         if ($i->status_id == Invoice::STATUS_SENT) {
-            $i->service()->removeUnpaidGatewayFees();
+            // $i->service()->removeUnpaidGatewayFees();
         }
     }
 

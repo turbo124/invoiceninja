@@ -281,7 +281,7 @@ class InvitationController extends Controller
 
         auth()->guard('contact')->loginUsingId($invitation->contact->id, true);
 
-        $invoice = $invitation->invoice->service()->removeUnpaidGatewayFees()->save();
+        $invoice = $invitation->invoice;
 
         if ($invoice->partial > 0) {
             $amount = round($invoice->partial, (int)$invoice->client->currency()->precision);

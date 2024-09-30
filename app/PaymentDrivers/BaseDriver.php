@@ -393,87 +393,75 @@ class BaseDriver extends AbstractPaymentDriver
 
         /*Fee charged at gateway*/
         $fee_total = $this->payment_hash->fee_total;
+        $original_fee = $fee_total;
 
-        if(!$fee_total || $fee_total == 0)
+        if(!$fee_total || $fee_total == 0 || !$this->payment_hash->fee_invoice)
             return;
 
         $invoice = $this->payment_hash->fee_invoice;
 
-        if($invoice){
-
-            $amount_with_fee = $this->payment_hash->data->amount_with_fee;
-            $base_amount = $invoice->calc()->getPayableSubTotal();
-
-            nlog("base amount = {$base_amount}");
-            nlog("amount with fee = {$amount_with_fee}");
-
-            if($invoice->discount > 0 && !$invoice->is_amount_discount){
-
-                $fee_total = ($amount_with_fee / (1 - ($invoice->discount/100))) - $base_amount;
-                nlog("discount adjusted fee total = {$fee_total}");
-            }
-
-            nlog("apparently no fee, so injecting here!");
-
-            if(!$invoice->uses_inclusive_taxes){ //must account for taxes! ? line item taxes also
-                $fee_total = round($fee_total/(1 + (($invoice->tax_rate1+$invoice->tax_rate2+$invoice->tax_rate3)/100)),2);
-            }
-
-            nlog("tax adjustments = {$fee_total}");
-
-            $balance = $invoice->balance;
-
-            App::forgetInstance('translator');
-            $t = app('translator');
-            $t->replace(Ninja::transformTranslations($invoice->company->settings));
-            App::setLocale($invoice->client->locale());
-
-            $invoice_item = new InvoiceItem();
-            $invoice_item->type_id = '4';
-            $invoice_item->product_key = ctrans('texts.surcharge');
-            $invoice_item->notes = ctrans('texts.online_payment_surcharge');
-            $invoice_item->quantity = 1;
-            $invoice_item->cost = (float)$fee_total;
-
-            $invoice_items = (array)$invoice->line_items;
-            $invoice_items[] = $invoice_item;
-
-            if (isset($data['gateway_type_id']) && $fees_and_limits = $this->company_gateway->getFeesAndLimits($data['gateway_type_id'])) {
-                $invoice_item->tax_rate1 = $fees_and_limits->fee_tax_rate1;
-                $invoice_item->tax_name1 = $fees_and_limits->fee_tax_name1;
-                $invoice_item->tax_rate2 = $fees_and_limits->fee_tax_rate2;
-                $invoice_item->tax_name2 = $fees_and_limits->fee_tax_name2;
-                $invoice_item->tax_rate3 = $fees_and_limits->fee_tax_rate3;
-                $invoice_item->tax_name3 = $fees_and_limits->fee_tax_name3;
-                $invoice_item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_OVERRIDE_TAX;
-            }
-
-            $invoice->line_items = array_values($invoice_items);
-
-            /**Refresh Invoice values*/
-            $invoice = $invoice->calc()->getInvoice();
-            $invoice->gateway_fee = 0;
-            $invoice->saveQuietly();
-            
-            $new_balance = $invoice->balance;
-
-            if (floatval($new_balance) - floatval($balance) != 0) {
-                $adjustment = $new_balance - $balance;
-
-                $invoice
-                ->ledger()
-                ->updateInvoiceBalance($adjustment, 'Adjustment for adding gateway fee **Base Driver**');
-
-                $invoice->client->service()->calculateBalance();
-            }
-
+        if($invoice->discount > 0 && !$invoice->is_amount_discount){
+            $fee_total = $fee_total / (1 - ($invoice->discount/100));
         }
-        else {
-            
-            $invoice->service()->toggleFeesPaid()->save();              
+
+        nlog("apparently no fee, so injecting here!");
+
+        if(!$invoice->uses_inclusive_taxes){ //must account for taxes! ? line item taxes also
+            $fee_total = round($fee_total/(1 + (($invoice->tax_rate1+$invoice->tax_rate2+$invoice->tax_rate3)/100)),2);
+        }
+
+        nlog("tax adjustments = {$fee_total}");
+
+        $balance = $invoice->balance;
+
+        App::forgetInstance('translator');
+        $t = app('translator');
+        $t->replace(Ninja::transformTranslations($invoice->company->settings));
+        App::setLocale($invoice->client->locale());
+
+        $invoice_item = new InvoiceItem();
+        $invoice_item->type_id = '4';
+        $invoice_item->product_key = ctrans('texts.surcharge');
+        $invoice_item->notes = ctrans('texts.online_payment_surcharge');
+        $invoice_item->quantity = 1;
+
+        if (isset($data['gateway_type_id']) && $fees_and_limits = $this->company_gateway->getFeesAndLimits($data['gateway_type_id'])) {
+
+            $invoice_item->tax_rate1 = $fees_and_limits->fee_tax_rate1;
+            $invoice_item->tax_name1 = $fees_and_limits->fee_tax_name1;
+            $invoice_item->tax_rate2 = $fees_and_limits->fee_tax_rate2;
+            $invoice_item->tax_name2 = $fees_and_limits->fee_tax_name2;
+            $invoice_item->tax_rate3 = $fees_and_limits->fee_tax_rate3;
+            $invoice_item->tax_name3 = $fees_and_limits->fee_tax_name3;
+            $invoice_item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_OVERRIDE_TAX;
+
+            $original_fee -= round($original_fee / (1 + (($fees_and_limits->fee_tax_rate1 + $fees_and_limits->fee_tax_rate2 + $fees_and_limits->fee_tax_rate3) / 100)), 2);
+            $fee_total -= $original_fee;
             
         }
-            
+
+        $invoice_item->cost = (float)$fee_total;
+        $invoice_items = (array)$invoice->line_items;
+        $invoice_items[] = $invoice_item;
+        $invoice->line_items = array_values($invoice_items);
+
+        /**Refresh Invoice values*/
+        $invoice = $invoice->calc()->getInvoice();
+        $invoice->gateway_fee = 0;
+        $invoice->calc()->getInvoice();
+        
+        $new_balance = $invoice->balance;
+
+        if (floatval($new_balance) - floatval($balance) != 0) {
+            $adjustment = $new_balance - $balance;
+
+            $invoice
+            ->ledger()
+            ->updateInvoiceBalance($adjustment, 'Adjustment for adding gateway fee **Base Driver**');
+
+            $invoice->client->service()->calculateBalance();
+        }
+    
     }
 
     /**
@@ -485,8 +473,8 @@ class BaseDriver extends AbstractPaymentDriver
      */
     public function unWindGatewayFees(PaymentHash $payment_hash)
     {
-        if($payment_hash->fee_invoice)
-            $payment_hash->fee_invoice->service()->removeUnpaidGatewayFees();
+        // if($payment_hash->fee_invoice)
+        //     $payment_hash->fee_invoice->service()->removeUnpaidGatewayFees();
     }
 
     /**

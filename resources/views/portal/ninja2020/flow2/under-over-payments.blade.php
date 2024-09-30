@@ -5,16 +5,13 @@
         {{ ctrans('texts.payment_amount') }}
     </p>
 
-    <dd class="text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2 flex flex-col">
+    <dd class="text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
         <template x-for="(invoice, index) in payableInvoices" :key="index">
-
             <div class="flex items-center mb-2">
-                <label>
-                    <span x-text="'{{ ctrans('texts.invoice') }} ' + invoice.number" class="mt-2"></span>
-                    <span class="pr-2">{{ $currency->code }} ({{ $currency->symbol }})</span>
-                    <input type="text" class="input mt-0 mr-4 relative" name="payable_invoices[]"
-                        x-model="payableInvoices[index].formatted_amount" />
-                </label>
+                <span x-text="'{{ ctrans('texts.invoice') }} ' + invoice.number" class="mr-2"></span>
+                <span class="mr-2">{{ $currency->code }} ({{ $currency->symbol }})</span>
+                <input type="text" class="input mt-0 w-32" name="payable_invoices[]"
+                    x-model="payableInvoices[index].formatted_amount" />
             </div>
         </template>
 
