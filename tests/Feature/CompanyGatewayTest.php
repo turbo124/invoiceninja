@@ -607,7 +607,7 @@ $this->assertTrue(true);
 
         $total = 10.93;
         $total_invoice_count = 5;
-        $total_gateway_fee = round($cg->calcGatewayFee($total, GatewayType::CREDIT_CARD, true), 2);
+        $total_gateway_fee = round($cg->calcGatewayFee($total, GatewayType::CREDIT_CARD, false), 2);
 
         $this->assertEquals(1.58, $total_gateway_fee);
 

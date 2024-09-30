@@ -400,17 +400,11 @@ class BaseDriver extends AbstractPaymentDriver
 
         $invoice = $this->payment_hash->fee_invoice;
 
-        if($invoice->discount > 0 && !$invoice->is_amount_discount){
-            $fee_total = $fee_total / (1 - ($invoice->discount/100));
-        }
-
         nlog("apparently no fee, so injecting here!");
 
-        if(!$invoice->uses_inclusive_taxes){ //must account for taxes! ? line item taxes also
-            $fee_total = round($fee_total/(1 + (($invoice->tax_rate1+$invoice->tax_rate2+$invoice->tax_rate3)/100)),2);
-        }
+       
 
-        nlog("tax adjustments = {$fee_total}");
+        nlog("first adjustments = {$fee_total}");
 
         $balance = $invoice->balance;
 
@@ -425,6 +419,10 @@ class BaseDriver extends AbstractPaymentDriver
         $invoice_item->notes = ctrans('texts.online_payment_surcharge');
         $invoice_item->quantity = 1;
 
+        if (!$invoice->uses_inclusive_taxes) { //must account for taxes! ? line item taxes also
+            $fee_total = round($fee_total / (1 + (($invoice->tax_rate1 + $invoice->tax_rate2 + $invoice->tax_rate3) / 100)), 2);
+        }
+
         if (isset($data['gateway_type_id']) && $fees_and_limits = $this->company_gateway->getFeesAndLimits($data['gateway_type_id'])) {
 
             $invoice_item->tax_rate1 = $fees_and_limits->fee_tax_rate1;
@@ -435,9 +433,12 @@ class BaseDriver extends AbstractPaymentDriver
             $invoice_item->tax_name3 = $fees_and_limits->fee_tax_name3;
             $invoice_item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_OVERRIDE_TAX;
 
-            $original_fee -= round($original_fee / (1 + (($fees_and_limits->fee_tax_rate1 + $fees_and_limits->fee_tax_rate2 + $fees_and_limits->fee_tax_rate3) / 100)), 2);
-            $fee_total -= $original_fee;
-            
+            $fee_total = round($fee_total / (1 + (($fees_and_limits->fee_tax_rate1 + $fees_and_limits->fee_tax_rate2 + $fees_and_limits->fee_tax_rate3) / 100)), 2);
+
+        }
+        
+        if ($invoice->discount > 0 && !$invoice->is_amount_discount) {
+            $fee_total = $fee_total / (1 - ($invoice->discount / 100));
         }
 
         $invoice_item->cost = (float)$fee_total;
