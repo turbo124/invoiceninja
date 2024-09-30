@@ -33,16 +33,20 @@ class AddGatewayFee extends AbstractService
             return $this->invoice;
         }
 
+        $this->invoice->gateway_fee = $gateway_fee;
+        $this->invoice->saveQuietly();
+
+        return $this->invoice;
         // Removes existing stale gateway fees
-        $this->cleanPendingGatewayFees();
+        // $this->cleanPendingGatewayFees();
 
-        // If a gateway fee is > 0 insert the line item
-        if ($gateway_fee > 0) {
-            return $this->processGatewayFee($gateway_fee);
-        }
+        // // If a gateway fee is > 0 insert the line item
+        // if ($gateway_fee > 0) {
+        //     return $this->processGatewayFee($gateway_fee);
+        // }
 
-        // If we have reached this far, then we are apply a gateway discount
-        return $this->processGatewayDiscount($gateway_fee);
+        // // If we have reached this far, then we are apply a gateway discount
+        // return $this->processGatewayDiscount($gateway_fee);
     }
 
     private function cleanPendingGatewayFees()

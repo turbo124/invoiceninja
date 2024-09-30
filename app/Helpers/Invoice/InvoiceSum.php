@@ -175,6 +175,22 @@ class InvoiceSum
         return $this;
     }
 
+    public function getPayableSubTotal(): float
+    {
+        if($this->invoice->partial > 0 && $this->invoice->discount > 0 && !$this->invoice->is_amount_discount){
+
+            return round($this->invoice->partial / (1 - ($this->invoice->discount/100)),2);
+        }
+        elseif($this->invoice->partial > 0 ){
+            return $this->invoice->partial;
+        }
+        elseif(floatval($this->invoice->amount) != floatval($this->invoice->balance) && $this->invoice->discount > 0 && !$this->invoice->is_amount_discount){
+            return $this->invoice->balance / (1 - ($this->invoice->discount / 100));
+        }
+
+        return $this->getSubTotal();
+    }
+
     private function calculateTotals(): self
     {
         $this->total += $this->total_taxes;

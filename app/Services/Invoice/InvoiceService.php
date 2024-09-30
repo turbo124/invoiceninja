@@ -279,7 +279,7 @@ class InvoiceService
     }
 
     public function markViewed()
-    {
+    { 
         $this->invoice->last_viewed = Carbon::now()->format('Y-m-d H:i');
 
         return $this;

@@ -399,23 +399,27 @@ class BaseDriver extends AbstractPaymentDriver
 
         $invoice = $this->payment_hash->fee_invoice;
 
-        $fee_count = collect($invoice->line_items)
-                        ->map(function ($item){
-                            $item->gross_line_total = round($item->gross_line_total, 2);
-                            return $item;
-                        })
-                        ->whereIn('type_id', ['3'])
-                        ->where('gross_line_total', '<=', round($fee_total,2))
-                        ->count();
+        if($invoice){
 
-        if($invoice && $fee_count == 0){
+            $amount_with_fee = $this->payment_hash->data->amount_with_fee;
+            $base_amount = $invoice->calc()->getPayableSubTotal();
 
-            
+            nlog("base amount = {$base_amount}");
+            nlog("amount with fee = {$amount_with_fee}");
+
+            if($invoice->discount > 0 && !$invoice->is_amount_discount){
+
+                $fee_total = ($amount_with_fee / (1 - ($invoice->discount/100))) - $base_amount;
+                nlog("discount adjusted fee total = {$fee_total}");
+            }
+
             nlog("apparently no fee, so injecting here!");
 
             if(!$invoice->uses_inclusive_taxes){ //must account for taxes! ? line item taxes also
                 $fee_total = round($fee_total/(1 + (($invoice->tax_rate1+$invoice->tax_rate2+$invoice->tax_rate3)/100)),2);
             }
+
+            nlog("tax adjustments = {$fee_total}");
 
             $balance = $invoice->balance;
 
@@ -431,7 +435,7 @@ class BaseDriver extends AbstractPaymentDriver
             $invoice_item->quantity = 1;
             $invoice_item->cost = (float)$fee_total;
 
-            $invoice_items = $invoice->line_items;
+            $invoice_items = (array)$invoice->line_items;
             $invoice_items[] = $invoice_item;
 
             if (isset($data['gateway_type_id']) && $fees_and_limits = $this->company_gateway->getFeesAndLimits($data['gateway_type_id'])) {
@@ -444,11 +448,13 @@ class BaseDriver extends AbstractPaymentDriver
                 $invoice_item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_OVERRIDE_TAX;
             }
 
-            $invoice->line_items = $invoice_items;
+            $invoice->line_items = array_values($invoice_items);
 
             /**Refresh Invoice values*/
             $invoice = $invoice->calc()->getInvoice();
-
+            $invoice->gateway_fee = 0;
+            $invoice->saveQuietly();
+            
             $new_balance = $invoice->balance;
 
             if (floatval($new_balance) - floatval($balance) != 0) {
