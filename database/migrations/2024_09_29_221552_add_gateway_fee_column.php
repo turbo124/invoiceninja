@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::table('invoices', function (Blueprint $table){
-            $table->decimal('gateway_fee', 13, 6)->default(0);
+            if (!Schema::hasColumn('invoices', 'gateway_fee')) {
+                    $table->decimal('gateway_fee', 13, 6)->default(0);
+            }
         });
     }
 
