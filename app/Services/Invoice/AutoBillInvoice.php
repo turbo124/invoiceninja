@@ -119,16 +119,13 @@ class AutoBillInvoice extends AbstractService
         /* $gateway fee */
         $this->invoice = $this->invoice->service()->addGatewayFee($gateway_token->gateway, $gateway_token->gateway_type_id, $amount)->save();
 
-
-        nlog($this->invoice->amount);
-        nlog($this->invoice->balance);
-
-        //change from $this->invoice->amount to $this->invoice->balance
-        if ($is_partial) {
-            $fee = $this->invoice->balance - $invoice_total;
-        } else {
-            $fee = $this->invoice->balance - $amount;
-        }
+        // if ($is_partial) {
+        //     $fee = $this->invoice->balance - $invoice_total;
+        // } else {
+        //     $fee = $this->invoice->balance - $amount;
+        // }
+        
+        $fee = round($this->invoice->gateway_fee ?? 0,2);
 
         nlog("fee is {$fee}");
 

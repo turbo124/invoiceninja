@@ -381,13 +381,73 @@ class BaseDriver extends AbstractPaymentDriver
         return $payment->service()->applyNumber()->save();
     }
 
+    public function confirmGatewayFee($data = []): void
+    {
+    
+        $invoice = $this->payment_hash->fee_invoice;
+
+        $fee_total = $this->payment_hash->fee_total;
+
+        if (!$fee_total || $fee_total == 0) {
+            return;
+        }
+            
+        if (!$invoice->uses_inclusive_taxes) { //must account for taxes! ? line item taxes also
+            $fee_total = $fee_total / (1 + (($invoice->tax_rate1 + $invoice->tax_rate2 + $invoice->tax_rate3) / 100));
+        }
+
+        if ($invoice->discount > 0 && !$invoice->is_amount_discount) {
+            $fee_total = round($fee_total / (1-($invoice->discount/100)),2);
+        }
+
+        App::forgetInstance('translator');
+        $t = app('translator');
+        $t->replace(Ninja::transformTranslations($invoice->company->settings));
+        App::setLocale($invoice->client->locale());
+
+        $invoice_item = new InvoiceItem();
+        $invoice_item->type_id = '4';
+        $invoice_item->product_key = ctrans('texts.surcharge');
+        $invoice_item->notes = ctrans('texts.online_payment_surcharge');
+        $invoice_item->quantity = 1;
+        $invoice_item->cost = (float)$fee_total;
+        $invoice_item->unit_code = $this->payment_hash->hash;
+
+        $invoice_items = $invoice->line_items;
+        $invoice_items[] = $invoice_item;
+
+        if (isset($data['gateway_type_id']) && $fees_and_limits = $this->company_gateway->getFeesAndLimits($data['gateway_type_id'])) {
+            $invoice_item->tax_rate1 = $fees_and_limits->fee_tax_rate1;
+            $invoice_item->tax_name1 = $fees_and_limits->fee_tax_name1;
+            $invoice_item->tax_rate2 = $fees_and_limits->fee_tax_rate2;
+            $invoice_item->tax_name2 = $fees_and_limits->fee_tax_name2;
+            $invoice_item->tax_rate3 = $fees_and_limits->fee_tax_rate3;
+            $invoice_item->tax_name3 = $fees_and_limits->fee_tax_name3;
+            $invoice_item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_OVERRIDE_TAX;
+        }
+
+        $invoice->line_items = array_values($invoice_items);
+        // $invoice->gateway_fee = $fee_total; // we save this here
+        $invoice = $invoice->calc()->getInvoice();
+
+        nlog(floatval($this->payment_hash->amount_with_fee() - $invoice->amount));
+
+        if(round($this->payment_hash->amount_with_fee() - $invoice->amount,2) == floatval(0.01)) {
+            $invoice->custom_surcharge1 += 0.01;
+            $invoice = $invoice->calc()->getInvoice();
+        }
+
+        $invoice->client->service()->calculateBalance();
+
+    }
+
     /**
      * When a successful payment is made, we need to append the gateway fee
      * to an invoice.
      *
      * @return void                            Success/Failure
      */
-    public function confirmGatewayFee($data = []): void
+    public function confirmGatewayFeeX($data = []): void
     {
         nlog("confirming gateway fee");
 

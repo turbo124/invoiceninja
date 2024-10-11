@@ -154,6 +154,8 @@ class BTCPayPaymentDriver extends BaseDriver
                     $payment->status_id = $StatusId;
                     $payment->save();
 
+                    $_invoice->service()->removeFeeWithHash($this->payment_hash->hash);
+
                 }
 
                 break;
@@ -168,6 +170,8 @@ class BTCPayPaymentDriver extends BaseDriver
                                         
                     $payment->status_id = $StatusId;
                     $payment->save();
+
+                    $_invoice->service()->removeFeeWithHash($this->payment_hash->hash);
 
                 }
 

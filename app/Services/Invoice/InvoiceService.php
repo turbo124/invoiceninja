@@ -130,6 +130,36 @@ class InvoiceService
 
         return $this;
     }
+    
+    /**
+     * Remove a gateway fee by its hash
+     * 
+     * Used where a payment has later *failed*
+     * @param  string $hash
+     * @return self
+     */
+    public function removeFeeWithHash(string $hash)
+    {
+
+        $pre = count($this->invoice->line_items);
+
+        $items = collect($this->invoice->line_items)
+                        ->reject(function ($item) use($hash){
+                            return $item->unit_code == $hash;
+                        })->toArray();
+
+        if ($pre != count($items)) {
+
+            $this->invoice->line_items = array_values($items);
+            $this->invoice = $this->invoice->calc()->getInvoice();
+            $this->invoice->client->service()->calculateBalance();
+
+
+        }
+
+        return $this;
+
+    }
 
     /**
      * Update an invoice balance.

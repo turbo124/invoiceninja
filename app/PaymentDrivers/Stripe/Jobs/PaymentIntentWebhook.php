@@ -62,6 +62,14 @@ class PaymentIntentWebhook implements ShouldQueue
 
         $company = Company::query()->where('company_key', $this->company_key)->first();
 
+        nlog($this->company_key);
+
+        if(!$company){
+            nlog("could not find company for this request");
+            nlog($this->stripe_request);
+            return;
+        }
+
         foreach ($this->stripe_request as $transaction) {
 
             $payment = Payment::query()

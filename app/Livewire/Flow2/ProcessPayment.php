@@ -34,7 +34,9 @@ class ProcessPayment extends Component
     {
 
         MultiDB::setDb($this->getContext()['db']);
-
+// nlog("context");
+// nlog($this->getContext());
+nlog($this->getContext()['invitation_id'] ?? false);
         $invitation = InvoiceInvitation::find($this->getContext()['invitation_id']);
 
         $data = [
@@ -87,6 +89,7 @@ class ProcessPayment extends Component
     public function exception($e, $stopPropagation) 
     {
       
+        nlog("process payment");
         $errors = session()->get('errors', new \Illuminate\Support\ViewErrorBag());
 
         $bag = new \Illuminate\Support\MessageBag();

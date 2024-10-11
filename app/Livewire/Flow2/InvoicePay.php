@@ -267,7 +267,7 @@ class InvoicePay extends Component
         $this->setContext('invoices', $invoices); // $this->context['invoices'] = $invoices;
         $this->setContext('settings', $settings); // $this->context['settings'] = $settings;
         $this->setContext('invitation', $invite); // $this->context['invitation'] = $invite;
-
+        $this->setContext('invitation_id', $this->invitation_id);
         $payable_invoices = $invoices->map(function ($i) {
             /** @var \App\Models\Invoice $i */
             return [
@@ -292,9 +292,8 @@ class InvoicePay extends Component
 
     public function exception($e, $stopPropagation) 
     {
-       
+        nlog("Invoice Pay");
         nlog($e->getMessage());
-
         $stopPropagation();
 
     }

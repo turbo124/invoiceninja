@@ -138,7 +138,7 @@ class RequiredFields extends Component
     
     public function exception($e, $stopPropagation) 
     {
-       
+        nlog("Required Fields");
         nlog($e->getMessage());
 
         $stopPropagation();

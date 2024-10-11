@@ -78,7 +78,7 @@ class PaymentMethod extends Component
 
     public function exception($e, $stopPropagation) 
     {
-       
+        nlog("Payment Method");
         nlog($e->getMessage());
         $stopPropagation();
 

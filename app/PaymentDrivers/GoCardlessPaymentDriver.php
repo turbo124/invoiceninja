@@ -304,6 +304,11 @@ class GoCardlessPaymentDriver extends BaseDriver
                     $payment_hash = PaymentHash::where('payment_id', $payment->id)->first();
                     $error = '';
 
+                    if($payment_hash){
+                        $invoice = $payment_hash->fee_invoice;
+                        $invoice->service()->removeFeeWithHash($payment_hash->hash);
+                    }
+
                     if (isset($event['details']['description'])) {
                         $error = $event['details']['description'];
                     }

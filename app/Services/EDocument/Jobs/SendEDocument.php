@@ -137,7 +137,7 @@ class SendEDocument implements ShouldQueue
     private function getHeaders(): array
     {
         return [
-            'X-API-SELF-HOST-TOKEN' => config('ninja.license_key'),
+            'X-API-SELF-HOST-TOKEN' => config('ninja.white_label_license_key'),
             "X-Requested-With" => "XMLHttpRequest",
             "Content-Type" => "application/json",
         ];

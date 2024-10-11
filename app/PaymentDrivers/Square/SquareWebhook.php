@@ -96,6 +96,11 @@ class SquareWebhook implements ShouldQueue
             $payment->service()->deletePayment();
 
             if ($this->driver->payment_hash) {
+
+
+                $invoice = $this->driver->payment_hash->fee_invoice;
+                $invoice->service()->removeFeeWithHash($this->driver->payment_hash->hash);
+
                 $error = ctrans('texts.client_payment_failure_body', [
                     'invoice' => implode(',', $payment->invoices->pluck('number')->toArray()),
                     'amount' => array_sum(array_column($this->driver->payment_hash->invoices(), 'amount')) + $this->driver->payment_hash->fee_total,

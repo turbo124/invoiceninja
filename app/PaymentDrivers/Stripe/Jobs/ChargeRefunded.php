@@ -91,6 +91,13 @@ class ChargeRefunded implements ShouldQueue
             $payment->service()->deletePayment();
             $payment->status_id = Payment::STATUS_FAILED;
             $payment->save();
+
+                        
+            if ($payment_hash) {
+                $invoice = $payment_hash->fee_invoice;
+                $invoice->service()->removeFeeWithHash($payment_hash->hash);
+            }
+
             return;
         }
 

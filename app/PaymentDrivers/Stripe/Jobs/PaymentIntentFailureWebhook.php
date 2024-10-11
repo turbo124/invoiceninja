@@ -95,6 +95,10 @@ class PaymentIntentFailureWebhook implements ShouldQueue
                 $payment_hash = PaymentHash::query()->where('payment_id', $payment->id)->first();
 
                 if ($payment_hash) {
+                    
+                    $invoice = $payment_hash->fee_invoice;
+                    $invoice->service()->removeFeeWithHash($payment_hash->hash);
+
                     $error = ctrans('texts.client_payment_failure_body', [
                         'invoice' => implode(',', $payment->invoices->pluck('number')->toArray()),
                         'amount' => array_sum(array_column($payment_hash->invoices(), 'amount')) + $payment_hash->fee_total, ]);

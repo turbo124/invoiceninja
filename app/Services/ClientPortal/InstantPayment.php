@@ -204,9 +204,11 @@ class InstantPayment
         $first_invoice = $invoices->first();
         $credit_totals = in_array($first_invoice->client->getSetting('use_credits_payment'), ['always', 'option']) ? $first_invoice->client->service()->getCreditBalance() : 0;
         $starting_invoice_amount = $first_invoice->balance;
+        $fee_totals = 0;
 
         if ($gateway) {
             $first_invoice->service()->addGatewayFee($gateway, $payment_method_id, $invoice_totals)->save();
+            $fee_totals = round($first_invoice->gateway_fee ?? 0,2);
         }
 
         /**
@@ -214,7 +216,7 @@ class InstantPayment
          * by adding it as a line item, and then subtract
          * the starting and finishing amounts of the invoice.
          */
-        $fee_totals = $first_invoice->balance - $starting_invoice_amount;
+        // $fee_totals = $first_invoice->balance - $starting_invoice_amount;
 
         if ($gateway) {
             $tokens = $client->gateway_tokens()
