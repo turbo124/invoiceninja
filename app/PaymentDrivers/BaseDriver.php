@@ -405,6 +405,8 @@ class BaseDriver extends AbstractPaymentDriver
         $t->replace(Ninja::transformTranslations($invoice->company->settings));
         App::setLocale($invoice->client->locale());
 
+        // nlog("==== {$fee_total}");
+
         $invoice_item = new InvoiceItem();
         $invoice_item->type_id = '4';
         $invoice_item->product_key = ctrans('texts.surcharge');
@@ -427,14 +429,35 @@ class BaseDriver extends AbstractPaymentDriver
         }
 
         $invoice->line_items = array_values($invoice_items);
-        // $invoice->gateway_fee = $fee_total; // we save this here
         $invoice = $invoice->calc()->getInvoice();
 
-        nlog(floatval($this->payment_hash->amount_with_fee() - $invoice->amount));
+        // nlog(floatval($this->payment_hash->amount_with_fee() - $invoice->amount));
 
-        if(round($this->payment_hash->amount_with_fee() - $invoice->amount,2) == floatval(0.01)) {
-            $invoice->custom_surcharge1 += 0.01;
+        $residual = round($this->payment_hash->amount_with_fee() - $invoice->amount,2);
+
+        // nlog($residual);
+        // nlog(abs($residual));
+
+        if(abs($residual) == floatval(0.01)) {
+            $invoice->custom_surcharge1 += $residual;
             $invoice = $invoice->calc()->getInvoice();
+        }
+        elseif (abs($residual) == floatval(0.02)) {
+
+            $adjustment = $residual > 0 ? -0.01 : 0.01;
+
+            $last_item_index = count($invoice_items) - 1;
+            $invoice_items[$last_item_index]->cost -= $adjustment;
+            $invoice->line_items = array_values($invoice_items);
+            $invoice = $invoice->calc()->getInvoice();
+        
+                $residual = round($this->payment_hash->amount_with_fee() - $invoice->amount, 2);
+    
+                if (abs($residual) == floatval(0.01)) {
+                    $invoice->custom_surcharge1 += $residual;
+                    $invoice = $invoice->calc()->getInvoice();
+                }
+
         }
 
         $invoice->client->service()->calculateBalance();

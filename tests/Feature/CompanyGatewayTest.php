@@ -11,6 +11,7 @@
 
 namespace Tests\Feature;
 
+use App\DataMapper\InvoiceItem;
 use Tests\TestCase;
 use App\Models\Invoice;
 use Tests\MockAccountData;
@@ -30,6 +31,7 @@ class CompanyGatewayTest extends TestCase
     use MockAccountData;
     use DatabaseTransactions;
     // use RefreshDatabase;
+    private int $iterator_tests = 20;
 
     protected function setUp(): void
     {
@@ -41,6 +43,231 @@ class CompanyGatewayTest extends TestCase
             $this->markTestSkipped('Skip test no company gateways installed');
         }
     }
+
+    private function stubInvoice()
+    {
+        $item = new InvoiceItem;
+        $item->cost = rand(10, 1000);
+        $item->quantity = 2;
+
+        $items = array_values([$item]);
+
+        $i = Invoice::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'line_items' => $items,
+            'status_id' => 1,
+        ]);
+
+        $i->calc()->getInvoice();
+        $i->service()->markSent()->save();
+
+        return $i;
+    }
+
+    private function pushThroughGateway(Invoice $i)
+    {
+        CompanyGateway::query()->where('company_id', $this->company->id)->forceDelete();
+
+        $data = [];
+        $data[1]['min_limit'] = -1;
+        $data[1]['max_limit'] = -1;
+        $data[1]['fee_amount'] = 0.3;
+        $data[1]['fee_percent'] = 3.2;
+        $data[1]['fee_tax_name1'] = '';
+        $data[1]['fee_tax_rate1'] = 0;
+        $data[1]['fee_tax_name2'] = '';
+        $data[1]['fee_tax_rate2'] = 0;
+        $data[1]['fee_tax_name3'] = '';
+        $data[1]['fee_tax_rate3'] = 0;
+        $data[1]['adjust_fee_percent'] = false;
+        $data[1]['fee_cap'] = 0;
+        $data[1]['is_enabled'] = true;
+
+        $cg = new CompanyGateway();
+        $cg->company_id = $this->company->id;
+        $cg->user_id = $this->user->id;
+        $cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
+        $cg->require_cvv = true;
+        $cg->require_billing_address = true;
+        $cg->require_shipping_address = true;
+        $cg->update_details = true;
+        $cg->config = encrypt(config('ninja.testvars.stripe'));
+        $cg->fees_and_limits = $data;
+        $cg->save();
+
+        $fee_invoice = $i->service()->addGatewayFee($cg, GatewayType::CREDIT_CARD, $i->balance)->save();
+
+        $this->assertNotNull($this->invoice->gateway_fee);
+
+        // nlog($fee_invoice->balance);
+        // nlog($fee_invoice->gateway_fee);
+        
+        $payment_hash = PaymentHash::create([
+            'hash' => \Illuminate\Support\Str::random(32),
+            'data' => [
+                'amount_with_fee' => round($fee_invoice->balance + $fee_invoice->gateway_fee,2),
+                'invoices' => [
+                    [
+                        'invoice_id' => $fee_invoice->hashed_id,
+                        'amount' => $fee_invoice->balance,
+                        'invoice_number' => $fee_invoice->number,
+                        'pre_payment' => $fee_invoice->is_proforma,
+                    ],
+                ],
+            ],
+            'fee_total' => $fee_invoice->gateway_fee,
+            'fee_invoice_id' => $fee_invoice->id,
+        ]);
+     
+        // nlog($payment_hash->amount_with_fee());
+
+        $cg->driver($fee_invoice->client)
+                ->setPaymentHash($payment_hash)
+                ->confirmGatewayFee();
+
+        $fee_invoice = $fee_invoice->fresh();
+
+        return [$fee_invoice, $payment_hash];
+    }
+
+    public function testEdgeCase1()
+    {
+
+        $item = new InvoiceItem();
+        $item->cost = 65;
+        $item->quantity = 2;
+        $item->is_amount_discount = false;
+        $item->discount = 0;
+
+        $items = array_values([$item]);
+
+        $i = Invoice::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'line_items' => $items,
+            'status_id' => 1,
+            'discount' => 1,
+            'is_amount_discount' => false,
+            'tax_name1' => 'GST',
+            'tax_rate1' => 10,
+            'tax_name2' => 'VAT',
+            'tax_rate2' => 17.5,
+            'tax_name3' => '',
+            'tax_rate3' => 0,
+            'uses_inclusive_taxes' => false,
+        ]);
+
+        $i->calc()->getInvoice();
+        $i->service()->markSent()->save();
+        
+        $this->assertEquals(164.09, $i->amount);
+        $this->assertEquals(164.09, $i->balance);
+        
+        $arr = $this->pushThroughGateway($i);
+        
+        $fee_invoice = $arr[0];
+        $payment_hash = $arr[1];
+
+        $this->assertEquals(5.55, round($fee_invoice->gateway_fee,2));
+        $this->assertEquals($fee_invoice->amount, $payment_hash->amount_with_fee());
+
+    }
+
+    public function testNewGatewayFeePathAmountDiscounts()
+    {
+
+        for($x=0; $x<$this->iterator_tests; $x++)
+        {
+            $i = $this->stubInvoice();
+            $i->uses_inclusive_taxes = false;
+            $i->is_amount_discount = true;
+            $i->discount = rand(1,99);
+            $i->calc()->getInvoice();
+
+            // nlog("------");
+            // nlog($i->discount);
+            // nlog($i->is_amount_discount ? 'amount' : 'percent');
+            // nlog($i->balance);
+            // nlog($i->total_taxes);
+            // nlog($i->gateway_fee);
+            // nlog($i->line_items);
+            // nlog($i->tax_rate1);
+            // nlog($i->tax_rate2);
+            // nlog($i->tax_rate3);
+            // nlog("======");
+
+            $return_array = $this->pushThroughGateway($i);
+
+            $fee_invoice = $return_array[0];
+            $payment_hash = $return_array[1];
+
+            $this->assertEquals($fee_invoice->amount, $payment_hash->amount_with_fee());
+        }
+    }
+
+    public function testNewGatewayFeePathInclusiveTaxes()
+    {
+
+        for($x=0; $x<$this->iterator_tests; $x++)
+        {
+            $i = $this->stubInvoice();
+            $i->uses_inclusive_taxes = true;
+            $i->calc()->getInvoice();
+
+            // nlog("------");
+            // nlog($i->discount);
+            // nlog($i->is_amount_discount ? 'amount' : 'percent');
+            // nlog($i->balance);
+            // nlog($i->total_taxes);
+            // nlog($i->gateway_fee);
+            // nlog($i->line_items);
+            // nlog($i->tax_rate1);
+            // nlog($i->tax_rate2);
+            // nlog($i->tax_rate3);
+            // nlog("======");
+
+            $return_array = $this->pushThroughGateway($i);
+
+            $fee_invoice = $return_array[0];
+            $payment_hash = $return_array[1];
+
+            $this->assertEquals($fee_invoice->amount, $payment_hash->amount_with_fee());
+        }
+    }
+
+    public function testNewGatewayFeePath()
+    {
+
+        for($x=0; $x<$this->iterator_tests; $x++)
+        {
+            $i = $this->stubInvoice();
+
+            // nlog("------");
+            // nlog($i->discount);
+            // nlog($i->is_amount_discount ? 'amount' : 'percent');
+            // nlog($i->balance);
+            // nlog($i->total_taxes);
+            // nlog($i->gateway_fee);
+            // nlog($i->line_items);
+            // nlog($i->tax_rate1);
+            // nlog($i->tax_rate2);
+            // nlog($i->tax_rate3);
+            // nlog("======");
+
+            $return_array = $this->pushThroughGateway($i);
+
+            $fee_invoice = $return_array[0];
+            $payment_hash = $return_array[1];
+
+            $this->assertEquals($fee_invoice->amount, $payment_hash->amount_with_fee());
+        }
+    }
+
+
+    
 
     public function testGatewayExists()
     {
@@ -124,10 +351,8 @@ class CompanyGatewayTest extends TestCase
         }
 
         if ((property_exists($fees_and_limits, 'min_limit')) && $fees_and_limits->min_limit !== null && $amount < $fees_and_limits->min_limit) {
-            nlog("amount {$amount} less than ".$fees_and_limits->min_limit);
             $passes = false;
         } elseif ((property_exists($fees_and_limits, 'max_limit')) && $fees_and_limits->max_limit !== null && $amount > $fees_and_limits->max_limit) {
-            nlog("amount {$amount} greater than ".$fees_and_limits->max_limit);
             $passes = false;
         } else {
             $passes = true;
@@ -286,7 +511,7 @@ class CompanyGatewayTest extends TestCase
         $i = $this->invoice->fresh();
 
         $this->assertEquals($i->amount, $payment_hash->amount_with_fee());
-        
+
     }
 
 
@@ -329,4 +554,6 @@ class CompanyGatewayTest extends TestCase
         /*simple pro rata*/
         $fees_and_limits = $cg->getFeesAndLimits(GatewayType::CREDIT_CARD);
     }
+
+    
 }
