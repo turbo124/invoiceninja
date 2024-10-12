@@ -31,7 +31,7 @@ class CompanyGatewayTest extends TestCase
     use MockAccountData;
     use DatabaseTransactions;
     // use RefreshDatabase;
-    private int $iterator_tests = 20;
+    private int $iterator_tests = 200;
 
     protected function setUp(): void
     {
