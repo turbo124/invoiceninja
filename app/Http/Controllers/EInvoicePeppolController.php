@@ -172,7 +172,7 @@ class EInvoicePeppolController extends BaseController
 
         $r = $storecove->updateLegalEntity($company->legal_entity_id, $request->validated());
 
-        if ($r) {
+        if ($r->successful()) {
             $tax_data = $company->tax_data;
 
             $tax_data->acts_as_sender = $request->acts_as_sender;
