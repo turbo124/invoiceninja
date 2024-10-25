@@ -896,6 +896,26 @@ class Peppol extends AbstractService
         $party_name->Name = $this->invoice->company->present()->name();
         $party->PartyName[] = $party_name;
 
+
+
+        if (strlen($this->company->settings->vat_number ?? '') > 1) {
+
+            $pi = new PartyIdentification();
+
+            $vatID = new ID();
+
+            if ($scheme = $this->resolveTaxScheme()) {
+                $vatID->schemeID = $scheme;
+            }
+
+            $vatID->value = $this->company->settings->vat_number; //todo if we are cross border - switch to the supplier local vat number
+            $pi->ID = $vatID;
+
+            $party->PartyIdentification[] = $pi;
+
+        }
+
+
         $address = new Address();
         $address->CityName = $this->invoice->company->settings->city;
         $address->StreetName = $this->invoice->company->settings->address1;
