@@ -172,7 +172,6 @@ class PeppolTest extends TestCase
 
         $this->assertCount(0, $errors);
 
-
     }
 
 

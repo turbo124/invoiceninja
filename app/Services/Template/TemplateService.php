@@ -283,7 +283,6 @@ class TemplateService
      */
     public function processData($data): self
     {
-
         $this->data = $this->preProcessDataBlocks($data);
 
         return $this;
@@ -494,6 +493,7 @@ class TemplateService
      */
     private function preProcessDataBlocks($data): array
     {
+           
         return collect($data)->map(function ($value, $key) {
 
             $processed = [];
@@ -962,7 +962,8 @@ class TemplateService
             'created_at' => $this->translateDate($task->created_at, $task->client ? $task->client->date_format() : $task->company->date_format(), $task->client ? $task->client->locale() : $task->company->locale()),
             'updated_at' => $this->translateDate($task->updated_at, $task->client ? $task->client->date_format() : $task->company->date_format(), $task->client ? $task->client->locale() : $task->company->locale()),
             'date' => $task->calculated_start_date ? $this->translateDate($task->calculated_start_date, $task->client ? $task->client->date_format() : $task->company->date_format(), $task->client ? $task->client->locale() : $task->company->locale()) : '',
-            'project' => $task->project ? $this->transformProject($task->project, true) : [],
+            // 'project' => $task->project ? $this->transformProject($task->project, true) : [],
+            'project' => $task->project ? $task->project->name : '',
             'time_log' => $task->processLogsExpandedNotation(),
             'custom_value1' => $task->custom_value1 ?: '',
             'custom_value2' => $task->custom_value2 ?: '',
@@ -1021,7 +1022,7 @@ class TemplateService
      */
     public function processProjects($projects): array
     {
-
+        
         return
         collect($projects)->map(function ($project) {
 
@@ -1042,7 +1043,7 @@ class TemplateService
 
     private function transformProject(Project $project, bool $nested = false): array
     {
-
+        
         return [
             'name' => $project->name ?: '',
             'number' => $project->number ?: '',
