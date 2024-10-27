@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Requests\EInvoice\Peppol;
+namespace Tests\Feature\EInvoice\Validation;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
