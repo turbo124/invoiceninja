@@ -399,23 +399,32 @@ class BaseRepository
         if(in_array($column, ['tax1','tax2','tax3'])) {
 
             $parts = explode("||", $new_value);
-
-            if (count($parts) !== 2)
-                return;
-
             $tax_name_column = str_replace("tax", "tax_name", $column);
-            $rate = filter_var($parts[1], FILTER_VALIDATE_FLOAT);
-            $tax_name = $parts[0];
-            
-            if ($rate === false)
-                return;
-            
-            $taxrate_column = str_replace("tax", "tax_rate", $column);
+            $tax_rate_column = str_replace("tax", "tax_rate", $column);
+
+            /** Harvest the tax name and rate */
+            if (count($parts) == 2)   
+            {
+                
+                $rate = filter_var($parts[1], FILTER_VALIDATE_FLOAT);
+                $tax_name = $parts[0];
+                
+                if ($rate === false)
+                    return;
+                
+            }
+            else { //else we need to clear the value
+
+                $rate = 0;
+                $tax_name = "";
+
+            }
 
             $model->update([
                 $tax_name_column => $tax_name,
-                $taxrate_column => $rate,
+                $tax_rate_column => $rate,
             ]);
+
             return;
         }
 

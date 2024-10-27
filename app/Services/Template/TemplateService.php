@@ -934,6 +934,8 @@ class TemplateService
             'balance' => $entity->client->balance,
             'payment_balance' => $entity->client->payment_balance,
             'credit_balance' => $entity->client->credit_balance,
+            'number' => $entity->client->number ?? '',
+            'id_number' => $entity->client->id_number ?? '',
             'vat_number' => $entity->client->vat_number ?? '',
             'currency' => $entity->client->currency()->code ?? 'USD',
             'custom_value1' => $entity->client->custom_value1 ?? '',
