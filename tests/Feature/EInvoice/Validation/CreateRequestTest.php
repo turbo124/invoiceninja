@@ -29,6 +29,8 @@ class CreateRequestTest extends TestCase
             'county' => 'Test County',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
+            'tenant_id' => 'testcompanykey',
+
         ], $this->request->rules());
 
         
@@ -46,6 +48,7 @@ class CreateRequestTest extends TestCase
             'county' => 'Test County',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
+            'tenant_id' => 'testcompanykey',
         ], $this->request->rules());
 
         $this->assertFalse($validator->passes());
@@ -78,7 +81,7 @@ class CreateRequestTest extends TestCase
             'country' => 'AT',
             'zip' => '12345',
             'county' => 'Test County',
-
+'tenant_id' => 'testcompanykey',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
         ], $this->request->rules());
