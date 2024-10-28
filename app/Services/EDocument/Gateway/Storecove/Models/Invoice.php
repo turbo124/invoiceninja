@@ -1,67 +1,57 @@
 <?php
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-use JsonSerializable;
 use Symfony\Component\Serializer\Annotation\SerializedName;
-use DateTime;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Attribute\Context;
 
-class Invoice implements JsonSerializable
+class Invoice 
 {
-    #[SerializedName('taxSystem')]
-    private string $taxSystem = 'tax_line_percentages';
+    public string $taxSystem = 'tax_line_percentages';
 
-    #[SerializedName('documentCurrency')]
-    private string $documentCurrency = '';
+    public string $documentCurrency = '';
 
-    #[SerializedName('invoiceNumber')]
-    private string $invoiceNumber = '';
+    public string $invoiceNumber = '';
 
-    #[SerializedName('issueDate')]
-    private DateTime $issueDate;
+    public string $issueDate = '';
 
-    #[SerializedName('taxPointDate')]
-    private ?DateTime $taxPointDate = null;
+    public string $taxPointDate = '';
 
-    #[SerializedName('dueDate')]
-    private DateTime $dueDate;
+	public string $dueDate = '';
 
-    #[SerializedName('invoicePeriod')]
-    private array $invoicePeriod = [];
+    public string $invoicePeriod = '';
 
-    #[SerializedName('references')]
-    private array $references = [];
+    public array $references = [];
 
-    #[SerializedName('accountingCost')]
-    private ?string $accountingCost = null;
+    public ?string $accountingCost = null;
 
-    #[SerializedName('note')]
-    private string $note = '';
+    public string $note = '';
 
-    #[SerializedName('amountIncludingVat')]
-    private float $amountIncludingVat = 0.0;
+    public float $amountIncludingVat = 0.0;
 
-    #[SerializedName('prepaidAmount')]
-    private ?float $prepaidAmount = null;
+    public ?float $prepaidAmount = null;
 
-    #[SerializedName('accountingSupplierParty')]
-    private array $accountingSupplierParty = [];
+    public array $accountingSupplierParty = [];
 
-    #[SerializedName('accountingCustomerParty')]
-    private array $accountingCustomerParty = [];
+    public array $accountingCustomerParty = [];
 
-    #[SerializedName('paymentMeans')]
-    private array $paymentMeans = [];
+    public array $paymentMeans = [];
 
-    #[SerializedName('taxTotal')]
-    private array $taxTotal = [];
+    public array $taxTotal = [];
 
-    /**
-     * @var InvoiceLines[]
-     */
-    private array $invoiceLines = [];
+    public array $invoiceLines = [];
 
-    // Getters and setters for all properties
 
     public function setDocumentCurrency(string $documentCurrency): void
     {
@@ -73,99 +63,163 @@ class Invoice implements JsonSerializable
         $this->invoiceNumber = $invoiceNumber;
     }
 
-    public function setIssueDate(DateTime $issueDate): void
+    public function setIssueDate($issueDate): void
     {
         $this->issueDate = $issueDate;
     }
 
-    public function setTaxPointDate(?DateTime $taxPointDate): void
+    public function setTaxPointDate($taxPointDate): void
     {
         $this->taxPointDate = $taxPointDate;
     }
 
-    public function setDueDate(DateTime $dueDate): void
+    public function setDueDate($dueDate): void
     {
         $this->dueDate = $dueDate;
     }
 
-    public function setInvoicePeriod(array $invoicePeriod): void
+    public function setInvoicePeriod($invoicePeriod): void
     {
         $this->invoicePeriod = $invoicePeriod;
     }
 
-    public function setReferences(array $references): void
+    public function setReferences( $references): void
     {
         $this->references = $references;
     }
 
-    public function setAccountingCost(?string $accountingCost): void
+    public function setAccountingCost($accountingCost): void
     {
         $this->accountingCost = $accountingCost;
     }
 
-    public function setNote(string $note): void
+    public function setNote($note): void
     {
         $this->note = $note;
     }
 
-    public function setAmountIncludingVat(float $amountIncludingVat): void
+    public function setAmountIncludingVat ($amountIncludingVat): void
     {
         $this->amountIncludingVat = $amountIncludingVat;
     }
 
-    public function setPrepaidAmount(?float $prepaidAmount): void
+    public function setPrepaidAmount( $prepaidAmount): void
     {
         $this->prepaidAmount = $prepaidAmount;
     }
 
-    public function setAccountingSupplierParty(array $accountingSupplierParty): void
+    public function setAccountingSupplierParty( $accountingSupplierParty): void
     {
         $this->accountingSupplierParty = $accountingSupplierParty;
     }
 
-    public function setAccountingCustomerParty(array $accountingCustomerParty): void
+    public function setAccountingCustomerParty( $accountingCustomerParty): void
     {
         $this->accountingCustomerParty = $accountingCustomerParty;
     }
 
-    public function setPaymentMeans(array $paymentMeans): void
+    public function setPaymentMeans( $paymentMeans): void
     {
         $this->paymentMeans = $paymentMeans;
     }
 
-    public function setTaxTotal(array $taxTotal): void
+    public function setTaxTotal( $taxTotal): void
     {
         $this->taxTotal = $taxTotal;
     }
 
-     /**
-     * @param InvoiceLines[] $invoiceLines
-     */
     public function setInvoiceLines(array $invoiceLines): void
     {
         $this->invoiceLines = $invoiceLines;
     }
 
-    public function jsonSerialize(): mixed
+    public function getInvoiceLines()
     {
-        return [
-            'taxSystem' => $this->taxSystem,
-            'documentCurrency' => $this->documentCurrency,
-            'invoiceNumber' => $this->invoiceNumber,
-            'issueDate' => $this->issueDate->format('Y-m-d'),
-            'taxPointDate' => $this->taxPointDate ? $this->taxPointDate->format('Y-m-d') : null,
-            'dueDate' => $this->dueDate->format('Y-m-d'),
-            'invoicePeriod' => $this->invoicePeriod,
-            'references' => $this->references,
-            'accountingCost' => $this->accountingCost,
-            'note' => $this->note,
-            'amountIncludingVat' => $this->amountIncludingVat,
-            'prepaidAmount' => $this->prepaidAmount,
-            'accountingSupplierParty' => $this->accountingSupplierParty,
-            'accountingCustomerParty' => $this->accountingCustomerParty,
-            'paymentMeans' => $this->paymentMeans,
-            'taxTotal' => $this->taxTotal,
-            'invoiceLines' => $this->invoiceLines,
-        ];
+        return $this->invoiceLines;
+    }
+
+    public function getTaxSystem(): string
+    {
+        return $this->taxSystem;
+    }
+
+    public function getDocumentCurrency(): string
+    {
+        return $this->documentCurrency;
+    }
+
+    public function getInvoiceNumber(): string
+    {
+        return $this->invoiceNumber;
+    }
+
+    public function getIssueDate(): string
+    {
+        return $this->issueDate;
+    }
+
+    public function getTaxPointDate(): string
+    {
+        return $this->taxPointDate;
+    }
+
+    public function getDueDate(): string
+    {
+        return $this->dueDate;
+    }
+
+    public function getInvoicePeriod(): string
+    {
+        return $this->invoicePeriod;
+    }
+
+    public function getReferences(): array
+    {
+        return $this->references;
+    }
+
+    public function getAccountingCost(): ?string
+    {
+        return $this->accountingCost;
+    }
+
+    public function getNote(): string
+    {
+        return $this->note;
+    }
+
+    public function getAmountIncludingVat(): float
+    {
+        return $this->amountIncludingVat;
+    }
+
+    public function getPrepaidAmount(): ?float
+    {
+        return $this->prepaidAmount;
+    }
+
+    public function getAccountingSupplierParty(): array
+    {
+        return $this->accountingSupplierParty;
+    }
+
+    public function getAccountingCustomerParty(): array
+    {
+        return $this->accountingCustomerParty;
+    }
+
+    public function getPaymentMeans(): array
+    {
+        return $this->paymentMeans;
+    }
+
+    public function getTaxTotal(): array
+    {
+        return $this->taxTotal;
+    }
+
+    public function setTaxSystem(string $taxSystem): void
+    {
+        $this->taxSystem = $taxSystem;
     }
 }

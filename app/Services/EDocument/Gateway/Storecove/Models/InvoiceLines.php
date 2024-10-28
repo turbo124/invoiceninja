@@ -7,25 +7,18 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class InvoiceLines
 {
-    #[SerializedName('ID.value')]
     public string $lineId = '';
 
-    #[SerializedName('LineExtensionAmount.amount')]
     public float $amountExcludingVat = 0.0;
 
-    #[SerializedName('Price.PriceAmount.amount')]
     public float $itemPrice = 0.0;
 
-    #[SerializedName('InvoicedQuantity')]
     public int $quantity = 0;
 
-    #[SerializedName('InvoicedQuantity.unitCode')]
     public string $quantityUnitCode = '';
 
-    #[SerializedName('Item.Name')]
     public string $name = '';
 
-    #[SerializedName('Item.Description')]
     public string $description = '';
 
     public Tax $tax;
