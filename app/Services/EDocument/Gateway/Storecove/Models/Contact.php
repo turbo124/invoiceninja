@@ -14,20 +14,11 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class Contact
 {
-    public string $email;
-    public string $firstName;
-    public string $lastName;
-    public string $phone;
 
     public function __construct(
-        string $email,
-        string $firstName,
-        string $lastName,
-        string $phone
-    ) {
-        $this->email = $email;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->phone = $phone;
-    }
+        public string $email,
+        public ?string $firstName = null,
+        public ?string $lastName = null,
+        public ?string $phone = null
+    ){}
 }

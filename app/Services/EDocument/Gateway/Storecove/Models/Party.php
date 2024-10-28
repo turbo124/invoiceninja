@@ -13,17 +13,9 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class Party
 {
-    public string $companyName;
-    public Address $address;
-    public Contact $contact;
-
     public function __construct(
-        string $companyName,
-        Address $address,
-        Contact $contact
-    ) {
-        $this->companyName = $companyName;
-        $this->address = $address;
-        $this->contact = $contact;
-    }
+        public Contact $contact,
+        ?public string $companyName = null,
+        ?public Address $address = null,
+    ) {}
 }

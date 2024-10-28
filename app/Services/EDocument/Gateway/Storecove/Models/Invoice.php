@@ -42,95 +42,147 @@ class Invoice
 
     public ?float $prepaidAmount = null;
 
-    public array $accountingSupplierParty = [];
+    public $accountingSupplierParty;
 
-    public array $accountingCustomerParty = [];
+    public $accountingCustomerParty;
 
-    public array $paymentMeans = [];
+    public $paymentMeans = [];
 
-    public array $taxTotal = [];
+    public $taxTotal = [];
 
-    public array $invoiceLines = [];
+    public $invoiceLines = [];
 
 
-    public function setDocumentCurrency(string $documentCurrency): void
+    public function setDocumentCurrency(string $documentCurrency): self
     {
         $this->documentCurrency = $documentCurrency;
-    }
+    
+        return $this;
+}
 
-    public function setInvoiceNumber(string $invoiceNumber): void
+    public function setInvoiceNumber(string $invoiceNumber): self
     {
         $this->invoiceNumber = $invoiceNumber;
-    }
+    
+        return $this;
+}
 
-    public function setIssueDate($issueDate): void
+    public function setIssueDate($issueDate): self
     {
         $this->issueDate = $issueDate;
+
+        return $this;
     }
 
-    public function setTaxPointDate($taxPointDate): void
+    public function setTaxPointDate($taxPointDate): self
     {
         $this->taxPointDate = $taxPointDate;
+
+        return $this;
     }
 
-    public function setDueDate($dueDate): void
+    public function setDueDate($dueDate): self
     {
         $this->dueDate = $dueDate;
+
+        return $this;
     }
 
-    public function setInvoicePeriod($invoicePeriod): void
+    public function setInvoicePeriod($invoicePeriod): self
     {
         $this->invoicePeriod = $invoicePeriod;
+        return $this;
     }
 
-    public function setReferences( $references): void
+    public function setReferences($references): self
     {
         $this->references = $references;
+        return $this;
+
     }
 
-    public function setAccountingCost($accountingCost): void
+    public function addReferences($reference): self
+    {
+        $this->references[] = $reference;
+
+        return $this;
+    }
+    public function setAccountingCost($accountingCost): self
     {
         $this->accountingCost = $accountingCost;
+        
+return $this;
+
     }
 
-    public function setNote($note): void
+    public function setNote($note): self
     {
         $this->note = $note;
+        
+return $this;
+
     }
 
-    public function setAmountIncludingVat ($amountIncludingVat): void
+    public function setAmountIncludingVat ($amountIncludingVat): self
     {
         $this->amountIncludingVat = $amountIncludingVat;
+        
+return $this;
+
     }
 
-    public function setPrepaidAmount( $prepaidAmount): void
+    public function setPrepaidAmount( $prepaidAmount): self
     {
         $this->prepaidAmount = $prepaidAmount;
+        
+return $this;
+
     }
 
-    public function setAccountingSupplierParty( $accountingSupplierParty): void
+    public function setAccountingSupplierParty($accountingSupplierParty): self
     {
         $this->accountingSupplierParty = $accountingSupplierParty;
+        
+return $this;
+
     }
 
-    public function setAccountingCustomerParty( $accountingCustomerParty): void
+    public function setAccountingCustomerParty( $accountingCustomerParty): self
     {
         $this->accountingCustomerParty = $accountingCustomerParty;
+        
+return $this;
+
     }
 
-    public function setPaymentMeans( $paymentMeans): void
+    public function setPaymentMeans( $paymentMeans): self
     {
         $this->paymentMeans = $paymentMeans;
+        
+return $this;
+
     }
 
-    public function setTaxTotal( $taxTotal): void
+    public function setTaxTotal( $taxTotal): self
     {
         $this->taxTotal = $taxTotal;
+        
+return $this;
+
     }
 
-    public function setInvoiceLines(array $invoiceLines): void
+    public function setInvoiceLines(array $invoiceLines): self
     {
         $this->invoiceLines = $invoiceLines;
+        
+return $this;
+
+    }
+
+    public function addInvoiceLines($invoiceLine): self
+    {
+        $this->invoiceLines[] = $invoiceLine;
+        return $this;
     }
 
     public function getInvoiceLines()
@@ -218,8 +270,9 @@ class Invoice
         return $this->taxTotal;
     }
 
-    public function setTaxSystem(string $taxSystem): void
+    public function setTaxSystem(string $taxSystem): self
     {
         $this->taxSystem = $taxSystem;
+        return $this;
     }
 }

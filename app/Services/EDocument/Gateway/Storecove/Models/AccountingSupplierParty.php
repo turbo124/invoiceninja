@@ -13,10 +13,7 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class AccountingSupplierParty
 {
-    public Party $party;
-
-    public function __construct(Party $party)
+    public function __construct(public Party $party)
     {
-        $this->party = $party;
     }
 }

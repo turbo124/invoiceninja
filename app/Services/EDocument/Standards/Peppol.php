@@ -993,10 +993,12 @@ class Peppol extends AbstractService
         $address = new Address();
         $address->CityName = $this->invoice->client->city;
         $address->StreetName = $this->invoice->client->address1;
-        // $address->BuildingName = $this->invoice->client->address2;
+
+        if(isset($this->invoice->client->address2) && strlen($this->invoice->client->address2) > 1)
+        $address->BuildingName = $this->invoice->client->address2;
+
         $address->PostalZone = $this->invoice->client->postal_code;
         $address->CountrySubentity = $this->invoice->client->state;
-        // $address->CountrySubentityCode = $this->invoice->client->state;
 
         $country = new Country();
 
@@ -1014,7 +1016,11 @@ class Peppol extends AbstractService
         $party->PhysicalLocation = $physical_location;
 
         $contact = new Contact();
+
         $contact->ElectronicMail = $this->invoice->client->present()->email();
+
+        if(isset($this->invoice->client->phone) && strlen($this->invoice->client->phone >2))
+            $contact->Telephone = $this->invoice->client->phone;
 
         $party->Contact = $contact;
 
