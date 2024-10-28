@@ -24,7 +24,7 @@ class EInvoiceTokenController extends BaseController
         $user = auth()->user();
 
         $user->account->update([
-            'e_invoice_token' => $request->input('token'),
+            'e_invoicing_token' => $request->input('token'),
         ]);
 
         return response()->noContent();
