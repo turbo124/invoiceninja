@@ -20,11 +20,12 @@ class EInvoiceTokenController extends BaseController
 {
     public function __invoke(UpdateTokenRequest $request): Response
     {
-        /** @var \App\Models\Company $company */
-        $company = auth()->user()->company();
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
-        $company->e_invoicing_token = $request->get('token');
-        $company->save();
+        $user->account->update([
+            'e_invoice_token' => $request->input('token'),
+        ]);
 
         return response()->noContent();
     }
