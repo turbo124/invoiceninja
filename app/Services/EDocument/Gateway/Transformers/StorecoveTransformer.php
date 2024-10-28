@@ -7,7 +7,9 @@ use App\Services\EDocument\Gateway\Storecove\Models\AccountingSupplierParty;
 use App\Services\EDocument\Gateway\Storecove\Models\Address;
 use App\Services\EDocument\Gateway\Storecove\Models\Contact;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
+use App\Services\EDocument\Gateway\Storecove\Models\InvoiceLines;
 use App\Services\EDocument\Gateway\Storecove\Models\Party;
+use App\Services\EDocument\Gateway\Storecove\Models\PaymentMeans;
 use App\Services\EDocument\Gateway\Storecove\Models\References;
 
 class StorecoveTransformer implements TransformerInterface
@@ -47,7 +49,6 @@ class StorecoveTransformer implements TransformerInterface
             $this->s_invoice->setAccountingCost($peppolInvoice->AccountingCostCode);
         }
         
-        
         $customer_company_name = $peppolInvoice->AccountingCustomerParty->Party->PartyName[0]->Name ?? '';
 
         $address = new Address(
@@ -69,40 +70,30 @@ class StorecoveTransformer implements TransformerInterface
         $party_identifiers = []; // do this outside the transformer.
         $acp = new AccountingCustomerParty($party_identifiers, $customer_party);
         $this->s_invoice->setAccountingCustomerParty($acp);
+        
 
-        $supplier_part = new Party()
-// $asp = new AccountingSupplierParty($party);
+        $supplier_contact = new Contact(
+            email: $peppolInvoice->AccountingSupplierParty->Party->Contact->ElectronicMail,
+            firstName: $peppolInvoice->AccountingSupplierParty->Party->Contact->Name ?? null,
+            phone: $peppolInvoice->AccountingSupplierParty->Party->Contact->Telephone ?? null,
+        );
 
+        $supplier_party = new Party(contact: $supplier_contact);
+        $asp = new AccountingSupplierParty($supplier_party);
+        $this->s_invoice->setAccountingSupplierParty($asp);
 
-if (isset($peppolInvoice->AccountingSupplierParty->Party)) {
-    $supplier = $peppolInvoice->AccountingSupplierParty->Party;
-    $this->s_invoice->setAccountingSupplierParty([
-        'name' => $supplier->PartyName[0]->Name ?? '',
-        'vatNumber' => $supplier->PartyIdentification[0]->ID->value ?? '',
-        'streetName' => $supplier->PostalAddress->StreetName ?? '',
-        'cityName' => $supplier->PostalAddress->CityName ?? '',
-        'postalZone' => $supplier->PostalAddress->PostalZone ?? '',
-        'countryCode' => $supplier->PostalAddress->Country->IdentificationCode->value ?? '',
-    ]);
-}
+        if (isset($peppolInvoice->PaymentMeans[0])) {
 
-// if (isset($peppolInvoice->AccountingCustomerParty->Party)) {
-//     $customer = $peppolInvoice->AccountingCustomerParty->Party;
-//     $this->s_invoice->setAccountingCustomerParty([
-//         'name' => $customer->PartyName[0]->Name ?? '',
-//         'vatNumber' => $customer->PartyIdentification[0]->ID->value ?? '',
-//         'streetName' => $customer->PostalAddress->StreetName ?? '',
-//         'cityName' => $customer->PostalAddress->CityName ?? '',
-//         'postalZone' => $customer->PostalAddress->PostalZone ?? '',
-//         'countryCode' => $customer->PostalAddress->Country->IdentificationCode->value ?? '',
-//     ]);
-// }
+            $payment_means = new PaymentMeans();
+            $payment_means->setCodeProps($peppolInvoice->PaymentMeans[0]);
 
-// if (isset($peppolInvoice->PaymentMeans[0])) {
-//     $this->s_invoice->setPaymentMeans([
-//         'paymentID' => $peppolInvoice->PaymentMeans[0]->PayeeFinancialAccount->ID->value ?? '',
-//     ]);
-// }
+            $this->s_invoice->addPaymentMeans($payment_means);
+        }
+
+        foreach($peppolInvoice->InvoiceLine as $invoiceLine)
+        {
+            $line = new InvoiceLines();
+        }
 
 // // Map tax total at invoice level
 // $taxTotal = [];

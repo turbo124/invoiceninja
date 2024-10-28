@@ -915,7 +915,6 @@ class Peppol extends AbstractService
 
         }
 
-
         $address = new Address();
         $address->CityName = $this->invoice->company->settings->city;
         $address->StreetName = $this->invoice->company->settings->address1;

@@ -15,7 +15,7 @@ class Party
 {
     public function __construct(
         public Contact $contact,
-        ?public string $companyName = null,
-        ?public Address $address = null,
+        public ?string $companyName = null,
+        public ?Address $address = null
     ) {}
 }

@@ -21,11 +21,12 @@ class InvoiceLines
 
     public string $description = '';
 
-    public Tax $tax;
+    public Tax $taxesDutiesFees;
+
+    public array $allowanceCharges = []; //line item discounts
 
     public function __construct()
     {
-        $this->tax = new Tax();
     }
 
     // Getters and setters
@@ -101,12 +102,29 @@ class InvoiceLines
 
     public function getTax(): Tax
     {
-        return $this->tax;
+        return $this->taxesDutiesFees;
     }
 
     public function setTax(Tax $tax): void
     {
-        $this->tax = $tax;
+        $this->taxesDutiesFees = $tax;
+    }
+
+    public function getAllowanceCharges(): array
+    {
+        return $this->allowanceCharges;
+    }
+
+    public function setAllowanceCharges(array $allowanceCharges): self
+    {
+        $this->allowanceCharges = $allowanceCharges;
+
+        return $this;
+    }
+
+    public function addAllowanceCharge($allowanceCharge): self
+    {
+        $this->allowanceCharges[] = $allowanceCharge;
     }
 }
 

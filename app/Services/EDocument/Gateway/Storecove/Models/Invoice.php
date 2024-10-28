@@ -163,6 +163,12 @@ return $this;
 
     }
 
+    public function addPaymentMeans($paymentMeans): self
+    {
+        $this->paymentMeans[] = $paymentMeans;
+        return $this;
+    }
+
     public function setTaxTotal( $taxTotal): self
     {
         $this->taxTotal = $taxTotal;

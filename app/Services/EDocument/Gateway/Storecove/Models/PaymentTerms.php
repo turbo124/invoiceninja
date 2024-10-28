@@ -14,10 +14,5 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class PaymentTerms
 {
-    public string $note;
-
-    public function __construct(string $note)
-    {
-        $this->note = $note;
-    }
+    public function __construct(public string $note){}
 }
