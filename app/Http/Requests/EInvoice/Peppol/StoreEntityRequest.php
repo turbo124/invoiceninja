@@ -20,8 +20,7 @@ use Illuminate\Validation\Rule;
 
 class StoreEntityRequest extends FormRequest
 {
-
-    private array $vat_regex_patterns = [
+    protected array $vat_regex_patterns = [
         'DE' => '/^DE\d{9}$/',
         'AT' => '/^ATU\d{8}$/',
         'BE' => '/^BE0\d{9}$/',
@@ -110,7 +109,6 @@ class StoreEntityRequest extends FormRequest
 
     public function country(): Country
     {
-        
         /** @var \Illuminate\Support\Collection<\App\Models\Country> */
         $countries = app('countries');
 
@@ -118,5 +116,4 @@ class StoreEntityRequest extends FormRequest
             return $this->country == $c->id;
         });
     }
-
 }

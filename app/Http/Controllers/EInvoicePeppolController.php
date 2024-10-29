@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use Http;
 use Illuminate\Http\Response;
 use App\Http\Requests\EInvoice\Peppol\StoreEntityRequest;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
@@ -20,7 +21,7 @@ use App\Http\Requests\EInvoice\Peppol\ShowEntityRequest;
 use App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest;
 
 class EInvoicePeppolController extends BaseController
-{        
+{
     /**
      * Returns the legal entity ID
      *
@@ -71,16 +72,19 @@ class EInvoicePeppolController extends BaseController
      * 
      * 
      * @param  ShowEntityRequest $request
-     * @param  Storecove $storecove
      * @return mixed
      */
-    public function show(ShowEntityRequest $request, Storecove $storecove)
+    public function show(ShowEntityRequest $request)
     {
         $company = auth()->user()->company();
 
-        $response = $storecove->getLegalEntity($company->legal_entity_id);
+        $response = Http::baseUrl(config('ninja.app_domain'))
+            ->post('/api/einvoice/peppol/legal_entity', data: [
+                'legal_entity_id' => $company->legal_entity_id,
+                'e_invoicing_token' => $company->account->e_invoicing_token,
+            ]);
 
-        return response()->json($response, 200);
+        return response()->json($response->json(), 200);
     }
 
     /**
@@ -98,18 +102,23 @@ class EInvoicePeppolController extends BaseController
          */
         $company = auth()->user()->company();
 
-        $legal_entity_response = $storecove->createLegalEntity($request->validated(), $company);
+        $response = Http::baseUrl(config('ninja.app_domain'))
+            ->post('/api/einvoice/peppol/setup', data: [
+                ...$request->validated(),
+                'classification' => $company->settings->classification,
+                'vat_number' => $company->settings->vat_number,
+                'e_invoicing_token' => $company->account->e_invoicing_token,
+            ]);
 
-        $scheme = $storecove->router->resolveRouting($request->country, $company->settings->classification);
+        info($response->status());
+        info($response->json());
+        info('Successful', ['status' => $response->successful()]);
+        info('legal entity id', ['v' => $response->json('legal_entity_id')]);
+        info($response->json());
 
-        $add_identifier_response = $storecove->addIdentifier(
-            legal_entity_id: $legal_entity_response['id'],
-            identifier: $company->settings->vat_number,
-            scheme: $scheme,
-        );
 
-        if ($add_identifier_response) {
-            $company->legal_entity_id = $legal_entity_response['id'];
+        if ($response->successful()) {
+            $company->legal_entity_id = $response->json('legal_entity_id');
 
             $tax_data = $company->tax_data;
 
@@ -118,7 +127,7 @@ class EInvoicePeppolController extends BaseController
 
             $settings = $company->settings;
             $settings->e_invoice_type = 'PEPPOL';
-            
+
             $company->tax_data = $tax_data;
             $company->settings = $settings;
 
@@ -127,11 +136,9 @@ class EInvoicePeppolController extends BaseController
             return response()->noContent();
         }
 
-        // @todo: Improve with proper error.
-
-        return response()->noContent(status: 422);
+        return response()->noContent(status: 500);
     }
-    
+
     /**
      * Add an additional tax identifier to
      * an existing legal entity id
@@ -144,7 +151,8 @@ class EInvoicePeppolController extends BaseController
      */
     public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): \Illuminate\Http\JsonResponse
     {
-        
+        // @todo: check with dave, since this method has 0 references and it's not being used.
+
         $company = auth()->user()->company();
         $tax_data = $company->tax_data;
 
@@ -165,14 +173,19 @@ class EInvoicePeppolController extends BaseController
         return response()->json(['message' => 'ok'], 200);
 
     }
-    
-    public function updateLegalEntity(UpdateEntityRequest $request, Storecove $storecove)
+
+    public function updateLegalEntity(UpdateEntityRequest $request)
     {
         $company = auth()->user()->company();
 
-        $r = $storecove->updateLegalEntity($company->legal_entity_id, $request->validated());
+        $response = Http::baseUrl(config('ninja.app_domain'))
+            ->put('/api/einvoice/peppol/legal_entity', data: [
+                ...$request->validated(),
+                'legal_entity_id' => $company->legal_entity_id,
+                'e_invoicing_token' => $company->account->e_invoicing_token,
+            ]);
 
-        if ($r->successful()) {
+        if ($response->successful()) {
             $tax_data = $company->tax_data;
 
             $tax_data->acts_as_sender = $request->acts_as_sender;
@@ -184,7 +197,7 @@ class EInvoicePeppolController extends BaseController
 
             return response()->noContent();
         }
-            
+
         return response()->json(['message' => 'Error updating identifier'], 422);
     }
 
@@ -192,21 +205,23 @@ class EInvoicePeppolController extends BaseController
      * Removed the legal identity from the Peppol network
      *
      * @param  DisconnectRequest $request
-     * @param  Storecove $storecove
      * @return \Illuminate\Http\Response
      */
-    public function disconnect(DisconnectRequest $request, Storecove $storecove): \Illuminate\Http\Response
+    public function disconnect(DisconnectRequest $request): \Illuminate\Http\Response
     {
         /**
          * @var \App\Models\Company $company
          */
         $company = auth()->user()->company();
 
-        $response = $storecove->deleteIdentifier(
-            legal_entity_id: $company->legal_entity_id,
-        );
+        $response = Http::baseUrl(config('ninja.app_domain'))
+            ->post('/api/einvoice/peppol/disconnect', data: [
+                'company_key' => $company->company_key,
+                'legal_entity_id' => $company->legal_entity_id,
+                'e_invoicing_token' => $company->account->e_invoicing_token,
+            ]);
 
-        if ($response) {
+        if ($response->successful()) {
             $company->legal_entity_id = null;
             $company->tax_data = $this->unsetVatNumbers($company->tax_data);
 
@@ -221,9 +236,7 @@ class EInvoicePeppolController extends BaseController
 
         }
 
-        // @todo: Improve with proper error.
-
-        return response()->noContent(status: 422);
+        return response()->noContent(status: 500);
     }
 
     private function unsetVatNumbers(mixed $taxData): mixed
