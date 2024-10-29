@@ -21,6 +21,10 @@ class ClientGatewayTokenRepository extends BaseRepository
     public function save(array $data, ClientGatewayToken $client_gateway_token): ClientGatewayToken
     {
         $client_gateway_token->fill($data);
+        
+        if(isset($data['company_gateway_id']))
+            $client_gateway_token->company_gateway_id = $data['company_gateway_id'];
+
         $client_gateway_token->save();
 
         return $client_gateway_token->fresh();
