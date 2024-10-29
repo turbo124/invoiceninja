@@ -202,6 +202,7 @@ class StorecoveTransformer implements TransformerInterface
         return $this;
 
     }
+    
     private function resolveJurisdication($ctc, $peppolInvoice): string 
     {
         if(isset($ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value))

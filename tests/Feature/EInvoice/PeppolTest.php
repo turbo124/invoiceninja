@@ -72,12 +72,12 @@ class PeppolTest extends TestCase
 
         $fib = new FinancialInstitutionBranch();
         $fib->ID = "DEUTDEMMXXX"; //BIC
-        $fib->Name = 'Deutsche Bank';
+        // $fib->Name = 'Deutsche Bank';
 
         $pfa = new PayeeFinancialAccount();
         $pfa->ID = 'DE89370400440532013000';
         $pfa->Name = 'PFA-NAME';
-        $pfa->AliasName = 'PFA-Alias';
+        // $pfa->AliasName = 'PFA-Alias';
         $pfa->AccountTypeCode = 'CHECKING';
         $pfa->AccountFormatCode = 'IBAN';
         $pfa->CurrencyCode = 'EUR';
@@ -197,12 +197,12 @@ class PeppolTest extends TestCase
 
         $fib = new FinancialInstitutionBranch();
         $fib->ID = "DEUTDEMMXXX"; //BIC
-        $fib->Name = 'Deutsche Bank';
+        // $fib->Name = 'Deutsche Bank';
 
         $pfa = new PayeeFinancialAccount();
         $pfa->ID = 'DE89370400440532013000';
         $pfa->Name = 'PFA-NAME';
-        $pfa->AliasName = 'PFA-Alias';
+        // $pfa->AliasName = 'PFA-Alias';
         $pfa->AccountTypeCode = 'CHECKING';
         $pfa->AccountFormatCode = 'IBAN';
         $pfa->CurrencyCode = 'EUR';
@@ -336,12 +336,12 @@ $peppol->toXml();
 
         $fib = new FinancialInstitutionBranch();
         $fib->ID = "DEUTDEMMXXX"; //BIC
-        $fib->Name = 'Deutsche Bank';
+        // $fib->Name = 'Deutsche Bank';
 
         $pfa = new PayeeFinancialAccount();
         $pfa->ID = 'DE89370400440532013000';
         $pfa->Name = 'PFA-NAME';
-        $pfa->AliasName = 'PFA-Alias';
+        // $pfa->AliasName = 'PFA-Alias';
         $pfa->AccountTypeCode = 'CHECKING';
         $pfa->AccountFormatCode = 'IBAN';
         $pfa->CurrencyCode = 'EUR';
@@ -456,12 +456,12 @@ $peppol->toXml();
 
         $fib = new FinancialInstitutionBranch();
         $fib->ID = "DEUTDEMMXXX"; //BIC
-        $fib->Name = 'Deutsche Bank';
+        // $fib->Name = 'Deutsche Bank';
 
         $pfa = new PayeeFinancialAccount();
         $pfa->ID = 'DE89370400440532013000';
         $pfa->Name = 'PFA-NAME';
-        $pfa->AliasName = 'PFA-Alias';
+        // $pfa->AliasName = 'PFA-Alias';
         $pfa->AccountTypeCode = 'CHECKING';
         $pfa->AccountFormatCode = 'IBAN';
         $pfa->CurrencyCode = 'EUR';

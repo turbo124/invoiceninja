@@ -68,9 +68,6 @@ class Peppol extends AbstractService
     use Taxer;
     use NumberFormatter;
 
-
-    //@todo - refactor and move storecove specific logic to the Storecove class
-
     /**
      * Assumptions:
      *
@@ -311,6 +308,8 @@ class Peppol extends AbstractService
 
     public Qvalia | Storecove $gateway;
 
+    private array $tax_map = [];
+
     /**
     * @param Invoice $invoice
     */
@@ -330,8 +329,14 @@ class Peppol extends AbstractService
      */
     public function run(): self
     {
-        $this->p_invoice->CustomizationID = $this->customizationID;
-        $this->p_invoice->ProfileID = $this->profileID;
+        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
+        $id->value = $this->customizationID;
+        $this->p_invoice->CustomizationID = $id;
+
+        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ProfileID();
+        $id->value = $this->profileID;
+        $this->p_invoice->ProfileID = $id;
+
         $this->p_invoice->ID = $this->invoice->number;
         $this->p_invoice->IssueDate = new \DateTime($this->invoice->date);
 
@@ -368,7 +373,8 @@ class Peppol extends AbstractService
 
         $this->p_invoice->AllowanceCharge = $this->getAllowanceCharges();
 
-        $this->setOrderReference();
+        $this->setOrderReference()
+        ->setTaxBreakdown();
 
         $this->p_invoice = $this->gateway
                                 ->mutator
@@ -743,7 +749,7 @@ class Peppol extends AbstractService
 
             $ts = new TaxScheme();
             $id = new ID();
-            $id->value = $item->tax_name1;
+            $id->value = $this->standardizeTaxSchemeId($item->tax_name1);
             $ts->ID = $id;
             $ctc->TaxScheme = $ts;
 
@@ -759,7 +765,7 @@ class Peppol extends AbstractService
                                 
                 $ts = new TaxScheme();
                 $id = new ID();
-                $id->value = $item->tax_name2;
+                $id->value = $this->standardizeTaxSchemeId($item->tax_name2);
                 $ts->ID = $id;
                 $ctc->TaxScheme = $ts;
 
@@ -774,7 +780,7 @@ class Peppol extends AbstractService
 
                 $ts = new TaxScheme();
                 $id = new ID();
-                $id->value = $item->tax_name3;
+                $id->value = $this->standardizeTaxSchemeId($item->tax_name3);
                 $ts->ID = $id;
                 $ctc->TaxScheme = $ts;
 
@@ -800,9 +806,9 @@ class Peppol extends AbstractService
 
             $item_taxes = $this->getItemTaxes($item);
 
-            if(count($item_taxes) > 0) {
-                $line->TaxTotal = $item_taxes;
-            }
+            // if(count($item_taxes) > 0) {
+            //     $line->TaxTotal = $item_taxes;
+            // }
 
             // $price = new Price();
             // $pa = new PriceAmount();
@@ -971,7 +977,7 @@ class Peppol extends AbstractService
             $ts = new TaxScheme();
 
             $id = new ID();
-            $id->value = $item->tax_name1;
+            $id->value = $this->standardizeTaxSchemeId($item->tax_name1);
 
             $jurisdiction = $this->getJurisdiction();
             $ts->JurisdictionRegionAddress[] = $jurisdiction;
@@ -983,6 +989,13 @@ class Peppol extends AbstractService
             $tax_total = new TaxTotal();
             $tax_total->TaxAmount = $tax_amount;
             $tax_total->TaxSubtotal[] = $tax_subtotal;
+
+            $this->tax_map[] = [
+                'taxableAmount' => $taxable_amount->amount,
+                'taxAmount' => $tax_amount->amount,
+                'percentage' => $item->tax_rate1,
+            ];
+
             $item_taxes[] = $tax_total;
 
         }
@@ -1014,7 +1027,7 @@ class Peppol extends AbstractService
             $ts = new TaxScheme();
 
             $id = new ID();
-            $id->value = $item->tax_name2;
+            $id->value = $this->standardizeTaxSchemeId($item->tax_name2);
             
             $jurisdiction = $this->getJurisdiction();
             $ts->JurisdictionRegionAddress[] = $jurisdiction;
@@ -1027,6 +1040,14 @@ class Peppol extends AbstractService
             $tax_total = new TaxTotal();
             $tax_total->TaxAmount = $tax_amount;
             $tax_total->TaxSubtotal[] = $tax_subtotal;
+
+            
+            $this->tax_map[] = [
+                'taxableAmount' => $taxable_amount->amount,
+                'taxAmount' => $tax_amount->amount,
+                'percentage' => $item->tax_rate1,
+            ];
+
             $item_taxes[] = $tax_total;
 
         }
@@ -1058,7 +1079,7 @@ class Peppol extends AbstractService
             $ts = new TaxScheme();
 
             $id = new ID();
-            $id->value = $item->tax_name3;
+            $id->value = $this->standardizeTaxSchemeId($item->tax_name3);
 
             $jurisdiction = $this->getJurisdiction();
             $ts->JurisdictionRegionAddress[] = $jurisdiction;
@@ -1070,6 +1091,14 @@ class Peppol extends AbstractService
             $tax_total = new TaxTotal();
             $tax_total->TaxAmount = $tax_amount;
             $tax_total->TaxSubtotal[] = $tax_subtotal;
+
+
+            $this->tax_map[] = [
+                'taxableAmount' => $taxable_amount->amount,
+                'taxAmount' => $tax_amount->amount,
+                'percentage' => $item->tax_rate1,
+            ];
+
             $item_taxes[] = $tax_total;
 
 
@@ -1108,6 +1137,18 @@ class Peppol extends AbstractService
 
             $party->PartyIdentification[] = $pi;
 
+            $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
+
+            $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
+            $companyID->value = $this->invoice->company->settings->vat_number;
+            $pts->CompanyID = $companyID;
+
+            $ts = new TaxScheme();
+            $ts->ID = $vatID;
+            $pts->TaxScheme = $ts;
+
+            $party->PartyTaxScheme[] = $pts;
+
         }
 
         $address = new Address();
@@ -1135,26 +1176,13 @@ class Peppol extends AbstractService
 
         $party->Contact = $contact;
 
-        $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
-
-        if(strlen($this->invoice->company->settings->id_number) > 1)
-        {
-            $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
-            $companyID->value = $this->invoice->company->settings->id_number;
-            $pts->CompanyID = $companyID;
-        }
-
         $ple = new \InvoiceNinja\EInvoice\Models\Peppol\PartyLegalEntity();
         $ple->RegistrationName = $this->invoice->company->present()->name();
         $party->PartyLegalEntity[] = $ple;
         
-        // $ts = new TaxScheme();
-        // $ts->CurrencyCode = $this->invoice->client->currency()->code;
-        // $ts->JurisdictionRegionAddress[] = $this->getJurisdiction();
-        // $pts->TaxScheme = $ts;
+        
 
-        $party->PartyTaxScheme[] = $pts;
-
+        
         $asp->Party = $party;
 
         return $asp;
@@ -1167,7 +1195,8 @@ class Peppol extends AbstractService
      */
     private function resolveTaxScheme(): string
     {
-        return (new StorecoveRouter())->resolveTaxScheme($this->invoice->client->country->iso_3166_2, $this->invoice->client->classification);
+        return $this->resolveScheme();
+        // return (new StorecoveRouter())->resolveTaxScheme($this->invoice->client->country->iso_3166_2, $this->invoice->client->classification);
     }
     
     /**
@@ -1354,6 +1383,75 @@ class Peppol extends AbstractService
         return $this;
     }
 
+    public function setTaxBreakdown(): self
+    {
+        
+        $tax_total = new TaxTotal();
+
+        $taxes = collect($this->tax_map)
+            ->groupBy('percentage')
+            ->map(function ($group) {
+
+                return [
+                    'taxableAmount' => $group->sum('taxableAmount'),
+                    'taxAmount' => $group->sum('taxAmount'),
+                    'percentage' => $group->first()['percentage'],
+                ];
+
+
+            });
+
+        foreach($taxes as $grouped_tax)
+        {
+            // Required: TaxAmount (BT-110)
+            $tax_amount = new TaxAmount();
+            $tax_amount->currencyID = $this->invoice->client->currency()->code;
+            $tax_amount->amount = (string)$grouped_tax['taxAmount'];
+            $tax_total->TaxAmount = $tax_amount;
+
+            // Required: TaxSubtotal (BG-23)
+            $tax_subtotal = new TaxSubtotal();
+
+            // Required: TaxableAmount (BT-116)
+            $taxable_amount = new TaxableAmount();
+            $taxable_amount->currencyID = $this->invoice->client->currency()->code;
+            $taxable_amount->amount = (string)$grouped_tax['taxableAmount'];
+            $tax_subtotal->TaxableAmount = $taxable_amount;
+
+            // Required: TaxAmount (BT-117)
+            $subtotal_tax_amount = new TaxAmount();
+            $subtotal_tax_amount->currencyID = $this->invoice->client->currency()->code;
+            $subtotal_tax_amount->amount = (string)$grouped_tax['taxAmount'];
+
+            $tax_subtotal->TaxAmount = $subtotal_tax_amount;
+
+            // Required: TaxCategory (BG-23)
+            $tax_category = new TaxCategory();
+
+            // Required: TaxCategory ID (BT-118)
+            $category_id = new ID();
+            $category_id->value = 'S'; // Standard rate
+            $tax_category->ID = $category_id;
+
+            // Required: TaxCategory Rate (BT-119)
+            $tax_category->Percent = (string)$grouped_tax['percentage'];
+
+            // Required: TaxScheme (BG-23)
+            $tax_scheme = new TaxScheme();
+            $scheme_id = new ID();
+            $scheme_id->value = $this->standardizeTaxSchemeId("taxname");
+            $tax_scheme->ID = $scheme_id;
+            $tax_category->TaxScheme = $tax_scheme;
+
+            $tax_subtotal->TaxCategory = $tax_category;
+            $tax_total->TaxSubtotal[] = $tax_subtotal;
+
+            $this->p_invoice->TaxTotal[] = $tax_total;
+        }
+
+        return $this;
+    }
+
     public function getJurisdiction()
     {
 
@@ -1389,4 +1487,108 @@ class Peppol extends AbstractService
         return $jurisdiction;
 
     }
+
+
+    private function standardizeTaxSchemeId(string $tax_name): string 
+    {
+                
+        $br = new BaseRule();
+        $eu_countries = $br->eu_country_codes;
+
+        // If company is in EU, standardize to VAT
+        if (in_array($this->company->country()->iso_3166_2, $eu_countries)) {
+            return "VAT";
+        }
+
+        // For non-EU countries, return original or handle specifically
+        return $this->standardizeTaxSchemeId($tax_name);
+    }
+
+    private function resolveScheme(): string
+    {
+
+        $vat_number = $this->company->settings->vat_number;
+        $tax_number = $this->company->settings->id_number;
+        $country_code = $this->company->country()->iso_3166_2;
+
+            switch ($country_code) {
+                case 'FR': // France
+                    return '0002'; // SIRENE
+
+                case 'SE': // Sweden
+                    return '0007'; // Organisationsnummer
+
+                case 'NO': // Norway
+                    return '0192'; // Enhetsregisteret
+
+                case 'FI': // Finland
+                    return '0213'; // Finnish VAT
+                    // '0212', // Finnish Organization Identifier
+                    // '0216', // OVT
+
+                case 'DK': // Denmark
+                    return '0184'; // DIGSTORG
+
+                case 'IT': // Italy
+                    return '0201'; // IPA
+                    // '0210', // CODICE FISCALE
+                    // '0211', // PARTITA IVA
+
+                case 'NL': // Netherlands
+                    return '0106'; // Chamber of Commerce
+                    // '0190', // Dutch Originator's Identification Number
+                
+                case 'BE': // Belgium
+                    return '0208'; // Enterprise Number
+
+                case 'LU': // Luxembourg
+                    return '0060'; // DUNS
+
+                case 'ES': // Spain
+                    return '0195'; // Company Registry
+
+                case 'AT': // Austria
+                    return '0088'; // GLN
+
+                case 'DE': // Germany
+                    return '0204'; // Leitweg-ID
+
+                case 'GB': // United Kingdom
+                    return '0088'; // GLN
+
+                case 'CH': // Switzerland
+                    return '0183'; // Swiss Unique Business ID
+
+                case 'SG': // Singapore
+                    return '0195'; // UEN
+                    //0009 DUNS
+
+                case 'AU': // Australia
+                    return '0151'; // ABN
+
+                case 'US': // United States
+                    return '0060'; // DUNS
+
+                case 'LT':
+                    return '0200';
+
+                case 'JP':
+                    return '0221'; // Japan Registered Invoice Number
+
+                case 'MY':
+                    return '0230'; // Malaysia National e-invoicing framework
+
+                case 'NZ':
+                    return '0088';
+         
+                // Default to GLN for any other country
+                default:
+                                        
+                    if (!empty($tax_number) && strlen($tax_number) === 9) {
+                        return '0009'; // DUNS if 9 digits
+                    }
+                    return '0088'; // Global Location Number (GLN)
+
+            }
+        }
 }
