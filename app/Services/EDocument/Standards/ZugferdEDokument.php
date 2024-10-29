@@ -178,7 +178,7 @@ class ZugferdEDokument extends AbstractService
             if (!$company->tax_data->regions->EU->has_sales_above_threshold){
                 // According to european law, each line item can only have one tax rate
                 if (!(empty($item->tax_name1) && empty($item->tax_name2) && empty($item->tax_name3))) {
-                    $taxtype = $this->getTaxType($item->tax_id);
+                    $taxtype = $this->getTaxType($item->tax_id ?? 2);
                     if (!empty($item->tax_name1)) {
                         if ($taxtype == ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES) {
                             $this->xdocument->addDocumentPositionTax($taxtype, 'VAT', $item->tax_rate1, exemptionReason: ctrans('texts.intracommunity_tax_info'));

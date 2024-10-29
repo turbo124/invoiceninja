@@ -163,8 +163,8 @@ class PaymentMeans
 
         if($ubl_payment_means->PayeeFinancialAccount ?? false){
 
-            $this->account = $ubl_payment_means->PayeeFinancialAccount->ID;
-            $this->branche_code = $ubl_payment_means->FinancialInstitutionBranch->ID;
+            $this->account = $ubl_payment_means->PayeeFinancialAccount->ID->value;
+            $this->branche_code = $ubl_payment_means->FinancialInstitutionBranch->ID->value ?? null;
 
         }
 

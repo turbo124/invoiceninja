@@ -95,6 +95,96 @@ class StorecoveTest extends TestCase
         nlog($json);
     }
 
+    public function testStorecoveTransformer()
+    {
+            
+      $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+
+      $invoice = $this->createATData();
+      
+      $item = new InvoiceItem();
+      $item->product_key = "Product Key";
+      $item->notes = "Product Description";
+      $item->cost = 10;
+      $item->quantity = 10;
+      $item->is_amount_discount = true;
+      $item->discount=5;
+      $item->tax_rate1 = 20;
+      $item->tax_name1 = 'VAT';
+
+      $invoice->line_items = [$item];
+      $invoice->calc()->getInvoice();
+
+      $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
+      foreach ($stub as $key => $value) {
+          $e_invoice->{$key} = $value;
+      }
+
+      $invoice->e_invoice = $e_invoice;
+
+      $p = new Peppol($invoice);
+      $p->run();
+      $peppolInvoice = $p->getInvoice();
+
+
+      $s_transformer = new StorecoveTransformer();
+      $s_transformer->transform($peppolInvoice);
+
+      $json = $s_transformer->toJson();
+
+      $this->assertJson($json);
+
+      nlog($json);
+
+    }
+
+    public function testStorecoveTransformerWithPercentageDiscount()
+    {
+            
+      $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+
+      $invoice = $this->createATData();
+      $invoice->is_amount_discount = false;
+      
+      $item = new InvoiceItem();
+      $item->product_key = "Product Key";
+      $item->notes = "Product Description";
+      $item->cost = 10;
+      $item->quantity = 10;
+      $item->is_amount_discount = false;
+      $item->discount=5;
+      $item->tax_rate1 = 20;
+      $item->tax_name1 = 'VAT';
+
+      $invoice->line_items = [$item];
+      $invoice->calc()->getInvoice();
+
+      $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
+      foreach ($stub as $key => $value) {
+          $e_invoice->{$key} = $value;
+      }
+
+      $invoice->e_invoice = $e_invoice;
+
+      $p = new Peppol($invoice);
+      $p->run();
+      $peppolInvoice = $p->getInvoice();
+
+
+      $s_transformer = new StorecoveTransformer();
+      $s_transformer->transform($peppolInvoice);
+
+      $json = $s_transformer->toJson();
+
+      $this->assertJson($json);
+
+      nlog("percentage");
+      nlog($json);
+
+    }
+
+
+
     public function testUnsetOfVatNumers()
     {
 

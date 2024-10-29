@@ -21,7 +21,7 @@ class InvoiceLines
 
     public string $description = '';
 
-    public Tax $taxesDutiesFees;
+    public Tax $tax;
 
     public array $allowanceCharges = []; //line item discounts
 
@@ -102,14 +102,14 @@ class InvoiceLines
 
     public function getTax(): Tax
     {
-        return $this->taxesDutiesFees;
+        return $this->tax;
     }
 
     public function setTax(Tax $tax): void
     {
-        $this->taxesDutiesFees = $tax;
+        $this->tax = $tax;
     }
-
+    
     public function getAllowanceCharges(): array
     {
         return $this->allowanceCharges;
@@ -125,6 +125,7 @@ class InvoiceLines
     public function addAllowanceCharge($allowanceCharge): self
     {
         $this->allowanceCharges[] = $allowanceCharge;
+        return $this;
     }
 }
 

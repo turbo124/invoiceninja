@@ -11,6 +11,7 @@
 
 namespace App\Services\EDocument\Standards;
 
+use App\DataMapper\Tax\BaseRule;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\Product;
@@ -671,13 +672,59 @@ class Peppol extends AbstractService
                 $line->TaxTotal = $item_taxes;
             }
 
-            $price = new Price();
-            $pa = new PriceAmount();
-            $pa->currencyID = $this->invoice->client->currency()->code;
-            $pa->amount = (string) ($this->costWithDiscount($item) - ($this->invoice->uses_inclusive_taxes ? ($this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) / $item->quantity) : 0));
-            $price->PriceAmount = $pa;
+            // $price = new Price();
+            // $pa = new PriceAmount();
+            // $pa->currencyID = $this->invoice->client->currency()->code;
+            // $pa->amount = (string) ($this->costWithDiscount($item) - ($this->invoice->uses_inclusive_taxes ? ($this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) / $item->quantity) : 0));
+            // $price->PriceAmount = $pa;
 
-            $line->Price = $price;
+            // $line->Price = $price;
+
+            // Handle Price and Discounts
+            if ($item->discount > 0) {
+                // Base Price (before discount)
+                $basePrice = new Price();
+                $basePriceAmount = new PriceAmount();
+                $basePriceAmount->currencyID = $this->invoice->client->currency()->code;
+                $basePriceAmount->amount = (string)$this->getBasePrice($item);
+                $basePrice->PriceAmount = $basePriceAmount;
+
+                // Add Allowance Charge to Price
+                $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+                $allowanceCharge->ChargeIndicator = false; // false = discount
+                $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+                $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+                $allowanceCharge->Amount->amount = (string)$this->calculateDiscountAmount($item);
+                $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+                $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+                $allowanceCharge->BaseAmount->amount = (string)$this->getBasePrice($item);
+
+                // Add percentage if available
+                if ($item->discount > 0 && !$item->is_amount_discount) {
+                    $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
+                    $mfn->value = (string) ($item->discount / 100);
+                    $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
+                }
+
+                $basePrice->AllowanceCharge[] = $allowanceCharge;
+                $line->Price = $basePrice;
+
+            } else {
+                // No discount case
+                $price = new Price();
+                $pa = new PriceAmount();
+                $pa->currencyID = $this->invoice->client->currency()->code;
+                $pa->amount = (string) ($this->costWithDiscount($item) - ($this->invoice->uses_inclusive_taxes
+                    ? ($this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) / $item->quantity)
+                    : 0));
+                $price->PriceAmount = $pa;
+                $line->Price = $price;
+            }
+
+
+
+
+
 
             $lines[] = $line;
         }
@@ -685,6 +732,21 @@ class Peppol extends AbstractService
         return $lines;
     }
     
+
+    private function getBasePrice($item): float
+    {
+        return $item->cost;
+    }
+
+    private function calculateDiscountAmount($item): float
+    {
+        if ($item->is_amount_discount) {
+            return $item->discount; // Per unit discount amount
+        }
+        
+        return $item->cost * ($item->discount / 100);
+    }
+
     
     /**
      * costWithDiscount
@@ -772,7 +834,6 @@ class Peppol extends AbstractService
             $taxable_amount->amount = $this->invoice->uses_inclusive_taxes ? $item->line_total - $tax_amount->amount : $item->line_total;
             $tax_subtotal->TaxableAmount = $taxable_amount;
             
-            
             $tc = new TaxCategory();
             
             $id = new ID();
@@ -784,6 +845,9 @@ class Peppol extends AbstractService
 
             $id = new ID();
             $id->value = $item->tax_name1;
+
+            $jurisdiction = $this->getJurisdiction();
+            $ts->JurisdictionRegionAddress[] = $jurisdiction;
 
             $ts->ID = $id;
             $tc->TaxScheme = $ts;
@@ -824,6 +888,9 @@ class Peppol extends AbstractService
 
             $id = new ID();
             $id->value = $item->tax_name2;
+            
+            $jurisdiction = $this->getJurisdiction();
+            $ts->JurisdictionRegionAddress[] = $jurisdiction;
 
             $ts->ID = $id;
             $tc->TaxScheme = $ts;
@@ -865,6 +932,9 @@ class Peppol extends AbstractService
 
             $id = new ID();
             $id->value = $item->tax_name3;
+
+            $jurisdiction = $this->getJurisdiction();
+            $ts->JurisdictionRegionAddress[] = $jurisdiction;
 
             $ts->ID = $id;
             $tc->TaxScheme = $ts;
@@ -908,7 +978,7 @@ class Peppol extends AbstractService
                 $vatID->schemeID = $scheme;
             }
 
-            $vatID->value = $this->company->settings->vat_number; //todo if we are cross border - switch to the supplier local vat number
+            $vatID->value = $this->company->settings->vat_number; //todo if we are cross border - switch to the supplier local vat number                                                                                                                     ->vat_number; //todo if we are cross border - switch to the supplier local vat number
             $pi->ID = $vatID;
 
             $party->PartyIdentification[] = $pi;
@@ -921,7 +991,6 @@ class Peppol extends AbstractService
         // $address->BuildingName = $this->invoice->company->settings->address2;
         $address->PostalZone = $this->invoice->company->settings->postal_code;
         $address->CountrySubentity = $this->invoice->company->settings->state;
-        // $address->CountrySubentityCode = $this->invoice->company->settings->state;
 
         $country = new Country();
 
@@ -1018,7 +1087,7 @@ class Peppol extends AbstractService
 
         $contact->ElectronicMail = $this->invoice->client->present()->email();
 
-        if(isset($this->invoice->client->phone) && strlen($this->invoice->client->phone >2))
+        if(isset($this->invoice->client->phone) && strlen($this->invoice->client->phone) > 2)
             $contact->Telephone = $this->invoice->client->phone;
 
         $party->Contact = $contact;
@@ -1091,49 +1160,82 @@ class Peppol extends AbstractService
     public function setInvoiceDefaults(): self
     {
 
-            // Stub new invoice with company settings.
-            if($this->_company_settings)
-            {
-                foreach(get_object_vars($this->_company_settings) as $prop => $value){
-                    $this->p_invoice->{$prop} = $value;
-                }
+        // Stub new invoice with company settings.
+        if($this->_company_settings)
+        {
+            foreach(get_object_vars($this->_company_settings) as $prop => $value){
+                $this->p_invoice->{$prop} = $value;
+            }
+        }
+
+        // Overwrite with any client level settings
+        if($this->_client_settings)
+        {
+            foreach (get_object_vars($this->_client_settings) as $prop => $value) {
+                $this->p_invoice->{$prop} = $value;
+            }
+        }
+
+        // Plucks special overriding properties scanning the correct settings level
+        $settings = [
+            'AccountingCostCode' => 7,
+            'AccountingCost' => 7,
+            'BuyerReference' => 6,
+            'AccountingSupplierParty' => 1,
+            'AccountingCustomerParty' => 2,
+            'PayeeParty' => 1,
+            'BuyerCustomerParty' => 2,
+            'SellerSupplierParty' => 1,
+            'TaxRepresentativeParty' => 1,
+            'Delivery' => 1,
+            'DeliveryTerms' => 7,
+            'PaymentMeans' => 7,
+            'PaymentTerms' => 7,
+        ];
+
+        //only scans for top level props
+        foreach($settings as $prop => $visibility) {
+
+            if($prop_value = $this->gateway->mutator->getSetting($prop)) {
+                $this->p_invoice->{$prop} = $prop_value;
             }
 
-            // Overwrite with any client level settings
-            if($this->_client_settings)
-            {
-                foreach (get_object_vars($this->_client_settings) as $prop => $value) {
-                    $this->p_invoice->{$prop} = $value;
-                }
-            }
+        }
 
-            // Plucks special overriding properties scanning the correct settings level
-            $settings = [
-                'AccountingCostCode' => 7,
-                'AccountingCost' => 7,
-                'BuyerReference' => 6,
-                'AccountingSupplierParty' => 1,
-                'AccountingCustomerParty' => 2,
-                'PayeeParty' => 1,
-                'BuyerCustomerParty' => 2,
-                'SellerSupplierParty' => 1,
-                'TaxRepresentativeParty' => 1,
-                'Delivery' => 1,
-                'DeliveryTerms' => 7,
-                'PaymentMeans' => 7,
-                'PaymentTerms' => 7,
-            ];
-
-            //only scans for top level props
-            foreach($settings as $prop => $visibility) {
-
-                if($prop_value = $this->gateway->mutator->getSetting($prop)) {
-                    $this->p_invoice->{$prop} = $prop_value;
-                }
-
-            }
-
-            return $this;
+        return $this;
     }
 
+    public function getJurisdiction()
+    {
+
+        //calculate nexus
+        $country_code = $this->company->country()->iso_3166_2;
+        $br = new BaseRule();
+        $eu_countries = $br->eu_country_codes;
+
+        if($this->invoice->client->country->iso_3166_2 == $this->company->country()->iso_3166_2){
+            //Domestic Sales
+            $country_code = $this->company->country()->iso_3166_2;
+        }
+        elseif(in_array($country_code, $eu_countries) && !in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
+            //NON-EU sale
+        }
+        elseif(in_array($country_code, $eu_countries) && in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
+            //EU Sale
+            if($this->company->tax_data->regions->EU->has_sales_above_threshold || !$this->invoice->client->has_valid_vat_number){ //over threshold - tax in buyer country
+                $country_code = $this->invoice->client->country->iso_3166_2;
+            }
+        }
+
+
+            $jurisdiction = new \InvoiceNinja\EInvoice\Models\Peppol\AddressType\JurisdictionRegionAddress();
+            $country = new Country();
+            $ic = new IdentificationCode();
+            $ic->value = $country_code;
+            $country->IdentificationCode = $ic;
+            $jurisdiction->Country = $country;
+
+            return $jurisdiction;
+
+    }
 }
