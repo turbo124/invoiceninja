@@ -553,7 +553,7 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            $allowanceCharge->ChargeIndicator = false; // false = discount
+            $allowanceCharge->ChargeIndicator = 'false'; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->calc->getTotalDiscount();
@@ -577,7 +577,7 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            $allowanceCharge->ChargeIndicator = true; // false = discount
+            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge1;
@@ -593,7 +593,7 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            $allowanceCharge->ChargeIndicator = true; // false = discount
+            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge2;
@@ -609,7 +609,7 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            $allowanceCharge->ChargeIndicator = true; // false = discount
+            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge3;
@@ -625,7 +625,7 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            $allowanceCharge->ChargeIndicator = true; // false = discount
+            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge4;
@@ -824,18 +824,18 @@ class Peppol extends AbstractService
                 $basePrice = new Price();
                 $basePriceAmount = new PriceAmount();
                 $basePriceAmount->currencyID = $this->invoice->client->currency()->code;
-                $basePriceAmount->amount = (string)$this->getBasePrice($item);
+                $basePriceAmount->amount = (string)($item->cost - $this->calculateDiscountAmount($item));
                 $basePrice->PriceAmount = $basePriceAmount;
 
                 // Add Allowance Charge to Price
                 $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-                $allowanceCharge->ChargeIndicator = false; // false = discount
+                $allowanceCharge->ChargeIndicator = 'false'; // false = discount
                 $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
                 $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
                 $allowanceCharge->Amount->amount = (string)$this->calculateDiscountAmount($item);
                 $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
                 $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->BaseAmount->amount = (string)$this->getBasePrice($item);
+                $allowanceCharge->BaseAmount->amount = (string)$item->cost;
 
                 // Add percentage if available
                 if ($item->discount > 0 && !$item->is_amount_discount) {
@@ -864,20 +864,15 @@ class Peppol extends AbstractService
 
         return $lines;
     }
-    
 
-    private function getBasePrice($item): float
-    {
-        return $item->cost * $item->quantity;
-    }
 
     private function calculateDiscountAmount($item): float
     {
         if ($item->is_amount_discount) {
-            return $item->discount; // Per unit discount amount
+            return $item->discount / $item->quantity; // Per unit discount amount
         }
         
-        return ($item->cost * $item->quantity) * ($item->discount / 100);
+        return ($item->cost / $item->quantity) * ($item->discount / 100);
     }
 
     
@@ -1147,6 +1142,13 @@ class Peppol extends AbstractService
             $ts->ID = $vatID;
             $pts->TaxScheme = $ts;
 
+            
+            //@todo if we have an exact GLN/routing number we should update this, otherwise Storecove will proxy and update on transit
+            $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\EndpointID();
+            $id->value = $this->company->settings->vat_number;
+            $id->schemeID = $this->resolveScheme();
+
+            $party->EndpointID = $id;
             $party->PartyTaxScheme[] = $pts;
 
         }
@@ -1230,6 +1232,18 @@ class Peppol extends AbstractService
 
         $party_name = new PartyName();
         $party_name->Name = $this->invoice->client->present()->name();
+
+
+        
+        //@todo if we have an exact GLN/routing number we should update this, otherwise Storecove will proxy and update on transit
+        if(strlen($this->invoice->client->routing_id ?? '') > 1)
+        {
+            $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\EndpointID();
+            $id->value = $this->invoice->client->routing_id;
+            $id->schemeID = $this->resolveScheme(true);
+            $party->EndpointID = $id;
+        }
+
         $party->PartyName[] = $party_name;
 
         $address = new Address();
@@ -1504,12 +1518,12 @@ class Peppol extends AbstractService
         return $this->standardizeTaxSchemeId($tax_name);
     }
 
-    private function resolveScheme(): string
+    private function resolveScheme(bool $is_client=false): string
     {
 
-        $vat_number = $this->company->settings->vat_number;
-        $tax_number = $this->company->settings->id_number;
-        $country_code = $this->company->country()->iso_3166_2;
+        $vat_number = $is_client ? $this->invoice->client->vat_number : $this->company->settings->vat_number;
+        $tax_number = $is_client ? $this->invoice->client->id_number : $this->company->settings->id_number;
+        $country_code = $is_client ? $this->invoice->client->country->iso_3166_2 : $this->company->country()->iso_3166_2;
 
             switch ($country_code) {
                 case 'FR': // France

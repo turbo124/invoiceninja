@@ -200,19 +200,30 @@ class PeppolTest extends TestCase
         // $fib->Name = 'Deutsche Bank';
 
         $pfa = new PayeeFinancialAccount();
-        $pfa->ID = 'DE89370400440532013000';
+        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+        $id->value = 'DE89370400440532013000';
+        $pfa->ID = $id;
         $pfa->Name = 'PFA-NAME';
-        // $pfa->AliasName = 'PFA-Alias';
-        $pfa->AccountTypeCode = 'CHECKING';
-        $pfa->AccountFormatCode = 'IBAN';
-        $pfa->CurrencyCode = 'EUR';
+
+        // $code = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\AccountTypeCode();
+        // $code->value = 'CHECKING';
+        // $pfa->AccountTypeCode = $code;
+
+        // $code = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\AccountFormatCode();
+        // $code->value = 'IBAN';
+        // $pfa->AccountFormatCode = $code;
+
+        // $code = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\CurrencyCode();
+        // $code->value = 'EUR';
+        // $pfa->CurrencyCode = $code;
+
         $pfa->FinancialInstitutionBranch = $fib;
 
         $pm = new PaymentMeans();
         $pm->PayeeFinancialAccount = $pfa;
 
         $pmc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\PaymentMeansCode();
-        $pmc->value = '59';
+        $pmc->value = '30';
 
         $pm->PaymentMeansCode = $pmc;
 
@@ -308,14 +319,7 @@ class PeppolTest extends TestCase
 
         $this->assertCount(0, $errors);
 
-
-// nlog($peppol->getInvoice());
-// nlog($peppol->toXml());
-// nlog($peppol->toJson());
-// ->toXml();
-
-
-$peppol->toXml();
+        $peppol->toXml();
 
     }
 

@@ -127,7 +127,7 @@ class StorecoveTransformer implements TransformerInterface
             
                 foreach($peppolLine->Price->AllowanceCharge as $allowance)
                 {
-                    $reason = $allowance->ChargeIndicator ? ctrans('texts.fee') : ctrans('texts.discount');
+                    $reason = isset($allowance->ChargeIndicator) ? ctrans('texts.discount') : ctrans('texts.fee');
                     $amount = $allowance->Amount->amount;
 
                     $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
@@ -202,7 +202,7 @@ class StorecoveTransformer implements TransformerInterface
         return $this;
 
     }
-    
+
     private function resolveJurisdication($ctc, $peppolInvoice): string 
     {
         if(isset($ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value))
