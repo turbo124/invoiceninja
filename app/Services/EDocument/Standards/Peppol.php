@@ -353,13 +353,14 @@ class Peppol extends AbstractService
             $this->p_invoice->ProjectReference[] = $pr;
         }
 
-
         $this->p_invoice->InvoiceTypeCode = ($this->invoice->amount >= 0) ? 380 : 381; //
         $this->p_invoice->AccountingSupplierParty = $this->getAccountingSupplierParty();
         $this->p_invoice->AccountingCustomerParty = $this->getAccountingCustomerParty();
         $this->p_invoice->InvoiceLine = $this->getInvoiceLines();
 
         $this->p_invoice->LegalMonetaryTotal = $this->getLegalMonetaryTotal();
+
+        $this->p_invoice->AllowanceCharge = $this->getAllowanceCharges();
 
         $this->setOrderReference();
 
@@ -379,6 +380,12 @@ class Peppol extends AbstractService
 
     }
 
+    public function decode(mixed $invoice):self
+    {
+        $this->p_invoice = $this->e->decode('Peppol', json_encode($invoice), 'json');
+
+        return $this;
+    }
     /**
      * Rehydrates an existing e invoice - or - scaffolds a new one
      *
@@ -389,8 +396,7 @@ class Peppol extends AbstractService
 
         if($this->invoice->e_invoice && isset($this->invoice->e_invoice->Invoice)) {
 
-            $this->p_invoice = $this->e->decode('Peppol', json_encode($this->invoice->e_invoice->Invoice), 'json');
-
+        $this->decode($this->invoice->e_invoice->Invoice);
 
         $this->gateway
             ->mutator
@@ -523,6 +529,103 @@ class Peppol extends AbstractService
         }
 
         return $this;
+
+    }
+
+    private function getAllowanceCharges(): array
+    {
+        $allowances = [];
+
+        //invoice discounts
+        if($this->invoice->discount > 0){
+
+            // Add Allowance Charge to Price
+            $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+            $allowanceCharge->ChargeIndicator = false; // false = discount
+            $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+            $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->Amount->amount = (string)$this->calc->getTotalDiscount();
+            $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+            $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+
+            // Add percentage if available
+            if ($this->invoice->discount > 0 && !$this->invoice->is_amount_discount) {
+                $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
+                $mfn->value = (string) ($this->invoice->discount / 100);
+                $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
+            }
+
+            $allowances[] = $allowanceCharge;
+        }
+
+        //invoice surcharges (@todo React - need to turn back on surcharge taxes and use the first tax....)
+
+        if($this->invoice->custom_surcharge1 > 0){
+
+            // Add Allowance Charge to Price
+            $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+            $allowanceCharge->ChargeIndicator = true; // false = discount
+            $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+            $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge1;
+            $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+            $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+
+            $allowances[] = $allowanceCharge;
+
+        }
+
+        if ($this->invoice->custom_surcharge2 > 0) {
+
+            // Add Allowance Charge to Price
+            $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+            $allowanceCharge->ChargeIndicator = true; // false = discount
+            $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+            $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge2;
+            $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+            $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+
+            $allowances[] = $allowanceCharge;
+
+        }
+
+        if ($this->invoice->custom_surcharge3 > 0) {
+
+            // Add Allowance Charge to Price
+            $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+            $allowanceCharge->ChargeIndicator = true; // false = discount
+            $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+            $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge3;
+            $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+            $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+
+            $allowances[] = $allowanceCharge;
+
+        }
+
+        if ($this->invoice->custom_surcharge4 > 0) {
+
+            // Add Allowance Charge to Price
+            $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+            $allowanceCharge->ChargeIndicator = true; // false = discount
+            $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+            $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge4;
+            $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+            $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+
+            $allowances[] = $allowanceCharge;
+
+        }
+
+        return $allowances;
 
     }
 
@@ -721,11 +824,6 @@ class Peppol extends AbstractService
                 $line->Price = $price;
             }
 
-
-
-
-
-
             $lines[] = $line;
         }
 
@@ -735,7 +833,7 @@ class Peppol extends AbstractService
 
     private function getBasePrice($item): float
     {
-        return $item->cost;
+        return $item->cost * $item->quantity;
     }
 
     private function calculateDiscountAmount($item): float
@@ -744,7 +842,7 @@ class Peppol extends AbstractService
             return $item->discount; // Per unit discount amount
         }
         
-        return $item->cost * ($item->discount / 100);
+        return ($item->cost * $item->quantity) * ($item->discount / 100);
     }
 
     
@@ -990,7 +1088,7 @@ class Peppol extends AbstractService
         $address->StreetName = $this->invoice->company->settings->address1;
         // $address->BuildingName = $this->invoice->company->settings->address2;
         $address->PostalZone = $this->invoice->company->settings->postal_code;
-        $address->CountrySubentity = $this->invoice->company->settings->state;
+        // $address->CountrySubentity = $this->invoice->company->settings->state;
 
         $country = new Country();
 
@@ -1001,7 +1099,7 @@ class Peppol extends AbstractService
         $address->Country = $country;
 
         $party->PostalAddress = $address;
-        $party->PhysicalLocation = $address;
+        // $party->PhysicalLocation = $address;
 
         $contact = new Contact();
         $contact->ElectronicMail = $this->gateway->mutator->getSetting('Invoice.AccountingSupplierParty.Party.Contact') ?? $this->invoice->company->owner()->present()->email();
@@ -1009,6 +1107,14 @@ class Peppol extends AbstractService
         $contact->Name = $this->gateway->mutator->getSetting('Invoice.AccountingSupplierParty.Party.Name') ?? $this->invoice->company->owner()->present()->name();
 
         $party->Contact = $contact;
+
+        // $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
+        // $ts = new TaxScheme();
+        // $ts->CurrencyCode = $this->invoice->client->currency()->code;
+        // $ts->JurisdictionRegionAddress[] = $this->getJurisdiction();
+
+        // $pts->TaxScheme = $ts;
+        // $party->PartyTaxScheme[] = $pts;
 
         $asp->Party = $party;
 
@@ -1063,10 +1169,10 @@ class Peppol extends AbstractService
         $address->StreetName = $this->invoice->client->address1;
 
         if(isset($this->invoice->client->address2) && strlen($this->invoice->client->address2) > 1)
-        $address->BuildingName = $this->invoice->client->address2;
+        $address->AdditionalStreetName = $this->invoice->client->address2;
 
         $address->PostalZone = $this->invoice->client->postal_code;
-        $address->CountrySubentity = $this->invoice->client->state;
+        // $address->CountrySubentity = $this->invoice->client->state;
 
         $country = new Country();
 
@@ -1078,10 +1184,10 @@ class Peppol extends AbstractService
 
         $party->PostalAddress = $address;
 
-        $physical_location = new PhysicalLocation();
-        $physical_location->Address = $address;
+        // $physical_location = new PhysicalLocation();
+        // $physical_location->Address = $address;
 
-        $party->PhysicalLocation = $physical_location;
+        // $party->PhysicalLocation = $physical_location;
 
         $contact = new Contact();
 
@@ -1227,15 +1333,17 @@ class Peppol extends AbstractService
             }
         }
 
+        $jurisdiction = new \InvoiceNinja\EInvoice\Models\Peppol\AddressType\JurisdictionRegionAddress();
+        $country = new Country();
+        $ic = new IdentificationCode();
+        $ic->value = $country_code;
+        $country->IdentificationCode = $ic;
+        $jurisdiction->Country = $country;        
+        $addressTypeCode = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\AddressTypeCode();
+        $addressTypeCode->value = 'JURISDICTION';  // or the appropriate code from PEPPOL spec
+        $jurisdiction->AddressTypeCode = $addressTypeCode;
 
-            $jurisdiction = new \InvoiceNinja\EInvoice\Models\Peppol\AddressType\JurisdictionRegionAddress();
-            $country = new Country();
-            $ic = new IdentificationCode();
-            $ic->value = $country_code;
-            $country->IdentificationCode = $ic;
-            $jurisdiction->Country = $country;
-
-            return $jurisdiction;
+        return $jurisdiction;
 
     }
 }

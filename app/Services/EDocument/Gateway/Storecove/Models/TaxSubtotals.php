@@ -13,20 +13,11 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class TaxSubtotals
 {
-    public float $taxableAmount;
-    public float $taxAmount;
-    public int $percentage;
-    public string $country;
 
     public function __construct(
-        float $taxableAmount,
-        float $taxAmount,
-        int $percentage,
-        string $country
-    ) {
-        $this->taxableAmount = $taxableAmount;
-        $this->taxAmount = $taxAmount;
-        $this->percentage = $percentage;
-        $this->country = $country;
-    }
+        public float $taxableAmount,
+        public float $taxAmount,
+        public float $percentage,
+        public string $country
+    ) {}
 }

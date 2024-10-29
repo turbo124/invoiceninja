@@ -52,6 +52,9 @@ class Invoice
 
     public $invoiceLines = [];
 
+    public $allowanceCharges = [];
+
+    public $taxSubtotals = [];
 
     public function setDocumentCurrency(string $documentCurrency): self
     {
@@ -281,4 +284,44 @@ return $this;
         $this->taxSystem = $taxSystem;
         return $this;
     }
+
+    public function getAllowanceCharges()
+    {
+        return $this->allowanceCharges;
+    }
+
+    public function setAllowanceCharges($allowanceCharges): self
+    {
+        $this->allowanceCharges = $allowanceCharges;
+
+        return $this;
+    }
+
+    public function addAllowanceCharge($allowanceCharge): self
+    {
+        $this->allowanceCharges[] = $allowanceCharge;
+
+        return $this;
+    }
+
+    public function getTaxSubtotals()
+    {
+        return $this->taxSubtotals;
+    }
+
+    public function setTaxSubtotals($taxSubtotals): self
+    {
+        $this->taxSubtotals = $taxSubtotals;
+
+        return $this;
+    }
+
+    public function addTaxSubtotals($taxSubtotals): self
+    {
+        $this->taxSubtotals[] = $taxSubtotals;
+
+        return $this;
+    }
+
+    
 }

@@ -13,10 +13,13 @@ use App\Services\EDocument\Gateway\Storecove\Models\AllowanceCharges;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingCustomerParty;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingSupplierParty;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
+use App\Services\EDocument\Gateway\Storecove\Models\TaxSubtotals;
 
 class StorecoveTransformer implements TransformerInterface
 {
     private StorecoveInvoice $s_invoice;
+
+    private array $tax_map = [];
 
     public function transform(mixed $peppolInvoice)
     {
@@ -55,7 +58,7 @@ class StorecoveTransformer implements TransformerInterface
 
         $address = new Address(
             street1: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->StreetName,
-            street2: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->BuildingName ?? null,
+            street2: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->AdditionalStreetName ?? null,
             city: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->CityName,
             zip: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->PostalZone,
             county: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity ?? null,
@@ -113,6 +116,7 @@ class StorecoveTransformer implements TransformerInterface
             if(isset($peppolLine->Item->ClassifiedTaxCategory) && is_array($peppolLine->Item->ClassifiedTaxCategory)){       
                 foreach($peppolLine->Item->ClassifiedTaxCategory as $ctc)
                 {
+                    $this->setTaxMap($ctc, $peppolLine, $peppolInvoice);
                     $tax = new Tax((float)$ctc->Percent, $this->resolveJurisdication($ctc, $peppolInvoice));
                     $line->setTax($tax);
                 }
@@ -138,54 +142,66 @@ class StorecoveTransformer implements TransformerInterface
 
         $this->s_invoice->invoiceLines = $lines;
 
-// // Map tax total at invoice level
-// $taxTotal = [];
-// if (isset($peppolInvoice->InvoiceLine[0]->TaxTotal[0])) {
-//     $taxTotal[] = [
-//         'taxAmount' => (float)($peppolInvoice->InvoiceLine[0]->TaxTotal[0]->TaxAmount->amount ?? 0),
-//         'taxCurrency' => $peppolInvoice->DocumentCurrencyCode ?? '',
-//     ];
-// }
-// $this->s_invoice->setTaxTotal($taxTotal);
+        //invoice level discounts + surcharges
+        if(isset($peppolLine->AllowanceCharge) && is_array($peppolLine->AllowanceCharge)){    
 
-// if (isset($peppolInvoice->InvoiceLine)) {
-//     $invoiceLines = [];
-//     foreach ($peppolInvoice->InvoiceLine as $line) {
-//         $invoiceLine = new InvoiceLines();
-//         $invoiceLine->setLineId($line->ID->value ?? '');
-//         $invoiceLine->setAmountExcludingVat((float)($line->LineExtensionAmount->amount ?? 0));
-//         $invoiceLine->setQuantity((float)($line->InvoicedQuantity ?? 0));
-//         $invoiceLine->setQuantityUnitCode(''); // Not present in the provided JSON
-//         $invoiceLine->setItemPrice((float)($line->Price->PriceAmount->amount ?? 0));
-//         $invoiceLine->setName($line->Item->Name ?? '');
-//         $invoiceLine->setDescription($line->Item->Description ?? '');
+            foreach ($peppolLine->AllowanceCharge as $allowance)
+            {
+                                
+                $reason = $allowance->ChargeIndicator ? ctrans('texts.fee') : ctrans('texts.discount');
+                $amount = $allowance->Amount->amount;
 
-//         $tax = new Tax();
-//         if (isset($line->TaxTotal[0])) {
-//             $taxTotal = $line->TaxTotal[0];
-//             $tax->setTaxAmount((float)($taxTotal->TaxAmount->amount ?? 0));
+                $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
+                $this->s_invoice->addAllowanceCharge($ac); //todo handle surcharge taxes
 
-//             if (isset($line->Item->ClassifiedTaxCategory[0])) {
-//                 $taxCategory = $line->Item->ClassifiedTaxCategory[0];
-//                 $tax->setTaxPercentage((float)($taxCategory->Percent ?? 0));
-//                 $tax->setTaxCategory($taxCategory->ID->value ?? '');
-//             }
+            }
+        }
 
-//             $tax->setTaxableAmount((float)($line->LineExtensionAmount->amount ?? 0));
-//         }
-//         $invoiceLine->setTax($tax);
+        
+        collect($this->tax_map)
+            ->groupBy('percentage')
+            ->each(function ($group) {
 
-//         $invoiceLines[] = $invoiceLine;
-//     }
-//     $this->s_invoice->setInvoiceLines($invoiceLines);
-// }
+                $taxSubtotals = new TaxSubtotals(
+                    taxableAmount: $group->sum('taxableAmount'),
+                    taxAmount: $group->sum('taxAmount'),
+                    percentage: $group->first()['percentage'],
+                    country: $group->first()['country']
+                );
 
-// $this->s_invoice->setAmountIncludingVat((float)($peppolInvoice->LegalMonetaryTotal->TaxInclusiveAmount->amount ?? 0));
+                $this->s_invoice->addTaxSubtotals($taxSubtotals);
 
-// return $this->s_invoice;
+
+            });
+            
+        $this->s_invoice->setAmountIncludingVat($peppolInvoice->LegalMonetaryTotal->TaxInclusiveAmount->amount);
+        $this->s_invoice->setPrepaidAmount(0);
+       
+        return $this->s_invoice;
 
     }
 
+    private function setTaxMap($ctc, $peppolLine, $peppolInvoice): self
+    {
+        $taxAmount = 0;
+        $taxableAmount = 0;
+
+        foreach($peppolLine->TaxTotal as $taxTotal)
+        {
+          $taxableAmount += $taxTotal->TaxSubtotal[0]->TaxableAmount->amount;
+          $taxAmount += $taxTotal->TaxSubtotal[0]->TaxAmount->amount;
+        }
+
+        $this->tax_map[] = [
+            'percentage' => $ctc->Percent, 
+            'country' => $this->resolveJurisdication($ctc, $peppolInvoice), 
+            'taxAmount' => $taxAmount, 
+            'taxableAmount' => $taxableAmount,
+        ]; 
+                   
+        return $this;
+
+    }
     private function resolveJurisdication($ctc, $peppolInvoice): string 
     {
         if(isset($ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value))
