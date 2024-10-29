@@ -304,7 +304,11 @@ class Peppol extends AbstractService
     private EInvoice $e;
 
     private string $api_network = Storecove::class; // Storecove::class; // Qvalia::class;
-    
+
+    private string $customizationID = 'urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0';
+
+    private string $profileID = 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0';    
+
     public Qvalia | Storecove $gateway;
 
     /**
@@ -326,6 +330,8 @@ class Peppol extends AbstractService
      */
     public function run(): self
     {
+        $this->p_invoice->CustomizationID = $this->customizationID;
+        $this->p_invoice->ProfileID = $this->profileID;
         $this->p_invoice->ID = $this->invoice->number;
         $this->p_invoice->IssueDate = new \DateTime($this->invoice->date);
 
@@ -734,7 +740,13 @@ class Peppol extends AbstractService
             $ctc->ID = new ID();
             $ctc->ID->value = $this->getTaxType($item->tax_id);
             $ctc->Percent = $item->tax_rate1;
-            
+
+            $ts = new TaxScheme();
+            $id = new ID();
+            $id->value = $item->tax_name1;
+            $ts->ID = $id;
+            $ctc->TaxScheme = $ts;
+
             $_item->ClassifiedTaxCategory[] = $ctc;
             }
 
@@ -743,6 +755,13 @@ class Peppol extends AbstractService
                 $ctc->ID = new ID();
                 $ctc->ID->value = $this->getTaxType($item->tax_id);
                 $ctc->Percent = $item->tax_rate2;
+
+                                
+                $ts = new TaxScheme();
+                $id = new ID();
+                $id->value = $item->tax_name2;
+                $ts->ID = $id;
+                $ctc->TaxScheme = $ts;
 
                 $_item->ClassifiedTaxCategory[] = $ctc;
             }
@@ -753,6 +772,12 @@ class Peppol extends AbstractService
                 $ctc->ID->value = $this->getTaxType($item->tax_id);
                 $ctc->Percent = $item->tax_rate3;
 
+                $ts = new TaxScheme();
+                $id = new ID();
+                $id->value = $item->tax_name3;
+                $ts->ID = $id;
+                $ctc->TaxScheme = $ts;
+
                 $_item->ClassifiedTaxCategory[] = $ctc;
             }
 
@@ -761,7 +786,11 @@ class Peppol extends AbstractService
             $id = new ID();
             $id->value = (string) ($key+1);
             $line->ID = $id;
-            $line->InvoicedQuantity = $item->quantity;
+
+            $iq = new \InvoiceNinja\EInvoice\Models\Peppol\QuantityType\InvoicedQuantity();
+            $iq->amount = $item->quantity;
+            $iq->unitCode = $item->unit_code ?? 'C62';
+            $line->InvoicedQuantity = $iq;
 
             $lea = new LineExtensionAmount();
             $lea->currencyID = $this->invoice->client->currency()->code;
@@ -1064,8 +1093,6 @@ class Peppol extends AbstractService
         $party_name->Name = $this->invoice->company->present()->name();
         $party->PartyName[] = $party_name;
 
-
-
         if (strlen($this->company->settings->vat_number ?? '') > 1) {
 
             $pi = new PartyIdentification();
@@ -1108,13 +1135,25 @@ class Peppol extends AbstractService
 
         $party->Contact = $contact;
 
-        // $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
+        $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
+
+        if(strlen($this->invoice->company->settings->id_number) > 1)
+        {
+            $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
+            $companyID->value = $this->invoice->company->settings->id_number;
+            $pts->CompanyID = $companyID;
+        }
+
+        $ple = new \InvoiceNinja\EInvoice\Models\Peppol\PartyLegalEntity();
+        $ple->RegistrationName = $this->invoice->company->present()->name();
+        $party->PartyLegalEntity[] = $ple;
+        
         // $ts = new TaxScheme();
         // $ts->CurrencyCode = $this->invoice->client->currency()->code;
         // $ts->JurisdictionRegionAddress[] = $this->getJurisdiction();
-
         // $pts->TaxScheme = $ts;
-        // $party->PartyTaxScheme[] = $pts;
+
+        $party->PartyTaxScheme[] = $pts;
 
         $asp->Party = $party;
 
@@ -1197,6 +1236,10 @@ class Peppol extends AbstractService
             $contact->Telephone = $this->invoice->client->phone;
 
         $party->Contact = $contact;
+
+        $ple = new \InvoiceNinja\EInvoice\Models\Peppol\PartyLegalEntity();
+        $ple->RegistrationName = $this->invoice->client->present()->name();
+        $party->PartyLegalEntity[] = $ple;
 
         $acp->Party = $party;
 

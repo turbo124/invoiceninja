@@ -210,6 +210,12 @@ class PeppolTest extends TestCase
 
         $pm = new PaymentMeans();
         $pm->PayeeFinancialAccount = $pfa;
+
+        $pmc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\PaymentMeansCode();
+        $pmc->value = '59';
+
+        $pm->PaymentMeansCode = $pmc;
+
         $einvoice->PaymentMeans[] = $pm;
 
         $stub = new \stdClass();
@@ -270,6 +276,7 @@ class PeppolTest extends TestCase
             'line_items' => [$item],
             'number' => 'DE-'.rand(1000, 100000),
             'date' => now()->format('Y-m-d'),
+            'due_date' => now()->addDays(30)->format('Y-m-d'),
             'is_amount_discount' => true,
         ]);
 
