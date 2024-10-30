@@ -5409,6 +5409,7 @@ $lang = array(
     'peppol_token_description' => 'Token is used as another step to make sure invoices are sent securely. Unlike white-label licenses, token can be rotated at any point without need to wait on Invoice Ninja support.',
     'peppol_token_warning' => 'You need to generate a token to continue.',
     'generate_token' => 'Generate Token',
+    'total_credits_amount' => 'Amount of Credits',
 );
 
 return $lang;
