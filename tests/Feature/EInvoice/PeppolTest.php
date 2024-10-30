@@ -323,7 +323,7 @@ class PeppolTest extends TestCase
         try{
             $processor = new \Saxon\SaxonProcessor();
         }
-        catch(\Exception $e){
+        catch(\Throwable $e){
             $this->markTestSkipped('saxon not installed');
         }
 
