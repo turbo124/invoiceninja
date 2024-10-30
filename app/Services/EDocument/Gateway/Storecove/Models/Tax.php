@@ -11,19 +11,14 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Annotation\SerializedName;
+
+
 class Tax
 {
-    public int $percentage;
-    public string $country;
-    public string $category;
-
     public function __construct(
-        int $percentage,
-        string $country,
-        string $category
-    ) {
-        $this->percentage = $percentage;
-        $this->country = $country;
-        $this->category = $category;
-    }
+        public float $percentage,
+        public string $country
+    ){}
+
 }

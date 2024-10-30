@@ -13,17 +13,8 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class AllowanceCharges
 {
-    public string $reason;
-    public float $amountExcludingTax;
-    public Tax $tax;
-
     public function __construct(
-        string $reason,
-        float $amountExcludingTax,
-        Tax $tax
-    ) {
-        $this->reason = $reason;
-        $this->amountExcludingTax = $amountExcludingTax;
-        $this->tax = $tax;
-    }
+        public string $reason,
+        public float $amountExcludingTax      
+    ) {}
 }

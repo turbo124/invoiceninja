@@ -63,6 +63,9 @@ class SelfUpdateController extends BaseController
 
         $file_headers = @get_headers($this->getDownloadUrl());
 
+        nlog("Download URL");
+        nlog($this->getDownloadUrl());
+        
         if(!is_array($file_headers)) {
             nlog($file_headers);
             return response()->json(['message' => 'There was a problem reaching the update server, please try again in a little while.'], 410);

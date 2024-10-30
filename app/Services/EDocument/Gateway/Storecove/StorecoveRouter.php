@@ -162,4 +162,93 @@ class StorecoveRouter
 
         return $rules[0][2];
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+     /**
+     * used as a proxy for
+     * the schemeID of partyidentification
+     * property - for Storecove only:
+     *
+     * Used in the format key:value
+     *
+     * ie. IT:IVA / DE:VAT
+     *
+     * Note there are multiple options for the following countries:
+     *
+     * US (EIN/SSN) employer identification number / social security number
+     * IT (CF/IVA) Codice Fiscale (person/company identifier) / company vat number
+     *
+     * @var array
+     */
+    private array $schemeIdIdentifiers = [
+        'US' => 'EIN',
+        'US' => 'SSN',
+        'NZ' => 'GST',
+        'CH' => 'VAT', // VAT number = CHE - 999999999 - MWST|IVA|VAT
+        'IS' => 'VAT',
+        'LI' => 'VAT',
+        'NO' => 'VAT',
+        'AD' => 'VAT',
+        'AL' => 'VAT',
+        'AT' => 'VAT', //Tested - Routing GOV + Business
+        'BA' => 'VAT',
+        'BE' => 'VAT',
+        'BG' => 'VAT',
+        'AU' => 'ABN', //Australia
+        'CA' => 'CBN', //Canada
+        'MX' => 'RFC', //Mexico
+        'NZ' => 'GST', //Nuuu zulund
+        'GB' => 'VAT', //Great Britain
+        'SA' => 'TIN', //South Africa
+        'CY' => 'VAT',
+        'CZ' => 'VAT',
+        'DE' => 'VAT', //tested - Requires Payment Means to be defined.
+        'DK' => 'ERST',
+        'EE' => 'VAT',
+        'ES' => 'VAT', //tested - B2G pending
+        'FI' => 'VAT',
+        'FR' => 'VAT', //tested - Need to ensure Siren/Siret routing
+        'GR' => 'VAT',
+        'HR' => 'VAT',
+        'HU' => 'VAT',
+        'IE' => 'VAT',
+        'IT' => 'IVA', //tested - Requires a Customer Party Identification (VAT number) - 'IT senders must first be provisioned in the partner system.' Cannot test currently
+        'IT' => 'CF', //tested - Requires a Customer Party Identification (VAT number) - 'IT senders must first be provisioned in the partner system.' Cannot test currently
+        'LT' => 'VAT',
+        'LU' => 'VAT',
+        'LV' => 'VAT',
+        'MC' => 'VAT',
+        'ME' => 'VAT',
+        'MK' => 'VAT',
+        'MT' => 'VAT',
+        'NL' => 'VAT',
+        'PL' => 'VAT',
+        'PT' => 'VAT',
+        'RO' => 'VAT',
+        'RS' => 'VAT',
+        'SE' => 'VAT',
+        'SI' => 'VAT',
+        'SK' => 'VAT',
+        'SM' => 'VAT',
+        'TR' => 'VAT',
+        'VA' => 'VAT',
+        'IN' => 'GSTIN',
+        'JP' => 'IIN',
+        'MY' => 'TIN',
+        'SG' => 'GST',
+        'GB' => 'VAT',
+        'SA' => 'TIN',
+    ];
+
 }

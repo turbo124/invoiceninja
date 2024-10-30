@@ -14,16 +14,7 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class AccountingCustomerParty
 {
-    /** @var PublicIdentifiers[] */
-    public array $publicIdentifiers;
-    public Party $party;
-
-    /**
-     * @param PublicIdentifiers[] $publicIdentifiers
-     */
-    public function __construct(array $publicIdentifiers, Party $party)
+    public function __construct(public array $publicIdentifiers, public Party $party)
     {
-        $this->publicIdentifiers = $publicIdentifiers;
-        $this->party = $party;
     }
 }

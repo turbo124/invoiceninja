@@ -22,8 +22,8 @@ class References
     public function __construct(
         string $documentType,
         string $documentId,
-        ?string $lineId,
-        ?string $issueDate
+        ?string $lineId = null,
+        ?string $issueDate = null
     ) {
         $this->documentType = $documentType;
         $this->documentId = $documentId;

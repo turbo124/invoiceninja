@@ -283,7 +283,6 @@ class TemplateService
      */
     public function processData($data): self
     {
-
         $this->data = $this->preProcessDataBlocks($data);
 
         return $this;
@@ -494,6 +493,7 @@ class TemplateService
      */
     private function preProcessDataBlocks($data): array
     {
+           
         return collect($data)->map(function ($value, $key) {
 
             $processed = [];
@@ -772,59 +772,55 @@ class TemplateService
     {
 
         return collect($quotes)->map(function ($quote) {
-
             return [
                 'amount' => Number::formatMoney($quote->amount, $quote->client),
                 'balance' => Number::formatMoney($quote->balance, $quote->client),
-                'balance_raw' => (float) $quote->balance,
-                'client' => $this->getClient($quote),
                 'status_id' => $quote->status_id,
                 'status' => Quote::stringStatus($quote->status_id),
+                'amount_raw' => $quote->amount ,
+                'balance_raw' => $quote->balance,
                 'number' => $quote->number ?: '',
-                'discount' => (float) $quote->discount,
+                'discount' => $quote->discount,
                 'po_number' => $quote->po_number ?: '',
-                'date' => $quote->date ? $this->translateDate($quote->date, $quote->client->date_format(), $quote->client->locale()) : '',
-                'last_sent_date' => $quote->last_sent_date ? $this->translateDate($quote->last_sent_date, $quote->client->date_format(), $quote->client->locale()) : '',
-                // 'next_send_date' => $quote->next_send_date ?: '',
-                // 'reminder1_sent' => $quote->reminder1_sent ?: '',
-                // 'reminder2_sent' => $quote->reminder2_sent ?: '',
-                // 'reminder3_sent' => $quote->reminder3_sent ?: '',
-                // 'reminder_last_sent' => $quote->reminder_last_sent ?: '',
-                'due_date' => $quote->due_date ? $this->translateDate($quote->due_date, $quote->client->date_format(), $quote->client->locale()) : '',
+                'date' => $this->translateDate($quote->date, $quote->client->date_format(), $quote->client->locale()),
+                'last_sent_date' => $this->translateDate($quote->last_sent_date, $quote->client->date_format(), $quote->client->locale()),
+                'next_send_date' => $this->translateDate($quote->next_send_date, $quote->client->date_format(), $quote->client->locale()),
+                'due_date' => $this->translateDate($quote->due_date, $quote->client->date_format(), $quote->client->locale()),
                 'terms' => $quote->terms ?: '',
                 'public_notes' => $quote->public_notes ?: '',
                 'private_notes' => $quote->private_notes ?: '',
-                'is_deleted' => (bool) $quote->is_deleted,
                 'uses_inclusive_taxes' => (bool) $quote->uses_inclusive_taxes,
-                'tax_name1' => $quote->tax_name1 ? $quote->tax_name1 : '',
+                'tax_name1' => $quote->tax_name1 ?? '',
                 'tax_rate1' => (float) $quote->tax_rate1,
-                'tax_name2' => $quote->tax_name2 ? $quote->tax_name2 : '',
+                'tax_name2' => $quote->tax_name2 ?? '',
                 'tax_rate2' => (float) $quote->tax_rate2,
-                'tax_name3' => $quote->tax_name3 ? $quote->tax_name3 : '',
+                'tax_name3' => $quote->tax_name3 ?? '',
                 'tax_rate3' => (float) $quote->tax_rate3,
-                'total_taxes' => (float) $quote->total_taxes,
-                'is_amount_discount' => (bool) ($quote->is_amount_discount ?: false),
-                'footer' => $quote->footer ?: '',
-                'partial' => (float) ($quote->partial ?: 0.0),
-                'partial_due_date' => $quote->partial_due_date ? $this->translateDate($quote->partial_due_date, $quote->client->date_format(), $quote->client->locale()) : '',
+                'total_taxes' => Number::formatMoney($quote->total_taxes, $quote->client),
+                'total_taxes_raw' => $quote->total_taxes,
+                'is_amount_discount' => (bool) $quote->is_amount_discount ?? false,//@phpstan-ignore-line
+                'footer' => $quote->footer ?? '',
+                'partial' => $quote->partial ?? 0,
+                'partial_due_date' => $this->translateDate($quote->partial_due_date, $quote->client->date_format(), $quote->client->locale()),
                 'custom_value1' => (string) $quote->custom_value1 ?: '',
                 'custom_value2' => (string) $quote->custom_value2 ?: '',
                 'custom_value3' => (string) $quote->custom_value3 ?: '',
                 'custom_value4' => (string) $quote->custom_value4 ?: '',
-                'has_expenses' => (bool) $quote->has_expenses,
                 'custom_surcharge1' => (float) $quote->custom_surcharge1,
                 'custom_surcharge2' => (float) $quote->custom_surcharge2,
                 'custom_surcharge3' => (float) $quote->custom_surcharge3,
                 'custom_surcharge4' => (float) $quote->custom_surcharge4,
+                'exchange_rate' => (float) $quote->exchange_rate,
                 'custom_surcharge_tax1' => (bool) $quote->custom_surcharge_tax1,
                 'custom_surcharge_tax2' => (bool) $quote->custom_surcharge_tax2,
                 'custom_surcharge_tax3' => (bool) $quote->custom_surcharge_tax3,
                 'custom_surcharge_tax4' => (bool) $quote->custom_surcharge_tax4,
                 'line_items' => $quote->line_items ? $this->padLineItems($quote->line_items, $quote->client) : (array) [],
-                'exchange_rate' => (float) $quote->exchange_rate,
-                'paid_to_date' => (float) $quote->paid_to_date,
+                'paid_to_date' => Number::formatMoney($quote->paid_to_date, $quote->client),
+                'client' => $this->getClient($quote),
+                'total_tax_map' => $quote->calc()->getTotalTaxMap(),
+                'line_tax_map' => $quote->calc()->getTaxMap(),
             ];
-
         })->toArray();
 
     }
@@ -854,7 +850,10 @@ class TemplateService
                     return [
                         'amount' => Number::formatMoney($credit->amount, $credit->client),
                         'balance' => Number::formatMoney($credit->balance, $credit->client),
+                        'amount_raw' => $credit->amount ,
                         'balance_raw' => $credit->balance,
+                        'status_id' => $credit->status_id,
+                        'status' => Credit::stringStatus($credit->status_id),
                         'number' => $credit->number ?: '',
                         'discount' => $credit->discount,
                         'po_number' => $credit->po_number ?: '',
@@ -935,6 +934,8 @@ class TemplateService
             'balance' => $entity->client->balance,
             'payment_balance' => $entity->client->payment_balance,
             'credit_balance' => $entity->client->credit_balance,
+            'number' => $entity->client->number ?? '',
+            'id_number' => $entity->client->id_number ?? '',
             'vat_number' => $entity->client->vat_number ?? '',
             'currency' => $entity->client->currency()->code ?? 'USD',
             'custom_value1' => $entity->client->custom_value1 ?? '',
@@ -962,7 +963,8 @@ class TemplateService
             'created_at' => $this->translateDate($task->created_at, $task->client ? $task->client->date_format() : $task->company->date_format(), $task->client ? $task->client->locale() : $task->company->locale()),
             'updated_at' => $this->translateDate($task->updated_at, $task->client ? $task->client->date_format() : $task->company->date_format(), $task->client ? $task->client->locale() : $task->company->locale()),
             'date' => $task->calculated_start_date ? $this->translateDate($task->calculated_start_date, $task->client ? $task->client->date_format() : $task->company->date_format(), $task->client ? $task->client->locale() : $task->company->locale()) : '',
-            'project' => $task->project ? $this->transformProject($task->project, true) : [],
+            // 'project' => $task->project ? $this->transformProject($task->project, true) : [],
+            'project' => $task->project ? $task->project->name : '',
             'time_log' => $task->processLogsExpandedNotation(),
             'custom_value1' => $task->custom_value1 ?: '',
             'custom_value2' => $task->custom_value2 ?: '',
@@ -1021,7 +1023,7 @@ class TemplateService
      */
     public function processProjects($projects): array
     {
-
+        
         return
         collect($projects)->map(function ($project) {
 
@@ -1042,7 +1044,7 @@ class TemplateService
 
     private function transformProject(Project $project, bool $nested = false): array
     {
-
+        
         return [
             'name' => $project->name ?: '',
             'number' => $project->number ?: '',

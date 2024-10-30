@@ -14,26 +14,12 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 
 class Address
 {
-    public string $street1;
-    public null $street2;
-    public string $city;
-    public string $zip;
-    public null $county;
-    public string $country;
-
     public function __construct(
-        string $street1,
-        null $street2,
-        string $city,
-        string $zip,
-        null $county,
-        string $country
-    ) {
-        $this->street1 = $street1;
-        $this->street2 = $street2;
-        $this->city = $city;
-        $this->zip = $zip;
-        $this->county = $county;
-        $this->country = $country;
-    }
+        public string $street1,
+        public string $city,
+        public string $zip,
+        public string $country,
+        public ?string $county = null,
+        public ?string $street2 = null,
+    ) { }
 }

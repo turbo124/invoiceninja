@@ -800,7 +800,8 @@ class HtmlEngine
                         $amount = Number::formatMoney($refunded_invoice['amount'], $payment->client);
                         $notes = ctrans('texts.status_partially_refunded_amount', ['amount' => $amount]);
 
-                        array_push($map, "{$date} {$entity} #{$invoice->number} {$notes}\n");
+                        if($invoice)
+                            array_push($map, "{$date} {$entity} #{$invoice->number} {$notes}\n");
 
                     }
 

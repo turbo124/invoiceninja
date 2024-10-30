@@ -1,77 +1,131 @@
 <?php
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use App\Services\EDocument\Gateway\Storecove\Models\Tax;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class InvoiceLines
 {
-    public string $lineId;
-    public float $amountExcludingVat;
-    public float $itemPrice;
-    public int $baseQuantity;
-    public int $quantity;
-    public string $quantityUnitCode;
-    /** @var AllowanceCharges[] */
-    public array $allowanceCharges;
-    public Tax $tax;
-    public string $orderLineReferenceLineId;
-    public string $accountingCost;
-    public string $name;
-    public string $description;
-    public string $invoicePeriod;
-    public string $note;
-    /** @var References[] */
-    public array $references;
-    /** @var AdditionalItemProperties[] */
-    public array $additionalItemProperties;
+    public string $lineId = '';
 
-    /**
-     * @param AllowanceCharges[] $allowanceCharges
-     * @param References[] $references
-     * @param AdditionalItemProperties[] $additionalItemProperties
-     */
-    public function __construct(
-        string $lineId,
-        float $amountExcludingVat,
-        float $itemPrice,
-        int $baseQuantity,
-        int $quantity,
-        string $quantityUnitCode,
-        array $allowanceCharges,
-        Tax $tax,
-        string $orderLineReferenceLineId,
-        string $accountingCost,
-        string $name,
-        string $description,
-        string $invoicePeriod,
-        string $note,
-        array $references,
-        array $additionalItemProperties
-    ) {
+    public float $amountExcludingVat = 0.0;
+
+    public float $itemPrice = 0.0;
+
+    public float $quantity = 0;
+
+    public string $quantityUnitCode = '';
+
+    public string $name = '';
+
+    public string $description = '';
+
+    public Tax $tax;
+
+    public array $allowanceCharges = []; //line item discounts
+
+    public function __construct()
+    {
+    }
+
+    // Getters and setters
+    public function getLineId(): string
+    {
+        return $this->lineId;
+    }
+
+    public function setLineId(string $lineId): void
+    {
         $this->lineId = $lineId;
+    }
+
+    public function getAmountExcludingVat(): float
+    {
+        return $this->amountExcludingVat;
+    }
+
+    public function setAmountExcludingVat(float $amountExcludingVat): void
+    {
         $this->amountExcludingVat = $amountExcludingVat;
+    }
+
+    public function getItemPrice(): float
+    {
+        return $this->itemPrice;
+    }
+
+    public function setItemPrice(float $itemPrice): void
+    {
         $this->itemPrice = $itemPrice;
-        $this->baseQuantity = $baseQuantity;
+    }
+
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity($quantity): void
+    {
         $this->quantity = $quantity;
+    }
+
+    public function getQuantityUnitCode(): string
+    {
+        return $this->quantityUnitCode;
+    }
+
+    public function setQuantityUnitCode(string $quantityUnitCode): void
+    {
         $this->quantityUnitCode = $quantityUnitCode;
-        $this->allowanceCharges = $allowanceCharges;
-        $this->tax = $tax;
-        $this->orderLineReferenceLineId = $orderLineReferenceLineId;
-        $this->accountingCost = $accountingCost;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
         $this->name = $name;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): void
+    {
         $this->description = $description;
-        $this->invoicePeriod = $invoicePeriod;
-        $this->note = $note;
-        $this->references = $references;
-        $this->additionalItemProperties = $additionalItemProperties;
+    }
+
+    public function getTax(): Tax
+    {
+        return $this->tax;
+    }
+
+    public function setTax(Tax $tax): void
+    {
+        $this->tax = $tax;
+    }
+    
+    public function getAllowanceCharges(): array
+    {
+        return $this->allowanceCharges;
+    }
+
+    public function setAllowanceCharges(array $allowanceCharges): self
+    {
+        $this->allowanceCharges = $allowanceCharges;
+
+        return $this;
+    }
+
+    public function addAllowanceCharge($allowanceCharge): self
+    {
+        $this->allowanceCharges[] = $allowanceCharge;
+        return $this;
     }
 }
+

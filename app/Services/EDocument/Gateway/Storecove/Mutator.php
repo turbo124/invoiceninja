@@ -496,8 +496,8 @@ class Mutator implements MutatorInterface
 
         $this->p_invoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity = $resolved_state;
         $this->p_invoice->AccountingCustomerParty->Party->PostalAddress->CityName = $resolved_city;
-        $this->p_invoice->AccountingCustomerParty->Party->PhysicalLocation->Address->CountrySubentity = $resolved_state;
-        $this->p_invoice->AccountingCustomerParty->Party->PhysicalLocation->Address->CityName = $resolved_city;
+        // $this->p_invoice->AccountingCustomerParty->Party->PhysicalLocation->Address->CountrySubentity = $resolved_state;
+        // $this->p_invoice->AccountingCustomerParty->Party->PhysicalLocation->Address->CityName = $resolved_city;
 
         return $this;
     }
