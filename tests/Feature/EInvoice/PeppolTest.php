@@ -320,6 +320,13 @@ class PeppolTest extends TestCase
 
         $xml = $peppol->toXml();
 
+        try{
+            $processor = new \Saxon\SaxonProcessor();
+        }
+        catch(\Exception $e){
+            $this->markTestSkipped('saxon not installed');
+        }
+
         $validator = new XsltDocumentValidator($xml);
         $validator->validate();
 
