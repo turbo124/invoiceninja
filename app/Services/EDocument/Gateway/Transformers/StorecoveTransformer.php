@@ -16,6 +16,7 @@ use App\Services\EDocument\Gateway\Storecove\Models\AllowanceCharges;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingCustomerParty;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingSupplierParty;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
+use Illuminate\Support\Str;
 
 class StorecoveTransformer implements TransformerInterface
 {
@@ -218,6 +219,20 @@ class StorecoveTransformer implements TransformerInterface
             return $ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value;
 
         return $peppolInvoice->AccountingSupplierParty->Party->PostalAddress->Country->IdentificationCode->value;
+    }
+
+    public function buildDocument(): mixed
+    {
+        $doc = new \stdClass;
+        $doc->document->documentType = "invoice";
+        $doc->document->invoice = $this->getInvoice();
+        $doc->attachments = [];
+        $doc->legalEntityId = '';
+        $doc->idempotencyGuid = Str::uuid();
+        $doc->routing->eIdentifiers = [];
+        $doc->emails = [];
+        
+        return $doc;
     }
 
     public function getInvoice(): StorecoveInvoice
