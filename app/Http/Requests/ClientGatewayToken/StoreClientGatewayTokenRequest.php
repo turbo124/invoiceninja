@@ -41,6 +41,7 @@ class StoreClientGatewayTokenRequest extends Request
             'company_gateway_id' => ['required', 'bail', \Illuminate\Validation\Rule::exists('company_gateways', 'id')->where('company_id', $user->company()->id)->where('is_deleted', 0)],
             'gateway_type_id' => 'required|integer',
             'meta' => 'required',
+            'is_default' => 'sometimes|bail|boolean'
         ];
 
         return $this->globalRules($rules);

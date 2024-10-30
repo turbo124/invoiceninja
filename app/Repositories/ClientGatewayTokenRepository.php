@@ -24,8 +24,16 @@ class ClientGatewayTokenRepository extends BaseRepository
         
         if(isset($data['company_gateway_id']))
             $client_gateway_token->company_gateway_id = $data['company_gateway_id'];
+                    
+        if (isset($data['is_default']) && !boolval($data['is_default'])) {
+            $client_gateway_token->is_default = false;
+        }
 
         $client_gateway_token->save();
+
+        if (isset($data['is_default']) && boolval($data['is_default'])) {
+            return $this->setDefault($client_gateway_token);
+        }
 
         return $client_gateway_token->fresh();
     }
