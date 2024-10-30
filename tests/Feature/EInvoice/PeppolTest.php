@@ -24,6 +24,7 @@ use InvoiceNinja\EInvoice\EInvoice;
 use InvoiceNinja\EInvoice\Symfony\Encode;
 use App\Services\EDocument\Standards\Peppol;
 use App\Services\EDocument\Standards\FatturaPANew;
+use App\Services\EDocument\Standards\Validation\XsltDocumentValidator;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -320,7 +321,6 @@ class PeppolTest extends TestCase
         $this->assertCount(0, $errors);
 
         $xml = $peppol->toXml();
-// nlog($xml);
 
         $cen = base_path('/tests/Feature/EInvoice/Validation/CEN-EN16931-UBL.xslt');
         $pep = base_path('/tests/Feature/EInvoice/Validation/PEPPOL-EN16931-UBL.xslt');
@@ -331,6 +331,14 @@ class PeppolTest extends TestCase
         $pep_test = base_path('tests/Feature/EInvoice/Validation/peppol_test.xml');
 
         $pschema = base_path('tests/Feature/EInvoice/Validation/PEPPOL-EN16931-UBL.sch');
+
+
+        $validator = new XsltDocumentValidator($xml);
+        $validator->validate();
+
+        nlog($validator->getErrors());
+        
+        $this->assertCount(0, $validator->getErrors());
 
 
         // try{

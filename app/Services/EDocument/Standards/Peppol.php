@@ -1428,7 +1428,7 @@ class Peppol extends AbstractService
                     return '0088'; // GLN
 
                 case 'DE': // Germany
-                    return '0204'; // Leitweg-ID
+                    return '0196'; // Leitweg-ID
 
                 case 'GB': // United Kingdom
                     return '0088'; // GLN

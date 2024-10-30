@@ -9,7 +9,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-
 namespace App\Services\EDocument\Standards\Validation;
 
 class XsltDocumentValidator
@@ -56,13 +55,17 @@ class XsltDocumentValidator
                 $xsltExecutable = $xslt->compileFromFile(app_path($stylesheet)); //@phpstan-ignore-line
                 $result = $xsltExecutable->transformToValue($xdmNode);
 
-                for ($x = 0; $x < $result->size(); $x++) 
-                {
+                nlog($result->size());
 
+                if($result->size() == 0)
+                    continue;
+
+                for ($x=0; $x<$result->size(); $x++) 
+                {
                     $a = $result->itemAt($x);
 
-                    $this->errors['stylesheet'][] = $a->getStringValue();
-
+                    if(strlen($a->getStringValue() ?? '') > 1)
+                        $this->errors['stylesheet'][] = $a->getStringValue();
                 }
 
             }
