@@ -18,9 +18,9 @@ use App\Services\EDocument\Gateway\Storecove\StorecoveRouter;
 
 class Mutator implements MutatorInterface
 {
-
+    
     private \InvoiceNinja\EInvoice\Models\Peppol\Invoice $p_invoice;
-
+    
     private ?\InvoiceNinja\EInvoice\Models\Peppol\Invoice $_client_settings;
 
     private ?\InvoiceNinja\EInvoice\Models\Peppol\Invoice $_company_settings;
@@ -30,7 +30,7 @@ class Mutator implements MutatorInterface
     private array $storecove_meta = [];
 
     private MutatorUtil $mutator_util;
-    // Constructor
+
     public function __construct(public Storecove $storecove)
     {
         $this->mutator_util = new MutatorUtil($this);
@@ -51,7 +51,7 @@ class Mutator implements MutatorInterface
     /**
      * setPeppol
      *
-     * @param  mixed $p_invoice
+     * @param  \InvoiceNinja\EInvoice\Models\Peppol\Invoice $p_invoice
      * @return self
      */
     public function setPeppol($p_invoice): self
@@ -63,7 +63,7 @@ class Mutator implements MutatorInterface
     /**
      * getPeppol
      *
-     * @return mixed
+     * @return \InvoiceNinja\EInvoice\Models\Peppol\Invoice
      */
     public function getPeppol(): mixed
     {
@@ -85,7 +85,7 @@ class Mutator implements MutatorInterface
     /**
      * setCompanySettings
      *  
-     * @param  mixed $company_settings
+     * @param  \InvoiceNinja\EInvoice\Models\Peppol\Invoice $company_settings
      * @return self
      */
     public function setCompanySettings($company_settings): self
@@ -93,22 +93,43 @@ class Mutator implements MutatorInterface
         $this->_company_settings = $company_settings;
         return $this;
     }
-
+    
+    /**
+     * getClientSettings
+     *
+     * @return \InvoiceNinja\EInvoice\Models\Peppol\Invoice
+     */
     public function getClientSettings(): mixed
     {
         return $this->_client_settings;
     }
-
+    
+    /**
+     * getCompanySettings
+     *
+     * @return \InvoiceNinja\EInvoice\Models\Peppol\Invoice
+     */
     public function getCompanySettings(): mixed
     {
         return $this->_company_settings;
     }
-
+    
+    /**
+     * getInvoice
+     *
+     * @return mixed
+     */
     public function getInvoice(): mixed
     {
         return $this->invoice;
     }
-
+    
+    /**
+     * getSetting
+     *
+     * @param  string $property_path
+     * @return mixed
+     */
     public function getSetting(string $property_path): mixed
     {
         return $this->mutator_util->getSetting($property_path);
@@ -496,9 +517,7 @@ class Mutator implements MutatorInterface
 
         $this->p_invoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity = $resolved_state;
         $this->p_invoice->AccountingCustomerParty->Party->PostalAddress->CityName = $resolved_city;
-        // $this->p_invoice->AccountingCustomerParty->Party->PhysicalLocation->Address->CountrySubentity = $resolved_state;
-        // $this->p_invoice->AccountingCustomerParty->Party->PhysicalLocation->Address->CityName = $resolved_city;
-
+        
         return $this;
     }
     
