@@ -2,6 +2,8 @@
 
 namespace App\Services\EDocument\Gateway\Transformers;
 
+use App\Helpers\Invoice\Taxer;
+use App\Utils\Traits\NumberFormatter;
 use App\Services\EDocument\Gateway\Storecove\Models\Tax;
 use App\Services\EDocument\Gateway\Storecove\Models\Party;
 use App\Services\EDocument\Gateway\Storecove\Models\Address;
@@ -9,14 +11,17 @@ use App\Services\EDocument\Gateway\Storecove\Models\Contact;
 use App\Services\EDocument\Gateway\Storecove\Models\References;
 use App\Services\EDocument\Gateway\Storecove\Models\InvoiceLines;
 use App\Services\EDocument\Gateway\Storecove\Models\PaymentMeans;
+use App\Services\EDocument\Gateway\Storecove\Models\TaxSubtotals;
 use App\Services\EDocument\Gateway\Storecove\Models\AllowanceCharges;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingCustomerParty;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingSupplierParty;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
-use App\Services\EDocument\Gateway\Storecove\Models\TaxSubtotals;
 
 class StorecoveTransformer implements TransformerInterface
 {
+    use Taxer;
+    use NumberFormatter;
+
     private StorecoveInvoice $s_invoice;
 
     private array $tax_map = [];
@@ -104,7 +109,7 @@ class StorecoveTransformer implements TransformerInterface
 
             // Basic line details
             $line->setLineId($peppolLine->ID->value);
-            $line->setQuantity((int)$peppolLine->InvoicedQuantity);
+            $line->setQuantity((int)$peppolLine->InvoicedQuantity->amount);
             $line->setItemPrice((float)$peppolLine->Price->PriceAmount->amount);
             $line->setAmountExcludingVat((float)$peppolLine->LineExtensionAmount->amount);
 
@@ -186,11 +191,20 @@ class StorecoveTransformer implements TransformerInterface
         $taxAmount = 0;
         $taxableAmount = 0;
 
-        foreach($peppolLine->TaxTotal as $taxTotal)
+        foreach($peppolLine->Item as $item)
         {
-          $taxableAmount += $taxTotal->TaxSubtotal[0]->TaxableAmount->amount;
-          $taxAmount += $taxTotal->TaxSubtotal[0]->TaxAmount->amount;
+             
+            $_taxAmount = $this->calcAmountLineTax($ctc->Percent, $peppolLine->LineExtensionAmount->amount);
+
+            $taxAmount += $_taxAmount;
+            $taxableAmount += $peppolLine->LineExtensionAmount->amount;
+
         }
+        // foreach($peppolLine->TaxTotal as $taxTotal)
+        // {
+        //   $taxableAmount += $taxTotal->TaxSubtotal[0]->TaxableAmount->amount;
+        //   $taxAmount += $taxTotal->TaxSubtotal[0]->TaxAmount->amount;
+        // }
 
         $this->tax_map[] = [
             'percentage' => $ctc->Percent, 
@@ -208,7 +222,7 @@ class StorecoveTransformer implements TransformerInterface
         if(isset($ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value))
             return $ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value;
 
-        return $peppolInvoice->AccountingSupplierParty->Party->PhysicalLocation->Country->IdentificationCode->value;
+        return $peppolInvoice->AccountingSupplierParty->Party->PostalAddress->Country->IdentificationCode->value;
     }
 
     public function getInvoice(): StorecoveInvoice

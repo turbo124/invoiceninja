@@ -673,14 +673,6 @@ class Peppol extends AbstractService
             //     $line->TaxTotal = $item_taxes;
             // }
 
-            // $price = new Price();
-            // $pa = new PriceAmount();
-            // $pa->currencyID = $this->invoice->client->currency()->code;
-            // $pa->amount = (string) ($this->costWithDiscount($item) - ($this->invoice->uses_inclusive_taxes ? ($this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) / $item->quantity) : 0));
-            // $price->PriceAmount = $pa;
-
-            // $line->Price = $price;
-
             // Handle Price and Discounts
             if ($item->discount > 0) {
                 // Base Price (before discount)
@@ -1005,7 +997,6 @@ class Peppol extends AbstractService
             $ts->ID = $vatID;
             $pts->TaxScheme = $ts;
 
-            
             //@todo if we have an exact GLN/routing number we should update this, otherwise Storecove will proxy and update on transit
             $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\EndpointID();
             $id->value = $this->company->settings->vat_number;
@@ -1388,84 +1379,6 @@ class Peppol extends AbstractService
         $tax_number = $is_client ? $this->invoice->client->id_number : $this->company->settings->id_number;
         $country_code = $is_client ? $this->invoice->client->country->iso_3166_2 : $this->company->country()->iso_3166_2;
 
-            switch ($country_code) {
-                case 'FR': // France
-                    return '0002'; // SIRENE
-
-                case 'SE': // Sweden
-                    return '0007'; // Organisationsnummer
-
-                case 'NO': // Norway
-                    return '0192'; // Enhetsregisteret
-
-                case 'FI': // Finland
-                    return '0213'; // Finnish VAT
-                    // '0212', // Finnish Organization Identifier
-                    // '0216', // OVT
-
-                case 'DK': // Denmark
-                    return '0184'; // DIGSTORG
-
-                case 'IT': // Italy
-                    return '0201'; // IPA
-                    // '0210', // CODICE FISCALE
-                    // '0211', // PARTITA IVA
-
-                case 'NL': // Netherlands
-                    return '0106'; // Chamber of Commerce
-                    // '0190', // Dutch Originator's Identification Number
-                
-                case 'BE': // Belgium
-                    return '0208'; // Enterprise Number
-
-                case 'LU': // Luxembourg
-                    return '0060'; // DUNS
-
-                case 'ES': // Spain
-                    return '0195'; // Company Registry
-
-                case 'AT': // Austria
-                    return '0088'; // GLN
-
-                case 'DE': // Germany
-                    return '0196'; // Leitweg-ID
-
-                case 'GB': // United Kingdom
-                    return '0088'; // GLN
-
-                case 'CH': // Switzerland
-                    return '0183'; // Swiss Unique Business ID
-
-                case 'SG': // Singapore
-                    return '0195'; // UEN
-                    //0009 DUNS
-
-                case 'AU': // Australia
-                    return '0151'; // ABN
-
-                case 'US': // United States
-                    return '0060'; // DUNS
-
-                case 'LT':
-                    return '0200';
-
-                case 'JP':
-                    return '0221'; // Japan Registered Invoice Number
-
-                case 'MY':
-                    return '0230'; // Malaysia National e-invoicing framework
-
-                case 'NZ':
-                    return '0088';
-         
-                // Default to GLN for any other country
-                default:
-                                        
-                    if (!empty($tax_number) && strlen($tax_number) === 9) {
-                        return '0009'; // DUNS if 9 digits
-                    }
-                    return '0088'; // Global Location Number (GLN)
-
-            }
-        }
+        return '0037';
+    }
 }

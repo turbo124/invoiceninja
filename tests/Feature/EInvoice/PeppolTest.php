@@ -191,6 +191,7 @@ class PeppolTest extends TestCase
         $settings->state = 'Bayern';
         $settings->postal_code = '98060';
         $settings->vat_number = 'DE923356489';
+        $settings->id_number = '991-00110-12';
         $settings->country_id = '276';
         $settings->currency_id = '3';
 
@@ -301,8 +302,6 @@ class PeppolTest extends TestCase
         $peppol->setInvoiceDefaults();
         $peppol->run();
 
-        // $peppol->toJson()->toXml();
-
         $de_invoice = $peppol->getInvoice();
 
         $this->assertNotNull($de_invoice);
@@ -310,7 +309,6 @@ class PeppolTest extends TestCase
         $e = new EInvoice();
         $xml = $e->encode($de_invoice, 'xml');
         $this->assertNotNull($xml);
-
 
         $errors = $e->validate($de_invoice);
 
@@ -322,106 +320,12 @@ class PeppolTest extends TestCase
 
         $xml = $peppol->toXml();
 
-        $cen = base_path('/tests/Feature/EInvoice/Validation/CEN-EN16931-UBL.xslt');
-        $pep = base_path('/tests/Feature/EInvoice/Validation/PEPPOL-EN16931-UBL.xslt');
-
-        $stylesheet = base_path('/tests/Feature/EInvoice/Validation/stylesheet.xslt');
-
-        $peppol_stylesheet = base_path('/tests/Feature/EInvoice/Validation/peppol.xslt');
-        $pep_test = base_path('tests/Feature/EInvoice/Validation/peppol_test.xml');
-
-        $pschema = base_path('tests/Feature/EInvoice/Validation/PEPPOL-EN16931-UBL.sch');
-
-
         $validator = new XsltDocumentValidator($xml);
         $validator->validate();
 
         nlog($validator->getErrors());
-        
+
         $this->assertCount(0, $validator->getErrors());
-
-
-        // try{
-        //     $processor = new \Saxon\SaxonProcessor();
-
-        //     $f = file_get_contents($pep_test);
-        //     $xmlFile = $f;
-        //     // $xslt = file_get_contents($cen);
-
-
-        //     $schematronFile = base_path('tests/Feature/EInvoice/Validation/PEPPOL-EN16931-UBL.sch');
-
-        //     $xslt = $processor->newXslt30Processor(); // Changed to newXsltProcessor
-
-
-        //     $x = $xslt->compileFromFile($pep);
-        //     $result = $x->transformFileToString($pep_test);
-        //     nlog($result);
-
-        //     $x = $xslt->compileFromFile($cen);
-        //     $result = $x->transformFileToString($pep_test);
-        //     $y = $x->transformFileToValue($pep_test);
-        //     nlog($result);
-        //     nlog($y);
-
-
-
-        // // $result = $xslt->transformFileToString($pep_test, $peppol_stylesheet); //output to strings
-
-        // // nlog("success");
-        // nlog($result);
-        // // nlog($result->getErrorMessage());
-
-        // } catch (Exception $e) {
-        //     nlog([
-        //         'valid' => false,
-        //         'message' => $e->getMessage()
-        //     ]);
-        // }
-
-
-// try {
-//     $xslt = $processor->newXslt30Processor();
-//     // $xslt->compileFromFile($cen);  // Changed to compileFromString since we have the file content
-
-//     // Attempt transformation to validate
-//     $result = $xslt->transformFileToString($xml,$cen);
-
-//     nlog([
-//         'valid' => true,
-//         'message' => 'XSLT is valid'
-//     ]);
-
-// } catch (Exception $e) {
-//     nlog([
-//         'valid' => false,
-//         'message' => $e->getMessage()
-//     ]);
-// }
-
-// try {
-//     $xslt = $processor->newXslt30Processor(); // Changed to newXsltProcessor
-//     $xslt->compileFromString($cen);
-
-//     // Attempt transformation to validate
-//     $result = $xslt->transformFileToString($xml);
-
-//     nlog([
-//         'valid' => true,
-//         'message' => 'XSLT is valid'
-//     ]);
-
-// } catch (Exception $e) {
-//     nlog([
-//         'valid' => false,
-//         'message' => $e->getMessage()
-//     ]);
-// }
-
-
-
-
-
 
     }
 

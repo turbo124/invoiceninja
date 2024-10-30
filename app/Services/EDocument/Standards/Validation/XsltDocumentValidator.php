@@ -55,8 +55,6 @@ class XsltDocumentValidator
                 $xsltExecutable = $xslt->compileFromFile(app_path($stylesheet)); //@phpstan-ignore-line
                 $result = $xsltExecutable->transformToValue($xdmNode);
 
-                nlog($result->size());
-
                 if($result->size() == 0)
                     continue;
 

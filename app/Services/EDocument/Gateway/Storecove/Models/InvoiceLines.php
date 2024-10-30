@@ -13,7 +13,7 @@ class InvoiceLines
 
     public float $itemPrice = 0.0;
 
-    public int $quantity = 0;
+    public float $quantity = 0;
 
     public string $quantityUnitCode = '';
 
@@ -60,12 +60,12 @@ class InvoiceLines
         $this->itemPrice = $itemPrice;
     }
 
-    public function getQuantity(): int
+    public function getQuantity()
     {
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): void
+    public function setQuantity($quantity): void
     {
         $this->quantity = $quantity;
     }
