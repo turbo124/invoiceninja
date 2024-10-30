@@ -200,11 +200,6 @@ class StorecoveTransformer implements TransformerInterface
             $taxableAmount += $peppolLine->LineExtensionAmount->amount;
 
         }
-        // foreach($peppolLine->TaxTotal as $taxTotal)
-        // {
-        //   $taxableAmount += $taxTotal->TaxSubtotal[0]->TaxableAmount->amount;
-        //   $taxAmount += $taxTotal->TaxSubtotal[0]->TaxAmount->amount;
-        // }
 
         $this->tax_map[] = [
             'percentage' => $ctc->Percent, 
