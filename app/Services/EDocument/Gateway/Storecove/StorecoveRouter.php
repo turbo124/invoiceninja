@@ -12,7 +12,12 @@
 namespace App\Services\EDocument\Gateway\Storecove;
 
 class StorecoveRouter
-{  
+{      
+    /**
+     * Provides a country matrix for the correct scheme to send via
+     *  
+     * @var mixed $routing_rules 
+     **/
     private array $routing_rules = [
         "US" => [
             ["B","DUNS, GLN, LEI","US:EIN","DUNS, GLN, LEI"],
@@ -163,18 +168,6 @@ class StorecoveRouter
         return $rules[0][2];
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
      /**
      * used as a proxy for
      * the schemeID of partyidentification
@@ -190,6 +183,7 @@ class StorecoveRouter
      * IT (CF/IVA) Codice Fiscale (person/company identifier) / company vat number
      *
      * @var array
+     * @deprecated
      */
     private array $schemeIdIdentifiers = [
         'US' => 'EIN',

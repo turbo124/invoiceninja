@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Http;
 use Turbo124\Beacon\Facades\LightLogs;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use Illuminate\Http\Client\RequestException;
 use App\DataMapper\Analytics\LegalEntityCreated;
 
 enum HttpVerb: string
@@ -83,16 +82,15 @@ class Storecove
 
         $uri =  "api/v2/discovery/receives";
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
-nlog($network_data);
-nlog($r->json());
-nlog($r->body());
+        // nlog($network_data);
+        // nlog($r->json());
+        // nlog($r->body());
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
     }
-    
 
     /**
-     * Discovery
+     * Discovery - attempts to find the identifier on the network
      *
      * @param  string $identifier
      * @param  string $scheme
@@ -113,19 +111,17 @@ nlog($r->body());
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
 
-        
-nlog($network_data);
-nlog($r->json());
-nlog($r->body());
+        // nlog($network_data);
+        // nlog($r->json());
+        // nlog($r->body());
 
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
     }
 
-
     /**
      * Unused as yet
-     *
+     * @todo
      * @param  mixed $document
      * @return string|bool
      */
@@ -158,7 +154,7 @@ nlog($r->body());
     }
     
     /**
-     * Send Document via StoreCove
+     * Send Raw UBL Document via StoreCove
      *
      * @param  string $document
      * @param  int $routing_id
@@ -195,9 +191,6 @@ nlog($r->body());
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $payload, $this->getHeaders());
 
-        nlog($r->body());
-        // nlog($r->json());
-
         if($r->successful()) {
             return $r->json()['guid'];
         }
@@ -227,7 +220,7 @@ nlog($r->body());
     /**
      * CreateLegalEntity
      *
-     * Creates a base entity. 
+     * Creates a legal entity for a Company. 
      * 
      * Following creation, you will also need to create a Peppol Identifier
      * 
@@ -255,6 +248,7 @@ nlog($r->body());
 
         }
 
+        //@todo - $data should contain the send/receive configuration for the next array
         $company_defaults = [
             'acts_as_receiver' => true,
             'acts_as_sender' => true,
@@ -431,7 +425,9 @@ nlog($r->body());
     }
 
     /**
-     * deleteIdentifier
+     * Delete Legal Entity Identifier
+     * 
+     * Remove the entity from the network
      *
      * @param  int $legal_entity_id
      * @return bool
@@ -446,9 +442,18 @@ nlog($r->body());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private function getHeaders(array $headers = [])
+    
+        
+    /**
+     * getHeaders
+     * 
+     * Base request headers
+     * 
+     * @param  array $headers
+     * @return array
+     */
+    private function getHeaders(array $headers = []): array
     {
-
         return array_merge([
             'Accept' => 'application/json',
             'Content-type' => 'application/json',
@@ -457,7 +462,7 @@ nlog($r->body());
     }
     
     /**
-     * httpClient
+     * Http Client
      *
      * @param  string $uri
      * @param  string $verb

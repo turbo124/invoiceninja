@@ -50,9 +50,7 @@ class AddTaxIdentifierRequest extends FormRequest
 
     public function authorize(): bool
     {
-        /**
-         * @var \App\Models\User
-         */
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         if (app()->isLocal()) {
