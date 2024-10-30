@@ -20,7 +20,7 @@ use Illuminate\Validation\Rule;
 
 class StoreEntityRequest extends FormRequest
 {
-    protected array $vat_regex_patterns = [
+    public static array $vat_regex_patterns = [
         'DE' => '/^DE\d{9}$/',
         'AT' => '/^ATU\d{8}$/',
         'BE' => '/^BE0\d{9}$/',
@@ -75,7 +75,7 @@ class StoreEntityRequest extends FormRequest
             'line1' => ['required', 'string'],
             'line2' => ['nullable', 'string'],
             'city' => ['required', 'string'],
-            'country' => ['required', 'bail', Rule::in(array_keys($this->vat_regex_patterns))],
+            'country' => ['required', 'bail', Rule::in(array_keys(self::$vat_regex_patterns))],
             'zip' => ['required', 'string'],
             'county' => ['required', 'string'],
             'acts_as_receiver' => ['required', 'bool'],
