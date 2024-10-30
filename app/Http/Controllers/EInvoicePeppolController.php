@@ -12,6 +12,7 @@
 namespace App\Http\Controllers;
 
 use Http;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use App\Http\Requests\EInvoice\Peppol\StoreEntityRequest;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
@@ -74,11 +75,15 @@ class EInvoicePeppolController extends BaseController
      * @param  ShowEntityRequest $request
      * @return mixed
      */
-    public function show(ShowEntityRequest $request)
+    public function show(ShowEntityRequest $request): JsonResponse
     {
         $company = auth()->user()->company();
 
         $response = Http::baseUrl(config('ninja.app_domain'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
             ->post('/api/einvoice/peppol/legal_entity', data: [
                 'legal_entity_id' => $company->legal_entity_id,
                 'e_invoicing_token' => $company->account->e_invoicing_token,
@@ -103,19 +108,16 @@ class EInvoicePeppolController extends BaseController
         $company = auth()->user()->company();
 
         $response = Http::baseUrl(config('ninja.app_domain'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
             ->post('/api/einvoice/peppol/setup', data: [
                 ...$request->validated(),
                 'classification' => $company->settings->classification,
                 'vat_number' => $company->settings->vat_number,
                 'e_invoicing_token' => $company->account->e_invoicing_token,
             ]);
-
-        info($response->status());
-        info($response->json());
-        info('Successful', ['status' => $response->successful()]);
-        info('legal entity id', ['v' => $response->json('legal_entity_id')]);
-        info($response->json());
-
 
         if ($response->successful()) {
             $company->legal_entity_id = $response->json('legal_entity_id');
@@ -174,12 +176,22 @@ class EInvoicePeppolController extends BaseController
 
     }
 
+    /**
+     * Update legal properties such as acting as sender or receiver.
+     * 
+     * @param \App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest $request
+     * @return JsonResponse|mixed|Response
+     */
     public function updateLegalEntity(UpdateEntityRequest $request)
     {
         $company = auth()->user()->company();
 
         $response = Http::baseUrl(config('ninja.app_domain'))
-            ->put('/api/einvoice/peppol/legal_entity', data: [
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->put('/api/einvoice/peppol/update', data: [
                 ...$request->validated(),
                 'legal_entity_id' => $company->legal_entity_id,
                 'e_invoicing_token' => $company->account->e_invoicing_token,
@@ -215,6 +227,10 @@ class EInvoicePeppolController extends BaseController
         $company = auth()->user()->company();
 
         $response = Http::baseUrl(config('ninja.app_domain'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
             ->post('/api/einvoice/peppol/disconnect', data: [
                 'company_key' => $company->company_key,
                 'legal_entity_id' => $company->legal_entity_id,
@@ -233,7 +249,6 @@ class EInvoicePeppolController extends BaseController
             $company->save();
 
             return response()->noContent();
-
         }
 
         return response()->noContent(status: 500);
