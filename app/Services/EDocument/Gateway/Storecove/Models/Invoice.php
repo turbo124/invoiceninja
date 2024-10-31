@@ -45,7 +45,7 @@ class Invoice
     //this is an experimental prop
     // #[SerializedPath('[cac:LegalMonetaryTotal][cbc:TaxInclusiveAmount][#]')]
     // #[Context(['path_type' => 'tax'])]
-	// public $amount_including_tax;
+	public $amount_including_tax;
 	
     #[SerializedPath('[cac:LegalMonetaryTotal][cbc:TaxInclusiveAmount][#]')]
 	public $amount_including_vat;
@@ -55,7 +55,10 @@ class Invoice
 	
     public ?bool $consumer_tax_mode; //toggle this to TRUE if we are using a secondary identifier ie. when German company is taxing French company and therefore using the additional Vat identifier
 	
+	#[SerializedName('cac:Delivery')]
     public ?Delivery $delivery;
+
+	//no mapping
 	public ?DeliveryTerms $delivery_terms;
 	
     #[SerializedPath('[cbc:DocumentCurrencyCode][#]')]
@@ -94,25 +97,54 @@ class Invoice
     #[SerializedPath('[cac:LegalMonetaryTotal][cbc:PrepaidAmount]')]
 	public ?string $prepaid_amount;
 
+	//no mapping
+	// 'price_mode_gross' can only be used for sender countries ES, IT and PT
 	public ?string $price_mode;
+
 	/** @var References[] */
 	public ?array $references;
+
+	//AU/NZ and JP. - only available intra country ie AU - AU
 	public ?bool $self_billing_mode;
+
+	//readonly prop for received documents
 	public ?string $sub_type;
+
+	//proxy of issue date
 	public ?string $tax_point_date;
+
+	#[SerializedPath('[cac:TaxTotal][cac:TaxSubtotal]')]
 	/** @var TaxSubtotals[] */
-	public ?array $tax_subtotals;
+	public $tax_subtotals;
+
+	//storecove - no mappings - tax_line_percentages
 	public ?string $tax_system;
+
+	//italy only - invoice level
 	/** @var TaxesDutiesFees[] */
 	public ?array $taxes_duties_fees;
+
+	//no mapping
 	public ?string $time_zone;
+
+	// india only enum (b2b, sezwp, sezwop, expwp, expwop, dexp)
 	public ?string $transaction_type;
-	/** @var string[] */
+
+	//no mapping
 	public ?array $ubl_extensions;
+
+	//no mapping 
 	public ?string $x2y;
+
+	//not found in schema
 	public ?bool $vat_reverse_charge;
 	public ?string $tax_exempt_reason;
 	public ?string $invoice_type;
+	public ?string $payment_means_iban;
+	public ?string $payment_means_bic;
+	public ?string $payment_means_code;
+	public ?string $payment_means_payment_id;
+	//not found in schema
 
     #[SerializedPath('[cbc:BuyerReference]')]
 	public ?string $buyer_reference;
@@ -132,22 +164,8 @@ class Invoice
     #[SerializedPath('[cac:ProjectReference][cbc:ID][#]')]
 	public ?string $project_reference;
 
-	public ?string $payment_means_iban;
-	public ?string $payment_means_bic;
-	public ?string $payment_means_code;
-	public ?string $payment_means_payment_id;
+	
 
-	/**
-	 * @param InvoiceLines[] $invoice_lines
-	 * @param AllowanceCharges[] $allowance_charges
-	 * @param Attachments[] $attachments
-	 * @param string[] $issue_reasons
-	 * @param PaymentMeansArray[] $payment_means_array
-	 * @param References[] $references
-	 * @param TaxSubtotals[] $tax_subtotals
-	 * @param TaxesDutiesFees[] $taxes_duties_fees
-	 * @param string[] $ubl_extensions
-	 */
 	public function __construct(
 		?string $invoice_number,
 		?DateTime $issue_date,
