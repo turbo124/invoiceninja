@@ -2,9 +2,14 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class AccountingCustomerParty
 {
-	public ?Party $party;
+	/** @var Party */
+	#[SerializedName('cac:Party')]
+	public $party;
     
 	/** @var PublicIdentifiers[] */
 	public ?array $public_identifiers;

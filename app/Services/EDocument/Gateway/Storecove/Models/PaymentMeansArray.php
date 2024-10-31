@@ -2,16 +2,34 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class PaymentMeansArray
 {
-	public ?string $code;
-	public ?string $account;
-	public ?string $branche_code;
-	public ?string $holder;
-	public ?string $network;
-	public ?string $mandate;
-	public ?string $payment_id;
-	public ?string $amount;
+	#[SerializedPath('[cbc:PaymentMeansCode][#]')]
+    public ?string $code;
+
+    #[SerializedPath('[cac:PayeeFinancialAccount][cbc:ID][#]')]
+    public ?string $account;
+
+    #[SerializedPath('[cac:PayeeFinancialAccount][cac:FinancialInstitutionBranch][cbc:ID][#]')]
+    public ?string $branche_code;
+
+    #[SerializedPath('[cac:PayeeFinancialAccount][cbc:Name]')]
+    public ?string $holder;
+
+    #[SerializedPath('[cac:PaymentMandate][cac:PayerFinancialAccount][cbc:ID][@schemeID]')]
+    public ?string $network;
+
+    #[SerializedPath('[cac:PaymentMandate][cbc:ID][#]')]
+    public ?string $mandate;
+
+    #[SerializedPath('[cbc:PaymentID][#]')]
+    public ?string $payment_id;
+
+    #[SerializedPath('[cbc:PaymentAmount][#]')]
+    public ?string $amount;
 
 	public function __construct(
 		?string $code,

@@ -2,12 +2,22 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class Party
 {
-	public ?string $company_name;
+	#[SerializedPath('[cac:PartyName][0][cbc:Name]')]
+	public $company_name;
+	
+	#[SerializedPath('[cac:PartyLegalEntity][0][cbc:RegistrationName]')]
 	public ?string $registration_name;
+
 	public ?string $classification_code;
+
+	#[SerializedPath('[cac:PostalAddress]')]
 	public ?Address $address;
+	
 	public ?Contact $contact;
 
 	public function __construct(

@@ -2,40 +2,88 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
+
 class InvoiceLines
 {
-	public ?string $line_id;
-	public ?string $description;
-	public ?string $name;
-	public ?string $order_line_reference_line_id;
-	public ?string $invoice_period;
-	public ?float $item_price;
-	public ?float $quantity;
-	public ?float $base_quantity;
-	public ?string $quantity_unit_code;
-	public ?string $allowance_charge;
-	/** @var AllowanceCharges[] */
-	public ?array $allowance_charges;
-	public ?string $amount_excluding_vat;
-	public ?string $amount_excluding_tax;
-	public ?string $amount_including_tax;
-	public ?Tax $tax;
-	/** @var TaxesDutiesFees[] */
-	public ?array $taxes_duties_fees;
-	public ?string $accounting_cost;
-	/** @var References[] */
-	public ?array $references;
-	/** @var AdditionalItemProperties[] */
-	public ?array $additional_item_properties;
-	public ?string $sellers_item_identification;
-	public ?string $buyers_item_identification;
-	public ?string $standard_item_identification;
-	public ?string $standard_item_identification_scheme_id;
-	public ?string $standard_item_identification_scheme_agency_id;
-	public ?string $note;
+
+	#[SerializedPath('[cbc:ID][#]')]
+    public ?string $line_id;
+
+    #[SerializedPath('[cac:Item][cbc:Description]')]
+    public ?string $description;
+
+    #[SerializedPath('[cac:Item][cbc:Name]')]
+    public ?string $name;
+
+    #[SerializedPath('[cac:OrderLineReference][cbc:LineID]')]
+    public ?string $order_line_reference_line_id;
+
+    #[SerializedPath('[cac:InvoicePeriod]')]
+    public ?string $invoice_period;
+
+    #[SerializedPath('[cac:Price][cbc:PriceAmount][#]')]
+    public ?float $item_price;
+
+    #[SerializedPath('[cbc:InvoicedQuantity][#]')]
+    public ?float $quantity;
+
+    #[SerializedPath('[cbc:BaseQuantity][#]')]
+    public ?float $base_quantity;
+
+    #[SerializedPath('[cbc:InvoicedQuantity][@unitCode]')]
+    public ?string $quantity_unit_code;
+
+    #[SerializedPath('[cac:AllowanceCharge]')]
+    /** @var AllowanceCharges[] */ //todo
+    public ?array $charges;
+
+    #[SerializedPath('[cbc:LineExtensionAmount][#]')]
+    public ?string $amount_excluding_vat;
+
+    #[SerializedPath('[cbc:TaxExclusiveAmount][#]')]
+    public ?string $amount_excluding_tax;
+
+    #[SerializedPath('[cbc:TaxInclusiveAmount][#]')]
+    public ?string $amount_including_tax;
+
+    #[SerializedPath('[cac:Item][cac:ClassifiedTaxCategory]')]
+    /** @var TaxesDutiesFees[] */
+    public array $taxes_duties_fees;    
+
+    #[SerializedPath('[cbc:AccountingCost]')]
+    public ?string $accounting_cost;
+
+    #[SerializedPath('[cac:DocumentReference]')]
+    /** @var References[] */
+    public ?array $references;
+
+    #[SerializedPath('[cac:Item][cac:AdditionalItemProperty]')]
+    /** @var AdditionalItemProperties[] */
+    public ?array $additional_item_properties;
+
+    #[SerializedPath('[cac:Item][cac:SellersItemIdentification][cbc:ID][#]')]
+    public ?string $sellers_item_identification;
+
+    #[SerializedPath('[cac:Item][cac:BuyersItemIdentification][cbc:ID][#]')]
+    public ?string $buyers_item_identification;
+
+    #[SerializedPath('[cac:Item][cac:StandardItemIdentification][cbc:ID][#]')]
+    public ?string $standard_item_identification;
+
+    #[SerializedPath('[cac:Item][cac:StandardItemIdentification][cbc:ID][@schemeID]')]
+    public ?string $standard_item_identification_scheme_id;
+
+    #[SerializedPath('[cac:Item][cac:StandardItemIdentification][cbc:ID][@schemeAgencyID]')]
+    public ?string $standard_item_identification_scheme_agency_id;
+
+    #[SerializedPath('[cbc:Note]')]
+    public ?string $note;
 
 	/**
-	 * @param AllowanceCharges[] $allowance_charges
+	 * @param AllowanceCharges[] $charges
 	 * @param TaxesDutiesFees[] $taxes_duties_fees
 	 * @param References[] $references
 	 * @param AdditionalItemProperties[] $additional_item_properties
@@ -50,12 +98,10 @@ class InvoiceLines
 		?float $quantity,
 		?float $base_quantity,
 		?string $quantity_unit_code,
-		?string $allowance_charge,
-		?array $allowance_charges,
+		?array $charges,
 		?string $amount_excluding_vat,
 		?string $amount_excluding_tax,
 		?string $amount_including_tax,
-		?Tax $tax,
 		?array $taxes_duties_fees,
 		?string $accounting_cost,
 		?array $references,
@@ -76,12 +122,10 @@ class InvoiceLines
 		$this->quantity = $quantity;
 		$this->base_quantity = $base_quantity;
 		$this->quantity_unit_code = $quantity_unit_code;
-		$this->allowance_charge = $allowance_charge;
-		$this->allowance_charges = $allowance_charges;
+		$this->charges = $charges;
 		$this->amount_excluding_vat = $amount_excluding_vat;
 		$this->amount_excluding_tax = $amount_excluding_tax;
 		$this->amount_including_tax = $amount_including_tax;
-		$this->tax = $tax;
 		$this->taxes_duties_fees = $taxes_duties_fees;
 		$this->accounting_cost = $accounting_cost;
 		$this->references = $references;
@@ -139,17 +183,12 @@ class InvoiceLines
 		return $this->quantity_unit_code;
 	}
 
-	public function getAllowanceCharge(): ?string
-	{
-		return $this->allowance_charge;
-	}
-
 	/**
 	 * @return AllowanceCharges[]
 	 */
 	public function getAllowanceCharges(): ?array
 	{
-		return $this->allowance_charges;
+		return $this->charges;
 	}
 
 	public function getAmountExcludingVat(): ?string
@@ -285,18 +324,12 @@ class InvoiceLines
 		return $this;
 	}
 
-	public function setAllowanceCharge(?string $allowance_charge): self
-	{
-		$this->allowance_charge = $allowance_charge;
-		return $this;
-	}
-
 	/**
-	 * @param AllowanceCharges[] $allowance_charges
+	 * @param AllowanceCharges[] $charges
 	 */
-	public function setAllowanceCharges(?array $allowance_charges): self
+	public function setAllowanceCharges(?array $charges): self
 	{
-		$this->allowance_charges = $allowance_charges;
+		$this->charges = $charges;
 		return $this;
 	}
 

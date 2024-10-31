@@ -22,9 +22,9 @@ class Invoice
     /** @var ?AccountingCustomerParty */
 	public $accounting_customer_party;
 
-    #[SerializedPath('[cac:InvoiceLine]')]
+    #[SerializedName('cac:InvoiceLine')]
 	/** @var InvoiceLines[] */
-	public ?array $invoice_lines;
+	public array $invoice_lines;
 
     #[SerializedPath('[cbc:AccountingCost]')]
 	public $accounting_cost;
@@ -39,7 +39,7 @@ class Invoice
 	public $accounting_supplier_party;
 
     #[SerializedPath('[cac:AllowanceCharge]')]
-	/** @var AllowanceCharges[] */
+	/** @var AllowanceCharges[] */ //todo
 	public ?array $allowance_charges;
 
     //this is an experimental prop
@@ -86,7 +86,7 @@ class Invoice
 
     #[SerializedPath('[cac:PaymentMeans]')]
 	/** @var PaymentMeansArray[] */
-	public ?array $payment_means_array;
+	public array $payment_means_array;
 
 	#[SerializedPath('[cac:PaymentTerms][0]')]
 	public ?PaymentTerms $payment_terms;

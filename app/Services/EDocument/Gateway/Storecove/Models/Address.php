@@ -2,13 +2,25 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 class Address
 {
-	public ?string $country;
-	public ?string $street1;
-	public ?string $street2;
-	public ?string $city;
-	public ?string $zip;
+    #[SerializedPath('[cac:Country][cbc:IdentificationCode][#]')]
+    public ?string $country;
+
+    #[SerializedPath('[cbc:StreetName]')]
+    public ?string $street1;
+
+    #[SerializedPath('[cbc:AdditionalStreetName]')]
+    public ?string $street2;
+
+    #[SerializedPath('[cbc:CityName]')]
+    public ?string $city;
+
+    #[SerializedPath('[cbc:PostalZone]')]
+    public ?string $zip;
+
 	public ?string $county;
 
 	public function __construct(

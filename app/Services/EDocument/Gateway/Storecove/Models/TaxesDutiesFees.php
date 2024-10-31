@@ -2,12 +2,21 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class TaxesDutiesFees
 {
-	public ?string $country;
+	public ?string $country; //need to run postprocessing on this 
 	public ?string $amount;
+
+	#[SerializedName('cbc:Percent')]
 	public ?string $percentage;
+
+	#[SerializedPath('[cbc:ID][#]')]
 	public ?string $category;
+
+	#[SerializedPath('[cac:TaxScheme][cbc:ID][#]')]
 	public ?string $type;
 
 	public function __construct(
