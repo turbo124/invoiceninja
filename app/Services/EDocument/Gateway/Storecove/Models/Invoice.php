@@ -2,44 +2,98 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use DateTime;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Attribute\Context;
+
 class Invoice
 {
-	public ?string $invoice_number;
-	public ?string $issue_date;
+    #[SerializedPath('[cbc:ID][#]')]
+	public $invoice_number;
 
+    /** @var ?\DateTime */
+    #[SerializedPath('[cbc:IssueDate]')]
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+	public ?DateTime $issue_date;
+
+    #[SerializedPath('[cac:AccountingCustomerParty]')]
     /** @var ?AccountingCustomerParty */
-	public  $accounting_customer_party;
-    
+	public $accounting_customer_party;
+
+    #[SerializedPath('[cac:InvoiceLine]')]
 	/** @var InvoiceLines[] */
 	public ?array $invoice_lines;
-	public ?string $accounting_cost;
+
+    #[SerializedPath('[cbc:AccountingCost]')]
+	public $accounting_cost;
+
 	public ?string $accounting_currency_exchange_rate;
 	public ?string $accounting_currency_taxable_amount;
 	public ?string $accounting_currency_tax_amount;
 	public ?string $accounting_currency_tax_amount_currency;
-	public ?AccountingSupplierParty $accounting_supplier_party;
+    
+    #[SerializedPath('[cac:AccountingSupplierParty]')]
+    /** @var ?AccountingSupplierParty */
+	public $accounting_supplier_party;
+
+    #[SerializedPath('[cac:AllowanceCharge]')]
 	/** @var AllowanceCharges[] */
 	public ?array $allowance_charges;
-	public ?string $amount_including_tax;
-	public ?string $amount_including_vat;
-	/** @var Attachments[] */
+
+    //this is an experimental prop
+    // #[SerializedPath('[cac:LegalMonetaryTotal][cbc:TaxInclusiveAmount][#]')]
+    // #[Context(['path_type' => 'tax'])]
+	// public $amount_including_tax;
+	
+    #[SerializedPath('[cac:LegalMonetaryTotal][cbc:TaxInclusiveAmount][#]')]
+	public $amount_including_vat;
+	
+    /** @var Attachments[] */
 	public ?array $attachments;
-	public ?bool $consumer_tax_mode;
-	public ?Delivery $delivery;
+	
+    public ?bool $consumer_tax_mode; //toggle this to TRUE if we are using a secondary identifier ie. when German company is taxing French company and therefore using the additional Vat identifier
+	
+    public ?Delivery $delivery;
 	public ?DeliveryTerms $delivery_terms;
-	public ?string $document_currency_code;
-	public ?string $due_date;
-	public ?string $invoice_period;
-	/** @var string[] */
+	
+    #[SerializedPath('[cbc:DocumentCurrencyCode][#]')]
+    public $document_currency_code;
+	
+    /** @var ?\DateTime */
+    #[SerializedPath('[cbc:DueDate]')]
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+    public ?DateTime $due_date;
+
+	//may need something custom for this
+    public ?string $invoice_period;
+
+    //no mapping
 	public ?array $issue_reasons;
-	public ?string $issue_time;
-	public ?string $note;
+	
+    //no mapping
+    public ?string $issue_time;
+
+    #[SerializedPath('[cbc:Note]')]
+	public $note;
+
+    //no mapping
 	public ?string $payable_rounding_amount;
+
+    #[SerializedPath('[cac:PaymentMeans]')]
 	/** @var PaymentMeansArray[] */
 	public ?array $payment_means_array;
+
+	#[SerializedPath('[cac:PaymentTerms][0]')]
 	public ?PaymentTerms $payment_terms;
+
+    // no mapping
 	public ?string $preferred_invoice_type;
+    
+    #[SerializedPath('[cac:LegalMonetaryTotal][cbc:PrepaidAmount]')]
 	public ?string $prepaid_amount;
+
 	public ?string $price_mode;
 	/** @var References[] */
 	public ?array $references;
@@ -59,12 +113,25 @@ class Invoice
 	public ?bool $vat_reverse_charge;
 	public ?string $tax_exempt_reason;
 	public ?string $invoice_type;
+
+    #[SerializedPath('[cbc:BuyerReference]')]
 	public ?string $buyer_reference;
+
+    #[SerializedPath('[cac:OrderReference][cbc:ID][#]')]
 	public ?string $order_reference;
+
+    #[SerializedPath('[cac:OrderReference][cbc:SalesOrderID][#]')]
 	public ?string $sales_order_id;
+
+    #[SerializedPath('[cac:BillingReference][cac:InvoiceDocumentReference][cbc:ID][#]')]
 	public ?string $billing_reference;
+
+    #[SerializedPath('[cac:ContractDocumentReference][cbc:ID][#]')]
 	public ?string $contract_document_reference;
+
+    #[SerializedPath('[cac:ProjectReference][cbc:ID][#]')]
 	public ?string $project_reference;
+
 	public ?string $payment_means_iban;
 	public ?string $payment_means_bic;
 	public ?string $payment_means_code;
@@ -83,7 +150,7 @@ class Invoice
 	 */
 	public function __construct(
 		?string $invoice_number,
-		?string $issue_date,
+		?DateTime $issue_date,
 		?AccountingCustomerParty $accounting_customer_party,
 		?array $invoice_lines,
 		?string $accounting_cost,
@@ -100,7 +167,7 @@ class Invoice
 		?Delivery $delivery,
 		?DeliveryTerms $delivery_terms,
 		?string $document_currency_code,
-		?string $due_date,
+		?DateTime $due_date,
 		?string $invoice_period,
 		?array $issue_reasons,
 		?string $issue_time,
