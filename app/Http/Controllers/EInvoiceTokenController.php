@@ -15,6 +15,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\EInvoice\UpdateTokenRequest;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 
 class EInvoiceTokenController extends BaseController
 {
@@ -23,10 +24,24 @@ class EInvoiceTokenController extends BaseController
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $user->account->update([
-            'e_invoicing_token' => $request->input('token'),
-        ]);
+        $response = Http::baseUrl(config('ninja.app_domain'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('/api/einvoice/tokens/rotate', data: [
+                'license' => config('ninja.license_key'),
+                'account_key' => $user->account->key,
+            ]);
 
-        return response()->noContent();
+        if ($response->successful()) {
+            $user->account->update([
+                'e_invoicing_token' => $response->json('token'),
+            ]);
+
+            return response()->noContent();
+        }
+
+        return response()->noContent(status: 422);
     }
 }
