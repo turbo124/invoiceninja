@@ -9,14 +9,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-namespace App\Services\EDocument\Gateway\Transformers;
 
-interface TransformerInterface
+class Contact
 {
-    public function transform(mixed $invoice);
 
-    public function getInvoice();
-
-    public function toJson();
+    public function __construct(
+        public string $email,
+        public ?string $firstName = null,
+        public ?string $lastName = null,
+        public ?string $phone = null
+    ){}
 }

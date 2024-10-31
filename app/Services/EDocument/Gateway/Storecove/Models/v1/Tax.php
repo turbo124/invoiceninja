@@ -9,14 +9,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-namespace App\Services\EDocument\Gateway\Transformers;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
-interface TransformerInterface
+
+class Tax
 {
-    public function transform(mixed $invoice);
+    public function __construct(
+        public float $percentage,
+        public string $country
+    ){}
 
-    public function getInvoice();
-
-    public function toJson();
 }

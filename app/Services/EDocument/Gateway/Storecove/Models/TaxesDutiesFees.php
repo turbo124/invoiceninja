@@ -2,7 +2,7 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-class Tax
+class TaxesDutiesFees
 {
 	public ?string $country;
 	public ?string $amount;

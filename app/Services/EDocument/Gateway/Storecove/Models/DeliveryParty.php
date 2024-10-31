@@ -2,10 +2,9 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-class AccountingCustomerParty
+class DeliveryParty
 {
 	public ?Party $party;
-    
 	/** @var PublicIdentifiers[] */
 	public ?array $public_identifiers;
 

@@ -9,14 +9,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-namespace App\Services\EDocument\Gateway\Transformers;
 
-interface TransformerInterface
+class AccountingCustomerParty
 {
-    public function transform(mixed $invoice);
-
-    public function getInvoice();
-
-    public function toJson();
+    public function __construct(public array $publicIdentifiers, public Party $party)
+    {
+    }
 }

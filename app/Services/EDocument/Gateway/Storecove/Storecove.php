@@ -440,6 +440,32 @@ class Storecove
 
         return $r->successful();
     }
+    
+    /**
+     * getDocument
+     *
+     * @param  string $guid
+     * @param  string $format json|original
+     * @return mixed
+     */
+    public function getDocument(string $guid, string $format = 'json')
+    {
+
+        $uri = "/received_documents/{$guid}/{$format}";
+
+        $r = $this->httpClient($uri, (HttpVerb::GET)->value, []);
+
+        if ($r->successful()) {
+            $data = $r->json();
+// nlog($data);
+// nlog(json_encode($data));
+nlog($r->body());
+    return $data;
+        }
+
+        return $r;
+
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     

@@ -2,7 +2,7 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-class Address
+class OriginAddress
 {
 	public ?string $country;
 	public ?string $street1;

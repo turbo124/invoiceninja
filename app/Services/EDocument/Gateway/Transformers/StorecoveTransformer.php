@@ -27,54 +27,54 @@ class StorecoveTransformer implements TransformerInterface
 
     private array $tax_map = [];
 
-    public function transform(mixed $peppolInvoice)
+    public function transform(mixed $invoice)
     {
     
         $this->s_invoice = new StorecoveInvoice();
 
-        $this->s_invoice->setDocumentCurrency($peppolInvoice->DocumentCurrencyCode ?? '');
-        $this->s_invoice->setInvoiceNumber($peppolInvoice->ID ?? '');
-        $this->s_invoice->setIssueDate($peppolInvoice->IssueDate->format('Y-m-d'));
-        $this->s_invoice->setTaxPointDate($peppolInvoice->IssueDate->format('Y-m-d'));
-        $this->s_invoice->setDueDate($peppolInvoice->DueDate->format('Y-m-d') ?? '');
-        $this->s_invoice->setNote($peppolInvoice->Note ?? '');
+        $this->s_invoice->setDocumentCurrency($invoice->DocumentCurrencyCode ?? '');
+        $this->s_invoice->setInvoiceNumber($invoice->ID ?? '');
+        $this->s_invoice->setIssueDate($invoice->IssueDate->format('Y-m-d'));
+        $this->s_invoice->setTaxPointDate($invoice->IssueDate->format('Y-m-d'));
+        $this->s_invoice->setDueDate($invoice->DueDate->format('Y-m-d') ?? '');
+        $this->s_invoice->setNote($invoice->Note ?? '');
 
         // Only use this if we are billing for services between a period.
-        if (isset($peppolInvoice->InvoicePeriod[0]) && 
-        isset($peppolInvoice->InvoicePeriod[0]->StartDate) && 
-        isset($peppolInvoice->InvoicePeriod[0]->EndDate)) {
-            $this->s_invoice->setInvoicePeriod("{$peppolInvoice->InvoicePeriod[0]->StartDate->format('Y-m-d')} - {$peppolInvoice->InvoicePeriod[0]->EndDate->format('Y-m-d')}");
+        if (isset($invoice->InvoicePeriod[0]) && 
+        isset($invoice->InvoicePeriod[0]->StartDate) && 
+        isset($invoice->InvoicePeriod[0]->EndDate)) {
+            $this->s_invoice->setInvoicePeriod("{$invoice->InvoicePeriod[0]->StartDate->format('Y-m-d')} - {$invoice->InvoicePeriod[0]->EndDate->format('Y-m-d')}");
         }
 
-        if($peppolInvoice->BuyerReference ?? false){
-            $ref = new References(documentId: $peppolInvoice->BuyerReference, documentType: 'buyer_reference');
+        if($invoice->BuyerReference ?? false){
+            $ref = new References(documentId: $invoice->BuyerReference, documentType: 'buyer_reference');
             $this->s_invoice->addReferences($ref);
         }
         
-        if ($peppolInvoice->OrderReference->ID ?? false) {
-            $ref = new References(documentId: $peppolInvoice->OrderReference->ID->value, documentType: 'sales_order');
+        if ($invoice->OrderReference->ID ?? false) {
+            $ref = new References(documentId: $invoice->OrderReference->ID->value, documentType: 'sales_order');
             $this->s_invoice->addReferences($ref);
         }
 
-        if($peppolInvoice->AccountingCostCode ?? false){
-            $this->s_invoice->setAccountingCost($peppolInvoice->AccountingCostCode);
+        if($invoice->AccountingCostCode ?? false){
+            $this->s_invoice->setAccountingCost($invoice->AccountingCostCode);
         }
         
-        $customer_company_name = $peppolInvoice->AccountingCustomerParty->Party->PartyName[0]->Name ?? '';
+        $customer_company_name = $invoice->AccountingCustomerParty->Party->PartyName[0]->Name ?? '';
 
         $address = new Address(
-            street1: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->StreetName,
-            street2: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->AdditionalStreetName ?? null,
-            city: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->CityName,
-            zip: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->PostalZone,
-            county: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity ?? null,
-            country: $peppolInvoice->AccountingCustomerParty->Party->PostalAddress->Country->IdentificationCode->value,
+            street1: $invoice->AccountingCustomerParty->Party->PostalAddress->StreetName,
+            street2: $invoice->AccountingCustomerParty->Party->PostalAddress->AdditionalStreetName ?? null,
+            city: $invoice->AccountingCustomerParty->Party->PostalAddress->CityName,
+            zip: $invoice->AccountingCustomerParty->Party->PostalAddress->PostalZone,
+            county: $invoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity ?? null,
+            country: $invoice->AccountingCustomerParty->Party->PostalAddress->Country->IdentificationCode->value,
         );
 
         $contact = new Contact(
-            email: $peppolInvoice->AccountingCustomerParty->Party->Contact->ElectronicMail, 
-            firstName: $peppolInvoice->AccountingCustomerParty->Party->Contact->Name ?? null, 
-            phone: $peppolInvoice->AccountingCustomerParty->Party->Contact->Telephone ?? null,
+            email: $invoice->AccountingCustomerParty->Party->Contact->ElectronicMail, 
+            firstName: $invoice->AccountingCustomerParty->Party->Contact->Name ?? null, 
+            phone: $invoice->AccountingCustomerParty->Party->Contact->Telephone ?? null,
         );
         
         $customer_party = new Party(companyName: $customer_company_name, address: $address, contact: $contact);
@@ -84,26 +84,26 @@ class StorecoveTransformer implements TransformerInterface
         
 
         $supplier_contact = new Contact(
-            email: $peppolInvoice->AccountingSupplierParty->Party->Contact->ElectronicMail,
-            firstName: $peppolInvoice->AccountingSupplierParty->Party->Contact->Name ?? null,
-            phone: $peppolInvoice->AccountingSupplierParty->Party->Contact->Telephone ?? null,
+            email: $invoice->AccountingSupplierParty->Party->Contact->ElectronicMail,
+            firstName: $invoice->AccountingSupplierParty->Party->Contact->Name ?? null,
+            phone: $invoice->AccountingSupplierParty->Party->Contact->Telephone ?? null,
         );
 
         $supplier_party = new Party(contact: $supplier_contact);
         $asp = new AccountingSupplierParty($supplier_party);
         $this->s_invoice->setAccountingSupplierParty($asp);
 
-        if (isset($peppolInvoice->PaymentMeans[0])) {
+        if (isset($invoice->PaymentMeans[0])) {
 
             $payment_means = new PaymentMeans();
-            $payment_means->setCodeProps($peppolInvoice->PaymentMeans[0]);
+            $payment_means->setCodeProps($invoice->PaymentMeans[0]);
 
             $this->s_invoice->addPaymentMeans($payment_means);
         }
 
         $lines = [];
 
-        foreach($peppolInvoice->InvoiceLine as $peppolLine)
+        foreach($invoice->InvoiceLine as $peppolLine)
         {
 
             $line = new InvoiceLines();
@@ -122,8 +122,8 @@ class StorecoveTransformer implements TransformerInterface
             if(isset($peppolLine->Item->ClassifiedTaxCategory) && is_array($peppolLine->Item->ClassifiedTaxCategory)){       
                 foreach($peppolLine->Item->ClassifiedTaxCategory as $ctc)
                 {
-                    $this->setTaxMap($ctc, $peppolLine, $peppolInvoice);
-                    $tax = new Tax((float)$ctc->Percent, $this->resolveJurisdication($ctc, $peppolInvoice));
+                    $this->setTaxMap($ctc, $peppolLine, $invoice);
+                    $tax = new Tax((float)$ctc->Percent, $this->resolveJurisdication($ctc, $invoice));
                     $line->setTax($tax);
                 }
             }
@@ -180,14 +180,14 @@ class StorecoveTransformer implements TransformerInterface
 
             });
             
-        $this->s_invoice->setAmountIncludingVat($peppolInvoice->LegalMonetaryTotal->TaxInclusiveAmount->amount);
+        $this->s_invoice->setAmountIncludingVat($invoice->LegalMonetaryTotal->TaxInclusiveAmount->amount);
         $this->s_invoice->setPrepaidAmount(0);
        
         return $this->s_invoice;
 
     }
 
-    private function setTaxMap($ctc, $peppolLine, $peppolInvoice): self
+    private function setTaxMap($ctc, $peppolLine, $invoice): self
     {
         $taxAmount = 0;
         $taxableAmount = 0;
@@ -204,7 +204,7 @@ class StorecoveTransformer implements TransformerInterface
 
         $this->tax_map[] = [
             'percentage' => $ctc->Percent, 
-            'country' => $this->resolveJurisdication($ctc, $peppolInvoice), 
+            'country' => $this->resolveJurisdication($ctc, $invoice), 
             'taxAmount' => $taxAmount, 
             'taxableAmount' => $taxableAmount,
         ]; 
@@ -213,12 +213,12 @@ class StorecoveTransformer implements TransformerInterface
 
     }
 
-    private function resolveJurisdication($ctc, $peppolInvoice): string 
+    private function resolveJurisdication($ctc, $invoice): string 
     {
         if(isset($ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value))
             return $ctc->TaxTotal[0]->JurisdictionRegionAddress->Country->IdentificationCode->value;
 
-        return $peppolInvoice->AccountingSupplierParty->Party->PostalAddress->Country->IdentificationCode->value;
+        return $invoice->AccountingSupplierParty->Party->PostalAddress->Country->IdentificationCode->value;
     }
 
     public function buildDocument(): mixed
