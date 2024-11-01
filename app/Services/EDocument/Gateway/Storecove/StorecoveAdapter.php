@@ -70,7 +70,28 @@ class StorecoveAdapter
     public function decorate(): self
     {
         //set all taxmap countries - resolve the taxing country
+        $lines = $this->storecove_invoice->getInvoiceLines();
 
+        foreach($lines as $line)
+        {
+            foreach($line->taxes_duties_fees as &$tax)
+            {
+                $tax->country = $this->nexus;
+            }
+            unset($tax);
+        }
+
+        $this->storecove_invoice->setInvoiceLines($lines);
+
+        $tax_subtotals = $this->storecove_invoice->getTaxSubtotals();
+
+        foreach($tax_subtotals as &$tax)
+        {
+            $tax->country = $this->nexus;
+        }
+        unset($tax);
+
+        $this->storecove_invoice->setTaxSubtotals($tax_subtotals);
         //configure identifiers
 
         //set additional identifier if required (ie de => FR with FR vat)
@@ -157,7 +178,7 @@ class StorecoveAdapter
             //Domestic Sales
             $this->nexus = $company_country_code;
         } elseif (in_array($company_country_code, $eu_countries) && !in_array($client_country_code, $eu_countries)) {
-            //NON-EU sale
+            //NON-EU Sale
             $this->nexus = $company_country_code;
         } elseif (in_array($company_country_code, $eu_countries) && in_array($client_country_code, $eu_countries)) {
             
@@ -167,13 +188,13 @@ class StorecoveAdapter
             if(!$this->ninja_invoice->client->has_valid_vat_number)
                 $this->nexus = $company_country_code;
             else if ($this->ninja_invoice->company->tax_data->regions->EU->has_sales_above_threshold && isset($this->ninja_invoice->company->tax_data->regions->EU->subregions->{$client_country_code}->vat_number)) { //over threshold - tax in buyer country
-                $country_code = $client_country_code;
+                $this->nexus = $client_country_code;
             }
+
+            //If we reach here? We are in an invalid state!
+            $this->nexus = $company_country_code;
+            $this->addError("Tax Nexus is client country ({$client_country_code}) - however VAT number not present for this region. Document not sent!");
         }
-
-
-        //IF EU -> EU && Buyer Country != Seller Country && has_sales_above_threshold === true
-        //
 
         return $this;
     }
