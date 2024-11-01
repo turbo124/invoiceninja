@@ -108,13 +108,17 @@ class EInvoiceController extends BaseController
             ->post('/api/einvoice/quota', data: [
                 'license_key' => config('ninja.license_key'),
                 'e_invoicing_token' => $company->account->e_invoicing_token,
-                'tenant_id' => $company->company_key,
+                'account_key' => $company->account->key,
             ]);
 
         if ($response->successful()) {
             return response($response->body());
         }
 
-        return response(0);
+        if ($response->getStatusCode() === 400) {
+            return response($response->body(), 400);
+        }
+
+        return response()->noContent(500);
     }
 }
