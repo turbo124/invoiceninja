@@ -209,6 +209,7 @@ class Peppol extends AbstractService
 
         $this->setOrderReference()->setTaxBreakdown();
 
+        //isolate this class to only peppol changes
         $this->p_invoice = $this->gateway
                                 ->mutator
                                 ->senderSpecificLevelMutators()

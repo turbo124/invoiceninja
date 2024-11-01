@@ -16,6 +16,7 @@ use App\Services\EDocument\Gateway\Storecove\Models\AllowanceCharges;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingCustomerParty;
 use App\Services\EDocument\Gateway\Storecove\Models\AccountingSupplierParty;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
+use App\Services\EDocument\Gateway\Storecove\Storecove;
 use Illuminate\Support\Str;
 
 class StorecoveTransformer implements TransformerInterface
@@ -27,17 +28,27 @@ class StorecoveTransformer implements TransformerInterface
 
     private array $tax_map = [];
 
+    public function setInvoice($s_invoice): self
+    {
+        $this->s_invoice = $s_invoice;
+        return $this;
+    }
+
+    public function getInvoice($s_invoice): StorecoveInvoice
+    {
+        return $this->s_invoice;
+    }
+
+    public function createNewStorecoveInvoice(): self
+    {
+        $this->s_invoice = (new \ReflectionClass(StorecoveInvoice::class))->newInstanceWithoutConstructor();
+    }
+
+    //$invoice = inbound peppol
     public function transform(mixed $invoice)
     {
     
-        $this->s_invoice = (new \ReflectionClass(StorecoveInvoice::class))->newInstanceWithoutConstructor();
-
-        // $this->s_invoice->setDocumentCurrency($invoice->DocumentCurrencyCode ?? '');
-        // $this->s_invoice->setInvoiceNumber($invoice->ID ?? '');
-        // $this->s_invoice->setIssueDate($invoice->IssueDate->format('Y-m-d'));
         $this->s_invoice->setTaxPointDate($invoice->IssueDate->format('Y-m-d'));
-        $this->s_invoice->setDueDate($invoice->DueDate->format('Y-m-d') ?? '');
-        // $this->s_invoice->setNote($invoice->Note ?? '');
 
         // Only use this if we are billing for services between a period.
         if (isset($invoice->InvoicePeriod[0]) && 
@@ -46,42 +57,18 @@ class StorecoveTransformer implements TransformerInterface
             $this->s_invoice->setInvoicePeriod("{$invoice->InvoicePeriod[0]->StartDate->format('Y-m-d')} - {$invoice->InvoicePeriod[0]->EndDate->format('Y-m-d')}");
         }
 
-        // $supplier_contact = new Contact(
-        //     email: $invoice->AccountingSupplierParty->Party->Contact->ElectronicMail,
-        //     firstName: $invoice->AccountingSupplierParty->Party->Contact->Name ?? null,
-        //     phone: $invoice->AccountingSupplierParty->Party->Contact->Telephone ?? null,
-        // );
-
-        // $supplier_party = new Party(contact: $supplier_contact);
-        // $asp = new AccountingSupplierParty($supplier_party);
-        // $this->s_invoice->setAccountingSupplierParty($asp);
-
         $lines = [];
 
-    //     foreach($invoice->InvoiceLine as $peppolLine)
-    //     {
+        foreach($invoice->InvoiceLine as $peppolLine)
+        {
 
-    //         $line = (new \ReflectionClass(InvoiceLines::class))->newInstanceWithoutConstructor();
-
-    //         // Basic line details
-    //         $line->setLineId($peppolLine->ID->value);
-    //         $line->setQuantity((int)$peppolLine->InvoicedQuantity->amount);
-    //         $line->setItemPrice((float)$peppolLine->Price->PriceAmount->amount);
-    //         $line->setAmountExcludingVat((float)$peppolLine->LineExtensionAmount->amount);
-
-    //         // Item details
-    //         $line->setName($peppolLine->Item->Name);
-    //         $line->setDescription($peppolLine->Item->Description);
-
-    //         // Tax handling
-    //         if(isset($peppolLine->Item->ClassifiedTaxCategory) && is_array($peppolLine->Item->ClassifiedTaxCategory)){       
-    //             foreach($peppolLine->Item->ClassifiedTaxCategory as $ctc)
-    //             {
-    //                 $this->setTaxMap($ctc, $peppolLine, $invoice);
-    //                 $tax = new Tax((float)$ctc->Percent, $this->resolveJurisdication($ctc, $invoice));
-    //                 $line->setTax($tax);
-    //             }
-    //         }
+            // Tax handling
+            if(isset($peppolLine->Item->ClassifiedTaxCategory) && is_array($peppolLine->Item->ClassifiedTaxCategory)){       
+                foreach($peppolLine->Item->ClassifiedTaxCategory as $ctc)
+                {
+                    $this->setTaxMap($ctc, $peppolLine, $invoice);
+                }
+            }
 
     //         //discounts 
     //         if(isset($peppolLine->Price->AllowanceCharge) && is_array($peppolLine->Price->AllowanceCharge)){       
@@ -103,42 +90,31 @@ class StorecoveTransformer implements TransformerInterface
 
     //     $this->s_invoice->invoiceLines = $lines;
 
-    //     //invoice level discounts + surcharges
-    //     if(isset($peppolLine->AllowanceCharge) && is_array($peppolLine->AllowanceCharge)){    
 
-    //         foreach ($peppolLine->AllowanceCharge as $allowance)
-    //         {
-                                
-    //             $reason = $allowance->ChargeIndicator ? ctrans('texts.fee') : ctrans('texts.discount');
-    //             $amount = $allowance->Amount->amount;
+        }
 
-    //             $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
-    //             $this->s_invoice->addAllowanceCharge($ac); //todo handle surcharge taxes
+        $sub_taxes = collect($this->tax_map)
+            ->groupBy('percentage')
+            ->map(function ($group) {
 
-    //         }
-    //     }
+                return new TaxSubtotals(
+                    taxable_amount: $group->sum('taxableAmount'),
+                    tax_amount: $group->sum('taxAmount'),
+                    percentage: $group->first()['percentage'],
+                    country: $group->first()['country'],
+                    category: null
+                );
 
-        
-    //     collect($this->tax_map)
-    //         ->groupBy('percentage')
-    //         ->each(function ($group) {
+            })->toArray();
 
-    //             $taxSubtotals = new TaxSubtotals(
-    //                 taxableAmount: $group->sum('taxableAmount'),
-    //                 taxAmount: $group->sum('taxAmount'),
-    //                 percentage: $group->first()['percentage'],
-    //                 country: $group->first()['country']
-    //             );
-
-    //             $this->s_invoice->addTaxSubtotals($taxSubtotals);
-
-
-    //         });
             
+            $this->s_invoice->setTaxSubtotals($sub_taxes);
+
+
     //     $this->s_invoice->setAmountIncludingVat($invoice->LegalMonetaryTotal->TaxInclusiveAmount->amount);
     //     $this->s_invoice->setPrepaidAmount(0);
        
-    //     return $this->s_invoice;
+        return $this->s_invoice;
 
     }
 

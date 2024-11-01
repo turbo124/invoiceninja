@@ -141,34 +141,34 @@ class StorecoveTest extends TestCase
     }
 
 
-    // public function testNormalizingToStorecove()
-    // {
+    public function testNormalizingToStorecove()
+    {
       
-    //     $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+        $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
 
-    //     $invoice = $this->createATData();
+        $invoice = $this->createATData();
 
-    //     $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
-    //     foreach ($stub as $key => $value) {
-    //         $e_invoice->{$key} = $value;
-    //     }
+        $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
+        foreach ($stub as $key => $value) {
+            $e_invoice->{$key} = $value;
+        }
 
-    //     $invoice->e_invoice = $e_invoice;
+        $invoice->e_invoice = $e_invoice;
 
-    //     $p = new Peppol($invoice);
-    //     $p->run();
-    //     $peppolInvoice = $p->getInvoice();
+        $p = new Peppol($invoice);
+        $p->run();
+        $peppolInvoice = $p->getInvoice();
 
 
-    //     $s_transformer = new StorecoveTransformer();
-    //     $s_transformer->transform($peppolInvoice);
+        $s_transformer = new StorecoveTransformer();
+        $s_transformer->transform($peppolInvoice);
 
-    //     $json = $s_transformer->toJson();
+        $json = $s_transformer->toJson();
 
-    //     $this->assertJson($json);
+        $this->assertJson($json);
         
-    //     nlog($json);
-    // }
+        nlog($json);
+    }
 
     // public function testStorecoveTransformer()
     // {

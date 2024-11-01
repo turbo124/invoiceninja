@@ -56,10 +56,22 @@ class Storecove
 
     public Mutator $mutator;
 
+    public StorecoveAdapter $adapter;
+
+
     public function __construct()
     {
         $this->router = new StorecoveRouter();
         $this->mutator = new Mutator($this);
+        $this->adapter = new StorecoveAdapter($this);
+    }
+    
+    public function build($peppol_model): self
+    {
+        $this->adapter
+             ->transform($peppol_model)
+             ->decorate()
+             ->validate();
     }
     
     /**

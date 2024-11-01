@@ -32,7 +32,7 @@ class SendEDocument implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public $tries = 2;
+    public $tries = 5;
     
     public $deleteWhenMissingModels = true;
 
@@ -42,10 +42,10 @@ class SendEDocument implements ShouldQueue
 
     public function backoff()
     {
-        return [rand(5, 29), rand(30, 59)];
+        return [rand(5, 29), rand(30, 59), rand(240, 360), 3600, 7200];
     }
 
-    public function handle()
+    public function handle(Storecove $storecove)
     {
         MultiDB::setDB($this->db);
 
@@ -55,20 +55,21 @@ class SendEDocument implements ShouldQueue
         {
         
             $p = new Peppol($model);
-
             $p->run();
-            $xml = $p->toXml();
-            $identifiers = $p->getStorecoveMeta();
 
-            $payload = [
-                'legal_entity_id' => $model->company->legal_entity_id,
-                'document' => base64_encode($xml),
-                'tenant_id' => $model->company->company_key,
-                'identifiers' => $identifiers,
-                'e_invoicing_token' => $model->company->e_invoicing_token,
+            $result = $storecove->build($model);
 
-                // include whitelabel key.
-            ];
+            // $xml = $p->toXml();
+            // $identifiers = $p->getStorecoveMeta();
+
+            // $payload = [
+            //     'legal_entity_id' => $model->company->legal_entity_id,
+            //     'document' => base64_encode($xml),
+            //     'tenant_id' => $model->company->company_key,
+            //     'identifiers' => $identifiers,
+            //     // 'e_invoicing_token' => $model->company->e_invoicing_token,
+            //     // include whitelabel key.
+            // ];
 
             $r = Http::withHeaders($this->getHeaders())
                 ->post(config('ninja.hosted_ninja_url')."/api/einvoice/submission", $payload);
