@@ -66,6 +66,7 @@ class SendEDocument implements ShouldQueue
                 'tenant_id' => $model->company->company_key,
                 'identifiers' => $identifiers,
                 'e_invoicing_token' => $model->company->account->e_invoicing_token,
+                'account_key' => $model->company->account->key,
             ];
 
             $r = Http::withHeaders($this->getHeaders())
