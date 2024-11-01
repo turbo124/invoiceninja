@@ -2,13 +2,25 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class TaxSubtotals
 {
-	public ?string $tax_amount;
-	public ?string $country;
-	public ?string $taxable_amount;
-	public ?string $percentage;
-	public ?string $category;
+
+    #[SerializedPath('[cbc:TaxAmount][#]')]
+    public ?string $tax_amount;
+
+    public ?string $country;
+
+    #[SerializedPath('[cbc:TaxableAmount][#]')]
+    public ?string $taxable_amount;
+
+    #[SerializedPath('[cac:TaxCategory][cbc:Percent]')]
+    public ?string $percentage;
+
+    #[SerializedPath('[cac:TaxCategory][cbc:ID][#]')]
+    public ?string $category;
 
 	public function __construct(
 		?string $tax_amount,

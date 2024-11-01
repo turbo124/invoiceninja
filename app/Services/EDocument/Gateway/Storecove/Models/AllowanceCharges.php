@@ -2,18 +2,38 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class AllowanceCharges
 {
-	public ?string $amount_excluding_vat;
-	public ?string $amount_excluding_tax;
-	public ?string $base_amount_excluding_tax;
-	public ?string $amount_including_tax;
-	public ?string $base_amount_including_tax;
-	public ?Tax $tax;
-	/** @var TaxesDutiesFees[] */
-	public ?array $taxes_duties_fees;
-	public ?string $reason;
-	public ?string $reason_code;
+    #[SerializedPath('[cbc:Amount][#]')]
+    public ?string $amount_excluding_vat;
+
+    // #[SerializedPath('[cbc:BaseAmount][#]')]
+    public ?string $amount_excluding_tax;
+
+    #[SerializedPath('[cbc:BaseAmount][#]')]
+    public ?string $base_amount_excluding_tax;
+
+    #[SerializedPath('[cbc:Amount][@currencyID]')]
+    public ?string $amount_including_tax;
+
+    #[SerializedPath('[cbc:BaseAmount][@currencyID]')]
+    public ?string $base_amount_including_tax;
+
+    // #[SerializedPath('[cac:TaxCategory]')]
+    // public ?Tax $tax;
+
+    #[SerializedPath('[cac:TaxCategory]')]
+    /** @var TaxesDutiesFees[] */
+    public ?array $taxes_duties_fees;
+
+    #[SerializedPath('[cbc:AllowanceChargeReason]')]
+    public ?string $reason;
+
+    #[SerializedPath('[cbc:AllowanceChargeReasonCode]')]
+    public ?string $reason_code;
 
 	/**
 	 * @param TaxesDutiesFees[] $taxes_duties_fees
@@ -34,7 +54,7 @@ class AllowanceCharges
 		$this->base_amount_excluding_tax = $base_amount_excluding_tax;
 		$this->amount_including_tax = $amount_including_tax;
 		$this->base_amount_including_tax = $base_amount_including_tax;
-		$this->tax = $tax;
+		// $this->tax = $tax;
 		$this->taxes_duties_fees = $taxes_duties_fees;
 		$this->reason = $reason;
 		$this->reason_code = $reason_code;

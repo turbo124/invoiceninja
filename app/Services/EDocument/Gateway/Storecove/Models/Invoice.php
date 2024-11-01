@@ -39,8 +39,8 @@ class Invoice
 	public $accounting_supplier_party;
 
     #[SerializedPath('[cac:AllowanceCharge]')]
-	/** @var AllowanceCharges[] */ //todo
-	public ?array $allowance_charges;
+	/** @var AllowanceCharges[] */ 
+	public array $allowance_charges;
 
     //this is an experimental prop
     // #[SerializedPath('[cac:LegalMonetaryTotal][cbc:TaxInclusiveAmount][#]')]
@@ -113,10 +113,11 @@ class Invoice
 	//proxy of issue date
 	public ?string $tax_point_date;
 
-	#[SerializedPath('[cac:TaxTotal][cac:TaxSubtotal]')]
+	#[SerializedPath('[cac:TaxTotal][0][cac:TaxSubtotal]')]
 	/** @var TaxSubtotals[] */
 	public $tax_subtotals;
 
+	/** @var InvoiceLines[] */
 	//storecove - no mappings - tax_line_percentages
 	public ?string $tax_system;
 
