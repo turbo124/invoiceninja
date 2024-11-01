@@ -2,7 +2,7 @@
 
 namespace App\Services\EDocument\Gateway\Storecove;
 
-use App\Services\EDocument\Gateway\Storecove\Models\Invoice;
+use App\DataMapper\Tax\BaseRule;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans;
@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use App\Services\EDocument\Gateway\Storecove\Models\Invoice;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -35,10 +36,23 @@ class StorecoveAdapter
     private array $errors = [];
 
     private bool $valid_document = true;
+    
+    private $ninja_invoice;
 
+    private string $nexus;
+
+    /**
+     * transform
+     *
+     * @param  \App\Models\Invoice $invoice
+     * @return self
+     */
     public function transform($invoice): self
     {
-        
+        $this->ninja_invoice = $invoice;
+
+        $this->buildNexus();
+
         $context = [
            DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
            AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
@@ -46,8 +60,8 @@ class StorecoveAdapter
 
         $serializer = $this->getSerializer();
 
-        /** @var Invoice $storecove_invoice */
-        $this->storecove_invoice = $serializer->deserialize($invoice, Invoice::class, 'json', $context);
+        // @phpstan-ignore-next-line
+        $this->storecove_invoice = $serializer->deserialize($invoice->e_invoice, Invoice::class, 'json', $context);
 
         return $this;
 
@@ -55,7 +69,7 @@ class StorecoveAdapter
 
     public function decorate(): self
     {
-        //set all taxmap countries
+        //set all taxmap countries - resolve the taxing country
 
         //configure identifiers
 
@@ -67,7 +81,7 @@ class StorecoveAdapter
         return $this->valid_document;
     }
 
-    public function getInvoice(): StorecoveInvoice
+    public function getInvoice(): Invoice
     {
         return $this->storecove_invoice;
     }
@@ -80,6 +94,7 @@ class StorecoveAdapter
     private function addError(string $error): self
     {
         $this->errors[] = $error;
+        return $this;
     }
 
     private function getSerializer()
@@ -110,8 +125,6 @@ class StorecoveAdapter
         $encoders = [$xml_encoder, $json_encoder];
         $serializer = new Serializer($normalizers, $encoders);
 
-       
-
         return $serializer;
     }
 
@@ -129,5 +142,39 @@ class StorecoveAdapter
         }
         // nlog($array);
         return $array;
+    }
+
+    private function buildNexus(): self
+    {
+
+        //Calculate nexus
+        $company_country_code = $this->ninja_invoice->company->country()->iso_3166_2;
+        $client_country_code = $this->ninja_invoice->client->country->iso_3166_2;
+        $br = new BaseRule();
+        $eu_countries = $br->eu_country_codes;
+
+        if ($client_country_code == $company_country_code) {
+            //Domestic Sales
+            $this->nexus = $company_country_code;
+        } elseif (in_array($company_country_code, $eu_countries) && !in_array($client_country_code, $eu_countries)) {
+            //NON-EU sale
+            $this->nexus = $company_country_code;
+        } elseif (in_array($company_country_code, $eu_countries) && in_array($client_country_code, $eu_countries)) {
+            
+            //EU Sale
+            
+            // Invalid VAT number = seller country nexus
+            if(!$this->ninja_invoice->client->has_valid_vat_number)
+                $this->nexus = $company_country_code;
+            else if ($this->ninja_invoice->company->tax_data->regions->EU->has_sales_above_threshold && isset($this->ninja_invoice->company->tax_data->regions->EU->subregions->{$client_country_code}->vat_number)) { //over threshold - tax in buyer country
+                $country_code = $client_country_code;
+            }
+        }
+
+
+        //IF EU -> EU && Buyer Country != Seller Country && has_sales_above_threshold === true
+        //
+
+        return $this;
     }
 }

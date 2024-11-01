@@ -65,15 +65,22 @@ class Storecove
         $this->mutator = new Mutator($this);
         $this->adapter = new StorecoveAdapter($this);
     }
-    
-    public function build($peppol_model): self
+        
+    /**
+     * build
+     *
+     * @param  \App\Models\Invoice $model
+     * @return mixed
+     */
+    public function build($model): mixed
     {
+        return 
         $this->adapter
-             ->transform($peppol_model)
+             ->transform($model)
              ->decorate()
              ->validate();
     }
-    
+
     /**
      * Discovery
      *
