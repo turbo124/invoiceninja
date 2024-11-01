@@ -241,6 +241,7 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::put('einvoice/peppol/update', [EInvoicePeppolController::class, 'updateLegalEntity'])->name('einvoice.peppol.update_legal_entity');
 
     Route::post('einvoice/token/update', EInvoiceTokenController::class)->name('einvoice.token.update');
+    Route::get('einvoice/quota', [EInvoiceController::class, 'quota'])->name('einvoice.quota');
 
     Route::post('emails', [EmailController::class, 'send'])->name('email.send')->middleware('user_verified');
     Route::post('emails/clientHistory/{client}', [EmailHistoryController::class, 'clientHistory'])->name('email.clientHistory');
