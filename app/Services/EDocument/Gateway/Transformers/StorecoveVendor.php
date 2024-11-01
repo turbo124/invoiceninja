@@ -9,7 +9,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace App\Services\EDocument\Gateway\Storecove\Models;
+namespace App\Services\EDocument\Gateway\Storecove\Transformers;
 
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
