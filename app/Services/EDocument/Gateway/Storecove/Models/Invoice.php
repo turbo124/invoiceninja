@@ -13,10 +13,10 @@ class Invoice
     #[SerializedPath('[cbc:ID][#]')]
 	public $invoice_number;
 
-    /** @var ?\DateTime */
+    // /** @var ?\DateTime */
     #[SerializedPath('[cbc:IssueDate]')]
-    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
-	public ?DateTime $issue_date;
+    // #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+	public $issue_date;
 
     #[SerializedPath('[cac:AccountingCustomerParty]')]
     /** @var ?AccountingCustomerParty */
@@ -64,10 +64,10 @@ class Invoice
     #[SerializedPath('[cbc:DocumentCurrencyCode][#]')]
     public $document_currency_code;
 	
-    /** @var ?\DateTime */
+    // /** @var ?\DateTime */
     #[SerializedPath('[cbc:DueDate]')]
-    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
-    public ?DateTime $due_date;
+    // #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+    public $due_date;
 
 	//may need something custom for this
     public ?string $invoice_period;
@@ -117,7 +117,6 @@ class Invoice
 	/** @var TaxSubtotals[] */
 	public $tax_subtotals;
 
-	/** @var InvoiceLines[] */
 	//storecove - no mappings - tax_line_percentages
 	public ?string $tax_system;
 
@@ -165,11 +164,9 @@ class Invoice
     #[SerializedPath('[cac:ProjectReference][cbc:ID][#]')]
 	public ?string $project_reference;
 
-	
-
 	public function __construct(
 		?string $invoice_number,
-		?DateTime $issue_date,
+		$issue_date,
 		?AccountingCustomerParty $accounting_customer_party,
 		?array $invoice_lines,
 		?string $accounting_cost,
@@ -186,7 +183,7 @@ class Invoice
 		?Delivery $delivery,
 		?DeliveryTerms $delivery_terms,
 		?string $document_currency_code,
-		?DateTime $due_date,
+		$due_date,
 		?string $invoice_period,
 		?array $issue_reasons,
 		?string $issue_time,
@@ -376,7 +373,7 @@ class Invoice
 		return $this->document_currency_code;
 	}
 
-	public function getDueDate(): ?string
+	public function getDueDate()
 	{
 		return $this->due_date;
 	}
@@ -575,7 +572,7 @@ class Invoice
 		return $this;
 	}
 
-	public function setIssueDate(?string $issue_date): self
+	public function setIssueDate($issue_date): self
 	{
 		$this->issue_date = $issue_date;
 		return $this;
@@ -686,7 +683,7 @@ class Invoice
 		return $this;
 	}
 
-	public function setDueDate(?string $due_date): self
+	public function setDueDate($due_date): self
 	{
 		$this->due_date = $due_date;
 		return $this;

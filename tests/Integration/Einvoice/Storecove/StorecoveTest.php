@@ -31,21 +31,20 @@ use App\Services\EDocument\Gateway\Storecove\Storecove;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use InvoiceNinja\EInvoice\Models\Peppol\Invoice as PeppolInvoice;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use App\Services\EDocument\Gateway\Transformers\StorecoveTransformer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
-use App\Services\EDocument\Gateway\Transformers\StorecoveTransformer;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class StorecoveTest extends TestCase
 {
@@ -65,78 +64,154 @@ class StorecoveTest extends TestCase
         }
     }
 
-
-    public function testNormalizingToStorecove()
+    public function testTransformPeppolToStorecove()
     {
       
-        $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+        $phpDocExtractor = new PhpDocExtractor();
+        $reflectionExtractor = new ReflectionExtractor();
+        // list of PropertyListExtractorInterface (any iterable)
+        $typeExtractors = [$reflectionExtractor,$phpDocExtractor];
+        // list of PropertyDescriptionExtractorInterface (any iterable)
+        $descriptionExtractors = [$phpDocExtractor];
+        // list of PropertyAccessExtractorInterface (any iterable)
+        $propertyInitializableExtractors = [$reflectionExtractor];
+        $propertyInfo = new PropertyInfoExtractor(
+            $propertyInitializableExtractors,
+            $descriptionExtractors,
+            $typeExtractors,
+        );
+        $xml_encoder = new XmlEncoder(['xml_format_output' => true, 'remove_empty_tags' => true,]);
+        $json_encoder = new JsonEncoder();
 
-        $invoice = $this->createATData();
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
 
-        $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
-        foreach ($stub as $key => $value) {
-            $e_invoice->{$key} = $value;
-        }
+        $normalizer = new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter, null, $propertyInfo);
 
-        $invoice->e_invoice = $e_invoice;
+        $normalizers = [new DateTimeNormalizer(), $normalizer,  new ArrayDenormalizer()];
+        $encoders = [$xml_encoder, $json_encoder];
+        $serializer = new Serializer($normalizers, $encoders);
 
-        $p = new Peppol($invoice);
-        $p->run();
-        $peppolInvoice = $p->getInvoice();
+        $context = [
+          DateTimeNormalizer::FORMAT_KEY => 'Y-m-d', 
+          AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+        ];
 
+        $p = file_get_contents(base_path('tests/Integration/Einvoice/samples/peppol.xml'));
 
-        $s_transformer = new StorecoveTransformer();
-        $s_transformer->transform($peppolInvoice);
+        $e = new \InvoiceNinja\EInvoice\EInvoice();
+        $peppolInvoice = $e->decode('Peppol', $p, 'xml');
 
-        $json = $s_transformer->toJson();
+        $this->assertInstanceOf(\InvoiceNinja\EInvoice\Models\Peppol\Invoice::class, $peppolInvoice);
 
-        $this->assertJson($json);
+        $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
+        // $peppolInvoice = $e->encode($peppolInvoice, 'json');
+
+        $peppolInvoice = $data = $e->encode($peppolInvoice, 'json', $context);
+
+        $invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
         
-        nlog($json);
+        $this->assertInstanceOf($parent, $invoice);
+                
+        $s_invoice = $serializer->encode($invoice, 'json', $context);
+
+        $arr = json_decode($s_invoice, true);
+
+        $arr = $this->removeEmptyValues($arr);
+
+        nlog($arr);
+        
     }
 
-    public function testStorecoveTransformer()
+
+    private function removeEmptyValues(array $array): array
     {
-            
-      $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
-
-      $invoice = $this->createATData();
-      
-      $item = new InvoiceItem();
-      $item->product_key = "Product Key";
-      $item->notes = "Product Description";
-      $item->cost = 10;
-      $item->quantity = 10;
-      $item->is_amount_discount = true;
-      $item->discount=5;
-      $item->tax_rate1 = 20;
-      $item->tax_name1 = 'VAT';
-
-      $invoice->line_items = [$item];
-      $invoice->calc()->getInvoice();
-
-      $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
-      foreach ($stub as $key => $value) {
-          $e_invoice->{$key} = $value;
-      }
-
-      $invoice->e_invoice = $e_invoice;
-
-      $p = new Peppol($invoice);
-      $p->run();
-      $peppolInvoice = $p->getInvoice();
-
-
-      $s_transformer = new StorecoveTransformer();
-      $s_transformer->transform($peppolInvoice);
-
-      $json = $s_transformer->toJson();
-
-      $this->assertJson($json);
-
-      nlog($json);
-
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->removeEmptyValues($value);
+                if (empty($array[$key])) {
+                    unset($array[$key]);
+                }
+            } elseif ($value === null || $value === '') {
+                unset($array[$key]);
+            }
+        }
+        // nlog($array);
+        return $array;
     }
+
+
+    // public function testNormalizingToStorecove()
+    // {
+      
+    //     $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+
+    //     $invoice = $this->createATData();
+
+    //     $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
+    //     foreach ($stub as $key => $value) {
+    //         $e_invoice->{$key} = $value;
+    //     }
+
+    //     $invoice->e_invoice = $e_invoice;
+
+    //     $p = new Peppol($invoice);
+    //     $p->run();
+    //     $peppolInvoice = $p->getInvoice();
+
+
+    //     $s_transformer = new StorecoveTransformer();
+    //     $s_transformer->transform($peppolInvoice);
+
+    //     $json = $s_transformer->toJson();
+
+    //     $this->assertJson($json);
+        
+    //     nlog($json);
+    // }
+
+    // public function testStorecoveTransformer()
+    // {
+            
+    //   $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+
+    //   $invoice = $this->createATData();
+      
+    //   $item = new InvoiceItem();
+    //   $item->product_key = "Product Key";
+    //   $item->notes = "Product Description";
+    //   $item->cost = 10;
+    //   $item->quantity = 10;
+    //   $item->is_amount_discount = true;
+    //   $item->discount=5;
+    //   $item->tax_rate1 = 20;
+    //   $item->tax_name1 = 'VAT';
+
+    //   $invoice->line_items = [$item];
+    //   $invoice->calc()->getInvoice();
+
+    //   $stub = json_decode('{"Invoice":{"Note":"Nooo","PaymentMeans":[{"ID":{"value":"afdasfasdfasdfas"},"PayeeFinancialAccount":{"Name":"PFA-NAME","ID":{"value":"DE89370400440532013000"},"AliasName":"PFA-Alias","AccountTypeCode":{"value":"CHECKING"},"AccountFormatCode":{"value":"IBAN"},"CurrencyCode":{"value":"EUR"},"FinancialInstitutionBranch":{"ID":{"value":"DEUTDEMMXXX"},"Name":"Deutsche Bank"}}}]}}');
+    //   foreach ($stub as $key => $value) {
+    //       $e_invoice->{$key} = $value;
+    //   }
+
+    //   $invoice->e_invoice = $e_invoice;
+
+    //   $p = new Peppol($invoice);
+    //   $p->run();
+    //   $peppolInvoice = $p->getInvoice();
+
+
+    //   $s_transformer = new StorecoveTransformer();
+    //   $s_transformer->transform($peppolInvoice);
+
+    //   $json = $s_transformer->toJson();
+
+    //   $this->assertJson($json);
+
+    //   nlog($json);
+
+    // }
 
     public function testStorecoveTransformerWithPercentageDiscount()
     {

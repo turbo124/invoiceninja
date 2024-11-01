@@ -18,6 +18,7 @@ class Party
 	#[SerializedPath('[cac:PostalAddress]')]
 	public ?Address $address;
 	
+	#[SerializedPath('[cac:Contact]')]
 	public ?Contact $contact;
 
 	public function __construct(

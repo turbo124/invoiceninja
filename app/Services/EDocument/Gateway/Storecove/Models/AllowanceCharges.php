@@ -44,7 +44,7 @@ class AllowanceCharges
 		?string $base_amount_excluding_tax,
 		?string $amount_including_tax,
 		?string $base_amount_including_tax,
-		?Tax $tax,
+		// ?Tax $tax,
 		?array $taxes_duties_fees,
 		?string $reason,
 		?string $reason_code
@@ -83,11 +83,6 @@ class AllowanceCharges
 	public function getBaseAmountIncludingTax(): ?string
 	{
 		return $this->base_amount_including_tax;
-	}
-
-	public function getTax(): ?Tax
-	{
-		return $this->tax;
 	}
 
 	/**
@@ -135,12 +130,6 @@ class AllowanceCharges
 	public function setBaseAmountIncludingTax(?string $base_amount_including_tax): self
 	{
 		$this->base_amount_including_tax = $base_amount_including_tax;
-		return $this;
-	}
-
-	public function setTax(?Tax $tax): self
-	{
-		$this->tax = $tax;
 		return $this;
 	}
 

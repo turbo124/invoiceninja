@@ -30,14 +30,14 @@ class StorecoveTransformer implements TransformerInterface
     public function transform(mixed $invoice)
     {
     
-        $this->s_invoice = new StorecoveInvoice();
+        $this->s_invoice = (new \ReflectionClass(StorecoveInvoice::class))->newInstanceWithoutConstructor();
 
-        $this->s_invoice->setDocumentCurrency($invoice->DocumentCurrencyCode ?? '');
-        $this->s_invoice->setInvoiceNumber($invoice->ID ?? '');
-        $this->s_invoice->setIssueDate($invoice->IssueDate->format('Y-m-d'));
+        // $this->s_invoice->setDocumentCurrency($invoice->DocumentCurrencyCode ?? '');
+        // $this->s_invoice->setInvoiceNumber($invoice->ID ?? '');
+        // $this->s_invoice->setIssueDate($invoice->IssueDate->format('Y-m-d'));
         $this->s_invoice->setTaxPointDate($invoice->IssueDate->format('Y-m-d'));
         $this->s_invoice->setDueDate($invoice->DueDate->format('Y-m-d') ?? '');
-        $this->s_invoice->setNote($invoice->Note ?? '');
+        // $this->s_invoice->setNote($invoice->Note ?? '');
 
         // Only use this if we are billing for services between a period.
         if (isset($invoice->InvoicePeriod[0]) && 
@@ -46,144 +46,99 @@ class StorecoveTransformer implements TransformerInterface
             $this->s_invoice->setInvoicePeriod("{$invoice->InvoicePeriod[0]->StartDate->format('Y-m-d')} - {$invoice->InvoicePeriod[0]->EndDate->format('Y-m-d')}");
         }
 
-        if($invoice->BuyerReference ?? false){
-            $ref = new References(documentId: $invoice->BuyerReference, documentType: 'buyer_reference');
-            $this->s_invoice->addReferences($ref);
-        }
-        
-        if ($invoice->OrderReference->ID ?? false) {
-            $ref = new References(documentId: $invoice->OrderReference->ID->value, documentType: 'sales_order');
-            $this->s_invoice->addReferences($ref);
-        }
+        // $supplier_contact = new Contact(
+        //     email: $invoice->AccountingSupplierParty->Party->Contact->ElectronicMail,
+        //     firstName: $invoice->AccountingSupplierParty->Party->Contact->Name ?? null,
+        //     phone: $invoice->AccountingSupplierParty->Party->Contact->Telephone ?? null,
+        // );
 
-        if($invoice->AccountingCostCode ?? false){
-            $this->s_invoice->setAccountingCost($invoice->AccountingCostCode);
-        }
-        
-        $customer_company_name = $invoice->AccountingCustomerParty->Party->PartyName[0]->Name ?? '';
-
-        $address = new Address(
-            street1: $invoice->AccountingCustomerParty->Party->PostalAddress->StreetName,
-            street2: $invoice->AccountingCustomerParty->Party->PostalAddress->AdditionalStreetName ?? null,
-            city: $invoice->AccountingCustomerParty->Party->PostalAddress->CityName,
-            zip: $invoice->AccountingCustomerParty->Party->PostalAddress->PostalZone,
-            county: $invoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity ?? null,
-            country: $invoice->AccountingCustomerParty->Party->PostalAddress->Country->IdentificationCode->value,
-        );
-
-        $contact = new Contact(
-            email: $invoice->AccountingCustomerParty->Party->Contact->ElectronicMail, 
-            firstName: $invoice->AccountingCustomerParty->Party->Contact->Name ?? null, 
-            phone: $invoice->AccountingCustomerParty->Party->Contact->Telephone ?? null,
-        );
-        
-        $customer_party = new Party(companyName: $customer_company_name, address: $address, contact: $contact);
-        $party_identifiers = []; // do this outside the transformer.
-        $acp = new AccountingCustomerParty($party_identifiers, $customer_party);
-        $this->s_invoice->setAccountingCustomerParty($acp);
-        
-
-        $supplier_contact = new Contact(
-            email: $invoice->AccountingSupplierParty->Party->Contact->ElectronicMail,
-            firstName: $invoice->AccountingSupplierParty->Party->Contact->Name ?? null,
-            phone: $invoice->AccountingSupplierParty->Party->Contact->Telephone ?? null,
-        );
-
-        $supplier_party = new Party(contact: $supplier_contact);
-        $asp = new AccountingSupplierParty($supplier_party);
-        $this->s_invoice->setAccountingSupplierParty($asp);
-
-        if (isset($invoice->PaymentMeans[0])) {
-
-            $payment_means = new PaymentMeans();
-            $payment_means->setCodeProps($invoice->PaymentMeans[0]);
-
-            $this->s_invoice->addPaymentMeans($payment_means);
-        }
+        // $supplier_party = new Party(contact: $supplier_contact);
+        // $asp = new AccountingSupplierParty($supplier_party);
+        // $this->s_invoice->setAccountingSupplierParty($asp);
 
         $lines = [];
 
-        foreach($invoice->InvoiceLine as $peppolLine)
-        {
+    //     foreach($invoice->InvoiceLine as $peppolLine)
+    //     {
 
-            $line = new InvoiceLines();
+    //         $line = (new \ReflectionClass(InvoiceLines::class))->newInstanceWithoutConstructor();
 
-            // Basic line details
-            $line->setLineId($peppolLine->ID->value);
-            $line->setQuantity((int)$peppolLine->InvoicedQuantity->amount);
-            $line->setItemPrice((float)$peppolLine->Price->PriceAmount->amount);
-            $line->setAmountExcludingVat((float)$peppolLine->LineExtensionAmount->amount);
+    //         // Basic line details
+    //         $line->setLineId($peppolLine->ID->value);
+    //         $line->setQuantity((int)$peppolLine->InvoicedQuantity->amount);
+    //         $line->setItemPrice((float)$peppolLine->Price->PriceAmount->amount);
+    //         $line->setAmountExcludingVat((float)$peppolLine->LineExtensionAmount->amount);
 
-            // Item details
-            $line->setName($peppolLine->Item->Name);
-            $line->setDescription($peppolLine->Item->Description);
+    //         // Item details
+    //         $line->setName($peppolLine->Item->Name);
+    //         $line->setDescription($peppolLine->Item->Description);
 
-            // Tax handling
-            if(isset($peppolLine->Item->ClassifiedTaxCategory) && is_array($peppolLine->Item->ClassifiedTaxCategory)){       
-                foreach($peppolLine->Item->ClassifiedTaxCategory as $ctc)
-                {
-                    $this->setTaxMap($ctc, $peppolLine, $invoice);
-                    $tax = new Tax((float)$ctc->Percent, $this->resolveJurisdication($ctc, $invoice));
-                    $line->setTax($tax);
-                }
-            }
+    //         // Tax handling
+    //         if(isset($peppolLine->Item->ClassifiedTaxCategory) && is_array($peppolLine->Item->ClassifiedTaxCategory)){       
+    //             foreach($peppolLine->Item->ClassifiedTaxCategory as $ctc)
+    //             {
+    //                 $this->setTaxMap($ctc, $peppolLine, $invoice);
+    //                 $tax = new Tax((float)$ctc->Percent, $this->resolveJurisdication($ctc, $invoice));
+    //                 $line->setTax($tax);
+    //             }
+    //         }
 
-            //discounts 
-            if(isset($peppolLine->Price->AllowanceCharge) && is_array($peppolLine->Price->AllowanceCharge)){       
+    //         //discounts 
+    //         if(isset($peppolLine->Price->AllowanceCharge) && is_array($peppolLine->Price->AllowanceCharge)){       
             
-                foreach($peppolLine->Price->AllowanceCharge as $allowance)
-                {
-                    $reason = isset($allowance->ChargeIndicator) ? ctrans('texts.discount') : ctrans('texts.fee');
-                    $amount = $allowance->Amount->amount;
+    //             foreach($peppolLine->Price->AllowanceCharge as $allowance)
+    //             {
+    //                 $reason = isset($allowance->ChargeIndicator) ? ctrans('texts.discount') : ctrans('texts.fee');
+    //                 $amount = $allowance->Amount->amount;
 
-                    $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
-                    $line->addAllowanceCharge($ac);
-                }
-            }
+    //                 $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
+    //                 $line->addAllowanceCharge($ac);
+    //             }
+    //         }
 
 
-            $lines[] = $line;
+    //         $lines[] = $line;
     
-        }
+    //     }
 
-        $this->s_invoice->invoiceLines = $lines;
+    //     $this->s_invoice->invoiceLines = $lines;
 
-        //invoice level discounts + surcharges
-        if(isset($peppolLine->AllowanceCharge) && is_array($peppolLine->AllowanceCharge)){    
+    //     //invoice level discounts + surcharges
+    //     if(isset($peppolLine->AllowanceCharge) && is_array($peppolLine->AllowanceCharge)){    
 
-            foreach ($peppolLine->AllowanceCharge as $allowance)
-            {
+    //         foreach ($peppolLine->AllowanceCharge as $allowance)
+    //         {
                                 
-                $reason = $allowance->ChargeIndicator ? ctrans('texts.fee') : ctrans('texts.discount');
-                $amount = $allowance->Amount->amount;
+    //             $reason = $allowance->ChargeIndicator ? ctrans('texts.fee') : ctrans('texts.discount');
+    //             $amount = $allowance->Amount->amount;
 
-                $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
-                $this->s_invoice->addAllowanceCharge($ac); //todo handle surcharge taxes
+    //             $ac = new AllowanceCharges(reason: $reason, amountExcludingTax: $amount);
+    //             $this->s_invoice->addAllowanceCharge($ac); //todo handle surcharge taxes
 
-            }
-        }
+    //         }
+    //     }
 
         
-        collect($this->tax_map)
-            ->groupBy('percentage')
-            ->each(function ($group) {
+    //     collect($this->tax_map)
+    //         ->groupBy('percentage')
+    //         ->each(function ($group) {
 
-                $taxSubtotals = new TaxSubtotals(
-                    taxableAmount: $group->sum('taxableAmount'),
-                    taxAmount: $group->sum('taxAmount'),
-                    percentage: $group->first()['percentage'],
-                    country: $group->first()['country']
-                );
+    //             $taxSubtotals = new TaxSubtotals(
+    //                 taxableAmount: $group->sum('taxableAmount'),
+    //                 taxAmount: $group->sum('taxAmount'),
+    //                 percentage: $group->first()['percentage'],
+    //                 country: $group->first()['country']
+    //             );
 
-                $this->s_invoice->addTaxSubtotals($taxSubtotals);
+    //             $this->s_invoice->addTaxSubtotals($taxSubtotals);
 
 
-            });
+    //         });
             
-        $this->s_invoice->setAmountIncludingVat($invoice->LegalMonetaryTotal->TaxInclusiveAmount->amount);
-        $this->s_invoice->setPrepaidAmount(0);
+    //     $this->s_invoice->setAmountIncludingVat($invoice->LegalMonetaryTotal->TaxInclusiveAmount->amount);
+    //     $this->s_invoice->setPrepaidAmount(0);
        
-        return $this->s_invoice;
+    //     return $this->s_invoice;
 
     }
 

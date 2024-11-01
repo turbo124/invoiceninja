@@ -206,11 +206,6 @@ class InvoiceLines
 		return $this->amount_including_tax;
 	}
 
-	public function getTax(): ?Tax
-	{
-		return $this->tax;
-	}
-
 	/**
 	 * @return TaxesDutiesFees[]
 	 */
@@ -351,11 +346,6 @@ class InvoiceLines
 		return $this;
 	}
 
-	public function setTax(?Tax $tax): self
-	{
-		$this->tax = $tax;
-		return $this;
-	}
 
 	/**
 	 * @param TaxesDutiesFees[] $taxes_duties_fees

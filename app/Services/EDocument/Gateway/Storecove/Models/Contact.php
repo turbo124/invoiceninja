@@ -2,11 +2,20 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 class Contact
 {
+
+	#[SerializedPath('[cbc:Name]')]
 	public ?string $first_name;
 	public ?string $last_name;
+
+	#[SerializedPath('[cbc:ElectronicMail]')]
 	public ?string $email;
+
+	#[SerializedPath('[cbc:Telephone]')]
 	public ?string $phone;
 	public ?string $id;
 
