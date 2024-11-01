@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EInvoice\ShowQuotaRequest;
 use App\Http\Requests\EInvoice\ValidateEInvoiceRequest;
 use App\Http\Requests\EInvoice\UpdateEInvoiceConfiguration;
 use App\Services\EDocument\Standards\Validation\Peppol\EntityLevel;
@@ -92,4 +93,28 @@ class EInvoiceController extends BaseController
    
     }
 
+    public function quota(ShowQuotaRequest $request): \Illuminate\Http\Response
+    {
+         /**
+         * @var \App\Models\Company
+         */
+        $company = auth()->user()->company();
+
+        $response = \Illuminate\Support\Facades\Http::baseUrl(config('ninja.app_domain'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('/api/einvoice/quota', data: [
+                'license_key' => config('ninja.license_key'),
+                'e_invoicing_token' => $company->account->e_invoicing_token,
+                'tenant_id' => $company->company_key,
+            ]);
+
+        if ($response->successful()) {
+            return response($response->body());
+        }
+
+        return response(0);
+    }
 }
