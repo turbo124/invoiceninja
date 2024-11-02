@@ -142,7 +142,7 @@ class Storecove
     /**
      * Unused as yet
      * @todo
-     * @param  mixed $payload
+     * @param  array $payload
      * @return string|bool
      */
     public function sendJsonDocument(array $payload)

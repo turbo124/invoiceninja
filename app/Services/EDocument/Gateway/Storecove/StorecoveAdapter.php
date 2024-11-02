@@ -68,7 +68,7 @@ $e = new \InvoiceNinja\EInvoice\EInvoice();
 $peppolInvoice = $e->decode('Peppol', $p, 'xml');
 
 $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
-$peppolInvoice = $data = $e->encode($peppolInvoice, 'json', $context);
+$peppolInvoice = $data = $e->encode($peppolInvoice, 'json');
 $this->storecove_invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
 // $s_invoice = $serializer->encode($invoice, 'json', $context);
 // $arr = json_decode($s_invoice, true);
