@@ -56,7 +56,7 @@ class SendEDocument implements ShouldQueue
         
             $p = new Peppol($model);
             $p->run();
-            $identifiers = $p->getStorecoveMeta();
+            $identifiers = $p->gateway->mutator->getStorecoveMeta();
 
             $result = $storecove->build($model);
 
@@ -65,7 +65,7 @@ class SendEDocument implements ShouldQueue
             
             $payload = [
                 'legal_entity_id' => $model->company->legal_entity_id,
-                'document' => base64_encode($xml),
+                // 'document' => base64_encode($xml),
                 'tenant_id' => $model->company->company_key,
                 'identifiers' => $identifiers,
                 // 'e_invoicing_token' => $model->company->e_invoicing_token,

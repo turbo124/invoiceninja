@@ -64,6 +64,8 @@ class Peppol extends AbstractService
      * Exclusive Taxes
      *
      */
+
+    private ?string $override_vat_number; 
     
     /** @var array $InvoiceTypeCodes */
     private array $InvoiceTypeCodes = [
@@ -163,6 +165,8 @@ class Peppol extends AbstractService
      */
     public function run(): self
     {
+        $this->getJurisdiction();
+
         /** Invoice Level Props */
         $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
         $id->value = $this->customizationID;
@@ -951,14 +955,14 @@ class Peppol extends AbstractService
             $pi = new PartyIdentification();
             $vatID = new ID();
             $vatID->schemeID = $this->resolveScheme();
-            $vatID->value = $this->company->settings->vat_number; //todo if we are cross border - switch to the supplier local vat number 
+            $vatID->value = $this->override_vat_number ?? $this->company->settings->vat_number; //todo if we are cross border - switch to the supplier local vat number 
             
             $pi->ID = $vatID;
             $party->PartyIdentification[] = $pi;
             $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
 
             $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
-            $companyID->value = $this->invoice->company->settings->vat_number;
+            $companyID->value = $this->override_vat_number ?? $this->company->settings->vat_number;
             $pts->CompanyID = $companyID;
 
             $ts = new TaxScheme();
@@ -1282,6 +1286,9 @@ class Peppol extends AbstractService
             //EU Sale
             if($this->company->tax_data->regions->EU->has_sales_above_threshold || !$this->invoice->client->has_valid_vat_number){ //over threshold - tax in buyer country
                 $country_code = $this->invoice->client->country->iso_3166_2;
+
+                if(isset($this->ninja_invoice->company->tax_data->regions->EU->subregions->{$country_code}->vat_number))
+                    $this->override_vat_number = $this->ninja_invoice->company->tax_data->regions->EU->subregions->{$country_code}->vat_number;
             }
         }
 
