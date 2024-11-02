@@ -78,7 +78,8 @@ class Storecove
         $this->adapter
              ->transform($model)
              ->decorate()
-             ->validate();
+             ->validate()
+             ->getDocument();
     }
 
     /**
@@ -141,32 +142,22 @@ class Storecove
     /**
      * Unused as yet
      * @todo
-     * @param  mixed $document
+     * @param  mixed $payload
      * @return string|bool
      */
-    public function sendJsonDocument($document)
+    public function sendJsonDocument(array $payload)
     {
-
-        $payload = [
-            // "legalEntityId" => 290868,
-            "idempotencyGuid" => \Illuminate\Support\Str::uuid(),
-            "routing" => [
-                "eIdentifiers" => [],
-                "emails" => ["david@invoiceninja.com"]
-            ],
-            "document" => [
-                "documentType" => "invoice",
-            "invoice" => $document,
-            ],
-        ];
-
+        nlog($payload);
         $uri = "document_submissions";
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $payload, $this->getHeaders());
 
         if($r->successful()) {
+            nlog("sent! GUID = {$r->json()['guid']}");
             return $r->json()['guid'];
         }
+
+        nlog($r->body());
 
         return false;
 

@@ -191,7 +191,7 @@ class Peppol extends AbstractService
             $ip = new InvoicePeriod();
             $ip->StartDate = new \DateTime($this->invoice->date);
             $ip->EndDate = new \DateTime($this->invoice->due_date);
-            $this->p_invoice->InvoicePeriod[] = $ip;
+            $this->p_invoice->InvoicePeriod = [$ip];
         }
         
         if ($this->invoice->project_id) {
@@ -199,7 +199,7 @@ class Peppol extends AbstractService
             $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
             $id->value = $this->invoice->project->number;
             $pr->ID = $id;
-            $this->p_invoice->ProjectReference[] = $pr;
+            $this->p_invoice->ProjectReference = [$pr];
         }
 
         /** Auto switch between Invoice / Credit based on the amount value */
@@ -221,7 +221,7 @@ class Peppol extends AbstractService
                                 ->getPeppol();
                                 
         //** @todo double check this logic, this will only ever write the doc once */
-        if(strlen($this->invoice->backup ?? '') == 0)
+        if(is_null($this->invoice->backup))
         {
             $this->invoice->e_invoice = $this->toObject();
             $this->invoice->save();

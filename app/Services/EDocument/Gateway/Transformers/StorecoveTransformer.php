@@ -49,7 +49,7 @@ class StorecoveTransformer implements TransformerInterface
     public function transform(mixed $invoice)
     {
     
-        $this->s_invoice->setTaxPointDate($invoice->IssueDate->format('Y-m-d'));
+        // $this->s_invoice->setTaxPointDate($invoice->IssueDate->format('Y-m-d'));
 
         // Only use this if we are billing for services between a period.
         if (isset($invoice->InvoicePeriod[0]) && 

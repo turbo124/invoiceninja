@@ -41,13 +41,13 @@ class InvoiceLines
     public ?array $charges;
 
     #[SerializedPath('[cbc:LineExtensionAmount][#]')]
-    public ?string $amount_excluding_vat;
+    public ?float $amount_excluding_vat;
 
     #[SerializedPath('[cbc:TaxExclusiveAmount][#]')]
-    public ?string $amount_excluding_tax;
+    public ?float $amount_excluding_tax;
 
     #[SerializedPath('[cbc:TaxInclusiveAmount][#]')]
-    public ?string $amount_including_tax;
+    public ?float $amount_including_tax;
 
     #[SerializedPath('[cac:Item][cac:ClassifiedTaxCategory]')]
     /** @var TaxesDutiesFees[] */
@@ -99,9 +99,9 @@ class InvoiceLines
 		?float $base_quantity,
 		?string $quantity_unit_code,
 		?array $charges,
-		?string $amount_excluding_vat,
-		?string $amount_excluding_tax,
-		?string $amount_including_tax,
+		?float $amount_excluding_vat,
+		?float $amount_excluding_tax,
+		?float $amount_including_tax,
 		?array $taxes_duties_fees,
 		?string $accounting_cost,
 		?array $references,
@@ -191,17 +191,17 @@ class InvoiceLines
 		return $this->charges;
 	}
 
-	public function getAmountExcludingVat(): ?string
+	public function getAmountExcludingVat(): ?float
 	{
 		return $this->amount_excluding_vat;
 	}
 
-	public function getAmountExcludingTax(): ?string
+	public function getAmountExcludingTax(): ?float
 	{
 		return $this->amount_excluding_tax;
 	}
 
-	public function getAmountIncludingTax(): ?string
+	public function getAmountIncludingTax(): ?float
 	{
 		return $this->amount_including_tax;
 	}
@@ -328,19 +328,19 @@ class InvoiceLines
 		return $this;
 	}
 
-	public function setAmountExcludingVat(?string $amount_excluding_vat): self
+	public function setAmountExcludingVat(?float $amount_excluding_vat): self
 	{
 		$this->amount_excluding_vat = $amount_excluding_vat;
 		return $this;
 	}
 
-	public function setAmountExcludingTax(?string $amount_excluding_tax): self
+	public function setAmountExcludingTax(?float $amount_excluding_tax): self
 	{
 		$this->amount_excluding_tax = $amount_excluding_tax;
 		return $this;
 	}
 
-	public function setAmountIncludingTax(?string $amount_including_tax): self
+	public function setAmountIncludingTax(?float $amount_including_tax): self
 	{
 		$this->amount_including_tax = $amount_including_tax;
 		return $this;

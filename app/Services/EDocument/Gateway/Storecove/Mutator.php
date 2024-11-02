@@ -574,6 +574,17 @@ class Mutator implements MutatorInterface
 
     /////////////// Storecove Helpers ///////////////
 
+    public function setClientRoutingCode(): self
+    {
+        $code = $this->getClientRoutingCode();
+        
+        $this->setStorecoveMeta($this->buildRouting([
+                ["scheme" => $code, "id" => $this->invoice->client->vat_number]
+            ]));
+
+        return $this;
+    }
+
     /**
      * getClientRoutingCode
      *

@@ -23,6 +23,7 @@ use App\Services\EDocument\Gateway\Transformers\StorecoveTransformer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
+use App\Services\EDocument\Standards\Peppol;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -51,17 +52,33 @@ class StorecoveAdapter
     {
         $this->ninja_invoice = $invoice;
 
-        $this->buildNexus();
-
-        $context = [
-           DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
-           AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
-        ];
-
         $serializer = $this->getSerializer();
 
+        $p = (new Peppol($invoice))->run()->toXml();
+
+        nlog($p);
+
+$context = [
+         DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+         AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+      ];
+
+
+$e = new \InvoiceNinja\EInvoice\EInvoice();
+$peppolInvoice = $e->decode('Peppol', $p, 'xml');
+
+$parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
+$peppolInvoice = $data = $e->encode($peppolInvoice, 'json', $context);
+$this->storecove_invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
+// $s_invoice = $serializer->encode($invoice, 'json', $context);
+// $arr = json_decode($s_invoice, true);
+// $data = $this->removeEmptyValues($arr);
+
+
+        $this->buildNexus();
+       
         // @phpstan-ignore-next-line
-        $this->storecove_invoice = $serializer->deserialize($invoice->e_invoice, Invoice::class, 'json', $context);
+        // $this->storecove_invoice = $serializer->deserialize($data, Invoice::class, 'json', $context);
 
         return $this;
 
@@ -77,6 +94,9 @@ class StorecoveAdapter
             foreach($line->taxes_duties_fees as &$tax)
             {
                 $tax->country = $this->nexus;
+                
+                if(property_exists($tax,'category'))
+                    $tax->category = $this->tranformTaxCode($tax->category);
             }
             unset($tax);
         }
@@ -88,12 +108,27 @@ class StorecoveAdapter
         foreach($tax_subtotals as &$tax)
         {
             $tax->country = $this->nexus;
+            
+            if (property_exists($tax, 'category')) 
+                $tax->category = $this->tranformTaxCode($tax->category);
+
         }
         unset($tax);
 
         $this->storecove_invoice->setTaxSubtotals($tax_subtotals);
         //configure identifiers
 
+        //update payment means codes to storecove equivalents
+        $payment_means = $this->storecove_invoice->getPaymentMeansArray();
+
+        foreach($payment_means as &$pm)
+        {
+            $pm->code = $this->transformPaymentMeansCode($pm->code);
+        }
+        
+        $this->storecove_invoice->setPaymentMeansArray($payment_means);
+
+        $this->storecove_invoice->setTaxSystem('tax_line_percentages');
         //set additional identifier if required (ie de => FR with FR vat)
         return $this;
     }
@@ -151,6 +186,30 @@ class StorecoveAdapter
         return $serializer;
     }
 
+    public function getDocument(): mixed
+    {
+        $serializer = $this->getSerializer();
+
+        $context = [
+          DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+          AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+        ];
+
+        $s_invoice = $serializer->encode($this->storecove_invoice, 'json', $context);
+
+        $s_invoice = json_decode($s_invoice, true);
+
+        $s_invoice = $this->removeEmptyValues($s_invoice);
+
+        $data = [
+            'errors' => $this->getErrors(),
+            'document' => $s_invoice,
+        ];
+
+        return $data;
+
+    }
+
     private function removeEmptyValues(array $array): array
     {
         foreach ($array as $key => $value) {
@@ -199,5 +258,62 @@ class StorecoveAdapter
         }
 
         return $this;
+    }
+
+    private function tranformTaxCode(string $code): ?string
+    {
+        return match($code){
+            'S' => 'standard',
+            'Z' => 'zero_rated',
+            'E' => 'exempt',
+            'AE' => 'reverse_charge',
+            'K' => 'intra_community',
+            'G' => 'export',
+            'O' => 'outside_scope',
+            'L' => 'cgst',
+            'I' => 'igst',
+            'SS' => 'sgst',
+            'B' => 'deemed_supply',
+            'SR' => 'srca_s',
+            'SC' => 'srca_c',
+            'NR' => 'not_registered',
+            default => null
+        };
+    }
+
+    private function transformPaymentMeansCode(?string $code): string
+    {
+        return match($code){
+            '30' => 'credit_transfer',
+            '58' => 'sepa_credit_transfer',
+            '31' => 'debit_transfer',
+            '49' => 'direct_debit',
+            '59' => 'sepa_direct_debit',
+            '48' => 'card',         // Generic card payment
+            '54' => 'bank_card',    
+            '55' => 'credit_card',
+            '57' => 'standing_agreement',
+            '10' => 'cash',
+            '20' => 'bank_cheque',
+            '21' => 'cashiers_cheque',
+            '97' => 'aunz_npp',
+            '98' => 'aunz_npp_payid',
+            '99' => 'aunz_npp_payto',
+            '71' => 'aunz_bpay',
+            '72' => 'aunz_postbillpay',
+            '73' => 'aunz_uri',
+            '50' => 'se_bankgiro',
+            '51' => 'se_plusgiro',
+            '74' => 'sg_giro',
+            '75' => 'sg_card',
+            '76' => 'sg_paynow',
+            '77' => 'it_mav',
+            '78' => 'it_pagopa',
+            '42' => 'nl_ga_beneficiary',
+            '43' => 'nl_ga_gaccount',
+            '1'  => 'undefined',    // Instrument not defined
+            default => 'undefined',
+        };
+
     }
 }

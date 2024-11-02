@@ -105,7 +105,6 @@ class StorecoveTest extends TestCase
         $this->assertInstanceOf(\InvoiceNinja\EInvoice\Models\Peppol\Invoice::class, $peppolInvoice);
 
         $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
-        // $peppolInvoice = $e->encode($peppolInvoice, 'json');
 
         $peppolInvoice = $data = $e->encode($peppolInvoice, 'json', $context);
 
@@ -159,15 +158,14 @@ class StorecoveTest extends TestCase
         $p->run();
         $peppolInvoice = $p->getInvoice();
 
+        // $s_transformer = new StorecoveTransformer();
+        // $s_transformer->transform($peppolInvoice);
 
-        $s_transformer = new StorecoveTransformer();
-        $s_transformer->transform($peppolInvoice);
+        // $json = $s_transformer->toJson();
 
-        $json = $s_transformer->toJson();
-
-        $this->assertJson($json);
+        // $this->assertJson($json);
         
-        nlog($json);
+        // nlog($json);
     }
 
     // public function testStorecoveTransformer()

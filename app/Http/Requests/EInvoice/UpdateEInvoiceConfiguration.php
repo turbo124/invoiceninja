@@ -41,37 +41,37 @@ class UpdateEInvoiceConfiguration extends Request
         return [
             'entity' => 'required|bail|in:invoice,client,company',
             'payment_means' => 'sometimes|bail|array',
-            'payment_means.code' => ['required_with:payment_means', 'bail', Rule::in(PaymentMeans::getPaymentMeansCodelist())],
-            'payment_means.bic_swift' => ['bail',
+            'payment_means.*.code' => ['required_with:payment_means', 'bail', Rule::in(PaymentMeans::getPaymentMeansCodelist())],
+            'payment_means.*.bic_swift' => ['bail',
                 Rule::requiredIf(function () {
                     $code = $this->input('payment_means.code');
                     $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
                     return in_array('bic_swift', $requirements);
                 }),
             ],
-            'payment_means.iban' => ['bail', 'string', 'min:8', 'max:11',
+            'payment_means.*.iban' => ['bail', 'sometimes', 'string', 'min:15', 'max:34',
                 Rule::requiredIf(function () {
                     $code = $this->input('payment_means.code');
                     $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
                     return in_array('iban', $requirements);
                 }),
             ],
-            'payment_means.account_holder' => ['bail', 'string', 'min:15', 'max:34',
+            'payment_means.*.account_holder' => ['bail', 'sometimes', 'string', 'max:255',
                 Rule::requiredIf(function () {
                     $code = $this->input('payment_means.code');
                     $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
                     return in_array('account_holder', $requirements);
                 }),
             ],
-            'payment_means.information' => ['bail', 'sometimes', 'string'],
-            'payment_means.card_type' => ['bail', 'string', 'min:4',
+            'payment_means.*.information' => ['bail', 'sometimes', 'nullable', 'string'],
+            'payment_means.*.card_type' => ['bail', 'sometimes', 'nullable', 'string', 'min:4',
                 Rule::requiredIf(function () {
                     $code = $this->input('payment_means.code');
                     $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
                     return in_array('card_type', $requirements);
                 }),
             ],
-            'payment_means.card_holder' => ['bail','string', 'min:4',
+            'payment_means.*.card_holder' => ['bail', 'sometimes', 'nullable', 'string', 'min:4',
                 Rule::requiredIf(function () {
                     $code = $this->input('payment_means.code');
                     $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];

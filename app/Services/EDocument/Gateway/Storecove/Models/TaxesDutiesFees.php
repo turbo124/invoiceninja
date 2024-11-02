@@ -8,10 +8,10 @@ use Symfony\Component\Serializer\Attribute\SerializedPath;
 class TaxesDutiesFees
 {
 	public ?string $country; //need to run postprocessing on this 
-	public ?string $amount;
+	public ?float $amount;
 
 	#[SerializedName('cbc:Percent')]
-	public ?string $percentage;
+	public ?float $percentage;
 
 	#[SerializedPath('[cbc:ID][#]')]
 	public ?string $category;
@@ -21,8 +21,8 @@ class TaxesDutiesFees
 
 	public function __construct(
 		?string $country,
-		?string $amount,
-		?string $percentage,
+		?float $amount,
+		?float $percentage,
 		?string $category,
 		?string $type
 	) {
@@ -38,12 +38,12 @@ class TaxesDutiesFees
 		return $this->country;
 	}
 
-	public function getAmount(): ?string
+	public function getAmount(): ?float
 	{
 		return $this->amount;
 	}
 
-	public function getPercentage(): ?string
+	public function getPercentage(): ?float
 	{
 		return $this->percentage;
 	}
@@ -64,13 +64,13 @@ class TaxesDutiesFees
 		return $this;
 	}
 
-	public function setAmount(?string $amount): self
+	public function setAmount(?float $amount): self
 	{
 		$this->amount = $amount;
 		return $this;
 	}
 
-	public function setPercentage(?string $percentage): self
+	public function setPercentage(?float $percentage): self
 	{
 		$this->percentage = $percentage;
 		return $this;
