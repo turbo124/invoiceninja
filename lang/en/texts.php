@@ -5403,8 +5403,19 @@ $lang = array(
     'payment_updated' => 'Payment Updated',
     'search_placeholder' => 'Find invoices, clients, and more',
     'invalid_vat_number' => "The VAT number is not valid for the selected country. Format should be Country Code followed by number only ie, DE123456789",
-    'acts_as_sender' => 'Acts as Sender',
-    'acts_as_receiver' => 'Acts as Receiver',
+    'acts_as_sender' => 'Send E Documents',
+    'acts_as_receiver' => 'Receive E Documents',
+    'iban_help' => 'The full IBAN number',
+    'bic_swift' => 'BIC/Swift code',
+    'bic_swift_help' => 'The Bank identifer',
+    'payer_bank_account' => 'Payer Bank Account Number',
+    'payer_bank_account_help' => 'The bank account number of the payer',
+    'bsb_sort' => 'BSB / Sort Code',
+    'bsb_sort_help' => 'Bank Branch Code',
+    'card_type' => 'Card Type',
+    'card_type_help' => 'ie. VISA, AMEX',
+    'card_number_help' => 'last 4 digits only',
+    'card_holder' => 'Card Holder Name',
 );
 
 return $lang;

@@ -5,8 +5,6 @@ namespace Tests\Feature\EInvoice\Validation;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\EInvoice\Peppol\StoreEntityRequest;
-use App\Models\Country;
-use Illuminate\Support\Collection;
 
 class CreateRequestTest extends TestCase
 {
@@ -20,36 +18,40 @@ class CreateRequestTest extends TestCase
 
     public function testValidInput()
     {
-        $validator = Validator::make([
+        $data = [
             'party_name' => 'Test Company',
             'line1' => '123 Test St',
             'city' => 'Test City',
-            'country' => 'DE', // Assuming 1 is the ID for Germany
+            'country' => 'DE',
             'zip' => '12345',
             'county' => 'Test County',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
             'tenant_id' => 'testcompanykey',
+        ];
 
-        ], $this->request->rules());
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
-        
         $this->assertTrue($validator->passes());
     }
 
     public function testInvalidCountry()
     {
-        $validator = Validator::make([
+        $data = [
             'party_name' => 'Test Company',
             'line1' => '123 Test St',
             'city' => 'Test City',
-            'country' => 999, // Invalid country ID
+            'country' => 999,
             'zip' => '12345',
             'county' => 'Test County',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
             'tenant_id' => 'testcompanykey',
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('country', $validator->errors()->toArray());
@@ -57,9 +59,12 @@ class CreateRequestTest extends TestCase
 
     public function testMissingRequiredFields()
     {
-        $validator = Validator::make([
+        $data = [
             'line2' => 'Optional line',
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
         $errors = $validator->errors()->toArray();
@@ -73,7 +78,7 @@ class CreateRequestTest extends TestCase
 
     public function testOptionalLine2()
     {
-        $validator = Validator::make([
+        $data = [
             'party_name' => 'Test Company',
             'line1' => '123 Test St',
             'line2' => 'Optional line',
@@ -81,20 +86,25 @@ class CreateRequestTest extends TestCase
             'country' => 'AT',
             'zip' => '12345',
             'county' => 'Test County',
-'tenant_id' => 'testcompanykey',
+            'tenant_id' => 'testcompanykey',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertTrue($validator->passes());
     }
 
     public function testCountryPreparation()
     {
-        $request = new StoreEntityRequest([
-            'country' => '276', // Assuming 1 is the ID for Germany
-        ]);
+        $data = [
+            'country' => '276', // Numeric code for Germany
+        ];
 
+        $request = new StoreEntityRequest();
+        $request->initialize($data);
         $request->prepareForValidation();
 
         $this->assertEquals('DE', $request->input('country'));
