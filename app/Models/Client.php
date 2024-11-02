@@ -295,9 +295,6 @@ class Client extends BaseModel implements HasLocalePreference
         return $this->hasMany(CompanyLedger::class)->orderBy('id', 'desc');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<CompanyLedger>
-     */
     public function company_ledger(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(CompanyLedger::class, 'company_ledgerable');
@@ -569,9 +566,6 @@ class Client extends BaseModel implements HasLocalePreference
         throw new \Exception('Could not find a settings object', 1);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document>
-     */
     public function documents(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');

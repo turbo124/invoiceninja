@@ -2,118 +2,417 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-use App\Services\EDocument\Gateway\Storecove\Models\Tax;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
+
 
 class InvoiceLines
 {
-    #[SerializedName('ID.value')]
-    public string $lineId = '';
 
-    #[SerializedName('LineExtensionAmount.amount')]
-    public float $amountExcludingVat = 0.0;
+	#[SerializedPath('[cbc:ID][#]')]
+    public ?string $line_id;
 
-    #[SerializedName('Price.PriceAmount.amount')]
-    public float $itemPrice = 0.0;
+    #[SerializedPath('[cac:Item][cbc:Description]')]
+    public ?string $description;
 
-    #[SerializedName('InvoicedQuantity')]
-    public int $quantity = 0;
+    #[SerializedPath('[cac:Item][cbc:Name]')]
+    public ?string $name;
 
-    #[SerializedName('InvoicedQuantity.unitCode')]
-    public string $quantityUnitCode = '';
+    #[SerializedPath('[cac:OrderLineReference][cbc:LineID]')]
+    public ?string $order_line_reference_line_id;
 
-    #[SerializedName('Item.Name')]
-    public string $name = '';
+    #[SerializedPath('[cac:InvoicePeriod]')]
+    public ?string $invoice_period;
 
-    #[SerializedName('Item.Description')]
-    public string $description = '';
+    #[SerializedPath('[cac:Price][cbc:PriceAmount][#]')]
+    public ?float $item_price;
 
-    public Tax $tax;
+    #[SerializedPath('[cbc:InvoicedQuantity][#]')]
+    public ?float $quantity;
 
-    public function __construct()
-    {
-        $this->tax = new Tax();
-    }
+    #[SerializedPath('[cbc:BaseQuantity][#]')]
+    public ?float $base_quantity;
 
-    // Getters and setters
-    public function getLineId(): string
-    {
-        return $this->lineId;
-    }
+    #[SerializedPath('[cbc:InvoicedQuantity][@unitCode]')]
+    public ?string $quantity_unit_code;
 
-    public function setLineId(string $lineId): void
-    {
-        $this->lineId = $lineId;
-    }
+    #[SerializedPath('[cac:AllowanceCharge]')]
+    /** @var AllowanceCharges[] */ //todo
+    public ?array $charges;
 
-    public function getAmountExcludingVat(): float
-    {
-        return $this->amountExcludingVat;
-    }
+    #[SerializedPath('[cbc:LineExtensionAmount][#]')]
+    public ?string $amount_excluding_vat;
 
-    public function setAmountExcludingVat(float $amountExcludingVat): void
-    {
-        $this->amountExcludingVat = $amountExcludingVat;
-    }
+    #[SerializedPath('[cbc:TaxExclusiveAmount][#]')]
+    public ?string $amount_excluding_tax;
 
-    public function getItemPrice(): float
-    {
-        return $this->itemPrice;
-    }
+    #[SerializedPath('[cbc:TaxInclusiveAmount][#]')]
+    public ?string $amount_including_tax;
 
-    public function setItemPrice(float $itemPrice): void
-    {
-        $this->itemPrice = $itemPrice;
-    }
+    #[SerializedPath('[cac:Item][cac:ClassifiedTaxCategory]')]
+    /** @var TaxesDutiesFees[] */
+    public array $taxes_duties_fees;    
 
-    public function getQuantity(): int
-    {
-        return $this->quantity;
-    }
+    #[SerializedPath('[cbc:AccountingCost]')]
+    public ?string $accounting_cost;
 
-    public function setQuantity(int $quantity): void
-    {
-        $this->quantity = $quantity;
-    }
+    #[SerializedPath('[cac:DocumentReference]')]
+    /** @var References[] */
+    public ?array $references;
 
-    public function getQuantityUnitCode(): string
-    {
-        return $this->quantityUnitCode;
-    }
+    #[SerializedPath('[cac:Item][cac:AdditionalItemProperty]')]
+    /** @var AdditionalItemProperties[] */
+    public ?array $additional_item_properties;
 
-    public function setQuantityUnitCode(string $quantityUnitCode): void
-    {
-        $this->quantityUnitCode = $quantityUnitCode;
-    }
+    #[SerializedPath('[cac:Item][cac:SellersItemIdentification][cbc:ID][#]')]
+    public ?string $sellers_item_identification;
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
+    #[SerializedPath('[cac:Item][cac:BuyersItemIdentification][cbc:ID][#]')]
+    public ?string $buyers_item_identification;
 
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
+    #[SerializedPath('[cac:Item][cac:StandardItemIdentification][cbc:ID][#]')]
+    public ?string $standard_item_identification;
 
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
+    #[SerializedPath('[cac:Item][cac:StandardItemIdentification][cbc:ID][@schemeID]')]
+    public ?string $standard_item_identification_scheme_id;
 
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
-    }
+    #[SerializedPath('[cac:Item][cac:StandardItemIdentification][cbc:ID][@schemeAgencyID]')]
+    public ?string $standard_item_identification_scheme_agency_id;
 
-    public function getTax(): Tax
-    {
-        return $this->tax;
-    }
+    #[SerializedPath('[cbc:Note]')]
+    public ?string $note;
 
-    public function setTax(Tax $tax): void
-    {
-        $this->tax = $tax;
-    }
+	/**
+	 * @param AllowanceCharges[] $charges
+	 * @param TaxesDutiesFees[] $taxes_duties_fees
+	 * @param References[] $references
+	 * @param AdditionalItemProperties[] $additional_item_properties
+	 */
+	public function __construct(
+		?string $line_id,
+		?string $description,
+		?string $name,
+		?string $order_line_reference_line_id,
+		?string $invoice_period,
+		?float $item_price,
+		?float $quantity,
+		?float $base_quantity,
+		?string $quantity_unit_code,
+		?array $charges,
+		?string $amount_excluding_vat,
+		?string $amount_excluding_tax,
+		?string $amount_including_tax,
+		?array $taxes_duties_fees,
+		?string $accounting_cost,
+		?array $references,
+		?array $additional_item_properties,
+		?string $sellers_item_identification,
+		?string $buyers_item_identification,
+		?string $standard_item_identification,
+		?string $standard_item_identification_scheme_id,
+		?string $standard_item_identification_scheme_agency_id,
+		?string $note
+	) {
+		$this->line_id = $line_id;
+		$this->description = $description;
+		$this->name = $name;
+		$this->order_line_reference_line_id = $order_line_reference_line_id;
+		$this->invoice_period = $invoice_period;
+		$this->item_price = $item_price;
+		$this->quantity = $quantity;
+		$this->base_quantity = $base_quantity;
+		$this->quantity_unit_code = $quantity_unit_code;
+		$this->charges = $charges;
+		$this->amount_excluding_vat = $amount_excluding_vat;
+		$this->amount_excluding_tax = $amount_excluding_tax;
+		$this->amount_including_tax = $amount_including_tax;
+		$this->taxes_duties_fees = $taxes_duties_fees;
+		$this->accounting_cost = $accounting_cost;
+		$this->references = $references;
+		$this->additional_item_properties = $additional_item_properties;
+		$this->sellers_item_identification = $sellers_item_identification;
+		$this->buyers_item_identification = $buyers_item_identification;
+		$this->standard_item_identification = $standard_item_identification;
+		$this->standard_item_identification_scheme_id = $standard_item_identification_scheme_id;
+		$this->standard_item_identification_scheme_agency_id = $standard_item_identification_scheme_agency_id;
+		$this->note = $note;
+	}
+
+	public function getLineId(): ?string
+	{
+		return $this->line_id;
+	}
+
+	public function getDescription(): ?string
+	{
+		return $this->description;
+	}
+
+	public function getName(): ?string
+	{
+		return $this->name;
+	}
+
+	public function getOrderLineReferenceLineId(): ?string
+	{
+		return $this->order_line_reference_line_id;
+	}
+
+	public function getInvoicePeriod(): ?string
+	{
+		return $this->invoice_period;
+	}
+
+	public function getItemPrice(): ?float
+	{
+		return $this->item_price;
+	}
+
+	public function getQuantity(): ?float
+	{
+		return $this->quantity;
+	}
+
+	public function getBaseQuantity(): ?float
+	{
+		return $this->base_quantity;
+	}
+
+	public function getQuantityUnitCode(): ?string
+	{
+		return $this->quantity_unit_code;
+	}
+
+	/**
+	 * @return AllowanceCharges[]
+	 */
+	public function getAllowanceCharges(): ?array
+	{
+		return $this->charges;
+	}
+
+	public function getAmountExcludingVat(): ?string
+	{
+		return $this->amount_excluding_vat;
+	}
+
+	public function getAmountExcludingTax(): ?string
+	{
+		return $this->amount_excluding_tax;
+	}
+
+	public function getAmountIncludingTax(): ?string
+	{
+		return $this->amount_including_tax;
+	}
+
+	/**
+	 * @return TaxesDutiesFees[]
+	 */
+	public function getTaxesDutiesFees(): ?array
+	{
+		return $this->taxes_duties_fees;
+	}
+
+	public function getAccountingCost(): ?string
+	{
+		return $this->accounting_cost;
+	}
+
+	/**
+	 * @return References[]
+	 */
+	public function getReferences(): ?array
+	{
+		return $this->references;
+	}
+
+	/**
+	 * @return AdditionalItemProperties[]
+	 */
+	public function getAdditionalItemProperties(): ?array
+	{
+		return $this->additional_item_properties;
+	}
+
+	public function getSellersItemIdentification(): ?string
+	{
+		return $this->sellers_item_identification;
+	}
+
+	public function getBuyersItemIdentification(): ?string
+	{
+		return $this->buyers_item_identification;
+	}
+
+	public function getStandardItemIdentification(): ?string
+	{
+		return $this->standard_item_identification;
+	}
+
+	public function getStandardItemIdentificationSchemeId(): ?string
+	{
+		return $this->standard_item_identification_scheme_id;
+	}
+
+	public function getStandardItemIdentificationSchemeAgencyId(): ?string
+	{
+		return $this->standard_item_identification_scheme_agency_id;
+	}
+
+	public function getNote(): ?string
+	{
+		return $this->note;
+	}
+
+	public function setLineId(?string $line_id): self
+	{
+		$this->line_id = $line_id;
+		return $this;
+	}
+
+	public function setDescription(?string $description): self
+	{
+		$this->description = $description;
+		return $this;
+	}
+
+	public function setName(?string $name): self
+	{
+		$this->name = $name;
+		return $this;
+	}
+
+	public function setOrderLineReferenceLineId(?string $order_line_reference_line_id): self
+	{
+		$this->order_line_reference_line_id = $order_line_reference_line_id;
+		return $this;
+	}
+
+	public function setInvoicePeriod(?string $invoice_period): self
+	{
+		$this->invoice_period = $invoice_period;
+		return $this;
+	}
+
+	public function setItemPrice(?float $item_price): self
+	{
+		$this->item_price = $item_price;
+		return $this;
+	}
+
+	public function setQuantity(?float $quantity): self
+	{
+		$this->quantity = $quantity;
+		return $this;
+	}
+
+	public function setBaseQuantity(?float $base_quantity): self
+	{
+		$this->base_quantity = $base_quantity;
+		return $this;
+	}
+
+	public function setQuantityUnitCode(?string $quantity_unit_code): self
+	{
+		$this->quantity_unit_code = $quantity_unit_code;
+		return $this;
+	}
+
+	/**
+	 * @param AllowanceCharges[] $charges
+	 */
+	public function setAllowanceCharges(?array $charges): self
+	{
+		$this->charges = $charges;
+		return $this;
+	}
+
+	public function setAmountExcludingVat(?string $amount_excluding_vat): self
+	{
+		$this->amount_excluding_vat = $amount_excluding_vat;
+		return $this;
+	}
+
+	public function setAmountExcludingTax(?string $amount_excluding_tax): self
+	{
+		$this->amount_excluding_tax = $amount_excluding_tax;
+		return $this;
+	}
+
+	public function setAmountIncludingTax(?string $amount_including_tax): self
+	{
+		$this->amount_including_tax = $amount_including_tax;
+		return $this;
+	}
+
+
+	/**
+	 * @param TaxesDutiesFees[] $taxes_duties_fees
+	 */
+	public function setTaxesDutiesFees(?array $taxes_duties_fees): self
+	{
+		$this->taxes_duties_fees = $taxes_duties_fees;
+		return $this;
+	}
+
+	public function setAccountingCost(?string $accounting_cost): self
+	{
+		$this->accounting_cost = $accounting_cost;
+		return $this;
+	}
+
+	/**
+	 * @param References[] $references
+	 */
+	public function setReferences(?array $references): self
+	{
+		$this->references = $references;
+		return $this;
+	}
+
+	/**
+	 * @param AdditionalItemProperties[] $additional_item_properties
+	 */
+	public function setAdditionalItemProperties(?array $additional_item_properties): self
+	{
+		$this->additional_item_properties = $additional_item_properties;
+		return $this;
+	}
+
+	public function setSellersItemIdentification(?string $sellers_item_identification): self
+	{
+		$this->sellers_item_identification = $sellers_item_identification;
+		return $this;
+	}
+
+	public function setBuyersItemIdentification(?string $buyers_item_identification): self
+	{
+		$this->buyers_item_identification = $buyers_item_identification;
+		return $this;
+	}
+
+	public function setStandardItemIdentification(?string $standard_item_identification): self
+	{
+		$this->standard_item_identification = $standard_item_identification;
+		return $this;
+	}
+
+	public function setStandardItemIdentificationSchemeId(?string $standard_item_identification_scheme_id): self
+	{
+		$this->standard_item_identification_scheme_id = $standard_item_identification_scheme_id;
+		return $this;
+	}
+
+	public function setStandardItemIdentificationSchemeAgencyId(?string $standard_item_identification_scheme_agency_id): self
+	{
+		$this->standard_item_identification_scheme_agency_id = $standard_item_identification_scheme_agency_id;
+		return $this;
+	}
+
+	public function setNote(?string $note): self
+	{
+		$this->note = $note;
+		return $this;
+	}
 }
-

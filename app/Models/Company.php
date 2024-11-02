@@ -362,7 +362,7 @@ class Company extends BaseModel
         'smtp_local_domain',
         'smtp_verify_peer',
         // 'e_invoice',
-        'e_invoicing_token',
+        // 'e_invoicing_token',
     ];
 
     protected $hidden = [
@@ -416,7 +416,7 @@ class Company extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function documents()
     {

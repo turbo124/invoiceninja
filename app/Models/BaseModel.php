@@ -261,48 +261,48 @@ class BaseModel extends Model
         return ctrans("texts.e_invoice"). "_" . $this->numberFormatter().'.'.$extension;
     }
 
-    public function numberFormatter()
-    {
-        $number = strlen($this->number) >= 1 ? $this->translate_entity() . "_" . $this->number : class_basename($this) . "_" . Str::random(5);
-
-        // Remove control characters
-        $formatted_number = preg_replace('/[\x00-\x1F\x7F]/u', '', $number);
-
-        // Replace slash, backslash, and null byte with underscore
-        $formatted_number = str_replace(['/', '\\', "\0"], '_', $formatted_number);
-
-        // Remove any other characters that are invalid in most filesystems
-        $formatted_number = str_replace(['<', '>', ':', '"', '|', '?', '*'], '', $formatted_number);
-
-        // Replace multiple spaces or underscores with a single underscore
-        $formatted_number = preg_replace('/[\s_]+/', '_', $formatted_number);
-
-        // Trim underscores from start and end
-        $formatted_number = trim($formatted_number, '_');
-
-        // Ensure the filename is not empty
-        if (empty($formatted_number)) {
-            $formatted_number = 'file_' . Str::random(5);
-        }
-
-        // Limit the length of the filename (adjust as needed)
-        $formatted_number = mb_substr($formatted_number, 0, 255);
-
-        return $formatted_number;
-    }
-
     // public function numberFormatter()
     // {
     //     $number = strlen($this->number) >= 1 ? $this->translate_entity() . "_" . $this->number : class_basename($this) . "_" . Str::random(5);
 
-    //     $formatted_number =  mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $number);
+    //     // Remove control characters
+    //     $formatted_number = preg_replace('/[\x00-\x1F\x7F]/u', '', $number);
 
-    //     $formatted_number = mb_ereg_replace("([\.]{2,})", '', $formatted_number);
+    //     // Replace slash, backslash, and null byte with underscore
+    //     $formatted_number = str_replace(['/', '\\', "\0"], '_', $formatted_number);
 
-    //     $formatted_number = preg_replace('/\s+/', '_', $formatted_number);
+    //     // Remove any other characters that are invalid in most filesystems
+    //     $formatted_number = str_replace(['<', '>', ':', '"', '|', '?', '*'], '', $formatted_number);
 
-    //     return \Illuminate\Support\Str::ascii($formatted_number);
+    //     // Replace multiple spaces or underscores with a single underscore
+    //     $formatted_number = preg_replace('/[\s_]+/', '_', $formatted_number);
+
+    //     // Trim underscores from start and end
+    //     $formatted_number = trim($formatted_number, '_');
+
+    //     // Ensure the filename is not empty
+    //     if (empty($formatted_number)) {
+    //         $formatted_number = 'file_' . Str::random(5);
+    //     }
+
+    //     // Limit the length of the filename (adjust as needed)
+    //     $formatted_number = mb_substr($formatted_number, 0, 255);
+
+    //     return $formatted_number;
     // }
+
+    public function numberFormatter()
+    {
+        $number = strlen($this->number) >= 1 ? $this->translate_entity() . "_" . $this->number : class_basename($this) . "_" . Str::random(5);
+
+        $formatted_number =  mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $number);
+
+        $formatted_number = mb_ereg_replace("([\.]{2,})", '', $formatted_number);
+
+        $formatted_number = preg_replace('/\s+/', '_', $formatted_number);
+
+        return \Illuminate\Support\Str::ascii($formatted_number);
+    }
 
     public function translate_entity()
     {

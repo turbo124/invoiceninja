@@ -1,71 +1,81 @@
 <?php
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
-use Symfony\Component\Serializer\Annotation\SerializedName;
-
-
 class Tax
 {
-    #[SerializedName('Item.ClassifiedTaxCategory.0.Percent')]
-    public float $taxPercentage = 0.0;
+	public ?string $country;
+	public ?string $amount;
+	public ?string $percentage;
+	public ?string $category;
+	public ?string $type;
 
-    #[SerializedName('LineExtensionAmount.amount')]
-    public float $taxableAmount = 0.0;
+	public function __construct(
+		?string $country,
+		?string $amount,
+		?string $percentage,
+		?string $category,
+		?string $type
+	) {
+		$this->country = $country;
+		$this->amount = $amount;
+		$this->percentage = $percentage;
+		$this->category = $category;
+		$this->type = $type;
+	}
 
-    #[SerializedName('TaxTotal.0.TaxAmount.amount')]
-    public float $taxAmount = 0.0;
+	public function getCountry(): ?string
+	{
+		return $this->country;
+	}
 
-    #[SerializedName('Item.ClassifiedTaxCategory.0.ID.value')]
-    public string $taxCategory = '';
+	public function getAmount(): ?string
+	{
+		return $this->amount;
+	}
 
-    // Getters and setters
-    public function getTaxPercentage(): float
-    {
-        return $this->taxPercentage;
-    }
+	public function getPercentage(): ?string
+	{
+		return $this->percentage;
+	}
 
-    public function setTaxPercentage(float $taxPercentage): void
-    {
-        $this->taxPercentage = $taxPercentage;
-    }
+	public function getCategory(): ?string
+	{
+		return $this->category;
+	}
 
-    public function getTaxableAmount(): float
-    {
-        return $this->taxableAmount;
-    }
+	public function getType(): ?string
+	{
+		return $this->type;
+	}
 
-    public function setTaxableAmount(float $taxableAmount): void
-    {
-        $this->taxableAmount = $taxableAmount;
-    }
+	public function setCountry(?string $country): self
+	{
+		$this->country = $country;
+		return $this;
+	}
 
-    public function getTaxAmount(): float
-    {
-        return $this->taxAmount;
-    }
+	public function setAmount(?string $amount): self
+	{
+		$this->amount = $amount;
+		return $this;
+	}
 
-    public function setTaxAmount(float $taxAmount): void
-    {
-        $this->taxAmount = $taxAmount;
-    }
+	public function setPercentage(?string $percentage): self
+	{
+		$this->percentage = $percentage;
+		return $this;
+	}
 
-    public function getTaxCategory(): string
-    {
-        return $this->taxCategory;
-    }
+	public function setCategory(?string $category): self
+	{
+		$this->category = $category;
+		return $this;
+	}
 
-    public function setTaxCategory(string $taxCategory): void
-    {
-        $this->taxCategory = $taxCategory;
-    }
+	public function setType(?string $type): self
+	{
+		$this->type = $type;
+		return $this;
+	}
 }
