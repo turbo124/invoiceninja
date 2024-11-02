@@ -23,7 +23,7 @@ class EInvoiceTokenController extends BaseController
         /** @var \App\Models\Company $company */
         $company = auth()->user()->company();
 
-        $company->e_invoicing_token = $request->get('token');
+        // $company->e_invoicing_token = $request->get('token');
         $company->save();
 
         return response()->noContent();

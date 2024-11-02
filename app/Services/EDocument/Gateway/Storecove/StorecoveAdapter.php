@@ -95,11 +95,13 @@ class StorecoveAdapter
         //configure identifiers
 
         //set additional identifier if required (ie de => FR with FR vat)
+        return $this;
     }
 
     public function validate(): self
     {
-        return $this->valid_document;
+        // $this->valid_document
+        return $this;
     }
 
     public function getInvoice(): Invoice

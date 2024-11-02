@@ -16,7 +16,7 @@ class StorecoveRouter
     /**
      * Provides a country matrix for the correct scheme to send via
      *  
-     * @var mixed $routing_rules 
+     * @var array $routing_rules 
      **/
     private array $routing_rules = [
         "US" => [

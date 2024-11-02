@@ -60,16 +60,19 @@ class SendEDocument implements ShouldQueue
 
             $result = $storecove->build($model);
 
-            // $xml = $p->toXml();
+            /**************************** Legacy */
+            $xml = $p->toXml();
             
-            // $payload = [
-            //     'legal_entity_id' => $model->company->legal_entity_id,
-            //     'document' => base64_encode($xml),
-            //     'tenant_id' => $model->company->company_key,
-            //     'identifiers' => $identifiers,
-            //     // 'e_invoicing_token' => $model->company->e_invoicing_token,
-            //     // include whitelabel key.
-            // ];
+            $payload = [
+                'legal_entity_id' => $model->company->legal_entity_id,
+                'document' => base64_encode($xml),
+                'tenant_id' => $model->company->company_key,
+                'identifiers' => $identifiers,
+                // 'e_invoicing_token' => $model->company->e_invoicing_token,
+                // include whitelabel key.
+            ];
+
+            /**************************** Legacy */
 
             $r = Http::withHeaders($this->getHeaders())
                 ->post(config('ninja.hosted_ninja_url')."/api/einvoice/submission", $payload);

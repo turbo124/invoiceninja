@@ -34,7 +34,7 @@ class StorecoveTransformer implements TransformerInterface
         return $this;
     }
 
-    public function getInvoice($s_invoice): StorecoveInvoice
+    public function getInvoice(): StorecoveInvoice
     {
         return $this->s_invoice;
     }
@@ -42,6 +42,7 @@ class StorecoveTransformer implements TransformerInterface
     public function createNewStorecoveInvoice(): self
     {
         $this->s_invoice = (new \ReflectionClass(StorecoveInvoice::class))->newInstanceWithoutConstructor();
+        return $this;
     }
 
     //$invoice = inbound peppol
@@ -164,11 +165,6 @@ class StorecoveTransformer implements TransformerInterface
         $doc->emails = [];
         
         return $doc;
-    }
-
-    public function getInvoice(): StorecoveInvoice
-    {
-        return $this->s_invoice;
     }
 
     public function toJson(): string

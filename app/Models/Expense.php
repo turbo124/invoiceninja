@@ -166,9 +166,6 @@ class Expense extends BaseModel
         return self::class;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document>
-     */
     public function documents(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
