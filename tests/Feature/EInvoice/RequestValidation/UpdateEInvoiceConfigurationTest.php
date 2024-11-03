@@ -50,9 +50,9 @@ class UpdateEInvoiceConfigurationTest extends TestCase
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => 'invalidcodehere'
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
@@ -65,12 +65,12 @@ class UpdateEInvoiceConfigurationTest extends TestCase
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '30',
-                'iban' => '12345678',
+                'iban' => '123456789101112254',
                 'bic_swift' => 'DEUTDEFF',
                 'account_holder' => 'John Doe Company Limited'
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
@@ -83,29 +83,29 @@ class UpdateEInvoiceConfigurationTest extends TestCase
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '48',
                 'card_type' => 'VISA',
                 'iban' => '12345678'
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
         $validator = Validator::make($data, $this->request->rules());
 
-        $this->assertTrue($validator->passes());
+        $this->assertFalse($validator->passes());
     }
 
     public function testValidatesPaymentMeansForCreditCard()
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '54',
                 'card_type' => 'VISA',
                 'card_number' => '************1234',
                 'card_holder' => 'John Doe'
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
@@ -118,44 +118,44 @@ class UpdateEInvoiceConfigurationTest extends TestCase
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '30',
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
         $validator = Validator::make($data, $this->request->rules());
-
         $this->assertFalse($validator->passes());
-        $this->assertTrue($validator->errors()->has('payment_means.iban'));
-        $this->assertTrue($validator->errors()->has('payment_means.bic_swift'));
+
+        $this->assertTrue($validator->errors()->has('payment_means.0.bic_swift'));
+
     }
 
     public function testFailsValidationWithInvalidPaymentMeansCode()
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '999',
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
         $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
-        $this->assertTrue($validator->errors()->has('payment_means.code'));
+        $this->assertTrue($validator->errors()->has('payment_means.0.code'));
     }
 
     public function testValidatesPaymentMeansForDirectDebit()
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '49',
                 'payer_bank_account' => '12345678',
                 'bic_swift' => 'DEUTDEFF'
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
@@ -168,11 +168,11 @@ class UpdateEInvoiceConfigurationTest extends TestCase
     {
         $data = [
             'entity' => 'invoice',
-            'payment_means' => [
+            'payment_means' => [[
                 'code' => '15',
                 'account_holder' => 'John Doe Company Limited',
                 'bsb_sort' => '123456'
-            ]
+            ]]
         ];
 
         $this->request->initialize($data);
