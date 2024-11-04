@@ -103,7 +103,7 @@ class StorecoveAdapter
             DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
             AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
         ];
-nlog($p);
+
         $e = new \InvoiceNinja\EInvoice\EInvoice();
         $peppolInvoice = $e->decode('Peppol', $p, 'xml');
 
@@ -345,8 +345,9 @@ nlog($p);
                     !($this->ninja_invoice->client->has_valid_vat_number ?? false) ||
                     $this->ninja_invoice->client->classification == 'individual';
 
-            if (strlen($this->ninja_invoice->company->settings->vat_number) < 2) {
-                // No VAT registration at all - must charge origin country VAT
+                    
+            // B2C, under threshold, no Company VAT Registerd - must charge origin country VAT
+            if ($is_b2c && !$is_over_threshold && strlen($this->ninja_invoice->company->settings->vat_number) < 2) {
                 nlog("no company vat");
                 $this->nexus = $company_country_code;
             } elseif ($is_b2c) {
@@ -361,7 +362,7 @@ nlog($p);
                     $this->nexus = $client_country_code;
                     $this->setupDestinationVAT($client_country_code);
                 } else {
-                    nlog("under threshold origina country");
+                    nlog("under threshold origin country");
                     // B2C under threshold - origin country VAT
                     $this->nexus = $company_country_code;
                 }
@@ -370,11 +371,6 @@ nlog($p);
                 // B2B with valid VAT - origin country
                 $this->nexus = $company_country_code;
             }
-            
-            nlog("nexus = {$this->nexus}");
-            nlog($this->ninja_invoice->company->tax_data->regions->EU->has_sales_above_threshold);
-            nlog("is b2c {$is_b2c}");
-            nlog("is over threshold {$is_over_threshold}");
 
         }
 
