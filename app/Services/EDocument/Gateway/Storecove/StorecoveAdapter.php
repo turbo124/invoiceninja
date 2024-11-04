@@ -208,7 +208,20 @@ nlog($peppolInvoice);
         $this->storecove_invoice->setAllowanceCharges($allowances);
 
         $this->storecove_invoice->setTaxSystem('tax_line_percentages');
-        //set additional identifier if required (ie de => FR with FR vat)
+        
+        //resolve and set the public identifier for the customer
+
+        $accounting_customer_party = $this->storecove_invoice->getAccountingCustomerParty();
+
+        if(strlen($this->ninja_invoice->client->vat_number) > 2)
+        {
+            $id = $this->ninja_invoice->client->vat_number;
+            $scheme = $this->storecove->router->resolveTaxScheme($this->ninja_invoice->client->country->iso_3166_2, $this->ninja_invoice->client->classification ?? 'individual');
+            $pi = new \App\Services\EDocument\Gateway\Storecove\Models\PublicIdentifiers($scheme, $id);
+            $accounting_customer_party->addPublicIdentifiers($pi);
+            $this->storecove_invoice->setAccountingCustomerParty($accounting_customer_party);
+        }
+
         return $this;
     }
 
