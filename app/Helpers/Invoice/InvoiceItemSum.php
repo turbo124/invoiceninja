@@ -400,7 +400,8 @@ class InvoiceItemSum
                 $tax_component += round($this->invoice->custom_surcharge4 * ($tax['percentage'] / 100), 2);
             }
 
-            $this->groupTax($tax['name'], $tax['percentage'], $tax_component);
+            if($tax_component > 0)
+                $this->groupTax($tax['name'], $tax['percentage'], $tax_component);
 
         });
 
