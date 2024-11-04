@@ -5411,6 +5411,7 @@ $lang = array(
     'generate_token' => 'Generate Token',
     'total_credits_amount' => 'Amount of Credits',
     'sales_above_threshold' => 'Sales above threshold',
+    'changing_vat_and_id_number_note' => 'You can\'t change your VAT number or ID number once PEPPOL is set up.',
 );
 
 return $lang;
