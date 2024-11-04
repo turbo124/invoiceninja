@@ -134,6 +134,7 @@ class EInvoicePeppolController extends BaseController
             $settings->vat_number = $request->vat_number ?? $company->settings->vat_number;
             $settings->id_number = $request->id_number ?? $company->settings->id_number;
             $settings->classification = $request->classification ?? $company->settings->classification;
+            $settings->enable_e_invoice = true;
 
             $company->tax_data = $tax_data;
             $company->settings = $settings;
