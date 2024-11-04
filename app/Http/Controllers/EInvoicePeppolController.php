@@ -114,8 +114,9 @@ class EInvoicePeppolController extends BaseController
             ])
             ->post('/api/einvoice/peppol/setup', data: [
                 ...$request->validated(),
-                'classification' => $company->settings->classification,
-                'vat_number' => $company->settings->vat_number,
+                'classification' => $request->classification ?? $company->settings->classification,
+                'vat_number' => $request->vat_number ?? $company->settings->vat_number,
+                'id_number' => $request->id_number ?? $company->settings->id_number,
                 'e_invoicing_token' => $company->account->e_invoicing_token,
             ]);
 
@@ -128,7 +129,11 @@ class EInvoicePeppolController extends BaseController
             $tax_data->acts_as_receiver = $request->acts_as_receiver;
 
             $settings = $company->settings;
+
             $settings->e_invoice_type = 'PEPPOL';
+            $settings->vat_number = $request->vat_number ?? $company->settings->vat_number;
+            $settings->id_number = $request->id_number ?? $company->settings->id_number;
+            $settings->classification = $request->classification ?? $company->settings->classification;
 
             $company->tax_data = $tax_data;
             $company->settings = $settings;
