@@ -52,6 +52,10 @@ class VendorContactController extends Controller
 
     public function edit(VendorContact $vendor_contact)
     {
+
+        if(!$vendor_contact->vendor->country_id)
+            $vendor_contact->vendor->country_id = auth()->guard('vendor')->user()->company->country()->id ?? 840;
+
         return $this->render('vendor_profile.edit', [
             'contact' => $vendor_contact,
             'vendor' => $vendor_contact->vendor,

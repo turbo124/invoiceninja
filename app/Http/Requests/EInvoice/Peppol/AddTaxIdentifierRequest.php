@@ -15,9 +15,6 @@ namespace App\Http\Requests\EInvoice\Peppol;
 use App\Models\Country;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Auth\Access\AuthorizationException;
-use App\Rules\EInvoice\Peppol\SupportsReceiverIdentifier;
-use App\Services\EDocument\Standards\Peppol\ReceiverIdentifier;
 
 class AddTaxIdentifierRequest extends FormRequest
 {
@@ -53,9 +50,7 @@ class AddTaxIdentifierRequest extends FormRequest
 
     public function authorize(): bool
     {
-        /**
-         * @var \App\Models\User
-         */
+        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         if (app()->isLocal()) {

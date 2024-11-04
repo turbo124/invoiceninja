@@ -93,7 +93,7 @@ class BaseRepository
      */
     public function delete($entity)
     {
-        if ($entity->is_deleted) {
+        if (!$entity || $entity->is_deleted) {
             return;
         }
 

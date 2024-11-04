@@ -97,6 +97,38 @@ class ClientGatewayTokenApiTest extends TestCase
         $this->cg->save();
     }
 
+
+    public function testCompanyGatewaySettableOnToken()
+    {
+                
+        $data = [
+            'client_id' => $this->client->hashed_id,
+            'company_gateway_id' => $this->cg->hashed_id,
+            'gateway_type_id' => GatewayType::CREDIT_CARD,
+            'token' => 'tokey',
+            'gateway_customer_reference' => 'reffy',
+            'meta' => '{}',
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/client_gateway_tokens', $data);
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $t1 = $arr['data']['id'];
+
+        $this->assertEquals($data['company_gateway_id'], $arr['data']['company_gateway_id']);
+        $this->assertEquals($data['gateway_type_id'], $arr['data']['gateway_type_id']);
+        $this->assertEquals('tokey', $arr['data']['token']);
+        $this->assertEquals('reffy', $arr['data']['gateway_customer_reference']);
+
+        $this->assertNotNull($arr['data']['token']);
+
+    }
+
     public function testClientGatewaySetDefault()
     {
         $data = [

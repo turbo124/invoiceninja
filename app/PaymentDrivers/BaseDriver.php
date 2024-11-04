@@ -329,6 +329,9 @@ class BaseDriver extends AbstractPaymentDriver
         $client_contact = $this->getContact();
         $client_contact_id = $client_contact ? $client_contact->id : $this->client->contacts()->first()->id;
 
+        if(isset($data['idempotency_key']))
+            $payment->idempotency_key = $data['idempotency_key'];
+
         $payment->amount = $data['amount'];
         $payment->type_id = $data['payment_type'];
         $payment->transaction_reference = $data['transaction_reference'];

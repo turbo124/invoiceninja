@@ -9,7 +9,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-
         if(Ninja::isSelfHost())
         {        
             Schema::table('companies', function (Blueprint $table) {

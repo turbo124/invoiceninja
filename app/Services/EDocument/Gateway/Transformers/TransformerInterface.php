@@ -9,17 +9,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+namespace App\Services\EDocument\Gateway\Transformers;
 
-class EIdentifiers
+interface TransformerInterface
 {
-    public string $scheme;
-    public string $id;
+    public function transform(mixed $invoice);
 
-    public function __construct(string $scheme, string $id)
-    {
-        $this->scheme = $scheme;
-        $this->id = $id;
-    }
+    public function getInvoice();
+
+    public function toJson();
 }

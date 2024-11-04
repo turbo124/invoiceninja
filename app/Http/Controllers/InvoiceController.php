@@ -815,6 +815,7 @@ class InvoiceController extends BaseController
      */
     public function downloadPdf($invitation_key)
     {
+
         $invitation = $this->invoice_repo->getInvitationByKey($invitation_key);
 
         if (! $invitation) {
@@ -834,10 +835,11 @@ class InvoiceController extends BaseController
         if (request()->input('inline') == 'true') {
             $headers = array_merge($headers, ['Content-Disposition' => 'inline']);
         }
-
+       
         return response()->streamDownload(function () use ($file) {
             echo $file;
         }, $file_name, $headers);
+
     }
 
     /**

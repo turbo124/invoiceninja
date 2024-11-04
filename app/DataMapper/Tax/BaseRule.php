@@ -163,6 +163,9 @@ class BaseRule implements RuleInterface
 
         $this->tax_data = new Response($this->invoice->tax_data);
 
+        if($this->invoice instanceof \App\Models\RecurringInvoice)
+            $this->tax_data = new Response($this->client->tax_data);
+
         return $this;
     }
 
