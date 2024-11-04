@@ -317,7 +317,6 @@ class BaseRule implements RuleInterface
         }
 
         if(isset($this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion})) {
-            
             if ($this->client_region === 'EU') {
                 $company_country_code = $this->client->company->country()->iso_3166_2;
                 $client_country_code = $this->client->country->iso_3166_2;
@@ -330,7 +329,7 @@ class BaseRule implements RuleInterface
                         $this->client->classification == 'individual';
 
                 // Use destination VAT only for B2C transactions over threshold
-                if ($is_b2c && $is_over_threshold && strlen($this->client->company->settings->vat_number) >= 2) {
+                if ($is_b2c && $is_over_threshold) {
                     $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_rate;
                     $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_name;
                 }
