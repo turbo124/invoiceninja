@@ -74,12 +74,18 @@ class Storecove
      */
     public function build($model): mixed
     {
-        return 
+        // return 
         $this->adapter
              ->transform($model)
              ->decorate()
-             ->validate()
-             ->getDocument();
+             ->validate();
+
+        return $this;
+    }
+
+    public function getResult(): array
+    {
+        return $this->adapter->getDocument();
     }
 
     /**

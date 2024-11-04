@@ -58,7 +58,7 @@ class SendEDocument implements ShouldQueue
         $p->run();
         $identifiers = $p->gateway->mutator->setClientRoutingCode()->getStorecoveMeta();
 
-        $result = $storecove->build($model);
+        $result = $storecove->build($model)->getResult();
 
         if (count($result['errors']) > 0) {
             nlog($result);

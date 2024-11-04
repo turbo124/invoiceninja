@@ -117,6 +117,11 @@ class StorecoveAdapter
 
     }
 
+    public function getNexus(): string
+    {
+        return $this->nexus;
+    }
+
     public function decorate(): self
     {
         //set all taxmap countries - resolve the taxing country
@@ -143,7 +148,8 @@ class StorecoveAdapter
                     if($allowance->reason == ctrans('texts.discount'))
                         $allowance->amount_excluding_tax = $allowance->amount_excluding_tax * -1;
 
-                    foreach($allowance->getTaxesDutiesFees as &$tax)
+
+                    foreach($allowance->getTaxesDutiesFees() ?? [] as &$tax)
                     {
                         
                         if (property_exists($tax, 'category')) {
@@ -310,7 +316,7 @@ class StorecoveAdapter
 
     private function buildNexus(): self
     {
-
+        nlog("building nexus");
         //Calculate nexus
         $company_country_code = $this->ninja_invoice->company->country()->iso_3166_2;
         $client_country_code = $this->ninja_invoice->client->country->iso_3166_2;
@@ -346,6 +352,7 @@ class StorecoveAdapter
                 if ($is_over_threshold) {
                     // B2C over threshold - need destination VAT number
                     if (!isset($this->ninja_invoice->company->tax_data->regions->EU->subregions->{$client_country_code}->vat_number)) {
+                        $this->nexus = $client_country_code;
                         $this->addError("Tax Nexus is client country ({$client_country_code}) - however VAT number not present for this region. Document not sent!");
                         return $this;
                     }
