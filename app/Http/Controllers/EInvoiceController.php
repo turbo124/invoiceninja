@@ -50,14 +50,13 @@ class EInvoiceController extends BaseController
 
     public function configurations(UpdateEInvoiceConfiguration $request)
     {
-     
         $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
         $pm = new PaymentMeans();
 
         $pmc = new PaymentMeansCode();
         $pmc->value = $request->input('payment_means.code', null);
 
-        if($this->input('payment_means.code') == '48')
+        if($request->input('payment_means.code') == '48')
         {
             $ctc = new CardTypeCode();
             $ctc->value = $request->input('payment_means.card_type', null);
@@ -67,7 +66,7 @@ class EInvoiceController extends BaseController
             $pm->CardAccount = $card_account;
         }
 
-        if($this->input('payment_means.iban'))
+        if($request->input('payment_means.iban'))
         {
             $fib = new FinancialInstitutionBranch();
             $bic_id = new ID();
