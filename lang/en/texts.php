@@ -5416,6 +5416,25 @@ $lang = array(
     'card_type_help' => 'ie. VISA, AMEX',
     'card_number_help' => 'last 4 digits only',
     'card_holder' => 'Card Holder Name',
+    'tokenize' => 'Tokenize',
+    'tokenize_help' => 'Tokenize payment method for future use.',
+    'credit_card_stripe_help' => 'Accept credit card payments using Stripe.',
+    'bank_transfer_stripe_help' => 'ACH direct debit. USD payments, instant verification available.',
+    'alipay_stripe_help' => 'Alipay allows users in China to pay securely using their mobile wallets.',
+    'sofort_stripe_help' => 'Sofort is a popular European payment method that enables bank transfers in real-time, primarily used in Germany and Austria.',
+    'apple_pay_stripe_help' => 'Apple/Google Pay for users with Apple/Android devices, using saved card information for easy checkout.',
+    'sepa_stripe_help' => 'SEPA Direct Debit (Single Euro Payments Area).',
+    'bancontact_stripe_help' => 'Bancontact is a widely used payment method in Belgium.',
+    'ideal_stripe_help' => 'iDEAL is the most popular payment method in the Netherlands.',
+    'giropay_stripe_help' => 'Giropay is a German payment method that facilitates secure and immediate online bank transfers.',
+    'przelewy24_stripe_help' => 'Przelewy24 is a common payment method in Poland.',
+    'direct_debit_stripe_help' => 'Stripe Bank Transfers using Stripes virtual bank accounts, available in Japan, UK, USA, Europe and Mexico. Ensure this is enabled in Stripe!',
+    'eps_stripe_help' => 'EPS is an Austrian online payment system.',
+    'acss_stripe_help' => 'ACSS (Automated Clearing Settlement System) Direct Debit for Canadian bank accounts.',
+    'becs_stripe_help' => 'BECS Direct Debit for Australian bank accounts.',
+    'klarna_stripe_help' => 'Klarna buy now and pay later in installments or on a set schedule.',
+    'bacs_stripe_help' => 'BACS Direct Debit for UK bank accounts, commonly used for subscription billing.',
+    'fpx_stripe_help' => 'FPX is a popular online payment method in Malaysia.'
 );
 
 return $lang;
