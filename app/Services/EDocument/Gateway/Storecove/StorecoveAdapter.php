@@ -1,4 +1,13 @@
 <?php
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
 namespace App\Services\EDocument\Gateway\Storecove;
 
@@ -98,13 +107,10 @@ class StorecoveAdapter
 
         $e = new \InvoiceNinja\EInvoice\EInvoice();
         $peppolInvoice = $e->decode('Peppol', $p, 'xml');
-nlog($peppolInvoice);
 
         $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
         $peppolInvoice = $e->encode($peppolInvoice, 'json');
         $this->storecove_invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
-
-        nlog($this->storecove_invoice);
 
         $this->buildNexus();
        
@@ -210,7 +216,6 @@ nlog($peppolInvoice);
         $this->storecove_invoice->setTaxSystem('tax_line_percentages');
         
         //resolve and set the public identifier for the customer
-
         $accounting_customer_party = $this->storecove_invoice->getAccountingCustomerParty();
 
         if(strlen($this->ninja_invoice->client->vat_number) > 2)

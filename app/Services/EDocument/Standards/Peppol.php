@@ -169,8 +169,8 @@ class Peppol extends AbstractService
      */
     public function run(): self
     {
-        $this->getJurisdiction();
-        $this->getAllUsedTaxes();
+        $this->getJurisdiction(); //Sets the nexus object into the Peppol document.
+        $this->getAllUsedTaxes(); //Maps all used line item taxes
 
         /** Invoice Level Props */
         $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
@@ -226,11 +226,11 @@ class Peppol extends AbstractService
                                 ->getPeppol();
                                 
         //** @todo double check this logic, this will only ever write the doc once */
-        if(is_null($this->invoice->backup))
-        {
-            $this->invoice->e_invoice = $this->toObject();
-            $this->invoice->save();
-        }
+        // if(is_null($this->invoice->backup))
+        // {
+        //     $this->invoice->e_invoice = $this->toObject();
+        //     $this->invoice->save();
+        // }
 
         return $this;
 
