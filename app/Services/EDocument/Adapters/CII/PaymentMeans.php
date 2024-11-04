@@ -363,7 +363,9 @@ class PaymentMeans implements PaymentMeansInterface
     ];
 
     public static array $payment_means_requirements_codes = [
-        '1' => [], // Instrument not defined
+        '1' => [
+            'bic_swift',
+        ], // Instrument not defined
         '2' => [
             'iban',
             'bic_swift'
