@@ -96,7 +96,7 @@ class TaxRuleConsistencyTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        // nlog($invoice->withoutRelations()->toArray());
+        nlog($invoice->withoutRelations()->toArray());
 
         $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
 

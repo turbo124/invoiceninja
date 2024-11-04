@@ -58,11 +58,11 @@ class InvoiceItemFactory
 
         for ($x = 0; $x < $items; $x++) {
             $item = self::create();
-            $item->quantity = $faker->numberBetween(1, 10);
+            $item->quantity = rand(1, 10);
             $item->cost = $faker->randomFloat(2, 1, 1000);
             $item->line_total = $item->quantity * $item->cost;
             $item->is_amount_discount = true;
-            $item->discount = $faker->numberBetween(1, 10);
+            $item->discount = rand(1, 10);
             $item->notes = str_replace(['"',"'"], ['',""], $faker->realText(20));
             $item->product_key = $faker->word();
             // $item->custom_value1 = $faker->realText(10);
@@ -78,11 +78,11 @@ class InvoiceItemFactory
 
 
             $item = self::create();
-            $item->quantity = $faker->numberBetween(1, 10);
+            $item->quantity = rand(1, 10);
             $item->cost = $faker->randomFloat(2, 1, 1000);
             $item->line_total = $item->quantity * $item->cost;
             $item->is_amount_discount = true;
-            $item->discount = $faker->numberBetween(1, 10);
+            $item->discount = rand(1, 10);
             $item->notes = str_replace(['"',"'"], ['',""], $faker->realText(20));
             $item->product_key = $faker->word();
             // $item->custom_value1 = $faker->realText(10);
@@ -112,7 +112,7 @@ class InvoiceItemFactory
 
         for ($x = 0; $x < $items; $x++) {
             $item = self::create();
-            $item->quantity = $faker->numberBetween(-1, -10);
+            $item->quantity = rand(-1, -10);
             $item->cost = $faker->randomFloat(2, -1, -1000);
             $item->line_total = $item->quantity * $item->cost;
             $item->is_amount_discount = true;

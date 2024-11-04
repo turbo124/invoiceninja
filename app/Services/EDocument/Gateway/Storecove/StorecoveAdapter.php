@@ -103,7 +103,7 @@ class StorecoveAdapter
             DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
             AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
         ];
-
+nlog($p);
         $e = new \InvoiceNinja\EInvoice\EInvoice();
         $peppolInvoice = $e->decode('Peppol', $p, 'xml');
 
@@ -208,6 +208,7 @@ class StorecoveAdapter
 
             
             if ($allowance->reason == ctrans('texts.discount')) {
+                nlog($allowance->amount_excluding_tax);
                 $allowance->amount_excluding_tax = $allowance->amount_excluding_tax * -1;
             }
 
@@ -331,9 +332,9 @@ class StorecoveAdapter
             //NON-EU Sale
             nlog("non eu");
             $this->nexus = $company_country_code;
-        } elseif (in_array($company_country_code, $eu_countries) && in_array($client_country_code, $eu_countries)) {
+        } elseif (in_array($client_country_code, $eu_countries)) {
             
-            //EU Sale
+            //EU Sale where Company country != Client Country
                     
             // First, determine if we're over threshold
             $is_over_threshold = isset($this->ninja_invoice->company->tax_data->regions->EU->has_sales_above_threshold) &&
