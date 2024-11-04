@@ -51,4 +51,10 @@ class AccountingSupplierParty
 		$this->public_identifiers = $public_identifiers;
 		return $this;
 	}
+
+	public function addPublicIdentifiers($public_identifier): self
+	{
+		$this->public_identifiers[] = $public_identifier;
+		return $this;
+	}
 }

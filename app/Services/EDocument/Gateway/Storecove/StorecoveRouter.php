@@ -73,7 +73,7 @@ class StorecoveRouter
         "MK" => ["B+G","","MK:VAT","MK:VAT"],
         "MT" => ["B+G","","MT:VAT","MT:VAT"],
         "NL" => ["G","NL:OINO",false,"NL:OINO"],
-        "NL" => ["B","NL:KVK","NL:VAT","NL:KVK or NL:VAT"],
+        "NL" => ["B","NL:KVK","NL:VAT","NL:VAT"],
         "PL" => ["G+B","","PL:VAT","PL:VAT"],
         "PT" => ["G+B","","PT:VAT","PT:VAT"],
         "RO" => ["G+B","","RO:VAT","RO:VAT"],

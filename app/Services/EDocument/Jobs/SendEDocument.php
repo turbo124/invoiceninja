@@ -48,9 +48,12 @@ class SendEDocument implements ShouldQueue
     public function handle(Storecove $storecove)
     {
         MultiDB::setDB($this->db);
+    
+        nlog("trying");
 
         $model = $this->entity::find($this->id);
 
+        /** Concrete implementation current linked to Storecove only */
         $p = new Peppol($model);
         $p->run();
         $identifiers = $p->gateway->mutator->setClientRoutingCode()->getStorecoveMeta();
@@ -58,6 +61,7 @@ class SendEDocument implements ShouldQueue
         $result = $storecove->build($model);
 
         if (count($result['errors']) > 0) {
+            nlog($result);
             return $result['errors'];
         }
         
@@ -70,12 +74,10 @@ class SendEDocument implements ShouldQueue
             ],
             'tenant_id' => $model->company->company_key,
             'routing' => $identifiers['routing'],
-            // 'e_invoicing_token' => $model->company->e_invoicing_token,
-            // include whitelabel key.
         ];
+        /** Concrete implementation current linked to Storecove only */
 
-        //temp
-
+        //@testing only
         $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
         $r = $sc->sendJsonDocument($payload);
 

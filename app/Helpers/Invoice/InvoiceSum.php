@@ -240,14 +240,10 @@ class InvoiceSum
 
     public function getRecurringInvoice()
     {
-        // $this->invoice->amount = $this->formatValue($this->getTotal(), $this->precision);
-        // $this->invoice->total_taxes = $this->getTotalTaxes();
 
         $this->setCalculatedAttributes();
         $this->invoice->balance = $this->invoice->amount;
         $this->invoice->saveQuietly();
-
-        // $this->invoice->saveQuietly();
 
         return $this->invoice;
     }
@@ -425,5 +421,15 @@ class InvoiceSum
         $this->build();
 
         return $this;
+    }
+
+    public function getNetSubtotal()
+    {
+        return $this->getSubTotal() - $this->getTotalDiscount();
+    }
+
+    public function getSubtotalWithSurcharges()
+    {
+        return $this->getSubTotal() + $this->getTotalSurcharges();
     }
 }

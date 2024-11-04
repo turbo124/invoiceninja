@@ -38,12 +38,12 @@ class InvoiceLines
 
     #[SerializedPath('[cac:AllowanceCharge]')]
     /** @var AllowanceCharges[] */ //todo
-    public ?array $charges;
+    public ?array $allowance_charges;
 
     #[SerializedPath('[cbc:LineExtensionAmount][#]')]
     public ?float $amount_excluding_vat;
 
-    #[SerializedPath('[cbc:TaxExclusiveAmount][#]')]
+    #[SerializedPath('[cac:Price][cbc:PriceAmount][value]')]
     public ?float $amount_excluding_tax;
 
     #[SerializedPath('[cbc:TaxInclusiveAmount][#]')]
@@ -51,7 +51,7 @@ class InvoiceLines
 
     #[SerializedPath('[cac:Item][cac:ClassifiedTaxCategory]')]
     /** @var TaxesDutiesFees[] */
-    public array $taxes_duties_fees;    
+    public ?array $taxes_duties_fees = [];    
 
     #[SerializedPath('[cbc:AccountingCost]')]
     public ?string $accounting_cost;
@@ -83,7 +83,7 @@ class InvoiceLines
     public ?string $note;
 
 	/**
-	 * @param AllowanceCharges[] $charges
+	 * @param AllowanceCharges[] $allowance_charges
 	 * @param TaxesDutiesFees[] $taxes_duties_fees
 	 * @param References[] $references
 	 * @param AdditionalItemProperties[] $additional_item_properties
@@ -98,7 +98,7 @@ class InvoiceLines
 		?float $quantity,
 		?float $base_quantity,
 		?string $quantity_unit_code,
-		?array $charges,
+		?array $allowance_charges,
 		?float $amount_excluding_vat,
 		?float $amount_excluding_tax,
 		?float $amount_including_tax,
@@ -122,7 +122,7 @@ class InvoiceLines
 		$this->quantity = $quantity;
 		$this->base_quantity = $base_quantity;
 		$this->quantity_unit_code = $quantity_unit_code;
-		$this->charges = $charges;
+		$this->allowance_charges = $allowance_charges;
 		$this->amount_excluding_vat = $amount_excluding_vat;
 		$this->amount_excluding_tax = $amount_excluding_tax;
 		$this->amount_including_tax = $amount_including_tax;
@@ -188,7 +188,7 @@ class InvoiceLines
 	 */
 	public function getAllowanceCharges(): ?array
 	{
-		return $this->charges;
+		return $this->allowance_charges;
 	}
 
 	public function getAmountExcludingVat(): ?float
@@ -320,11 +320,11 @@ class InvoiceLines
 	}
 
 	/**
-	 * @param AllowanceCharges[] $charges
+	 * @param AllowanceCharges[] $allowance_charges
 	 */
-	public function setAllowanceCharges(?array $charges): self
+	public function setAllowanceCharges(?array $allowance_charges): self
 	{
-		$this->charges = $charges;
+		$this->allowance_charges = $allowance_charges;
 		return $this;
 	}
 

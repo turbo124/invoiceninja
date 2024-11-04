@@ -401,6 +401,11 @@ class InvoiceSumInclusive
         return $this->getTotalTaxes();
     }
 
+    public function getNetSubtotal()
+    {
+        return $this->getSubTotal() - $this->getTotalDiscount();
+    }
+
     public function purgeTaxes()
     {
         return $this;

@@ -149,6 +149,10 @@ class Peppol extends AbstractService
 
     private array $tax_map = [];
 
+    private float $allowance_total = 0;
+
+    private $globalTaxCategories;
+
     public function __construct(public Invoice $invoice)
     {
         $this->company = $invoice->company;
@@ -166,6 +170,7 @@ class Peppol extends AbstractService
     public function run(): self
     {
         $this->getJurisdiction();
+        $this->getAllUsedTaxes();
 
         /** Invoice Level Props */
         $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
@@ -208,8 +213,8 @@ class Peppol extends AbstractService
         $this->p_invoice->AccountingSupplierParty = $this->getAccountingSupplierParty();
         $this->p_invoice->AccountingCustomerParty = $this->getAccountingCustomerParty();
         $this->p_invoice->InvoiceLine = $this->getInvoiceLines();
-        $this->p_invoice->LegalMonetaryTotal = $this->getLegalMonetaryTotal();
         $this->p_invoice->AllowanceCharge = $this->getAllowanceCharges();
+        $this->p_invoice->LegalMonetaryTotal = $this->getLegalMonetaryTotal();
 
         $this->setOrderReference()->setTaxBreakdown();
 
@@ -430,18 +435,22 @@ class Peppol extends AbstractService
             $allowanceCharge->ChargeIndicator = 'false'; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)$this->calc->getTotalDiscount();
-            $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
-            $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+            $allowanceCharge->Amount->amount = (string)number_format($this->calc->getTotalDiscount(),2);
 
             // Add percentage if available
             if ($this->invoice->discount > 0 && !$this->invoice->is_amount_discount) {
+                        
+                $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+                $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+                $allowanceCharge->BaseAmount->amount = (string) number_format($this->calc->getSubtotalWithSurcharges(), 2);
+
                 $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
-                $mfn->value = (string) ($this->invoice->discount / 100);
+                $mfn->value = (string)number_format(round(($this->invoice->discount), 2), 2);  // Format to always show 2 decimals
                 $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
             }
-
+            
+            $allowanceCharge->TaxCategory = $this->globalTaxCategories;
+            $allowanceCharge->AllowanceChargeReason = ctrans('texts.discount');
             $allowances[] = $allowanceCharge;
         }
 
@@ -450,14 +459,17 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge1;
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
 
+            $this->calculateTaxMap($this->invoice->custom_surcharge1);
+
+            $allowanceCharge->TaxCategory = $this->globalTaxCategories;
+            $allowanceCharge->AllowanceChargeReason = ctrans('texts.surcharge');
             $allowances[] = $allowanceCharge;
 
         }
@@ -466,14 +478,18 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge2;
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
+            
+            
+            $this->calculateTaxMap($this->invoice->custom_surcharge2);
 
+            $allowanceCharge->TaxCategory = $this->globalTaxCategories;
+            $allowanceCharge->AllowanceChargeReason = ctrans('texts.surcharge');
             $allowances[] = $allowanceCharge;
 
         }
@@ -482,14 +498,17 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge3;
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
+            
+            $this->calculateTaxMap($this->invoice->custom_surcharge3);
 
+            $allowanceCharge->TaxCategory = $this->globalTaxCategories;
+            $allowanceCharge->AllowanceChargeReason = ctrans('texts.surcharge');
             $allowances[] = $allowanceCharge;
 
         }
@@ -498,14 +517,17 @@ class Peppol extends AbstractService
 
             // Add Allowance Charge to Price
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            // $allowanceCharge->ChargeIndicator = true; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge4;
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubTotal();
+            $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
 
+            $this->calculateTaxMap($this->invoice->custom_surcharge4);
+
+            $allowanceCharge->TaxCategory = $this->globalTaxCategories;
+            $allowanceCharge->AllowanceChargeReason = ctrans('texts.surcharge');
             $allowances[] = $allowanceCharge;
 
         }
@@ -527,7 +549,7 @@ class Peppol extends AbstractService
 
         $lea = new LineExtensionAmount();
         $lea->currencyID = $this->invoice->client->currency()->code;
-        $lea->amount = $this->invoice->uses_inclusive_taxes ? round($this->invoice->amount - $this->invoice->total_taxes, 2) : $taxable;
+        $lea->amount = $this->invoice->uses_inclusive_taxes ? round($this->invoice->amount - $this->invoice->total_taxes, 2) : $this->calc->getSubTotal();
         $lmt->LineExtensionAmount = $lea;
 
         $tea = new TaxExclusiveAmount();
@@ -544,6 +566,11 @@ class Peppol extends AbstractService
         $pa->currencyID = $this->invoice->client->currency()->code;
         $pa->amount = $this->invoice->amount;
         $lmt->PayableAmount = $pa;
+
+        $am = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\AllowanceTotalAmount();
+        $am->currencyID = $this->invoice->client->currency()->code;
+        $am->amount = (string)$this->calc->getTotalDiscount();
+        $lmt->AllowanceTotalAmount = $am;
 
         return $lmt;
     }
@@ -576,6 +603,8 @@ class Peppol extends AbstractService
                 break;
             case Product::PRODUCT_TYPE_REVERSE_TAX:
                 $tax_type = 'AE';
+            case Product::PRODUCT_INTRA_COMMUNITY:
+                $tax_type = 'K';
                 break;
         }
 
@@ -616,32 +645,43 @@ class Peppol extends AbstractService
         $lines = [];
 
         foreach($this->invoice->line_items as $key => $item) {
+            
+            $base_price_amount = (string)$this->calculateAdjustedBaseAmount($item);
 
             $_item = new Item();
             $_item->Name = $item->product_key;
             $_item->Description = $item->notes;
 
-            if($item->tax_rate1 > 0)
+            
+            $ctc = new ClassifiedTaxCategory();
+            $ctc->ID = new ID();
+            $ctc->ID->value = $this->getTaxType($item->tax_id);
+            $ctc->Percent = (string)$item->tax_rate1;
+
+            $ts = new TaxScheme();
+            $id = new ID();
+            $id->value = $this->standardizeTaxSchemeId($item->tax_name1);
+            $ts->ID = $id;
+            $ctc->TaxScheme = $ts;
+
+            if(floatval($item->tax_rate1) === 0.0)
             {
-                $ctc = new ClassifiedTaxCategory();
-                $ctc->ID = new ID();
-                $ctc->ID->value = $this->getTaxType($item->tax_id);
-                $ctc->Percent = $item->tax_rate1;
+                $ctc->ID->value = 'K';
 
-                $ts = new TaxScheme();
-                $id = new ID();
-                $id->value = $this->standardizeTaxSchemeId($item->tax_name1);
-                $ts->ID = $id;
-                $ctc->TaxScheme = $ts;
-
-                $_item->ClassifiedTaxCategory[] = $ctc;
+                $terc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\TaxExemptionReasonCode();
+                $terc->value = 'VATEX-EU-IC';
+                $ctc->TaxExemptionReasonCode = $terc;
+                $ctc->TaxExemptionReason = 'Intra-Community supply';
             }
+
+            $_item->ClassifiedTaxCategory[] = $ctc;
+        
 
             if ($item->tax_rate2 > 0) {
                 $ctc = new ClassifiedTaxCategory();
                 $ctc->ID = new ID();
                 $ctc->ID->value = $this->getTaxType($item->tax_id);
-                $ctc->Percent = $item->tax_rate2;
+                $ctc->Percent = (string)$item->tax_rate2;
                                 
                 $ts = new TaxScheme();
                 $id = new ID();
@@ -656,7 +696,7 @@ class Peppol extends AbstractService
                 $ctc = new ClassifiedTaxCategory();
                 $ctc->ID = new ID();
                 $ctc->ID->value = $this->getTaxType($item->tax_id);
-                $ctc->Percent = $item->tax_rate3;
+                $ctc->Percent = (string)$item->tax_rate3;
 
                 $ts = new TaxScheme();
                 $id = new ID();
@@ -689,11 +729,12 @@ class Peppol extends AbstractService
 
             // Handle Price and Discounts
             if ($item->discount > 0) {
+                
                 // Base Price (before discount)
                 $basePrice = new Price();
                 $basePriceAmount = new PriceAmount();
                 $basePriceAmount->currencyID = $this->invoice->client->currency()->code;
-                $basePriceAmount->amount = (string)($item->cost - $this->calculateDiscountAmount($item));
+                $basePriceAmount->amount = (string)$item->cost;
                 $basePrice->PriceAmount = $basePriceAmount;
 
                 // Add Allowance Charge to Price
@@ -701,29 +742,35 @@ class Peppol extends AbstractService
                 $allowanceCharge->ChargeIndicator = 'false'; // false = discount
                 $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
                 $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->Amount->amount = (string)$this->calculateDiscountAmount($item);
-                $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
-                $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->BaseAmount->amount = (string)$item->cost;
+                $allowanceCharge->Amount->amount = (string)number_format($this->calculateTotalItemDiscountAmount($item),2);
+                $this->allowance_total += $this->calculateTotalItemDiscountAmount($item);
+
 
                 // Add percentage if available
                 if ($item->discount > 0 && !$item->is_amount_discount) {
+
+                    $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+                    $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+                    $allowanceCharge->BaseAmount->amount = (string)round(($item->cost * $item->quantity),2);
+
                     $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
-                    $mfn->value = (string) ($item->discount / 100);
+                    $mfn->value = (string) round($item->discount,2);
                     $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
                 }
+                
+                // }
+                // Required reason
+                $allowanceCharge->AllowanceChargeReason = ctrans('texts.discount');
 
-                $basePrice->AllowanceCharge[] = $allowanceCharge;
                 $line->Price = $basePrice;
+                $line->AllowanceCharge[] = $allowanceCharge;
 
             } else {
                 // No discount case
                 $price = new Price();
                 $pa = new PriceAmount();
                 $pa->currencyID = $this->invoice->client->currency()->code;
-                $pa->amount = (string) ($this->costWithDiscount($item) - ($this->invoice->uses_inclusive_taxes
-                    ? ($this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) / $item->quantity)
-                    : 0));
+                $pa->amount = (string)$item->cost;
                 $price->PriceAmount = $pa;
                 $line->Price = $price;
             }
@@ -735,47 +782,127 @@ class Peppol extends AbstractService
     }
 
     
-    /**
-     * calculateDiscountAmount
-     * 
-     * Helper method to determine the discount amount to be used.
-     * 
-     * @param  mixed $item
-     * @return float
-     */
-    private function calculateDiscountAmount($item): float
-    {
-        if ($item->is_amount_discount) {
-            return $item->discount / $item->quantity; // Per unit discount amount
-        }
+    // /**
+    //  * calculateDiscountAmount
+    //  * 
+    //  * Helper method to determine the discount amount to be used.
+    //  * 
+    //  * @param  mixed $item
+    //  * @return float
+    //  */
+    // private function calculateDiscountAmount($item): float
+    // {
+    //     if ($item->is_amount_discount) {
+    //         return $item->discount / $item->quantity; // Per unit discount amount
+    //     }
         
-        return ($item->cost / $item->quantity) * ($item->discount / 100);
-    }
+    //     return ($item->cost / $item->quantity) * ($item->discount / 100);
+    // }
 
-    
-    /**
-     * costWithDiscount
-     *
-     * Helper method to determine the cost INCLUDING discount
-     * 
-     * @param  mixed $item
-     * @return float
-     */
-    private function costWithDiscount($item): float
+    private function calculateTotalItemDiscountAmount($item):float
     {
-        $cost = $item->cost;
-
-        if ($item->discount != 0) {
-            if ($this->invoice->is_amount_discount) {
-                $cost -= $item->discount / $item->quantity;
-            } else {
-                $cost -= $cost * $item->discount / 100;
-            }
+                
+        if ($item->is_amount_discount) {
+            return $item->discount;
         }
 
-        return $cost;
+        return ($item->cost) * ($item->discount / 100);
+
+    }
+
+    // /**
+    //  * costWithDiscount
+    //  *
+    //  * Helper method to determine the cost INCLUDING discount
+    //  * 
+    //  * @param  mixed $item
+    //  * @return float
+    //  */
+    // private function costWithDiscount($item): float
+    // {
+    //     $cost = $item->cost;
+
+    //     if ($item->discount != 0) {
+    //         if ($this->invoice->is_amount_discount) {
+    //             $cost -= $item->discount / $item->quantity;
+    //         } else {
+    //             $cost -= $cost * $item->discount / 100;
+    //         }
+    //     }
+
+    //     return $cost;
+    // }
+        
+    /**
+     * calculateTaxMap
+     *
+     * Generates a standard tax_map entry for a given $amount
+     * 
+     * Iterates through all of the globalTaxCategories found in the document
+     * 
+     * @param  float $amount
+     * @return self
+     */
+    private function calculateTaxMap($amount): self
+    {
+
+        foreach($this->globalTaxCategories as $tc)
+        {
+
+            $this->tax_map[] = [
+                'taxableAmount' => $amount,
+                'taxAmount' => $amount * ($tc->Percent/100),
+                'percentage' => $tc->Percent,
+            ];
+
+        }
+
+        return $this;
     }
     
+    /**
+     * getAllUsedTaxes
+     *
+     * Build a full tax category property based on all
+     * of the item taxes that have been applied to the invoice.
+     * 
+     * @return self
+     */
+    private function getAllUsedTaxes(): self
+    {
+        $this->globalTaxCategories = [];
+
+        collect($this->invoice->line_items)
+            ->flatMap(function ($item) {
+                return collect([1, 2, 3])
+                    ->map(fn ($i) => [
+                        'name' => $item->{"tax_name{$i}"} ?? '',
+                        'percentage' => $item->{"tax_rate{$i}"} ?? 0,
+                        'scheme' => $this->getTaxType($item->tax_id),
+                    ])
+                    ->filter(fn ($tax) => strlen($tax['name']) > 1);
+            })
+            ->unique(fn ($tax) => $tax['percentage'] . '_' . $tax['name'])
+            ->values()
+            ->each(function ($tax){
+                
+                $taxCategory = new \InvoiceNinja\EInvoice\Models\Peppol\TaxCategoryType\TaxCategory();
+                $taxCategory->ID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+                $taxCategory->ID->value = $tax['scheme'];
+                $taxCategory->Percent = (string)$tax['percentage'];
+                $taxScheme = new \InvoiceNinja\EInvoice\Models\Peppol\TaxSchemeType\TaxScheme();
+                $taxScheme->ID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+                $taxScheme->ID->value = $this->standardizeTaxSchemeId($tax['name']);
+                $taxCategory->TaxScheme = $taxScheme;
+
+                $this->globalTaxCategories[] = $taxCategory;
+                
+            });
+
+        
+        return $this;
+
+    }
     /**
      * getItemTaxes
      *
@@ -788,18 +915,20 @@ class Peppol extends AbstractService
     private function getItemTaxes(object $item): array
     {
         $item_taxes = [];
+        
+        $adjusted_base_amount = $this->calculateAdjustedBaseAmount($item);
 
-        if(strlen($item->tax_name1 ?? '') > 1) {
+        // if(strlen($item->tax_name1 ?? '') > 1) {
 
             $tax_amount = new TaxAmount();
             $tax_amount->currencyID = $this->invoice->client->currency()->code;
-            $tax_amount->amount = $this->invoice->uses_inclusive_taxes ? $this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) : $this->calcAmountLineTax($item->tax_rate1, $item->line_total);
+            $tax_amount->amount = $this->invoice->uses_inclusive_taxes ? $this->calcInclusiveLineTax($item->tax_rate1, $adjusted_base_amount) : $this->calcAmountLineTax($item->tax_rate1, $adjusted_base_amount);
             $tax_subtotal = new TaxSubtotal();
             $tax_subtotal->TaxAmount = $tax_amount;
 
             $taxable_amount = new TaxableAmount();
             $taxable_amount->currencyID = $this->invoice->client->currency()->code;
-            $taxable_amount->amount = $this->invoice->uses_inclusive_taxes ? $item->line_total - $tax_amount->amount : $item->line_total;
+            $taxable_amount->amount = $this->invoice->uses_inclusive_taxes ? $adjusted_base_amount - $tax_amount->amount : $adjusted_base_amount;
             $tax_subtotal->TaxableAmount = $taxable_amount;
             
             $tc = new TaxCategory();
@@ -807,8 +936,11 @@ class Peppol extends AbstractService
             $id = new ID();
             $id->value = $this->getTaxType($item->tax_id);
             
+            if(floatval($item->tax_rate1) === 0.0)
+                $id->value = 'K';
+
             $tc->ID = $id;
-            $tc->Percent = $item->tax_rate1;
+            $tc->Percent = (string)$item->tax_rate1;
             $ts = new TaxScheme();
 
             $id = new ID();
@@ -833,7 +965,7 @@ class Peppol extends AbstractService
 
             $item_taxes[] = $tax_total;
 
-        }
+        // }
 
 
         if(strlen($item->tax_name2 ?? '') > 1) {
@@ -855,7 +987,7 @@ class Peppol extends AbstractService
             $id->value = $this->getTaxType($item->tax_id);
 
             $tc->ID = $id;
-            $tc->Percent = $item->tax_rate2;
+            $tc->Percent = (string)$item->tax_rate2;
             $ts = new TaxScheme();
 
             $id = new ID();
@@ -904,7 +1036,7 @@ class Peppol extends AbstractService
             $id->value = $this->getTaxType($item->tax_id);
 
             $tc->ID = $id;
-            $tc->Percent = $item->tax_rate3;
+            $tc->Percent = (string)$item->tax_rate3;
             $ts = new TaxScheme();
 
             $id = new ID();
@@ -1246,6 +1378,11 @@ class Peppol extends AbstractService
             // Required: TaxCategory ID (BT-118)
             $category_id = new ID();
             $category_id->value = 'S'; // Standard rate
+
+            if(floatval($grouped_tax['taxAmount']) === 0.0)
+               $category_id->value = 'K'; // Exempt
+    
+
             $tax_category->ID = $category_id;
 
             // Required: TaxCategory Rate (BT-119)
@@ -1341,5 +1478,73 @@ class Peppol extends AbstractService
 
         return '0037';
     }
+
+
+
+
+
+
+    /**
+     * calculateAdjustedBaseAmount
+     *
+     * Calculates the adjusted base amount for a line item considering invoice-level discounts
+     * 
+     */
+    private function calculateAdjustedBaseAmount(
+        object $line_item, 
+        // float $invoice_discount, 
+        // bool $is_percentage,
+        // array $all_line_items,
+        // float $allowance_charges
+    ) 
+    {
+        // 1. Calculate total invoice amount before invoice-level discount
+        $total_amount = 0;
+        foreach ($this->invoice->line_items as $item) {
+            $line_total = $item->quantity * $item->cost;
+            
+            // Apply line-level discount if exists
+            if ($item->discount > 0) {
+                if ($item->is_amount_discount) {
+                    $line_total -= $item->discount;
+                } else {
+                    $line_total -= ($line_total * ($item->discount / 100));
+                }
+            }
+            
+            $total_amount += $line_total;
+        }
+
+        // 2. Add any additional charges or subtract additional allowances
+        $total_amount += ($this->invoice->custom_surcharge1 + $this->invoice->custom_surcharge2 +$this->invoice->custom_surcharge3 + $this->invoice->custom_surcharge4);
+
+        // 3. Calculate this line item's proportion of total
+        $line_total = $line_item->quantity * $line_item->cost;
+        
+        // Apply line-level discount if exists
+        if ($line_item->discount > 0) {
+            if ($line_item->is_amount_discount) {
+                $line_total -= $line_item->discount;
+            } else {
+                $line_total -= ($line_total * ($line_item->discount / 100));
+            }
+        }
+
+        $proportion = $line_total / $total_amount;
+
+        // 4. Calculate invoice-level discount amount for this line
+        $line_discount = 0;
+        if (!$this->invoice->is_amount_discount) {
+            $line_discount = $line_total * ($this->invoice->discount / 100);
+        } else {
+            $line_discount = $this->invoice->discount * $proportion;
+        }
+
+        // 5. Return adjusted base amount
+        return (string)round($line_total - $line_discount, 2);
+    }
+
+
+
 
 }

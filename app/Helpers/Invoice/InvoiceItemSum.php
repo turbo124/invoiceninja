@@ -141,8 +141,8 @@ class InvoiceItemSum
         $this->invoice = $invoice;
         $this->client = $invoice->client ?? $invoice->vendor;
 
-        if ($this->invoice->client) {
-            $this->currency = $this->invoice->client->currency();
+        if ($this->client) {
+            $this->currency = $this->client->currency();
             $this->shouldCalculateTax();
         } else {
             $this->currency = $this->invoice->vendor->currency();
@@ -158,7 +158,7 @@ class InvoiceItemSum
             return $this;
         }
 
-        $this->calcLineItems();
+        $this->calcLineItems()->getPeppolSurchargeTaxes();
 
         return $this;
     }
@@ -186,7 +186,6 @@ class InvoiceItemSum
 
         if (in_array($this->client->company->country()->iso_3166_2, $this->tax_jurisdictions)) { //only calculate for supported tax jurisdictions
 
-
             /** @var \App\DataMapper\Tax\BaseRule $class */
             $class = "App\DataMapper\Tax\\".str_replace("-","_",$this->client->company->country()->iso_3166_2)."\\Rule";
 
@@ -206,6 +205,46 @@ class InvoiceItemSum
         }
 
         return $this;
+    }
+
+    private function calculateNexus()
+    {
+
+        $company_country_code = $this->invoice->company->country()->iso_3166_2;
+        $client_country_code = $this->client->country->iso_3166_2;
+        $base_rule = new \App\DataMapper\Tax\BaseRule();
+        $eu_countries = $base_rule->eu_country_codes;
+        $nexus_rule = $company_country_code;
+
+        if ($client_country_code == $company_country_code) {
+            //Domestic Sales
+            $nexus_rule = $company_country_code;
+        } elseif (in_array($company_country_code, $eu_countries) && !in_array($client_country_code, $eu_countries)) {
+            //NON-EU Sale
+            $nexus_rule = $company_country_code;
+        } elseif (in_array($company_country_code, $eu_countries) && in_array($client_country_code, $eu_countries)) {
+
+            //EU Sale
+            // Invalid VAT number = seller country nexus
+            if(isset($this->client->has_valid_vat_number) && !$this->client->has_valid_vat_number){
+                $nexus_rule = $company_country_code;
+            }
+            elseif (isset($this->invoice->company->tax_data->regions->EU->has_sales_above_threshold) && $this->invoice->company->tax_data->regions->EU->has_sales_above_threshold) { //over threshold - tax in buyer country
+                $nexus_rule = $client_country_code;
+            } elseif (isset($this->invoice->company->tax_data->regions->EU->has_sales_above_threshold) && !$this->invoice->company->tax_data->regions->EU->has_sales_above_threshold) {
+                $nexus_rule = $company_country_code;
+            } elseif ($this->client->classification != 'individual' && (isset($this->client->has_valid_vat_number) && !$this->client->has_valid_vat_number)){
+                $nexus_rule = $company_country_code;
+            } else {
+                $nexus_rule = $company_country_code;
+            }
+
+        }
+
+        nlog($nexus_rule);
+
+        $class = "App\DataMapper\Tax\\".str_replace("-", "_", $nexus_rule)."\\Rule";
+        return $class;
     }
 
     private function push(): self
@@ -320,6 +359,50 @@ class InvoiceItemSum
         $this->item->gross_line_total = $this->getLineTotal() + $item_tax;
 
         $this->item->tax_amount = $item_tax;
+
+        return $this;
+    }
+
+
+    private function getPeppolSurchargeTaxes(): self
+    {
+        if(!$this->client->getSetting('e_invoice_type') == 'PEPPOL')
+            return $this;
+
+        collect($this->invoice->line_items)
+            ->flatMap(function ($item) {
+                return collect([1, 2, 3])
+                    ->map(fn ($i) => [
+                        'name' => $item->{"tax_name{$i}"} ?? '',
+                        'percentage' => $item->{"tax_rate{$i}"} ?? 0,
+                    ])
+                    ->filter(fn ($tax) => strlen($tax['name']) > 1);
+            })
+            ->unique(fn ($tax) => $tax['percentage'] . '_' . $tax['name'])
+            ->values()
+            ->each(function ($tax){
+                    
+            $tax_component = 0;
+
+            if ($this->invoice->custom_surcharge1) {
+                $tax_component += round($this->invoice->custom_surcharge1 * ($tax['percentage'] / 100), 2);
+            }
+
+            if ($this->invoice->custom_surcharge2) {
+                $tax_component += round($this->invoice->custom_surcharge2 * ($tax['percentage'] / 100), 2);
+            }
+
+            if ($this->invoice->custom_surcharge3) {
+                $tax_component += round($this->invoice->custom_surcharge3 * ($tax['percentage'] / 100), 2);
+            }
+
+            if ($this->invoice->custom_surcharge4) {
+                $tax_component += round($this->invoice->custom_surcharge4 * ($tax['percentage'] / 100), 2);
+            }
+
+            $this->groupTax($tax['name'], $tax['percentage'], $tax_component);
+
+        });
 
         return $this;
     }
