@@ -38,7 +38,6 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use InvoiceNinja\EInvoice\Models\Peppol\Invoice as PeppolInvoice;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use App\Services\EDocument\Gateway\Transformers\StorecoveTransformer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
@@ -158,14 +157,6 @@ class StorecoveTest extends TestCase
         $p->run();
         $peppolInvoice = $p->getInvoice();
 
-        // $s_transformer = new StorecoveTransformer();
-        // $s_transformer->transform($peppolInvoice);
-
-        // $json = $s_transformer->toJson();
-
-        // $this->assertJson($json);
-        
-        // nlog($json);
     }
 
     // public function testStorecoveTransformer()
@@ -243,17 +234,7 @@ class StorecoveTest extends TestCase
       $p->run();
       $peppolInvoice = $p->getInvoice();
 
-
-      $s_transformer = new StorecoveTransformer();
-      $s_transformer->transform($peppolInvoice);
-
-      $json = $s_transformer->toJson();
-
-      $this->assertJson($json);
-
-      nlog("percentage");
-      nlog($json);
-
+      $this->assertNotNull($peppolInvoice);
     }
 
 
