@@ -155,7 +155,15 @@ class BaseRule implements RuleInterface
 
         $this->resolveRegions();
 
+        
         if(!$this->isTaxableRegion()) {
+            $this->tax_data = null;
+            $this->tax_rate1 = 0;
+            $this->tax_name1 = '';
+            $this->tax_rate2 = 0;
+            $this->tax_name2 = '';
+            $this->tax_rate3 = 0;
+            $this->tax_name3 = '';
             return $this;
         }
 
@@ -377,7 +385,7 @@ class BaseRule implements RuleInterface
 
         }
 
-        // $this->taxByType($item);
+        $this->taxByType($item);
 
         return $this;
 
