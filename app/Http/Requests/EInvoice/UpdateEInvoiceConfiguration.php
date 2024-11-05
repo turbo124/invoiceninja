@@ -37,7 +37,6 @@ class UpdateEInvoiceConfiguration extends Request
 
     public function rules()
     {
-        
         return [
            'entity' => 'required|bail|in:invoice,client,company',
            'payment_means' => 'sometimes|bail|array',
@@ -46,45 +45,64 @@ class UpdateEInvoiceConfiguration extends Request
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
+               $rules = ['bail', 'string', 'min:8', 'max:11'];
 
-               return ['bail', 'string', 'min:8', 'max:11', Rule::requiredIf(in_array('bic_swift', $requirements))];
+               if (in_array('bic_swift', $requirements)) {
+                   return [...$rules, 'required'];
+               }
+
+               return [...$rules, 'nullable'];
            }),
            'payment_means.*.iban' => Rule::forEach(function (string|null $value, string $attribute) {
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
+               $rules = ['bail', 'sometimes', 'string', 'min:34', 'max:34'];
 
-               return ['bail', 'sometimes', 'string', 'min:15', 'max:34',
-                   Rule::requiredIf(in_array('iban', $requirements))];
+               if (in_array('iban', $requirements)) {
+                   return [...$rules, 'required'];
+               }
+
+               return [...$rules, 'nullable'];
            }),
            'payment_means.*.account_holder' => Rule::forEach(function (string|null $value, string $attribute) {
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
+               $rules = ['bail', 'sometimes', 'string', 'max:255'];
 
-               return ['bail', 'sometimes', 'string', 'max:255',
-                   Rule::requiredIf(in_array('account_holder', $requirements))];
+               if (in_array('account_holder', $requirements)) {
+                   return [...$rules, 'required'];
+               }
+
+               return [...$rules, 'nullable'];
            }),
            'payment_means.*.information' => ['bail', 'sometimes', 'nullable', 'string'],
            'payment_means.*.card_type' => Rule::forEach(function (string|null $value, string $attribute) {
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
+               $rules = ['bail', 'sometimes', 'nullable', 'string', 'min:4'];
 
-               return ['bail', 'sometimes', 'nullable', 'string', 'min:4',
-                   Rule::requiredIf(in_array('card_type', $requirements))];
+               if (in_array('card_type', $requirements)) {
+                   return [...$rules, 'required'];
+               }
+
+               return [...$rules, 'nullable'];
            }),
            'payment_means.*.card_holder' => Rule::forEach(function (string|null $value, string $attribute) {
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
+               $rules = ['bail', 'sometimes', 'nullable', 'string', 'min:4'];
 
-               return ['bail', 'sometimes', 'nullable', 'string', 'min:4',
-                   Rule::requiredIf(in_array('card_holder', $requirements))];
+               if (in_array('card_holder', $requirements)) {
+                   return [...$rules, 'required'];
+               }
+
+               return [...$rules, 'nullable'];
            }),
        ];
-
-
     }
 
     public function prepareForValidation()
