@@ -377,7 +377,7 @@ class BaseRule implements RuleInterface
 
         }
 
-        $this->taxByType($item);
+        // $this->taxByType($item);
 
         return $this;
 
