@@ -99,9 +99,6 @@ class CreateRequestTest extends TestCase
         $this->request->initialize($data);
         $validator = Validator::make($data, $this->request->rules());
 
-
-nlog($validator->errors());
-
         $this->assertTrue($validator->passes());
     }
 

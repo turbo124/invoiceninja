@@ -81,7 +81,7 @@ class SearchController extends Controller
                         ],
                     ],
                 ],
-                'size' => 1000,
+                'size' => 100,
             ],
         ];
 
