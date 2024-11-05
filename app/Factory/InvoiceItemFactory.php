@@ -41,6 +41,7 @@ class InvoiceItemFactory
         $item->custom_value3 = '';
         $item->custom_value4 = '';
         $item->type_id = '1';
+        $item->tax_id = '1';
 
         return $item;
     }

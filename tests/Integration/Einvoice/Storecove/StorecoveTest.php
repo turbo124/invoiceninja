@@ -14,6 +14,7 @@ namespace Tests\Integration\Einvoice\Storecove;
 use Tests\TestCase;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\Country;
 use App\Models\Invoice;
 use Tests\MockAccountData;
 use Illuminate\Support\Str;
@@ -61,6 +62,198 @@ class StorecoveTest extends TestCase
         if (config('ninja.testvars.travis') !== false || !config('ninja.storecove_api_key')) {
             $this->markTestSkipped("do not run in CI");
         }
+    }
+
+    private function setupTestData(array $params = []): array
+    {
+        
+        $settings = CompanySettings::defaults();
+        $settings->vat_number = $params['company_vat'] ?? 'DE123456789';
+        $settings->country_id = Country::where('iso_3166_2', 'DE')->first()->id;
+        $settings->email = $this->faker->safeEmail();
+
+        $tax_data = new TaxModel();
+        $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
+        $tax_data->regions->EU->tax_all_subregions = true;
+        $tax_data->seller_subregion = $params['company_country'] ?? 'DE';
+
+        $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+
+        $fib = new \InvoiceNinja\EInvoice\Models\Peppol\BranchType\FinancialInstitutionBranch();
+        $fib->ID = "DEUTDEMMXXX"; //BIC
+
+        $pfa = new \InvoiceNinja\EInvoice\Models\Peppol\FinancialAccountType\PayeeFinancialAccount();
+        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+        $id->value = 'DE89370400440532013000';
+        $pfa->ID = $id;
+        $pfa->Name = 'PFA-NAME';
+
+        $pfa->FinancialInstitutionBranch = $fib;
+
+        $pm = new \InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans();
+        $pm->PayeeFinancialAccount = $pfa;
+
+        $pmc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\PaymentMeansCode();
+        $pmc->value = '30';
+
+        $pm->PaymentMeansCode = $pmc;
+
+        $einvoice->PaymentMeans[] = $pm;
+
+        $stub = new \stdClass();
+        $stub->Invoice = $einvoice;
+
+        $this->company->settings = $settings;
+        $this->company->tax_data = $tax_data;
+        $this->company->calculate_taxes = true;
+        $this->company->legal_entity_id = 290868;
+        $this->company->e_invoice = $stub;
+        $this->company->save();
+        $company = $this->company;
+
+        $client = Client::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'country_id' => Country::where('iso_3166_2', $params['client_country'] ?? 'FR')->first()->id,
+            'vat_number' => $params['client_vat'] ?? '',
+            'classification' => $params['classification'] ?? 'individual',
+            'has_valid_vat_number' => $params['has_valid_vat'] ?? false,
+            'name' => 'Test Client'
+        ]);
+
+        $contact = ClientContact::factory()->create([
+            'client_id' => $client->id,
+            'company_id' =>$client->company_id,
+            'user_id' => $client->user_id,
+            'first_name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'email' => $this->faker->safeEmail()
+        ]);
+
+        $invoice = \App\Models\Invoice::factory()->create([
+            'client_id' => $client->id,
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'date' => now()->addDay()->format('Y-m-d'),
+            'due_date' => now()->addDays(2)->format('Y-m-d'),
+            'uses_inclusive_taxes' => false,
+            'tax_rate1' => 0,
+            'tax_name1' => '',
+            'tax_rate2' => 0,
+            'tax_name2' => '',
+            'tax_rate3' => 0,
+            'tax_name3' => '',
+        ]);
+
+        $items = $invoice->line_items;
+        foreach($items as &$item)
+        {
+          $item->tax_name2 = '';
+          $item->tax_rate2 = 0;
+          $item->tax_name3 = '';
+          $item->tax_rate3 = 0;
+          $item->uses_inclusive_taxes = false;
+        }
+        unset($item);
+
+        $invoice->line_items = array_values($items);
+        $invoice = $invoice->calc()->getInvoice();
+        nlog($invoice->withoutRelations()->toArray());
+        // $invoice->setRelation('company', $this->company);
+
+        return compact('company', 'client', 'invoice');
+    }
+
+    public function testDeToDeSending()
+    {
+        $this->routing_id = 290868;
+
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => '',
+            'classification' => 'individual',
+            'has_valid_vat' => false,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+        ];
+
+        $data = $this->setupTestData($scenario);
+
+        $invoice = $data['invoice'];
+        $invoice = $invoice->calc()->getInvoice();
+        $company = $data['company'];
+        $client = $data['client'];
+        $tax_rate = $company->tax_data->regions->EU->subregions->DE->tax_rate;
+
+        $this->assertEquals('DE', $company->country()->iso_3166_2);
+        $this->assertEquals('DE', $client->country->iso_3166_2);
+
+        foreach($invoice->line_items as $item)
+        {
+          $this->assertEquals('1', $item->tax_id);
+          $this->assertEquals($tax_rate, $item->tax_rate1);
+        }
+
+        $this->sendDocument($invoice);
+    }
+
+    private function sendDocument($model)
+    {
+        $storecove = new Storecove();
+        $p = new Peppol($model);
+        $p->run();
+
+
+nlog($p->toXml());
+
+
+try {
+    $processor = new \Saxon\SaxonProcessor();
+} catch (\Throwable $e) {
+    $this->markTestSkipped('saxon not installed');
+}
+
+$validator = new \App\Services\EDocument\Standards\Validation\XsltDocumentValidator($p->toXml());
+$validator->validate();
+
+if (count($validator->getErrors()) > 0) {
+    
+    nlog($validator->getErrors());
+}
+
+$this->assertCount(0, $validator->getErrors());
+
+
+
+        $identifiers = $p->gateway->mutator->setClientRoutingCode()->getStorecoveMeta();
+
+        $result = $storecove->build($model)->getResult();
+
+        if (count($result['errors']) > 0) {
+            nlog("errors!");
+            nlog($result);
+            return $result['errors'];
+        }
+
+        $payload = [
+            'legal_entity_id' => $model->company->legal_entity_id,
+            "idempotencyGuid" => \Illuminate\Support\Str::uuid(),
+            'document' => [
+                'document_type' => 'invoice',
+                'invoice' => $result['document'],
+            ],
+            'tenant_id' => $model->company->company_key,
+            'routing' => $identifiers['routing'],
+        ];
+        /** Concrete implementation current linked to Storecove only */
+
+        //@testing only
+        $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
+        $r = $sc->sendJsonDocument($payload);
+
+        nlog($r);
     }
 
     public function testTransformPeppolToStorecove()

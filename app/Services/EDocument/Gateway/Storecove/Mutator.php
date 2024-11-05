@@ -578,6 +578,9 @@ class Mutator implements MutatorInterface
     {
         $code = $this->getClientRoutingCode();
         
+        if(strlen($this->invoice->client->vat_number) < 2) 
+            return $this->setEmailRouting($this->invoice->client->present()->email());
+
         $this->setStorecoveMeta($this->buildRouting([
                 ["scheme" => $code, "id" => $this->invoice->client->vat_number]
             ]));

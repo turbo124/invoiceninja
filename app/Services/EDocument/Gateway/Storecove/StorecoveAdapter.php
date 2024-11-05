@@ -208,7 +208,6 @@ class StorecoveAdapter
 
             
             if ($allowance->reason == ctrans('texts.discount')) {
-                nlog($allowance->amount_excluding_tax);
                 $allowance->amount_excluding_tax = $allowance->amount_excluding_tax * -1;
             }
 

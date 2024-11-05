@@ -61,11 +61,6 @@ class TaxRuleConsistencyTest extends TestCase
         $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
         $tax_data->regions->EU->tax_all_subregions = true;
 
-        // $company = Company::factory()->create([
-        //     'account_id' => $this->account->id,
-        //     'settings' => $settings,
-        //     'tax_data' => $tax_data,
-        // ]);
         $this->company->settings = $settings;
         $this->company->tax_data = $tax_data;
         $this->company->save();
@@ -74,7 +69,7 @@ class TaxRuleConsistencyTest extends TestCase
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
-            'country_id' => Country::where('iso_3166_2', 'FR')->first()->id,
+            'country_id' => Country::where('iso_3166_2', $params['client_country'] ?? 'FR')->first()->id,
             'vat_number' => $params['client_vat'] ?? '',
             'classification' => $params['classification'] ?? 'individual',
             'has_valid_vat_number' => $params['has_valid_vat'] ?? false,
@@ -94,9 +89,8 @@ class TaxRuleConsistencyTest extends TestCase
             'client_id' => $client->id,
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
+            'discount' => rand(1,10),
         ]);
-
-        nlog($invoice->withoutRelations()->toArray());
 
         $e_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
 

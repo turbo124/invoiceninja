@@ -81,7 +81,6 @@ class SendEDocument implements ShouldQueue
         $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
         $r = $sc->sendJsonDocument($payload);
 
-        
         if (is_string($r)) {
             return $this->writeActivity($model, $r);
         }

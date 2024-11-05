@@ -2,25 +2,28 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
 
 class AllowanceCharges
 {
     // #[SerializedPath('[cbc:Amount][#]')]
-    public mixed $amount_excluding_vat;
+    public ?float $amount_excluding_vat;
+
 
     #[SerializedPath('[cbc:Amount][#]')]
-	public mixed $amount_excluding_tax;
+	public ?float $amount_excluding_tax;
 
     #[SerializedPath('[cbc:BaseAmount][#]')]
-    public mixed $base_amount_excluding_tax;
+    public ?float $base_amount_excluding_tax;
 
     // #[SerializedPath('[cbc:Amount][#]')]
-    public mixed $amount_including_tax;
+    public ?float $amount_including_tax;
 
     // #[SerializedPath('[cbc:BaseAmount][#]')]
-    public mixed $base_amount_including_tax;
+    public ?float $base_amount_including_tax;
 
     // #[SerializedPath('[cac:TaxCategory]')]
     // public ?Tax $tax;
@@ -39,11 +42,14 @@ class AllowanceCharges
 	 * @param TaxesDutiesFees[] $taxes_duties_fees
 	 */
 	public function __construct(
-		mixed $amount_excluding_vat,
-		mixed $amount_excluding_tax,
-		mixed $base_amount_excluding_tax,
-		mixed $amount_including_tax,
-		mixed $base_amount_including_tax,
+		#[Context(['input_format' => 'float'])]
+		?float $amount_excluding_vat,
+		#[Context(['input_format' => 'float'])]
+		?float $amount_excluding_tax,
+		#[Context(['input_format' => 'float'])]
+		?float $base_amount_excluding_tax,
+		?float $amount_including_tax,
+		?float $base_amount_including_tax,
 		// ?Tax $tax,
 		?array $taxes_duties_fees,
 		?string $reason,
@@ -60,27 +66,27 @@ class AllowanceCharges
 		$this->reason_code = $reason_code;
 	}
 
-	public function getAmountExcludingVat(): mixed
+	public function getAmountExcludingVat(): ?float
 	{
 		return $this->amount_excluding_vat;
 	}
 
-	public function getAmountExcludingTax(): mixed
+	public function getAmountExcludingTax(): ?float
 	{
 		return $this->amount_excluding_tax;
 	}
 
-	public function getBaseAmountExcludingTax(): mixed
+	public function getBaseAmountExcludingTax(): ?float
 	{
 		return $this->base_amount_excluding_tax;
 	}
 
-	public function getAmountIncludingTax(): mixed
+	public function getAmountIncludingTax(): ?float
 	{
 		return $this->amount_including_tax;
 	}
 
-	public function getBaseAmountIncludingTax(): mixed
+	public function getBaseAmountIncludingTax(): ?float
 	{
 		return $this->base_amount_including_tax;
 	}
@@ -103,31 +109,31 @@ class AllowanceCharges
 		return $this->reason_code;
 	}
 
-	public function setAmountExcludingVat(mixed $amount_excluding_vat): self
+	public function setAmountExcludingVat(?float $amount_excluding_vat): self
 	{
 		$this->amount_excluding_vat = $amount_excluding_vat;
 		return $this;
 	}
 
-	public function setAmountExcludingTax(mixed $amount_excluding_tax): self
+	public function setAmountExcludingTax(?float $amount_excluding_tax): self
 	{
 		$this->amount_excluding_tax = $amount_excluding_tax;
 		return $this;
 	}
 
-	public function setBaseAmountExcludingTax(mixed $base_amount_excluding_tax): self
+	public function setBaseAmountExcludingTax(?float $base_amount_excluding_tax): self
 	{
 		$this->base_amount_excluding_tax = $base_amount_excluding_tax;
 		return $this;
 	}
 
-	public function setAmountIncludingTax(mixed $amount_including_tax): self
+	public function setAmountIncludingTax(?float $amount_including_tax): self
 	{
 		$this->amount_including_tax = $amount_including_tax;
 		return $this;
 	}
 
-	public function setBaseAmountIncludingTax(mixed $base_amount_including_tax): self
+	public function setBaseAmountIncludingTax(?float $base_amount_including_tax): self
 	{
 		$this->base_amount_including_tax = $base_amount_including_tax;
 		return $this;

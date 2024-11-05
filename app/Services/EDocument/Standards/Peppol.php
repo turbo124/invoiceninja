@@ -435,17 +435,17 @@ class Peppol extends AbstractService
             $allowanceCharge->ChargeIndicator = 'false'; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)number_format($this->calc->getTotalDiscount(),2);
+            $allowanceCharge->Amount->amount = (string)number_format($this->calc->getTotalDiscount(),2, '.', '');
 
             // Add percentage if available
             if ($this->invoice->discount > 0 && !$this->invoice->is_amount_discount) {
                         
                 $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
                 $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->BaseAmount->amount = (string) number_format($this->calc->getSubtotalWithSurcharges(), 2);
+                $allowanceCharge->BaseAmount->amount = (string) number_format($this->calc->getSubtotalWithSurcharges(), 2, '.', '');
 
                 $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
-                $mfn->value = (string)number_format(round(($this->invoice->discount), 2), 2);  // Format to always show 2 decimals
+                $mfn->value = (string)number_format(round(($this->invoice->discount), 2), 2, '.', '');  // Format to always show 2 decimals
                 $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
             }
             
@@ -742,7 +742,7 @@ class Peppol extends AbstractService
                 $allowanceCharge->ChargeIndicator = 'false'; // false = discount
                 $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
                 $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->Amount->amount = (string)number_format($this->calculateTotalItemDiscountAmount($item),2);
+                $allowanceCharge->Amount->amount = (string)number_format($this->calculateTotalItemDiscountAmount($item),2, '.', '');
                 $this->allowance_total += $this->calculateTotalItemDiscountAmount($item);
 
 
@@ -806,7 +806,7 @@ class Peppol extends AbstractService
             return $item->discount;
         }
 
-        return ($item->cost) * ($item->discount / 100);
+        return ($item->cost * $item->quantity) * ($item->discount / 100);
 
     }
 
