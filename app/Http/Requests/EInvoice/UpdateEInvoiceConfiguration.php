@@ -57,7 +57,7 @@ class UpdateEInvoiceConfiguration extends Request
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
-               $rules = ['bail', 'sometimes', 'string', 'min:34', 'max:34'];
+               $rules = ['bail', 'sometimes', 'string', 'min:15', 'max:34'];
 
                if (in_array('iban', $requirements)) {
                    return [...$rules, 'required'];

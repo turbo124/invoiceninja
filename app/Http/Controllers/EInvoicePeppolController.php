@@ -73,7 +73,7 @@ class EInvoicePeppolController extends BaseController
      * 
      * 
      * @param  ShowEntityRequest $request
-     * @return mixed
+     * @return JsonResponse
      */
     public function show(ShowEntityRequest $request): JsonResponse
     {
