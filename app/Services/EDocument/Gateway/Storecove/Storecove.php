@@ -153,7 +153,7 @@ class Storecove
      */
     public function sendJsonDocument(array $payload)
     {
-        nlog($payload);
+        
         $uri = "document_submissions";
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $payload, $this->getHeaders());
@@ -163,6 +163,7 @@ class Storecove
             return $r->json()['guid'];
         }
 
+        nlog($payload);
         nlog($r->body());
 
         return false;

@@ -38,22 +38,18 @@ use InvoiceNinja\EInvoice\Models\Peppol\FinancialAccountType\PayeeFinancialAccou
 use InvoiceNinja\EInvoice\Models\FatturaPA\FatturaElettronicaBodyType\FatturaElettronicaBody;
 use InvoiceNinja\EInvoice\Models\FatturaPA\FatturaElettronicaHeaderType\FatturaElettronicaHeader;
 
-/**
- * 
- */
 class PeppolTest extends TestCase
 {
     use DatabaseTransactions;
     use MockAccountData;
+
+    protected int $iterations = 1000;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
-
-
-        // $this->markTestSkipped('prevent running in CI');
 
         $this->withoutMiddleware(
             ThrottleRequests::class
@@ -145,6 +141,7 @@ class PeppolTest extends TestCase
         ]);
 
         $items = $invoice->line_items;
+
         foreach($items as &$item)
         {
           $item->tax_name2 = '';
@@ -163,7 +160,6 @@ class PeppolTest extends TestCase
 
     public function testWithChaosMonkey()
     {
-
 
         $scenarios = [
             [
@@ -268,8 +264,7 @@ class PeppolTest extends TestCase
             $this->assertCount(0, $validator->getErrors());
         }
 
-
-        for($x=0; $x<1000; $x++){
+        for($x=0; $x< $this->iterations; $x++){
 
             $scenario = $scenarios[0];
                         
@@ -293,7 +288,51 @@ class PeppolTest extends TestCase
 
             if (count($validator->getErrors()) > 0) {
                 nlog("index {$x}");
+                nlog($invoice->calc()->getTotalTaxes());
+                nlog($invoice->calc()->getTotal());
+                nlog($invoice->calc()->getSubtotal());
+                nlog($invoice->calc()->getTaxMap());
                 nlog($invoice->withoutRelations()->toArray());
+                nlog($p->toXml());
+                nlog($validator->getErrors());
+            }
+
+            $this->assertCount(0, $validator->getErrors());
+
+        }
+
+        for ($x = 0; $x < $this->iterations; $x++) {
+
+            $scenario = end($scenarios);
+
+            $data = $this->setupTestData($scenario);
+
+            $invoice = $data['invoice'];
+            $invoice = $invoice->calc()->getInvoice();
+
+            $storecove = new Storecove();
+            $p = new Peppol($invoice);
+            $p->run();
+
+            try {
+                $processor = new \Saxon\SaxonProcessor();
+            } catch (\Throwable $e) {
+                $this->markTestSkipped('saxon not installed');
+            }
+
+            $validator = new \App\Services\EDocument\Standards\Validation\XsltDocumentValidator($p->toXml());
+            $validator->validate();
+
+            if (count($validator->getErrors()) > 0) {
+                nlog("De-De tax");
+
+                nlog("index {$x}");
+                nlog($invoice->calc()->getTotalTaxes());
+                nlog($invoice->calc()->getTotal());
+                nlog($invoice->calc()->getSubtotal());
+                nlog($invoice->calc()->getTaxMap());
+                nlog($invoice->withoutRelations()->toArray());
+
                 nlog($p->toXml());
                 nlog($validator->getErrors());
             }

@@ -65,11 +65,13 @@ class ZugferdEDokument extends AbstractService
 
         $this->xdocument = ZugferdDocumentBuilder::CreateNew($profile);
 
+        $user_or_company_phone = strlen($this->document->user->present()->phone()) > 3 ? $this->document->user->present()->phone() : $company->present()->phone; 
+
         $this->xdocument
             ->setDocumentSupplyChainEvent(date_create($this->document->date ?? now()->format('Y-m-d')))
             ->setDocumentSeller($company->getSetting('name'))
             ->setDocumentSellerAddress($company->getSetting("address1"), $company->getSetting("address2"), "", $company->getSetting("postal_code"), $company->getSetting("city"), $company->country()->iso_3166_2, $company->getSetting("state"))
-            ->setDocumentSellerContact($this->document->user->present()->getFullName(), "", $this->document->user->present()->phone(), "", $this->document->user->email)
+            ->setDocumentSellerContact($this->document->user->present()->getFullName(), "", $user_or_company_phone, "", $this->document->user->email)
             ->setDocumentSellerCommunication("EM", $this->document->user->email)
             ->setDocumentBuyer($client->present()->name(), $client->number)
             ->setDocumentBuyerAddress($client->address1, "", "", $client->postal_code, $client->city, $client->country->iso_3166_2, $client->state)

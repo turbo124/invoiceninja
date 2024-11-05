@@ -562,7 +562,6 @@ class Peppol extends AbstractService
 
         $tea = new TaxExclusiveAmount();
         $tea->currencyID = $this->invoice->client->currency()->code;
-        // $tea->amount = $this->invoice->uses_inclusive_taxes ? round($this->invoice->amount - $this->invoice->total_taxes, 2) : $taxable;
 
         $tea->amount = round($this->invoice->amount - $this->invoice->total_taxes, 2);
         $lmt->TaxExclusiveAmount = $tea;
@@ -866,24 +865,6 @@ class Peppol extends AbstractService
         return $lines;
     }
 
-
-    // /**
-    //  * calculateDiscountAmount
-    //  * 
-    //  * Helper method to determine the discount amount to be used.
-    //  * 
-    //  * @param  mixed $item
-    //  * @return float
-    //  */
-    // private function calculateDiscountAmount($item): float
-    // {
-    //     if ($item->is_amount_discount) {
-    //         return $item->discount / $item->quantity; // Per unit discount amount
-    //     }
-        
-    //     return ($item->cost / $item->quantity) * ($item->discount / 100);
-    // }
-
     private function calculateTotalItemDiscountAmount($item):float
     {
                 
@@ -895,29 +876,6 @@ class Peppol extends AbstractService
 
     }
 
-    // /**
-    //  * costWithDiscount
-    //  *
-    //  * Helper method to determine the cost INCLUDING discount
-    //  * 
-    //  * @param  mixed $item
-    //  * @return float
-    //  */
-    // private function costWithDiscount($item): float
-    // {
-    //     $cost = $item->cost;
-
-    //     if ($item->discount != 0) {
-    //         if ($this->invoice->is_amount_discount) {
-    //             $cost -= $item->discount / $item->quantity;
-    //         } else {
-    //             $cost -= $cost * $item->discount / 100;
-    //         }
-    //     }
-
-    //     return $cost;
-    // }
-        
     /**
      * calculateTaxMap
      *
@@ -987,169 +945,7 @@ class Peppol extends AbstractService
         return $this;
 
     }
-    /**
-     * getItemTaxes
-     *
-     * Builds a tax map for later use when 
-     * collating taxes
-     * 
-     * @param  object $item
-     * @return array
-    //  */
-    // private function getItemTaxes(object $item): array
-    // {
-    //     $item_taxes = [];
-        
-    //     $adjusted_base_amount = $this->calculateAdjustedBaseAmount($item);
-
-    //     // if(strlen($item->tax_name1 ?? '') > 1) {
-
-    //         $tax_amount = new TaxAmount();
-    //         $tax_amount->currencyID = $this->invoice->client->currency()->code;
-    //         $tax_amount->amount = $this->invoice->uses_inclusive_taxes ? $this->calcInclusiveLineTax($item->tax_rate1, $adjusted_base_amount) : $this->calcAmountLineTax($item->tax_rate1, $adjusted_base_amount);
-    //         $tax_subtotal = new TaxSubtotal();
-    //         $tax_subtotal->TaxAmount = $tax_amount;
-
-    //         $taxable_amount = new TaxableAmount();
-    //         $taxable_amount->currencyID = $this->invoice->client->currency()->code;
-    //         $taxable_amount->amount = $this->invoice->uses_inclusive_taxes ? $adjusted_base_amount - $tax_amount->amount : $adjusted_base_amount;
-    //         $tax_subtotal->TaxableAmount = $taxable_amount;
-            
-    //         $tc = new TaxCategory();
-            
-    //         $id = new ID();
-    //         $id->value = $this->getTaxType($item->tax_id);
-            
-    //         if(floatval($item->tax_rate1) === 0.0)
-    //             $id->value = $this->resolveTaxExemptReason($item);
-
-    //         $tc->ID = $id;
-    //         $tc->Percent = (string)$item->tax_rate1;
-    //         $ts = new TaxScheme();
-
-    //         $id = new ID();
-    //         $id->value = $this->standardizeTaxSchemeId($item->tax_name1);
-
-    //         $jurisdiction = $this->getJurisdiction();
-    //         $ts->JurisdictionRegionAddress[] = $jurisdiction;
-
-    //         $ts->ID = $id;
-    //         $tc->TaxScheme = $ts;
-    //         $tax_subtotal->TaxCategory = $tc;
-
-    //         $tax_total = new TaxTotal();
-    //         $tax_total->TaxAmount = $tax_amount;
-    //         $tax_total->TaxSubtotal[] = $tax_subtotal;
-
-    //         $this->tax_map[] = [
-    //             'taxableAmount' => $taxable_amount->amount,
-    //             'taxAmount' => $tax_amount->amount,
-    //             'percentage' => $item->tax_rate1,
-    //         ];
-
-    //         $item_taxes[] = $tax_total;
-
-    //     // }
-
-
-    //     if(strlen($item->tax_name2 ?? '') > 1) {
-
-    //         $tax_amount = new TaxAmount();
-    //         $tax_amount->currencyID = $this->invoice->client->currency()->code;
-    //         $tax_amount->amount = $this->invoice->uses_inclusive_taxes ? $this->calcInclusiveLineTax($item->tax_rate2, $item->line_total) : $this->calcAmountLineTax($item->tax_rate2, $item->line_total);
-    //         $tax_subtotal = new TaxSubtotal();
-    //         $tax_subtotal->TaxAmount = $tax_amount;
-
-    //         $taxable_amount = new TaxableAmount();
-    //         $taxable_amount->currencyID = $this->invoice->client->currency()->code;
-    //         $taxable_amount->amount = $item->line_total;
-    //         $tax_subtotal->TaxableAmount = $taxable_amount;
-
-    //         $tc = new TaxCategory();
-            
-    //         $id = new ID();
-    //         $id->value = $this->getTaxType($item->tax_id);
-
-    //         $tc->ID = $id;
-    //         $tc->Percent = (string)$item->tax_rate2;
-    //         $ts = new TaxScheme();
-
-    //         $id = new ID();
-    //         $id->value = $this->standardizeTaxSchemeId($item->tax_name2);
-            
-    //         $jurisdiction = $this->getJurisdiction();
-    //         $ts->JurisdictionRegionAddress[] = $jurisdiction;
-
-    //         $ts->ID = $id;
-    //         $tc->TaxScheme = $ts;
-    //         $tax_subtotal->TaxCategory = $tc;
-
-    //         $tax_total = new TaxTotal();
-    //         $tax_total->TaxAmount = $tax_amount;
-    //         $tax_total->TaxSubtotal[] = $tax_subtotal;
-            
-    //         $this->tax_map[] = [
-    //             'taxableAmount' => $taxable_amount->amount,
-    //             'taxAmount' => $tax_amount->amount,
-    //             'percentage' => $item->tax_rate2,
-    //         ];
-
-    //         $item_taxes[] = $tax_total;
-
-    //     }
-
-
-    //     if(strlen($item->tax_name3 ?? '') > 1) {
-
-    //         $tax_amount = new TaxAmount();
-    //         $tax_amount->currencyID = $this->invoice->client->currency()->code;
-
-    //         $tax_amount->amount = $this->invoice->uses_inclusive_taxes ? $this->calcInclusiveLineTax($item->tax_rate3, $item->line_total) : $this->calcAmountLineTax($item->tax_rate3, $item->line_total);
-
-    //         $tax_subtotal = new TaxSubtotal();
-    //         $tax_subtotal->TaxAmount = $tax_amount;
-
-    //         $taxable_amount = new TaxableAmount();
-    //         $taxable_amount->currencyID = $this->invoice->client->currency()->code;
-    //         $taxable_amount->amount = $item->line_total;
-    //         $tax_subtotal->TaxableAmount = $taxable_amount;
-
-    //         $tc = new TaxCategory();
-
-    //         $id = new ID();
-    //         $id->value = $this->getTaxType($item->tax_id);
-
-    //         $tc->ID = $id;
-    //         $tc->Percent = (string)$item->tax_rate3;
-    //         $ts = new TaxScheme();
-
-    //         $id = new ID();
-    //         $id->value = $this->standardizeTaxSchemeId($item->tax_name3);
-
-    //         $jurisdiction = $this->getJurisdiction();
-    //         $ts->JurisdictionRegionAddress[] = $jurisdiction;
-
-    //         $ts->ID = $id;
-    //         $tc->TaxScheme = $ts;
-    //         $tax_subtotal->TaxCategory = $tc;
-
-    //         $tax_total = new TaxTotal();
-    //         $tax_total->TaxAmount = $tax_amount;
-    //         $tax_total->TaxSubtotal[] = $tax_subtotal;
-
-
-    //         $this->tax_map[] = [
-    //             'taxableAmount' => $taxable_amount->amount,
-    //             'taxAmount' => $tax_amount->amount,
-    //             'percentage' => $item->tax_rate3,
-    //         ];
-
-    //         $item_taxes[] = $tax_total;
-
-    //     }
-
-    //     return $item_taxes;
-    // }
+    
     
     /**
      * getAccountingSupplierParty
@@ -1483,7 +1279,9 @@ class Peppol extends AbstractService
             // Required: TaxableAmount (BT-116)
             $taxable_amount = new TaxableAmount();
             $taxable_amount->currencyID = $this->invoice->client->currency()->code;
-            $taxable_amount->amount = (string)round($this->invoice->amount - $this->invoice->total_taxes, 2);
+            $taxable_amount->amount = (string)round($this->invoice->amount,2);
+
+            nlog("0 tax taxable amount = ".$taxable_amount->amount);
 
             $tax_subtotal->TaxableAmount = $taxable_amount;
 
@@ -1503,11 +1301,6 @@ class Peppol extends AbstractService
 
             $tax_category->ID = $category_id;
 
-            // Required: TaxCategory Rate (BT-119)
-            // if ($grouped_tax['tax_rate'] > 0) {
-            //     $tax_category->Percent = (string)$grouped_tax['tax_rate'];
-            // }
-
             // Required: TaxScheme (BG-23)
             $tax_scheme = new TaxScheme();
             $scheme_id = new ID();
@@ -1516,7 +1309,6 @@ class Peppol extends AbstractService
             $tax_category->TaxScheme = $tax_scheme;
 
             $tax_subtotal->TaxCategory = $this->globalTaxCategories[0];
-            // $tax_subtotal->TaxCategory = $tax_category;
 
             $tax_total->TaxSubtotal[] = $tax_subtotal;
 
@@ -1526,7 +1318,7 @@ class Peppol extends AbstractService
 
         }
 
-        foreach($taxes as $grouped_tax)
+        foreach($taxes as $key => $grouped_tax)
         {
             // Required: TaxAmount (BT-110)
             $tax_amount = new TaxAmount();
@@ -1541,8 +1333,10 @@ class Peppol extends AbstractService
             $taxable_amount = new TaxableAmount();
             $taxable_amount->currencyID = $this->invoice->client->currency()->code;
 
-            $taxable_amount->amount = (string)round($grouped_tax['base_amount'],2);
-            
+            if(floatval($grouped_tax['total']) === 0.0)
+                $taxable_amount->amount = (string)round($this->invoice->amount, 2);
+            else
+                $taxable_amount->amount = (string)round($grouped_tax['base_amount'],2);
             $tax_subtotal->TaxableAmount = $taxable_amount;
 
             // Required: TaxAmount (BT-117)
@@ -1657,62 +1451,5 @@ class Peppol extends AbstractService
 
         return '0037';
     }
-
-
-    /**
-     * calculateAdjustedBaseAmount
-     *
-     * Calculates the adjusted base amount for a line item considering invoice-level discounts
-     * 
-     */
-    private function calculateAdjustedBaseAmount(object $line_item) 
-    {
-        $precision = $this->invoice->client->currency()->precision;
-        
-        // 1. First calculate the raw line total
-        $line_total = round($line_item->quantity * $line_item->cost, $precision);
-        
-        // 2. Apply line-level discount if any
-        if ($line_item->discount > 0) {
-            if ($line_item->is_amount_discount) {
-                $line_total = round($line_total - $line_item->discount, $precision);
-            } else {
-                $line_total = round($line_total * (1 - $line_item->discount / 100), $precision);
-            }
-        }
-
-        // 3. If no invoice-level discount, return now
-        if ($this->invoice->discount <= 0) {
-            return (string)$line_total;
-        }
-
-        // 4. Calculate total of all line items after their individual discounts
-        $invoice_subtotal = 0;
-        foreach ($this->invoice->line_items as $item) {
-            $item_total = round($item->quantity * $item->cost, $precision);
-            if ($item->discount > 0) {
-                if ($item->is_amount_discount) {
-                    $item_total = round($item_total - $item->discount, $precision);
-                } else {
-                    $item_total = round($item_total * (1 - $item->discount / 100), $precision);
-                }
-            }
-            $invoice_subtotal = round($invoice_subtotal + $item_total, $precision);
-        }
-
-        // 5. Calculate this line's portion of the invoice discount
-        if ($invoice_subtotal > 0) {
-            if ($this->invoice->is_amount_discount) {
-                $discount_portion = round(($line_total / $invoice_subtotal) * $this->invoice->discount, $precision);
-            } else {
-                $discount_portion = round($line_total * ($this->invoice->discount / 100), $precision);
-            }
-            $line_total = round($line_total - $discount_portion, $precision);
-        }
-
-        return (string)$line_total;
-    }
-
-
 
 }

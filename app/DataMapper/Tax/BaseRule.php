@@ -373,7 +373,12 @@ class BaseRule implements RuleInterface
                 default => $this->defaultForeign(),
             };
 
+            return $this;
+
         }
+
+        $this->taxByType($item);
+
         return $this;
 
     }
