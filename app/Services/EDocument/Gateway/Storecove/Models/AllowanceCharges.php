@@ -5,18 +5,18 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
-use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
 
 class AllowanceCharges
 {
     // #[SerializedPath('[cbc:Amount][#]')]
     public ?float $amount_excluding_vat;
 
-
+	#[Context(['input_format' => 'float'])]
     #[SerializedPath('[cbc:Amount][#]')]
 	public ?float $amount_excluding_tax;
 
-    #[SerializedPath('[cbc:BaseAmount][#]')]
+    #[Context(['input_format' => 'float'])]
+	#[SerializedPath('[cbc:BaseAmount][#]')]
     public ?float $base_amount_excluding_tax;
 
     // #[SerializedPath('[cbc:Amount][#]')]
@@ -42,11 +42,8 @@ class AllowanceCharges
 	 * @param TaxesDutiesFees[] $taxes_duties_fees
 	 */
 	public function __construct(
-		#[Context(['input_format' => 'float'])]
 		?float $amount_excluding_vat,
-		#[Context(['input_format' => 'float'])]
 		?float $amount_excluding_tax,
-		#[Context(['input_format' => 'float'])]
 		?float $base_amount_excluding_tax,
 		?float $amount_including_tax,
 		?float $base_amount_including_tax,

@@ -96,6 +96,8 @@ class StorecoveRouter
         "Other" => ["B","DUNS, GLN, LEI",false,"DUNS, GLN, LEI"],
     ];
 
+    private $invoice;
+
     public function __construct()
     {
     }
@@ -110,11 +112,7 @@ class StorecoveRouter
     public function resolveRouting(string $country, ?string $classification = 'business'): string
     {
         $rules = $this->routing_rules[$country];
-        
-        if(is_array($rules) && !is_array($rules[0])) {
-            return $rules[3];
-        }
-    
+            
         $code = 'B';
         
         match($classification) {
@@ -123,6 +121,22 @@ class StorecoveRouter
             "individual" => $code = "C",
             default => $code = "B",
         };
+                
+        if ($this->invoice && $country == 'FR') {
+
+            if ($code == 'B' && strlen($this->invoice->client->id_number) == 9) {
+                return 'FR:SIRENE';
+            } elseif ($code == 'B' && strlen($this->invoice->client->id_number) == 14) {
+                return 'FR:SIRET';
+            } elseif ($code == 'G') {
+                return '0009:11000201100044';
+            }
+
+        }
+        
+        if (is_array($rules) && !is_array($rules[0])) {
+            return $rules[3];
+        }
 
         foreach($rules as $rule) {
             if(stripos($rule[0], $code) !== false) {
@@ -133,6 +147,11 @@ class StorecoveRouter
         return $rules[0][3];
     }
     
+    public function setInvoice($invoice):self
+    {
+        $this->invoice = $invoice;
+        return $this;
+    }
     /**
      * resolveTaxScheme
      *
@@ -153,6 +172,17 @@ class StorecoveRouter
             "individual" => $code = "C",
             default => $code = "B",
         };
+
+        // if($this->invoice && $country == 'FR'){
+
+        //     if($code == 'B' && strlen(trim(str_ireplace("fr", "", $this->invoice->client->vat_number))) == 9)
+        //         return 'FR:SIRENE';
+        //     elseif($code == 'B' && strlen(trim(str_ireplace("fr", "", $this->invoice->client->vat_number))) == 14)
+        //         return 'FR:SIRET';
+        //     elseif($code == 'G')
+        //         return 'FR:SIRET'; //@todo need to add customerAssignedAccountIdValue
+
+        // }
 
         //single array
         if(is_array($rules) && !is_array($rules[0])) {

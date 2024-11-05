@@ -2,6 +2,7 @@
 
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 
@@ -10,8 +11,9 @@ class TaxesDutiesFees
 	public ?string $country; //need to run postprocessing on this 
 	public ?float $amount;
 
+	#[Context(['input_format' => 'float'])]
 	#[SerializedName('cbc:Percent')]
-	public ?float $percentage;
+	public ?float $percentage = 0;
 
 	#[SerializedPath('[cbc:ID][#]')]
 	public ?string $category;

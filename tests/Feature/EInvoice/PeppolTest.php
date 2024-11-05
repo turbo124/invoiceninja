@@ -502,6 +502,7 @@ class PeppolTest extends TestCase
             'country_id' => 276,
             'routing_id' => 'ABC1234',
             'settings' => $client_settings,
+            'vat_number' => 'DE173655434',
         ]);
 
         $item = new InvoiceItem();
@@ -653,6 +654,7 @@ class PeppolTest extends TestCase
             'country_id' => 276,
             'routing_id' => 'ABC1234',
             'settings' => $client_settings,
+            'vat_number' => 'DE173655434',
         ]);
 
         $item = new InvoiceItem();
@@ -803,6 +805,7 @@ class PeppolTest extends TestCase
             'country_id' => 276,
             'routing_id' => 'ABC1234',
             'settings' => $client_settings,
+            'vat_number' => 'DE173655434',
         ]);
 
         $item = new InvoiceItem();
@@ -951,6 +954,7 @@ class PeppolTest extends TestCase
             'country_id' => 276,
             'routing_id' => 'ABC1234',
             'settings' => $client_settings,
+            'vat_number' => 'DE173655434',
         ]);
 
         $item = new InvoiceItem();
@@ -1094,6 +1098,7 @@ class PeppolTest extends TestCase
             'country_id' => 276,
             'routing_id' => 'ABC1234',
             'settings' => $client_settings,
+            'vat_number' => 'DE173655434',
         ]);
 
 
@@ -1215,6 +1220,7 @@ class PeppolTest extends TestCase
             'country_id' => 276,
             'routing_id' => 'ABC1234',
             'settings' => $client_settings,
+            'vat_number' => 'DE173655434',
         ]);
 
 

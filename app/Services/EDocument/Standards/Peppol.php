@@ -153,6 +153,8 @@ class Peppol extends AbstractService
 
     private $globalTaxCategories;
 
+    private string $tax_category_id;
+
     public function __construct(public Invoice $invoice)
     {
         $this->company = $invoice->company;
@@ -171,6 +173,10 @@ class Peppol extends AbstractService
     {
         $this->getJurisdiction(); //Sets the nexus object into the Peppol document.
         $this->getAllUsedTaxes(); //Maps all used line item taxes
+
+        nlog("amount: {$this->invoice->amount}");
+        nlog("taxes: {$this->invoice->total_taxes}");
+        nlog("exclusive = {$this->invoice->amount} -{$this->invoice->total_taxes}");
 
         /** Invoice Level Props */
         $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
@@ -215,6 +221,7 @@ class Peppol extends AbstractService
         $this->p_invoice->InvoiceLine = $this->getInvoiceLines();
         $this->p_invoice->AllowanceCharge = $this->getAllowanceCharges();
         $this->p_invoice->LegalMonetaryTotal = $this->getLegalMonetaryTotal();
+        $this->p_invoice->Delivery = $this->getDelivery();
 
         $this->setOrderReference()->setTaxBreakdown();
 
@@ -448,8 +455,13 @@ class Peppol extends AbstractService
                 $mfn->value = (string)number_format(round(($this->invoice->discount), 2), 2, '.', '');  // Format to always show 2 decimals
                 $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
             }
-            
-            $allowanceCharge->TaxCategory = $this->globalTaxCategories;
+
+            $tc = clone $this->globalTaxCategories[0];
+            // $tc->Percent = '0';
+            unset($tc->TaxExemptionReasonCode);
+            unset($tc->TaxExemptionReason);
+
+            $allowanceCharge->TaxCategory[] = $tc;
             $allowanceCharge->AllowanceChargeReason = ctrans('texts.discount');
             $allowances[] = $allowanceCharge;
         }
@@ -554,7 +566,9 @@ class Peppol extends AbstractService
 
         $tea = new TaxExclusiveAmount();
         $tea->currencyID = $this->invoice->client->currency()->code;
-        $tea->amount = $this->invoice->uses_inclusive_taxes ? round($this->invoice->amount - $this->invoice->total_taxes, 2) : $taxable;
+        // $tea->amount = $this->invoice->uses_inclusive_taxes ? round($this->invoice->amount - $this->invoice->total_taxes, 2) : $taxable;
+
+        $tea->amount = round($this->invoice->amount - $this->invoice->total_taxes, 2);
         $lmt->TaxExclusiveAmount = $tea;
 
         $tia = new TaxInclusiveAmount();
@@ -612,7 +626,7 @@ class Peppol extends AbstractService
         
         if (empty($tax_type)) {
             if ((in_array($this->company->country()->iso_3166_2, $eu_states) && in_array($this->invoice->client->country->iso_3166_2, $eu_states)) && $this->invoice->company->country()->iso_3166_2 != $this->invoice->client->country->iso_3166_2) {
-                $tax_type = 'K'; //EEA Exempt
+                $tax_type = 'K'; // EEA Exempt
             } elseif (!in_array($this->invoice->client->country->iso_3166_2, $eu_states)) {
                 $tax_type = 'G'; //Free export item, VAT not charged
             } else {
@@ -633,6 +647,83 @@ class Peppol extends AbstractService
         return $tax_type;
     }
        
+
+    private function resolveTaxExemptReason($item, $ctc = null): mixed
+    {
+        
+        $eu_states = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "EL", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "ES-CE", "ES-ML", "ES-CN", "SE", "IS", "LI", "NO", "CH"];
+
+        if($item->tax_id == '9') {
+            $tax_type = 'AE'; // EEA Exempt
+            $reason_code = 'vatex-eu-ae';
+            $reason = 'Reverse charge';
+        } elseif ((in_array($this->company->country()->iso_3166_2, $eu_states) && 
+                   in_array($this->invoice->client->country->iso_3166_2, $eu_states)) && 
+                   $this->invoice->company->country()->iso_3166_2 != $this->invoice->client->country->iso_3166_2) {
+            $tax_type = 'K'; // EEA Exempt
+            $reason_code = 'vatex-eu-ic';
+            $reason = 'Intra-Community supply';
+
+        } elseif (!in_array($this->invoice->client->country->iso_3166_2, $eu_states)) {
+            $tax_type = 'G'; //Free export item, VAT not charged
+            $reason_code = 'vatex-eu-g';
+            $reason = 'Export outside the EU';
+        } else {
+            $tax_type = 'O'; //Standard rate
+            $reason_code = "vatex-eu-o";
+            $reason = 'Services outside scope of tax';
+        }
+
+        $this->tax_category_id = $tax_type;
+
+        //no vat, build a single tax category for tax exemption
+       
+        $taxCategory = new \InvoiceNinja\EInvoice\Models\Peppol\TaxCategoryType\TaxCategory();
+        $taxCategory->ID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+        $taxCategory->ID->value = $tax_type;
+
+        if($this->tax_category_id != 'O')
+            $taxCategory->Percent = '0';
+
+        $taxScheme = new \InvoiceNinja\EInvoice\Models\Peppol\TaxSchemeType\TaxScheme();
+        $taxScheme->ID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+        $taxScheme->ID->value = $this->standardizeTaxSchemeId('vat');
+        $taxCategory->TaxScheme = $taxScheme;
+        $terc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\TaxExemptionReasonCode();
+        $terc->value = $reason_code;
+        $taxCategory->TaxExemptionReasonCode = $terc;
+        $taxCategory->TaxExemptionReason = $reason;
+
+        $this->globalTaxCategories = [$taxCategory];
+
+        
+        if($this->tax_category_id == 'O' && isset($this->p_invoice->AccountingSupplierParty->Party->PartyTaxScheme))
+            unset($this->p_invoice->AccountingSupplierParty->Party->PartyTaxScheme);
+
+            
+        if ($this->tax_category_id == 'O' && isset($this->p_invoice->AccountingCustomerParty->Party->PartyTaxScheme)) {
+            unset($this->p_invoice->AccountingCustomerParty->Party->PartyTaxScheme);
+        }
+
+        if($ctc) {        
+            $ctc->ID->value = $tax_type;
+
+            if($this->tax_category_id != 'O')
+                $ctc->Percent = '0';
+            // $terc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\TaxExemptionReasonCode();
+            // $terc->value = $reason_code;
+            // $ctc->TaxExemptionReasonCode = $terc;
+            // $ctc->TaxExemptionReason = $reason;
+
+            return $ctc;
+        }
+
+        return $tax_type;
+
+    }
+
+
+
     /**
      * getInvoiceLines
      * 
@@ -656,7 +747,9 @@ class Peppol extends AbstractService
             $ctc = new ClassifiedTaxCategory();
             $ctc->ID = new ID();
             $ctc->ID->value = $this->getTaxType($item->tax_id);
-            $ctc->Percent = (string)$item->tax_rate1;
+
+            if($item->tax_rate1 > 0)
+                $ctc->Percent = (string)$item->tax_rate1;
 
             $ts = new TaxScheme();
             $id = new ID();
@@ -666,12 +759,11 @@ class Peppol extends AbstractService
 
             if(floatval($item->tax_rate1) === 0.0)
             {
-                $ctc->ID->value = 'K';
+                $ctc = $this->resolveTaxExemptReason($item, $ctc);
 
-                $terc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\TaxExemptionReasonCode();
-                $terc->value = 'VATEX-EU-IC';
-                $ctc->TaxExemptionReasonCode = $terc;
-                $ctc->TaxExemptionReason = 'Intra-Community supply';
+                if($this->tax_category_id == 'O')
+                    unset($ctc->Percent);
+                
             }
 
             $_item->ClassifiedTaxCategory[] = $ctc;
@@ -899,7 +991,6 @@ class Peppol extends AbstractService
                 
             });
 
-        
         return $this;
 
     }
@@ -937,7 +1028,7 @@ class Peppol extends AbstractService
             $id->value = $this->getTaxType($item->tax_id);
             
             if(floatval($item->tax_rate1) === 0.0)
-                $id->value = 'K';
+                $id->value = $this->resolveTaxExemptReason($item);
 
             $tc->ID = $id;
             $tc->Percent = (string)$item->tax_rate1;
@@ -1098,7 +1189,9 @@ class Peppol extends AbstractService
             $pts->CompanyID = $companyID;
 
             $ts = new TaxScheme();
-            $ts->ID = $vatID;
+            $id = new ID();
+            $id->value = $this->standardizeTaxSchemeId('vat');
+            $ts->ID = $id;
             $pts->TaxScheme = $ts;
 
             //@todo if we have an exact GLN/routing number we should update this, otherwise Storecove will proxy and update on transit
@@ -1169,6 +1262,21 @@ class Peppol extends AbstractService
 
             $party->PartyIdentification[] = $pi;
 
+            $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
+
+            $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
+            $companyID->value = $this->invoice->client->vat_number;
+            $pts->CompanyID = $companyID;
+
+            $ts = new TaxScheme();
+            $id = new ID();
+            $id->value = $this->standardizeTaxSchemeId('vat');
+            $ts->ID = $id;
+            $pts->TaxScheme = $ts;
+
+            $party->PartyTaxScheme[] = $pts;
+
+
         }
 
         $party_name = new PartyName();
@@ -1222,6 +1330,37 @@ class Peppol extends AbstractService
         return $acp;
     }
     
+    private function getDelivery(): array
+    {
+        $delivery = new \InvoiceNinja\EInvoice\Models\Peppol\DeliveryType\Delivery();
+        $location = new \InvoiceNinja\EInvoice\Models\Peppol\LocationType\DeliveryLocation();
+
+        $address = new Address();
+        // $address->CityName = $this->invoice->client->city;
+        // $address->StreetName = $this->invoice->client->address1;
+
+        // if (strlen($this->invoice->client->address2 ?? '') > 1) {
+        //     $address->AdditionalStreetName = $this->invoice->client->address2;
+        // }
+
+        // $address->PostalZone = $this->invoice->client->postal_code;
+        // $address->CountrySubentity = $this->invoice->client->state;
+
+        $country = new Country();
+
+        $ic = new IdentificationCode();
+        $shipping = $this->invoice->client->shipping_country ? $this->invoice->client->shipping_country->iso_3166_2 : $this->invoice->client->country->iso_3166_2;
+        $ic->value = $shipping;
+
+        $country->IdentificationCode = $ic;
+        $address->Country = $country;
+        $location->Address = $address;
+        $delivery->DeliveryLocation = $location;
+
+        return [$delivery];
+
+    }
+
     /**
      * getTaxable
      *
@@ -1245,12 +1384,14 @@ class Peppol extends AbstractService
             $total += $line_total;
         }
 
+        $total = round($total, 2);
+
         if ($this->invoice->discount > 0) {
             if ($this->invoice->is_amount_discount) {
                 $total -= $this->invoice->discount;
             } else {
                 $total *= (100 - $this->invoice->discount) / 100;
-                $total = round($total, 2);
+                
             }
         }
 
@@ -1270,7 +1411,7 @@ class Peppol extends AbstractService
             $total += $this->invoice->custom_surcharge4;
         }
 
-        return $total;
+        return round($total,2);
     }
 
     /////////////////  Helper Methods /////////////////////////
@@ -1362,12 +1503,20 @@ class Peppol extends AbstractService
             // Required: TaxableAmount (BT-116)
             $taxable_amount = new TaxableAmount();
             $taxable_amount->currencyID = $this->invoice->client->currency()->code;
-            $taxable_amount->amount = (string)$grouped_tax['taxableAmount'];
+
+
+            if (floatval($grouped_tax['taxAmount']) === 0.0) {
+                $taxable_amount->amount = (string)round($this->invoice->amount - $this->invoice->total_taxes, 2);
+            }   
+            else
+                $taxable_amount->amount = (string)$grouped_tax['taxableAmount'];
+            
             $tax_subtotal->TaxableAmount = $taxable_amount;
 
             // Required: TaxAmount (BT-117)
             $subtotal_tax_amount = new TaxAmount();
             $subtotal_tax_amount->currencyID = $this->invoice->client->currency()->code;
+
             $subtotal_tax_amount->amount = (string)$grouped_tax['taxAmount'];
 
             $tax_subtotal->TaxAmount = $subtotal_tax_amount;
@@ -1379,14 +1528,15 @@ class Peppol extends AbstractService
             $category_id = new ID();
             $category_id->value = 'S'; // Standard rate
 
-            if(floatval($grouped_tax['taxAmount']) === 0.0)
-               $category_id->value = 'K'; // Exempt
-    
+            if(floatval($grouped_tax['taxAmount']) === 0.0){
+               $category_id->value = $this->tax_category_id; // Exempt
+            }
 
             $tax_category->ID = $category_id;
 
             // Required: TaxCategory Rate (BT-119)
-            $tax_category->Percent = (string)$grouped_tax['percentage'];
+            if($grouped_tax['percentage'] > 0)
+                $tax_category->Percent = (string)$grouped_tax['percentage'];
 
             // Required: TaxScheme (BG-23)
             $tax_scheme = new TaxScheme();
@@ -1395,7 +1545,9 @@ class Peppol extends AbstractService
             $tax_scheme->ID = $scheme_id;
             $tax_category->TaxScheme = $tax_scheme;
 
-            $tax_subtotal->TaxCategory = $tax_category;
+            $tax_subtotal->TaxCategory = $this->globalTaxCategories[0];
+            // $tax_subtotal->TaxCategory = $tax_category;
+
             $tax_total->TaxSubtotal[] = $tax_subtotal;
 
             $this->p_invoice->TaxTotal[] = $tax_total;
@@ -1409,7 +1561,7 @@ class Peppol extends AbstractService
 
         //calculate nexus
         $country_code = $this->company->country()->iso_3166_2;
-        $br = new BaseRule();
+        $br = new \App\DataMapper\Tax\BaseRule();
         $eu_countries = $br->eu_country_codes;
 
         if($this->invoice->client->country->iso_3166_2 == $this->company->country()->iso_3166_2){
@@ -1500,6 +1652,7 @@ class Peppol extends AbstractService
     {
         // 1. Calculate total invoice amount before invoice-level discount
         $total_amount = 0;
+
         foreach ($this->invoice->line_items as $item) {
             $line_total = $item->quantity * $item->cost;
             

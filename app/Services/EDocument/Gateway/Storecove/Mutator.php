@@ -578,11 +578,16 @@ class Mutator implements MutatorInterface
     {
         $code = $this->getClientRoutingCode();
         
-        if(strlen($this->invoice->client->vat_number) < 2) 
+        if(strlen($this->invoice->client->vat_number) < 2 || strlen($this->invoice->client->id_number) < 2) 
             return $this->setEmailRouting($this->invoice->client->present()->email());
 
+        if($this->invoice->client->country->iso_3166_2 == 'FR')
+            $vat = $this->invoice->client->id_number;
+        else
+            $vat = $this->invoice->client->vat_number;
+
         $this->setStorecoveMeta($this->buildRouting([
-                ["scheme" => $code, "id" => $this->invoice->client->vat_number]
+                ["scheme" => $code, "id" => $vat]
             ]));
 
         return $this;
@@ -595,7 +600,7 @@ class Mutator implements MutatorInterface
      */
     private function getClientRoutingCode(): string
     {
-        return (new StorecoveRouter())->resolveRouting($this->invoice->client->country->iso_3166_2, $this->invoice->client->classification);
+        return (new StorecoveRouter())->setInvoice($this->invoice)->resolveRouting($this->invoice->client->country->iso_3166_2, $this->invoice->client->classification);
     }
 
 

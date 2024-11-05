@@ -134,7 +134,7 @@ class StorecoveAdapter
                 foreach($line->taxes_duties_fees as &$tax)
                 {
                     $tax->country = $this->nexus;
-                    
+                    $tax->percentage = $tax->percentage ?? 0; 
                     if(property_exists($tax,'category'))
                         $tax->category = $this->tranformTaxCode($tax->category);
                 }
@@ -170,7 +170,8 @@ class StorecoveAdapter
         foreach($tax_subtotals as &$tax)
         {
             $tax->country = $this->nexus;
-            
+            $tax->percentage = $tax->percentage ?? 0;
+
             if (property_exists($tax, 'category')) 
                 $tax->category = $this->tranformTaxCode($tax->category);
 
@@ -199,6 +200,7 @@ class StorecoveAdapter
             foreach($taxes as &$tax)
             {            
                 $tax->country = $this->nexus;
+                $tax->percentage = $tax->percentage ?? 0;
 
                 if (property_exists($tax, 'category')) {
                     $tax->category = $this->tranformTaxCode($tax->category);
@@ -225,8 +227,9 @@ class StorecoveAdapter
 
         if(strlen($this->ninja_invoice->client->vat_number) > 2)
         {
+            // $id = str_ireplace("fr","", $this->ninja_invoice->client->vat_number);
             $id = $this->ninja_invoice->client->vat_number;
-            $scheme = $this->storecove->router->resolveTaxScheme($this->ninja_invoice->client->country->iso_3166_2, $this->ninja_invoice->client->classification ?? 'individual');
+            $scheme = $this->storecove->router->setInvoice($this->ninja_invoice)->resolveTaxScheme($this->ninja_invoice->client->country->iso_3166_2, $this->ninja_invoice->client->classification ?? 'individual');
             $pi = new \App\Services\EDocument\Gateway\Storecove\Models\PublicIdentifiers($scheme, $id);
             $accounting_customer_party->addPublicIdentifiers($pi);
             $this->storecove_invoice->setAccountingCustomerParty($accounting_customer_party);
@@ -382,13 +385,13 @@ class StorecoveAdapter
         nlog("configuring destination tax");
         $this->storecove_invoice->setConsumerTaxMode(true);
         $id = $this->ninja_invoice->company->tax_data->regions->EU->subregions->{$client_country_code}->vat_number;
-        $scheme = $this->storecove->router->resolveTaxScheme($client_country_code, $this->ninja_invoice->client->classification ?? 'individual');
+        $scheme = $this->storecove->router->setInvoice($this->ninja_invoice)->resolveTaxScheme($client_country_code, $this->ninja_invoice->client->classification ?? 'individual');
 
         $pi = new \App\Services\EDocument\Gateway\Storecove\Models\PublicIdentifiers($scheme, $id);
         $asp = $this->storecove_invoice->getAccountingSupplierParty();
         $asp->addPublicIdentifiers($pi);
         $this->storecove_invoice->setAccountingSupplierParty($asp);
-
+        
         return $this;
     }
 

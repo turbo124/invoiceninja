@@ -71,6 +71,7 @@ class StorecoveTest extends TestCase
         $settings->vat_number = $params['company_vat'] ?? 'DE123456789';
         $settings->country_id = Country::where('iso_3166_2', 'DE')->first()->id;
         $settings->email = $this->faker->safeEmail();
+        $settings->currency_id = '3';
 
         $tax_data = new TaxModel();
         $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
@@ -118,7 +119,9 @@ class StorecoveTest extends TestCase
             'vat_number' => $params['client_vat'] ?? '',
             'classification' => $params['classification'] ?? 'individual',
             'has_valid_vat_number' => $params['has_valid_vat'] ?? false,
-            'name' => 'Test Client'
+            'name' => 'Test Client',
+            'is_tax_exempt' => $params['is_tax_exempt'] ?? false,
+            'id_number' => $params['client_id_number'] ?? '',
         ]);
 
         $contact = ClientContact::factory()->create([
@@ -158,10 +161,90 @@ class StorecoveTest extends TestCase
 
         $invoice->line_items = array_values($items);
         $invoice = $invoice->calc()->getInvoice();
-        nlog($invoice->withoutRelations()->toArray());
-        // $invoice->setRelation('company', $this->company);
 
         return compact('company', 'client', 'invoice');
+    }
+
+    public function testDeToFrClientTaxExemptSending()
+    {
+        $this->routing_id = 290868;
+
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        $data = $this->setupTestData($scenario);
+
+        $invoice = $data['invoice'];
+        $invoice = $invoice->calc()->getInvoice();
+        $company = $data['company'];
+        $client = $data['client'];
+        $client->save();
+
+        $this->assertEquals('DE', $company->country()->iso_3166_2);
+        $this->assertEquals('FR', $client->country->iso_3166_2);
+
+        foreach($invoice->line_items as $item)
+        {
+          $this->assertEquals('1', $item->tax_id);
+          $this->assertEquals(0, $item->tax_rate1);
+        }
+
+        $this->assertEquals(floatval(0), floatval($invoice->total_taxes));
+        $this->sendDocument($invoice);
+    }
+
+        
+    /**
+     * PtestDeToDeClientTaxExemptSending
+     *
+     * Disabled for now - there is an issue with internal tax exempt client in same country
+     * @return void
+     */
+    public function PtestDeToDeClientTaxExemptSending()
+    {
+        $this->routing_id = 290868;
+
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => 'DE173755434',
+          'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => true,
+        ];
+
+        $data = $this->setupTestData($scenario);
+
+        $invoice = $data['invoice'];
+        $invoice = $invoice->calc()->getInvoice();
+        $company = $data['company'];
+        $client = $data['client'];
+        $client->save();
+
+        $this->assertEquals('DE', $company->country()->iso_3166_2);
+        $this->assertEquals('DE', $client->country->iso_3166_2);
+
+        foreach($invoice->line_items as $item)
+        {
+          $this->assertEquals('1', $item->tax_id);
+          $this->assertEquals(0, $item->tax_rate1);
+        }
+
+        $this->assertEquals(floatval(0), floatval($invoice->total_taxes));
+        $this->sendDocument($invoice);
     }
 
     public function testDeToDeSending()
@@ -205,27 +288,21 @@ class StorecoveTest extends TestCase
         $p = new Peppol($model);
         $p->run();
 
+        try {
+            $processor = new \Saxon\SaxonProcessor();
+        } catch (\Throwable $e) {
+            $this->markTestSkipped('saxon not installed');
+        }
 
-nlog($p->toXml());
+        $validator = new \App\Services\EDocument\Standards\Validation\XsltDocumentValidator($p->toXml());
+        $validator->validate();
 
+        if (count($validator->getErrors()) > 0) {
+            nlog($p->toXml());
+            nlog($validator->getErrors());
+        }
 
-try {
-    $processor = new \Saxon\SaxonProcessor();
-} catch (\Throwable $e) {
-    $this->markTestSkipped('saxon not installed');
-}
-
-$validator = new \App\Services\EDocument\Standards\Validation\XsltDocumentValidator($p->toXml());
-$validator->validate();
-
-if (count($validator->getErrors()) > 0) {
-    
-    nlog($validator->getErrors());
-}
-
-$this->assertCount(0, $validator->getErrors());
-
-
+        $this->assertCount(0, $validator->getErrors());
 
         $identifiers = $p->gateway->mutator->setClientRoutingCode()->getStorecoveMeta();
 

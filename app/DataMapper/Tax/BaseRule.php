@@ -368,6 +368,8 @@ class BaseRule implements RuleInterface
                 Product::PRODUCT_TYPE_REDUCED_TAX => $this->taxReduced($item),
                 Product::PRODUCT_TYPE_OVERRIDE_TAX => $this->override($item),
                 Product::PRODUCT_TYPE_ZERO_RATED => $this->zeroRated($item),
+                Product::PRODUCT_TYPE_REVERSE_TAX => $this->zeroRated($item),
+                Product::PRODUCT_INTRA_COMMUNITY => $this->zeroRated($item),
                 default => $this->defaultForeign(),
             };
 
