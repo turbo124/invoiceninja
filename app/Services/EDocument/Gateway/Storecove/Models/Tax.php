@@ -5,15 +5,15 @@ namespace App\Services\EDocument\Gateway\Storecove\Models;
 class Tax
 {
 	public ?string $country;
-	public ?string $amount;
-	public ?string $percentage;
+	public ?float $amount;
+	public ?float $percentage;
 	public ?string $category;
 	public ?string $type;
 
 	public function __construct(
 		?string $country,
-		?string $amount,
-		?string $percentage,
+		?float $amount,
+		?float $percentage,
 		?string $category,
 		?string $type
 	) {
@@ -29,12 +29,12 @@ class Tax
 		return $this->country;
 	}
 
-	public function getAmount(): ?string
+	public function getAmount(): ?float
 	{
 		return $this->amount;
 	}
 
-	public function getPercentage(): ?string
+	public function getPercentage(): ?float
 	{
 		return $this->percentage;
 	}
@@ -55,13 +55,13 @@ class Tax
 		return $this;
 	}
 
-	public function setAmount(?string $amount): self
+	public function setAmount(?float $amount): self
 	{
 		$this->amount = $amount;
 		return $this;
 	}
 
-	public function setPercentage(?string $percentage): self
+	public function setPercentage(?float $percentage): self
 	{
 		$this->percentage = $percentage;
 		return $this;

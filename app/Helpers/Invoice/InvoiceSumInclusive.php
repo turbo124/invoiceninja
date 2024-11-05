@@ -368,19 +368,33 @@ class InvoiceSumInclusive
         $values = $this->invoice_items->getGroupedTaxes();
 
         foreach ($keys as $key) {
+
             $tax_name = $values->filter(function ($value, $k) use ($key) {
                 return $value['key'] == $key;
             })->pluck('tax_name')->first();
 
+            $tax_rate = $values->filter(function ($value, $k) use ($key) {
+                return $value['key'] == $key;
+            })->pluck('tax_rate')->first();
+
+            $tax_id = $values->filter(function ($value, $k) use ($key) {
+                return $value['key'] == $key;
+            })->pluck('tax_id')->first();
+
             $total_line_tax = $values->filter(function ($value, $k) use ($key) {
                 return $value['key'] == $key;
             })->sum('total');
+            
+            $base_amount = $values->filter(function ($value, $k) use ($key) {
+                return $value['key'] == $key;
+            })->sum('base_amount');
 
-            //$total_line_tax -= $this->discount($total_line_tax);
+            $tax_id = $values->first()['tax_id'] ?? '';
 
-            $this->tax_map[] = ['name' => $tax_name, 'total' => $total_line_tax];
+            $this->tax_map[] = ['name' => $tax_name, 'total' => $total_line_tax, 'tax_id' => $tax_id, 'tax_rate' => $tax_rate, 'base_amount' => round($base_amount,2)];
 
             $this->total_taxes += $total_line_tax;
+            
         }
 
         return $this;
@@ -399,6 +413,11 @@ class InvoiceSumInclusive
     public function getItemTotalTaxes()
     {
         return $this->getTotalTaxes();
+    }
+
+    public function getNetSubtotal()
+    {
+        return $this->getSubTotal() - $this->getTotalDiscount();
     }
 
     public function purgeTaxes()

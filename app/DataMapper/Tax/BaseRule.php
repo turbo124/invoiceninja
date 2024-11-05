@@ -155,7 +155,15 @@ class BaseRule implements RuleInterface
 
         $this->resolveRegions();
 
+        
         if(!$this->isTaxableRegion()) {
+            $this->tax_data = null;
+            $this->tax_rate1 = 0;
+            $this->tax_name1 = '';
+            $this->tax_rate2 = 0;
+            $this->tax_name2 = '';
+            $this->tax_rate3 = 0;
+            $this->tax_name3 = '';
             return $this;
         }
 
@@ -317,8 +325,32 @@ class BaseRule implements RuleInterface
         }
 
         if(isset($this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion})) {
-            $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_rate;
-            $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_name;
+            if ($this->client_region === 'EU') {
+                $company_country_code = $this->client->company->country()->iso_3166_2;
+                $client_country_code = $this->client->country->iso_3166_2;
+
+                $is_over_threshold = isset($this->client->company->tax_data->regions->EU->has_sales_above_threshold) &&
+                                    $this->client->company->tax_data->regions->EU->has_sales_above_threshold;
+
+                $is_b2c = strlen($this->client->vat_number) < 2 ||
+                        !($this->client->has_valid_vat_number ?? false) ||
+                        $this->client->classification == 'individual';
+
+                // Use destination VAT only for B2C transactions over threshold
+                if ($is_b2c && $is_over_threshold) {
+                    $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_rate;
+                    $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_name;
+                }
+                // Otherwise, use origin country tax rates
+                elseif (in_array($company_country_code, $this->eu_country_codes)) {
+                    $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$company_country_code}->tax_rate;
+                    $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$company_country_code}->tax_name;
+                }
+            }
+            else {
+                $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_rate;
+                $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_name;
+            }
         }
 
         return $this;
@@ -344,10 +376,17 @@ class BaseRule implements RuleInterface
                 Product::PRODUCT_TYPE_REDUCED_TAX => $this->taxReduced($item),
                 Product::PRODUCT_TYPE_OVERRIDE_TAX => $this->override($item),
                 Product::PRODUCT_TYPE_ZERO_RATED => $this->zeroRated($item),
+                Product::PRODUCT_TYPE_REVERSE_TAX => $this->zeroRated($item),
+                Product::PRODUCT_INTRA_COMMUNITY => $this->zeroRated($item),
                 default => $this->defaultForeign(),
             };
 
+            return $this;
+
         }
+
+        $this->taxByType($item);
+
         return $this;
 
     }

@@ -9,24 +9,24 @@ class TaxSubtotals
 {
 
     #[SerializedPath('[cbc:TaxAmount][#]')]
-    public ?string $tax_amount;
+    public ?float $tax_amount;
 
     public ?string $country;
 
     #[SerializedPath('[cbc:TaxableAmount][#]')]
-    public ?string $taxable_amount;
+    public ?float $taxable_amount;
 
     #[SerializedPath('[cac:TaxCategory][cbc:Percent]')]
-    public ?string $percentage;
+    public ?float $percentage;
 
     #[SerializedPath('[cac:TaxCategory][cbc:ID][#]')]
     public ?string $category;
 
 	public function __construct(
-		?string $tax_amount,
+		?float $tax_amount,
 		?string $country,
-		?string $taxable_amount,
-		?string $percentage,
+		?float $taxable_amount,
+		?float $percentage,
 		?string $category
 	) {
 		$this->tax_amount = $tax_amount;
@@ -36,7 +36,7 @@ class TaxSubtotals
 		$this->category = $category;
 	}
 
-	public function getTaxAmount(): ?string
+	public function getTaxAmount(): ?float
 	{
 		return $this->tax_amount;
 	}
@@ -46,12 +46,12 @@ class TaxSubtotals
 		return $this->country;
 	}
 
-	public function getTaxableAmount(): ?string
+	public function getTaxableAmount(): ?float
 	{
 		return $this->taxable_amount;
 	}
 
-	public function getPercentage(): ?string
+	public function getPercentage(): ?float
 	{
 		return $this->percentage;
 	}
@@ -61,7 +61,7 @@ class TaxSubtotals
 		return $this->category;
 	}
 
-	public function setTaxAmount(?string $tax_amount): self
+	public function setTaxAmount(?float $tax_amount): self
 	{
 		$this->tax_amount = $tax_amount;
 		return $this;
@@ -73,13 +73,13 @@ class TaxSubtotals
 		return $this;
 	}
 
-	public function setTaxableAmount(?string $taxable_amount): self
+	public function setTaxableAmount(?float $taxable_amount): self
 	{
 		$this->taxable_amount = $taxable_amount;
 		return $this;
 	}
 
-	public function setPercentage(?string $percentage): self
+	public function setPercentage(?float $percentage): self
 	{
 		$this->percentage = $percentage;
 		return $this;

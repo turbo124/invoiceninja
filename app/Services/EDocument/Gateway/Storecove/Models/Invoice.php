@@ -40,7 +40,7 @@ class Invoice
 
     #[SerializedPath('[cac:AllowanceCharge]')]
 	/** @var AllowanceCharges[] */ 
-	public array $allowance_charges;
+	public ?array $allowance_charges = [];
 
     //this is an experimental prop
     // #[SerializedPath('[cac:LegalMonetaryTotal][cbc:TaxInclusiveAmount][#]')]
@@ -67,7 +67,7 @@ class Invoice
     // /** @var ?\DateTime */
     #[SerializedPath('[cbc:DueDate]')]
     // #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
-    public $due_date;
+    public ?string $due_date;
 
 	//may need something custom for this
     public ?string $invoice_period;
@@ -166,7 +166,7 @@ class Invoice
 
 	public function __construct(
 		?string $invoice_number,
-		$issue_date,
+		?string $issue_date,
 		?AccountingCustomerParty $accounting_customer_party,
 		?array $invoice_lines,
 		?string $accounting_cost,
@@ -176,14 +176,14 @@ class Invoice
 		?string $accounting_currency_tax_amount_currency,
 		?AccountingSupplierParty $accounting_supplier_party,
 		?array $allowance_charges,
-		?string $amount_including_tax,
-		?string $amount_including_vat,
+		?float $amount_including_tax,
+		?float $amount_including_vat,
 		?array $attachments,
 		?bool $consumer_tax_mode,
 		?Delivery $delivery,
 		?DeliveryTerms $delivery_terms,
 		?string $document_currency_code,
-		$due_date,
+		?string $due_date,
 		?string $invoice_period,
 		?array $issue_reasons,
 		?string $issue_time,
@@ -335,12 +335,12 @@ class Invoice
 		return $this->allowance_charges;
 	}
 
-	public function getAmountIncludingTax(): ?string
+	public function getAmountIncludingTax(): ?float
 	{
 		return $this->amount_including_tax;
 	}
 
-	public function getAmountIncludingVat(): ?string
+	public function getAmountIncludingVat(): ?float
 	{
 		return $this->amount_including_vat;
 	}
@@ -638,13 +638,13 @@ class Invoice
 		return $this;
 	}
 
-	public function setAmountIncludingTax(?string $amount_including_tax): self
+	public function setAmountIncludingTax(?float $amount_including_tax): self
 	{
 		$this->amount_including_tax = $amount_including_tax;
 		return $this;
 	}
 
-	public function setAmountIncludingVat(?string $amount_including_vat): self
+	public function setAmountIncludingVat(?float $amount_including_vat): self
 	{
 		$this->amount_including_vat = $amount_including_vat;
 		return $this;
@@ -683,7 +683,7 @@ class Invoice
 		return $this;
 	}
 
-	public function setDueDate($due_date): self
+	public function setDueDate(?string $due_date): self
 	{
 		$this->due_date = $due_date;
 		return $this;

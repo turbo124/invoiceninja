@@ -159,10 +159,6 @@ class InvoicePay extends Component
 
         $this->setContext('fields', $fields); // $this->context['fields'] = $fields;
 
-        if ($company_gateway->always_show_required_fields) {
-            return $this->required_fields = true;
-        }
-
         /** @var \App\Models\ClientContact $contact */
         $contact = $this->getContext()['contact'];
 
@@ -183,6 +179,10 @@ class InvoicePay extends Component
                     return $this->required_fields = true;
                 }
             }
+        }
+        
+        if ($company_gateway->always_show_required_fields) {
+            return $this->required_fields = true;
         }
 
         return $this->required_fields = false;

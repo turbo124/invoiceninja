@@ -48,34 +48,58 @@ class SendEDocument implements ShouldQueue
     public function handle(Storecove $storecove)
     {
         MultiDB::setDB($this->db);
+    
+        nlog("trying");
 
         $model = $this->entity::find($this->id);
 
+        /** Concrete implementation current linked to Storecove only */
+        $p = new Peppol($model);
+        $p->run();
+        $identifiers = $p->gateway->mutator->setClientRoutingCode()->getStorecoveMeta();
+
+        $result = $storecove->build($model)->getResult();
+
+        if (count($result['errors']) > 0) {
+            nlog($result);
+            return $result['errors'];
+        }
+        
+        $payload = [
+            'legal_entity_id' => $model->company->legal_entity_id,
+            "idempotencyGuid" => \Illuminate\Support\Str::uuid(),
+            'document' => [
+                'document_type' => 'invoice',
+                'invoice' => $result['document'],
+            ],
+            'tenant_id' => $model->company->company_key,
+            'routing' => $identifiers['routing'],
+            
+            //
+            'account_key' => $model->company->account->key,
+            'e_invoicing_token' => $model->company->account->e_invoicing_token,
+            'identifiers' => $identifiers,
+        ];
+        
+        /** Concrete implementation current linked to Storecove only */
+
+        //@testing only
+        $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
+        $r = $sc->sendJsonDocument($payload);
+
+        if (is_string($r)) {
+            return $this->writeActivity($model, $r);
+        }
+        else {
+                // nlog($r->body());
+        }
+        
+        return;
+
+
         if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->legal_entity_id)
         {
-        
-            $p = new Peppol($model);
-            $p->run();
-            $identifiers = $p->getStorecoveMeta();
-
-            $result = $storecove->build($model);
-
-            /**************************** Legacy */
-            $xml = $p->toXml();
             
-            $payload = [
-                'legal_entity_id' => $model->company->legal_entity_id,
-                'document' => base64_encode($xml),
-                'tenant_id' => $model->company->company_key,
-                'identifiers' => $identifiers,
-                'e_invoicing_token' => $model->company->account->e_invoicing_token,
-                'account_key' => $model->company->account->key,
-                // 'e_invoicing_token' => $model->company->e_invoicing_token,
-                // include whitelabel key.
-            ];
-
-            /**************************** Legacy */
-
             $r = Http::withHeaders($this->getHeaders())
                 ->post(config('ninja.hosted_ninja_url')."/api/einvoice/submission", $payload);
 
@@ -97,15 +121,9 @@ class SendEDocument implements ShouldQueue
 
         if(Ninja::isHosted() && ($model instanceof Invoice) && $model->company->legal_entity_id)
         {
-            //hosted sender
-            $p = new Peppol($model);
-
-            $p->run();
-            $xml = $p->toXml();
-            $identifiers = $p->getStorecoveMeta();
 
             $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
-            $r = $sc->sendDocument($xml, $model->company->legal_entity_id, $identifiers);
+            $r = $sc->sendJsonDocument($payload);
 
             if(is_string($r))
                 return $this->writeActivity($model, $r);
