@@ -348,12 +348,26 @@ class InvoiceSum
             $tax_name = $values->filter(function ($value, $k) use ($key) {
                 return $value['key'] == $key;
             })->pluck('tax_name')->first();
+            
+            $tax_rate = $values->filter(function ($value, $k) use ($key) {
+                return $value['key'] == $key;
+            })->pluck('tax_rate')->first();
+            
+            $tax_id = $values->filter(function ($value, $k) use ($key) {
+                return $value['key'] == $key;
+            })->pluck('tax_id')->first();
 
             $total_line_tax = $values->filter(function ($value, $k) use ($key) {
                 return $value['key'] == $key;
             })->sum('total');
+            
+            $base_amount = $values->filter(function ($value, $k) use ($key) {
+                return $value['key'] == $key;
+            })->sum('base_amount');
 
-            $this->tax_map[] = ['name' => $tax_name, 'total' => $total_line_tax];
+            $tax_id = $values->first()['tax_id'] ?? '';
+
+            $this->tax_map[] = ['name' => $tax_name, 'total' => $total_line_tax, 'tax_id' => $tax_id, 'tax_rate' => $tax_rate, 'base_amount' => $base_amount];
 
             $this->total_taxes += $total_line_tax;
         }

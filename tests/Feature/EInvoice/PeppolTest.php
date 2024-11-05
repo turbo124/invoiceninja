@@ -269,7 +269,7 @@ class PeppolTest extends TestCase
         }
 
 
-        for($x=0; $x<100; $x++){
+        for($x=0; $x<1000; $x++){
 
             $scenario = $scenarios[0];
                         
@@ -292,6 +292,8 @@ class PeppolTest extends TestCase
             $validator->validate();
 
             if (count($validator->getErrors()) > 0) {
+                nlog("index {$x}");
+                nlog($invoice->withoutRelations()->toArray());
                 nlog($p->toXml());
                 nlog($validator->getErrors());
             }
