@@ -59,7 +59,7 @@ class EInvoiceController extends BaseController
             $pmc->value = $payment_means['code'];
             $pm->PaymentMeansCode = $pmc;
 
-            if($payment_means['code'] == '48')
+            if(in_array($payment_means['code'], ['54,55']))
             {
                 $ctc = new CardTypeCode();
                 $ctc->value = $payment_means['card_type'];
