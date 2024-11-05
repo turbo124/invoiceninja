@@ -20,8 +20,7 @@ use Illuminate\Validation\Rule;
 
 class StoreEntityRequest extends FormRequest
 {
-
-    private array $vat_regex_patterns = [
+    public static array $vat_regex_patterns = [
         'DE' => '/^DE\d{9}$/',
         'AT' => '/^ATU\d{8}$/',
         'BE' => '/^BE0\d{9}$/',
@@ -62,7 +61,7 @@ class StoreEntityRequest extends FormRequest
             return true;
         }
 
-        return $user->account->isPaid() && $user->isAdmin() && 
+        return $user->account->isPaid() && $user->isAdmin() &&
             $user->company()->legal_entity_id === null;
     }
 
@@ -76,12 +75,15 @@ class StoreEntityRequest extends FormRequest
             'line1' => ['required', 'string'],
             'line2' => ['nullable', 'string'],
             'city' => ['required', 'string'],
-            'country' => ['required', 'bail', Rule::in(array_keys($this->vat_regex_patterns))],
+            'country' => ['required', 'bail', Rule::in(array_keys(self::$vat_regex_patterns))],
             'zip' => ['required', 'string'],
             'county' => ['required', 'string'],
             'acts_as_receiver' => ['required', 'bool'],
             'acts_as_sender' => ['required', 'bool'],
             'tenant_id' => ['required'],
+            'classification' => ['required', 'string'],
+            'vat_number' => [Rule::requiredIf(fn() => $this->input('classification') !== 'individual')],
+            'id_number' => [Rule::requiredIf(fn() => $this->input('classification') === 'individual')],
         ];
     }
 
@@ -96,7 +98,7 @@ class StoreEntityRequest extends FormRequest
     {
         $input = $this->all();
 
-        if(isset($input['country'])) {
+        if (isset($input['country'])) {
             $country = $this->country();
             $input['country'] = $country->iso_3166_2;
         }
@@ -104,19 +106,18 @@ class StoreEntityRequest extends FormRequest
         $input['acts_as_receiver'] = $input['acts_as_receiver'] ?? true;
         $input['acts_as_sender'] = $input['acts_as_sender'] ?? true;
 
-        $this->replace($input);
+        $input['classification'] = $input['classification'] ?? 'individual';
 
+        $this->replace($input);
     }
 
     public function country(): Country
     {
-        
         /** @var \Illuminate\Support\Collection<\App\Models\Country> */
         $countries = app('countries');
 
-        return $countries->first(function ($c){
+        return $countries->first(function ($c) {
             return $this->country == $c->id;
         });
     }
-
 }

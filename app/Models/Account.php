@@ -128,6 +128,7 @@ class Account extends BaseModel
         'platform',
         'set_react_as_default_ap',
         'inapp_transaction_id',
+        'e_invoicing_token',
     ];
 
     protected $casts = [

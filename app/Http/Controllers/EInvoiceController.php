@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EInvoice\ShowQuotaRequest;
 use App\Http\Requests\EInvoice\ValidateEInvoiceRequest;
 use App\Http\Requests\EInvoice\UpdateEInvoiceConfiguration;
 use App\Services\EDocument\Standards\Validation\Peppol\EntityLevel;
@@ -48,7 +49,6 @@ class EInvoiceController extends BaseController
 
     public function configurations(UpdateEInvoiceConfiguration $request)
     {
-     
         $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
 
         foreach($request->input('payment_means', []) as $payment_means)
@@ -102,4 +102,32 @@ class EInvoiceController extends BaseController
         $company->save();
     }
 
+    public function quota(ShowQuotaRequest $request): \Illuminate\Http\Response
+    {
+         /**
+         * @var \App\Models\Company
+         */
+        $company = auth()->user()->company();
+
+        $response = \Illuminate\Support\Facades\Http::baseUrl(config('ninja.app_domain'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('/api/einvoice/quota', data: [
+                'license_key' => config('ninja.license_key'),
+                'e_invoicing_token' => $company->account->e_invoicing_token,
+                'account_key' => $company->account->key,
+            ]);
+
+        if ($response->successful()) {
+            return response($response->body());
+        }
+
+        if ($response->getStatusCode() === 400) {
+            return response($response->body(), 400);
+        }
+
+        return response()->noContent(500);
+    }
 }
