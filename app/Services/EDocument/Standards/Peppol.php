@@ -1281,8 +1281,6 @@ class Peppol extends AbstractService
             $taxable_amount->currencyID = $this->invoice->client->currency()->code;
             $taxable_amount->amount = (string)round($this->invoice->amount,2);
 
-            nlog("0 tax taxable amount = ".$taxable_amount->amount);
-
             $tax_subtotal->TaxableAmount = $taxable_amount;
 
             $subtotal_tax_amount = new TaxAmount();
