@@ -28,6 +28,9 @@ class CreateRequestTest extends TestCase
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
             'tenant_id' => 'testcompanykey',
+            'classification' => 'individual',
+            'id_number' => 'xx',
+            
         ];
 
         $this->request->initialize($data);
@@ -89,10 +92,15 @@ class CreateRequestTest extends TestCase
             'tenant_id' => 'testcompanykey',
             'acts_as_sender' => true,
             'acts_as_receiver' => true,
+            'classification' => 'business',
+            'vat_number' => '234234',
         ];
 
         $this->request->initialize($data);
         $validator = Validator::make($data, $this->request->rules());
+
+
+nlog($validator->errors());
 
         $this->assertTrue($validator->passes());
     }
