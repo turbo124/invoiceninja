@@ -81,7 +81,7 @@ class EInvoiceController extends BaseController
                 $iban_id = new ID();
                 $iban_id->value = $payment_means['iban'];
                 $pfa->ID = $iban_id;
-                $pfa->Name = $payment_means['account_holder'];
+                $pfa->Name = $payment_means['payer_bank_account'];
                 $pfa->FinancialInstitutionBranch = $fib;
 
                 $pm->PayeeFinancialAccount = $pfa;

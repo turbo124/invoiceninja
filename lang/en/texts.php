@@ -5441,7 +5441,8 @@ $lang = array(
     'becs_stripe_help' => 'BECS Direct Debit for Australian bank accounts.',
     'klarna_stripe_help' => 'Klarna buy now and pay later in installments or on a set schedule.',
     'bacs_stripe_help' => 'BACS Direct Debit for UK bank accounts, commonly used for subscription billing.',
-    'fpx_stripe_help' => 'FPX is a popular online payment method in Malaysia.'
+    'fpx_stripe_help' => 'FPX is a popular online payment method in Malaysia.',
+    'payment_means' => 'Payment Means',
 );
 
 return $lang;

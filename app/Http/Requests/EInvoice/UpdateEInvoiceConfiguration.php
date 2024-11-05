@@ -65,13 +65,13 @@ class UpdateEInvoiceConfiguration extends Request
 
                return [...$rules, 'nullable'];
            }),
-           'payment_means.*.account_holder' => Rule::forEach(function (string|null $value, string $attribute) {
+           'payment_means.*.payer_bank_account' => Rule::forEach(function (string|null $value, string $attribute) {
                $index = explode('.', $attribute)[1];
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
                $rules = ['bail', 'sometimes', 'string', 'max:255'];
 
-               if (in_array('account_holder', $requirements)) {
+               if (in_array('payer_bank_account', $requirements)) {
                    return [...$rules, 'required'];
                }
 
