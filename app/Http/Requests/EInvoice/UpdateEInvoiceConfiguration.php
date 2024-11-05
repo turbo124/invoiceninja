@@ -48,7 +48,7 @@ return [
                $code = $this->input("payment_means.{$index}.code");
                $requirements = PaymentMeans::$payment_means_requirements_codes[$code] ?? [];
 
-               return ['bail', Rule::requiredIf(in_array('bic_swift', $requirements))];
+               return ['bail', 'string', 'min:6', Rule::requiredIf(in_array('bic_swift', $requirements))];
            }),
            'payment_means.*.iban' => Rule::forEach(function (string|null $value, string $attribute) {
                $index = explode('.', $attribute)[1];
