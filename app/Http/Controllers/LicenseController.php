@@ -233,7 +233,7 @@ class LicenseController extends BaseController
             return response()->json(['message' => 'License not found. Make sure to update LICENSE_KEY in .env!'], status: 422);
         }
 
-        $response = Http::baseUrl(config('ninja.app_domain'))
+        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',

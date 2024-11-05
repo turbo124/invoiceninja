@@ -5443,6 +5443,9 @@ $lang = array(
     'bacs_stripe_help' => 'BACS Direct Debit for UK bank accounts, commonly used for subscription billing.',
     'fpx_stripe_help' => 'FPX is a popular online payment method in Malaysia.',
     'payment_means' => 'Payment Means',
+    'act_as_sender' => 'Send E-Invoice',
+    'act_as_receiver' => 'Receive E-Invoice',
+    'saved_einvoice_details' => 'Saved E-Invoice Settings',
 );
 
 return $lang;

@@ -24,7 +24,7 @@ class EInvoiceTokenController extends BaseController
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $response = Http::baseUrl(config('ninja.app_domain'))
+        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
