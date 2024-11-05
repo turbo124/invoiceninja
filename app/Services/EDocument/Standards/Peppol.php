@@ -731,7 +731,7 @@ class Peppol extends AbstractService
      * 
      * @return array
      */
-    private function getInvoiceLines(): array
+    private function getInvoiceLinesx(): array
     {
         $lines = [];
 
@@ -874,6 +874,158 @@ class Peppol extends AbstractService
     }
 
     
+
+
+     /**
+     * getInvoiceLines
+     * 
+     * Compiles the invoice line items of the document
+     * 
+     * @return array
+     */
+    private function getInvoiceLines(): array
+    {
+        $lines = [];
+
+        foreach($this->invoice->line_items as $key => $item) {
+            
+            $base_price_amount = (string)$this->calculateAdjustedBaseAmount($item);
+
+            $_item = new Item();
+            $_item->Name = $item->product_key;
+            $_item->Description = $item->notes;
+
+            
+            $ctc = new ClassifiedTaxCategory();
+            $ctc->ID = new ID();
+            $ctc->ID->value = $this->getTaxType($item->tax_id);
+
+            if($item->tax_rate1 > 0)
+                $ctc->Percent = (string)$item->tax_rate1;
+
+            $ts = new TaxScheme();
+            $id = new ID();
+            $id->value = $this->standardizeTaxSchemeId($item->tax_name1);
+            $ts->ID = $id;
+            $ctc->TaxScheme = $ts;
+
+            if(floatval($item->tax_rate1) === 0.0)
+            {
+                $ctc = $this->resolveTaxExemptReason($item, $ctc);
+
+                if($this->tax_category_id == 'O')
+                    unset($ctc->Percent);
+                
+            }
+
+            $_item->ClassifiedTaxCategory[] = $ctc;
+        
+
+            if ($item->tax_rate2 > 0) {
+                $ctc = new ClassifiedTaxCategory();
+                $ctc->ID = new ID();
+                $ctc->ID->value = $this->getTaxType($item->tax_id);
+                $ctc->Percent = (string)$item->tax_rate2;
+                                
+                $ts = new TaxScheme();
+                $id = new ID();
+                $id->value = $this->standardizeTaxSchemeId($item->tax_name2);
+                $ts->ID = $id;
+                $ctc->TaxScheme = $ts;
+
+                $_item->ClassifiedTaxCategory[] = $ctc;
+            }
+
+            if ($item->tax_rate3 > 0) {
+                $ctc = new ClassifiedTaxCategory();
+                $ctc->ID = new ID();
+                $ctc->ID->value = $this->getTaxType($item->tax_id);
+                $ctc->Percent = (string)$item->tax_rate3;
+
+                $ts = new TaxScheme();
+                $id = new ID();
+                $id->value = $this->standardizeTaxSchemeId($item->tax_name3);
+                $ts->ID = $id;
+                $ctc->TaxScheme = $ts;
+
+                $_item->ClassifiedTaxCategory[] = $ctc;
+            }
+
+            $line = new InvoiceLine();
+            
+            $id = new ID();
+            $id->value = (string) ($key+1);
+            $line->ID = $id;
+
+            $iq = new \InvoiceNinja\EInvoice\Models\Peppol\QuantityType\InvoicedQuantity();
+            $iq->amount = $item->quantity;
+            $iq->unitCode = $item->unit_code ?? 'C62';
+            $line->InvoicedQuantity = $iq;
+
+            $lea = new LineExtensionAmount();
+            $lea->currencyID = $this->invoice->client->currency()->code;
+            $lea->amount = $this->invoice->uses_inclusive_taxes ? $item->line_total - $this->calcInclusiveLineTax($item->tax_rate1, $item->line_total) : $item->line_total;
+            $line->LineExtensionAmount = $lea;
+            $line->Item = $_item;
+
+            /** Builds the tax map for the document */
+            $this->getItemTaxes($item);
+
+            // Handle Price and Discounts
+            if ($item->discount > 0) {
+                
+                // Base Price (before discount)
+                $basePrice = new Price();
+                $basePriceAmount = new PriceAmount();
+                $basePriceAmount->currencyID = $this->invoice->client->currency()->code;
+                $basePriceAmount->amount = (string)$item->cost;
+                $basePrice->PriceAmount = $basePriceAmount;
+
+                // Add Allowance Charge to Price
+                $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+                $allowanceCharge->ChargeIndicator = 'false'; // false = discount
+                $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+                $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+                $allowanceCharge->Amount->amount = (string)number_format($this->calculateTotalItemDiscountAmount($item),2, '.', '');
+                $this->allowance_total += $this->calculateTotalItemDiscountAmount($item);
+
+
+                // Add percentage if available
+                if ($item->discount > 0 && !$item->is_amount_discount) {
+
+                    $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+                    $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+                    $allowanceCharge->BaseAmount->amount = (string)round(($item->cost * $item->quantity),2);
+
+                    $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
+                    $mfn->value = (string) round($item->discount,2);
+                    $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
+                }
+                
+                // }
+                // Required reason
+                $allowanceCharge->AllowanceChargeReason = ctrans('texts.discount');
+
+                $line->Price = $basePrice;
+                $line->AllowanceCharge[] = $allowanceCharge;
+
+            } else {
+                // No discount case
+                $price = new Price();
+                $pa = new PriceAmount();
+                $pa->currencyID = $this->invoice->client->currency()->code;
+                $pa->amount = (string)$item->cost;
+                $price->PriceAmount = $pa;
+                $line->Price = $price;
+            }
+
+            $lines[] = $line;
+        }
+
+        return $lines;
+    }
+
+
     // /**
     //  * calculateDiscountAmount
     //  * 
@@ -1632,71 +1784,59 @@ class Peppol extends AbstractService
     }
 
 
-
-
-
-
     /**
      * calculateAdjustedBaseAmount
      *
      * Calculates the adjusted base amount for a line item considering invoice-level discounts
      * 
      */
-    private function calculateAdjustedBaseAmount(
-        object $line_item, 
-        // float $invoice_discount, 
-        // bool $is_percentage,
-        // array $all_line_items,
-        // float $allowance_charges
-    ) 
+    private function calculateAdjustedBaseAmount(object $line_item) 
     {
-        // 1. Calculate total invoice amount before invoice-level discount
-        $total_amount = 0;
-
-        foreach ($this->invoice->line_items as $item) {
-            $line_total = $item->quantity * $item->cost;
-            
-            // Apply line-level discount if exists
-            if ($item->discount > 0) {
-                if ($item->is_amount_discount) {
-                    $line_total -= $item->discount;
-                } else {
-                    $line_total -= ($line_total * ($item->discount / 100));
-                }
-            }
-            
-            $total_amount += $line_total;
-        }
-
-        // 2. Add any additional charges or subtract additional allowances
-        $total_amount += ($this->invoice->custom_surcharge1 + $this->invoice->custom_surcharge2 +$this->invoice->custom_surcharge3 + $this->invoice->custom_surcharge4);
-
-        // 3. Calculate this line item's proportion of total
-        $line_total = $line_item->quantity * $line_item->cost;
+        $precision = $this->invoice->client->currency()->precision;
         
-        // Apply line-level discount if exists
+        // 1. First calculate the raw line total
+        $line_total = round($line_item->quantity * $line_item->cost, $precision);
+        
+        // 2. Apply line-level discount if any
         if ($line_item->discount > 0) {
             if ($line_item->is_amount_discount) {
-                $line_total -= $line_item->discount;
+                $line_total = round($line_total - $line_item->discount, $precision);
             } else {
-                $line_total -= ($line_total * ($line_item->discount / 100));
+                $line_total = round($line_total * (1 - $line_item->discount / 100), $precision);
             }
         }
 
-        $proportion = $line_total / $total_amount;
-
-        // 4. Calculate invoice-level discount amount for this line
-        $line_discount = 0;
-        if (!$this->invoice->is_amount_discount) {
-            $line_discount = $line_total * ($this->invoice->discount / 100);
-        } else {
-            $line_discount = $this->invoice->discount * $proportion;
+        // 3. If no invoice-level discount, return now
+        if ($this->invoice->discount <= 0) {
+            return (string)$line_total;
         }
 
-        // 5. Return adjusted base amount
-        return (string)round($line_total - $line_discount, 2);
-    }
+        // 4. Calculate total of all line items after their individual discounts
+        $invoice_subtotal = 0;
+        foreach ($this->invoice->line_items as $item) {
+            $item_total = round($item->quantity * $item->cost, $precision);
+            if ($item->discount > 0) {
+                if ($item->is_amount_discount) {
+                    $item_total = round($item_total - $item->discount, $precision);
+                } else {
+                    $item_total = round($item_total * (1 - $item->discount / 100), $precision);
+                }
+            }
+            $invoice_subtotal = round($invoice_subtotal + $item_total, $precision);
+        }
 
+        // 5. Calculate this line's portion of the invoice discount
+        if ($invoice_subtotal > 0) {
+            if ($this->invoice->is_amount_discount) {
+                $discount_portion = round(($line_total / $invoice_subtotal) * $this->invoice->discount, $precision);
+            } else {
+                $discount_portion = round($line_total * ($this->invoice->discount / 100), $precision);
+            }
+            $line_total = round($line_total - $discount_portion, $precision);
+        }
+
+        return (string)$line_total;
+    }
 
 
 

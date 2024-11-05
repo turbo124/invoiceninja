@@ -14,9 +14,12 @@ namespace Tests\Feature\EInvoice;
 use Tests\TestCase;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\Country;
 use App\Models\Invoice;
 use Tests\MockAccountData;
+use App\Models\ClientContact;
 use App\DataMapper\InvoiceItem;
+use App\DataMapper\Tax\TaxModel;
 use App\DataMapper\ClientSettings;
 use App\DataMapper\CompanySettings;
 use App\Factory\CompanyUserFactory;
@@ -24,11 +27,12 @@ use InvoiceNinja\EInvoice\EInvoice;
 use InvoiceNinja\EInvoice\Symfony\Encode;
 use App\Services\EDocument\Standards\Peppol;
 use App\Services\EDocument\Standards\FatturaPANew;
-use App\Services\EDocument\Standards\Validation\XsltDocumentValidator;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans;
+use App\Services\EDocument\Gateway\Storecove\Storecove;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use InvoiceNinja\EInvoice\Models\FatturaPA\FatturaElettronica;
+use App\Services\EDocument\Standards\Validation\XsltDocumentValidator;
 use InvoiceNinja\EInvoice\Models\Peppol\BranchType\FinancialInstitutionBranch;
 use InvoiceNinja\EInvoice\Models\Peppol\FinancialAccountType\PayeeFinancialAccount;
 use InvoiceNinja\EInvoice\Models\FatturaPA\FatturaElettronicaBodyType\FatturaElettronicaBody;
@@ -55,6 +59,249 @@ class PeppolTest extends TestCase
             ThrottleRequests::class
         );
     }
+
+     private function setupTestData(array $params = []): array
+    {
+        
+        $settings = CompanySettings::defaults();
+        $settings->vat_number = $params['company_vat'] ?? 'DE123456789';
+        $settings->country_id = Country::where('iso_3166_2', 'DE')->first()->id;
+        $settings->email = $this->faker->safeEmail();
+        $settings->currency_id = '3';
+
+        $tax_data = new TaxModel();
+        $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
+        $tax_data->regions->EU->tax_all_subregions = true;
+        $tax_data->seller_subregion = $params['company_country'] ?? 'DE';
+
+        $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
+
+        $fib = new \InvoiceNinja\EInvoice\Models\Peppol\BranchType\FinancialInstitutionBranch();
+        $fib->ID = "DEUTDEMMXXX"; //BIC
+
+        $pfa = new \InvoiceNinja\EInvoice\Models\Peppol\FinancialAccountType\PayeeFinancialAccount();
+        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+        $id->value = 'DE89370400440532013000';
+        $pfa->ID = $id;
+        $pfa->Name = 'PFA-NAME';
+
+        $pfa->FinancialInstitutionBranch = $fib;
+
+        $pm = new \InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans();
+        $pm->PayeeFinancialAccount = $pfa;
+
+        $pmc = new \InvoiceNinja\EInvoice\Models\Peppol\CodeType\PaymentMeansCode();
+        $pmc->value = '30';
+
+        $pm->PaymentMeansCode = $pmc;
+
+        $einvoice->PaymentMeans[] = $pm;
+
+        $stub = new \stdClass();
+        $stub->Invoice = $einvoice;
+
+        $this->company->settings = $settings;
+        $this->company->tax_data = $tax_data;
+        $this->company->calculate_taxes = true;
+        $this->company->legal_entity_id = 290868;
+        $this->company->e_invoice = $stub;
+        $this->company->save();
+        $company = $this->company;
+
+        $client = Client::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'country_id' => Country::where('iso_3166_2', $params['client_country'] ?? 'FR')->first()->id,
+            'vat_number' => $params['client_vat'] ?? '',
+            'classification' => $params['classification'] ?? 'individual',
+            'has_valid_vat_number' => $params['has_valid_vat'] ?? false,
+            'name' => 'Test Client',
+            'is_tax_exempt' => $params['is_tax_exempt'] ?? false,
+            'id_number' => $params['client_id_number'] ?? '',
+        ]);
+
+        $contact = ClientContact::factory()->create([
+            'client_id' => $client->id,
+            'company_id' =>$client->company_id,
+            'user_id' => $client->user_id,
+            'first_name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'email' => $this->faker->safeEmail()
+        ]);
+
+        $invoice = \App\Models\Invoice::factory()->create([
+            'client_id' => $client->id,
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'date' => now()->addDay()->format('Y-m-d'),
+            'due_date' => now()->addDays(2)->format('Y-m-d'),
+            'uses_inclusive_taxes' => false,
+            'tax_rate1' => 0,
+            'tax_name1' => '',
+            'tax_rate2' => 0,
+            'tax_name2' => '',
+            'tax_rate3' => 0,
+            'tax_name3' => '',
+        ]);
+
+        $items = $invoice->line_items;
+        foreach($items as &$item)
+        {
+          $item->tax_name2 = '';
+          $item->tax_rate2 = 0;
+          $item->tax_name3 = '';
+          $item->tax_rate3 = 0;
+          $item->uses_inclusive_taxes = false;
+        }
+        unset($item);
+
+        $invoice->line_items = array_values($items);
+        $invoice = $invoice->calc()->getInvoice();
+
+        return compact('company', 'client', 'invoice');
+    }
+
+    public function testWithChaosMonkey()
+    {
+
+
+        $scenarios = [
+            [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+            ],
+            [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => 'DE923356482',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+            ],
+            [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => 'DE923356482',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+            ],
+            [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => 'DE923356482',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+            ],
+            [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => 'AT923356482',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+            ],
+            [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'DE',
+            'client_vat' => '',
+            'client_id_number' => '123456789',
+            'classification' => 'individual',
+            'has_valid_vat' => true,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+            ],
+        ];
+
+        foreach($scenarios as $scenario)
+        {
+            $data = $this->setupTestData($scenario);
+
+            $invoice = $data['invoice'];
+            $invoice = $invoice->calc()->getInvoice();
+
+            $storecove = new Storecove();
+            $p = new Peppol($invoice);
+            $p->run();
+
+            try {
+                $processor = new \Saxon\SaxonProcessor();
+            } catch (\Throwable $e) {
+                $this->markTestSkipped('saxon not installed');
+            }
+
+            $validator = new \App\Services\EDocument\Standards\Validation\XsltDocumentValidator($p->toXml());
+            $validator->validate();
+
+            if (count($validator->getErrors()) > 0) {
+                nlog($p->toXml());
+                nlog($validator->getErrors());
+            }
+
+            $this->assertCount(0, $validator->getErrors());
+        }
+
+
+        for($x=0; $x<100; $x++){
+
+            $scenario = $scenarios[0];
+                        
+            $data = $this->setupTestData($scenario);
+
+            $invoice = $data['invoice'];
+            $invoice = $invoice->calc()->getInvoice();
+
+            $storecove = new Storecove();
+            $p = new Peppol($invoice);
+            $p->run();
+
+            try {
+                $processor = new \Saxon\SaxonProcessor();
+            } catch (\Throwable $e) {
+                $this->markTestSkipped('saxon not installed');
+            }
+
+            $validator = new \App\Services\EDocument\Standards\Validation\XsltDocumentValidator($p->toXml());
+            $validator->validate();
+
+            if (count($validator->getErrors()) > 0) {
+                nlog($p->toXml());
+                nlog($validator->getErrors());
+            }
+
+            $this->assertCount(0, $validator->getErrors());
+
+        }
+
+    }
+
 
     public function testDeInvoiceIntraCommunitySupply()
     {
