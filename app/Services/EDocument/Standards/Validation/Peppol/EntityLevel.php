@@ -102,7 +102,7 @@ class EntityLevel
         }
         catch(PeppolValidationException $e) {
 
-            $this->errors['invoice'] = ['field' => $e->getInvalidField()];
+            $this->errors['invoice'] = ['field' => $e->getInvalidField(), 'label' => $e->getInvalidField()];
 
         };
 
@@ -126,13 +126,13 @@ class EntityLevel
             if($field == 'country_id' && $client->country_id >=1)
                 continue;
 
-            $errors[] = ['field' => ctrans("texts.{$field}")];
+            $errors[] = ['field' => $field, 'label' => ctrans("texts.{$field}")];
 
         }
 
         //If not an individual, you MUST have a VAT number
         if ($client->classification != 'individual' && !$this->validString($client->vat_number)) {
-            $errors[] = ['field' => ctrans("texts.vat_number")];
+            $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
         }
 
         return $errors;
@@ -180,7 +180,7 @@ class EntityLevel
             if($this->validString($settings_object->getSetting($field)))
                 continue;
     
-            $errors[] = ['field' => ctrans("texts.{$field}")];
+            $errors[] = ['field' => $field, 'label' => ctrans("texts.{$field}")];
 
         }
 
@@ -191,8 +191,12 @@ class EntityLevel
         //If not an individual, you MUST have a VAT number
         if($company->getSetting('classification') != 'individual' && !$this->validString($company->getSetting('vat_number')))
         {
-            $errors[] = ['field' => ctrans("texts.vat_number")];
+            $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
         }
+        elseif ($company->getSetting('classification') == 'individual' && !$this->validString($company->getSetting('id_number'))) {
+            $errors[] = ['field' => 'id_number', 'label' => ctrans("texts.id_number")];
+        }
+
 
         // foreach($this->company_fields as $field)
         // {
