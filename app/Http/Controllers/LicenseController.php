@@ -238,7 +238,7 @@ class LicenseController extends BaseController
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])
-            ->post('/api/check', data: [
+            ->post('/api/check/whitelabel', data: [
                 'license' => config('ninja.license_key'),
             ]);
 
@@ -246,6 +246,6 @@ class LicenseController extends BaseController
             return response()->json($response->json());
         }
 
-        return response()->json(['message' => 'Invalid license'], status: 422);
+        return response()->json(['message' => $response->json('message')], status: 422);
     }
 }
