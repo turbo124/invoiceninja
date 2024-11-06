@@ -5446,6 +5446,7 @@ $lang = array(
     'act_as_sender' => 'Send E-Invoice',
     'act_as_receiver' => 'Receive E-Invoice',
     'saved_einvoice_details' => 'Saved E-Invoice Settings',
+    'sales_above_threshold' => 'Sales above threshold',
 );
 
 return $lang;
