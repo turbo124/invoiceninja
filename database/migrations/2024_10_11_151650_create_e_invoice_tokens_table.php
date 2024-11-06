@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('e_invoicing_tokens', function (Blueprint $table) {
             $table->id();
             $table->string('license',64);
-            $table->uuid('token',64)->unique()->index();
+            $table->uuid('token')->unique()->index();
             $table->string('account_key',64);
             $table->timestamps();
         });
