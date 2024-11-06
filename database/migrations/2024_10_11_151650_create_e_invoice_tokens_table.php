@@ -31,7 +31,7 @@ return new class extends Migration
                 $table->string('e_invoicing_token')->nullable();
             });
             
-        });
+        }
 
     }
 
