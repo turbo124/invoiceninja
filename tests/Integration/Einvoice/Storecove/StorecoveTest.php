@@ -168,7 +168,7 @@ class StorecoveTest extends TestCase
 
     public function testIngestStorecoveDocument()
     {
-      
+      nlog("starting first ingest test");
         $s = new Storecove();
         $x = $s->getDocument('3f0981f1-5105-4970-81f2-6b7482ad27d7');
         
