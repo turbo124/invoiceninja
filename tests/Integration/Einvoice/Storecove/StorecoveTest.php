@@ -171,6 +171,63 @@ class StorecoveTest extends TestCase
       
         $s = new Storecove();
         $x = $s->getDocument('3f0981f1-5105-4970-81f2-6b7482ad27d7');
+        
+          $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+
+          // Create a proper PropertyInfoExtractor
+          $phpDocExtractor = new PhpDocExtractor();
+          $reflectionExtractor = new ReflectionExtractor();
+
+          $propertyInfo = new PropertyInfoExtractor(
+              // List of extractors for type info
+              [$reflectionExtractor, $phpDocExtractor],
+              // List of extractors for descriptions
+              [$phpDocExtractor],
+              // List of extractors for access info
+              [$reflectionExtractor],
+              // List of extractors for mutation info
+              [$reflectionExtractor],
+              // List of extractors for initialization info
+              [$reflectionExtractor]
+          );
+
+          $normalizers = [
+              new DateTimeNormalizer(),
+              new ArrayDenormalizer(),
+              new ObjectNormalizer(
+                  $classMetadataFactory,
+                  null,
+                  null,
+                  $propertyInfo
+              )
+          ];
+
+          $context = [
+              DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+              AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+              AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => false,
+              AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,  // Add this
+          ];
+
+          $encoders = [new JsonEncoder()];
+
+
+          $serializer = new Serializer($normalizers, $encoders);
+
+          $context = [
+              DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+              AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+              AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => false,  // Enforce types
+          ];
+
+          $object = $serializer->deserialize(
+              $x,
+              StorecoveInvoice::class,
+              'json',
+              $context
+          );
+
+          $this->assertInstanceOf(StorecoveInvoice::class, $object);
 
     }
 
