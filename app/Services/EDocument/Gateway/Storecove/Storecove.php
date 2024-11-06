@@ -338,7 +338,7 @@ class Storecove
      * @param  string $scheme
      * @return mixed
      */
-    public function addIdentifier(int $legal_entity_id, string $identifier, string $scheme)
+    public function addIdentifier(int $legal_entity_id, string $identifier, string $scheme): array|\Illuminate\Http\Client\Response
     {
         $uri = "legal_entities/{$legal_entity_id}/peppol_identifiers";
 
@@ -357,7 +357,6 @@ class Storecove
         }
 
         return $r;
-
     }
     
     /**

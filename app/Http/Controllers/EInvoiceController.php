@@ -15,6 +15,7 @@ use App\Http\Requests\EInvoice\ShowQuotaRequest;
 use App\Http\Requests\EInvoice\ValidateEInvoiceRequest;
 use App\Http\Requests\EInvoice\UpdateEInvoiceConfiguration;
 use App\Services\EDocument\Standards\Validation\Peppol\EntityLevel;
+use Illuminate\Http\JsonResponse;
 use InvoiceNinja\EInvoice\Models\Peppol\BranchType\FinancialInstitutionBranch;
 use InvoiceNinja\EInvoice\Models\Peppol\FinancialInstitutionType\FinancialInstitution;
 use InvoiceNinja\EInvoice\Models\Peppol\FinancialAccountType\PayeeFinancialAccount;
@@ -102,7 +103,7 @@ class EInvoiceController extends BaseController
         $company->save();
     }
 
-    public function quota(ShowQuotaRequest $request): \Illuminate\Http\Response
+    public function quota(ShowQuotaRequest $request): JsonResponse
     {
          /**
          * @var \App\Models\Company
@@ -120,14 +121,17 @@ class EInvoiceController extends BaseController
                 'account_key' => $company->account->key,
             ]);
 
-        if ($response->successful()) {
-            return response($response->body());
+
+        if ($response->status() == 422) {
+            return response()->json(['message' => $response->json('message')], 422);
         }
 
         if ($response->getStatusCode() === 400) {
-            return response($response->body(), 400);
+            return response()->json(['message' => $response->json('message')], 400);
         }
 
-        return response()->noContent(500);
+        return response()->json([
+            'quota' => $response->json('quota'),
+        ]);
     }
 }
