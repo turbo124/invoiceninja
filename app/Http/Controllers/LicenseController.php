@@ -230,7 +230,7 @@ class LicenseController extends BaseController
     public function check(CheckRequest $request): Response|JsonResponse
     {
         if (! config('ninja.license_key')) {
-            return response()->json(['message' => 'License not found. Make sure to update LICENSE_KEY in .env!'], status: 422);
+            return response()->json(['message' => ctrans('texts.white_label_license_not_present')], status: 422);
         }
 
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))

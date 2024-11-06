@@ -5446,6 +5446,9 @@ $lang = array(
     'act_as_sender' => 'Send E-Invoice',
     'act_as_receiver' => 'Receive E-Invoice',
     'saved_einvoice_details' => 'Saved E-Invoice Settings',
+    'add_license_to_env' => 'We\'ll need your license key for future communication to our services. Make sure to LICENSE_KEY as environment variable.',
+    'white_label_license_not_present' => 'License not found. Make sure to set LICENSE_KEY as environment variable.',
+    'white_label_license_not_found' => 'White label license not found.',
 );
 
 return $lang;
