@@ -82,7 +82,7 @@ class StoreEntityRequest extends FormRequest
             'acts_as_sender' => ['required', 'bool'],
             'tenant_id' => ['required'],
             'classification' => ['required', 'in:business,individual'],
-            'vat_number' => [Rule::requiredIf(fn() => $this->input('classification') === 'business')],
+            'vat_number' => [Rule::requiredIf(fn() => $this->input('classification') !== 'individual')],
             'id_number' => [Rule::requiredIf(fn() => $this->input('classification') === 'individual')],
         ];
     }
