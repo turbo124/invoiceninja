@@ -80,6 +80,32 @@ class StorecoveAdapter
         return $this;
     }
     
+    public function deserialize($storecove_object)
+    {
+        
+        $context = [
+                DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+            ];
+
+        $serializer = $this->getSerializer();
+
+        $obj['Invoice'] = $storecove_object['document']['invoice'];
+
+        $storecove_object = $serializer->normalize($obj, null, [\Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
+
+        // return $storecove_object;
+        // $storecove_object = $serializer->encode($storecove_object, 'json', $context);
+        // return $storecove_object;
+        // return $data;
+        // $object = $serializer->denormalize(json_encode($storecove_object['document']['invoice']), \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class, 'json', [\Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
+        
+        // return $storecove_object;
+            
+        return $serializer->deserialize(json_encode($storecove_object), \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class, 'json', $context);
+
+    }
+
     /**
      * transform
      *

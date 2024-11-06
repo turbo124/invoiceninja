@@ -165,6 +165,15 @@ class StorecoveTest extends TestCase
         return compact('company', 'client', 'invoice');
     }
 
+
+    public function testIngestStorecoveDocument()
+    {
+      
+        $s = new Storecove();
+        $x = $s->getDocument('3f0981f1-5105-4970-81f2-6b7482ad27d7');
+
+    }
+
     public function testDeToFrClientTaxExemptSending()
     {
         $this->routing_id = 290868;

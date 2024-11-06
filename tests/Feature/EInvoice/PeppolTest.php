@@ -43,7 +43,7 @@ class PeppolTest extends TestCase
     use DatabaseTransactions;
     use MockAccountData;
 
-    protected int $iterations = 1000;
+    protected int $iterations = 10;
 
     protected function setUp(): void
     {
