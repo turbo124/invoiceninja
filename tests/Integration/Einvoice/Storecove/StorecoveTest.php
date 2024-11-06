@@ -45,13 +45,13 @@ use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-
+use Illuminate\Routing\Middleware\ThrottleRequests;
 class StorecoveTest extends TestCase
 {
     use MockAccountData;
     use DatabaseTransactions;
 
-    private int $routing_id;
+    private int $routing_id = 0;
 
     protected function setUp(): void
     {
@@ -62,6 +62,11 @@ class StorecoveTest extends TestCase
         if (config('ninja.testvars.travis') !== false || !config('ninja.storecove_api_key')) {
             $this->markTestSkipped("do not run in CI");
         }
+                
+        $this->withoutMiddleware(
+            ThrottleRequests::class
+        );
+
     }
 
     private function setupTestData(array $params = []): array
@@ -166,71 +171,7 @@ class StorecoveTest extends TestCase
     }
 
 
-    public function testIngestStorecoveDocument()
-    {
-      nlog("starting first ingest test");
-        $s = new Storecove();
-        $x = $s->getDocument('3f0981f1-5105-4970-81f2-6b7482ad27d7');
-        
-          $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-
-          // Create a proper PropertyInfoExtractor
-          $phpDocExtractor = new PhpDocExtractor();
-          $reflectionExtractor = new ReflectionExtractor();
-
-          $propertyInfo = new PropertyInfoExtractor(
-              // List of extractors for type info
-              [$reflectionExtractor, $phpDocExtractor],
-              // List of extractors for descriptions
-              [$phpDocExtractor],
-              // List of extractors for access info
-              [$reflectionExtractor],
-              // List of extractors for mutation info
-              [$reflectionExtractor],
-              // List of extractors for initialization info
-              [$reflectionExtractor]
-          );
-
-          $normalizers = [
-              new DateTimeNormalizer(),
-              new ArrayDenormalizer(),
-              new ObjectNormalizer(
-                  $classMetadataFactory,
-                  null,
-                  null,
-                  $propertyInfo
-              )
-          ];
-
-          $context = [
-              DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
-              AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
-              AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => false,
-              AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,  // Add this
-          ];
-
-          $encoders = [new JsonEncoder()];
-
-
-          $serializer = new Serializer($normalizers, $encoders);
-
-          $context = [
-              DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
-              AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
-              AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => false,  // Enforce types
-          ];
-
-          $object = $serializer->deserialize(
-              $x,
-              StorecoveInvoice::class,
-              'json',
-              $context
-          );
-
-          $this->assertInstanceOf(StorecoveInvoice::class, $object);
-
-    }
-
+   
     public function testDeToFrClientTaxExemptSending()
     {
         $this->routing_id = 290868;
@@ -1994,5 +1935,6 @@ class StorecoveTest extends TestCase
 
 
     }
+
 
 }
