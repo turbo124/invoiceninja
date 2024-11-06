@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Utils\Ninja;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -11,7 +12,7 @@ return new class extends Migration
         Schema::create('e_invoicing_tokens', function (Blueprint $table) {
             $table->id();
             $table->string('license',64);
-            $table->uuid('token',64)->unique()->index();
+            $table->uuid('token')->unique()->index();
             $table->string('account_key',64);
             $table->timestamps();
         });
@@ -24,9 +25,13 @@ return new class extends Migration
             });
         }
 
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->string('e_invoicing_token')->nullable();
-        });
+        if (!Schema::hasColumn('accounts', 'e_invoicing_token')) {
+
+            Schema::table('accounts', function (Blueprint $table) {
+                $table->string('e_invoicing_token')->nullable();
+            });
+            
+        }
 
     }
 

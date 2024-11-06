@@ -18,8 +18,14 @@ return new class extends Migration
             });
         }
         
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->string('e_invoicing_token')->nullable();
-        });
+        if (!Schema::hasColumn('accounts', 'e_invoicing_token')) {
+
+            Schema::table('accounts', function (Blueprint $table) {
+                
+                $table->string('e_invoicing_token')->nullable();
+            });
+
+        }
+
     }
 };

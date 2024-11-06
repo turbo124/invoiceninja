@@ -45,13 +45,13 @@ use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-
+use Illuminate\Routing\Middleware\ThrottleRequests;
 class StorecoveTest extends TestCase
 {
     use MockAccountData;
     use DatabaseTransactions;
 
-    private int $routing_id;
+    private int $routing_id = 0;
 
     protected function setUp(): void
     {
@@ -62,6 +62,11 @@ class StorecoveTest extends TestCase
         if (config('ninja.testvars.travis') !== false || !config('ninja.storecove_api_key')) {
             $this->markTestSkipped("do not run in CI");
         }
+                
+        $this->withoutMiddleware(
+            ThrottleRequests::class
+        );
+
     }
 
     private function setupTestData(array $params = []): array
@@ -166,14 +171,7 @@ class StorecoveTest extends TestCase
     }
 
 
-    public function testIngestStorecoveDocument()
-    {
-      
-        $s = new Storecove();
-        $x = $s->getDocument('3f0981f1-5105-4970-81f2-6b7482ad27d7');
-
-    }
-
+   
     public function testDeToFrClientTaxExemptSending()
     {
         $this->routing_id = 290868;
@@ -1937,5 +1935,6 @@ class StorecoveTest extends TestCase
 
 
     }
+
 
 }

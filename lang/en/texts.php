@@ -4395,7 +4395,7 @@ $lang = array(
     'reminder_message' => 'Reminder for invoice :number for :balance',
     'gmail_credentials_invalid_subject' => 'Send with GMail invalid credentials',
     'gmail_credentials_invalid_body' => 'Your GMail credentials are not correct, please log into the administrator portal and navigate to Settings > User Details and disconnect and reconnect your GMail account. We will send you this notification daily until this issue is resolved',
-    'total_columns' => 'Total Fields',
+    'total_columns' => 'Totals Fields',
     'view_task' => 'View Task',
     'cancel_invoice' => 'Cancel',
     'changed_status' => 'Successfully changed task status',
@@ -5449,6 +5449,7 @@ $lang = array(
     'add_license_to_env' => 'We\'ll need your license key for future communication to our services. Make sure to LICENSE_KEY as environment variable.',
     'white_label_license_not_present' => 'License not found. Make sure to set LICENSE_KEY as environment variable.',
     'white_label_license_not_found' => 'White label license not found.',
+    'sales_above_threshold' => 'Sales above threshold',
 );
 
 return $lang;
