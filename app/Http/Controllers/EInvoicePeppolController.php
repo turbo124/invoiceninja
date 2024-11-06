@@ -100,7 +100,7 @@ class EInvoicePeppolController extends BaseController
      * @param  Storecove $storecove
      * @return Response
      */
-    public function setup(StoreEntityRequest $request, Storecove $storecove): Response
+    public function setup(StoreEntityRequest $request, Storecove $storecove): Response|JsonResponse
     {
         /**
          * @var \App\Models\Company
@@ -142,6 +142,12 @@ class EInvoicePeppolController extends BaseController
             $company->save();
 
             return response()->noContent();
+        }
+
+        nlog($response->json());
+
+        if ($response->status() === 422) {
+            return response()->json($response->json(), 422);
         }
 
         return response()->noContent(status: 500);
