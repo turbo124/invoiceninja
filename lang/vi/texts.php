@@ -5405,6 +5405,7 @@ $lang = array(
     'invalid_vat_number' => "Mã số VAT không hợp lệ đối với quốc gia đã chọn. Định dạng phải là Mã quốc gia theo sau là số, ví dụ: DE123456789",
     'acts_as_sender' => 'Hoạt động như Người gửi',
     'acts_as_receiver' => 'Hoạt động như Người nhận',
+    'sales_above_threshold' => 'Doanh số vượt ngưỡng',
 );
 
 return $lang;

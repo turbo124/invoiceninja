@@ -5403,6 +5403,7 @@ Développe automatiquement la section des notes dans le tableau de produits pour
     'invalid_vat_number' => "Le numéro de TVA n'est pas valide pour le pays sélectionné. Le format doit être le code du pays suivi uniquement du numéro, par exemple DE123456789.",
     'acts_as_sender' => 'Agit en tant qu\'expéditeur',
     'acts_as_receiver' => 'Agit en tant que destinataire',
+    'sales_above_threshold' => 'Ventes dépassant le seuil',
 );
 
 return $lang;

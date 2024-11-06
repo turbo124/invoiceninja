@@ -96,13 +96,16 @@ class RequiredFields extends Component
         /** @var \App\Models\ClientContact $contact */
         $rff->check($contact);
 
-        if ($rff->unfilled_fields === 0) {
+        if ($rff->unfilled_fields === 0 && !$this->company_gateway->always_show_required_fields)
             $this->dispatch('required-fields');
-        }
-
-        if ($rff->unfilled_fields > 0) {
+        else
             $this->is_loading = false;
-        }
+
+        // }
+
+        // if ($rff->unfilled_fields > 0) {
+            // $this->is_loading = false;
+        // }
     }
 
     public function handleSubmit(array $data)

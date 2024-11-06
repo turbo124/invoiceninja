@@ -11,9 +11,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\License\CheckRequest;
 use App\Models\Account;
 use App\Utils\CurlUtils;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use stdClass;
@@ -223,5 +225,27 @@ class LicenseController extends BaseController
             $account->plan_expires = null;
             $account->save();
         }
+    }
+
+    public function check(CheckRequest $request): Response|JsonResponse
+    {
+        if (! config('ninja.license_key')) {
+            return response()->json(['message' => 'License not found. Make sure to update LICENSE_KEY in .env!'], status: 422);
+        }
+
+        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('/api/check', data: [
+                'license' => config('ninja.license_key'),
+            ]);
+
+        if ($response->successful()) {
+            return response()->json($response->json());
+        }
+
+        return response()->json(['message' => 'Invalid license'], status: 422);
     }
 }

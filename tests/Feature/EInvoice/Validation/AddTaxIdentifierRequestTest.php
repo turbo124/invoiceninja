@@ -10,7 +10,7 @@ class AddTaxIdentifierRequestTest extends TestCase
 {
     protected AddTaxIdentifierRequest $request;
 
-     private array $vat_regex_patterns = [
+    private array $vat_regex_patterns = [
         'DE' => '/^DE\d{9}$/',
         'AT' => '/^ATU\d{8}$/',
         'BE' => '/^BE0\d{9}$/',
@@ -48,20 +48,26 @@ class AddTaxIdentifierRequestTest extends TestCase
 
     public function testValidInput()
     {
-        $validator = Validator::make([
+        $data = [
             'country' => 'DE',
             'vat_number' => 'DE123456789',
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertTrue($validator->passes());
     }
 
     public function testInvalidCountry()
     {
-        $validator = Validator::make([
+        $data = [
             'country' => 'US',
             'vat_number' => 'DE123456789',
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('country', $validator->errors()->toArray());
@@ -73,24 +79,9 @@ class AddTaxIdentifierRequestTest extends TestCase
             'country' => 'DE',
             'vat_number' => 'DE12345', // Too short
         ];
-        
-        $rules = [
-            'country' => ['required', 'bail'],
-            'vat_number' => [
-               'required',
-               'string',
-               'bail',
-               function ($attribute, $value, $fail) use ($data){
-                   if ( isset($this->vat_regex_patterns[$data['country']])) {
-                       if (!preg_match($this->vat_regex_patterns[$data['country']], $value)) {
-                           $fail(ctrans('texts.invalid_vat_number'));
-                       }
-                   }
-               },
-            ]
-        ];
 
-        $validator = Validator::make($data, $rules);
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('vat_number', $validator->errors()->toArray());
@@ -98,9 +89,12 @@ class AddTaxIdentifierRequestTest extends TestCase
 
     public function testMissingCountry()
     {
-        $validator = Validator::make([
+        $data = [
             'vat_number' => 'DE123456789',
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('country', $validator->errors()->toArray());
@@ -108,9 +102,12 @@ class AddTaxIdentifierRequestTest extends TestCase
 
     public function testMissingVatNumber()
     {
-        $validator = Validator::make([
+        $data = [
             'country' => 'DE',
-        ], $this->request->rules());
+        ];
+
+        $this->request->initialize($data);
+        $validator = Validator::make($data, $this->request->rules());
 
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('vat_number', $validator->errors()->toArray());

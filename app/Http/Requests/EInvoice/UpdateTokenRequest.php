@@ -36,9 +36,7 @@ class UpdateTokenRequest extends Request
 
     public function rules(): array
     {
-        return [
-            'token' => 'required',
-        ];
+        return [];
     }
 
     protected function failedAuthorization(): void
