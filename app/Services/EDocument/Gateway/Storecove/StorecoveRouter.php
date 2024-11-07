@@ -173,17 +173,6 @@ class StorecoveRouter
             default => $code = "B",
         };
 
-        // if($this->invoice && $country == 'FR'){
-
-        //     if($code == 'B' && strlen(trim(str_ireplace("fr", "", $this->invoice->client->vat_number))) == 9)
-        //         return 'FR:SIRENE';
-        //     elseif($code == 'B' && strlen(trim(str_ireplace("fr", "", $this->invoice->client->vat_number))) == 14)
-        //         return 'FR:SIRET';
-        //     elseif($code == 'G')
-        //         return 'FR:SIRET'; //@todo need to add customerAssignedAccountIdValue
-
-        // }
-
         //single array
         if(is_array($rules) && !is_array($rules[0])) {
             return $rules[2];
@@ -198,6 +187,36 @@ class StorecoveRouter
         return $rules[0][2];
     }
 
+    public function resolveIdentifierTypeByValue(string $identifier): string
+    {
+        $parts = explode(":", $identifier);
+        $country = $parts[0];
+
+        $rules = $this->routing_rules[$country];
+        
+        if (is_array($rules) && !is_array($rules[0])) {
+                    
+            if (stripos($identifier, $rules[2]) !== false) {
+                return 'vat_number';
+            } elseif (stripos($identifier, $rules[3]) !== false) {
+                return 'id_number';
+            }
+            
+        }
+        else {
+            foreach($rules as $country_identifiers)
+            {
+                
+                if(stripos($identifier, $country_identifiers[2]) !== false)
+                    return 'vat_number';
+                elseif(stripos($identifier, $country_identifiers[3]) !== false)
+                    return 'id_number';
+            }
+        }
+
+        return '';
+
+    }
      /**
      * used as a proxy for
      * the schemeID of partyidentification

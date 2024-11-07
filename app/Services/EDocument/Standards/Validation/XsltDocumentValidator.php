@@ -20,6 +20,11 @@ class XsltDocumentValidator
 
     private string $ubl_xsd = 'app/Services/EDocument/Standards/Validation/Peppol/Stylesheets/UBL2.1/UBL-Invoice-2.1.xsd';
 
+    private string $peppol_stylesheet = 'app/Services/EDocument/Standards/Validation/Peppol/Stylesheets/nl_ubl_stylesheet.xslt';
+
+    // private string $peppol_stylesheetx = 'app/Services/EDocument/Standards/Validation/Peppol/Stylesheets/ubl_stylesheet.xslt';
+    // private string $peppol_stylesheet = 'app/Services/EDocument/Standards/Validation/Peppol/Stylesheets/ci_to_ubl_stylesheet.xslt';
+
     private array $errors = [];
 
     public function __construct(public string $xml_document)
@@ -119,6 +124,37 @@ class XsltDocumentValidator
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    public function getHtml(): string
+    {
+        $stylesheet_path = app_path($this->peppol_stylesheet);
+  
+        try {
+            // Create Saxon processor
+            $processor = new \Saxon\SaxonProcessor();
+            $xslt = $processor->newXslt30Processor();
+
+            // Load XML document
+            $xml_doc = $processor->parseXmlFromString($this->xml_document);
+            // Or from file:
+            // $xml_doc = $processor->parseXmlFromFile('path/to/input.xml');
+
+            // Compile and apply stylesheet
+            $stylesheet = $xslt->compileFromFile($this->peppol_stylesheet);
+
+            // Transform to HTML
+            $result = $stylesheet->transformToString($xml_doc);
+            // Or to save to file:
+            // $stylesheet->transformToFile($xml_doc, 'path/to/output.html');
+
+            return $result;
+
+        } catch (\Exception $e) {
+            // Handle any errors
+            throw new \Exception("XSLT transformation failed: " . $e->getMessage());
+        }
+
     }
 
 }

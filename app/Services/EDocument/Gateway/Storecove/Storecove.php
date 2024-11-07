@@ -17,6 +17,7 @@ use Turbo124\Beacon\Facades\LightLogs;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use App\DataMapper\Analytics\LegalEntityCreated;
+use App\Services\EDocument\Gateway\Transformers\StorecoveExpense;
 
 enum HttpVerb: string
 {
@@ -58,12 +59,14 @@ class Storecove
 
     public StorecoveAdapter $adapter;
 
+    public StorecoveExpense $expense;
 
     public function __construct()
     {
         $this->router = new StorecoveRouter();
         $this->mutator = new Mutator($this);
         $this->adapter = new StorecoveAdapter($this);
+        $this->expense = new StorecoveExpense($this);
     }
         
     /**
@@ -336,7 +339,7 @@ class Storecove
      * @param  int $legal_entity_id
      * @param  string $identifier
      * @param  string $scheme
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
     public function addIdentifier(int $legal_entity_id, string $identifier, string $scheme): array|\Illuminate\Http\Client\Response
     {
