@@ -578,7 +578,7 @@ class Mutator implements MutatorInterface
     {
         $code = $this->getClientRoutingCode();
         
-        if(strlen($this->invoice->client->vat_number) < 2 || strlen($this->invoice->client->id_number) < 2) 
+        if(strlen($this->invoice->client->vat_number ?? '') < 2 && strlen($this->invoice->client->id_number ?? '') < 2) 
             return $this->setEmailRouting($this->invoice->client->present()->email());
 
         if($this->invoice->client->country->iso_3166_2 == 'FR')
