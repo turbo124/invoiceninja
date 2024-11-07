@@ -36,12 +36,8 @@ class EInvoiceValidationTest extends TestCase
 
     protected function setUp(): void
     {
-        
         parent::setUp();
-
-        // $this->markTestSkipped('company model issues');
         $this->makeTestData();
-
     }
 
     public function testInvalidCompanySettings()

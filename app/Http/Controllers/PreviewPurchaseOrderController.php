@@ -84,7 +84,7 @@ class PreviewPurchaseOrderController extends BaseController
      *       ),
      *     )
      */
-    public function show($request)
+    public function show(Request $request)
     {
         if (request()->has('entity') &&
             request()->has('entity_id') &&

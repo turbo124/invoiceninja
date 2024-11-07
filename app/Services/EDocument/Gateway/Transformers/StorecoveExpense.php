@@ -135,9 +135,10 @@ class StorecoveExpense
         $expense_repo = new ExpenseRepository();
 
         $expense = ExpenseFactory::create($vendor->company_id, $vendor->user_id);
+        $expense->vendor_id = $vendor->id;
+        
         unset($expense_array['vendor']);
        
-
         return $expense_repo->save($expense_array, $expense);
 
     }
