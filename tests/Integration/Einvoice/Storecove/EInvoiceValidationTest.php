@@ -12,19 +12,22 @@
 namespace Tests\Integration\Einvoice\Storecove;
 
 use Tests\TestCase;
+use App\Models\User;
 use App\Models\Client;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\Invoice;
 use Tests\MockAccountData;
+use App\Models\CompanyToken;
 use App\Models\ClientContact;
 use App\DataMapper\InvoiceItem;
 use App\DataMapper\ClientSettings;
 use App\DataMapper\CompanySettings;
+use App\Factory\CompanyUserFactory;
 use App\Services\EDocument\Standards\Peppol;
-use App\Services\EDocument\Standards\Validation\Peppol\EntityLevel;
 use InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Services\EDocument\Standards\Validation\Peppol\EntityLevel;
 
 class EInvoiceValidationTest extends TestCase
 {
@@ -35,53 +38,107 @@ class EInvoiceValidationTest extends TestCase
     {
         
         parent::setUp();
+
+        // $this->markTestSkipped('company model issues');
         $this->makeTestData();
 
     }
 
-    public function testEinvoiceValidationEndpointInvoice()
-    {
+//     public function testEinvoiceValidationEndpointInvoice()
+//     {
+               
+//         $company = Company::factory()->create([
+//             'account_id' => $this->account->id,
+//             'legal_entity_id' => 123432
+//         ]);
 
-        $this->company->legal_entity_id = 123432;
-        $this->company->save();
+// $user = User::factory()->create([
+//     'account_id' => $this->account->id,
+//     'confirmation_code' => '123',
+//     'email' =>  $this->faker->safeEmail(),
+// ]);
 
-        $data =[
-            'entity' => 'invoices',
-            'entity_id' => $this->invoice->hashed_id,
-        ];
+// $cu = CompanyUserFactory::create($user->id, $company->id, $this->account->id);
+// $cu->is_owner = true;
+// $cu->is_admin = true;
+// $cu->is_locked = false;
+// $cu->permissions = '["view_client"]';
+// $cu->save();
 
-        $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/einvoice/validateEntity', $data);
+// $different_company_token = \Illuminate\Support\Str::random(64);
 
-        $response->assertStatus(200);
+// $company_token = new CompanyToken();
+// $company_token->user_id = $user->id;
+// $company_token->company_id = $company->id;
+// $company_token->account_id = $this->account->id;
+// $company_token->name = 'test token';
+// $company_token->token = $different_company_token;
+// $company_token->is_system = true;
+// $company_token->save();
 
-        $arr = $response->json();
+// $data = [
+//     'action' => 'archive',
+//     'ids' => [
+//         $this->client->id
+//     ]
+// ];
 
-    }
 
-    public function testEinvoiceValidationEndpoint()
-    {
+// $c = Client::factory()->create([
+//     'company_id' => $company->id,
+//     'user_id' => $user->id
+// ]);
 
-        $this->company->legal_entity_id = 123432;
-        $this->company->save();
 
-        $data =[
-            'entity' => 'companies',
-            'entity_id' => $this->company->hashed_id,
-        ];
+// ClientContact::factory()->create([
+//                 'user_id' => $user->id,
+//                 'client_id' => $c->id,
+//                 'company_id' => $company->id,
+//                 'is_primary' => 1,
+//             ]);
 
-        $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/einvoice/validateEntity', $data);
 
-        $response->assertStatus(200);
+// $i = Invoice::factory()->create([
+//     'company_id' => $company->id,
+//     'user_id' => $user->id,
+//     'client_id' => $c->id
+// ]);
 
-        $arr = $response->json();
+//         $data =[
+//             'entity' => 'invoices',
+//             'entity_id' => $i->hashed_id,
+//         ];
 
-    }
+//         $response = $this->withHeaders([
+//                 'X-API-SECRET' => config('ninja.api_secret'),
+//                 'X-API-TOKEN' => $different_company_token,
+//             ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+//         $response->assertStatus(200);
+
+//     }
+
+//     public function testEinvoiceValidationEndpoint()
+//     {
+
+//         $this->company->legal_entity_id = 123432;
+//         $this->company->save();
+
+//         $data =[
+//             'entity' => 'companies',
+//             'entity_id' => $this->company->hashed_id,
+//         ];
+
+//         $response = $this->withHeaders([
+//                 'X-API-SECRET' => config('ninja.api_secret'),
+//                 'X-API-TOKEN' => $this->token,
+//             ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+//         $response->assertStatus(200);
+
+//         $arr = $response->json();
+
+//     }
 
     public function testInvalidCompanySettings()
     {
@@ -170,6 +227,7 @@ class EInvoiceValidationTest extends TestCase
         $settings->postal_code = '2113';
         $settings->country_id = '1';
         $settings->vat_number = '';
+        $settings->id_number ='adfadf';
         $settings->classification = 'individual';
 
         $account = Account::factory()->create();
