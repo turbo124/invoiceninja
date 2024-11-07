@@ -31,8 +31,6 @@ class EInvoiceValidationTest extends TestCase
     use MockAccountData;
     use DatabaseTransactions;
 
-    private int $routing_id;
-
     protected function setUp(): void
     {
         
