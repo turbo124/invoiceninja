@@ -5449,7 +5449,8 @@ $lang = array(
     'add_license_to_env' => 'We\'ll need your license key for future communication to our services. Make sure to LICENSE_KEY as environment variable.',
     'white_label_license_not_present' => 'License not found. Make sure to set LICENSE_KEY as environment variable.',
     'white_label_license_not_found' => 'White label license not found.',
-    'sales_above_threshold' => 'Sales above threshold',
+    'connection_status' => 'Connection Status',
+    'connected' => 'Connected',
 );
 
 return $lang;
