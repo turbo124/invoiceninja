@@ -131,7 +131,7 @@ class EInvoicePeppolController extends BaseController
             $settings = $company->settings;
 
             $settings->name = $request->party_name;
-            $settings->country_id = $request->country_id;
+            $settings->country_id = (string) $request->country_id;
             $settings->address1 = $request->line1;
             $settings->address2 = $request->line2;
             $settings->city = $request->city;
