@@ -537,7 +537,6 @@ nlog($r->body());
         }
         catch (ClientException $e) {
             // 4xx errors
-            nlog($r->body());
             nlog("LEI:: {$this->legal_entity_id}");
             nlog("Client error: " . $e->getMessage());
             nlog("Response body: " . $e->getResponse()->getBody()->getContents());

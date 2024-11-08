@@ -123,6 +123,12 @@ class StorecoveExpense
                 if (strlen($expense_array['vendor']['id_number']) > 2) {
                     $query->orWhere('id_number', $expense_array['vendor']['id_number']);
                 }
+                
+                // If no valid identifiers, force no results
+                if (strlen($expense_array['vendor']['vat_number']) <= 2 && strlen($expense_array['vendor']['id_number']) <= 2) {
+                    $query->where('id', 0); // Forces no match
+                }
+
             })->first();
         
         if(!$vendor)
@@ -131,6 +137,7 @@ class StorecoveExpense
             $vendor = VendorFactory::create($company->id, $company->owner()->id);
             $vendor = $vendor_repo->save($expense_array['vendor'], $vendor);
         }
+
 
         $expense_repo = new ExpenseRepository();
 
@@ -225,7 +232,7 @@ class StorecoveExpense
         $currencies = app('currencies');
 
         $currency = $currencies->first(function ($c) use ($storecove_invoice) {
-            return $storecove_invoice->getDocumentCurrencyCode() == $c->iso_3166_3;
+            return $storecove_invoice->getDocumentCurrencyCode() == $c->code;
         })->id ?? 1;
 
         //vendor
@@ -243,7 +250,7 @@ class StorecoveExpense
             'contacts' => [
                 [
                     'first_name' => $party->getContact()->getFirstName() ?? '',
-                    'last_name' => $party->getContact()->getFirstName() ?? '',
+                    'last_name' => $party->getContact()->getLastName() ?? '',
                     'email' => $party->getContact()->getEmail() ?? '',
                     'phone' => $party->getContact()->getPhone() ?? '',
                 ]
@@ -254,11 +261,10 @@ class StorecoveExpense
         $expense = [
             'amount' => $storecove_invoice->getAmountIncludingTax(),
             'currency_id' => $currency,
-            'vendor_id' => '',
             'date' => $storecove_invoice->getIssueDate(),
-            'public_notes' => $item_descriptions->implode("\n"),
-            'private_notes' => $storecove_invoice->getNote() ?? '',
-            'transaction_reference' => $storecove_invoice->getInvoiceNumber(),
+            'public_notes' => $storecove_invoice->getNote() ?? '',
+            'private_notes' => $storecove_invoice->getInvoiceNumber(),
+            'transaction_reference' => '',
             'uses_inclusive_taxes' => true,
             'tax_name1' => $tax_name1,
             'tax_rate1' => $tax_rate1,
@@ -273,6 +279,7 @@ class StorecoveExpense
             'vendor' => $vendor,
         ];
 
+        nlog($expense);
 
         return $expense;
 

@@ -165,8 +165,7 @@ class EInvoicePeppolController extends BaseController
      */
     public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): \Illuminate\Http\JsonResponse
     {
-        // @todo: check with dave, since this method has 0 references and it's not being used.
-
+        
         $company = auth()->user()->company();
         $tax_data = $company->tax_data;
 

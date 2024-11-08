@@ -48,6 +48,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use App\Services\EDocument\Gateway\Storecove\Models\Invoice as StorecoveInvoice;
+use App\Services\EDocument\Standards\Validation\XsltDocumentValidator;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class StorecoveIngestTest extends TestCase
@@ -141,6 +142,24 @@ class StorecoveIngestTest extends TestCase
         return $storecove_invoice;
     }
 
+    public function testRenderHtmlDocument()
+    {
+                
+        $doc = json_decode($this->document, true);
+
+        $decoded = base64_decode($doc['original']);
+        $guid = $doc['guid'];
+
+        $filename = "{$guid}.xml";
+
+        $xslt = new XsltDocumentValidator($decoded);
+        $html = $xslt->getHtml();
+
+        nlog($html);
+
+        $this->assertIsString($html);
+    }
+
     public function testSaveDocument()
     {
         $doc = json_decode($this->document,true);
@@ -159,7 +178,6 @@ class StorecoveIngestTest extends TestCase
 
         $d = $this->expense->documents->first();
         
-        nlog($d->getFile());
     }
 
     public function testExpenseCreation()
