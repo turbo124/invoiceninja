@@ -177,9 +177,9 @@ class EInvoicePeppolController extends BaseController
 
         $scheme = $storecove->router->resolveRouting($request->country, $company->settings->classification);
 
-        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->identifier, $scheme);
+        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->vat_number, $scheme);
 
-        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->identifier;
+        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->vat_number;
         $company->tax_data = $tax_data;
         $company->save();
 
