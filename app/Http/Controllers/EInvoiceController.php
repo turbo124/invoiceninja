@@ -30,7 +30,13 @@ class EInvoiceController extends BaseController
     private array $einvoice_props = [
         'payment_means',
     ];
-
+    
+    /**
+     * Checks a given model for validity for sending
+     *
+     * @param  ValidateEInvoiceRequest $request
+     * @return void
+     */
     public function validateEntity(ValidateEInvoiceRequest $request)
     {
         $el = new EntityLevel();
@@ -47,7 +53,13 @@ class EInvoiceController extends BaseController
         return response()->json($data, $data['passes'] ? 200 : 400);
 
     }
-
+    
+    /**
+     * Updated the E-Invoice Setting Configurations
+     *
+     * @param  UpdateEInvoiceConfiguration $request
+     * @return void
+     */
     public function configurations(UpdateEInvoiceConfiguration $request)
     {
         $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
@@ -102,7 +114,13 @@ class EInvoiceController extends BaseController
         $company->e_invoice = $stub;
         $company->save();
     }
-
+    
+    /**
+     * Returns the current E-Invoice Quota.
+     *
+     * @param  ShowQuotaRequest $request
+     * @return JsonResponse
+     */
     public function quota(ShowQuotaRequest $request): JsonResponse
     {
          /**

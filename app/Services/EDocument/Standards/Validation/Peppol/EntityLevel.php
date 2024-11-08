@@ -20,14 +20,16 @@ use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\PurchaseOrder;
 use App\Services\EDocument\Standards\Peppol;
+use App\Services\EDocument\Standards\Validation\XsltDocumentValidator;
 use Illuminate\Support\Facades\App;
+use XSLTProcessor;
 
 class EntityLevel
 {
     private array $client_fields = [
         'address1',
         'city',
-        'state',
+        // 'state',
         'postal_code',
         'country_id',
     ];
@@ -35,7 +37,7 @@ class EntityLevel
     private array $company_settings_fields = [
         'address1',
         'city',
-        'state',
+        // 'state',
         'postal_code',
         'country_id',
     ];
@@ -97,14 +99,35 @@ class EntityLevel
 
         $p = new Peppol($invoice);
 
+        $xml = false;
+
         try{
-            $p->run()->toXml();
+            $xml = $p->run()->toXml();
         }
         catch(PeppolValidationException $e) {
-
             $this->errors['invoice'] = ['field' => $e->getInvalidField(), 'label' => $e->getInvalidField()];
-
         };
+
+        if($xml){
+            // Second pass through the XSLT validator
+            $xslt = new XsltDocumentValidator($xml);
+            $errors = $xslt->validate()->getErrors();
+
+            if(count($errors['stylesheet']) > 0){
+
+            }
+        
+            if(count($errors['generate']) > 0) {
+
+            }
+
+            if (count($errors['xsd']) > 0) {
+
+            }
+
+        }
+
+
 
         $this->errors['passes'] = count($this->errors['invoice']) == 0 && count($this->errors['client']) == 0 && count($this->errors['company']) == 0;
 
