@@ -35,7 +35,7 @@ class EInvoiceController extends BaseController
      * Checks a given model for validity for sending
      *
      * @param  ValidateEInvoiceRequest $request
-     * @return void
+     * 
      */
     public function validateEntity(ValidateEInvoiceRequest $request)
     {
@@ -50,7 +50,7 @@ class EInvoiceController extends BaseController
             default => $data['passes'] = false,
         };
         
-        return response()->json($data, $data['passes'] ? 200 : 400);
+        return response()->json($data, $data['passes'] ? 200 : 422);
 
     }
     

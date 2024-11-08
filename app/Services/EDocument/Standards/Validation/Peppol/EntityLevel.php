@@ -113,21 +113,19 @@ class EntityLevel
             $xslt = new XsltDocumentValidator($xml);
             $errors = $xslt->validate()->getErrors();
 
-            if(count($errors['stylesheet']) > 0){
-
+            if(isset($errors['stylesheet']) && count($errors['stylesheet']) > 0){
+                $this->errors['invoice'] = array_merge($this->errors['invoice'], $errors['stylesheet']);
             }
         
-            if(count($errors['generate']) > 0) {
-
+            if(isset($errors['general']) && count($errors['general']) > 0) {
+                $this->errors['invoice'] = array_merge($this->errors['invoice'], $errors['general']);
             }
 
-            if (count($errors['xsd']) > 0) {
-
+            if (isset($errors['xsd']) && count($errors['xsd']) > 0) {
+                $this->errors['invoice'] = array_merge($this->errors['invoice'], $errors['xsd']);
             }
 
         }
-
-
 
         $this->errors['passes'] = count($this->errors['invoice']) == 0 && count($this->errors['client']) == 0 && count($this->errors['company']) == 0;
 

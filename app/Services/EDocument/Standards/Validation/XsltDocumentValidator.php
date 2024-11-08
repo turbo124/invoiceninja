@@ -98,7 +98,7 @@ class XsltDocumentValidator
 
             $errorMessages = [];
             foreach ($errors as $error) {
-                $this->errors['xsd'] = sprintf(
+                $this->errors['xsd'][] = sprintf(
                     'Line %d: %s',
                     $error->line,
                     trim($error->message)
