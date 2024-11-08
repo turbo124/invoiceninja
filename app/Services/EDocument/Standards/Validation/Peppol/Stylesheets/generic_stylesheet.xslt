@@ -65,6 +65,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Name</th>
                                 <th>Description</th>
                                 <th>Quantity</th>
                                 <th>Price</th>
@@ -119,6 +120,7 @@
     <xsl:template match="*[local-name()='InvoiceLine' or local-name()='CreditNoteLine']">
         <tr>
             <td><xsl:value-of select="cbc:ID"/></td>
+            <td><xsl:value-of select="cac:Item/cbc:Name"/></td>
             <td><xsl:value-of select="cac:Item/cbc:Description"/></td>
             <td class="amount"><xsl:value-of select="cbc:InvoicedQuantity|cbc:CreditedQuantity"/></td>
             <td class="amount"><xsl:value-of select="cac:Price/cbc:PriceAmount"/></td>

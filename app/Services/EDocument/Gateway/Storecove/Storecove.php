@@ -120,14 +120,11 @@ class Storecove
             ],
         };
 
-        nlog($network_data);
-
-
         $uri =  "discovery/receives";
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
         // nlog($network_data);
         // nlog($r->json());
-        nlog($r->body());
+        // nlog($r->body());
 
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
@@ -155,8 +152,7 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
 
-        nlog($r->json());
-
+        // nlog($r->json());
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
     }
@@ -537,7 +533,6 @@ nlog($r->body());
         }
         catch (ClientException $e) {
             // 4xx errors
-            nlog($r->body());
             nlog("LEI:: {$this->legal_entity_id}");
             nlog("Client error: " . $e->getMessage());
             nlog("Response body: " . $e->getResponse()->getBody()->getContents());

@@ -5450,6 +5450,9 @@ $lang = array(
     'white_label_license_not_present' => 'License not found. Make sure to set LICENSE_KEY as environment variable.',
     'white_label_license_not_found' => 'White label license not found.',
     'details_update_info' => 'We\'ll update your company details with the provided information.',
+    'sales_above_threshold' => 'Sales above threshold',
+    'client_address_required' => 'Full client address is required for E-invoicing',
+    'connected' => 'Connected',
 );
 
 return $lang;
