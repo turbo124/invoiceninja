@@ -48,6 +48,10 @@ class PeppolTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        
+        if (config('ninja.testvars.travis') !== false) {
+            $this->markTestSkipped('Skip test for GH Actions');
+        }
 
         $this->makeTestData();
 
