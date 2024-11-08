@@ -346,6 +346,9 @@ class PeppolTest extends TestCase
         ])->postJson('/api/v1/einvoice/validateEntity', $data);
 
         if($response->getStatusCode() !== 200){
+
+            $p = new Peppol($invoice);
+            nlog($p->run()->toXml());
             nlog($invoice->withoutRelations()->toArray());
             nlog($response->json());
         }

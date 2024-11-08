@@ -439,17 +439,17 @@ class Peppol extends AbstractService
             $allowanceCharge->ChargeIndicator = 'false'; // false = discount
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)number_format($this->calc->getTotalDiscount(),2, '.', '');
+            $allowanceCharge->Amount->amount = number_format($this->calc->getTotalDiscount(), 2, '.', '');
 
             // Add percentage if available
             if ($this->invoice->discount > 0 && !$this->invoice->is_amount_discount) {
                         
                 $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
                 $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->BaseAmount->amount = (string) number_format($this->calc->getSubtotalWithSurcharges(), 2, '.', '');
+                $allowanceCharge->BaseAmount->amount = number_format($this->calc->getSubtotalWithSurcharges(), 2, '.', '');
 
                 $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
-                $mfn->value = (string)number_format(round(($this->invoice->discount), 2), 2, '.', '');  // Format to always show 2 decimals
+                $mfn->value = number_format(round(($this->invoice->discount), 2), 2, '.', '');  // Format to always show 2 decimals
                 $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
             }
 
@@ -470,7 +470,7 @@ class Peppol extends AbstractService
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge1;
+            $allowanceCharge->Amount->amount = number_format($this->invoice->custom_surcharge1, 2, '.', '');
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
@@ -489,7 +489,7 @@ class Peppol extends AbstractService
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge2;
+            $allowanceCharge->Amount->amount = number_format($this->invoice->custom_surcharge2, 2, '.', '');
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
@@ -509,7 +509,7 @@ class Peppol extends AbstractService
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge3;
+            $allowanceCharge->Amount->amount = number_format($this->invoice->custom_surcharge3, 2, '.', '');
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
@@ -528,7 +528,7 @@ class Peppol extends AbstractService
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
             $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
             $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = (string)$this->invoice->custom_surcharge4;
+            $allowanceCharge->Amount->amount = number_format($this->invoice->custom_surcharge4, 2, '.', '');
             $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
             $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
             $allowanceCharge->BaseAmount->amount = (string) $this->calc->getSubtotalWithSurcharges();
@@ -579,7 +579,7 @@ class Peppol extends AbstractService
 
         $am = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\AllowanceTotalAmount();
         $am->currencyID = $this->invoice->client->currency()->code;
-        $am->amount = (string)$this->calc->getTotalDiscount();
+        $am->amount = number_format($this->calc->getTotalDiscount(), 2, '.','');
         $lmt->AllowanceTotalAmount = $am;
 
         return $lmt;
@@ -732,8 +732,8 @@ class Peppol extends AbstractService
 
         foreach($this->invoice->line_items as $key => $item) {
             
-            $item->line_total = round($item->line_total,2);
-            $item->gross_line_total = round($item->gross_line_total, 2);
+            // $item->line_total = round($item->line_total,2);
+            // $item->gross_line_total = round($item->gross_line_total, 2);
 
             $_item = new Item();
             $_item->Name = $item->product_key;
@@ -830,7 +830,7 @@ class Peppol extends AbstractService
                 $allowanceCharge->ChargeIndicator = 'false'; // false = discount
                 $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
                 $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->Amount->amount = (string)number_format($this->calculateTotalItemDiscountAmount($item),2, '.', '');
+                $allowanceCharge->Amount->amount = number_format($this->calculateTotalItemDiscountAmount($item),2, '.', '');
                 $this->allowance_total += $this->calculateTotalItemDiscountAmount($item);
 
 

@@ -39,6 +39,7 @@ class XsltDocumentValidator
      */
     public function validate(): self
     {
+        // nlog($this->xml_document);
         $this->validateXsd()
              ->validateSchema();
 
