@@ -247,7 +247,6 @@ class PeppolTest extends TestCase
             'is_tax_exempt' => false,
         ];
 
-        
         $entity_data = $this->setupTestData($scenario);
 
         $invoice = $entity_data['invoice'];
@@ -255,15 +254,6 @@ class PeppolTest extends TestCase
         $client->address1 = '';
         $client->city = '';
         $client->save();
-        // $company = $entity_data['company'];
-        // $settings = $company->settings;
-
-        // $settings->address1 = 'some address';
-        // $settings->city = 'some city';
-        // $settings->postal_code = '102394';
-
-        // $company->settings = $settings;
-        // $company->save();
 
         $data = [
             'entity' => 'invoices',
@@ -300,13 +290,6 @@ class PeppolTest extends TestCase
         $invoice = $entity_data['invoice'];
         $company = $entity_data['company'];
         $settings = $company->settings;
-
-        // $settings->address1 = 'some address';
-        // $settings->city = 'some city';
-        // $settings->postal_code = '102394';
-
-        // $company->settings = $settings;
-        // $company->save();
 
         $data = [
             'entity' => 'invoices',

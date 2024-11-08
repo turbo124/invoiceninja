@@ -159,8 +159,8 @@ class InvoiceItemSumInclusive
     {
         $this->sub_total += $this->getLineTotal();
 
-        $this->item->line_total = round($this->item->line_total, $this->currency->precision);
-        $this->item->gross_line_total = round($this->item->gross_line_total, $this->currency->precision);
+        // $this->item->line_total = round($this->item->line_total, $this->currency->precision);
+        // $this->item->gross_line_total = round($this->item->gross_line_total, $this->currency->precision);
 
         $this->line_items[] = $this->item;
 

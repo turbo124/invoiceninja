@@ -732,6 +732,9 @@ class Peppol extends AbstractService
 
         foreach($this->invoice->line_items as $key => $item) {
             
+            $item->line_total = round($item->line_total,2);
+            $item->gross_line_total = round($item->gross_line_total, 2);
+
             $_item = new Item();
             $_item->Name = $item->product_key;
             $_item->Description = $item->notes;
