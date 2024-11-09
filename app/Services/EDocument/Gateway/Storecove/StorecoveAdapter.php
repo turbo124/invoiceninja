@@ -12,6 +12,8 @@
 namespace App\Services\EDocument\Gateway\Storecove;
 
 use App\DataMapper\Tax\BaseRule;
+use App\Models\Expense;
+use App\Models\Vendor;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans;
@@ -31,6 +33,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use App\Services\EDocument\Gateway\Storecove\PeppolToStorecoveNormalizer;
+use App\Services\EDocument\Gateway\Storecove\Transformers\StorecoveExpense;
 use App\Services\EDocument\Standards\Peppol;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -477,4 +480,5 @@ class StorecoveAdapter
         };
 
     }
+    
 }

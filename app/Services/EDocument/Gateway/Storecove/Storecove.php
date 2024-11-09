@@ -17,6 +17,7 @@ use Turbo124\Beacon\Facades\LightLogs;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use App\DataMapper\Analytics\LegalEntityCreated;
+use App\Services\EDocument\Gateway\Transformers\StorecoveExpense;
 
 enum HttpVerb: string
 {
@@ -34,11 +35,11 @@ class Storecove
     
     /** @var array $peppol_discovery */
     private array $peppol_discovery = [
-        "documentTypes" =>  ["invoice"],
-        "network" =>  "peppol",
-        "metaScheme" =>  "iso6523-actorid-upis",
-        "scheme" =>  "de:lwid",
-        "identifier" => "DE:VAT"
+            "documentTypes" =>  ["invoice"],
+            "network" =>  "peppol",
+            "metaScheme" =>  "iso6523-actorid-upis",
+            // "scheme" =>  "de:lwid",
+            // "identifier" => "DE:VAT",
     ];
     
     /** @var array $dbn_discovery */
@@ -46,8 +47,8 @@ class Storecove
         "documentTypes" =>  ["invoice"],
         "network" =>  "dbnalliance",
         "metaScheme" =>  "iso6523-actorid-upis",
-        "scheme" =>  "gln",
-        "identifier" => "1200109963131"
+        // "scheme" =>  "gln",
+        // "identifier" => "1200109963131",
     ];
 
     private ?int $legal_entity_id = null;
@@ -58,12 +59,14 @@ class Storecove
 
     public StorecoveAdapter $adapter;
 
+    public StorecoveExpense $expense;
 
     public function __construct()
     {
         $this->router = new StorecoveRouter();
         $this->mutator = new Mutator($this);
         $this->adapter = new StorecoveAdapter($this);
+        $this->expense = new StorecoveExpense($this);
     }
         
     /**
@@ -100,17 +103,29 @@ class Storecove
     {
         $network_data = [];
 
-        match ($network) {
-            'peppol' => $network_data = array_merge($this->peppol_discovery, ['scheme' => $scheme, 'identifier' => $identifier]),
-            'dbn' => $network_data = array_merge($this->dbn_discovery, ['scheme' => $scheme, 'identifier' => $identifier]),
-            default => $network_data = array_merge($this->peppol_discovery, ['scheme' => $scheme, 'identifier' => $identifier]),
+        $network_data = match ($network) {
+            'peppol' => [
+                    ...$this->peppol_discovery,
+                    'scheme' => $scheme,
+                    'identifier' => $identifier
+            ],
+            'dbn' => array_merge(
+                $this->dbn_discovery,
+                ['scheme' => $scheme, 'identifier' => $identifier]
+            ),
+            default => [
+                    ...$this->peppol_discovery,
+                    'scheme' => $scheme,
+                    'identifier' => $identifier
+            ],
         };
 
-        $uri =  "api/v2/discovery/receives";
+        $uri =  "discovery/receives";
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
         // nlog($network_data);
         // nlog($r->json());
         // nlog($r->body());
+
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
     }
@@ -133,14 +148,11 @@ class Storecove
             default => $network_data = array_merge($this->peppol_discovery, ['scheme' => $scheme, 'identifier' => $identifier]),
         };
 
-        $uri =  "api/v2/discovery/exists";
+        $uri =  "discovery/exists";
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
 
-        // nlog($network_data);
         // nlog($r->json());
-        // nlog($r->body());
-
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
     }
@@ -336,9 +348,9 @@ class Storecove
      * @param  int $legal_entity_id
      * @param  string $identifier
      * @param  string $scheme
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
-    public function addIdentifier(int $legal_entity_id, string $identifier, string $scheme)
+    public function addIdentifier(int $legal_entity_id, string $identifier, string $scheme): array|\Illuminate\Http\Client\Response
     {
         $uri = "legal_entities/{$legal_entity_id}/peppol_identifiers";
 
@@ -357,7 +369,6 @@ class Storecove
         }
 
         return $r;
-
     }
     
     /**
@@ -522,7 +533,6 @@ nlog($r->body());
         }
         catch (ClientException $e) {
             // 4xx errors
-            
             nlog("LEI:: {$this->legal_entity_id}");
             nlog("Client error: " . $e->getMessage());
             nlog("Response body: " . $e->getResponse()->getBody()->getContents());

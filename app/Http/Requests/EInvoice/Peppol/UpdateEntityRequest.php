@@ -27,7 +27,7 @@ class UpdateEntityRequest extends FormRequest
          */
         $user = auth()->user();
 
-        if (app()->isLocal()) {
+        if (config('ninja.app_env') == 'local') {
             return true;
         }
 

@@ -528,6 +528,7 @@ class Design extends BaseDesign
 
     public function statementInvoiceTableTotals(): array
     {
+        
         if ($this->type !== self::STATEMENT) {
             return [];
         }
@@ -654,6 +655,10 @@ class Design extends BaseDesign
     public function statementCreditTableTotals(): array
     {
         if ($this->type !== self::STATEMENT) {
+            return [];
+        }
+
+        if (\array_key_exists('show_credits_table', $this->options) && $this->options['show_credits_table'] === false) {
             return [];
         }
 

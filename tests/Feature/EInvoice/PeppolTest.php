@@ -48,6 +48,10 @@ class PeppolTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        
+        if (config('ninja.testvars.travis') !== false) {
+            $this->markTestSkipped('Skip test for GH Actions');
+        }
 
         $this->makeTestData();
 
@@ -156,6 +160,205 @@ class PeppolTest extends TestCase
         $invoice = $invoice->calc()->getInvoice();
 
         return compact('company', 'client', 'invoice');
+    }
+
+    public function testEntityValidationFailsForInvoiceViaInvoice()       
+    {
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        
+        $entity_data = $this->setupTestData($scenario);
+
+        $invoice = $entity_data['invoice'];
+        $invoice->number = null;
+        $invoice->save();
+
+        $data = [
+            'entity' => 'invoices',
+            'entity_id' => $invoice->hashed_id
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+        $response->assertStatus(422);
+
+    }
+
+    public function testEntityValidationFailsForClientViaClient()   
+    {
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        
+        $entity_data = $this->setupTestData($scenario);
+
+        $invoice = $entity_data['invoice'];
+        $client = $entity_data['client'];
+        $client->address1 = '';
+        $client->city = '';
+        $client->save();
+
+        $data = [
+            'entity' => 'clients',
+            'entity_id' => $client->hashed_id
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+        $response->assertStatus(422);
+
+    }
+
+    public function testEntityValidationFailsForClientViaInvoice()   
+    {
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        $entity_data = $this->setupTestData($scenario);
+
+        $invoice = $entity_data['invoice'];
+        $client = $entity_data['client'];
+        $client->address1 = '';
+        $client->city = '';
+        $client->save();
+
+        $data = [
+            'entity' => 'invoices',
+            'entity_id' => $invoice->hashed_id
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+        $response->assertStatus(422);
+
+    }
+
+    public function testEntityValidationFailsForCompany()
+    {
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        
+        $entity_data = $this->setupTestData($scenario);
+
+        $invoice = $entity_data['invoice'];
+        $company = $entity_data['company'];
+        $settings = $company->settings;
+
+        $data = [
+            'entity' => 'invoices',
+            'entity_id' => $invoice->hashed_id
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+        $response->assertStatus(422);
+
+    }
+
+
+    public function testEntityValidation()
+    {
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_country' => 'DE',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '123456789',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => true,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        
+        $entity_data = $this->setupTestData($scenario);
+
+        $invoice = $entity_data['invoice'];
+        $company = $entity_data['company'];
+        $settings = $company->settings;
+
+        $settings->address1 = 'some address';
+        $settings->city = 'some city';
+        $settings->postal_code = '102394';
+
+        $company->settings = $settings;
+        $company->save();
+
+        $data = [
+            'entity' => 'invoices',
+            'entity_id' => $invoice->hashed_id
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/validateEntity', $data);
+
+        if($response->getStatusCode() !== 200){
+
+            $p = new Peppol($invoice);
+            nlog($p->run()->toXml());
+            nlog($invoice->withoutRelations()->toArray());
+            nlog($response->json());
+        }
+
+        $response->assertStatus(200);
+
     }
 
     public function testWithChaosMonkey()

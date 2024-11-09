@@ -22,18 +22,34 @@ class TaxSubtotals
     #[SerializedPath('[cac:TaxCategory][cbc:ID][#]')]
     public ?string $category;
 
+	public ?string $type;
+
 	public function __construct(
 		?float $tax_amount,
 		?string $country,
 		?float $taxable_amount,
 		?float $percentage,
-		?string $category
+		?string $category,
+		?string $type
 	) {
 		$this->tax_amount = $tax_amount;
 		$this->country = $country;
 		$this->taxable_amount = $taxable_amount;
 		$this->percentage = $percentage;
 		$this->category = $category;
+		$this->type = $type;
+	}
+
+	public function getType(): ?string
+	{
+		return $this->type;
+	}
+
+	public function setType(?string $type):self
+	{
+		$this->type = $type;
+
+		return $this;
 	}
 
 	public function getTaxAmount(): ?float
@@ -89,5 +105,10 @@ class TaxSubtotals
 	{
 		$this->category = $category;
 		return $this;
+	}
+
+	public function toArray(): array
+	{
+		return (array)$this;
 	}
 }

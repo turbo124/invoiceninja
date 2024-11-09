@@ -4395,7 +4395,7 @@ $lang = array(
     'reminder_message' => 'Reminder for invoice :number for :balance',
     'gmail_credentials_invalid_subject' => 'Send with GMail invalid credentials',
     'gmail_credentials_invalid_body' => 'Your GMail credentials are not correct, please log into the administrator portal and navigate to Settings > User Details and disconnect and reconnect your GMail account. We will send you this notification daily until this issue is resolved',
-    'total_columns' => 'Total Fields',
+    'total_columns' => 'Totals Fields',
     'view_task' => 'View Task',
     'cancel_invoice' => 'Cancel',
     'changed_status' => 'Successfully changed task status',
@@ -5403,8 +5403,8 @@ $lang = array(
     'payment_updated' => 'Payment Updated',
     'search_placeholder' => 'Find invoices, clients, and more',
     'invalid_vat_number' => "The VAT number is not valid for the selected country. Format should be Country Code followed by number only ie, DE123456789",
-    'acts_as_sender' => 'Acts as Sender',
-    'acts_as_receiver' => 'Acts as Receiver',
+    'acts_as_sender' => 'Send E-Invoices',
+    'acts_as_receiver' => 'Receive E-Invoices',
     'peppol_token_generated' => 'PEPPOL token successfully generated.',
     'peppol_token_description' => 'Token is used as another step to make sure invoices are sent securely. Unlike white-label licenses, token can be rotated at any point without need to wait on Invoice Ninja support.',
     'peppol_token_warning' => 'You need to generate a token to continue.',
@@ -5446,7 +5446,12 @@ $lang = array(
     'act_as_sender' => 'Send E-Invoice',
     'act_as_receiver' => 'Receive E-Invoice',
     'saved_einvoice_details' => 'Saved E-Invoice Settings',
+    'add_license_to_env' => 'We\'ll need your license key for future communication to our services. Make sure to LICENSE_KEY as environment variable.',
+    'white_label_license_not_present' => 'License not found. Make sure to set LICENSE_KEY as environment variable.',
+    'white_label_license_not_found' => 'White label license not found.',
     'sales_above_threshold' => 'Sales above threshold',
+    'client_address_required' => 'Full client address is required for E-invoicing',
+    'connected' => 'Connected',
 );
 
 return $lang;

@@ -100,7 +100,7 @@ class EInvoicePeppolController extends BaseController
      * @param  Storecove $storecove
      * @return Response
      */
-    public function setup(StoreEntityRequest $request, Storecove $storecove): Response
+    public function setup(StoreEntityRequest $request, Storecove $storecove): Response|JsonResponse
     {
         /**
          * @var \App\Models\Company
@@ -144,6 +144,12 @@ class EInvoicePeppolController extends BaseController
             return response()->noContent();
         }
 
+        nlog($response->json());
+
+        if ($response->status() === 422) {
+            return response()->json($response->json(), 422);
+        }
+
         return response()->noContent(status: 500);
     }
 
@@ -159,8 +165,7 @@ class EInvoicePeppolController extends BaseController
      */
     public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): \Illuminate\Http\JsonResponse
     {
-        // @todo: check with dave, since this method has 0 references and it's not being used.
-
+        
         $company = auth()->user()->company();
         $tax_data = $company->tax_data;
 
@@ -172,9 +177,9 @@ class EInvoicePeppolController extends BaseController
 
         $scheme = $storecove->router->resolveRouting($request->country, $company->settings->classification);
 
-        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->identifier, $scheme);
+        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->vat_number, $scheme);
 
-        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->identifier;
+        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->vat_number;
         $company->tax_data = $tax_data;
         $company->save();
 

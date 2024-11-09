@@ -139,7 +139,7 @@ class BaseRule implements RuleInterface
 
     public function shouldCalcTax(): bool
     {
-        return $this->should_calc_tax && $this->checkIfInvoiceLocked();
+        return $this->should_calc_tax && $this->checkIfInvoiceLocked() && $this->invoice->client;
     }
     /**
      * Initializes the tax rule for the entity.
@@ -257,7 +257,7 @@ class BaseRule implements RuleInterface
     private function resolveRegions(): self
     {
 
-        $this->client_region = $this->region_codes[$this->client->country->iso_3166_2];
+        $this->client_region = $this->region_codes[$this->client->country->iso_3166_2 ?? $this->client->company->country()->iso_3166_2];
 
         match($this->client_region) {
             'US' => $this->client_subregion = isset($this->invoice?->client?->tax_data?->geoState) ? $this->invoice->client->tax_data->geoState : $this->getUSState(),

@@ -94,6 +94,7 @@ class SendEDocument implements ShouldQueue
                 // nlog($r->body());
         }
         
+        //@todo remove early return prior to release
         return;
 
 
@@ -159,16 +160,16 @@ class SendEDocument implements ShouldQueue
     /**
      * Self hosted request headers
      *
-     * @return array
-     */
-    private function getHeaders(): array
-    {
-        return [
-            'X-API-SELF-HOST-TOKEN' => config('ninja.license_key'),
-            "X-Requested-With" => "XMLHttpRequest",
-            "Content-Type" => "application/json",
-        ];
-    }
+     * 
+     **/
+    // private function getHeaders(): array
+    // {
+    //     return [
+    //         'X-API-SELF-HOST-TOKEN' => config('ninja.license_key'),
+    //         "X-Requested-With" => "XMLHttpRequest",
+    //         "Content-Type" => "application/json",
+    //     ];
+    // }
 
     public function failed($exception = null)
     {

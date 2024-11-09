@@ -20,6 +20,12 @@ class XsltDocumentValidator
 
     private string $ubl_xsd = 'app/Services/EDocument/Standards/Validation/Peppol/Stylesheets/UBL2.1/UBL-Invoice-2.1.xsd';
 
+    private string $peppol_stylesheet = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/generic_stylesheet.xslt';
+    // private string $peppol_stylesheet = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/xrechung.xslt';
+
+    // private string $peppol_stylesheetx = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/ubl_stylesheet.xslt';
+    // private string $peppol_stylesheet = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/ci_to_ubl_stylesheet.xslt';
+
     private array $errors = [];
 
     public function __construct(public string $xml_document)
@@ -33,6 +39,7 @@ class XsltDocumentValidator
      */
     public function validate(): self
     {
+        // nlog($this->xml_document);
         $this->validateXsd()
              ->validateSchema();
 
@@ -92,7 +99,7 @@ class XsltDocumentValidator
 
             $errorMessages = [];
             foreach ($errors as $error) {
-                $this->errors['xsd'] = sprintf(
+                $this->errors['xsd'][] = sprintf(
                     'Line %d: %s',
                     $error->line,
                     trim($error->message)
@@ -119,6 +126,42 @@ class XsltDocumentValidator
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    public function getHtml(): mixed
+    {
+  //need to harvest the document type and apply the correct stylesheet
+        try {
+            // Create Saxon processor
+            $processor = new \Saxon\SaxonProcessor();
+            $xslt = $processor->newXslt30Processor();
+
+            $xml = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $this->xml_document);
+
+            // Load XML document
+            $xml_doc = $processor->parseXmlFromString($xml);
+            nlog($xml_doc);
+            // Or from file:
+            // $xml_doc = $processor->parseXmlFromFile('path/to/input.xml');
+
+            // Compile and apply stylesheet
+            $stylesheet = $xslt->compileFromFile(app_path($this->peppol_stylesheet)); //@phpstan-ignore-line
+
+            // Transform to HTML
+            $result = $stylesheet->transformToString($xml_doc); //@phpstan-ignore-line
+
+            // Or to save to file:
+            // $stylesheet->transformToFile($xml_doc, 'path/to/output.html');
+
+            return $result;
+
+        } catch (\Throwable $th) {
+            nlog("failed to convert xml to html ".$th->getMessage());
+            return ['errors' => $th->getMessage()];
+            // Handle any errors
+            // throw new \Exception("XSLT transformation failed: " . $e->getMessage());
+        }
+
     }
 
 }

@@ -179,7 +179,7 @@ class InvoiceItemSum
     private function shouldCalculateTax(): self
     {
 
-        if (!$this->invoice->company?->calculate_taxes || $this->invoice->company->account->isFreeHostedClient()) { //@phpstan-ignore-line
+        if (!$this->invoice->client || !$this->invoice->company?->calculate_taxes || $this->invoice->company->account->isFreeHostedClient()) { //@phpstan-ignore-line
             $this->calc_tax = false;
             return $this;
         }
@@ -212,6 +212,9 @@ class InvoiceItemSum
         $this->sub_total += round($this->getLineTotal(), $this->currency->precision);
 
         $this->gross_sub_total += $this->getGrossLineTotal();
+
+        // $this->item->line_total = round($this->item->line_total, $this->currency->precision);
+        // $this->item->gross_line_total = round($this->item->gross_line_total, $this->currency->precision);
 
         $this->line_items[] = $this->item;
 

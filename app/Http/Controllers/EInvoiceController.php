@@ -15,6 +15,7 @@ use App\Http\Requests\EInvoice\ShowQuotaRequest;
 use App\Http\Requests\EInvoice\ValidateEInvoiceRequest;
 use App\Http\Requests\EInvoice\UpdateEInvoiceConfiguration;
 use App\Services\EDocument\Standards\Validation\Peppol\EntityLevel;
+use Illuminate\Http\JsonResponse;
 use InvoiceNinja\EInvoice\Models\Peppol\BranchType\FinancialInstitutionBranch;
 use InvoiceNinja\EInvoice\Models\Peppol\FinancialInstitutionType\FinancialInstitution;
 use InvoiceNinja\EInvoice\Models\Peppol\FinancialAccountType\PayeeFinancialAccount;
@@ -29,7 +30,13 @@ class EInvoiceController extends BaseController
     private array $einvoice_props = [
         'payment_means',
     ];
-
+    
+    /**
+     * Checks a given model for validity for sending
+     *
+     * @param  ValidateEInvoiceRequest $request
+     * 
+     */
     public function validateEntity(ValidateEInvoiceRequest $request)
     {
         $el = new EntityLevel();
@@ -43,10 +50,16 @@ class EInvoiceController extends BaseController
             default => $data['passes'] = false,
         };
         
-        return response()->json($data, $data['passes'] ? 200 : 400);
+        return response()->json($data, $data['passes'] ? 200 : 422);
 
     }
-
+    
+    /**
+     * Updated the E-Invoice Setting Configurations
+     *
+     * @param  UpdateEInvoiceConfiguration $request
+     * @return void
+     */
     public function configurations(UpdateEInvoiceConfiguration $request)
     {
         $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
@@ -101,8 +114,14 @@ class EInvoiceController extends BaseController
         $company->e_invoice = $stub;
         $company->save();
     }
-
-    public function quota(ShowQuotaRequest $request): \Illuminate\Http\Response
+    
+    /**
+     * Returns the current E-Invoice Quota.
+     *
+     * @param  ShowQuotaRequest $request
+     * @return JsonResponse
+     */
+    public function quota(ShowQuotaRequest $request): JsonResponse
     {
          /**
          * @var \App\Models\Company
@@ -120,14 +139,17 @@ class EInvoiceController extends BaseController
                 'account_key' => $company->account->key,
             ]);
 
-        if ($response->successful()) {
-            return response($response->body());
+
+        if ($response->status() == 422) {
+            return response()->json(['message' => $response->json('message')], 422);
         }
 
         if ($response->getStatusCode() === 400) {
-            return response($response->body(), 400);
+            return response()->json(['message' => $response->json('message')], 400);
         }
 
-        return response()->noContent(500);
+        return response()->json([
+            'quota' => $response->json('quota'),
+        ]);
     }
 }

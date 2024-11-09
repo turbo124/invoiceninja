@@ -370,7 +370,7 @@ class TaskRepository extends BaseRepository
 
             $duration = 0;
 
-            $task->project->tasks->each(function ($task) use (&$duration) {
+            $task->project->tasks()->withTrashed()->where('is_deleted',0)->each(function ($task) use (&$duration) {
 
                 if(is_iterable(json_decode($task->time_log))) {
 

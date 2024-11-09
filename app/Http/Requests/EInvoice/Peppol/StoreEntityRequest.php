@@ -57,7 +57,7 @@ class StoreEntityRequest extends FormRequest
          */
         $user = auth()->user();
 
-        if (app()->isLocal()) {
+        if (config('ninja.app_env') == 'local') {
             return true;
         }
 
@@ -81,7 +81,7 @@ class StoreEntityRequest extends FormRequest
             'acts_as_receiver' => ['required', 'bool'],
             'acts_as_sender' => ['required', 'bool'],
             'tenant_id' => ['required'],
-            'classification' => ['required', 'string'],
+            'classification' => ['required', 'in:business,individual'],
             'vat_number' => [Rule::requiredIf(fn() => $this->input('classification') !== 'individual')],
             'id_number' => [Rule::requiredIf(fn() => $this->input('classification') === 'individual')],
         ];
@@ -105,8 +105,6 @@ class StoreEntityRequest extends FormRequest
 
         $input['acts_as_receiver'] = $input['acts_as_receiver'] ?? true;
         $input['acts_as_sender'] = $input['acts_as_sender'] ?? true;
-
-        $input['classification'] = $input['classification'] ?? 'individual';
 
         $this->replace($input);
     }

@@ -53,7 +53,7 @@ class AddTaxIdentifierRequest extends FormRequest
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (app()->isLocal()) {
+        if (config('ninja.app_env') == 'local') {
             return true;
         }
 
