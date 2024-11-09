@@ -199,7 +199,7 @@ class Storecove
             "idempotencyGuid" => \Illuminate\Support\Str::uuid(),
             "routing" => [
                 "eIdentifiers" => [],
-                "emails" => ["david@invoiceninja.com"]
+                "emails" => ["peppol@mail.invoicing.co"]
             ],
             "document" => [
 

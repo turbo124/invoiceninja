@@ -121,6 +121,9 @@ class MailgunController extends BaseController
         $input = $request->all();
 
         nlog($input);
+        if($input['recipient'] == config('ninja.storecove_email_catchall') && stripos('no-reply@mailer.storecove.com', $input['from']) !== false){
+
+        }
 
         if (!array_key_exists('sender', $input) || !array_key_exists('recipient', $input) || !array_key_exists('message-url', $input)) {
             nlog('Failed: Message could not be parsed, because required parameters are missing. Please ensure contacting this api-endpoint with a store & notify operation instead of a forward operation!');
