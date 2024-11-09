@@ -60,11 +60,11 @@ class StorecoveExpense
             // List of extractors for descriptions
             [$phpDocExtractor],
             // List of extractors for access info
-            [$reflectionExtractor],
-            // List of extractors for mutation info
-            [$reflectionExtractor],
-            // List of extractors for initialization info
-            [$reflectionExtractor]
+            // [$reflectionExtractor],
+            // // List of extractors for mutation info
+            // [$reflectionExtractor],
+            // // List of extractors for initialization info
+            // [$reflectionExtractor]
         );
 
         $normalizers = [
