@@ -24,7 +24,7 @@ class UpdateTokenRequest extends Request
      */
     public function authorize(): bool
     {
-        if (app()->isLocal()) {
+        if (config('ninja.app_env') == 'local') {
             return true;
         }
 
