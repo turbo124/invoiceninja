@@ -74,13 +74,13 @@ class SendEDocument implements ShouldQueue
             ],
             'tenant_id' => $model->company->company_key,
             'routing' => $identifiers['routing'],
-            
-            //
             'account_key' => $model->company->account->key,
             'e_invoicing_token' => $model->company->account->e_invoicing_token,
-            'identifiers' => $identifiers,
+            // 'identifiers' => $identifiers,
         ];
         
+        nlog($payload);
+
         /** Concrete implementation current linked to Storecove only */
 
         //@testing only

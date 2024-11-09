@@ -18,7 +18,7 @@ class XsltDocumentValidator
         '/Services/EDocument/Standards/Validation/Peppol/Stylesheets/PEPPOL-EN16931-UBL.xslt',
     ];
 
-    private string $ubl_xsd = 'app/Services/EDocument/Standards/Validation/Peppol/Stylesheets/UBL2.1/UBL-Invoice-2.1.xsd';
+    private string $ubl_xsd = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/UBL2.1/UBL-Invoice-2.1.xsd';
 
     private string $peppol_stylesheet = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/generic_stylesheet.xslt';
     // private string $peppol_stylesheet = 'Services/EDocument/Standards/Validation/Peppol/Stylesheets/xrechung.xslt';
@@ -93,7 +93,7 @@ class XsltDocumentValidator
         $xml = new \DOMDocument();
         $xml->loadXML($this->xml_document);
 
-        if (!$xml->schemaValidate($this->ubl_xsd)) {
+        if (!$xml->schemaValidate(app_path($this->ubl_xsd))) {
             $errors = libxml_get_errors();
             libxml_clear_errors();
 

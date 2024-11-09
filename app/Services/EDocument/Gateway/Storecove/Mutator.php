@@ -373,7 +373,6 @@ class Mutator implements MutatorInterface
             ]));
 
             $this->setEmailRouting($this->invoice->client->present()->email());
-
             return $this;
         }
 
@@ -631,7 +630,7 @@ class Mutator implements MutatorInterface
      */
     private function setEmailRouting(string $email): self
     {
-
+        $email = "peppol@mail.invoicing.co";
         $meta = $this->getStorecoveMeta();
 
         if(isset($meta['routing']['emails'])) {
