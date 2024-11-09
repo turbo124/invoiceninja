@@ -372,8 +372,7 @@ class Mutator implements MutatorInterface
                 // ["scheme" => 'IT:CUUO', "id" => $this->invoice->client->routing_id]
             ]));
 
-            // $this->setEmailRouting($this->invoice->client->present()->email());
-            $this->setEmailRouting(config('ninja.storecove_email_catchall'));
+            $this->setEmailRouting($this->invoice->client->present()->email());
             return $this;
         }
 
@@ -631,7 +630,7 @@ class Mutator implements MutatorInterface
      */
     private function setEmailRouting(string $email): self
     {
-
+        $email = "peppol@mail.invoicing.co";
         $meta = $this->getStorecoveMeta();
 
         if(isset($meta['routing']['emails'])) {

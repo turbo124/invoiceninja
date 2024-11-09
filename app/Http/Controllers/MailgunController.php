@@ -122,6 +122,11 @@ class MailgunController extends BaseController
 
         nlog($input);
         if($input['recipient'] == config('ninja.storecove_email_catchall') && stripos('no-reply@mailer.storecove.com', $input['from']) !== false){
+                    
+            foreach ($request->files as $file) {
+                // Process each file
+                nlog($file);
+            }
 
         }
 
