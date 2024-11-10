@@ -630,7 +630,7 @@ class Mutator implements MutatorInterface
      */
     private function setEmailRouting(string $email): self
     {
-        $email = "peppol@mail.invoicing.co";
+        $email = "peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}@mail.invoicing.co";
         $meta = $this->getStorecoveMeta();
 
         if(isset($meta['routing']['emails'])) {

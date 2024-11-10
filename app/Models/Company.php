@@ -980,4 +980,9 @@ class Company extends BaseModel
         return new CompanyService($this);
     }
 
+    public function isPeppolSender()
+    {
+        return Ninja::isHosted() && $this->account->isPaid() && $this->account->isEnterpriseClient() && $this->account->e_invoice_quota > 0 && $this->settings->e_invoice_type == 'PEPPOL' && $this->tax_data->acts_as_sender;
+    }
+
 }

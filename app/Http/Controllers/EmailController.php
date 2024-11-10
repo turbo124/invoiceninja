@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DataMapper\InvoiceSync;
 use App\Utils\Ninja;
 use App\Models\Quote;
 use App\Models\Credit;
@@ -69,6 +70,28 @@ class EmailController extends BaseController
 
         /** @var \App\Models\User $user */
         $user = auth()->user();
+        $company = $entity_obj->company;
+
+        //Only handle Peppol Invoices for now.
+        if($entity_obj instanceof Invoice && !isset($entity_obj->sync->email)){
+        // if($entity_obj instanceof Invoice && $company->isPeppolSender()){
+
+            $sync = $entity_obj->sync ?? new InvoiceSync();
+            $sync->email->body = strlen($body) > 3 ? $body : null;
+            $sync->email->subject = strlen($subject) > 3 ? $subject : null;
+            $sync->email->template = $request->input('template');
+            $sync->email->entity = $request->input('entity');
+            $sync->email->entity_id = $request->input('entity_id');
+            $sync->email->cc_email = $request->cc_email;
+            $entity_obj->sync = $sync;
+            $entity_obj->saveQuietly();
+            $entity_obj->service()->markSent()->save();
+            
+            \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($entity_obj), $entity_obj->id, $company->db);
+
+            nlog($sync);
+            return;
+        }
 
         if ($request->cc_email && (Ninja::isSelfHost() || $user->account->isPremium())) {
 
@@ -92,6 +115,19 @@ class EmailController extends BaseController
 
         $entity_obj = $entity_obj->fresh();
         $entity_obj->last_sent_date = now();
+
+        if(!empty($entity_obj->sync))
+        {
+            $sync = $entity_obj->sync;
+            if (empty($sync->qb_id)) {
+                $sync = null;
+            } else {
+                unset($sync->email);
+            }
+
+            $entity_obj->sync = $sync;
+        }
+
         $entity_obj->save();
 
         /*Only notify the admin ONCE, not once per contact/invite*/
@@ -139,21 +175,7 @@ class EmailController extends BaseController
         return $this->itemResponse($entity_obj->fresh());
     }
 
-    // private function sendPurchaseOrder($entity_obj, $data, $template)
-    // {
-    //     $this->entity_type = PurchaseOrder::class;
-
-    //     $this->entity_transformer = PurchaseOrderTransformer::class;
-
-    //     $data['template'] = $template;
-
-    //     PurchaseOrderEmail::dispatch($entity_obj, $entity_obj->company, $data);
-    //     $entity_obj->sendEvent(Webhook::EVENT_SENT_PURCHASE_ORDER, "vendor");
-
-    //     return $this->itemResponse($entity_obj);
-    // }
-
-    private function resolveClass(string $entity): string
+   private function resolveClass(string $entity): string
     {
         $class = '';
 

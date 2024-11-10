@@ -29,18 +29,39 @@ class InvoiceSyncCast implements CastsAttributes
             return null;
         }
 
-        $is = new InvoiceSync();
-        $is->qb_id =  $data['qb_id'];
+        $is = new InvoiceSync($data);
+        // $is->qb_id = $data['qb_id'];
+        // $is->email = $data['email'];
 
         return $is;
     }
 
     public function set($model, string $key, $value, array $attributes)
     {
+        $data = [];
+
+        if(isset($value->qb_id) && strlen($value->qb_id) >= 1)
+            $data['qb_id'] = $value->qb_id;
+
+        if (isset($value->email) && $value->email !== null) {
+        
+            $data['email'] = [
+                'body' => $value->email->body ?? '',
+                'subject' => $value->email->subject ?? '',
+                'template' => $value->email->template ?? '',
+                'entity' => $value->email->entity ?? '',
+                'entity_id' => $value->email->entity_id ?? '',
+                'cc_email' => $value->email->cc_email ?? '',
+                'action' => $value->email->action ?? '',
+                'ids' => $value->email->ids ?? '',
+                'type' => $value->email->email_type ?? '',
+            ];
+
+        }
+
         return [
-            $key => json_encode([
-                'qb_id' => $value->qb_id,
-            ])
+            $key => json_encode($data)
         ];
+
     }
 }
