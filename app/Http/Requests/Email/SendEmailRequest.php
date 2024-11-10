@@ -93,7 +93,7 @@ class SendEmailRequest extends Request
             $input['entity_id'] = $this->decodePrimaryKey($input['entity_id']);
         }
 
-        if (isset($input['entity']) && in_array($input['entity'], ['invoice','quote','credit','recurring_invoice','purchase_order','payment'])) {
+        if (isset($input['entity']) && in_array($input['entity'], ['invoice','quote','credit','recurring_invoice','purchase_order','payment','purchaseOrder'])) {
             $this->entity_plural = Str::plural($input['entity']) ?? '';
             $input['entity'] = "App\Models\\".ucfirst(Str::camel($input['entity']));
         }
