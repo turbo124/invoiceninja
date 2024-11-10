@@ -44,11 +44,45 @@ class UblEDocument extends AbstractService
     public function run(): \App\Models\Expense
     {
 
-            $e = new EInvoice();
+        $e = new EInvoice();
+        $xml = $this->extractInvoiceUbl($this->file->get());
+        $invoice = $e->decode('Peppol', $xml, 'xml');
+        return $this->buildAndSaveExpense($invoice);
 
-            $invoice = $e->decode('Peppol', $this->file->get(), 'xml');
+    }
 
-            return $this->buildAndSaveExpense($invoice);
+    private function extractInvoiceUbl(string $xml): string
+    {
+
+        $xml = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $xml);
+        nlog($xml);                
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($xml);
+
+        $xpath = new \DOMXPath($dom);
+
+        // Register the namespaces
+        $xpath->registerNamespace('sh', 'http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader');
+        $xpath->registerNamespace('ubl', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2');
+
+        // Search for Invoice with default namespace
+        $invoiceNodes = $xpath->query('//ubl:Invoice');
+
+        if ($invoiceNodes === false || $invoiceNodes->length === 0) {
+            throw new \Exception('No Invoice tag found in XML');
+        }
+
+        $invoiceNode = $invoiceNodes->item(0);
+
+        // Create new document with just the Invoice
+        $newDom = new \DOMDocument();
+        $newNode = $newDom->importNode($invoiceNode, true);
+        $newDom->appendChild($newNode);
+
+        return $newDom->saveXML($newDom->documentElement);
+
+
 
     }
 
