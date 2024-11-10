@@ -5452,6 +5452,8 @@ $lang = array(
     'sales_above_threshold' => 'Sales above threshold',
     'client_address_required' => 'Full client address is required for E-invoicing',
     'connected' => 'Connected',
+    'email_count_quotes' => 'Email :count quotes',
+
 );
 
 return $lang;

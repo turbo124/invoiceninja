@@ -40,6 +40,7 @@ class SendEmailRequest extends Request
         'email_template_custom2',
         'email_template_custom3',
         'email_template_purchase_order',
+        'email_quote_template_reminder1',
     ];
 
     /**
