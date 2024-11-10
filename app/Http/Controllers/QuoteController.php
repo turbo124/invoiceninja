@@ -519,7 +519,6 @@ class QuoteController extends BaseController
         $user = auth()->user();
 
         $action = $request->input('action');
-
         $ids = $request->input('ids');
 
         if (Ninja::isHosted() && (stripos($action, 'email') !== false) && !$user->account->account_sms_verified) {
@@ -774,7 +773,7 @@ class QuoteController extends BaseController
             case 'email':
             case 'send_email':
 
-                $quote->service()->sendEmail();
+                $quote->service()->sendEmail(contact: null, email_type: request()->input('email_type', 'quote'));
 
                 return response()->json(['message' => ctrans('texts.sent_message')], 200);
 
