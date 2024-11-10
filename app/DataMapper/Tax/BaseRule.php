@@ -359,7 +359,7 @@ class BaseRule implements RuleInterface
     public function tax($item = null): self
     {
 
-        if ($this->client->is_tax_exempt || !property_exists($item, 'tax_id')) {
+        if ($this->client->is_tax_exempt || !property_exists($item, 'tax_id') ) {
 
             return $this->taxExempt($item);
 

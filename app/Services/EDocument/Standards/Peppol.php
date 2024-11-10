@@ -407,7 +407,6 @@ class Peppol extends AbstractService
             $id->value = $this->invoice->po_number;
 
             $order_reference->ID = $id;
-
             $this->p_invoice->OrderReference = $order_reference;
 
         }
@@ -1068,7 +1067,6 @@ class Peppol extends AbstractService
             $pts->TaxScheme = $ts;
 
             $party->PartyTaxScheme[] = $pts;
-
 
         }
 

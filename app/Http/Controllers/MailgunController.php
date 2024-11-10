@@ -144,7 +144,7 @@ class MailgunController extends BaseController
 
             nlog($parts);
 
-            if(count($parts) != 4 && $parts[0] != 'peppol' && stripos('db-ninja-0', $parts[3]) !== false)
+            if(!in_array(count($parts), [4,5]) && $parts[0] != 'peppol' && stripos('db-ninja-0', $parts[3]) !== false)
                 return;
 
             $entity = ucfirst($parts[1]);
@@ -164,12 +164,10 @@ class MailgunController extends BaseController
                 return;
             }
 
-            foreach ($request->files as $file) {
-                $this->saveDocuments($file, $entity, true);
-            }
+            $this->saveDocuments($request->allFiles(), $entity, true);
 
-
-            if(empty($entity->sync))
+            // if sync is empty OR there is a 5th part to the email - just save.
+            if(empty($entity->sync) || count($parts) == 5)
                 return; //just save the document, do not email it!
 
             $sync = $entity->sync;

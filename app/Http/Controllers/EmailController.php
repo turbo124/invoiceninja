@@ -72,6 +72,7 @@ class EmailController extends BaseController
         $user = auth()->user();
         $company = $entity_obj->company;
 
+        //@todo - need to resolve if this entity is email only
         //Only handle Peppol Invoices for now. //double check if the identifier here was
         if($entity_obj instanceof Invoice && !isset($entity_obj->sync->email)){
         // if($entity_obj instanceof Invoice && $company->isPeppolSender()){

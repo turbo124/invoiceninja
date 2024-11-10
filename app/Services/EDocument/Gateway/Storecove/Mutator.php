@@ -581,9 +581,13 @@ class Mutator implements MutatorInterface
     {
         $code = $this->getClientRoutingCode();
         
-        if($this->invoice->client->classification == 'individual' || (strlen($this->invoice->client->vat_number ?? '') < 2 && strlen($this->invoice->client->id_number ?? '') < 2)){ 
+        if($this->invoice->client->classification == 'government'){
+            $this->setEmailRouting("peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}_storeonly@mail.invoicing.co");
+        }
+        else if($this->invoice->client->classification == 'individual' || (strlen($this->invoice->client->vat_number ?? '') < 2 && strlen($this->invoice->client->id_number ?? '') < 2)){ 
             return $this->setEmailRouting($this->getIndividualEmailRoute());
-        }else {
+        }
+        else {
             $this->setEmailRouting("peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}_storeonly@mail.invoicing.co");
         }
 
@@ -591,6 +595,9 @@ class Mutator implements MutatorInterface
             $vat = $this->invoice->client->id_number;
         else
             $vat = $this->invoice->client->vat_number;
+
+        if($this->invoice->client->country->iso_3166_2 == 'DE' && $this->invoice->client->classification == 'government')
+            $vat = $this->invoice->client->routing_id;
 
         $this->setStorecoveMeta($this->buildRouting([
                 ["scheme" => $code, "id" => $vat]
@@ -665,7 +672,7 @@ class Mutator implements MutatorInterface
     private function setStorecoveMeta(array $meta): self
     {
 
-        $this->storecove_meta = array_merge($this->storecove_meta, $meta);
+        $this->storecove_meta = array_merge_recursive($this->storecove_meta, $meta);
 
         return $this;
     }
