@@ -72,7 +72,7 @@ class EmailController extends BaseController
         $user = auth()->user();
         $company = $entity_obj->company;
 
-        //Only handle Peppol Invoices for now.
+        //Only handle Peppol Invoices for now. //double check if the identifier here was
         if($entity_obj instanceof Invoice && !isset($entity_obj->sync->email)){
         // if($entity_obj instanceof Invoice && $company->isPeppolSender()){
 
@@ -88,8 +88,6 @@ class EmailController extends BaseController
             $entity_obj->service()->markSent()->save();
             
             \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($entity_obj), $entity_obj->id, $company->db);
-
-            nlog($sync);
             return;
         }
 

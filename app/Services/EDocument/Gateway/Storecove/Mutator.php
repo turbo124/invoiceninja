@@ -372,7 +372,8 @@ class Mutator implements MutatorInterface
                 // ["scheme" => 'IT:CUUO', "id" => $this->invoice->client->routing_id]
             ]));
 
-            $this->setEmailRouting($this->invoice->client->present()->email());
+            $this->setEmailRouting($this->getIndividualEmailRoute());
+
             return $this;
         }
 
@@ -570,15 +571,21 @@ class Mutator implements MutatorInterface
         return $this;
     }
 
-
     /////////////// Storecove Helpers ///////////////
-
+    private function getIndividualEmailRoute(): string
+    {
+        return "peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}@mail.invoicing.co";
+    }
+    
     public function setClientRoutingCode(): self
     {
         $code = $this->getClientRoutingCode();
         
-        if($this->invoice->client->classification == 'individual' || (strlen($this->invoice->client->vat_number ?? '') < 2 && strlen($this->invoice->client->id_number ?? '') < 2)) 
-            return $this->setEmailRouting($this->invoice->client->present()->email());
+        if($this->invoice->client->classification == 'individual' || (strlen($this->invoice->client->vat_number ?? '') < 2 && strlen($this->invoice->client->id_number ?? '') < 2)){ 
+            return $this->setEmailRouting($this->getIndividualEmailRoute());
+        }else {
+            $this->setEmailRouting("peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}_storeonly@mail.invoicing.co");
+        }
 
         if($this->invoice->client->country->iso_3166_2 == 'FR')
             $vat = $this->invoice->client->id_number;
@@ -630,7 +637,6 @@ class Mutator implements MutatorInterface
      */
     private function setEmailRouting(string $email): self
     {
-        $email = "peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}@mail.invoicing.co";
         $meta = $this->getStorecoveMeta();
 
         if(isset($meta['routing']['emails'])) {

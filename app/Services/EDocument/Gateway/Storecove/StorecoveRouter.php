@@ -15,7 +15,7 @@ class StorecoveRouter
 {      
     /**
      * Provides a country matrix for the correct scheme to send via
-     *  
+     * [ "iso_3166_2" =>  [<business_type>, <identifier1>, <tax_identifier>, <routing_identifier>]
      * @var array $routing_rules 
      **/
     private array $routing_rules = [
@@ -72,8 +72,10 @@ class StorecoveRouter
         "ME" => ["B+G","","ME:VAT","ME:VAT"],
         "MK" => ["B+G","","MK:VAT","MK:VAT"],
         "MT" => ["B+G","","MT:VAT","MT:VAT"],
-        "NL" => ["G","NL:OINO",false,"NL:OINO"],
-        "NL" => ["B","NL:KVK","NL:VAT","NL:VAT"],
+        "NL" => [
+            ["B","NL:KVK","NL:VAT","NL:VAT"],
+            ["G","NL:OINO",false,"NL:OINO"],
+        ],
         "PL" => ["G+B","","PL:VAT","PL:VAT"],
         "PT" => ["G+B","","PT:VAT","PT:VAT"],
         "RO" => ["G+B","","RO:VAT","RO:VAT"],
@@ -105,6 +107,9 @@ class StorecoveRouter
     /**
      * Return the routing code based on country and entity classification
      *
+     * ** note ** Individuals routing to their email address will
+     * not hit this code path.
+     *  
      * @param  string $country
      * @param  ?string $classification
      * @return string
