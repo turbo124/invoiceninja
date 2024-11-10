@@ -15,7 +15,7 @@ class StorecoveRouter
 {      
     /**
      * Provides a country matrix for the correct scheme to send via
-     *  
+     * [ "iso_3166_2" =>  [<business_type>, <identifier1>, <tax_identifier>, <routing_identifier>]
      * @var array $routing_rules 
      **/
     private array $routing_rules = [
@@ -72,8 +72,10 @@ class StorecoveRouter
         "ME" => ["B+G","","ME:VAT","ME:VAT"],
         "MK" => ["B+G","","MK:VAT","MK:VAT"],
         "MT" => ["B+G","","MT:VAT","MT:VAT"],
-        "NL" => ["G","NL:OINO",false,"NL:OINO"],
-        "NL" => ["B","NL:KVK","NL:VAT","NL:VAT"],
+        "NL" => [
+            ["B","NL:KVK","NL:VAT","NL:VAT"],
+            ["G","NL:OINO",false,"NL:OINO"],
+        ],
         "PL" => ["G+B","","PL:VAT","PL:VAT"],
         "PT" => ["G+B","","PT:VAT","PT:VAT"],
         "RO" => ["G+B","","RO:VAT","RO:VAT"],
@@ -104,9 +106,9 @@ class StorecoveRouter
     
     /**
      * Return the routing code based on country and entity classification
-     *
+     * 
      * @param  string $country
-     * @param  ?string $classification
+     * @param  ?string $classification DE:STNR
      * @return string
      */
     public function resolveRouting(string $country, ?string $classification = 'business'): string
@@ -122,6 +124,7 @@ class StorecoveRouter
             default => $code = "B",
         };
                 
+        //France determine routing scheme
         if ($this->invoice && $country == 'FR') {
 
             if ($code == 'B' && strlen($this->invoice->client->id_number) == 9) {
@@ -134,10 +137,17 @@ class StorecoveRouter
 
         }
         
+        //DE we can route via Steurnummer
+        if($this->invoice && $country = "DE" && $classification == 'individual' && strlen($this->invoice->client->id_number ?? '') > 4){
+            return 'DE:STNR';
+        }
+
+        //Single array 
         if (is_array($rules) && !is_array($rules[0])) {
             return $rules[3];
         }
 
+        //Multi Array - iterate
         foreach($rules as $rule) {
             if(stripos($rule[0], $code) !== false) {
                 return $rule[3];

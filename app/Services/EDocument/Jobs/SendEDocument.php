@@ -91,7 +91,7 @@ class SendEDocument implements ShouldQueue
             return $this->writeActivity($model, $r);
         }
         else {
-                // nlog($r->body());
+            // nlog($r->body());
         }
         
         //@todo remove early return prior to release

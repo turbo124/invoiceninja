@@ -112,7 +112,7 @@ class SendEmailRequest extends Request
     public function messages()
     {
         return [
-            'template.in' => 'Template :input is anot a valid template.',
+            'template.in' => 'Template :input is not a valid template.',
             'entity.in' => 'Entity :input is not a valid entity.'
         ];
     }

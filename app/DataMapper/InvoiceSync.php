@@ -21,9 +21,27 @@ class InvoiceSync implements Castable
 {
     public string $qb_id;
     
+    public mixed $email;
+
     public function __construct(array $attributes = [])
     {
+        
         $this->qb_id = $attributes['qb_id'] ?? '';
+        $this->email = new \stdClass();
+
+        if(isset($attributes['email']))
+        {
+            
+            $this->email->body = $attributes['email']['body'] ?? '';
+            $this->email->subject = $attributes['email']['subject'] ?? '';
+            $this->email->template = $attributes['email']['template'] ?? '';
+            $this->email->entity = $attributes['email']['entity'] ?? '';
+            $this->email->entity_id = $attributes['email']['entity_id'] ?? '';
+            $this->email->cc_email = $attributes['email']['cc_email'] ?? '';
+            $this->email->action = $attributes['email']['action'] ?? '';
+            $this->email->ids = $attributes['email']['ids'] ?? [];
+            $this->email->email_type = $attributes['email']['type'] ?? '';
+        }
     }
 
     /**

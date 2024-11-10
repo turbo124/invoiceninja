@@ -364,8 +364,6 @@ class StorecoveAdapter
             nlog("non eu");
             $this->nexus = $company_country_code;
         } elseif (in_array($client_country_code, $eu_countries)) {
-            
-            //EU Sale where Company country != Client Country
                     
             // First, determine if we're over threshold
             $is_over_threshold = isset($this->ninja_invoice->company->tax_data->regions->EU->has_sales_above_threshold) &&
@@ -405,7 +403,20 @@ class StorecoveAdapter
 
         }
 
-       
+        if($company_country_code == 'DE' && $client_country_code == 'DE' && $this->ninja_invoice->client->classification == 'government') {
+            $this->removeSupplierVatNumber();
+        }
+
+        return $this;
+    }
+
+    private function removeSupplierVatNumber(): self
+    {
+
+        $asp = $this->storecove_invoice->getAccountingSupplierParty();
+        $asp->setPublicIdentifiers([]);
+        $this->storecove_invoice->setAccountingSupplierParty($asp);
+
         return $this;
     }
 
