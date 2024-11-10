@@ -73,24 +73,24 @@ class EmailController extends BaseController
         $company = $entity_obj->company;
 
         //@todo - need to resolve if this entity is email only
-        //Only handle Peppol Invoices for now. //double check if the identifier here was
-        if($entity_obj instanceof Invoice && !isset($entity_obj->sync->email)){
-        // if($entity_obj instanceof Invoice && $company->isPeppolSender()){
+        //Only handle Peppol Invoices for now. //double check if the identifier here was found in discovery otherwise email route!
+        // if($entity_obj instanceof Invoice && !isset($entity_obj->sync->email)){
+        // // if($entity_obj instanceof Invoice && $company->isPeppolSender()){
 
-            $sync = $entity_obj->sync ?? new InvoiceSync();
-            $sync->email->body = strlen($body) > 3 ? $body : null;
-            $sync->email->subject = strlen($subject) > 3 ? $subject : null;
-            $sync->email->template = $request->input('template');
-            $sync->email->entity = $request->input('entity');
-            $sync->email->entity_id = $request->input('entity_id');
-            $sync->email->cc_email = $request->cc_email;
-            $entity_obj->sync = $sync;
-            $entity_obj->saveQuietly();
-            $entity_obj->service()->markSent()->save();
+        //     $sync = $entity_obj->sync ?? new InvoiceSync();
+        //     $sync->email->body = strlen($body) > 3 ? $body : null;
+        //     $sync->email->subject = strlen($subject) > 3 ? $subject : null;
+        //     $sync->email->template = $request->input('template');
+        //     $sync->email->entity = $request->input('entity');
+        //     $sync->email->entity_id = $request->input('entity_id');
+        //     $sync->email->cc_email = $request->cc_email;
+        //     $entity_obj->sync = $sync;
+        //     $entity_obj->saveQuietly();
+        //     $entity_obj->service()->markSent()->save();
             
-            \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($entity_obj), $entity_obj->id, $company->db);
-            return;
-        }
+        //     \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($entity_obj), $entity_obj->id, $company->db);
+        //     return;
+        // }
 
         if ($request->cc_email && (Ninja::isSelfHost() || $user->account->isPremium())) {
 

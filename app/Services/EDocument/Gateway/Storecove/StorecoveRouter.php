@@ -106,12 +106,9 @@ class StorecoveRouter
     
     /**
      * Return the routing code based on country and entity classification
-     *
-     * ** note ** Individuals routing to their email address will
-     * not hit this code path.
-     *  
+     * 
      * @param  string $country
-     * @param  ?string $classification
+     * @param  ?string $classification DE:STNR
      * @return string
      */
     public function resolveRouting(string $country, ?string $classification = 'business'): string
@@ -127,6 +124,7 @@ class StorecoveRouter
             default => $code = "B",
         };
                 
+        //France determine routing scheme
         if ($this->invoice && $country == 'FR') {
 
             if ($code == 'B' && strlen($this->invoice->client->id_number) == 9) {
@@ -139,10 +137,17 @@ class StorecoveRouter
 
         }
         
+        //DE we can route via Steurnummer
+        if($this->invoice && $country = "DE" && $classification == 'individual' && strlen($this->invoice->client->id_number ?? '') > 4){
+            return 'DE:STNR';
+        }
+
+        //Single array 
         if (is_array($rules) && !is_array($rules[0])) {
             return $rules[3];
         }
 
+        //Multi Array - iterate
         foreach($rules as $rule) {
             if(stripos($rule[0], $code) !== false) {
                 return $rule[3];

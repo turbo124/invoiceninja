@@ -103,35 +103,35 @@ class TemplateService
         $this->twig->addExtension(new IntlExtension());
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
-        $function = new \Twig\TwigFunction('img', function ($string, $style = '') {
-            return '<img src="' . $string . '" style="' . $style . '"></img>';
-        });
+        $function = new \Twig\TwigFunction('img', \Closure::fromCallable(function (string $image_src, string $image_style = '') {
+            return '<img src="' . $image_src . '" style="' . $image_style . '"></img>';
+        }));
         $this->twig->addFunction($function);
 
-        $function = new \Twig\TwigFunction('t', function ($string) {
-            return ctrans("texts.{$string}");
-        });
-
+        $function = new \Twig\TwigFunction('t', \Closure::fromCallable(function (string $text_key) {
+            return ctrans("texts.{$text_key}");
+        }));
         $this->twig->addFunction($function);
 
-        $filter = new \Twig\TwigFilter('sum', function (?array $array, ?string $column) {
-
-            if(!is_array($array)) {
+        $filter = new \Twig\TwigFilter('sum', \Closure::fromCallable(function (?array $array, ?string $column) {
+            if (!is_array($array)) {
                 return 0;
             }
 
             return array_sum(array_column($array, $column));
-        });
-
+        }));
         $this->twig->addFilter($filter);
 
         $allowedTags = ['if', 'for', 'set', 'filter'];
         $allowedFilters = ['replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags'];
-        $allowedFunctions = ['range', 'cycle', 'constant', 'date',];
+        $allowedFunctions = ['range', 'cycle', 'constant', 'date','img','t'];
         $allowedProperties = ['type_id'];
-        $allowedMethods = ['img','t'];
+        // $allowedMethods = ['img','t'];
+        $allowedMethods = [
+            'Illuminate\Support\Collection' => ['__toString'], 
+        ];
 
-        $policy = new \Twig\Sandbox\SecurityPolicy($allowedTags, $allowedFilters, $allowedFunctions, $allowedProperties, $allowedMethods);
+        $policy = new \Twig\Sandbox\SecurityPolicy($allowedTags, $allowedFilters, $allowedMethods, $allowedProperties, $allowedFunctions);
         $this->twig->addExtension(new \Twig\Extension\SandboxExtension($policy, true));
 
         return $this;
