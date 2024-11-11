@@ -177,7 +177,7 @@ class ZugferdEDokument extends AbstractService
             }
 
             $this->xdocument->setDocumentPositionLineSummation($item->line_total);
-            if (!$company->tax_data->regions->EU->has_sales_above_threshold){
+            if (isset($company->tax_data->regions->EU->has_sales_above_threshold) && !$company->tax_data->regions->EU->has_sales_above_threshold){
                 // According to european law, each line item can only have one tax rate
                 if (!(empty($item->tax_name1) && empty($item->tax_name2) && empty($item->tax_name3))) {
                     $taxtype = $this->getTaxType($item->tax_id ?? 2);
@@ -236,7 +236,7 @@ class ZugferdEDokument extends AbstractService
             $document_discount = $this->document->amount * $this->document->discount / 100;
         }
 
-        if (!$company->tax_data->regions->EU->has_sales_above_threshold){
+        if (isset($company->tax_data->regions->EU->has_sales_above_threshold) && !$company->tax_data->regions->EU->has_sales_above_threshold){
         $this->xdocument->setDocumentSummation($this->document->amount, $this->document->balance, $invoicing_data->getSubTotal(), $invoicing_data->getTotalSurcharges(), $document_discount, $invoicing_data->getSubTotal() - $document_discount, $invoicing_data->getItemTotalTaxes(), 0.0, $this->document->amount - $this->document->balance);
         foreach ($this->tax_map as $item) {
             if ($document_discount > 0) {

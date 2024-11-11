@@ -1394,7 +1394,7 @@ class Peppol extends AbstractService
         }
         elseif(in_array($country_code, $eu_countries) && in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
             //EU Sale
-            if($this->company->tax_data->regions->EU->has_sales_above_threshold || !$this->invoice->client->has_valid_vat_number){ //over threshold - tax in buyer country
+            if((isset($this->company->tax_data->regions->EU->has_sales_above_threshold) && $this->company->tax_data->regions->EU->has_sales_above_threshold) || !$this->invoice->client->has_valid_vat_number){ //over threshold - tax in buyer country
                 $country_code = $this->invoice->client->country->iso_3166_2;
 
                 if(isset($this->ninja_invoice->company->tax_data->regions->EU->subregions->{$country_code}->vat_number))
