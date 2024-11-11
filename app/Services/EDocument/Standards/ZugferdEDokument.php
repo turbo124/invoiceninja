@@ -76,6 +76,7 @@ class ZugferdEDokument extends AbstractService
             ->setDocumentBuyer($client->present()->name(), $client->number)
             ->setDocumentBuyerAddress($client->address1, "", "", $client->postal_code, $client->city, $client->country->iso_3166_2, $client->state)
             ->setDocumentBuyerContact($client->present()->primary_contact_name(), "", $client->present()->phone(), "", $client->present()->email())
+            ->setDocumentBuyerCommunication("EM", $client->present()->email())
             ->addDocumentPaymentTerm(ctrans("texts.xinvoice_payable", ['payeddue' => date_create($this->document->date ?? now()->format('Y-m-d'))->diff(date_create($this->document->due_date ?? now()->format('Y-m-d')))->format("%d"), 'paydate' => $this->document->due_date]));
 
         if (!empty($this->document->public_notes)) {
@@ -113,9 +114,7 @@ class ZugferdEDokument extends AbstractService
             $this->xdocument->setDocumentBuyerOrderReferencedDocument($this->document->po_number);
         }
         if (empty($client->routing_id)) {
-
-            $this->xdocument->setDocumentBuyerReference(ctrans("texts.xinvoice_no_buyers_reference"))
-                ->setDocumentSellerCommunication("EM", $this->document->user->email);
+            $this->xdocument->setDocumentBuyerReference(ctrans("texts.xinvoice_no_buyers_reference"));
         } else {
             $this->xdocument->setDocumentBuyerReference($client->routing_id)
                  ->setDocumentBuyerCommunication("0204", $client->routing_id);
