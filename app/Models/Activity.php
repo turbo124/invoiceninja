@@ -275,6 +275,8 @@ class Activity extends StaticModel
 
     public const EINVOICE_DELIVERY_FAILURE = 147;
 
+    public const E_EXPENSE_CREATED = 148;
+
     protected $casts = [
         'is_system' => 'boolean',
         'updated_at' => 'timestamp',

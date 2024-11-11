@@ -5460,6 +5460,7 @@ $lang = array(
     'peppol_cleared_for_sending' => 'Cleared by tax authority, sending to receiver',
     'account_holder' => 'Account Name',
     'account_holder_help' => 'The name of the account',
+    'activity_148' => 'E-Expense :expense received from :vendor',
 );
 
 return $lang;
