@@ -17,8 +17,8 @@ return [
     'require_https' => env('REQUIRE_HTTPS', true),
     'app_url' => rtrim(env('APP_URL', ''), '/'),
     'app_domain' => env('APP_DOMAIN', 'invoicing.co'),
-    'app_version' => env('APP_VERSION', '5.10.46'),
-    'app_tag' => env('APP_TAG', '5.10.46'),
+    'app_version' => env('APP_VERSION', '5.10.47'),
+    'app_tag' => env('APP_TAG', '5.10.47'),
     'minimum_client_version' => '5.0.16',
     'terms_version' => '1.0.1',
     'api_secret' => env('API_SECRET', false),
@@ -258,5 +258,5 @@ return [
     'qvalia_partner_number' => env('QVALIA_PARTNER_NUMBER', false), 
     'pdf_page_numbering_x_alignment' => env('PDF_PAGE_NUMBER_X', 0),
     'pdf_page_numbering_y_alignment' => env('PDF_PAGE_NUMBER_Y', -6),
-    
+    'hosted_einvoice_secret' => env('HOSTED_EINVOICE_SECRET', null),
 ];

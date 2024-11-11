@@ -127,15 +127,15 @@ class EInvoiceController extends BaseController
          * @var \App\Models\Company
          */
         $company = auth()->user()->company();
-
+        
         $response = \Illuminate\Support\Facades\Http::baseUrl(config('ninja.hosted_ninja_url'))
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
+                'X-EInvoice-Token' => $company->account->e_invoicing_token,
             ])
             ->post('/api/einvoice/quota', data: [
                 'license_key' => config('ninja.license_key'),
-                'e_invoicing_token' => $company->account->e_invoicing_token,
                 'account_key' => $company->account->key,
             ]);
 

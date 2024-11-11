@@ -316,7 +316,8 @@ class BaseRule implements RuleInterface
 
             return $this;
 
-        } elseif($this->client_region == 'AU') { //these are defaults and are only stubbed out for now, for AU we can actually remove these
+        } 
+        elseif($this->client_region == 'AU') { //these are defaults and are only stubbed out for now, for AU we can actually remove these
 
             $this->tax_rate1 = $this->client->company->tax_data->regions->AU->subregions->AU->tax_rate;
             $this->tax_name1 = $this->client->company->tax_data->regions->AU->subregions->AU->tax_name;
@@ -345,6 +346,10 @@ class BaseRule implements RuleInterface
                 elseif (in_array($company_country_code, $this->eu_country_codes)) {
                     $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$company_country_code}->tax_rate;
                     $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$company_country_code}->tax_name;
+                }
+                elseif($is_over_threshold){
+                    $this->tax_rate1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_rate;
+                    $this->tax_name1 = $this->client->company->tax_data->regions->{$this->client_region}->subregions->{$this->client_subregion}->tax_name;
                 }
             }
             else {

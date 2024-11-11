@@ -118,16 +118,13 @@ class StorecoveAdapter
     public function transform($invoice): self
     {
         $this->ninja_invoice = $invoice;
-
         $serializer = $this->getSerializer();
-
 
         /** Currently - due to class structures, the serialization process goes like this:
          * 
          * e-invoice => Peppol -> XML -> Peppol Decoded -> encode to Peppol -> deserialize to Storecove
          */
         $p = (new Peppol($invoice))->run()->toXml();
-
         $context = [
             DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
             AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
@@ -135,13 +132,12 @@ class StorecoveAdapter
 
         $e = new \InvoiceNinja\EInvoice\EInvoice();
         $peppolInvoice = $e->decode('Peppol', $p, 'xml');
-
         $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
         $peppolInvoice = $e->encode($peppolInvoice, 'json');
         $this->storecove_invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
 
         $this->buildNexus();
-       
+
         return $this;
 
     }
@@ -395,6 +391,8 @@ class StorecoveAdapter
                     // B2C under threshold - origin country VAT
                     $this->nexus = $company_country_code;
                 }
+            } elseif ($is_over_threshold && !in_array($company_country_code, $eu_countries)){
+                    $this->nexus = $client_country_code;
             } else {
                 nlog("B2B with valid vat");
                 // B2B with valid VAT - origin country
@@ -422,7 +420,7 @@ class StorecoveAdapter
 
     private function setupDestinationVAT($client_country_code):self
     {
-        nlog("configuring destination tax");
+        
         $this->storecove_invoice->setConsumerTaxMode(true);
         $id = $this->ninja_invoice->company->tax_data->regions->EU->subregions->{$client_country_code}->vat_number;
         $scheme = $this->storecove->router->setInvoice($this->ninja_invoice)->resolveTaxScheme($client_country_code, $this->ninja_invoice->client->classification ?? 'individual');

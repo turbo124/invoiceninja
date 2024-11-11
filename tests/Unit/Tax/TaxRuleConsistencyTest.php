@@ -51,10 +51,11 @@ class TaxRuleConsistencyTest extends TestCase
 
     private function setupTestData(array $params = []): array
     {
-        
+        $company_iso = isset($params['company_country']) ? $params['company_country'] : 'DE';
+
         $settings = CompanySettings::defaults();
         $settings->vat_number = $params['company_vat'] ?? 'DE123456789';
-        $settings->country_id = Country::where('iso_3166_2', 'DE')->first()->id;
+        $settings->country_id = (string)Country::where('iso_3166_2', $company_iso)->first()->id;
         $settings->email = $this->faker->safeEmail();
 
         $tax_data = new TaxModel();
@@ -137,7 +138,7 @@ class TaxRuleConsistencyTest extends TestCase
                 'expected_rate' => 19, // Should use German VAT
                 'expected_nexus' => 'DE',
             ],
-            'B2B Transaction' => [
+            'B2B Transaction DE FR' => [
                 'params' => [
                     'company_country' => 'DE',
                     'client_country' => 'FR',
@@ -149,6 +150,19 @@ class TaxRuleConsistencyTest extends TestCase
                 ],
                 'expected_rate' => 19, // Should use German VAT
                 'expected_nexus' => 'DE',
+            ],
+            'B2B Transaction US DK' => [
+                'params' => [
+                    'company_country' => 'US',
+                    'client_country' => 'DK',
+                    'company_vat' => 'US123456789',
+                    'client_vat' => 'DK123456789',
+                    'classification' => 'business',
+                    'has_valid_vat' => true,
+                    'over_threshold' => true,
+                ],
+                'expected_rate' => 25, // Should use DK VAT
+                'expected_nexus' => 'DK',
             ],
         ];
 
@@ -163,10 +177,10 @@ class TaxRuleConsistencyTest extends TestCase
             // Test StorecoveAdapter
             $storecove = new Storecove();
             $storecove->build($data['invoice']);
-            
+
             $this->assertEquals(
                 $scenario['expected_rate'],
-                $baseRule->tax_rate1
+                $baseRule->tax_rate1, "{$name} {$scenario['expected_nexus']}"
             );
 
             $this->assertEquals(
