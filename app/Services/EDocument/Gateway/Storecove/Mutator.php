@@ -593,6 +593,9 @@ class Mutator implements MutatorInterface
             return $this->setEmailRouting($this->getIndividualEmailRoute());
         }
 
+        //Regardless, always include the client email address as a route - Storecove will only use this as a fallback.
+        $this->setEmailRouting($this->getIndividualEmailRoute());
+
         $code = $this->getClientRoutingCode();
         $identifier = false;
 

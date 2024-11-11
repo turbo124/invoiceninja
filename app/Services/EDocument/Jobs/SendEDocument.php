@@ -144,6 +144,7 @@ class SendEDocument implements ShouldQueue
         $activity->user_id = $model->user_id;
         $activity->client_id = $model->client_id ?? $model->vendor_id;
         $activity->company_id = $model->company_id;
+        $activity->account_id = $model->company->account_id;
         $activity->activity_type_id = Activity::EINVOICE_SENT;
         $activity->invoice_id = $model->id;
         $activity->notes = str_replace('"', '', $guid);
