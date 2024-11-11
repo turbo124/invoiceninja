@@ -102,6 +102,7 @@ class StoreEntityRequest extends FormRequest
         if (isset($input['country'])) {
             $country = $this->country();
             $input['country'] = $country->iso_3166_2;
+            $input['country_id'] = $country->id;
         }
 
         $input['acts_as_receiver'] = $input['acts_as_receiver'] ?? true;
