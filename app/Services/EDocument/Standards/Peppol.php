@@ -944,7 +944,7 @@ class Peppol extends AbstractService
                 $this->globalTaxCategories[] = $taxCategory;
                 
             });
-
+            
         return $this;
 
     }
@@ -1379,7 +1379,7 @@ class Peppol extends AbstractService
 
     public function getJurisdiction()
     {
-
+        
         //calculate nexus
         $country_code = $this->company->country()->iso_3166_2;
         $br = new \App\DataMapper\Tax\BaseRule();
@@ -1390,10 +1390,11 @@ class Peppol extends AbstractService
             $country_code = $this->company->country()->iso_3166_2;
         }
         elseif(in_array($country_code, $eu_countries) && !in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
-            //NON-EU sale
+            //EU => FOREIGN sale
         }
-        elseif(in_array($country_code, $eu_countries) && in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
-            //EU Sale
+        elseif(in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
+        // elseif(in_array($country_code, $eu_countries) && in_array($this->invoice->client->country->iso_3166_2, $eu_countries)){
+            // EU Sale 
             if((isset($this->company->tax_data->regions->EU->has_sales_above_threshold) && $this->company->tax_data->regions->EU->has_sales_above_threshold) || !$this->invoice->client->has_valid_vat_number){ //over threshold - tax in buyer country
                 $country_code = $this->invoice->client->country->iso_3166_2;
 
@@ -1424,12 +1425,12 @@ class Peppol extends AbstractService
         $eu_countries = $br->eu_country_codes;
 
         // If company is in EU, standardize to VAT
-        if (in_array($this->company->country()->iso_3166_2, $eu_countries)) {
+        // if (in_array($this->company->country()->iso_3166_2, $eu_countries)) {
             return "VAT";
-        }
+        // }
 
         // For non-EU countries, return original or handle specifically
-        return $this->standardizeTaxSchemeId($tax_name);
+        // return $this->standardizeTaxSchemeId($tax_name);
     }
     
     /**
