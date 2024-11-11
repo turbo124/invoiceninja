@@ -53,6 +53,11 @@ class SendEDocument implements ShouldQueue
 
         $model = $this->entity::find($this->id);
 
+        if($model->company->account->is_flagged){
+            nlog("Bad Actor");
+            return; //Bad Actor present.
+        }
+
         /** Concrete implementation current linked to Storecove only */
         $p = new Peppol($model);
         $p->run();
