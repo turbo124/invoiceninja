@@ -26,7 +26,7 @@ class CreatePaymentMethodRequest extends FormRequest
         /** @var Client $client */
         $client = auth()->guard('contact')->user()->client;
 
-        $available_methods = collect($this->client->service()->getPaymentMethods(-1))
+        $available_methods = collect($client->service()->getPaymentMethods(-1))
             ->pluck('gateway_type_id')
             ->toArray();
 
