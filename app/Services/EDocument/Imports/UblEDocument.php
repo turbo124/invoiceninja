@@ -50,7 +50,16 @@ class UblEDocument extends AbstractService
         return $this->buildAndSaveExpense($invoice);
 
     }
-
+    
+    /**
+     * extractInvoiceUbl
+     *
+     * If the <Invoice object is nested, this method will
+     * extract and return only the <Invoice> document.
+     * 
+     * @param  string $xml
+     * @return string
+     */
     private function extractInvoiceUbl(string $xml): string
     {
 
@@ -81,8 +90,6 @@ class UblEDocument extends AbstractService
         $newDom->appendChild($newNode);
 
         return $newDom->saveXML($newDom->documentElement);
-
-
 
     }
 

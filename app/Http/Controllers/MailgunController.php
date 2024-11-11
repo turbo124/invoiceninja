@@ -17,7 +17,6 @@ use App\Libraries\MultiDB;
 use Illuminate\Http\Request;
 use App\Utils\Traits\SavesDocuments;
 use App\Jobs\Mailgun\ProcessMailgunWebhook;
-use App\Http\Requests\Email\SendEmailRequest;
 use App\Jobs\Mailgun\ProcessMailgunInboundWebhook;
 
 /**
@@ -137,9 +136,6 @@ class MailgunController extends BaseController
             nlog('Failed: Message could not be parsed, because required parameters are missing. Please ensure contacting this api-endpoint with a store & notify operation instead of a forward operation!');
             return response()->json(['message' => 'Failed. Missing Parameters. Use store and notify!'], 400);
         }
-
-        // @turbo124 TODO: how to check for services.mailgun.webhook_signing_key on company level, when custom credentials are defined
-        // TODO: validation for client mail credentials by recipient
         
         /** @var \App\Models\Company $company */
         $company = MultiDB::findAndSetDbByExpenseMailbox($input["recipient"]);

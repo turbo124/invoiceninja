@@ -5326,7 +5326,7 @@ $lang = array(
     'activity_142' => 'Quote :number reminder 1 sent',
     'activity_143' => 'Auto Bill succeeded for invoice :invoice',
     'activity_144' => 'Auto Bill failed for invoice :invoice. :notes',
-    'activity_145' => 'EInvoice :invoice for :client was e-delivered. :notes',
+    'activity_145' => 'E-Invoice :invoice for :client was sent. :notes',
     'payment_failed' => 'Payment Failed',
     'ssl_host_override' => 'SSL Host Override',
     'upload_logo_short' => 'Upload Logo',
@@ -5453,7 +5453,11 @@ $lang = array(
     'client_address_required' => 'Full client address is required for E-invoicing',
     'connected' => 'Connected',
     'email_count_quotes' => 'Email :count quotes',
-
+    'activity_146' => 'E-Invoice :invoice for :client successfully delivered! :notes',
+    'activity_147' => 'E-Invoice :invoice for :client failed delivery. :notes',
+    'peppol_routing_problem' => 'Routing problem. No recipient/destination found.',
+    'peppol_sending_failed' => 'Technical delivery problem. Retry not possible',
+    'peppol_cleared_for_sending' => 'Cleared by tax authority, sending to receiver',
 );
 
 return $lang;

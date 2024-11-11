@@ -574,7 +574,7 @@ class Mutator implements MutatorInterface
     /////////////// Storecove Helpers ///////////////
     private function getIndividualEmailRoute(): string
     {
-        return "peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}@mail.invoicing.co";
+        return $this->invoice->client->present()->email();
     }
     
     private function getClientPublicIdentifier(string $code): string
