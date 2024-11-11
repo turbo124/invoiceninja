@@ -26,57 +26,11 @@ class EInvoicePeppolController extends BaseController
 {
     /**
      * Returns the legal entity ID
-     *
-     * 
-     * [
-     *       "id" => 290868,
-     *       "party_name" => "Untitled Company",
-     *       "line1" => "Address 1",
-     *       "line2" => "Address 2",
-     *       "zip" => "Postal Code",
-     *       "city" => "City",
-     *       "county" => "State",
-     *       "country" => "DE",
-     *       "tenant_id" => "EbRYYRWO7oUJE3G3jVa4Xddf6gHGI6kD",
-     *       "public" => true,
-     *       "acts_as_sender" => true,
-     *       "acts_as_receiver" => true,
-     *       "tax_registered" => true,
-     *       "peppol_identifiers" => [
-     *       [
-     *           "superscheme" => "iso6523-actorid-upis",
-     *           "scheme" => "DE:VAT",
-     *           "identifier" => "DE923356489",
-     *           "networks" => [
-     *           "peppol",
-     *           ],
-     *           "corppass_enabled" => false,
-     *       ],
-     *       ],
-     *       "administrations" => [],
-     *       "advertisements" => [
-     *       "invoice",
-     *       ],
-     *       "smart_inbox" => "a4p2q0@receive.storecove.com",
-     *       "api_keys" => [],
-     *       "additional_tax_identifiers" => [
-     *       [
-     *           "id" => 264566,
-     *           "legal_entity_id" => 290868,
-     *           "country" => null,
-     *           "county" => null,
-     *           "identifier" => "ATU73769157",
-     *           "superscheme" => "iso6523-actorid-upis",
-     *           "scheme" => "AT:VAT",
-     *       ],
-     *       ],
-     *   ]
-     * 
      * 
      * @param  ShowEntityRequest $request
      * @return JsonResponse
      */
-    public function show(ShowEntityRequest $request): JsonResponse
+    public function show(ShowEntityRequest $request, Storecove $storecove): JsonResponse
     {
         $company = auth()->user()->company();
 
@@ -85,21 +39,23 @@ class EInvoicePeppolController extends BaseController
             'Accept' => 'application/json',
         ];
 
-        if (Ninja::isSelfHost()) {
-            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
-        }
+        $response $storecove->proxy->setCompany($company)->getLegalEntity($company->legal_entity_id);
 
-        if (Ninja::isHosted()) {
-            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
-        }
+        // if (Ninja::isSelfHost()) {
+        //     $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        // }
 
-        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders($headers)
-            ->post('/api/einvoice/peppol/legal_entity', data: [
-                'legal_entity_id' => $company->legal_entity_id,
-            ]);
+        // if (Ninja::isHosted()) {
+        //     $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
+        // }
 
-        return response()->json($response->json(), 200);
+        // $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
+        //     ->withHeaders($headers)
+        //     ->post('/api/einvoice/peppol/legal_entity', data: [
+        //         'legal_entity_id' => $company->legal_entity_id,
+        //     ]);
+
+        return response()->json($response, 200);
     }
 
     /**
@@ -273,10 +229,44 @@ class EInvoicePeppolController extends BaseController
             return response()->noContent();
         }
 
-        nlog($response->status());
-
         return response()->noContent(status: 500);
     }
+
+    /**
+     * Add an additional tax identifier to
+     * an existing legal entity id
+     * 
+     * Response will be the same as show()
+     *
+     * @param  AddTaxIdentifierRequest $request
+     * @param  Storecove $storecove
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): \Illuminate\Http\JsonResponse
+    {
+        
+        $company = auth()->user()->company();
+        $tax_data = $company->tax_data;
+
+        $additional_vat = $tax_data->regions->EU->subregions->{$request->country}->vat_number ?? null;
+
+        if (!is_null($additional_vat) && !empty($additional_vat)) {
+            return response()->json(['message' => 'Identifier already exists for this region.'], 400);
+        }
+
+        $scheme = $storecove->router->resolveRouting($request->country, $company->settings->classification);
+
+        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->vat_number, $scheme);
+
+        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->vat_number;
+        $company->tax_data = $tax_data;
+        $company->save();
+
+        return response()->json(['message' => 'ok'], 200);
+
+    }
+
+
 
     private function unsetVatNumbers(mixed $taxData): mixed
     {
