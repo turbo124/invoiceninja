@@ -725,7 +725,23 @@ class StorecoveRouterTest extends TestCase
 
     }
 
+    public function testDeSteurNummerRegistration()
+    {
+        $invoice = $this->buildData();
 
+        $client = $invoice->client;
+        $client->country_id = 276;
+        // $client->vat_number = 'DE123456789';
+        $client->id_number = '12/345/67890';
+        $client->classification = 'individual';
+        $client->save();
+
+        $storecove = new Storecove();
+        $storecove->router->setInvoice($invoice->fresh());
+
+        $this->assertEquals('DE:STNR', $storecove->router->resolveRouting('DE', 'individual'));
+
+    }
 
     public function testDeBusinessClientRoutingIdentifier()
     {

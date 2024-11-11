@@ -138,7 +138,8 @@ class StorecoveRouter
         }
         
         //DE we can route via Steurnummer
-        if($this->invoice && $country = "DE" && $classification == 'individual' && strlen($this->invoice->client->id_number ?? '') > 4){
+        if($this->invoice && $country = "DE" && $classification == 'individual'){
+        // if($this->invoice && $country = "DE" && $classification == 'individual' && strlen($this->invoice->client->id_number ?? '') > 4){
             return 'DE:STNR';
         }
 

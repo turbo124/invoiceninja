@@ -538,7 +538,7 @@ class StorecoveTest extends TestCase
         return $taxData;
     }
     // public function testCreateLegalEntity()
-    // {
+    // {12/345/67890
 
     // $data = [
     //     'acts_as_receiver' => true,
@@ -554,7 +554,7 @@ class StorecoveTest extends TestCase
     //     'tenant_id' => $this->company->company_key,
     //     'zip' => $this->company->settings->postal_code,
     //     'peppol_identifiers' => [
-    //         'scheme' => 'DE:VAT',
+    //         'scheme' => 'DE:STNR',
     //         'id' => 'DE:VAT'
     //     ],
     // ];
