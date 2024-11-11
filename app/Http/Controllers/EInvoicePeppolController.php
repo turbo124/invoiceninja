@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Utils\Ninja;
 use Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -79,14 +80,23 @@ class EInvoicePeppolController extends BaseController
     {
         $company = auth()->user()->company();
 
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        if (Ninja::isSelfHost()) {
+            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        }
+
+        if (Ninja::isHosted()) {
+            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
+        }
+
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])
+            ->withHeaders($headers)
             ->post('/api/einvoice/peppol/legal_entity', data: [
                 'legal_entity_id' => $company->legal_entity_id,
-                'e_invoicing_token' => $company->account->e_invoicing_token,
             ]);
 
         return response()->json($response->json(), 200);
@@ -107,17 +117,26 @@ class EInvoicePeppolController extends BaseController
          */
         $company = auth()->user()->company();
 
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        if (Ninja::isSelfHost()) {
+            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        }
+
+        if (Ninja::isHosted()) {
+            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
+        }
+
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])
+            ->withHeaders($headers)
             ->post('/api/einvoice/peppol/setup', data: [
                 ...$request->validated(),
                 'classification' => $request->classification ?? $company->settings->classification,
                 'vat_number' => $request->vat_number ?? $company->settings->vat_number,
                 'id_number' => $request->id_number ?? $company->settings->id_number,
-                'e_invoicing_token' => $company->account->e_invoicing_token,
             ]);
 
         if ($response->successful()) {
@@ -169,15 +188,24 @@ class EInvoicePeppolController extends BaseController
     {
         $company = auth()->user()->company();
 
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        if (Ninja::isSelfHost()) {
+            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        }
+
+        if (Ninja::isHosted()) {
+            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
+        }
+
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])
+            ->withHeaders($headers)
             ->put('/api/einvoice/peppol/update', data: [
                 ...$request->validated(),
                 'legal_entity_id' => $company->legal_entity_id,
-                'e_invoicing_token' => $company->account->e_invoicing_token,
             ]);
 
         if ($response->successful()) {
@@ -209,15 +237,26 @@ class EInvoicePeppolController extends BaseController
          */
         $company = auth()->user()->company();
 
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        if (Ninja::isSelfHost()) {
+            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        }
+
+        if (Ninja::isHosted()) {
+            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
+        }
+
+        nlog($headers);
+
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])
+            ->withHeaders($headers)
             ->post('/api/einvoice/peppol/disconnect', data: [
                 'company_key' => $company->company_key,
                 'legal_entity_id' => $company->legal_entity_id,
-                'e_invoicing_token' => $company->account->e_invoicing_token,
             ]);
 
         if ($response->successful()) {
@@ -233,6 +272,8 @@ class EInvoicePeppolController extends BaseController
 
             return response()->noContent();
         }
+
+        nlog($response->status());
 
         return response()->noContent(status: 500);
     }
