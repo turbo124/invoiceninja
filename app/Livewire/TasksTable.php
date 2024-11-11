@@ -54,7 +54,7 @@ class TasksTable extends Component
 
         return render('components.livewire.tasks-table', [
             'tasks' => $query,
-            'show_item_description' => auth()->guard('contact')->user()->company->invoice_task_item_description ?? false,
+            'show_item_description' => auth()->guard('contact')->user()->client->getSetting("show_task_item_description"),
         ]);
     }
 }
