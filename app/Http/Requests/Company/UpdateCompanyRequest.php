@@ -61,6 +61,7 @@ class UpdateCompanyRequest extends Request
         'SK' => '/^SK\d{10}$/',
         'SI' => '/^SI\d{8}$/',
         'SE' => '/^SE\d{12}$/',
+        'DE:STNR' => '/^[0-9]{11}$/', //de steurnummer,
     ];
 
     /**
@@ -77,6 +78,10 @@ class UpdateCompanyRequest extends Request
 
     public function rules()
     {
+        
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         $input = $this->all();
 
         $rules = [];
@@ -121,8 +126,8 @@ class UpdateCompanyRequest extends Request
                 'string',
                 'bail',
                 'sometimes',
-                Rule::requiredIf(function () {
-                    return $this->input('settings.e_invoice_type') === 'PEPPOL';
+                Rule::requiredIf(function () use ($user) {
+                    return $this->input('settings.e_invoice_type') === 'PEPPOL' && $user->company()->settings->classification != 'individual';
                 }),
                 function ($attribute, $value, $fail) {
                     $country_code = $this->getCountryCode();

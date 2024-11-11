@@ -48,6 +48,7 @@ class StoreEntityRequest extends FormRequest
         'SK' => '/^SK\d{10}$/',
         'SI' => '/^SI\d{8}$/',
         'SE' => '/^SE\d{12}$/',
+        'DE:STNR' => '/^[0-9]{11}$/', //de steurnummer,
     ];
 
     public function authorize(): bool

@@ -5458,6 +5458,8 @@ $lang = array(
     'peppol_routing_problem' => 'Routing problem. No recipient/destination found.',
     'peppol_sending_failed' => 'Technical delivery problem. Retry not possible',
     'peppol_cleared_for_sending' => 'Cleared by tax authority, sending to receiver',
+    'account_holder' => 'Account Name',
+    'account_holder_help' => 'The name of the account',
 );
 
 return $lang;

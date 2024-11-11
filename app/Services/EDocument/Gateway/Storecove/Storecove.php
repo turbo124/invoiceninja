@@ -381,6 +381,7 @@ class Storecove
             
             return $data;
         }
+        nlog($r->body());
 
         return $r;
     }
