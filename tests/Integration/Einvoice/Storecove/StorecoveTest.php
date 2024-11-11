@@ -74,6 +74,8 @@ class StorecoveTest extends TestCase
         
         $settings = CompanySettings::defaults();
         $settings->vat_number = $params['company_vat'] ?? 'DE123456789';
+        $settings->id_number = $params['company_id_number'] ?? '';
+        $settings->classification = $params['company_classification'] ?? 'business';
         $settings->country_id = Country::where('iso_3166_2', 'DE')->first()->id;
         $settings->email = $this->faker->safeEmail();
         $settings->currency_id = '3';
@@ -170,8 +172,101 @@ class StorecoveTest extends TestCase
         return compact('company', 'client', 'invoice');
     }
 
+    public function testDEtoFRB2BReverseCharge()
+    {
+      
+        $this->routing_id = 290868;
 
-   
+        $scenario = [
+            'company_vat' => 'DE923356489',
+            'company_id_number' => '01234567890',
+            'company_country' => 'DE',
+            'company_classification' => 'business',
+            'client_country' => 'FR',
+            'client_vat' => 'FRAA123456789',
+            'client_id_number' => '',
+            'classification' => 'business',
+            'has_valid_vat' => false,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => true,
+        ];
+
+        $data = $this->setupTestData($scenario);
+
+        $invoice = $data['invoice'];
+
+        $line_items = $invoice->line_items;
+
+        foreach($line_items as &$item)
+        {
+          $item->tax_id = (string)\App\Models\Product::PRODUCT_TYPE_REVERSE_TAX;
+        }
+        unset($item);
+
+        $invoice->line_items = array_values($line_items);
+
+        $invoice = $invoice->calc()->getInvoice();
+
+        $this->assertEquals(floatval(0), floatval($invoice->total_taxes));
+    }
+
+    public function testDEIToDEGNoTaxes()
+    {
+      
+        $this->routing_id = 290868;
+
+        $scenario = [
+            'company_vat' => '',
+            'company_id_number' => '01234567890',
+            'company_country' => 'DE',
+            'company_classification' => 'individual',
+            'client_country' => 'DE',
+            'client_vat' => '',
+            'client_id_number' => '',
+            'classification' => 'government',
+            'has_valid_vat' => false,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => true,
+        ];
+
+        $data = $this->setupTestData($scenario);
+
+        $invoice = $data['invoice'];
+        $invoice = $invoice->calc()->getInvoice();
+
+        $this->assertEquals(floatval(0), floatval($invoice->total_taxes));
+    }
+
+    public function testDeNoVatNumberToDeVatNumber()
+    {
+      
+        $this->routing_id = 290868;
+
+        $scenario = [
+            'company_vat' => '',
+            'company_id_number' => '01234567890',
+            'company_country' => 'DE',
+            'company_classification' => 'individual',
+            'client_country' => 'DE',
+            'client_vat' => 'DE923356489',
+            'client_id_number' => '',
+            'classification' => 'business',
+            'has_valid_vat' => true,
+            'over_threshold' => false,
+            'legal_entity_id' => 290868,
+            'is_tax_exempt' => false,
+        ];
+
+        $data = $this->setupTestData($scenario);
+
+        $invoice = $data['invoice'];
+        $invoice = $invoice->calc()->getInvoice();
+
+        $this->assertGreaterThan(0, $invoice->total_taxes);
+    }
+
     public function testDeToFrClientTaxExemptSending()
     {
         $this->routing_id = 290868;
@@ -209,7 +304,6 @@ class StorecoveTest extends TestCase
         $this->assertEquals(floatval(0), floatval($invoice->total_taxes));
         $this->sendDocument($invoice);
     }
-
         
     /**
      * PtestDeToDeClientTaxExemptSending
@@ -538,7 +632,7 @@ class StorecoveTest extends TestCase
         return $taxData;
     }
     // public function testCreateLegalEntity()
-    // {
+    // {12/345/67890
 
     // $data = [
     //     'acts_as_receiver' => true,
@@ -554,7 +648,7 @@ class StorecoveTest extends TestCase
     //     'tenant_id' => $this->company->company_key,
     //     'zip' => $this->company->settings->postal_code,
     //     'peppol_identifiers' => [
-    //         'scheme' => 'DE:VAT',
+    //         'scheme' => 'DE:STNR',
     //         'id' => 'DE:VAT'
     //     ],
     // ];

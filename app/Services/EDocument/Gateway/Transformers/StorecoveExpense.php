@@ -11,21 +11,24 @@
 
 namespace App\Services\EDocument\Gateway\Transformers;
 
-use App\Factory\ExpenseFactory;
-use App\Factory\VendorFactory;
-use App\Models\Company;
+use App\Utils\Ninja;
 use App\Models\Vendor;
-use App\Repositories\ExpenseRepository;
-use App\Repositories\VendorContactRepository;
+use App\Models\Company;
+use App\Models\Activity;
+use App\Factory\VendorFactory;
+use App\Factory\ExpenseFactory;
 use App\Repositories\VendorRepository;
-use App\Services\EDocument\Gateway\Storecove\Models\Invoice;
-use App\Services\EDocument\Gateway\Storecove\Storecove;
+use App\Repositories\ExpenseRepository;
+use App\Repositories\ActivityRepository;
 use Symfony\Component\Serializer\Serializer;
+use App\Repositories\VendorContactRepository;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use InvoiceNinja\EInvoice\Models\Peppol\PaymentMeans;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use App\Services\EDocument\Gateway\Storecove\Storecove;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use App\Services\EDocument\Gateway\Storecove\Models\Invoice;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -146,7 +149,21 @@ class StorecoveExpense
         
         unset($expense_array['vendor']);
        
-        return $expense_repo->save($expense_array, $expense);
+        $expense = $expense_repo->save($expense_array, $expense);
+
+        $fields = new \stdClass();
+
+        $fields->expense_id = $expense->id;
+        $fields->user_id = $expense->user_id;
+        $fields->company_id = $expense->company_id;
+        $fields->account_id = $expense->company->account_id;
+        $fields->vendor_id = $expense->vendor_id;
+        $fields->activity_type_id = Activity::E_EXPENSE_CREATED;
+
+        $activity_repo = new ActivityRepository();
+        $activity_repo->save($fields, $expense, Ninja::eventVars());
+
+        return $expense;
 
     }
 

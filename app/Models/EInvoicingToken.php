@@ -24,4 +24,9 @@ class EInvoicingToken extends Model
         'token',
         'account_key',
     ];
+
+    public function license()
+    {
+        $this->belongsTo(License::class, 'license_key', 'license_key');
+    }
 }

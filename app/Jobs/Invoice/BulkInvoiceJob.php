@@ -83,7 +83,6 @@ class BulkInvoiceJob implements ShouldQueue
         if ($this->invoice->invitations->count() >= 1) {
             $this->invoice->entityEmailEvent($this->invoice->invitations->first(), 'invoice', $this->reminder_template);
             $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
-
         }
     }
 

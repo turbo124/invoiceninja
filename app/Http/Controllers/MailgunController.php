@@ -17,7 +17,6 @@ use App\Libraries\MultiDB;
 use Illuminate\Http\Request;
 use App\Utils\Traits\SavesDocuments;
 use App\Jobs\Mailgun\ProcessMailgunWebhook;
-use App\Http\Requests\Email\SendEmailRequest;
 use App\Jobs\Mailgun\ProcessMailgunInboundWebhook;
 
 /**
@@ -125,7 +124,6 @@ class MailgunController extends BaseController
     {
         $input = $request->all();
 
-        
         $authorizedByHash = \hash_equals(\hash_hmac('sha256', $input['timestamp'] . $input['token'], config('services.mailgun.webhook_signing_key')), $input['signature']);
         $authorizedByToken = $request->has('token') && $request->get('token') == config('ninja.inbound_mailbox.inbound_webhook_token');
         if (!$authorizedByHash && !$authorizedByToken) {
@@ -133,67 +131,11 @@ class MailgunController extends BaseController
         }
 
         nlog($input);
-        nlog("checks");
-        /** Peppol invoice xml ingest */
-        if(stripos($input['recipient'], "peppol_") !== false && stripos($input['from'], 'no-reply@mailer.storecove.com') !== false){
-            
-            $email_parts = explode("@", $input['recipient']);
-            nlog($email_parts);
-
-            $parts = explode("_", $email_parts[0]);
-
-            nlog($parts);
-
-            if(!in_array(count($parts), [4,5]) && $parts[0] != 'peppol' && stripos('db-ninja-0', $parts[3]) !== false)
-                return;
-
-            $entity = ucfirst($parts[1]);
-            $entity_id = $parts[2];
-            $db = $parts[3];
-
-            MultiDB::setDB($db);
-
-            $class = "\\App\\Models\\".ucfirst(\Illuminate\Support\Str::camel($entity));
-
-            /** @var \App\Models\Invoice $entity */
-            $entity = $class::query()->withTrashed()->find($entity_id);
-            
-            if(!$entity){
-                nlog("could not resolve entity for mailgun webhook");
-                nlog($input);
-                return;
-            }
-
-            $this->saveDocuments($request->allFiles(), $entity, true);
-
-            // if sync is empty OR there is a 5th part to the email - just save.
-            if(empty($entity->sync) || count($parts) == 5)
-                return; //just save the document, do not email it!
-
-            $sync = $entity->sync;
-
-            $request = new SendEmailRequest([
-                'entity' => $sync->email->entity,
-                'entity_id' => $entity->id,
-                'template' => $sync->email->template,
-                'subject' => $sync->email->subject,
-                'body' => $sync->email->body,
-                'cc_email' => $sync->email->cc_email,
-            ]);
-
-            $request->setUserResolver(fn () => $entity->user);  // Or auth()->user()
-
-            app(\App\Http\Controllers\EmailController::class)->send($request);
-            return;
-        }
 
         if (!array_key_exists('sender', $input) || !array_key_exists('recipient', $input) || !array_key_exists('message-url', $input)) {
             nlog('Failed: Message could not be parsed, because required parameters are missing. Please ensure contacting this api-endpoint with a store & notify operation instead of a forward operation!');
             return response()->json(['message' => 'Failed. Missing Parameters. Use store and notify!'], 400);
         }
-
-        // @turbo124 TODO: how to check for services.mailgun.webhook_signing_key on company level, when custom credentials are defined
-        // TODO: validation for client mail credentials by recipient
         
         /** @var \App\Models\Company $company */
         $company = MultiDB::findAndSetDbByExpenseMailbox($input["recipient"]);

@@ -53,6 +53,11 @@ class SendEDocument implements ShouldQueue
 
         $model = $this->entity::find($this->id);
 
+        if($model->company->account->is_flagged){
+            nlog("Bad Actor");
+            return; //Bad Actor present.
+        }
+
         /** Concrete implementation current linked to Storecove only */
         $p = new Peppol($model);
         $p->run();
@@ -84,19 +89,19 @@ class SendEDocument implements ShouldQueue
         /** Concrete implementation current linked to Storecove only */
 
         //@testing only
-        $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
-        $r = $sc->sendJsonDocument($payload);
+        // $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
+        // $r = $sc->sendJsonDocument($payload);
 
-        if (is_string($r)) {
-            return $this->writeActivity($model, $r);
-        }
-        else {
-            // nlog($r->body());
-        }
+        // if (is_string($r)) {
+        //     return $this->writeActivity($model, $r);
+        // }
+        // else {
+        //     // nlog($r->body());
+        // }
         
-        //@todo remove early return prior to release
-        return;
-
+        // //@todo remove early return prior to release
+        // return;
+        //@testing only
 
         if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->legal_entity_id)
         {
@@ -115,12 +120,12 @@ class SendEDocument implements ShouldQueue
             if($r->failed()) {
                 nlog("Model {$model->number} failed to be accepted by invoice ninja, error follows:");
                 nlog($r->getBody()->getContents());
+                return response()->json(['message' => "Model {$model->number} failed to be accepted by invoice ninja"], 400);
             }
 
-            //self hosted sender
         }
 
-        if(Ninja::isHosted() && ($model instanceof Invoice) && $model->company->legal_entity_id)
+        if(Ninja::isHosted() && ($model instanceof Invoice) && !$model->company->account->is_flagged && $model->company->legal_entity_id)
         {
 
             $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
@@ -144,7 +149,8 @@ class SendEDocument implements ShouldQueue
         $activity->user_id = $model->user_id;
         $activity->client_id = $model->client_id ?? $model->vendor_id;
         $activity->company_id = $model->company_id;
-        $activity->activity_type_id = Activity::EMAIL_EINVOICE_SUCCESS;
+        $activity->account_id = $model->company->account_id;
+        $activity->activity_type_id = Activity::EINVOICE_SENT;
         $activity->invoice_id = $model->id;
         $activity->notes = str_replace('"', '', $guid);
 
@@ -162,14 +168,14 @@ class SendEDocument implements ShouldQueue
      *
      * 
      **/
-    // private function getHeaders(): array
-    // {
-    //     return [
-    //         'X-API-SELF-HOST-TOKEN' => config('ninja.license_key'),
-    //         "X-Requested-With" => "XMLHttpRequest",
-    //         "Content-Type" => "application/json",
-    //     ];
-    // }
+    private function getHeaders(): array
+    {
+        return [
+            'X-API-SELF-HOST-TOKEN' => config('ninja.license_key'),
+            "X-Requested-With" => "XMLHttpRequest",
+            "Content-Type" => "application/json",
+        ];
+    }
 
     public function failed($exception = null)
     {

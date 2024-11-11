@@ -236,7 +236,6 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::post('einvoice/configurations', [EInvoiceController::class, 'configurations'])->name('einvoice.configurations');
     
     Route::post('einvoice/peppol/legal_entity', [EInvoicePeppolController::class, 'show'])->name('einvoice.peppol.legal_entity');
-    Route::post('einvoice/peppol/add_additional_legal_identifier', [EInvoicePeppolController::class,'addAdditionalTaxIdentifier'])->name('einvoice.peppol.add_additional_legal_identifier');
     Route::post('einvoice/peppol/setup', [EInvoicePeppolController::class, 'setup'])->name('einvoice.peppol.setup');
     Route::post('einvoice/peppol/disconnect', [EInvoicePeppolController::class, 'disconnect'])->name('einvoice.peppol.disconnect');
     Route::put('einvoice/peppol/update', [EInvoicePeppolController::class, 'updateLegalEntity'])->name('einvoice.peppol.update_legal_entity');

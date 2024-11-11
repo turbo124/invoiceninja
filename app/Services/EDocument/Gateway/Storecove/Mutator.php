@@ -574,7 +574,7 @@ class Mutator implements MutatorInterface
     /////////////// Storecove Helpers ///////////////
     private function getIndividualEmailRoute(): string
     {
-        return "peppol_invoice_{$this->invoice->id}_{$this->invoice->company->db}@mail.invoicing.co";
+        return $this->invoice->client->present()->email();
     }
     
     private function getClientPublicIdentifier(string $code): string
@@ -592,6 +592,9 @@ class Mutator implements MutatorInterface
         if($this->invoice->client->classification == 'individual' || (strlen($this->invoice->client->vat_number ?? '') < 2 && strlen($this->invoice->client->id_number ?? '') < 2)){ 
             return $this->setEmailRouting($this->getIndividualEmailRoute());
         }
+
+        //Regardless, always include the client email address as a route - Storecove will only use this as a fallback.
+        $this->setEmailRouting($this->getIndividualEmailRoute());
 
         $code = $this->getClientRoutingCode();
         $identifier = false;

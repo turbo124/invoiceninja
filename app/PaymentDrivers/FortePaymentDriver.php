@@ -352,7 +352,7 @@ class FortePaymentDriver extends BaseDriver
     {
         $response = $this->getLocation();
 
-        if($response) {
+        if($response && $response['services']) {
             $body = $response['services'];
 
             $fees_and_limits = $this->company_gateway->fees_and_limits;

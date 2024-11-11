@@ -4,7 +4,7 @@ namespace Tests\Feature\EInvoice\Validation;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\EInvoice\Peppol\AddTaxIdentifierRequest;
+use Modules\Admin\Http\Requests\EInvoice\Peppol\AddTaxIdentifierRequest;
 
 class AddTaxIdentifierRequestTest extends TestCase
 {
@@ -42,6 +42,11 @@ class AddTaxIdentifierRequestTest extends TestCase
 
     protected function setUp(): void
     {
+        
+        if (!class_exists(\Modules\Admin\Http\Requests\EInvoice\Peppol\AddTaxIdentifierRequest::class)) {
+            $this->markTestSkipped('Skip test for GH Actions');
+        }
+
         parent::setUp();
         $this->request = new AddTaxIdentifierRequest();
     }

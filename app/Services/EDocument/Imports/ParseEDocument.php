@@ -43,6 +43,7 @@ class ParseEDocument extends AbstractService
     {
         nlog("starting");
         nlog($this->company->id);
+        // nlog($this->file->get());
 
         /** @var \App\Models\Account $account */
         $account = $this->company->owner()->account;

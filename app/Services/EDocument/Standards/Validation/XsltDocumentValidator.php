@@ -130,7 +130,7 @@ class XsltDocumentValidator
 
     public function getHtml(): mixed
     {
-  //need to harvest the document type and apply the correct stylesheet
+        //@todo need to harvest the document type and apply the correct stylesheet
         try {
             // Create Saxon processor
             $processor = new \Saxon\SaxonProcessor();
@@ -140,18 +140,12 @@ class XsltDocumentValidator
 
             // Load XML document
             $xml_doc = $processor->parseXmlFromString($xml);
-            nlog($xml_doc);
-            // Or from file:
-            // $xml_doc = $processor->parseXmlFromFile('path/to/input.xml');
-
+            
             // Compile and apply stylesheet
             $stylesheet = $xslt->compileFromFile(app_path($this->peppol_stylesheet)); //@phpstan-ignore-line
 
             // Transform to HTML
             $result = $stylesheet->transformToString($xml_doc); //@phpstan-ignore-line
-
-            // Or to save to file:
-            // $stylesheet->transformToFile($xml_doc, 'path/to/output.html');
 
             return $result;
 

@@ -484,6 +484,7 @@ class BillingPortalPurchase extends Component
             'invoice_id' => $this->invoice->hashed_id,
             'context' => $context,
             'campaign' => $this->campaign,
+            'request_data' => $this->request_data,
         ], now()->addMinutes(60));
 
         $this->dispatch('beforePaymentEventsCompleted');
