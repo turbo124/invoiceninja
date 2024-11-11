@@ -152,47 +152,11 @@ class EInvoicePeppolController extends BaseController
             return response()->noContent();
         }
 
-        nlog($response->json());
-
         if ($response->status() === 422) {
             return response()->json($response->json(), 422);
         }
 
         return response()->noContent(status: 500);
-    }
-
-    /**
-     * Add an additional tax identifier to
-     * an existing legal entity id
-     * 
-     * Response will be the same as show()
-     *
-     * @param  AddTaxIdentifierRequest $request
-     * @param  Storecove $storecove
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): \Illuminate\Http\JsonResponse
-    {
-        
-        $company = auth()->user()->company();
-        $tax_data = $company->tax_data;
-
-        $additional_vat = $tax_data->regions->EU->subregions->{$request->country}->vat_number ?? null;
-
-        if (!is_null($additional_vat) && !empty($additional_vat)) {
-            return response()->json(['message' => 'Identifier already exists for this region.'], 400);
-        }
-
-        $scheme = $storecove->router->resolveRouting($request->country, $company->settings->classification);
-
-        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->vat_number, $scheme);
-
-        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->vat_number;
-        $company->tax_data = $tax_data;
-        $company->save();
-
-        return response()->json(['message' => 'ok'], 200);
-
     }
 
     /**

@@ -5462,6 +5462,10 @@ $lang = array(
     'account_holder' => 'Account Name',
     'account_holder_help' => 'The name of the account',
     'activity_148' => 'E-Expense :expense received from :vendor',
+    'additional_tax_identifiers' => 'Additional Tax Identifiers',
+    'configure' => 'Configure',
+    'new_identifier' => 'New VAT Number',
+
 );
 
 return $lang;
