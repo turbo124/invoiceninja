@@ -204,18 +204,18 @@ class SquareCreditCard {
             document.getElementById('payment-list').classList.remove('hidden');
             document.getElementById('toggle-payment-with-credit-card')?.click();
         });
+
+        /** @type {NodeListOf<HTMLInputElement>} */
+        const first = document.querySelector('input[name="payment-type"]');
+
+        if (first) {
+            first.click();
+        }
     }
 }
 
 function boot() {
-    new SquareCreditCard().handle();
-
-    /** @type {NodeListOf<HTMLInputElement>} */
-    const tokens = document.querySelectorAll('input.toggle-payment-with-token');
-
-    if (tokens.length > 0) {
-        tokens[0].click();
-    }
+    new SquareCreditCard().handle();   
 }
 
 instant() ? boot() : wait('#square-credit-card-payment').then(() => boot());
