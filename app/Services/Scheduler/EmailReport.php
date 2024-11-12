@@ -120,12 +120,18 @@ class EmailReport
         }
 
         $nmo = new NinjaMailerObject();
-        $nmo->mailable = new DownloadReport($this->scheduler->company, $files);
-        $nmo->company = $this->scheduler->company;
+        $nmo->mailable = new DownloadReport($this->scheduler->company->withoutRelations(), $files);
+        $nmo->company = $this->scheduler->company->withoutRelations();
         $nmo->settings = $this->scheduler->company->settings;
-        $nmo->to_user = $this->scheduler->user;
+        $nmo->to_user = $this->scheduler->user->withoutRelations();
 
-        NinjaMailerJob::dispatch($nmo);
+                
+        try {
+            (new NinjaMailerJob($nmo))->handle();
+        } catch (\Throwable $th) {
+            nlog("EXCEPTION:: EmailReport:: could not email report for schdule {$this->scheduler->id} ". $th->getMessage());
+        }
+
 
         //calculate next run dates;
         $this->scheduler->calculateNextRun();

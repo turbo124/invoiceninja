@@ -76,8 +76,13 @@ class SendToAdmin implements ShouldQueue
         $nmo->company = $this->company;
         $nmo->settings = $this->company->settings;
         $nmo->to_user = $user;
+    
+        try {
+            (new NinjaMailerJob($nmo))->handle();
+        } catch (\Throwable $th) {
+            nlog("EXCEPTION:: SendToAdmin:: could not email report for" . $th->getMessage());
+        }
 
-        NinjaMailerJob::dispatch($nmo);
     }
 
     public function middleware()
