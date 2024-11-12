@@ -36,7 +36,7 @@ class EInvoicePeppolController extends BaseController
 
         $response_array = $storecove->proxy->setCompany($company)->getLegalEntity($company->legal_entity_id);
 
-        return response()->json($response_array, isset($response_array['code'] ?? 200);
+        return response()->json($response_array, $response_array['code'] ?? 200);
     }
 
     /**
