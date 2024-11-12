@@ -49,7 +49,7 @@ class GoCardlessPaymentDriver extends BaseDriver
     public static $methods = [
         GatewayType::BANK_TRANSFER => \App\PaymentDrivers\GoCardless\DirectDebit::class,
         GatewayType::DIRECT_DEBIT => \App\PaymentDrivers\GoCardless\DirectDebit::class,
-        GatewayType::SEPA => \App\PaymentDrivers\GoCardless\SEPA::class,
+        GatewayType::SEPA => \App\PaymentDrivers\GoCardless\DirectDebit::class,
         GatewayType::INSTANT_BANK_PAY => \App\PaymentDrivers\GoCardless\InstantBankPay::class,
     ];
 
