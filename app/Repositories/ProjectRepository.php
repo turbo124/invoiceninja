@@ -35,13 +35,13 @@ class ProjectRepository extends BaseRepository
                                     ->each(function ($task) use(&$lines){
 
                                         $item = new InvoiceItem();
-                                        $item->type_id = '2';
+                                        $item->quantity = $task->getQuantity();
                                         $item->cost = $task->getRate();
                                         $item->product_key = '';
                                         $item->notes = '';
-                                        $item->quantity = $task->getQuantity();
                                         $item->task_id = $task->hashed_id;
                                         $item->tax_id = (string) Product::PRODUCT_TYPE_SERVICE;
+                                        $item->type_id = '2';
 
                                         $lines[] = $item;
 
@@ -55,16 +55,15 @@ class ProjectRepository extends BaseRepository
                                    ->each(function ($expense) use(&$lines){
                             
                                         $item = new InvoiceItem();
-                                        $item->cost = $expense->amount;
-                                        $item->product_key = '';
-                                        $item->notes = $expense->public_notes;
                                         $item->quantity = 1;
+                                        $item->cost = $expense->foreign_amount > 0 ? $expense->foreign_amount : $expense->amount;
+                                        $item->product_key = $expense->category->exists() ? $expense->category->name : '';
+                                        $item->notes = $expense->public_notes ?? '';
+                                        $item->line_total = round($item->cost * $item->quantity,2);
                                         $item->tax_name1 = $expense->tax_name1;
                                         $item->tax_rate1 = $expense->calculatedTaxRate($expense->tax_amount1, $expense->tax_rate1);
-                                        
                                         $item->tax_name2 = $expense->tax_name2;
                                         $item->tax_rate2 = $expense->calculatedTaxRate($expense->tax_amount2, $expense->tax_rate2);
-
                                         $item->tax_name3 = $expense->tax_name3;
                                         $item->tax_rate3 = $expense->calculatedTaxRate($expense->tax_amount3, $expense->tax_rate3);
                                         $item->tax_id = (string) Product::PRODUCT_TYPE_PHYSICAL;
@@ -74,6 +73,7 @@ class ProjectRepository extends BaseRepository
                                         $lines[] = $item;
                                    });
 
+        $invoice->uses_inclusive_taxes = $project->company->settings->inclusive_taxes ?? false;
         $invoice->line_items = $lines;
         return $invoice;
         
