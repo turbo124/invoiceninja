@@ -34,28 +34,9 @@ class EInvoicePeppolController extends BaseController
     {
         $company = auth()->user()->company();
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
+        $response_array = $storecove->proxy->setCompany($company)->getLegalEntity($company->legal_entity_id);
 
-        $response $storecove->proxy->setCompany($company)->getLegalEntity($company->legal_entity_id);
-
-        // if (Ninja::isSelfHost()) {
-        //     $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
-        // }
-
-        // if (Ninja::isHosted()) {
-        //     $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
-        // }
-
-        // $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-        //     ->withHeaders($headers)
-        //     ->post('/api/einvoice/peppol/legal_entity', data: [
-        //         'legal_entity_id' => $company->legal_entity_id,
-        //     ]);
-
-        return response()->json($response, 200);
+        return response()->json($response_array, isset($response_array['code'] ?? 200);
     }
 
     /**
