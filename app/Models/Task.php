@@ -305,6 +305,11 @@ class Task extends BaseModel
 
     }
 
+    public function getQuantity(): float
+    {
+        return round(($this->calcDuration() / 3600) , 2);
+    }
+
     public function taskValue(): float
     {
         return round(($this->calcDuration() / 3600) * $this->getRate(), 2);
