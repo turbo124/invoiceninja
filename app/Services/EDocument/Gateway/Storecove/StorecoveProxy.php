@@ -28,24 +28,39 @@ class StorecoveProxy
         $this->company = $company;
         return $this;
     }
-
+    
+    /**
+     * Example refactor.
+     * getLegalEntity
+     *
+     * @param  int $legal_entity_id
+     * @return array
+     */
     public function getLegalEntity(int $legal_entity_id): array
     {
         if(Ninja::isHosted()){
             $response = $this->storecove->getLegalEntity($legal_entity_id);
 
-            if(is_array($response))
+            if(is_array($response)) //successful response is the array
                 return $response;
-
-            return $this->handleResponseError($response);
+ 
+            return $this->handleResponseError($response); //otherwise need to handle the http response returned
         }
 
         $uri = '/api/einvoice/peppol/legal_entity';
         $payload = ['legal_entity_id' => $legal_entity_id];
 
-        return $this->remoteRequest($uri, $payload);
+        return $this->remoteRequest($uri, $payload); //abstract the http calls
     }
-
+    
+    /**
+     * handleResponseError
+     *
+     * Generic error handler that can return an array response
+     * 
+     * @param  mixed $response
+     * @return array
+     */
     private function handleResponseError($response): array
     {
                 
