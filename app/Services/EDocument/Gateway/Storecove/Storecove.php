@@ -61,12 +61,15 @@ class Storecove
 
     public StorecoveExpense $expense;
 
+    public StorecoveProxy $proxy;
+
     public function __construct()
     {
         $this->router = new StorecoveRouter();
         $this->mutator = new Mutator($this);
         $this->adapter = new StorecoveAdapter($this);
         $this->expense = new StorecoveExpense($this);
+        $this->proxy = new StorecoveProxy($this);
     }
         
     /**
