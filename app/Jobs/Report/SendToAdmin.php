@@ -19,6 +19,7 @@ use Illuminate\Bus\Queueable;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
 use App\Services\Report\ARDetailReport;
+use App\Services\Report\ARSummaryReport;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -60,7 +61,7 @@ class SendToAdmin implements ShouldQueue
         $files = [];
         $files[] = ['file' => $csv, 'file_name' => "{$this->file_name}", 'mime' => 'text/csv'];
 
-        if(in_array(get_class($export), [ARDetailReport::class])) {
+        if(in_array(get_class($export), [ARDetailReport::class, ARSummaryReport::class])) {
             $pdf = base64_encode($export->getPdf());
             $files[] = ['file' => $pdf, 'file_name' => str_replace(".csv", ".pdf", $this->file_name), 'mime' => 'application/pdf'];
         }
