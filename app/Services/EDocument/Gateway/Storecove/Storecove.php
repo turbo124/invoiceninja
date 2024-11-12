@@ -349,7 +349,7 @@ class Storecove
      * @param  int $id
      * @return mixed
      */
-    public function getLegalEntity($id)
+    public function getLegalEntity($id): array|\Illuminate\Http\Client\Response
     {
 
         $uri = "legal_entities/{$id}";
