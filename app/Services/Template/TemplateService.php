@@ -104,7 +104,10 @@ class TemplateService
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
         $function = new \Twig\TwigFunction('img', \Closure::fromCallable(function (string $image_src, string $image_style = '') {
-            return '<img src="' . $image_src . '" style="' . $image_style . '"></img>';
+            $html = '<img src="' . $image_src . '" style="' . $image_style . '"></img>';
+            
+            return new \Twig\Markup($html, 'UTF-8');
+
         }));
         $this->twig->addFunction($function);
 

@@ -46,10 +46,6 @@ class EmailReport
     use MakesHash;
     use MakesDates;
 
-    // private Client $client;
-
-    // private bool $multiple_clients = false;
-
     private string $file_name = 'file.csv';
 
     public function __construct(public Scheduler $scheduler)
@@ -114,12 +110,17 @@ class EmailReport
             return;
         }
 
-        $csv = $export->run();
+        $csv = base64_encode($export->run());
+        $files = [];
+        $files[] = ['file' => $csv, 'file_name' => "{$this->file_name}", 'mime' => 'text/csv'];
 
-        //todo - potentially we send this to more than one user.
+        if (in_array(get_class($export), [ARDetailReport::class])) {
+            $pdf = base64_encode($export->getPdf());
+            $files[] = ['file' => $pdf, 'file_name' => str_replace(".csv", ".pdf", $this->file_name), 'mime' => 'application/pdf'];
+        }
 
         $nmo = new NinjaMailerObject();
-        $nmo->mailable = new DownloadReport($this->scheduler->company, $csv, $this->file_name);
+        $nmo->mailable = new DownloadReport($this->scheduler->company, $files);
         $nmo->company = $this->scheduler->company;
         $nmo->settings = $this->scheduler->company->settings;
         $nmo->to_user = $this->scheduler->user;
