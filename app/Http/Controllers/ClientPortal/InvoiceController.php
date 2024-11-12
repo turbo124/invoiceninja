@@ -97,9 +97,15 @@ class InvoiceController extends Controller
     {
         $data = Cache::get($hash);
 
-        if(!$data) {
-            usleep(200000);
+        for($x=0; $x<3; $x++){
+       
             $data = Cache::get($hash);
+            
+            if($data)
+                break;
+    
+            usleep(200000);
+
         }
 
         $invitation = false;
