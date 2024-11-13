@@ -5465,7 +5465,8 @@ $lang = array(
     'additional_tax_identifiers' => 'Additional Tax Identifiers',
     'configure' => 'Configure',
     'new_identifier' => 'New VAT Number',
-
+    'notification_credits_low' => 'Warning! Your credit balance is low.',
+    'notification_no_credits' => 'Warning! Your credit balance is empty.',
 );
 
 return $lang;

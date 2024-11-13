@@ -11,8 +11,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Utils\Ninja;
-use Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use App\Http\Requests\EInvoice\Peppol\StoreEntityRequest;
@@ -54,65 +52,44 @@ class EInvoicePeppolController extends BaseController
          */
         $company = auth()->user()->company();
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
+        $response = $storecove
+            ->proxy
+            ->setCompany($company)
+            ->setup($request->validated());
 
-        if (Ninja::isSelfHost()) {
-            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        if (data_get($response, 'status') === 'error') {
+            return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
         }
 
-        if (Ninja::isHosted()) {
-            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
-        }
+        $company->legal_entity_id = $response['legal_entity_id'];
 
-        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders($headers)
-            ->post('/api/einvoice/peppol/setup', data: [
-                ...$request->validated(),
-                'classification' => $request->classification ?? $company->settings->classification,
-                'vat_number' => $request->vat_number ?? $company->settings->vat_number,
-                'id_number' => $request->id_number ?? $company->settings->id_number,
-            ]);
+        $tax_data = $company->tax_data;
 
-        if ($response->successful()) {
-            $company->legal_entity_id = $response->json('legal_entity_id');
+        $tax_data->acts_as_sender = $request->acts_as_sender;
+        $tax_data->acts_as_receiver = $request->acts_as_receiver;
 
-            $tax_data = $company->tax_data;
+        $settings = $company->settings;
 
-            $tax_data->acts_as_sender = $request->acts_as_sender;
-            $tax_data->acts_as_receiver = $request->acts_as_receiver;
+        $settings->name = $request->party_name;
+        $settings->country_id = (string) $request->country_id;
+        $settings->address1 = $request->line1;
+        $settings->address2 = $request->line2;
+        $settings->city = $request->city;
+        $settings->state = $request->county;
+        $settings->postal_code = $request->zip;
 
-            $settings = $company->settings;
+        $settings->e_invoice_type = 'PEPPOL';
+        $settings->vat_number = $request->vat_number ?? $company->settings->vat_number;
+        $settings->id_number = $request->id_number ?? $company->settings->id_number;
+        $settings->classification = $request->classification ?? $company->settings->classification;
+        $settings->enable_e_invoice = true;
 
-            $settings->name = $request->party_name;
-            $settings->country_id = (string) $request->country_id;
-            $settings->address1 = $request->line1;
-            $settings->address2 = $request->line2;
-            $settings->city = $request->city;
-            $settings->state = $request->county;
-            $settings->postal_code = $request->zip;
+        $company->tax_data = $tax_data;
+        $company->settings = $settings;
 
-            $settings->e_invoice_type = 'PEPPOL';
-            $settings->vat_number = $request->vat_number ?? $company->settings->vat_number;
-            $settings->id_number = $request->id_number ?? $company->settings->id_number;
-            $settings->classification = $request->classification ?? $company->settings->classification;
-            $settings->enable_e_invoice = true;
+        $company->save();
 
-            $company->tax_data = $tax_data;
-            $company->settings = $settings;
-
-            $company->save();
-
-            return response()->noContent();
-        }
-
-        if ($response->status() === 422) {
-            return response()->json($response->json(), 422);
-        }
-
-        return response()->noContent(status: 500);
+        return response()->noContent();
     }
 
     /**
@@ -121,44 +98,29 @@ class EInvoicePeppolController extends BaseController
      * @param \App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest $request
      * @return JsonResponse|mixed|Response
      */
-    public function updateLegalEntity(UpdateEntityRequest $request)
+    public function updateLegalEntity(UpdateEntityRequest $request, Storecove $storecove): JsonResponse
     {
         $company = auth()->user()->company();
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
+        $response = $storecove
+            ->proxy
+            ->setCompany($company)
+            ->updateLegalEntity($request->validated());
 
-        if (Ninja::isSelfHost()) {
-            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        if (data_get($response, 'status') === 'error') {
+            return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
         }
 
-        if (Ninja::isHosted()) {
-            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
-        }
+        $tax_data = $company->tax_data;
 
-        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders($headers)
-            ->put('/api/einvoice/peppol/update', data: [
-                ...$request->validated(),
-                'legal_entity_id' => $company->legal_entity_id,
-            ]);
+        $tax_data->acts_as_sender = $request->acts_as_sender;
+        $tax_data->acts_as_receiver = $request->acts_as_receiver;
 
-        if ($response->successful()) {
-            $tax_data = $company->tax_data;
+        $company->tax_data = $tax_data;
 
-            $tax_data->acts_as_sender = $request->acts_as_sender;
-            $tax_data->acts_as_receiver = $request->acts_as_receiver;
+        $company->save();
 
-            $company->tax_data = $tax_data;
-
-            $company->save();
-
-            return response()->noContent();
-        }
-
-        return response()->json(['message' => 'Error updating identifier'], 422);
+        return response()->json();
     }
 
     /**
@@ -167,50 +129,33 @@ class EInvoicePeppolController extends BaseController
      * @param  DisconnectRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function disconnect(DisconnectRequest $request): \Illuminate\Http\Response
+    public function disconnect(DisconnectRequest $request, Storecove $storecove): JsonResponse
     {
         /**
          * @var \App\Models\Company $company
          */
         $company = auth()->user()->company();
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
+        $response = $storecove
+            ->proxy
+            ->setCompany($company)
+            ->disconnect();
 
-        if (Ninja::isSelfHost()) {
-            $headers['X-EInvoice-Token'] = $company->account->e_invoicing_token;
+        if (data_get($response, 'status') === 'error') {
+            return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
         }
 
-        if (Ninja::isHosted()) {
-            $headers['X-EInvoice-Secret'] = config('ninja.hosted_einvoice_secret');
-        }
+        $company->legal_entity_id = null;
+        $company->tax_data = $this->unsetVatNumbers($company->tax_data);
 
-        nlog($headers);
+        $settings = $company->settings;
+        $settings->e_invoice_type = 'EN16931';
 
-        $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
-            ->withHeaders($headers)
-            ->post('/api/einvoice/peppol/disconnect', data: [
-                'company_key' => $company->company_key,
-                'legal_entity_id' => $company->legal_entity_id,
-            ]);
+        $company->settings = $settings;
 
-        if ($response->successful()) {
-            $company->legal_entity_id = null;
-            $company->tax_data = $this->unsetVatNumbers($company->tax_data);
+        $company->save();
 
-            $settings = $company->settings;
-            $settings->e_invoice_type = 'EN16931';
-
-            $company->settings = $settings;
-
-            $company->save();
-
-            return response()->noContent();
-        }
-
-        return response()->noContent(status: 500);
+        return response()->json();
     }
 
     /**
@@ -223,9 +168,8 @@ class EInvoicePeppolController extends BaseController
      * @param  Storecove $storecove
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): \Illuminate\Http\JsonResponse
+    public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): JsonResponse
     {
-        
         $company = auth()->user()->company();
         $tax_data = $company->tax_data;
 
@@ -235,19 +179,21 @@ class EInvoicePeppolController extends BaseController
             return response()->json(['message' => 'Identifier already exists for this region.'], 400);
         }
 
-        $scheme = $storecove->router->resolveRouting($request->country, $company->settings->classification);
+        $response = $storecove
+            ->proxy
+            ->setCompany($company)
+            ->addAdditionalTaxIdentifier($request->validated());
 
-        $storecove->addAdditionalTaxIdentifier($company->legal_entity_id, $request->vat_number, $scheme);
+        if (data_get($response, 'status') === 'error') {
+            return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
+        }
 
         $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->vat_number;
         $company->tax_data = $tax_data;
         $company->save();
 
         return response()->json(['message' => 'ok'], 200);
-
     }
-
-
 
     private function unsetVatNumbers(mixed $taxData): mixed
     {
