@@ -12,17 +12,21 @@
 
 namespace App\Livewire\BillingPortal\Authentication;
 
-use App\Jobs\Mail\NinjaMailerJob;
-use App\Jobs\Mail\NinjaMailerObject;
-use App\Mail\Subscription\OtpCode;
-use App\Models\ClientContact;
-use App\Models\Subscription;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
+use App\Models\Subscription;
+use App\Models\ClientContact;
+use App\Utils\Traits\MakesHash;
+use App\Jobs\Mail\NinjaMailerJob;
+use Livewire\Attributes\Computed;
+use App\Mail\Subscription\OtpCode;
+use App\Jobs\Mail\NinjaMailerObject;
+use Illuminate\Support\Facades\Cache;
 
 class Login extends Component
 {
-    public Subscription $subscription;
+    use MakesHash;
+
+    public string $subscription_id;
 
     public array $context;
 
@@ -39,12 +43,18 @@ class Login extends Component
         'initial_completed' => false,
     ];
 
+    #[Computed]
+    public function subscription()
+    {
+        return Subscription::find($this->decodePrimaryKey($this->subscription_id));
+    }
+
     public function initial()
     {
         $this->validateOnly('email', ['email' => 'required|bail|email:rfc|email']);
 
         $contact = ClientContact::where('email', $this->email)
-            ->where('company_id', $this->subscription->company_id)
+            ->where('company_id', $this->subscription()->company_id)
             ->first();
 
         if ($contact === null) {
@@ -65,7 +75,7 @@ class Login extends Component
     public function withPassword()
     {
         $contact = ClientContact::where('email', $this->email)
-            ->where('company_id', $this->subscription->company_id)
+            ->where('company_id', $this->subscription()->company_id)
             ->first();
 
         if ($contact) {
@@ -93,9 +103,9 @@ class Login extends Component
         $cc->email = $this->email;
 
         $nmo = new NinjaMailerObject();
-        $nmo->mailable = new OtpCode($this->subscription->company, $this->context['contact'] ?? null, $code);
-        $nmo->company = $this->subscription->company;
-        $nmo->settings = $this->subscription->company->settings;
+        $nmo->mailable = new OtpCode($this->subscription()->company, $this->context['contact'] ?? null, $code);
+        $nmo->company = $this->subscription()->company;
+        $nmo->settings = $this->subscription()->company->settings;
         $nmo->to_user = $cc;
 
         NinjaMailerJob::dispatch($nmo);
@@ -124,7 +134,7 @@ class Login extends Component
         }
 
         $contact = ClientContact::where('email', $this->email)
-            ->where('company_id', $this->subscription->company_id)
+            ->where('company_id', $this->subscription()->company_id)
             ->first();
 
         if ($contact) {
@@ -147,7 +157,7 @@ class Login extends Component
         $attempt = auth()->guard('contact')->attempt([
             'email' => $this->email,
             'password' => $this->password,
-            'company_id' => $this->subscription->company_id,
+            'company_id' => $this->subscription()->company_id,
         ]);
 
         if ($attempt) {
@@ -165,6 +175,7 @@ class Login extends Component
             $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
         }
+        
     }
 
     public function render(): \Illuminate\View\View

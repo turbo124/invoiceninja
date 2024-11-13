@@ -1,15 +1,12 @@
 <div class="grid grid-cols-12 bg-gray-50">
     <div
-    @php
-    nlog($context);
-    @endphp
     class="col-span-12 xl:col-span-6 bg-white flex flex-col items-center lg:h-screen"
     >
         <div class="w-full p-10 lg:mt-24 md:max-w-xl">
             <img
                 class="h-8"
-                src="{{ $subscription->company->present()->logo }}"
-                alt="{{ $subscription->company->present()->name }}"
+                src="{{ $this->subscription->company->present()->logo }}"
+                alt="{{ $this->subscription->company->present()->name }}"
             />
 
             <svg id="spinner" class="animate-spin h-8 w-8 text-primary mt-10 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -18,7 +15,7 @@
             </svg>
 
             <div class="my-10" id="container">
-                @livewire($this->component, ['context' => $context, 'subscription' => $this->subscription], key($this->componentUniqueId()))
+                @livewire($this->component, ['context' => $context, 'subscription_id' => $this->subscription->hashed_id], key($this->componentUniqueId()))
             </div>
         </div>
     </div>
@@ -27,7 +24,7 @@
         <div class="sticky top-0">
             <div class="w-full p-10 lg:mt-24 md:max-w-xl">
                 <div class="my-6 space-y-10 xl:ml-5">
-                    @livewire('billing-portal.summary', ['subscription' => $subscription, 'context' => $context], key($this->summaryUniqueId()))
+                    @livewire('billing-portal.summary', ['subscription_id' => $this->subscription->hashed_id, 'context' => $context], key($this->summaryUniqueId()))
                 </div>
             </div>
         </div>

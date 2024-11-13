@@ -23,7 +23,7 @@
 
                     <div class="flex flex-col">
                         <h2 class="text-lg font-medium">{{ $product['product_key'] }}</h2>
-                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($subscription->frequency_id) }}</span></p>
+                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $this->subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($subscription->frequency_id) }}</span></p>
                     </div>
                 </div>
 

@@ -23,7 +23,7 @@
 
                     <div class="flex flex-col">
                         <h2 class="text-lg font-medium">{{ $product['product_key'] }}</h2>
-                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($subscription->frequency_id) }}</span></p>
+                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $this->subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($subscription->frequency_id) }}</span></p>
                     </div>
                 </div>
 
@@ -45,7 +45,7 @@
                                 <option {{ $entry['quantity'] == '1' ? 'selected' : '' }}  value="1">1</option>
         
                                 @if($subscription->max_seats_limit > 1)
-                                    @for ($i = 2; $i <= ($subscription->use_inventory_management ? min($subscription->max_seats_limit,$product['in_stock_quantity']) : $subscription->max_seats_limit); $i++)
+                                    @for ($i = 2; $i <= ($subscription->use_inventory_management ? min($this->subscription->max_seats_limit,$product['in_stock_quantity']) : $subscription->max_seats_limit); $i++)
                                         <option {{ $entry['quantity'] == $i ? 'selected' : '' }}  value="{{ $i }}">{{ $i }}</option>
                                     @endfor
                                 @else

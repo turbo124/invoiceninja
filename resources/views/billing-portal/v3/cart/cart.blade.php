@@ -1,11 +1,11 @@
 <div>
     <livewire:billing-portal.cart.one-time-products
-        :subscription="$subscription"
+        :subscription_id="$this->subscription->hashed_id"
         :context="$context"
     />
 
     <livewire:billing-portal.cart.recurring-products
-        :subscription="$subscription"
+        :subscription_id="$this->subscription->hashed_id"
         :context="$context"
     />
 
@@ -14,14 +14,13 @@
     @endif
 
     <livewire:billing-portal.cart.optional-recurring-products
-        :subscription="$subscription"
         :context="$context"
     />
 
     <div class="mt-10"></div>
 
     <livewire:billing-portal.cart.optional-one-time-products
-        :subscription="$subscription"
+        :subscription_id="$this->subscription->hashed_id"
         :context="$context"
     />
 

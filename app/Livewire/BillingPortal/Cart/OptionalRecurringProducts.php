@@ -12,14 +12,22 @@
 
 namespace App\Livewire\BillingPortal\Cart;
 
-use App\Models\Subscription;
 use Livewire\Component;
+use App\Models\Subscription;
+use Livewire\Attributes\Computed;
 
 class OptionalRecurringProducts extends Component
 {
-    public Subscription $subscription;
-
     public array $context;
+
+
+    public string $subscription_id;
+
+    #[Computed()]
+    public function subscription()
+    {
+        return Subscription::find($this->decodePrimaryKey($this->subscription_id))->withoutRelations()->makeHidden(['webhook_configuration','steps']);
+    }
 
     public function quantity($id, $value): void
     {

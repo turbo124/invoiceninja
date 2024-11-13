@@ -15,18 +15,29 @@ namespace App\Livewire\BillingPortal;
 use App\Models\RecurringInvoice;
 use App\Models\Subscription;
 use App\Utils\Number;
+use App\Utils\Traits\MakesHash;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Summary extends Component
 {
-    public Subscription $subscription;
+    use MakesHash;
+
+    public string $subscription_id;
 
     public array $context;
 
+    #[Computed()]
+    public function subscription()
+    {
+        return Subscription::find($this->decodePrimaryKey($this->subscription_id))->withoutRelations()->makeHidden(['webhook_configuration','steps']);
+    }
+
     public function mount()
     {
+        $subscription = Subscription::find($this->decodePrimaryKey($this->subscription_id));
+
         $bundle = $this->context['bundle'] ?? [
             'recurring_products' => [],
             'optional_recurring_products' => [],
@@ -34,7 +45,7 @@ class Summary extends Component
             'optional_one_time_products' => [],
         ];
 
-        foreach ($this->subscription->service()->recurring_products() as $key => $product) {
+        foreach ($subscription->service()->recurring_products() as $key => $product) {
             $bundle['recurring_products'][$product->hashed_id] = [
                 'product' => $product,
                 'quantity' => $bundle['recurring_products'][$product->hashed_id]['quantity'] ?? 1,
@@ -43,7 +54,7 @@ class Summary extends Component
             $bundle['recurring_products'][$product->hashed_id]['product']['is_recurring'] = true;
         }
 
-        foreach ($this->subscription->service()->products() as $key => $product) {
+        foreach ($subscription->service()->products() as $key => $product) {
             $bundle['one_time_products'][$product->hashed_id] = [
                 'product' => $product,
                 'quantity' => $bundle['one_time_products'][$product->hashed_id]['quantity'] ?? 1,
@@ -52,7 +63,7 @@ class Summary extends Component
             $bundle['one_time_products'][$product->hashed_id]['product']['is_recurring'] = false;
         }
 
-        foreach ($this->subscription->service()->optional_recurring_products() as $key => $product) {
+        foreach ($subscription->service()->optional_recurring_products() as $key => $product) {
             $bundle['optional_recurring_products'][$product->hashed_id] = [
                 'product' => $product,
                 'quantity' => $bundle['optional_recurring_products'][$product->hashed_id]['quantity'] ?? 0,
@@ -61,7 +72,7 @@ class Summary extends Component
             $bundle['optional_recurring_products'][$product->hashed_id]['product']['is_recurring'] = true;
         }
 
-        foreach ($this->subscription->service()->optional_products() as $key => $product) {
+        foreach ($subscription->service()->optional_products() as $key => $product) {
             $bundle['optional_one_time_products'][$product->hashed_id] = [
                 'product' => $product,
                 'quantity' => $bundle['optional_one_time_products'][$product->hashed_id]['quantity'] ?? 0,
@@ -91,7 +102,7 @@ class Summary extends Component
             return $one_time + $one_time_optional;
         }
 
-        return Number::formatMoney($one_time + $one_time_optional, $this->subscription->company);
+        return Number::formatMoney($one_time + $one_time_optional, $this->subscription()->company);
 
     }
 
@@ -115,8 +126,8 @@ class Summary extends Component
 
         return \sprintf(
             '%s/%s',
-            Number::formatMoney($recurring + $recurring_optional, $this->subscription->company),
-            RecurringInvoice::frequencyForKey($this->subscription->frequency_id ?? 0)
+            Number::formatMoney($recurring + $recurring_optional, $this->subscription()->company),
+            RecurringInvoice::frequencyForKey($this->subscription()->frequency_id ?? 0)
         );
     }
 
@@ -128,7 +139,7 @@ class Summary extends Component
                 $this->oneTimePurchasesTotal(raw: true),
                 $this->recurringPurchasesTotal(raw: true),
             ])->sum(),
-            $this->subscription->company
+            $this->subscription()->company
         );
     }
 
@@ -145,7 +156,7 @@ class Summary extends Component
                 'product_key' => $item['product']['product_key'],
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
-                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription->frequency_id),
+                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription()->frequency_id),
             ];
         }
 
@@ -154,7 +165,7 @@ class Summary extends Component
                 'product_key' => $item['product']['product_key'],
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
-                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription->frequency_id),
+                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription()->frequency_id),
             ];
         }
 
@@ -163,7 +174,7 @@ class Summary extends Component
                 'product_key' => $item['product']['product_key'],
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
-                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company),
+                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company),
             ];
         }
 
@@ -172,7 +183,7 @@ class Summary extends Component
                 'product_key' => $item['product']['product_key'],
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
-                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription->company),
+                'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company),
             ];
         }
 
