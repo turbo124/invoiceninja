@@ -97,6 +97,13 @@ class EntityLevel
         $this->errors['client'] = $this->testClientState($invoice->client);
         $this->errors['company'] = $this->testCompanyState($invoice->client); // uses client level settings which is what we want
 
+        if(count($this->errors['client']) > 0){
+            
+            $this->errors['passes'] = false;
+            return $this->errors;
+
+        }
+
         $p = new Peppol($invoice);
 
         $xml = false;

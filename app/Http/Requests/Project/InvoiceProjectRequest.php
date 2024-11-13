@@ -31,27 +31,30 @@ class InvoiceProjectRequest extends Request
 
     public function rules()
     {
-        
-        $user = auth()->user();
-        $company = $user->company();
+       return [];
+       
+       //if we need to restrict a project to only one invoice...
 
-        return [
-            'project_id' => [
-            'required',
-            function($attribute, $value, $fail) use($company){
-                if (Invoice::withTrashed()->where('company_id', $company->id)->where('is_deleted', 0)->where('project_id', $value)->exists()) {
-                    $fail('This project has already been invoiced.');
-                }
-            }
-        ]
-        ];
+        // $user = auth()->user();
+        // $company = $user->company();
+
+        // return [
+        //     'project_id' => [
+        //     'required',
+        //     function($attribute, $value, $fail) use($company){
+        //         if (Invoice::withTrashed()->where('company_id', $company->id)->where('is_deleted', 0)->where('project_id', $value)->exists()) {
+        //             $fail('This project has already been invoiced.');
+        //         }
+        //     }
+        // ]
+        // ];
     }
 
     public function prepareForValidation()
     {
         $input = $this->all();
 
-            $input['project_id'] = $this->project->id;
+            // $input['project_id'] = $this->project->id;
 
         $this->replace($input);
 
