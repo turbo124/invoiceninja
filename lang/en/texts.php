@@ -5466,7 +5466,9 @@ $lang = array(
     'configure' => 'Configure',
     'new_identifier' => 'New VAT Number',
     'notification_credits_low' => 'Warning! Your credit balance is low.',
+    'notification_credits_low_text' => 'Please add credits to your account to avoid interruption of services.',
     'notification_no_credits' => 'Warning! Your credit balance is empty.',
+    'notification_no_credits_text' => 'Please add credits to your account to avoid interruption of services.',
 );
 
 return $lang;
