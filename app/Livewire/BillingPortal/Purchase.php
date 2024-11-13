@@ -29,8 +29,6 @@ class Purchase extends Component
 {
     use MakesHash;
 
-    private $sub;
-
     public string $subscription_id;
 
     public string $db;
@@ -138,10 +136,10 @@ class Purchase extends Component
 
         MultiDB::setDb($this->db);
 
-        $this->sub = Subscription::find($this->decodePrimaryKey($this->subscription_id));
+        $sub = Subscription::find($this->decodePrimaryKey($this->subscription_id));
 
-        if ($this->sub->steps) {
-            $steps = collect(explode(',', $this->sub->steps))
+        if ($sub->steps) {
+            $steps = collect(explode(',', $sub->steps))
                 ->map(fn ($step) => $classes[$step])
                 ->toArray();
 
@@ -163,8 +161,6 @@ class Purchase extends Component
         }
 
         $this->id = Str::uuid();
-
-        MultiDB::setDb($this->db);
 
         $this
             ->handleContext('hash', $this->hash)
