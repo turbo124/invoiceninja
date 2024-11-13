@@ -86,22 +86,7 @@ class SendEDocument implements ShouldQueue
         
         nlog($payload);
 
-        /** Concrete implementation current linked to Storecove only */
-
-        //@testing only
-        // $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
-        // $r = $sc->sendJsonDocument($payload);
-
-        // if (is_string($r)) {
-        //     return $this->writeActivity($model, $r);
-        // }
-        // else {
-        //     // nlog($r->body());
-        // }
-        
-        // //@todo remove early return prior to release
-        // return;
-        //@testing only
+        nlog(json_encode($payload));
 
         if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->legal_entity_id)
         {

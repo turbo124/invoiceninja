@@ -664,7 +664,7 @@ class Peppol extends AbstractService
             $reason_code = 'vatex-eu-g';
             $reason = 'Export outside the EU';
         } else {
-            $tax_type = 'O'; //Standard rate
+            $tax_type = 'O'; 
             $reason_code = "vatex-eu-o";
             $reason = 'Services outside scope of tax';
         }
@@ -691,10 +691,8 @@ class Peppol extends AbstractService
 
         $this->globalTaxCategories = [$taxCategory];
 
-        
         if($this->tax_category_id == 'O' && isset($this->p_invoice->AccountingSupplierParty->Party->PartyTaxScheme))
             unset($this->p_invoice->AccountingSupplierParty->Party->PartyTaxScheme);
-
             
         if ($this->tax_category_id == 'O' && isset($this->p_invoice->AccountingCustomerParty->Party->PartyTaxScheme)) {
             unset($this->p_invoice->AccountingCustomerParty->Party->PartyTaxScheme);

@@ -435,6 +435,10 @@ class StorecoveAdapter
 
     private function tranformTaxCode(string $code): ?string
     {
+
+        if($code == 'O' && $this->ninja_invoice->client->classification == 'government')
+            return 'exempt';
+        
         return match($code){
             'S' => 'standard',
             'Z' => 'zero_rated',
