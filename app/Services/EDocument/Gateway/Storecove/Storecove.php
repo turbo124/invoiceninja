@@ -504,7 +504,7 @@ class Storecove
      * Remove the entity from the network
      *
      * @param  int $legal_entity_id
-     * @return bool
+     * @return array|\Illuminate\Http\Client\Response
      */
     public function deleteIdentifier(int $legal_entity_id): array|\Illuminate\Http\Client\Response
     {

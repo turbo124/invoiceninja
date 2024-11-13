@@ -159,7 +159,7 @@ class EntityLevel
         }
 
         //If not an individual, you MUST have a VAT number
-        if ($client->classification != 'individual' && !$this->validString($client->vat_number)) {
+        if (!in_array($client->classification, ['government','individual']) && !$this->validString($client->vat_number)) {
             $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
         }
 
