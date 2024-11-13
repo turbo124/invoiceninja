@@ -506,14 +506,14 @@ class Storecove
      * @param  int $legal_entity_id
      * @return bool
      */
-    public function deleteIdentifier(int $legal_entity_id): bool|\Illuminate\Http\Client\Response
+    public function deleteIdentifier(int $legal_entity_id): array|\Illuminate\Http\Client\Response
     {
         $uri = "/legal_entities/{$legal_entity_id}";
 
         $r = $this->httpClient($uri, (HttpVerb::DELETE)->value, []);
 
         if ($r->successful()) {
-            return true;
+            return [];
         }
 
         return $r;
