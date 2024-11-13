@@ -347,7 +347,7 @@ class Storecove
      * GetLegalEntity
      *
      * @param  int $id
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
     public function getLegalEntity($id): array|\Illuminate\Http\Client\Response
     {

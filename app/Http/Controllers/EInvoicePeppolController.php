@@ -96,7 +96,7 @@ class EInvoicePeppolController extends BaseController
      * Update legal properties such as acting as sender or receiver.
      * 
      * @param \App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest $request
-     * @return JsonResponse|
+     * @return JsonResponse
      */
     public function updateLegalEntity(UpdateEntityRequest $request, Storecove $storecove): JsonResponse
     {
