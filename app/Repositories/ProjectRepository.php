@@ -25,6 +25,8 @@ class ProjectRepository extends BaseRepository
     {
         $invoice = InvoiceFactory::create($project->company_id, $project->user_id);
         $invoice->client_id = $project->client_id;
+        $invoice->project_id = $project->id;
+
         $lines = [];
 
         $uninvoiced_tasks = $project->tasks()
@@ -38,7 +40,7 @@ class ProjectRepository extends BaseRepository
                                         $item->quantity = $task->getQuantity();
                                         $item->cost = $task->getRate();
                                         $item->product_key = '';
-                                        $item->notes = '';
+                                        $item->notes = $task->description();
                                         $item->task_id = $task->hashed_id;
                                         $item->tax_id = (string) Product::PRODUCT_TYPE_SERVICE;
                                         $item->type_id = '2';
@@ -57,7 +59,7 @@ class ProjectRepository extends BaseRepository
                                         $item = new InvoiceItem();
                                         $item->quantity = 1;
                                         $item->cost = $expense->foreign_amount > 0 ? $expense->foreign_amount : $expense->amount;
-                                        $item->product_key = $expense->category->exists() ? $expense->category->name : '';
+                                        $item->product_key = $expense->category()->exists() ? $expense->category->name : '';
                                         $item->notes = $expense->public_notes ?? '';
                                         $item->line_total = round($item->cost * $item->quantity,2);
                                         $item->tax_name1 = $expense->tax_name1;

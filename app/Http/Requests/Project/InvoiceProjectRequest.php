@@ -11,6 +11,7 @@
 
 namespace App\Http\Requests\Project;
 
+use App\Models\Invoice;
 use App\Http\Requests\Request;
 
 class InvoiceProjectRequest extends Request
@@ -30,12 +31,27 @@ class InvoiceProjectRequest extends Request
 
     public function rules()
     {
-        return [];
+        
+        $user = auth()->user();
+        $company = $user->company();
+
+        return [
+            'project_id' => [
+            'required',
+            function($attribute, $value, $fail) use($company){
+                if (Invoice::withTrashed()->where('company_id', $company->id)->where('is_deleted', 0)->where('project_id', $value)->exists()) {
+                    $fail('This project has already been invoiced.');
+                }
+            }
+        ]
+        ];
     }
 
     public function prepareForValidation()
     {
         $input = $this->all();
+
+            $input['project_id'] = $this->project->id;
 
         $this->replace($input);
 

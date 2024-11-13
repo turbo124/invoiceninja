@@ -258,7 +258,7 @@ class Expense extends BaseModel
         return ctrans('texts.logged');
     }
 
-    public function calculated_tax_rate($tax_amount, $tax_rate): float
+    public function calculatedTaxRate($tax_amount, $tax_rate): float
     {
 
         if ($this->calculate_tax_by_amount) {
