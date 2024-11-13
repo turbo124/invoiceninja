@@ -18,7 +18,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AddTaxIdentifierRequest extends FormRequest
 {
-    public array $vat_regex_patterns = [
+    public static array $vat_regex_patterns = [
         'DE' => '/^DE\d{9}$/',
         'AT' => '/^ATU\d{8}$/',
         'BE' => '/^BE0\d{9}$/',
@@ -66,14 +66,14 @@ class AddTaxIdentifierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'country' => ['required', 'bail', Rule::in(array_keys($this->vat_regex_patterns))],
+            'country' => ['required', 'bail', Rule::in(array_keys(self::$vat_regex_patterns))],
             'vat_number' => [
                'required',
                'string',
                'bail',
                function ($attribute, $value, $fail) {
-                   if ($this->country && isset($this->vat_regex_patterns[$this->country])) {
-                       if (!preg_match($this->vat_regex_patterns[$this->country], $value)) {
+                   if ($this->country && isset(self::$vat_regex_patterns[$this->country])) {
+                       if (!preg_match(self::$vat_regex_patterns[$this->country], $value)) {
                            $fail(ctrans('texts.invalid_vat_number'));
                        }
                    }
