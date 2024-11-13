@@ -149,7 +149,7 @@ class EInvoiceController extends BaseController
         }
 
         return response()->json([
-            'quota' => $response->json('quota'),
+            'quota' => $response->body(),
         ]);
     }
 }

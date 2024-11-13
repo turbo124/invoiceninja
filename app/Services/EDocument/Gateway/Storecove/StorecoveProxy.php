@@ -75,7 +75,7 @@ class StorecoveProxy
         return $this->remoteRequest('/api/einvoice/peppol/setup', $data);
     }
 
-    public function disconnect(): bool|array
+    public function disconnect(): array
     {
         $data = [
             'company_key' => $this->company->company_key,
@@ -87,7 +87,7 @@ class StorecoveProxy
                 legal_entity_id: $data['legal_entity_id'],
             );
 
-            if (is_bool($response)) {
+            if (is_array($response)) {
                 return $response;
             }
 
@@ -193,7 +193,6 @@ class StorecoveProxy
 
     private function remoteRequest(string $uri, array $payload = []): array
     {
-
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
             ->withHeaders($this->getHeaders())
             ->post($uri, $payload);
