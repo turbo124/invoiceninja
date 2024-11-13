@@ -59,7 +59,6 @@ class RequiredClientInfo extends Component
      */
     public $countries;
 
-
     public $client_name;
     public $contact_first_name;
     public $contact_last_name;
