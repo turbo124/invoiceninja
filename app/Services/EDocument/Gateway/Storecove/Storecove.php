@@ -427,7 +427,7 @@ class Storecove
      * @param  int $legal_entity_id
      * @param  string $identifier
      * @param  string $scheme
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
 
     public function addAdditionalTaxIdentifier(int $legal_entity_id, string $identifier, string $scheme): array|\Illuminate\Http\Client\Response
