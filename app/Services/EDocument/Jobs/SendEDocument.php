@@ -118,7 +118,7 @@ class SendEDocument implements ShouldQueue
         if(Ninja::isHosted() && ($model instanceof Invoice) && !$model->company->account->is_flagged && $model->company->legal_entity_id)
         {
             if ($model->company->account->e_invoice_quota === 0) {
-                $key = "e_invoice_quota_exhausted_{$model->company->account->id}";
+                $key = "e_invoice_quota_exhausted_{$model->company->account->key}";
 
                 if (! Cache::has($key)) {
                     $mo = new EmailObject();
@@ -135,7 +135,7 @@ class SendEDocument implements ShouldQueue
                     Cache::put($key, true, now()->addHours(24));
                 }
             } else if ($model->company->account->e_invoice_quota <= config('ninja.e_invoice_quota_warning')) {
-                $key = "e_invoice_quota_low_{$model->company->account->id}";
+                $key = "e_invoice_quota_low_{$model->company->account->key}";
 
                 if (! Cache::has($key)) {
                     $mo = new EmailObject();
