@@ -11,13 +11,14 @@
 
 namespace App\Services\EDocument\Jobs;
 
-use App\Mail\EInvoice\Peppol\CreditsExhausted;
-use App\Mail\EInvoice\Peppol\CreditsLow;
+use App\Services\Email\Email;
+use App\Services\Email\EmailObject;
 use App\Utils\Ninja;
 use App\Models\Invoice;
 use App\Libraries\MultiDB;
 use App\Models\Activity;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -27,6 +28,7 @@ use App\Services\EDocument\Standards\Peppol;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
 use Mail;
+use Illuminate\Mail\Mailables\Address;
 
 class SendEDocument implements ShouldQueue
 {
@@ -116,9 +118,39 @@ class SendEDocument implements ShouldQueue
         if(Ninja::isHosted() && ($model instanceof Invoice) && !$model->company->account->is_flagged && $model->company->legal_entity_id)
         {
             if ($model->company->account->e_invoice_quota === 0) {
-                Mail::send(new CreditsExhausted($model->company->account->owner()->email, is_hosted: true));
+                $key = "e_invoice_quota_exhausted_{$model->company->account->key}";
+
+                if (! Cache::has($key)) {
+                    $mo = new EmailObject();
+                    $mo->subject = ctrans('texts.notification_no_credits');
+                    $mo->body = ctrans('texts.notification_no_credits_text');
+                    $mo->text_body = ctrans('texts.notification_no_credits_text');
+                    $mo->company_key = $model->company->company_key;
+                    $mo->html_template = 'email.template.generic';
+                    $mo->to = [new Address($model->company->account->owner()->email, $model->company->account->owner()->name())];
+                    $mo->email_template_body = 'notification_no_credits';
+                    $mo->email_template_subject = 'notification_no_credits_text';
+
+                    Email::dispatch($mo, $model->company);
+                    Cache::put($key, true, now()->addHours(24));
+                }
             } else if ($model->company->account->e_invoice_quota <= config('ninja.e_invoice_quota_warning')) {
-                Mail::send(new CreditsLow($model->company->account->owner()->email, is_hosted: true));
+                $key = "e_invoice_quota_low_{$model->company->account->key}";
+
+                if (! Cache::has($key)) {
+                    $mo = new EmailObject();
+                    $mo->subject = ctrans('texts.notification_credits_low');
+                    $mo->body = ctrans('texts.notification_credits_low_text');
+                    $mo->text_body = ctrans('texts.notification_credits_low_text');
+                    $mo->company_key = $model->company->company_key;
+                    $mo->html_template = 'email.template.generic';
+                    $mo->to = [new Address($model->company->account->owner()->email, $model->company->account->owner()->name())];
+                    $mo->email_template_body = 'notification_credits_low';
+                    $mo->email_template_subject = 'notification_credits_low_text';
+
+                    Email::dispatch($mo, $model->company);
+                    Cache::put($key, true, now()->addHours(24));
+                }
             }
 
             $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
