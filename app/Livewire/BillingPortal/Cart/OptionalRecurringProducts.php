@@ -14,12 +14,15 @@ namespace App\Livewire\BillingPortal\Cart;
 
 use Livewire\Component;
 use App\Models\Subscription;
+use App\Utils\Traits\MakesHash;
 use Livewire\Attributes\Computed;
 
 class OptionalRecurringProducts extends Component
 {
-    public array $context;
+    
+    use MakesHash;
 
+    public array $context;
 
     public string $subscription_id;
 

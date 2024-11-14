@@ -24,6 +24,13 @@
         :context="$context"
     />
 
+    @if($this->subscription->promo_discount > 0)
+    <livewire:billing-portal.cart.coupon
+        :subscription_id="$this->subscription->hashed_id"
+        :context="$context"
+    />
+    @endif
+    
     <div class="mt-3">
         <form wire:submit="handleSubmit">
             <button
