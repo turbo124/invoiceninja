@@ -2075,7 +2075,6 @@ $lang = array(
     'create_expense_category' => 'Tạo danh mục',
     'pro_plan_reports' => ':link để bật báo cáo bằng cách tham gia Pro Plan',
     'mark_ready' => 'Đánh dấu Sẵn sàng',
-
     'limits' => 'Giới hạn',
     'fees' => 'Phí',
     'fee' => 'Phí',
@@ -5465,7 +5464,11 @@ $lang = array(
     'additional_tax_identifiers' => 'Mã số thuế bổ sung',
     'configure' => 'Cấu hình',
     'new_identifier' => 'Số VAT mới',
-
+    'notification_credits_low' => 'Cảnh báo! Số dư tín dụng của bạn đang thấp.',
+    'notification_credits_low_text' => 'Vui lòng Thêm tín dụng đến tài khoản của bạn đến tránh bị gián đoạn dịch vụ.',
+    'notification_no_credits' => 'Cảnh báo! Số dư tín dụng của bạn đang trống.',
+    'notification_no_credits_text' => 'Vui lòng Thêm tín dụng đến tài khoản của bạn đến tránh bị gián đoạn dịch vụ.',
+    'saved_comment' => 'Bình luận đã lưu',
 );
 
 return $lang;
