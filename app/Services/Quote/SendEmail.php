@@ -41,7 +41,6 @@ class SendEmail
 
         $this->quote->invitations->each(function ($invitation) {
             if (! $invitation->contact->trashed() && $invitation->contact->email) {
-                // EmailEntity::dispatch($invitation, $invitation->company, $this->reminder_template);
                 
                 //@refactor 2024-11-10
                 $mo = new EmailObject();
