@@ -146,7 +146,7 @@ class ReminderJob implements ShouldQueue
         (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
                 $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
                     if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                        EmailEntity::dispatch($invitation, $invitation->company, $reminder_template);
+                        EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                         nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                         $invoice->entityEmailEvent($invitation, $reminder_template);
                         $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
@@ -223,7 +223,7 @@ class ReminderJob implements ShouldQueue
                 (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
             $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
                 if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                    EmailEntity::dispatch($invitation, $invitation->company, $reminder_template);
+                    EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                     nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                     $invoice->entityEmailEvent($invitation, $reminder_template);
                     $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");

@@ -5468,7 +5468,7 @@ $lang = array(
     'notification_credits_low_text' => 'Please add credits to your account to avoid interruption of services.',
     'notification_no_credits' => 'Warning! Your credit balance is empty.',
     'notification_no_credits_text' => 'Please add credits to your account to avoid interruption of services.',
-    'saved_comment', 'Comment Saved',
+    'saved_comment', => 'Comment Saved',
 );
 
 return $lang;

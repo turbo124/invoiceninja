@@ -60,8 +60,7 @@ class BulkInvoiceJob implements ShouldQueue
         $this->invoice->service()->markSent()->save();
 
         $this->invoice->invitations->load('contact.client.country', 'invoice.client.country', 'invoice.company')->each(function ($invitation) {
-            // EmailEntity::dispatch($invitation, $this->invoice->company, $this->reminder_template)->delay(now()->addSeconds(5));
-
+            
             //@refactor 2024-11-10 - move email into EmailObject/Email::class
             $template = $this->resolveTemplateString($this->reminder_template);
 
