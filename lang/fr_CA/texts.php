@@ -5324,7 +5324,7 @@ Développe automatiquement la section des notes dans le tableau de produits pour
     'activity_142' => 'Le rappel 1 de la soumission :number a été envoyé',
     'activity_143' => 'La facturation automatique a réussi pour la facture :invoice',
     'activity_144' => 'La facturation automatique de :invoice_number a échouée. :notes',
-    'activity_145' => 'E-Facture :invoice pour :client à été envoyée. :notes',
+    'activity_145' => 'La facture électronique :invoice pour :client a été envoyée. :notes',
     'payment_failed' => 'Le paiement a échoué',
     'ssl_host_override' => 'Substitution d\'hôte SSL',
     'upload_logo_short' => 'Téléverser un logo',
@@ -5447,9 +5447,23 @@ Développe automatiquement la section des notes dans le tableau de produits pour
     'add_license_to_env' => 'Nous aurons besoin de votre clé de licence pour les futures communications avec nos services. Assurez-vous de définir LICENSE_KEY comme variable d\'environnement.',
     'white_label_license_not_present' => 'Licence non trouvée. Assurez-vous de définir LICENSE_KEY comme variable d\'environnement.',
     'white_label_license_not_found' => 'Licence sans marque introuvable',
+    'details_update_info' => 'Nous mettrons à jour les informations de votre entreprise avec les données fournies.',
     'sales_above_threshold' => 'Ventes dépassant le seuil',
     'client_address_required' => 'L\'adresse complète du client est requise pour la facturation électronique.',
     'connected' => 'Connecté',
+    'email_count_quotes' => 'Envoyez par courriel :count soumissions',
+    'activity_146' => 'La facture électronique :invoice pour :client a été livrée! :notes',
+    'activity_147' => 'La facture électronique :invoice pour :client n\'a pas pu être envoyée. :notes',
+    'peppol_routing_problem' => 'Problème de routage. Aucun destinataire/destination trouvé.',
+    'peppol_sending_failed' => 'Problème technique de livraison. Réessai impossible.',
+    'peppol_cleared_for_sending' => 'Validé par l\'autorité fiscale, envoi au destinataire.',
+    'account_holder' => 'Nom du compte',
+    'account_holder_help' => 'Le nom du compte',
+    'activity_148' => 'Dépense électronique :expense reçue de :vendor',
+    'additional_tax_identifiers' => 'Identifiants fiscaux supplémentaires',
+    'configure' => 'Paramétrer',
+    'new_identifier' => 'Nouveau numéro de taxe de vente',
+
 );
 
 return $lang;

@@ -5326,7 +5326,7 @@ $lang = array(
     'activity_142' => 'Báo giá :number nhắc nhở 1 đã gửi',
     'activity_143' => 'Hóa đơn tự động đã thành công cho hóa đơn :invoice',
     'activity_144' => 'Hóa đơn tự động không thành công cho hóa đơn :invoice . :notes',
-    'activity_145' => 'Hóa đơn điện tử :invoice cho :client đã được gửi qua email. :notes',
+    'activity_145' => 'E- Hóa đơn :invoice cho :client đã được gửi. :ghi chú',
     'payment_failed' => 'Thanh toán không thành công',
     'ssl_host_override' => 'Ghi đè máy chủ SSL',
     'upload_logo_short' => 'Tải lên Logo',
@@ -5449,9 +5449,23 @@ $lang = array(
     'add_license_to_env' => 'Chúng tôi sẽ cần khóa cấp phép của bạn để liên lạc trong tương lai đến các dịch vụ của chúng tôi. Đảm bảo đến làm biến môi trường.',
     'white_label_license_not_present' => 'Không tìm thấy giấy phép. Hãy đảm bảo đến LICENSE_KEY làm biến môi trường.',
     'white_label_license_not_found' => 'Không tìm thấy giấy phép White label .',
+    'details_update_info' => 'Chúng tôi sẽ cập nhật chi tiết về công ty của bạn với các thông tin được cung cấp.',
     'sales_above_threshold' => 'Doanh số vượt ngưỡng',
     'client_address_required' => 'Cần có địa chỉ khách hàng đầy đủ cho E- lập hóa đơn',
     'connected' => 'Đã kết nối',
+    'email_count_quotes' => 'email :count Báo giá',
+    'activity_146' => 'E- Hóa đơn :invoice for :client Thành công giao hàng! :ghi chú',
+    'activity_147' => 'E- Hóa đơn :invoice cho :client giao hàng không thành công. :notes',
+    'peppol_routing_problem' => 'Sự cố định tuyến. Không tìm thấy người nhận/đích đến.',
+    'peppol_sending_failed' => 'Sự cố giao hàng kỹ thuật. Không thể thử lại',
+    'peppol_cleared_for_sending' => 'Đã được cơ quan thuế xác nhận, gửi đến người nhận',
+    'account_holder' => 'tài khoản Name',
+    'account_holder_help' => 'Tên của tài khoản',
+    'activity_148' => 'E- Chi phí :expense nhận được từ :vendor',
+    'additional_tax_identifiers' => 'Mã số thuế bổ sung',
+    'configure' => 'Cấu hình',
+    'new_identifier' => 'Số VAT mới',
+
 );
 
 return $lang;
