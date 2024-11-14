@@ -150,6 +150,7 @@ class ReminderJob implements ShouldQueue
                         nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                         $invoice->entityEmailEvent($invitation, $reminder_template);
                         $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
+                        usleep(300000);
                     }
                 });
             }
@@ -226,6 +227,7 @@ class ReminderJob implements ShouldQueue
                     nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                     $invoice->entityEmailEvent($invitation, $reminder_template);
                     $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
+                    usleep(300000);
                 }
             });
         }
