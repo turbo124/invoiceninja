@@ -6,7 +6,7 @@
         @foreach($this->items() as $item)
             @if($item['quantity'] > 0)
                 <div class="flex justify-between text-sm">
-                    <span>{{  $item['quantity'] }}x {{ $item['product_key'] }}</span>
+                    <span class="truncate max-w-[350px]">{{  $item['quantity'] }} x {{ $item['notes'] }}</span>
                     <span>{{ $item['total'] }}</span>
                 </div>
             @endif

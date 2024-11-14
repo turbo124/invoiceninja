@@ -1,8 +1,14 @@
 <div>
+    <div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-6">{{ $this->subscription->name }}</h1>
+    </div>
+
     <livewire:billing-portal.cart.one-time-products
         :subscription_id="$this->subscription->hashed_id"
         :context="$context"
     />
+
+    <div class="mt-5"></div>
 
     <livewire:billing-portal.cart.recurring-products
         :subscription_id="$this->subscription->hashed_id"
@@ -10,7 +16,7 @@
     />
 
     @if($this->showOptionalProductsLabel())
-        <p class="text-xl mt-10 mb-4">{{ ctrans('texts.optional_products') }}</p>
+        <p class="text-xl mt-5 mb-4">{{ ctrans('texts.optional_products') }}</p>
     @endif
 
     <livewire:billing-portal.cart.optional-recurring-products
@@ -18,7 +24,7 @@
         :context="$context"
     />
 
-    <div class="mt-10"></div>
+    <div class="mt-5"></div>
 
     <livewire:billing-portal.cart.optional-one-time-products
         :subscription_id="$this->subscription->hashed_id"
