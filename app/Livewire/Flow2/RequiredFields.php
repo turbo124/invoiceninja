@@ -12,11 +12,12 @@
 
 namespace App\Livewire\Flow2;
 
+use Livewire\Component;
 use App\Libraries\MultiDB;
 use App\Models\CompanyGateway;
+use Livewire\Attributes\Computed;
 use App\Services\Client\RFFService;
 use App\Utils\Traits\WithSecureContext;
-use Livewire\Component;
 
 class RequiredFields extends Component
 {
@@ -44,7 +45,7 @@ class RequiredFields extends Component
     public ?string $client_custom_value3;
     public ?string $client_custom_value4;
 
-    public $contact;
+    // public $contact;
     
     /** @var array<int, string> */
     public array $fields = [];
@@ -101,11 +102,6 @@ class RequiredFields extends Component
         else
             $this->is_loading = false;
 
-        // }
-
-        // if ($rff->unfilled_fields > 0) {
-            // $this->is_loading = false;
-        // }
     }
 
     public function handleSubmit(array $data)

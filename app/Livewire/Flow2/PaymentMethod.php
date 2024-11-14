@@ -20,7 +20,7 @@ class PaymentMethod extends Component
 {
     use WithSecureContext;
 
-    public $invoice;
+    // public $invoice;
 
     public $variables;
 

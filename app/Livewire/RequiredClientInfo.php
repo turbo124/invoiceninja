@@ -44,14 +44,8 @@ class RequiredClientInfo extends Component
      */
     public $fields = [];
 
-    /**
-     * @var ClientContact
-     */
     public $contact_id;
 
-    /**
-     * @var \App\Models\Client
-     */
     public $client_id;
 
     /**

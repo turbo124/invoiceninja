@@ -2075,7 +2075,6 @@ $lang = array(
     'create_expense_category' => 'Create category',
     'pro_plan_reports' => ':link to enable reports by joining the Pro Plan',
     'mark_ready' => 'Mark Ready',
-
     'limits' => 'Limits',
     'fees' => 'Fees',
     'fee' => 'Fee',
