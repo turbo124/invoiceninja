@@ -257,4 +257,19 @@ class Expense extends BaseModel
 
         return ctrans('texts.logged');
     }
+
+    public function calculatedTaxRate($tax_amount, $tax_rate): float
+    {
+
+        if ($this->calculate_tax_by_amount) {
+            if ($this->uses_inclusive_taxes) {
+                return round((($tax_amount / $this->amount) * 100 * 1000) / 10) / 100;
+            }
+
+            return round((($tax_amount / $this->amount) * 1000) / 10) / 1;
+        }
+
+        return $tax_rate;
+
+    }
 }

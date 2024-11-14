@@ -58,6 +58,19 @@ class ProcessPayment extends Component
             throw new PaymentFailed($responder_data['error'], 400);
         }
 
+        if(isset($responder_data['payload']['total']['fee_total']))
+        {
+
+            $gateway_fee = data_get($responder_data, 'payload.total.fee_total', false);
+            $amount = data_get($responder_data, 'payload.total.amount_with_fee', 0);
+        
+            $this->setContext('amount', $amount);
+            $this->setContext('gateway_fee', $gateway_fee);
+
+            $this->dispatch('payment-view-rendered');
+        }
+    
+        
         if(isset($responder_data['component']) && $responder_data['component'] == 'CreditPaymentComponent'){
             $this->payment_view = $responder_data['view'];
             $this->payment_data_payload = $responder_data['payload'];

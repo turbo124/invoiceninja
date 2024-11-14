@@ -11,6 +11,8 @@
 
 namespace App\Services\EDocument\Jobs;
 
+use App\Mail\EInvoice\Peppol\CreditsExhausted;
+use App\Mail\EInvoice\Peppol\CreditsLow;
 use App\Utils\Ninja;
 use App\Models\Invoice;
 use App\Libraries\MultiDB;
@@ -24,6 +26,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Services\EDocument\Standards\Peppol;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
+use Mail;
 
 class SendEDocument implements ShouldQueue
 {
@@ -86,22 +89,7 @@ class SendEDocument implements ShouldQueue
         
         nlog($payload);
 
-        /** Concrete implementation current linked to Storecove only */
-
-        //@testing only
-        // $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
-        // $r = $sc->sendJsonDocument($payload);
-
-        // if (is_string($r)) {
-        //     return $this->writeActivity($model, $r);
-        // }
-        // else {
-        //     // nlog($r->body());
-        // }
-        
-        // //@todo remove early return prior to release
-        // return;
-        //@testing only
+        nlog(json_encode($payload));
 
         if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->legal_entity_id)
         {
@@ -127,6 +115,11 @@ class SendEDocument implements ShouldQueue
 
         if(Ninja::isHosted() && ($model instanceof Invoice) && !$model->company->account->is_flagged && $model->company->legal_entity_id)
         {
+            if ($model->company->account->e_invoice_quota === 0) {
+                Mail::send(new CreditsExhausted($model->company->account->owner()->email, is_hosted: true));
+            } else if ($model->company->account->e_invoice_quota <= config('ninja.e_invoice_quota_warning')) {
+                Mail::send(new CreditsLow($model->company->account->owner()->email, is_hosted: true));
+            }
 
             $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
             $r = $sc->sendJsonDocument($payload);

@@ -66,7 +66,7 @@
                                 @if($settings->client_portal_allow_under_payment || $settings->client_portal_allow_over_payment)
                                     <button class="button button-primary bg-primary">{{ ctrans('texts.pay_now') }}</button>
                                 @else
-                                    @livewire('pay-now-dropdown', ['total' => $invoice->getPayableAmount(), 'company' => $company])
+                                    @livewire('pay-now-dropdown', ['total' => $invoice->getPayableAmount(), 'company_id' => $company->id, 'db' => $company->db])
                                 @endif
                             </div>
                         </div>
@@ -93,7 +93,7 @@
     @endif
 
     @include('portal.ninja2020.components.entity-documents', ['entity' => $invoice])
-    @livewire('pdf-slot', ['entity' => $invoice, 'invitation' => $invitation, 'db' => $invoice->company->db])
+    @livewire('pdf-slot', ['class' => get_class($invoice), 'entity_id' => $invoice->id, 'invitation_id' => $invitation->id ?? false, 'db' => $invoice->company->db])
 
 @endsection
 

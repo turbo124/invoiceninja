@@ -262,6 +262,35 @@ class Storecove
         return $r;
     }
 
+    public function setupLegalEntity(array $data): array|\Illuminate\Http\Client\Response
+    {
+        $legal_entity_response = $this->createLegalEntity($data);
+
+        if (! is_array($legal_entity_response)) {
+            return $legal_entity_response;
+        }
+
+        $scheme = $this->router->resolveRouting($data['country'], $data['classification']);
+
+        $add_identifier_response = $this->addIdentifier(
+            legal_entity_id: $legal_entity_response['id'],
+            identifier: $data['classification'] === 'individual' ? str_replace('/','', $data['id_number']) : str_replace(" ", "", $data['vat_number']),
+            scheme: $scheme,
+        );
+
+        if (! is_array($add_identifier_response)) {
+            return $add_identifier_response;
+        }
+
+        return [
+            'legal_entity_id' => $legal_entity_response['id'],
+            'tax_data' => [
+                'acts_as_sender' => $data['acts_as_sender'],
+                'acts_as_receiver' => $data['acts_as_receiver'],
+            ],
+        ];
+    }
+
     /**
      * CreateLegalEntity
      *
@@ -318,9 +347,9 @@ class Storecove
      * GetLegalEntity
      *
      * @param  int $id
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
-    public function getLegalEntity($id)
+    public function getLegalEntity($id): array|\Illuminate\Http\Client\Response
     {
 
         $uri = "legal_entities/{$id}";
@@ -398,10 +427,10 @@ class Storecove
      * @param  int $legal_entity_id
      * @param  string $identifier
      * @param  string $scheme
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
 
-    public function addAdditionalTaxIdentifier(int $legal_entity_id, string $identifier, string $scheme)
+    public function addAdditionalTaxIdentifier(int $legal_entity_id, string $identifier, string $scheme): array|\Illuminate\Http\Client\Response
     {
 
         $uri = "legal_entities/{$legal_entity_id}/additional_tax_identifiers";
@@ -475,15 +504,19 @@ class Storecove
      * Remove the entity from the network
      *
      * @param  int $legal_entity_id
-     * @return bool
+     * @return array|\Illuminate\Http\Client\Response
      */
-    public function deleteIdentifier(int $legal_entity_id): bool
+    public function deleteIdentifier(int $legal_entity_id): array|\Illuminate\Http\Client\Response
     {
         $uri = "/legal_entities/{$legal_entity_id}";
 
         $r = $this->httpClient($uri, (HttpVerb::DELETE)->value, []);
 
-        return $r->successful();
+        if ($r->successful()) {
+            return [];
+        }
+
+        return $r;
     }
     
     /**

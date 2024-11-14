@@ -2075,7 +2075,6 @@ $lang = array(
     'create_expense_category' => 'Create category',
     'pro_plan_reports' => ':link to enable reports by joining the Pro Plan',
     'mark_ready' => 'Mark Ready',
-
     'limits' => 'Limits',
     'fees' => 'Fees',
     'fee' => 'Fee',
@@ -5465,7 +5464,11 @@ $lang = array(
     'additional_tax_identifiers' => 'Additional Tax Identifiers',
     'configure' => 'Configure',
     'new_identifier' => 'New VAT Number',
-
+    'notification_credits_low' => 'Warning! Your credit balance is low.',
+    'notification_credits_low_text' => 'Please add credits to your account to avoid interruption of services.',
+    'notification_no_credits' => 'Warning! Your credit balance is empty.',
+    'notification_no_credits_text' => 'Please add credits to your account to avoid interruption of services.',
+    'saved_comment', 'Comment Saved',
 );
 
 return $lang;

@@ -5313,7 +5313,7 @@ $lang = array(
     'activity_142' => 'Citácia :number upomienka 1 odoslaná',
     'activity_143' => 'Automatická faktúra bola úspešná pre faktúru :invoice',
     'activity_144' => 'Automatické vyúčtovanie zlyhalo pre faktúru :invoice . :poznámky',
-    'activity_145' => 'EFaktúra :invoice za :client bola doručená elektronicky. :poznámky',
+    'activity_145' => 'E-Invoice :invoice for :client was sent. :notes',
     'payment_failed' => 'Platba zlyhala',
     'ssl_host_override' => 'Prepísanie hostiteľa SSL',
     'upload_logo_short' => 'Nahrať logo',
@@ -5436,9 +5436,23 @@ $lang = array(
     'add_license_to_env' => 'We\'ll need your license key for future communication to our services. Make sure to LICENSE_KEY as environment variable.',
     'white_label_license_not_present' => 'License not found. Make sure to set LICENSE_KEY as environment variable.',
     'white_label_license_not_found' => 'White label license not found.',
+    'details_update_info' => 'We\'ll update your company details with the provided information.',
     'sales_above_threshold' => 'Sales above threshold',
     'client_address_required' => 'Full client address is required for E-invoicing',
     'connected' => 'Connected',
+    'email_count_quotes' => 'Email :count quotes',
+    'activity_146' => 'E-Invoice :invoice for :client successfully delivered! :notes',
+    'activity_147' => 'E-Invoice :invoice for :client failed delivery. :notes',
+    'peppol_routing_problem' => 'Routing problem. No recipient/destination found.',
+    'peppol_sending_failed' => 'Technical delivery problem. Retry not possible',
+    'peppol_cleared_for_sending' => 'Cleared by tax authority, sending to receiver',
+    'account_holder' => 'Account Name',
+    'account_holder_help' => 'The name of the account',
+    'activity_148' => 'E-Expense :expense received from :vendor',
+    'additional_tax_identifiers' => 'Additional Tax Identifiers',
+    'configure' => 'Configure',
+    'new_identifier' => 'New VAT Number',
+
 );
 
 return $lang;

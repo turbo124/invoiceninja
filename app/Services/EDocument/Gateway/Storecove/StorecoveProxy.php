@@ -22,13 +22,13 @@ class StorecoveProxy
     public function __construct(public Storecove $storecove)
     {
     }
-    
+
     public function setCompany(Company $company): self
     {
         $this->company = $company;
         return $this;
     }
-    
+
     /**
      * Example refactor.
      * getLegalEntity
@@ -38,12 +38,12 @@ class StorecoveProxy
      */
     public function getLegalEntity(int $legal_entity_id): array
     {
-        if(Ninja::isHosted()){
+        if (Ninja::isHosted()) {
             $response = $this->storecove->getLegalEntity($legal_entity_id);
 
-            if(is_array($response)) //successful response is the array
+            if (is_array($response)) //successful response is the array
                 return $response;
- 
+
             return $this->handleResponseError($response); //otherwise need to handle the http response returned
         }
 
@@ -52,7 +52,96 @@ class StorecoveProxy
 
         return $this->remoteRequest($uri, $payload); //abstract the http calls
     }
-    
+
+    public function setup(array $data): array
+    {
+        $data = [
+            ...$data,
+            'classification' => $data['classification'] ?? $this->company->settings->classification,
+            'vat_number' => $data['vat_number'] ?? $this->company->settings->vat_number,
+            'id_number' => $data['id_number'] ?? $this->company->settings->id_number,
+        ];
+
+        if (Ninja::isHosted()) {
+            $response = $this->storecove->setupLegalEntity($data);
+
+            if (is_array($response)) {
+                return $response;
+            }
+
+            return $this->handleResponseError($response);
+        }
+
+        return $this->remoteRequest('/api/einvoice/peppol/setup', $data);
+    }
+
+    public function disconnect(): array
+    {
+        $data = [
+            'company_key' => $this->company->company_key,
+            'legal_entity_id' => $this->company->legal_entity_id,
+        ];
+
+        if (Ninja::isHosted()) {
+            $response = $this->storecove->deleteIdentifier(
+                legal_entity_id: $data['legal_entity_id'],
+            );
+
+            if (is_array($response)) {
+                return $response;
+            }
+
+            return $this->handleResponseError($response);
+        }
+
+        return $this->remoteRequest('/api/einvoice/peppol/disconnect', $data);
+    }
+
+    public function updateLegalEntity(array $data): array
+    {
+        $data = [
+            ...$data,
+            'legal_entity_id' => $this->company->legal_entity_id,
+        ];
+
+        if (Ninja::isHosted()) {
+            $response = $this->storecove->updateLegalEntity($data['legal_entity_id'], $data);
+
+            if (is_array($response)) {
+                return $response;
+            }
+
+            return $this->handleResponseError($response);
+        }
+
+        return $this->remoteRequest('/api/einvoice/peppol/update', $data);
+    }
+
+    public function addAdditionalTaxIdentifier(array $data): array
+    {
+        $scheme = $this->storecove->router->resolveRouting($data['country'], $this->company->settings->classification);
+
+        $data = [
+            ...$data,
+            'classification' => $this->company->settings->classification,
+            'legal_entity_id' => $this->company->legal_entity_id,
+            'scheme' => $scheme,
+        ];
+
+        if (Ninja::isHosted()) {
+            
+            $response = $this->storecove->addAdditionalTaxIdentifier($data['legal_entity_id'], $data['vat_number'], $scheme);
+        
+            if (is_array($response)) {
+                return $response;
+            }
+
+            return $this->handleResponseError($response);
+        }
+
+        return $this->remoteRequest('/api/einvoice/peppol/add_additional_legal_identifier', $data);
+    }
+
     /**
      * handleResponseError
      *
@@ -61,9 +150,8 @@ class StorecoveProxy
      * @param  mixed $response
      * @return array
      */
-    private function handleResponseError($response): array
+    public function handleResponseError($response): array
     {
-                
         $error = [
             'status' => 'error',
             'message' => 'Unknown error occurred',
@@ -92,24 +180,24 @@ class StorecoveProxy
             $error['message'] = 'Resource not found';
         }
 
-        nlog(['Storecove API Error' => [
-            'status' => $response->status(),
-            'body' => $response->body(),
-            'error' => $error
-        ]]);
+        nlog([
+            'Storecove API Error' => [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'error' => $error,
+            ],
+        ]);
 
         return $error;
-
     }
 
-    private function remoteRequest(string $uri, array $payload =[]): array
+    private function remoteRequest(string $uri, array $payload = []): array
     {
-
         $response = Http::baseUrl(config('ninja.hosted_ninja_url'))
             ->withHeaders($this->getHeaders())
             ->post($uri, $payload);
 
-        if($response->successful())
+        if ($response->successful())
             return $response->json();
 
         return $this->handleResponseError($response);
@@ -117,7 +205,7 @@ class StorecoveProxy
 
     private function getHeaders(): array
     {
-        
+
         return [
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',

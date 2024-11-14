@@ -124,8 +124,6 @@ class InvoicePay extends Component
     #[On('payable-amount')]
     public function payableAmount($payable_amount)
     {
-        // $this->setContext('payable_invoices.0.amount', Number::parseFloat($payable_amount)); // $this->context['payable_invoices'][0]['amount'] = Number::parseFloat($payable_amount); //TODO DB: check parseFloat()
-        
         $this->setContext('amount', $payable_amount);
         $this->under_over_payment = false;
     }
@@ -240,11 +238,7 @@ class InvoicePay extends Component
         $this->setContext('db', $this->db); // $this->context['db'] = $this->db;
         $this->setContext('invitation_id', $this->invitation_id);
 
-        if(is_array($this->invoices))
-            $this->invoices = Invoice::find($this->transformKeys($this->invoices));
-        elseif ($this->invoices instanceof \Illuminate\Support\Collection) {
-            $this->invoices = Invoice::find($this->invoices->pluck('id'));
-        }
+        $this->invoices = Invoice::find($this->transformKeys($this->invoices));
 
         $invoices = $this->invoices->filter(function ($i) {
             $i = $i->service()

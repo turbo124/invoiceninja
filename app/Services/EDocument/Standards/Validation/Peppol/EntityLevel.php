@@ -97,6 +97,13 @@ class EntityLevel
         $this->errors['client'] = $this->testClientState($invoice->client);
         $this->errors['company'] = $this->testCompanyState($invoice->client); // uses client level settings which is what we want
 
+        if(count($this->errors['client']) > 0){
+            
+            $this->errors['passes'] = false;
+            return $this->errors;
+
+        }
+
         $p = new Peppol($invoice);
 
         $xml = false;
@@ -152,7 +159,7 @@ class EntityLevel
         }
 
         //If not an individual, you MUST have a VAT number
-        if ($client->classification != 'individual' && !$this->validString($client->vat_number)) {
+        if (!in_array($client->classification, ['government','individual']) && !$this->validString($client->vat_number)) {
             $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
         }
 

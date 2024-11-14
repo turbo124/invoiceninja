@@ -17,8 +17,8 @@ return [
     'require_https' => env('REQUIRE_HTTPS', true),
     'app_url' => rtrim(env('APP_URL', ''), '/'),
     'app_domain' => env('APP_DOMAIN', 'invoicing.co'),
-    'app_version' => env('APP_VERSION', '5.10.48'),
-    'app_tag' => env('APP_TAG', '5.10.48'),
+    'app_version' => env('APP_VERSION', '5.10.49'),
+    'app_tag' => env('APP_TAG', '5.10.49'),
     'minimum_client_version' => '5.0.16',
     'terms_version' => '1.0.1',
     'api_secret' => env('API_SECRET', false),
@@ -259,4 +259,5 @@ return [
     'pdf_page_numbering_x_alignment' => env('PDF_PAGE_NUMBER_X', 0),
     'pdf_page_numbering_y_alignment' => env('PDF_PAGE_NUMBER_Y', -6),
     'hosted_einvoice_secret' => env('HOSTED_EINVOICE_SECRET', null),
+    'e_invoice_quota_warning' => env('E_INVOICE_QUOTA_WARNING', 15),
 ];

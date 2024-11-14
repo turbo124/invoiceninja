@@ -76,9 +76,9 @@ class XsltDocumentValidator
             }
             
         }
-        catch(\Exception $e){
+        catch(\Throwable $th){
 
-            $this->errors['general'][] = $e->getMessage();
+            $this->errors['general'][] = $th->getMessage();
         }   
 
         return $this;
