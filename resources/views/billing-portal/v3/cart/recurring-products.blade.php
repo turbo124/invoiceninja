@@ -23,14 +23,14 @@
 
                     <div class="flex flex-col">
                         <h2 class="text-lg font-medium">{{ $product['product_key'] }}</h2>
-                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $this->subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($subscription->frequency_id) }}</span></p>
+                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $this->subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($this->subscription->frequency_id) }}</span></p>
                     </div>
                 </div>
 
                 <div class="flex flex-col-reverse space-y-3">
                     <div class="flex">
-                        @if($subscription->per_seat_enabled)
-                            @if($subscription->use_inventory_management && $product['in_stock_quantity'] < 1)
+                        @if($this->subscription->per_seat_enabled)
+                            @if($this->subscription->use_inventory_management && $product['in_stock_quantity'] < 1)
                                 <p class="text-sm font-light text-red-500 text-right mr-2 mt-2">{{ ctrans('texts.out_of_stock') }}</p>
                             @else
                                 <p class="text-sm font-light text-gray-700 text-right mr-2 mt-2">{{ ctrans('texts.qty') }}</p>
@@ -40,19 +40,13 @@
                                 id="{{ $product['hashed_id'] }}" 
                                 class="rounded-md border-gray-300 shadow-sm sm:text-sm" 
                                 wire:change="quantity($event.target.id, $event.target.value)" 
-                                {{ $subscription->use_inventory_management && $product['in_stock_quantity'] < 1 ? 'disabled' : '' }}
+                                {{ $this->subscription->use_inventory_management && $product['in_stock_quantity'] < 1 ? 'disabled' : '' }}
                                 >
                                 <option {{ $entry['quantity'] == '1' ? 'selected' : '' }}  value="1">1</option>
         
-                                @if($subscription->max_seats_limit > 1)
-                                    @for ($i = 2; $i <= ($subscription->use_inventory_management ? min($this->subscription->max_seats_limit,$product['in_stock_quantity']) : $subscription->max_seats_limit); $i++)
-                                        <option {{ $entry['quantity'] == $i ? 'selected' : '' }}  value="{{ $i }}">{{ $i }}</option>
-                                    @endfor
-                                @else
-                                    @for ($i = 2; $i <= ($subscription->use_inventory_management ? min($product['in_stock_quantity'], min(100,$product['max_quantity'])) : min(100,$product['max_quantity'])); $i++)
-                                        <option {{ $entry['quantity'] == $i ? 'selected' : '' }}  value="{{ $i }}">{{ $i }}</option>
-                                    @endfor
-                                @endif
+                                @for ($i = 1; $i <= $this->subscription->maxQuantity($product); $i++)
+                                    <option {{ $entry['quantity'] == $i ? 'selected' : '' }} value="{{ $i }}">{{ $i }}</option>
+                                @endfor
                             </select>
                         @endif
                     </div>

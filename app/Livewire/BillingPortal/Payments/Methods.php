@@ -29,16 +29,11 @@ class Methods extends Component
 
     public function mount(): void
     {
-        nlog($this->subscription_id);
-
         $total = collect($this->context['products'])->sum('total_raw');
-
 
         $methods = auth()->guard('contact')->user()->client->service()->getPaymentMethods($total); //@todo this breaks down when the cart is in front of the login - we have no context on the user - nor their country/currency()
         
         $this->methods = $methods;
-
-        nlog($methods);
 
     }
 

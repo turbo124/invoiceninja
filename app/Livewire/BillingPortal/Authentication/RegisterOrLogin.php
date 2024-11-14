@@ -125,10 +125,10 @@ class RegisterOrLogin extends Component
         $cc->email = $this->email;
 
         $nmo = new NinjaMailerObject();
-        $nmo->mailable = new OtpCode($this->subscription()->company, $this->context['contact'] ?? null, $code);
+        $nmo->mailable = new OtpCode($this->subscription()->company, $contact, $code);
         $nmo->company = $this->subscription()->company;
         $nmo->settings = $this->subscription()->company->settings;
-        $nmo->to_user = $cc;
+        $nmo->to_user = $contact;
 
         NinjaMailerJob::dispatch($nmo);
 
@@ -161,7 +161,7 @@ class RegisterOrLogin extends Component
         if ($contact) {
             auth()->guard('contact')->loginUsingId($contact->id, true);
 
-            $this->dispatch('purchase.context', property: 'contact', value: $contact);
+            // $this->dispatch('purchase.context', property: 'contact', value: $contact);
             $this->dispatch('purchase.next');
 
             return;
@@ -184,8 +184,6 @@ class RegisterOrLogin extends Component
             additional: $this->additional_fields,
         );
 
-        nlog($data);
-
         $rules = $service->rules();
         $data = Validator::make($data, $rules)->validate();
 
@@ -194,7 +192,7 @@ class RegisterOrLogin extends Component
 
         auth()->guard('contact')->loginUsingId($contact->id, true);
 
-        $this->dispatch('purchase.context', property: 'contact', value: $contact);
+        // $this->dispatch('purchase.context', property: 'contact', value: $contact);
         $this->dispatch('purchase.next');
     }
 
@@ -214,7 +212,7 @@ class RegisterOrLogin extends Component
 
             auth()->guard('contact')->loginUsingId($contact->id, true);
 
-            $this->dispatch('purchase.context', property: 'contact', value: $contact);
+            // $this->dispatch('purchase.context', property: 'contact', value: $contact);
             $this->dispatch('purchase.next');
 
             return;
@@ -264,7 +262,7 @@ class RegisterOrLogin extends Component
     {
         
         if (auth()->guard('contact')->check()) {
-            $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
+            // $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
 
             return;

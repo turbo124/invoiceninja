@@ -88,7 +88,7 @@ class Login extends Component
 
         auth()->guard('contact')->loginUsingId($contact->id, true);
 
-        $this->dispatch('purchase.context', property: 'contact', value: $contact);
+        // $this->dispatch('purchase.context', property: 'contact', value: $contact);
         $this->dispatch('purchase.next');
     }
 
@@ -96,6 +96,7 @@ class Login extends Component
     {
         $code = rand(100000, 999999);
         $email_hash = "subscriptions:otp:{$this->email}";
+        $contact = auth()->guard('contact')->user();
 
         Cache::put($email_hash, $code, 600);
 
@@ -103,7 +104,7 @@ class Login extends Component
         $cc->email = $this->email;
 
         $nmo = new NinjaMailerObject();
-        $nmo->mailable = new OtpCode($this->subscription()->company, $this->context['contact'] ?? null, $code);
+        $nmo->mailable = new OtpCode($this->subscription()->company, $contact ?? null, $code);
         $nmo->company = $this->subscription()->company;
         $nmo->settings = $this->subscription()->company->settings;
         $nmo->to_user = $cc;
@@ -140,7 +141,7 @@ class Login extends Component
         if ($contact) {
             auth()->guard('contact')->loginUsingId($contact->id, true);
 
-            $this->dispatch('purchase.context', property: 'contact', value: $contact);
+            // $this->dispatch('purchase.context', property: 'contact', value: $contact);
             $this->dispatch('purchase.next');
 
             return;
@@ -162,7 +163,7 @@ class Login extends Component
 
         if ($attempt) {
 
-            $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
+            // $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
         }
 
@@ -172,7 +173,7 @@ class Login extends Component
     public function mount()
     {
         if (auth()->guard('contact')->check()) {
-            $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
+            // $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
         }
         

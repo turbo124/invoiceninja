@@ -92,7 +92,7 @@ class Register extends Component
 
         auth()->guard('contact')->loginUsingId($contact->id, true);
 
-        $this->dispatch('purchase.context', property: 'contact', value: $contact);
+        // $this->dispatch('purchase.context', property: 'contact', value: $contact);
         $this->dispatch('purchase.next');
     }
 
@@ -112,7 +112,7 @@ class Register extends Component
 
             auth()->guard('contact')->loginUsingId($contact->id, true);
 
-            $this->dispatch('purchase.context', property: 'contact', value: $contact);
+            // $this->dispatch('purchase.context', property: 'contact', value: $contact);
             $this->dispatch('purchase.next');
 
             return;
@@ -161,7 +161,7 @@ class Register extends Component
     public function mount()
     {
         if (auth()->guard('contact')->check()) {
-            $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
+            // $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
         }
 

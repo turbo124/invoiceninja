@@ -27,6 +27,20 @@ class Coupon extends Component
 
     public ?string $couponCode = null;
 
+    public bool $showCouponCode = false;
+
+    public function mount()
+    {
+        $subscription = $this->subscription();
+        $this->showCouponCode = ($subscription->promo_discount > 0) && (!array_key_exists('valid_coupon',$this->context));
+        
+        if(isset($this->context['request_data']['coupon']) && $this->context['request_data']['coupon'] == $this->subscription()->promo_code){
+            $this->showCouponCode = false;
+            $this->dispatch('purchase.context', property: "valid_coupon", value: $this->context['request_data']['coupon']);
+        }
+
+    }
+
     #[Computed()]
     public function subscription()
     {
@@ -35,32 +49,28 @@ class Coupon extends Component
 
     public function applyCoupon()
     {
+
         $this->validate([
             'couponCode' => ['required', 'string', 'min:3'],
         ]);
 
         try {
-            
+        
             if($this->couponCode == $this->subscription()->promo_code) {
-
-            
-                $this->couponCode = null;
-
+                $this->showCouponCode = false;
+                $this->dispatch('purchase.context', property: "valid_coupon", value: $this->couponCode);
+                $this->dispatch('summary.refresh');
             }
             else {
-                $this->addError('couponCode', 'Invalid coupon code.');
+                $this->addError('couponCode', ctrans('texts.invalid_coupon'));
             }
 
-            
         } catch (\Exception $e) {
-            $this->addError('couponCode', 'Invalid coupon code.');
+            $this->addError('couponCode', ctrans('texts.invalid_coupon'));
         }
-    }
 
-    // public function quantity($id, $value): void
-    // {
-    //     $this->dispatch('purchase.context', property: "bundle.optional_one_time_products.{$id}.quantity", value: $value);
-    // }
+
+    }
 
     public function render(): \Illuminate\View\View
     {

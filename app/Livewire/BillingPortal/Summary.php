@@ -82,63 +82,99 @@ class Summary extends Component
         }
 
         $this->dispatch('purchase.context', property: 'bundle', value: $bundle);
+       
     }
 
-    public function oneTimePurchasesTotal(bool $raw = false)
+   /**
+     * Base calculations for one-time purchases
+     */
+    #[Computed]
+    public function oneTimePurchasesTotal(): float
     {
-        if (isset($this->context['bundle']['recurring_products']) === false) {
-            return 0;
+        if (!isset($this->context['bundle']['one_time_products'])) {
+            return 0.0;
         }
 
         $one_time = collect($this->context['bundle']['one_time_products'])->sum(function ($item) {
-            return $item['product']['price'] * $item['quantity'];
+            return (float)$item['product']['price'] * (float)$item['quantity'];
         });
 
         $one_time_optional = collect($this->context['bundle']['optional_one_time_products'])->sum(function ($item) {
-            return $item['product']['price'] * $item['quantity'];
+            return (float)$item['product']['price'] * (float)$item['quantity'];
         });
 
-        if ($raw) {
-            return $one_time + $one_time_optional;
-        }
-
-        return Number::formatMoney($one_time + $one_time_optional, $this->subscription()->company);
-
+        return (float)$one_time + (float)$one_time_optional;
     }
 
-    public function recurringPurchasesTotal(bool $raw = false)
+    /**
+     * Base calculations for recurring purchases
+     */
+    #[Computed]
+    public function recurringPurchasesTotal(): float
     {
-        if (isset($this->context['bundle']['recurring_products']) === false) {
-            return 0;
+        if (!isset($this->context['bundle']['recurring_products'])) {
+            return 0.0;
         }
 
         $recurring = collect($this->context['bundle']['recurring_products'])->sum(function ($item) {
-            return $item['product']['price'] * $item['quantity'];
+            return (float)$item['product']['price'] * (float)$item['quantity'];
         });
 
         $recurring_optional = collect($this->context['bundle']['optional_recurring_products'])->sum(function ($item) {
-            return $item['product']['price'] * $item['quantity'];
+            return (float)$item['product']['price'] * (float)$item['quantity'];
         });
 
-        if ($raw) {
-            return $recurring + $recurring_optional;
+        return (float)$recurring + (float)$recurring_optional;
+    }
+
+    /**
+     * Calculate subtotal before any discounts
+     */
+    #[Computed]
+    protected function calculateSubtotal(): float
+    {
+        return $this->oneTimePurchasesTotal() + $this->recurringPurchasesTotal();
+    }
+
+    /**
+     * Calculate discount amount based on subtotal
+     */
+    #[Computed]
+    public function discount(): float
+    {
+        if (!isset($this->context['valid_coupon']) || 
+            $this->context['valid_coupon'] != $this->subscription()->promo_code) {
+            return 0.0;
         }
 
-        return \sprintf(
-            '%s/%s',
-            Number::formatMoney($recurring + $recurring_optional, $this->subscription()->company),
-            RecurringInvoice::frequencyForKey($this->subscription()->frequency_id ?? 0)
+        $subscription = $this->subscription();
+        $discount = $subscription->promo_discount;
+        
+        return $subscription->is_amount_discount 
+            ? $discount 
+            : ($this->calculateSubtotal() * $discount/100);
+    }
+
+    /**
+     * Format subtotal for display
+     */
+    #[Computed]
+    public function subtotal(): string
+    {
+        return Number::formatMoney(
+            $this->calculateSubtotal(),
+            $this->subscription()->company
         );
     }
 
-    #[Computed()]
-    public function total()
+    /**
+     * Calculate and format final total
+     */
+    #[Computed]
+    public function total(): string
     {
         return Number::formatMoney(
-            collect([
-                $this->oneTimePurchasesTotal(raw: true),
-                $this->recurringPurchasesTotal(raw: true),
-            ])->sum(),
+            $this->calculateSubtotal() - $this->discount(),
             $this->subscription()->company
         );
     }
@@ -190,6 +226,23 @@ class Summary extends Component
         $this->dispatch('purchase.context', property: 'products', value: $products);
 
         return $products;
+    }
+
+    #[On('summary.refresh')] 
+    public function refresh()
+    {
+        // nlog("am i refreshing here?");
+
+        // $this->oneTimePurchasesTotal = $this->oneTimePurchasesTotal();
+        // $this->recurringPurchasesTotal = $this->recurringPurchasesTotal();
+        // $this->discount = $this->discount();
+
+        // nlog($this->oneTimePurchasesTotal);
+        // nlog($this->recurringPurchasesTotal);
+        // nlog($this->discount);
+
+
+
     }
 
     public function render()

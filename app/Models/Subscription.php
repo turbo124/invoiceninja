@@ -214,10 +214,14 @@ class Subscription extends BaseModel
         $in_stock_quantity = data_get($product, 'in_stock_quantity', 0);
         $max_limit = 100;
 
-        if(!$this->use_inventory_management)
-            return $max_quantity != 0 ? $max_quantity : $max_limit;
+        if (!$this->use_inventory_management) {
+            return min($max_limit, $max_quantity > 0 ? $max_quantity : $max_limit);
+        }
 
-        return $max_quantity !=0 ? $max_quantity : min($max_limit, $in_stock_quantity);
-        
+        if ($max_quantity > 0) {
+            return min($max_limit, $max_quantity);
+        }
+
+        return min($max_limit, $in_stock_quantity);
     }
 }

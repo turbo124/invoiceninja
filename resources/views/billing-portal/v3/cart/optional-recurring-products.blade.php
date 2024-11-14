@@ -23,22 +23,22 @@
 
                     <div class="flex flex-col">
                         <h2 class="text-lg font-medium">{{ $product['product_key'] }}</h2>
-                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $this->subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($subscription->frequency_id) }}</span></p>
+                        <p class="block text-sm">{{ \App\Utils\Number::formatMoney($product['price'], $this->subscription['company']) }} / <span class="lowercase">{{ App\Models\RecurringInvoice::frequencyForKey($this->subscription->frequency_id) }}</span></p>
                     </div>
                 </div>
 
                 <div class="flex flex-col-reverse space-y-3">
                     <div class="flex">
                         
-                        @if($subscription->use_inventory_management && $product['in_stock_quantity'] <= 0)
+                        @if($this->subscription->use_inventory_management && $product['in_stock_quantity'] <= 0)
                             <p class="text-sm font-light text-red-500 text-right mr-2 mt-2">{{ ctrans('texts.out_of_stock') }}</p>
                         @else
                             <p class="text-sm font-light text-gray-700 text-right mr-2 mt-2">{{ ctrans('texts.qty') }}</p>
                         @endif
 
-                        <select id="{{ $product['hashed_id'] }}" wire:change="quantity($event.target.id, $event.target.value)" class="rounded-md border-gray-300 shadow-sm sm:text-sm" {{ $subscription->use_inventory_management && $product['in_stock_quantity'] < 1 ? 'disabled' : '' }}>
+                        <select id="{{ $product['hashed_id'] }}" wire:change="quantity($event.target.id, $event.target.value)" class="rounded-md border-gray-300 shadow-sm sm:text-sm" {{ $this->subscription->use_inventory_management && $product['in_stock_quantity'] < 1 ? 'disabled' : '' }}>
                             <option {{ $entry['quantity'] == '0' ? 'selected' : '' }} value="0" selected="selected">0</option>
-                            @for ($i = 1; $i <= $subscription->maxQuantity($product); $i++)
+                            @for ($i = 1; $i <= $this->subscription->maxQuantity($product); $i++)
                                 <option {{ $entry['quantity'] == $i ? 'selected' : '' }} value="{{ $i }}">{{ $i }}</option>
                             @endfor
                         </select>
