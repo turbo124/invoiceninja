@@ -148,7 +148,7 @@ class EntityLevel
 
                 foreach($p->getErrors() as $error)
                 {
-                    $this->errors['invoice'][] = ['field' => $error, 'label' => 'error'];
+                    $this->errors['invoice'][] = $error;
                 }
             }
 
