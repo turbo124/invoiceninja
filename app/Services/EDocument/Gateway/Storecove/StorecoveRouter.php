@@ -138,7 +138,7 @@ class StorecoveRouter
         }
         
         //DE we can route via Steurnummer? double check with storecove @blocked
-        if($country = "DE" && $classification == 'individual'){
+        if($country == "DE" && $classification == 'individual'){
             return 'DE:STNR';
         }
 

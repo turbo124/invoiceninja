@@ -435,11 +435,15 @@ class Storecove
 
         $uri = "legal_entities/{$legal_entity_id}/additional_tax_identifiers";
 
+        $identifier = preg_replace('/^[^0-9]{2}/', '', $identifier);
+
         $data = [
             "identifier" => $identifier,
             "scheme" => $scheme,
             "superscheme" => "iso6523-actorid-upis",
         ];
+
+        nlog($data);
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $data);
 

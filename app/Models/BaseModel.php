@@ -409,6 +409,7 @@ class BaseModel extends Model
      * into a single document
      *
      * @param  string $pdf
+     * @todo need to provide a fallback here in case the headers of the PDF do not allow merging
      * @return mixed
      */
     public function documentMerge(string $pdf): mixed
@@ -439,6 +440,8 @@ class BaseModel extends Model
 
         try {
             $pdf = (new PdfMerge($files->flatten()->toArray()))->run();
+            return $pdf;
+
         } catch(\Exception $e) {
             nlog("Exception:: BaseModel:: PdfMerge::" . $e->getMessage());
         }
