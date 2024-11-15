@@ -36,17 +36,17 @@ class InvoiceSumInclusive
 
     public $invoice_item;
 
-    public $total_taxes;
+    public $total_taxes = 0;
 
-    private $total;
+    private $total = 0;
 
-    private $total_discount;
+    private $total_discount = 0;
 
     private $total_custom_values;
 
     private $total_tax_map;
 
-    private $sub_total;
+    private $sub_total = 0;
 
     private $precision;
 

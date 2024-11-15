@@ -26,6 +26,39 @@ use XSLTProcessor;
 
 class EntityLevel
 {
+    private array $eu_country_codes = [
+            'AT', // Austria
+            'BE', // Belgium
+            'BG', // Bulgaria
+            'CY', // Cyprus
+            'CZ', // Czech Republic
+            'DE', // Germany
+            'DK', // Denmark
+            'EE', // Estonia
+            'ES', // Spain
+            'ES-CN', // Canary Islands
+            'ES-CE', // Ceuta
+            'ES-ML', // Melilla
+            'FI', // Finland
+            'FR', // France
+            'GR', // Greece
+            'HR', // Croatia
+            'HU', // Hungary
+            'IE', // Ireland
+            'IT', // Italy
+            'LT', // Lithuania
+            'LU', // Luxembourg
+            'LV', // Latvia
+            'MT', // Malta
+            'NL', // Netherlands
+            'PL', // Poland
+            'PT', // Portugal
+            'RO', // Romania
+            'SE', // Sweden
+            'SI', // Slovenia
+            'SK', // Slovakia
+    ];
+
     private array $client_fields = [
         'address1',
         'city',
@@ -110,10 +143,22 @@ class EntityLevel
 
         try{
             $xml = $p->run()->toXml();
+
+            if(count($p->getErrors()) >= 1){
+
+                foreach($p->getErrors() as $error)
+                {
+                    $this->errors['invoice'][] = ['field' => $error, 'label' => 'error'];
+                }
+            }
+
         }
         catch(PeppolValidationException $e) {
             $this->errors['invoice'] = ['field' => $e->getInvalidField(), 'label' => $e->getInvalidField()];
-        };
+        }
+        catch(\Throwable $th){
+
+        }
 
         if($xml){
             // Second pass through the XSLT validator
@@ -158,8 +203,8 @@ class EntityLevel
 
         }
 
-        //If not an individual, you MUST have a VAT number
-        if (!in_array($client->classification, ['government','individual']) && !$this->validString($client->vat_number)) {
+        //If not an individual, you MUST have a VAT number if you are in the EU
+        if (!in_array($client->classification, ['government', 'individual']) && in_array($client->country->iso_3166_2, $this->eu_country_codes) && !$this->validString($client->vat_number)) {
             $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
         }
 
