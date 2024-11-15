@@ -180,7 +180,7 @@ class Storecove
         nlog($payload);
         nlog($r->body());
 
-        return false;
+        return $r;
 
     }
     
