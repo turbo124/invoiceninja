@@ -165,7 +165,7 @@ class Storecove
      * @todo
      * @param  array $payload
      */
-    public function sendJsonDocument(array $payload)
+    public function sendJsonDocument(array $payload): string|\Illuminate\Http\Client\Response
     {
         
         $uri = "document_submissions";
