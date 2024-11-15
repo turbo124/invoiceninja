@@ -582,6 +582,21 @@ class InvoiceController extends BaseController
             return $this->listResponse(Invoice::withTrashed()->whereIn('id', $this->transformKeys($ids))->company());
         }
 
+        if(in_array($action, ['email','send_email'])) {
+            
+            $invoice = $invoices->first();
+
+            if($user->can('edit', $invoice)){
+
+                $template = $request->input('email_type', $invoice->calculateTemplate('invoice'));
+
+                BulkInvoiceJob::dispatch($invoices->pluck('id')->toArray(), $user->company()->db, $template);
+
+            }
+
+            return $this->listResponse(Invoice::withTrashed()->whereIn('id', $this->transformKeys($ids))->company());
+
+        }
         /*
          * Send the other actions to the switch
          */
@@ -749,19 +764,6 @@ class InvoiceController extends BaseController
                 $invoice = $invoice->service()->handleCancellation()->save();
                 if (! $bulk) {
                     $this->itemResponse($invoice);
-                }
-                break;
-
-            case 'email':
-            case 'send_email':
-                //check query parameter for email_type and set the template else use calculateTemplate
-
-                $template = request()->has('email_type') ? request()->input('email_type') : $invoice->calculateTemplate('invoice');
-
-                BulkInvoiceJob::dispatch($invoice, $template);
-
-                if (! $bulk) {
-                    return response()->json(['message' => 'email sent'], 200);
                 }
                 break;
 

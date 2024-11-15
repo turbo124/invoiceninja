@@ -155,6 +155,8 @@ class Peppol extends AbstractService
 
     private string $tax_category_id;
 
+    private array $errors = [];
+
     public function __construct(public Invoice $invoice)
     {
         $this->company = $invoice->company;
@@ -171,69 +173,68 @@ class Peppol extends AbstractService
      */
     public function run(): self
     {
-        $this->getJurisdiction(); //Sets the nexus object into the Peppol document.
-        $this->getAllUsedTaxes(); //Maps all used line item taxes
+        try {
+            $this->getJurisdiction(); //Sets the nexus object into the Peppol document.
+            $this->getAllUsedTaxes(); //Maps all used line item taxes
 
-        /** Invoice Level Props */
-        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
-        $id->value = $this->customizationID;
-        $this->p_invoice->CustomizationID = $id;
+            /** Invoice Level Props */
+            $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CustomizationID();
+            $id->value = $this->customizationID;
+            $this->p_invoice->CustomizationID = $id;
 
-        $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ProfileID();
-        $id->value = $this->profileID;
-        $this->p_invoice->ProfileID = $id;
+            $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ProfileID();
+            $id->value = $this->profileID;
+            $this->p_invoice->ProfileID = $id;
 
-        $this->p_invoice->ID = $this->invoice->number;
-        $this->p_invoice->IssueDate = new \DateTime($this->invoice->date);
+            $this->p_invoice->ID = $this->invoice->number;
+            $this->p_invoice->IssueDate = new \DateTime($this->invoice->date);
 
-        if($this->invoice->due_date) 
-            $this->p_invoice->DueDate = new \DateTime($this->invoice->due_date);
+            if($this->invoice->due_date) 
+                $this->p_invoice->DueDate = new \DateTime($this->invoice->due_date);
 
-        if(strlen($this->invoice->public_notes ?? '') > 0)
-            $this->p_invoice->Note = strip_tags($this->invoice->public_notes);
+            if(strlen($this->invoice->public_notes ?? '') > 0)
+                $this->p_invoice->Note = strip_tags($this->invoice->public_notes);
 
-        $this->p_invoice->DocumentCurrencyCode = $this->invoice->client->currency()->code;
+            $this->p_invoice->DocumentCurrencyCode = $this->invoice->client->currency()->code;
 
-        if ($this->invoice->date && $this->invoice->due_date) {
-            $ip = new InvoicePeriod();
-            $ip->StartDate = new \DateTime($this->invoice->date);
-            $ip->EndDate = new \DateTime($this->invoice->due_date);
-            $this->p_invoice->InvoicePeriod = [$ip];
+            if ($this->invoice->date && $this->invoice->due_date) {
+                $ip = new InvoicePeriod();
+                $ip->StartDate = new \DateTime($this->invoice->date);
+                $ip->EndDate = new \DateTime($this->invoice->due_date);
+                $this->p_invoice->InvoicePeriod = [$ip];
+            }
+            
+            if ($this->invoice->project_id) {
+                $pr = new \InvoiceNinja\EInvoice\Models\Peppol\ProjectReferenceType\ProjectReference();
+                $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
+                $id->value = $this->invoice->project->number;
+                $pr->ID = $id;
+                $this->p_invoice->ProjectReference = [$pr];
+            }
+
+            /** Auto switch between Invoice / Credit based on the amount value */
+            $this->p_invoice->InvoiceTypeCode = ($this->invoice->amount >= 0) ? 380 : 381;
+
+            $this->p_invoice->AccountingSupplierParty = $this->getAccountingSupplierParty();
+            $this->p_invoice->AccountingCustomerParty = $this->getAccountingCustomerParty();
+            $this->p_invoice->InvoiceLine = $this->getInvoiceLines();
+            $this->p_invoice->AllowanceCharge = $this->getAllowanceCharges();
+            $this->p_invoice->LegalMonetaryTotal = $this->getLegalMonetaryTotal();
+            $this->p_invoice->Delivery = $this->getDelivery();
+
+            $this->setOrderReference()->setTaxBreakdown();
+
+            //isolate this class to only peppol changes
+            $this->p_invoice = $this->gateway
+                                    ->mutator
+                                    ->senderSpecificLevelMutators()
+                                    ->receiverSpecificLevelMutators()
+                                    ->getPeppol();
+
+        }catch(\Throwable $th) {
+            nlog("Unable to create Peppol Invoice" . $th->getMessage());
+            $this->errors[] = $th->getMessage();
         }
-        
-        if ($this->invoice->project_id) {
-            $pr = new \InvoiceNinja\EInvoice\Models\Peppol\ProjectReferenceType\ProjectReference();
-            $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\ID();
-            $id->value = $this->invoice->project->number;
-            $pr->ID = $id;
-            $this->p_invoice->ProjectReference = [$pr];
-        }
-
-        /** Auto switch between Invoice / Credit based on the amount value */
-        $this->p_invoice->InvoiceTypeCode = ($this->invoice->amount >= 0) ? 380 : 381;
-
-        $this->p_invoice->AccountingSupplierParty = $this->getAccountingSupplierParty();
-        $this->p_invoice->AccountingCustomerParty = $this->getAccountingCustomerParty();
-        $this->p_invoice->InvoiceLine = $this->getInvoiceLines();
-        $this->p_invoice->AllowanceCharge = $this->getAllowanceCharges();
-        $this->p_invoice->LegalMonetaryTotal = $this->getLegalMonetaryTotal();
-        $this->p_invoice->Delivery = $this->getDelivery();
-
-        $this->setOrderReference()->setTaxBreakdown();
-
-        //isolate this class to only peppol changes
-        $this->p_invoice = $this->gateway
-                                ->mutator
-                                ->senderSpecificLevelMutators()
-                                ->receiverSpecificLevelMutators()
-                                ->getPeppol();
-                                
-        //** @todo double check this logic, this will only ever write the doc once */
-        // if(is_null($this->invoice->backup))
-        // {
-        //     $this->invoice->e_invoice = $this->toObject();
-        //     $this->invoice->save();
-        // }
 
         return $this;
 
@@ -1449,6 +1450,11 @@ class Peppol extends AbstractService
         $country_code = $is_client ? $this->invoice->client->country->iso_3166_2 : $this->company->country()->iso_3166_2;
 
         return '0037';
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
 }

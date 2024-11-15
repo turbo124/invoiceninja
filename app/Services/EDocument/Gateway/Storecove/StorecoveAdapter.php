@@ -53,8 +53,15 @@ class StorecoveAdapter
 
     private string $nexus;
 
+    private bool $has_error = false;
+
     public function validate(): self
     {
+        
+        if ($this->has_error) {
+            return $this;
+        }
+
         return $this;
     }
 
@@ -97,14 +104,6 @@ class StorecoveAdapter
 
         $storecove_object = $serializer->normalize($obj, null, [\Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
 
-        // return $storecove_object;
-        // $storecove_object = $serializer->encode($storecove_object, 'json', $context);
-        // return $storecove_object;
-        // return $data;
-        // $object = $serializer->denormalize(json_encode($storecove_object['document']['invoice']), \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class, 'json', [\Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
-        
-        // return $storecove_object;
-            
         return $serializer->deserialize(json_encode($storecove_object), \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class, 'json', $context);
 
     }
@@ -117,26 +116,33 @@ class StorecoveAdapter
      */
     public function transform($invoice): self
     {
-        $this->ninja_invoice = $invoice;
-        $serializer = $this->getSerializer();
+        try {
+            $this->ninja_invoice = $invoice;
+            $serializer = $this->getSerializer();
 
-        /** Currently - due to class structures, the serialization process goes like this:
-         * 
-         * e-invoice => Peppol -> XML -> Peppol Decoded -> encode to Peppol -> deserialize to Storecove
-         */
-        $p = (new Peppol($invoice))->run()->toXml();
-        $context = [
-            DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
-            AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
-        ];
+            /** Currently - due to class structures, the serialization process goes like this:
+             * 
+             * e-invoice => Peppol -> XML -> Peppol Decoded -> encode to Peppol -> deserialize to Storecove
+             */
+            $p = (new Peppol($invoice))->run()->toXml();
+            $context = [
+                DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+            ];
 
-        $e = new \InvoiceNinja\EInvoice\EInvoice();
-        $peppolInvoice = $e->decode('Peppol', $p, 'xml');
-        $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
-        $peppolInvoice = $e->encode($peppolInvoice, 'json');
-        $this->storecove_invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
+            $e = new \InvoiceNinja\EInvoice\EInvoice();
+            $peppolInvoice = $e->decode('Peppol', $p, 'xml');
+            $parent = \App\Services\EDocument\Gateway\Storecove\Models\Invoice::class;
+            $peppolInvoice = $e->encode($peppolInvoice, 'json');
+            $this->storecove_invoice = $serializer->deserialize($peppolInvoice, $parent, 'json', $context);
 
-        $this->buildNexus();
+            $this->buildNexus();
+        }
+        catch(\Throwable $th){
+
+            $this->addError($th->getMessage());
+            $this->has_error = true;
+        }
 
         return $this;
 
@@ -149,6 +155,9 @@ class StorecoveAdapter
 
     public function decorate(): self
     {
+        if($this->has_error)
+            return $this;
+
         //set all taxmap countries - resolve the taxing country
         $lines = $this->storecove_invoice->getInvoiceLines();
 
@@ -298,6 +307,11 @@ class StorecoveAdapter
      */
     public function getDocument(): mixed
     {
+
+        if($this->has_error)
+            return ['errors' => $this->getErrors(), 'document' => false];
+        
+        
         $serializer = $this->getSerializer();
 
         $context = [
