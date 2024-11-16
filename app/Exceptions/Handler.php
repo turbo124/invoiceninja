@@ -110,10 +110,13 @@ class Handler extends ExceptionHandler
                     'email' => 'anonymous@example.com',
                     'name'  => 'Unknown User',
                 ]);
-
+                              
+            });
+            
             if ($this->validException($exception) && $this->sentryShouldReport($exception)) {
                 Integration::captureUnhandledException($exception);
             }
+
         }
 
         parent::report($exception);
