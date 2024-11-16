@@ -247,7 +247,7 @@ class InvoiceItemSumInclusive
         $item_tax += $this->formatValue($item_tax_rate1_total, $this->currency->precision);
 
         if (strlen($this->item->tax_name1) > 1) {
-            $this->groupTax($this->item->tax_name1, $this->item->tax_rate1, $item_tax_rate1_total, $amount, $this->item->tax_id);
+            $this->groupTax($this->item->tax_name1, $this->item->tax_rate1, $item_tax_rate1_total, $amount, $this->item->tax_id ?? '1');
         }
 
         $item_tax_rate2_total = $this->calcInclusiveLineTax($this->item->tax_rate2, $amount);
@@ -255,7 +255,7 @@ class InvoiceItemSumInclusive
         $item_tax += $this->formatValue($item_tax_rate2_total, $this->currency->precision);
 
         if (strlen($this->item->tax_name2) > 1) {
-            $this->groupTax($this->item->tax_name2, $this->item->tax_rate2, $item_tax_rate2_total, $amount, $this->item->tax_id);
+            $this->groupTax($this->item->tax_name2, $this->item->tax_rate2, $item_tax_rate2_total, $amount, $this->item->tax_id ?? '1');
         }
 
         $item_tax_rate3_total = $this->calcInclusiveLineTax($this->item->tax_rate3, $amount);
@@ -263,7 +263,7 @@ class InvoiceItemSumInclusive
         $item_tax += $this->formatValue($item_tax_rate3_total, $this->currency->precision);
 
         if (strlen($this->item->tax_name3) > 1) {
-            $this->groupTax($this->item->tax_name3, $this->item->tax_rate3, $item_tax_rate3_total, $amount, $this->item->tax_id);
+            $this->groupTax($this->item->tax_name3, $this->item->tax_rate3, $item_tax_rate3_total, $amount, $this->item->tax_id ?? '1');
         }
 
         $this->item->tax_amount = $this->formatValue($item_tax, $this->currency->precision);
@@ -379,7 +379,7 @@ class InvoiceItemSumInclusive
             $item_tax += $item_tax_rate1_total;
 
             if ($item_tax_rate1_total != 0) {
-                $this->groupTax($this->item->tax_name1, $this->item->tax_rate1, $item_tax_rate1_total, $amount, $this->item->tax_id);
+                $this->groupTax($this->item->tax_name1, $this->item->tax_rate1, $item_tax_rate1_total, $amount, $this->item->tax_id ?? '1');
             }
 
             $item_tax_rate2_total = $this->calcInclusiveLineTax($this->item->tax_rate2, $amount);
@@ -387,7 +387,7 @@ class InvoiceItemSumInclusive
             $item_tax += $item_tax_rate2_total;
 
             if ($item_tax_rate2_total != 0) {
-                $this->groupTax($this->item->tax_name2, $this->item->tax_rate2, $item_tax_rate2_total, $amount, $this->item->tax_id);
+                $this->groupTax($this->item->tax_name2, $this->item->tax_rate2, $item_tax_rate2_total, $amount, $this->item->tax_id) ?? '1';
             }
 
             $item_tax_rate3_total = $this->calcInclusiveLineTax($this->item->tax_rate3, $amount);
@@ -395,7 +395,7 @@ class InvoiceItemSumInclusive
             $item_tax += $item_tax_rate3_total;
 
             if ($item_tax_rate3_total != 0) {
-                $this->groupTax($this->item->tax_name3, $this->item->tax_rate3, $item_tax_rate3_total, $amount, $this->item->tax_id);
+                $this->groupTax($this->item->tax_name3, $this->item->tax_rate3, $item_tax_rate3_total, $amount, $this->item->tax_id) ?? '1';
             }
 
             $this->setTotalTaxes($this->getTotalTaxes() + $item_tax);
