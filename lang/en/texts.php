@@ -5462,6 +5462,7 @@ $lang = array(
     'account_holder_help' => 'The name of the account',
     'activity_148' => 'E-Expense :expense received from :vendor',
     'additional_tax_identifiers' => 'Additional Tax Identifiers',
+    'additional_tax_identifiers_help' => 'If you are registered for VAT in other regions, you can add your VAT numbers for those regions here.',
     'configure' => 'Configure',
     'new_identifier' => 'New VAT Number',
     'notification_credits_low' => 'Warning! Your credit balance is low.',
