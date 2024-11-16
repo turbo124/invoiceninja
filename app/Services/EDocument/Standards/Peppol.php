@@ -762,7 +762,6 @@ class Peppol extends AbstractService
 
             $_item->ClassifiedTaxCategory[] = $ctc;
         
-
             if ($item->tax_rate2 > 0) {
                 $ctc = new ClassifiedTaxCategory();
                 $ctc->ID = new ID();

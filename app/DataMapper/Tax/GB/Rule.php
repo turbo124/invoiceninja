@@ -43,7 +43,6 @@ class Rule extends BaseRule implements RuleInterface
 
     public string $tax_name1 = 'VAT';
 
-    private string $tax_name;
     /**
      * Initializes the rules and builds any required data.
      *
@@ -51,6 +50,7 @@ class Rule extends BaseRule implements RuleInterface
      */
     public function init(): self
     {
+        
         $this->calculateRates();
 
         return $this;
@@ -65,10 +65,11 @@ class Rule extends BaseRule implements RuleInterface
     public function taxByType($item): self
     {
 
-        if ($this->client->is_tax_exempt || !property_exists($item, 'tax_id')) {
+        
+        if ($this->client->is_tax_exempt || !property_exists($item, 'tax_id') || (isset($item->type_id) && $item->type_id == '5')) {
             return $this->taxExempt($item);
         }
-
+        
         match(intval($item->tax_id)) {
             Product::PRODUCT_TYPE_EXEMPT => $this->taxExempt($item),
             Product::PRODUCT_TYPE_DIGITAL => $this->taxDigital($item),
@@ -92,7 +93,7 @@ class Rule extends BaseRule implements RuleInterface
      */
     public function reverseTax($item): self
     {
-        $this->tax_rate1 = 20;
+        $this->tax_rate1 = 0;
         $this->tax_name1 = 'VAT';
 
         return $this;
@@ -215,14 +216,49 @@ class Rule extends BaseRule implements RuleInterface
      */
     public function override($item): self
     {
+        
+        $this->tax_rate1 = $item->tax_rate1;
+        $this->tax_name1 = $item->tax_name1;
+        $this->tax_rate2 = $item->tax_rate2;
+        $this->tax_name2 = $item->tax_name2;
+        $this->tax_rate3 = $item->tax_rate3;
+        $this->tax_name3 = $item->tax_name3;
+
         return $this;
     }
 
     /**
-     * Calculates the tax rates based on the client's location.
-     *
-     * @return self
-     */
+    * Calculates the tax rates based on the client's location.
+    *
+    * Internal (UK) Sales:
+    * - Standard rate: 20%
+    * - Reduced rate: 5%
+    * - Zero rate: 0% (still VAT registered but charge no VAT)
+    * - Exempt: No VAT registration required
+    *
+    * External Sales:
+    * 1. To EU Businesses (B2B):
+    *    - Zero-rated (0%)
+    *    - Reverse charge applies (customer pays VAT in their country)
+    *    - Must validate EU VAT number
+    *    - Must report in EC Sales List
+    *
+    * 2. To EU Consumers (B2C):
+    *    - Charge UK VAT rate (20%)
+    *    - Unless distance selling threshold exceeded in destination country
+    *    - Then must register for VAT in that country
+    *
+    * 3. To Non-EU (Rest of World):
+    *    - Zero-rated (0%)
+    *    - Export documentation required
+    *
+    * Special Cases:
+    * - Northern Ireland (GB-NIR): Follows EU VAT rules for goods but UK rules for services
+    * - Channel Islands: Outside UK & EU VAT area
+    * - Digital Services: Special rules apply (check MOSS registration)
+    *
+    * @return self
+    */
     public function calculateRates(): self
     {
         if ($this->client->is_tax_exempt) {
@@ -233,9 +269,38 @@ class Rule extends BaseRule implements RuleInterface
             return $this;
         }
 
-        // $this->tax_rate = $this->client->company->tax_data->regions->UK->subregions->{$this->client->company->country()->iso_3166_2}->tax_rate ?? 0;
-        // $this->reduced_tax_rate = $this->client->company->tax_data->regions->UK->subregions->{$this->client->company->country()->iso_3166_2}->tax_rate ?? 0;
+        // GB => GB sales
+        if($this->client_subregion == 'GB') {
 
+            $this->tax_name = $this->client->company->tax_data->regions->UK->subregions->GB->tax_name;
+            $this->tax_rate = $this->client->company->tax_data->regions->UK->subregions->GB->tax_rate ?? 0;
+
+            return $this;
+        }
+        
+        $is_over_threshold = $this->client->company->tax_data->regions->EU->has_sales_above_threshold ?? false;
+
+        //GB => EU sales - Reverse Charge
+        if (in_array($this->client_subregion, $this->eu_country_codes) && !in_array($this->client->classification, ['','individual'])) {
+
+            $this->tax_name = 'VAT';
+            $this->tax_rate = 0;
+
+            return $this;
+        }
+        elseif(in_array($this->client_subregion, $this->eu_country_codes) && $is_over_threshold) {
+            
+            $this->tax_name = $this->client->company->tax_data->regions->EU->subregions->{$this->client->country->iso_3166_2}->tax_name;
+            $this->tax_rate = $this->client->company->tax_data->regions->EU->subregions->{$this->client->country->iso_3166_2}->tax_rate ?? 0;
+            
+            return $this;
+        }
+        
+        // must be tax exempt at this point
+
+            $this->tax_name = 'VAT';
+            $this->tax_rate = 0;
+        
         return $this;
 
     }

@@ -63,6 +63,11 @@ class InvoiceItemSum
         'SE', // Sweden
         'SI', // Slovenia
         'SK', // Slovakia
+
+        'NO', //NORWAY - EEA
+        'IS', //ICELAND - EEA
+        'LI', //Liechtenstein - EEA
+        
     ];
 
     private array $tax_jurisdictions = [
@@ -97,9 +102,15 @@ class InvoiceItemSum
         'SI', // Slovenia
         'SK', // Slovakia
 
+        'NO', //NORWAY - EEA
+        'IS', //ICELAND - EEA
+        'LI', //Liechtenstein - EEA
+
         'US', // USA
 
         'AU', // Australia
+
+        'GB', // GB
     ];
 
     protected RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice;

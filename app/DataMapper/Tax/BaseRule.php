@@ -106,6 +106,8 @@ class BaseRule implements RuleInterface
             'US' => 'US', // United States
 
             'AU' => 'AU', // Australia
+
+            'GB' => 'UK', //Great Britain
     ];
 
     /** EU TAXES */
@@ -263,6 +265,7 @@ class BaseRule implements RuleInterface
             'US' => $this->client_subregion = isset($this->invoice?->client?->tax_data?->geoState) ? $this->invoice->client->tax_data->geoState : $this->getUSState(),
             'EU' => $this->client_subregion = $this->client->country->iso_3166_2,
             'AU' => $this->client_subregion = 'AU',
+            'UK' => $this->client_subregion = 'GB',
             default => $this->client_subregion = $this->client->country->iso_3166_2,
         };
 
