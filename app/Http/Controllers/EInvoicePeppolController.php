@@ -22,6 +22,7 @@ use App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest;
 
 class EInvoicePeppolController extends BaseController
 {
+    
     /**
      * Returns the legal entity ID
      * 
@@ -170,10 +171,17 @@ class EInvoicePeppolController extends BaseController
      */
     public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): JsonResponse
     {
+        
         $company = auth()->user()->company();
         $tax_data = $company->tax_data;
 
-        $additional_vat = $tax_data->regions->EU->subregions->{$request->country}->vat_number ?? null;
+        $vat_number = $request->vat_number;
+        $country = $request->country;
+
+        if($country == 'GB')
+            $additional_vat = $tax_data->regions->UK->subregions->{$country}->vat_number ?? null;
+        else
+            $additional_vat = $tax_data->regions->EU->subregions->{$country}->vat_number ?? null;
 
         if (!is_null($additional_vat) && !empty($additional_vat)) {
             return response()->json(['message' => 'Identifier already exists for this region.'], 400);
@@ -188,7 +196,11 @@ class EInvoicePeppolController extends BaseController
             return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
         }
 
-        $tax_data->regions->EU->subregions->{$request->country}->vat_number = $request->vat_number;
+        if($country == 'GB')
+            $tax_data->regions->UK->subregions->{$country}->vat_number = $vat_number;
+        else
+            $tax_data->regions->EU->subregions->{$country}->vat_number = $vat_number;
+        
         $company->tax_data = $tax_data;
         $company->save();
 

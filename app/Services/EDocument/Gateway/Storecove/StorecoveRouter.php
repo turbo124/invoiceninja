@@ -58,6 +58,7 @@ class StorecoveRouter
         "HR" => ["B+G","","HR:VAT","HR:VAT"],
         "HU" => ["B+G","","HU:VAT","HU:VAT"],
         "IE" => ["B+G","","IE:VAT","IE:VAT"],
+        "IS" => ["B+G","IS:KTNR","IS:VAT","IS:KTNR"],
         "IT" => [
             ["G","","IT:IVA","IT:CUUO"], // (Peppol)
             ["B","","IT:IVA","IT:CUUO"], // (SDI)
@@ -138,7 +139,7 @@ class StorecoveRouter
         }
         
         //DE we can route via Steurnummer? double check with storecove @blocked
-        if($country = "DE" && $classification == 'individual'){
+        if($country == "DE" && $classification == 'individual'){
             return 'DE:STNR';
         }
 

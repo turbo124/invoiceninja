@@ -2072,7 +2072,6 @@ Lorsque les montant apparaîtront sur votre relevé, veuillez revenir sur cette 
     'create_expense_category' => 'Créer une catégorie',
     'pro_plan_reports' => ':link pour activer les rapports en joignant le Plan Pro',
     'mark_ready' => 'Marquer comme prêt',
-
     'limits' => 'Limites',
     'fees' => 'Frais',
     'fee' => 'Frais',
@@ -5463,7 +5462,11 @@ Développe automatiquement la section des notes dans le tableau de produits pour
     'additional_tax_identifiers' => 'Identifiants fiscaux supplémentaires',
     'configure' => 'Paramétrer',
     'new_identifier' => 'Nouveau numéro de taxe de vente',
-
+    'notification_credits_low' => 'Attention ! Votre solde de crédit est bas.',
+    'notification_credits_low_text' => 'Veuillez ajouter des crédits à votre compte pour éviter l\'interruption des services.',
+    'notification_no_credits' => 'Attention ! Votre solde de crédit est vide.',
+    'notification_no_credits_text' => 'Please add credits to your account to avoid interruption of services.',
+    'saved_comment' => 'Commentaire sauvegardé',
 );
 
 return $lang;

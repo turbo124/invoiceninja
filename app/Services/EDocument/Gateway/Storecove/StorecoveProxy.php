@@ -119,7 +119,7 @@ class StorecoveProxy
 
     public function addAdditionalTaxIdentifier(array $data): array
     {
-        $scheme = $this->storecove->router->resolveRouting($data['country'], $this->company->settings->classification);
+        $scheme = $this->storecove->router->resolveTaxScheme($data['country'], $this->company->settings->classification);
 
         $data = [
             ...$data,

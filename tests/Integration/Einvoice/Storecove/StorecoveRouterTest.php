@@ -71,6 +71,23 @@ class StorecoveRouterTest extends TestCase
 
     }
 
+    public function testIsBusinessTaxIdentifier()
+    {
+        $invoice = $this->buildData();
+
+        $client = $invoice->client;
+        $client->country_id = 352;
+        $client->vat_number = 'IS1234567890';
+        $client->classification = 'business';
+        $client->save();
+
+        $storecove = new Storecove();
+        $storecove->router->setInvoice($invoice->fresh());
+
+        $this->assertEquals("IS:VAT", $storecove->router->resolveTaxScheme('IS', 'business'));
+
+    }
+    
     // Luxembourg Tests
     public function testLuBusinessClientRoutingIdentifier()
     {
@@ -810,4 +827,6 @@ class StorecoveRouterTest extends TestCase
         $this->assertEquals(false, $storecove->router->resolveTaxScheme('DE', 'government'));
 
     }
+
+    
 }

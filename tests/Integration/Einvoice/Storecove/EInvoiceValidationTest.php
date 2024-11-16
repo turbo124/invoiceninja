@@ -185,6 +185,7 @@ class EInvoiceValidationTest extends TestCase
         $client = Client::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $company->id,
+            'country_id' => 276,
             'classification' => 'business',
             'vat_number' => '',
         ]);
@@ -389,7 +390,7 @@ class EInvoiceValidationTest extends TestCase
             'company_id' => $company->id,
             'classification' => 'business',
             'vat_number' => 'DE123456789',
-            'country_id' => 1,
+            'country_id' => 276,
             'address1' => '10 Wallaby Way',
             'address2' => '',
             'city' => 'Sydney',
@@ -416,7 +417,7 @@ class EInvoiceValidationTest extends TestCase
             'company_id' => $company->id,
             'classification' => 'business',
             'vat_number' => '',
-            'country_id' => 1,
+            'country_id' => 276,
             'address1' => '10 Wallaby Way',
             'address2' => '',
             'city' => 'Sydney',

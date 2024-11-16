@@ -16,6 +16,7 @@ use App\Http\Requests\Request;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Validation\Rule;
 use App\DataMapper\CompanySettings;
+use App\Http\Requests\EInvoice\Peppol\AddTaxIdentifierRequest;
 use App\Http\ValidationRules\ValidSettingsRule;
 use App\Http\ValidationRules\Company\ValidSubdomain;
 use App\Http\ValidationRules\Company\ValidExpenseMailbox;
@@ -33,37 +34,6 @@ class UpdateCompanyRequest extends Request
         'portal_custom_head'
     ];
     
-    private array $vat_regex_patterns = [
-        'DE' => '/^DE\d{9}$/',
-        'AT' => '/^ATU\d{8}$/',
-        'BE' => '/^BE0\d{9}$/',
-        'BG' => '/^BG\d{9,10}$/',
-        'CY' => '/^CY\d{8}L$/',
-        'HR' => '/^HR\d{11}$/',
-        'DK' => '/^DK\d{8}$/',
-        'ES' => '/^ES[A-Z0-9]\d{7}[A-Z0-9]$/',
-        'EE' => '/^EE\d{9}$/',
-        'FI' => '/^FI\d{8}$/',
-        'FR' => '/^FR\d{2}\d{9}$/',
-        'EL' => '/^EL\d{9}$/',
-        'HU' => '/^HU\d{8}$/',
-        'IE' => '/^IE\d{7}[A-Z]{1,2}$/',
-        'IT' => '/^IT\d{11}$/',
-        'LV' => '/^LV\d{11}$/',
-        'LT' => '/^LT(\d{9}|\d{12})$/',
-        'LU' => '/^LU\d{8}$/',
-        'MT' => '/^MT\d{8}$/',
-        'NL' => '/^NL\d{9}B\d{2}$/',
-        'PL' => '/^PL\d{10}$/',
-        'PT' => '/^PT\d{9}$/',
-        'CZ' => '/^CZ\d{8,10}$/',
-        'RO' => '/^RO\d{2,10}$/',
-        'SK' => '/^SK\d{10}$/',
-        'SI' => '/^SI\d{8}$/',
-        'SE' => '/^SE\d{12}$/',
-        'DE:STNR' => '/^[0-9]{11}$/', //de steurnummer,
-    ];
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -131,8 +101,8 @@ class UpdateCompanyRequest extends Request
                 }),
                 function ($attribute, $value, $fail) {
                     $country_code = $this->getCountryCode();
-                    if ($country_code && isset($this->vat_regex_patterns[$country_code]) && $this->input('settings.e_invoice_type') === 'PEPPOL') {
-                        if (!preg_match($this->vat_regex_patterns[$country_code], $value)) {
+                    if ($country_code && isset(AddTaxIdentifierRequest::$vat_regex_patterns[$country_code]) && $this->input('settings.e_invoice_type') === 'PEPPOL') {
+                        if (!preg_match(AddTaxIdentifierRequest::$vat_regex_patterns[$country_code], $value)) {
                             $fail(ctrans('texts.invalid_vat_number'));
                         }
                     }
@@ -222,7 +192,7 @@ class UpdateCompanyRequest extends Request
             $settings['email_style_custom'] = str_replace(['{!!', '!!}', '{{', '}}', '@checked', '@dd', '@dump', '@if', '@if(', '@endif', '@isset', '@unless', '@auth', '@empty', '@guest', '@env', '@section', '@switch', '@foreach', '@while', '@include', '@each', '@once', '@push', '@use', '@forelse', '@verbatim', '<?php', '@php', '@for', '@class', '</sc', '<sc', 'html;base64', '@elseif', '@else', '@endunless', '@endisset', '@endempty', '@endauth', '@endguest', '@endproduction', '@endenv', '@hasSection', '@endhasSection', '@sectionMissing', '@endsectionMissing', '@endfor', '@endforeach', '@empty', '@endforelse', '@endwhile', '@continue', '@break', '@includeIf', '@includeWhen', '@includeUnless', '@includeFirst', '@component', '@endcomponent', '@endsection', '@yield', '@show', '@append', '@overwrite', '@stop', '@extends', '@endpush', '@stack', '@prepend', '@endprepend', '@slot', '@endslot', '@endphp', '@method', '@csrf', '@error', '@enderror', '@json', '@endverbatim', '@inject'], '', $settings['email_style_custom']);
         }
 
-        if (isset($settings['company_logo']) && strlen($settings['company_logo']) > 2) {
+        if (isset($settings['company_logo']) && strlen($settings['company_logo'] ?? '') > 2) {
             $settings['company_logo'] = $this->forceScheme($settings['company_logo']);
         }
 
@@ -241,7 +211,26 @@ class UpdateCompanyRequest extends Request
         return $settings;
     }
 
-    private function addScheme($url, $scheme = 'https://')
+    
+    /**
+     * forceScheme
+     *
+     * @param  string $url
+     * @return string
+     */
+    private function forceScheme(string $url): string 
+    {
+        return stripos($url, 'http') !== false ? $url : "https://{$url}";
+    }
+
+    /**
+     * addScheme
+     *
+     * @param  string $url
+     * @param  string $scheme
+     * @return string
+     */
+    private function addScheme(string $url, $scheme = 'https://'): string
     {
         if (Ninja::isHosted()) {
             $url = str_replace('http://', '', $url);
@@ -250,10 +239,4 @@ class UpdateCompanyRequest extends Request
 
         return rtrim($url, '/');
     }
-
-    private function forceScheme($url)
-    {
-        return stripos($url, 'http') !== false ? $url : "https://{$url}";
-    }
-
 }

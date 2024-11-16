@@ -61,7 +61,7 @@ class RecurringInvoiceTest extends TestCase
         $this->makeTestData();
     }
 
-public function testBulkUpdatesTaxes()
+    public function testBulkUpdatesTaxes()
     {
         RecurringInvoice::factory(5)->create([
             'user_id' => $this->user->id,
