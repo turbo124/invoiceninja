@@ -115,6 +115,8 @@ class TaxModel
             $this->regions->EU->subregions->NO->reduced_tax_rate = 12;
             $this->regions->EU->subregions->NO->apply_tax = false;
 
+            $this->ukRegion();
+
             $this->version = 'delta';
 
         }
@@ -131,7 +133,6 @@ class TaxModel
         $this->regions = new \stdClass();
         $this->regions->US = new \stdClass();
         $this->regions->EU = new \stdClass();
-        $this->regions->GB = new \stdClass();
 
         $this->usRegion()
              ->euRegion()
@@ -147,9 +148,11 @@ class TaxModel
 
         // Add new UK region
         $this->regions->UK = new \stdClass();
-        $this->regions->UK->tax_name = 'VAT';
-        $this->regions->UK->apply_tax = false;
+        $this->regions->UK->has_sales_above_threshold = false;  
+        $this->regions->UK->tax_threshold = 85000;             
+        $this->regions->UK->tax_all_subregions = false;        
         $this->regions->UK->subregions = new \stdClass();
+
 
         // Great Britain (England, Scotland, Wales)
         $this->regions->UK->subregions->GB = new \stdClass();
@@ -667,6 +670,40 @@ class TaxModel
 
         return $this;
 
+    }
+
+    public function getSubregions(): array
+    {
+        $subregions = [];
+
+        foreach ($this->regions as $region_code => $region) {
+            if (!isset($region->subregions)) {
+                continue;
+            }
+
+            $subregions[$region_code] = [];
+            
+            foreach ($region->subregions as $subregion_code => $subregion) {
+                $subregions[$region_code][] = $subregion_code;
+            }
+        }
+
+        return $subregions;
+    }
+
+    public function getRegionBySubregion(string $subregion_code): ?string
+    {
+        foreach ($this->regions as $region_code => $region) {
+            if (!isset($region->subregions)) {
+                continue;
+            }
+            
+            if (isset($region->subregions->{$subregion_code})) {
+                return $region_code;
+            }
+        }
+
+        return null;
     }
 
 }

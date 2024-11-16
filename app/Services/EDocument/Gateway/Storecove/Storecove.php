@@ -435,13 +435,13 @@ class Storecove
 
         $uri = "legal_entities/{$legal_entity_id}/additional_tax_identifiers";
 
-        if(
-        stripos($identifier, 'AT') !== false  
-        || stripos($identifier, 'BE') !== false  
+        // if(
+        // stripos($identifier, 'AT') !== false  
+        // stripos($identifier, 'BE') !== false  
         // || stripos($identifier, 'IS') !== false
-        ){
-            $identifier = preg_replace('/^[^0-9]{2}/', '', $identifier);
-        }
+        // ){
+            // $identifier = preg_replace('/^[^0-9]{2}/', '', $identifier);
+        // }
 
         $data = [
             "identifier" => $identifier,
