@@ -192,7 +192,7 @@ class UpdateCompanyRequest extends Request
             $settings['email_style_custom'] = str_replace(['{!!', '!!}', '{{', '}}', '@checked', '@dd', '@dump', '@if', '@if(', '@endif', '@isset', '@unless', '@auth', '@empty', '@guest', '@env', '@section', '@switch', '@foreach', '@while', '@include', '@each', '@once', '@push', '@use', '@forelse', '@verbatim', '<?php', '@php', '@for', '@class', '</sc', '<sc', 'html;base64', '@elseif', '@else', '@endunless', '@endisset', '@endempty', '@endauth', '@endguest', '@endproduction', '@endenv', '@hasSection', '@endhasSection', '@sectionMissing', '@endsectionMissing', '@endfor', '@endforeach', '@empty', '@endforelse', '@endwhile', '@continue', '@break', '@includeIf', '@includeWhen', '@includeUnless', '@includeFirst', '@component', '@endcomponent', '@endsection', '@yield', '@show', '@append', '@overwrite', '@stop', '@extends', '@endpush', '@stack', '@prepend', '@endprepend', '@slot', '@endslot', '@endphp', '@method', '@csrf', '@error', '@enderror', '@json', '@endverbatim', '@inject'], '', $settings['email_style_custom']);
         }
 
-        if (isset($settings['company_logo']) && strlen($settings['company_logo']) > 2) {
+        if (isset($settings['company_logo']) && strlen($settings['company_logo'] ?? '') > 2) {
             $settings['company_logo'] = $this->forceScheme($settings['company_logo']);
         }
 
@@ -211,7 +211,26 @@ class UpdateCompanyRequest extends Request
         return $settings;
     }
 
-    private function addScheme($url, $scheme = 'https://')
+    
+    /**
+     * forceScheme
+     *
+     * @param  string $url
+     * @return string
+     */
+    private function forceScheme(string $url): string 
+    {
+        return stripos($url, 'http') !== false ? $url : "https://{$url}";
+    }
+
+    /**
+     * addScheme
+     *
+     * @param  string $url
+     * @param  string $scheme
+     * @return string
+     */
+    private function addScheme(string $url, $scheme = 'https://'): string
     {
         if (Ninja::isHosted()) {
             $url = str_replace('http://', '', $url);
@@ -220,10 +239,4 @@ class UpdateCompanyRequest extends Request
 
         return rtrim($url, '/');
     }
-
-    private function forceScheme($url)
-    {
-        return stripos($url, 'http') !== false ? $url : "https://{$url}";
-    }
-
 }
