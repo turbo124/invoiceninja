@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4852ecaf52da09e731a6abc1906aebc9",
+    "content-hash": "2a537011bcf8bb561a2b629b4c7ed0d3",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -4329,6 +4329,60 @@
                 }
             ],
             "time": "2022-05-21T17:30:32+00:00"
+        },
+        {
+            "name": "invoiceninja/admin-package",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../admin-package",
+                "reference": "4274d4d686907b96ce9c52bd8cc9d1f514c6cd91"
+            },
+            "require": {
+                "illuminate/database": "^11.0",
+                "illuminate/support": "^11.0",
+                "livewire/livewire": "^3",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpstan/phpstan": "^1.12",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "InvoiceNinja\\Ronin\\Providers\\RoninServiceProvider",
+                        "InvoiceNinja\\Ronin\\Providers\\RouteServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "InvoiceNinja\\Ronin\\": "src/",
+                    "InvoiceNinja\\Ronin\\Database\\Factories\\": "database/factories/",
+                    "InvoiceNinja\\Ronin\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "InvoiceNinja\\Ronin\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "Elastic"
+            ],
+            "authors": [
+                {
+                    "name": "David Bomba",
+                    "email": "turbo124@gmail.com"
+                }
+            ],
+            "description": "Admin Management for Invoice Ninja",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "invoiceninja/einvoice",

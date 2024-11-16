@@ -102,49 +102,14 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
-        if (Ninja::isHosted()) {
-
+        if (app()->bound('sentry')) {
             Integration::configureScope(function (Scope $scope): void {
-                $name = 'hosted@invoiceninja.com';
-
-                if (auth()->guard('contact') && auth()->guard('contact')->user()) { // @phpstan-ignore-line
-                    $name = 'Contact = '.auth()->guard('contact')->user()->email;
-                    $key = auth()->guard('contact')->user()->company->account->key;
-                } elseif (auth()->guard('user') && auth()->guard('user')->user()) { // @phpstan-ignore-line
-
-                    $name = 'Admin = '.auth()->guard('user')->user()->email;
-                    $key = auth()->user()->account->key;
-                } else {
-                    $key = 'Anonymous';
-                }
-
+                               
                 $scope->setUser([
-                    'id'    => $key,
-                    'email' => 'hosted@invoiceninja.com',
-                    'name'  => $name,
+                    'id'    => 'unknown',
+                    'email' => 'anonymous@example.com',
+                    'name'  => 'Unknown User',
                 ]);
-            });
-
-            if ($this->validException($exception) && $this->sentryShouldReport($exception)) {
-                Integration::captureUnhandledException($exception);
-            }
-        } elseif (app()->bound('sentry')) {
-            Integration::configureScope(function (Scope $scope): void {
-                if (auth()->guard('contact') && auth()->guard('contact')->user() && auth()->guard('contact')->user()->company->account->report_errors) {// @phpstan-ignore-line
-
-                    $scope->setUser([
-                        'id'    => auth()->guard('contact')->user()->company->account->key,
-                        'email' => 'anonymous@example.com',
-                        'name'  => 'Anonymous User',
-                    ]);
-                } elseif (auth()->guard('user') && auth()->guard('user')->user() && auth()->user()->companyIsSet() && auth()->user()->company()->account->report_errors) {// @phpstan-ignore-line
-                    $scope->setUser([
-                        'id'    => auth()->user()->account->key,
-                        'email' => 'anonymous@example.com',
-                        'name'  => 'Anonymous User',
-                    ]);
-                }
-            });
 
             if ($this->validException($exception) && $this->sentryShouldReport($exception)) {
                 Integration::captureUnhandledException($exception);
