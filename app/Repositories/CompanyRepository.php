@@ -41,13 +41,6 @@ class CompanyRepository extends BaseRepository
 
         $company->fill($data);
 
-        // if($company->calculate_taxes){
-        //     $company->tax_data = new TaxModel($company->tax_data);
-        // }
-        // else{ 
-        //     $company->tax_data = null;
-        // }
-
         // nlog($data);
         /** Only required to handle v4 migration workloads */
         if(Ninja::isHosted() && $company->isDirty('is_disabled') && !$company->is_disabled) {
