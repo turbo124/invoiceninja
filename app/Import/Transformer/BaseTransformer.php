@@ -95,19 +95,19 @@ class BaseTransformer
 
     }
 
-    public function getInvoiceTypeId($data, $field)
+    public function getInvoiceTypeId($data, $field, $default = '1')
     {
-        return isset($data[$field]) && $data[$field] ? (string)$data[$field] : '1';
+        return isset($data[$field]) && $data[$field] ? (string)$data[$field] : $default;
     }
 
-    public function getNumber($data, $field)
+    public function getNumber($data, $field, $default = 0)
     {
-        return (isset($data->$field) && $data->$field) ? (int)$data->$field : 0;
+        return (isset($data->$field) && $data->$field) ? (int)$data->$field : $default;
     }
 
-    public function getString($data, $field)
+    public function getString($data, $field, $default = '')
     {
-        return isset($data[$field]) && $data[$field] ? trim($data[$field]) : '';
+        return isset($data[$field]) && $data[$field] ? trim($data[$field]) : $default;
     }
 
     public function getValueOrNull($data, $field)
