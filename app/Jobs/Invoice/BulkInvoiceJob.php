@@ -34,6 +34,8 @@ class BulkInvoiceJob implements ShouldQueue
 
     public $timeout = 3600;
     
+    private bool $contact_has_email = false;
+
     private array $templates = [
         'email_template_invoice',
         'email_template_quote',
@@ -80,27 +82,32 @@ class BulkInvoiceJob implements ShouldQueue
                     
                     $template = $this->resolveTemplateString($this->reminder_template);
 
-                    $mo = new EmailObject();
-                    $mo->entity_id = $invitation->invoice_id;
-                    $mo->template = $template; //full template name in use
-                    $mo->email_template_body = $template;
-                    $mo->email_template_subject = str_replace("template", "subject", $template);
+                    if($invitation->contact->email)
+                    {
+                        $this->contact_has_email = true;
 
-                    $mo->entity_class = get_class($invitation->invoice);
-                    $mo->invitation_id = $invitation->id;
-                    $mo->client_id = $invitation->contact->client_id ?? null;
-                    $mo->vendor_id = $invitation->contact->vendor_id ?? null;
+                        $mo = new EmailObject();
+                        $mo->entity_id = $invitation->invoice_id;
+                        $mo->template = $template; //full template name in use
+                        $mo->email_template_body = $template;
+                        $mo->email_template_subject = str_replace("template", "subject", $template);
 
-                    Email::dispatch($mo, $invitation->company->withoutRelations());
-
+                        $mo->entity_class = get_class($invitation->invoice);
+                        $mo->invitation_id = $invitation->id;
+                        $mo->client_id = $invitation->contact->client_id ?? null;
+                        $mo->vendor_id = $invitation->contact->vendor_id ?? null;
+                    
+                        Email::dispatch($mo, $invitation->company->withoutRelations());
+                    }
                 });
 
-                if ($invoice->invitations->count() >= 1) {
+                if ($invoice->invitations->count() >= 1 && $this->contact_has_email) {
                     $invoice->entityEmailEvent($invoice->invitations->first(), 'invoice', $this->reminder_template);
                     $invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
                 }
 
                 sleep(1); // this is needed to slow down the amount of data that is pushed into cache
+                $this->contact_has_email = false;
         });
     }
 
