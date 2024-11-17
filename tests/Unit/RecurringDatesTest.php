@@ -43,6 +43,30 @@ class RecurringDatesTest extends TestCase
         $this->makeTestData();
     }
 
+    public function testSendTimeAtHour24UTC()
+    {
+                
+        $settings = CompanySettings::defaults();
+        $settings->timezone_id = '31';  // 31 for UTC +0 // 15 for New York 
+        $settings->entity_send_time = '24';
+
+        $company = Company::factory()->create([
+                    'account_id' => $this->account->id,
+                    'settings' => $settings,
+                ]);
+
+        $client = Client::factory()->create([
+            'company_id' => $company->id,
+            'user_id' => $this->user->id,
+        ]);
+
+
+        $generic_date = \Carbon\Carbon::create(2024, 12, 1, 0, 0, 0);
+        $this->travelTo($generic_date);
+
+        $this->assertEquals($generic_date, now()->addSeconds($client->timezone_offset()));
+    }
+
     public function testDueDateDaysCalculationsTZ2()
     {
         

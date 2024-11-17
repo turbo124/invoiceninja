@@ -987,8 +987,11 @@ class Client extends BaseModel implements HasLocalePreference
 
         $entity_send_time = $this->getSetting('entity_send_time');
 
-        if ($entity_send_time == 0) {
+        if ($entity_send_time == 0) { //Send UTC time
             return 0;
+        }
+        elseif($entity_send_time == 24) { // Step back a few seconds to ensure we do not send exactly at hour 24 as that will be the next day - technically.
+            $offset -= 10;
         }
 
         $offset -= $this->company->utc_offset();
