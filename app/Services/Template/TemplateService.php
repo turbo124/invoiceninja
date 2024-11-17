@@ -789,6 +789,7 @@ class TemplateService
                 'last_sent_date' => $this->translateDate($quote->last_sent_date, $quote->client->date_format(), $quote->client->locale()),
                 'next_send_date' => $this->translateDate($quote->next_send_date, $quote->client->date_format(), $quote->client->locale()),
                 'due_date' => $this->translateDate($quote->due_date, $quote->client->date_format(), $quote->client->locale()),
+                'valid_until' => $this->translateDate($quote->due_date, $quote->client->date_format(), $quote->client->locale()),
                 'terms' => $quote->terms ?: '',
                 'public_notes' => $quote->public_notes ?: '',
                 'private_notes' => $quote->private_notes ?: '',
@@ -864,6 +865,7 @@ class TemplateService
                         'last_sent_date' => $this->translateDate($credit->last_sent_date, $credit->client->date_format(), $credit->client->locale()),
                         'next_send_date' => $this->translateDate($credit->next_send_date, $credit->client->date_format(), $credit->client->locale()),
                         'due_date' => $this->translateDate($credit->due_date, $credit->client->date_format(), $credit->client->locale()),
+                        'valid_until' => $this->translateDate($credit->due_date, $credit->client->date_format(), $credit->client->locale()),
                         'terms' => $credit->terms ?: '',
                         'public_notes' => $credit->public_notes ?: '',
                         'private_notes' => $credit->private_notes ?: '',
@@ -1495,6 +1497,11 @@ class TemplateService
         // Some variables don't map 1:1 to table columns. This gives us support for such cases.
         $aliases = [
             '$quote.balance_due' => 'partial',
+            '$purchase_order.po_number' => 'number',
+            '$purchase_order.total' => 'amount',
+            '$purchase_order.due_date' => 'due_date',
+            '$purchase_order.balance_due' => 'balance_due',
+            '$credit.valid_until' => 'due_date',
         ];
 
         try {
