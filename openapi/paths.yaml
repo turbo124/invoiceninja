@@ -96,7 +96,7 @@ paths:
         label: curl
         source: |
           curl --request POST \
-            --url 'https://invoicing.co/api/v1/login?include=company,token' \
+            --url 'https://demo.invoiceninja.com/api/v1/login?include=company,token' \
             --header 'X-API-TOKEN: YOUR_API_TOKEN_HERE' \
             --header 'X-Requested-With: XMLHttpRequest' \
             --header 'Accept: application/json'
