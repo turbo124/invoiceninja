@@ -87,6 +87,19 @@ paths:
   /api/v1/login:
     post:
       x-codeSamples:
+      - lang: php
+        label: php
+        source: |
+          $ninja = new InvoiceNinja("your_token");
+          
+      - lang: curl
+        label: curl
+        source: |
+          curl --request POST \
+            --url 'https://invoicing.co/api/v1/login?include=company,token' \
+            --header 'X-API-TOKEN: YOUR_API_TOKEN_HERE' \
+            --header 'X-Requested-With: XMLHttpRequest' \
+            --header 'Accept: application/json'
       tags:
         - auth
       summary: "Login"
@@ -101,7 +114,16 @@ paths:
         - $ref: "#/components/parameters/include_static"
         - $ref: "#/components/parameters/clear_cache"
       requestBody:
-        description: "User credentials"
+        description: |
+          User credentials
+
+          ```json
+          {
+            "email" : "fred@flintstonze.com",
+            "password" : "magicpassword123",
+            "one_time_password" : "12345",
+          }
+          ```
         required: true
         content:
           application/json:

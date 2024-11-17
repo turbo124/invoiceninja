@@ -535,15 +535,15 @@
         email_template_custom1:
           description: "Custom reminder template body"
           type: string
-          example: "<HTML>"
+          example: "<HTML></HTML>"
         email_template_custom2:
           description: "Custom reminder template body"
           type: string
-          example: "<HTML>"
+          example: "<HTML></HTML>"
         email_template_custom3:
           description: "Custom reminder template body"
           type: string
-          example: "<HTML>"
+          example: "<HTML></HTML>"
         enable_reminder1:
           description: "Toggles whether this reminder is enabled"
           type: boolean

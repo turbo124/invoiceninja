@@ -116,10 +116,23 @@
       name: include
       in: query
       description: |
-        Include child relations of the CompanyUser object, format is comma separated. 
+        Include child relations of the CompanyUser object, format is comma separated.    
+
+        <br />
         
         > ### **Note**: it is possible to chain multiple includes together, ie. include=account,token
 
+        <br />
+
+        ```html
+        
+        Available includes:
+
+          user
+          company
+          token
+          account
+        ```
       required: false
       schema:
         type: string
@@ -164,7 +177,7 @@
       name: include_static
       in: query
       description: |
-        This include will also return the full set of static variables used in the application including:
+        This include will return the full set of static variables used in the application including:
           - Currencies
           - Countries 
           - Languages
@@ -182,7 +195,7 @@
       description: |
         Clears cache
 
-        Sometimes after a system update where the static variables have been updated, it may be necessary to clear the cache so that the static variables repopulate  
+        Clears (and rebuilds) the static variable cache.  
 
       required: false
       schema:

@@ -1,5 +1,6 @@
 tags:
   - name: auth
+    x-displayName: Authentication
     description: |
       Attempts to authenticate with the API using a email/password combination.
     
@@ -12,13 +13,17 @@ tags:
       /api/v1/login?include=company,user
       ```
   - name: clients
-    x-tag-expanded: false
+    x-displayName: Clients
+    
     # description: |
     #   Endpoint definitions for interacting with clients.
   - name: products
+    x-displayName: Products
     description: |
       Endpoint definitions for interacting with products.
   - name: invoices
+    x-displayName: Invoices
+    
     description: |
 
       ## Invoice Statuses
@@ -41,41 +46,65 @@ tags:
         - An invoice which is not yet due, but also, not paid
         
   - name: Recurring Invoices
+    x-displayName: Recurring Invoices
     description: |
       Endpoint definitions for interacting with recurring_invoices.
+
   - name: payments
+    x-displayName: Payments
     description: |
       Endpoint definitions for interacting with payments.
+  
   - name: quotes
+    x-displayName:: Quotes
     description: |
       Endpoint definitions for interacting with quotes.
+
   - name: credits
+    x-displayName: Credits
     description: |
       Endpoint definitions for interacting with credits.
+
   - name: projects
+    x-displayName: Projects
     description: |
       Endpoint definitions for interacting with projects.
+
   - name: tasks
+    x-displayName: Tasks
     description: |
       Endpoint definitions for interacting with tasks.
+
   - name: vendors
+    x-displayName: Vendors
     description: |
       Endpoint definitions for interacting with vendors.
+
   - name: Purchase Orders
+    x-displayName: Purchase Orders
     description: |
       Endpoint definitions for interacting with purchase orders.
+
   - name: expenses
+    x-displayName: Expenses
     description: |
       Endpoint definitions for interacting with expenses.
+
   - name: recurring_expenses
+    x-displayName: Recurring Expenses
     description: |
       Endpoint definitions for interacting with recurring_expenses.
+
   - name: bank_transactions
+    x-displayName: Bank Transactions
     description: |
       Endpoint definitions for interacting with bank transactions.
+
   - name: reports
+    x-displayName: Reports
     description: |
       Endpoint definitions for interacting with reports.
+      
 externalDocs:
   description: "https://invoiceninja.github.io"
   url: "https://invoiceninja.github.io"

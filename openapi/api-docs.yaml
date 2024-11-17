@@ -170,6 +170,19 @@ paths:
   /api/v1/login:
     post:
       x-codeSamples:
+      - lang: php
+        label: php
+        source: |
+          $ninja = new InvoiceNinja("your_token");
+          
+      - lang: curl
+        label: curl
+        source: |
+          curl --request POST \
+            --url 'https://invoicing.co/api/v1/login?include=company,token' \
+            --header 'X-API-TOKEN: YOUR_API_TOKEN_HERE' \
+            --header 'X-Requested-With: XMLHttpRequest' \
+            --header 'Accept: application/json'
       tags:
         - auth
       summary: "Login"
@@ -184,7 +197,16 @@ paths:
         - $ref: "#/components/parameters/include_static"
         - $ref: "#/components/parameters/clear_cache"
       requestBody:
-        description: "User credentials"
+        description: |
+          User credentials
+
+          ```json
+          {
+            "email" : "fred@flintstonze.com",
+            "password" : "magicpassword123",
+            "one_time_password" : "12345",
+          }
+          ```
         required: true
         content:
           application/json:
@@ -14748,10 +14770,23 @@ components:
       name: include
       in: query
       description: |
-        Include child relations of the CompanyUser object, format is comma separated. 
+        Include child relations of the CompanyUser object, format is comma separated.    
+
+        <br />
         
         > ### **Note**: it is possible to chain multiple includes together, ie. include=account,token
 
+        <br />
+
+        ```html
+        
+        Available includes:
+
+          user
+          company
+          token
+          account
+        ```
       required: false
       schema:
         type: string
@@ -14796,7 +14831,7 @@ components:
       name: include_static
       in: query
       description: |
-        This include will also return the full set of static variables used in the application including:
+        This include will return the full set of static variables used in the application including:
           - Currencies
           - Countries 
           - Languages
@@ -14814,7 +14849,7 @@ components:
       description: |
         Clears cache
 
-        Sometimes after a system update where the static variables have been updated, it may be necessary to clear the cache so that the static variables repopulate  
+        Clears (and rebuilds) the static variable cache.  
 
       required: false
       schema:
@@ -18527,15 +18562,15 @@ components:
         email_template_custom1:
           description: "Custom reminder template body"
           type: string
-          example: "<HTML>"
+          example: "<HTML></HTML>"
         email_template_custom2:
           description: "Custom reminder template body"
           type: string
-          example: "<HTML>"
+          example: "<HTML></HTML>"
         email_template_custom3:
           description: "Custom reminder template body"
           type: string
-          example: "<HTML>"
+          example: "<HTML></HTML>"
         enable_reminder1:
           description: "Toggles whether this reminder is enabled"
           type: boolean
@@ -21300,7 +21335,7 @@ components:
     CompanyUser:
       properties:
         permissions:
-          description: 'The user permissionsfor this company in a comma separated list'
+          description: 'The user permissions for this company in a comma separated list'
           type: string
           example: 'create_invoice,create_client,view_client'
         settings:
@@ -21346,7 +21381,7 @@ components:
     CompanyUserRef:
       properties:
         permissions:
-          description: 'The user permissionsfor this company in a comma separated list'
+          description: 'The user permissions for this company in a comma separated list'
           type: string
           example: 'create_invoice,create_client,view_client'
         settings:
@@ -22156,6 +22191,7 @@ components:
       type: object
 tags:
   - name: auth
+    x-displayName: Authentication
     description: |
       Attempts to authenticate with the API using a email/password combination.
     
@@ -22168,13 +22204,17 @@ tags:
       /api/v1/login?include=company,user
       ```
   - name: clients
-    x-tag-expanded: false
+    x-displayName: Clients
+    
     # description: |
     #   Endpoint definitions for interacting with clients.
   - name: products
+    x-displayName: Products
     description: |
       Endpoint definitions for interacting with products.
   - name: invoices
+    x-displayName: Invoices
+    
     description: |
 
       ## Invoice Statuses
@@ -22197,41 +22237,65 @@ tags:
         - An invoice which is not yet due, but also, not paid
         
   - name: Recurring Invoices
+    x-displayName: Recurring Invoices
     description: |
       Endpoint definitions for interacting with recurring_invoices.
+
   - name: payments
+    x-displayName: Payments
     description: |
       Endpoint definitions for interacting with payments.
+  
   - name: quotes
+    x-displayName:: Quotes
     description: |
       Endpoint definitions for interacting with quotes.
+
   - name: credits
+    x-displayName: Credits
     description: |
       Endpoint definitions for interacting with credits.
+
   - name: projects
+    x-displayName: Projects
     description: |
       Endpoint definitions for interacting with projects.
+
   - name: tasks
+    x-displayName: Tasks
     description: |
       Endpoint definitions for interacting with tasks.
+
   - name: vendors
+    x-displayName: Vendors
     description: |
       Endpoint definitions for interacting with vendors.
+
   - name: Purchase Orders
+    x-displayName: Purchase Orders
     description: |
       Endpoint definitions for interacting with purchase orders.
+
   - name: expenses
+    x-displayName: Expenses
     description: |
       Endpoint definitions for interacting with expenses.
+
   - name: recurring_expenses
+    x-displayName: Recurring Expenses
     description: |
       Endpoint definitions for interacting with recurring_expenses.
+
   - name: bank_transactions
+    x-displayName: Bank Transactions
     description: |
       Endpoint definitions for interacting with bank transactions.
+
   - name: reports
+    x-displayName: Reports
     description: |
       Endpoint definitions for interacting with reports.
+      
 externalDocs:
   description: "https://invoiceninja.github.io"
   url: "https://invoiceninja.github.io"
