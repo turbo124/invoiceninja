@@ -86,16 +86,11 @@ paths:
 
   /api/v1/login:
     post:
+      x-codeSamples:
       tags:
-        - login
-      summary: "Attempts authentication"
+        - auth
+      summary: "Login"
       description: |
-        After authenticating with the API, the returned object is a CompanyUser object which is a bridge linking the user to the company. 
-
-        The company user object itself contains the users permissions (admin/owner or fine grained permissions) You will most likely want to 
-        also include in the response of this object both the company and the user object, this can be done by using the include parameter.
-
-        /api/v1/login?include=company,user
 
       operationId: postLogin
       parameters:

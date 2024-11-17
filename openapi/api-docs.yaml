@@ -169,16 +169,11 @@ paths:
 
   /api/v1/login:
     post:
+      x-codeSamples:
       tags:
-        - login
-      summary: "Attempts authentication"
+        - auth
+      summary: "Login"
       description: |
-        After authenticating with the API, the returned object is a CompanyUser object which is a bridge linking the user to the company. 
-
-        The company user object itself contains the users permissions (admin/owner or fine grained permissions) You will most likely want to 
-        also include in the response of this object both the company and the user object, this can be done by using the include parameter.
-
-        /api/v1/login?include=company,user
 
       operationId: postLogin
       parameters:
@@ -14651,7 +14646,6 @@ components:
       required: true
       schema:
         type: string
-        readOnly: true
         example: XMLHttpRequest
     X-API-TOKEN:
       name: X-API-TOKEN
@@ -14753,7 +14747,11 @@ components:
     login_include:
       name: include
       in: query
-      description: Include child relations of the CompanyUser object, format is comma separated. **Note** it is possible to chain multiple includes together, ie. include=account,token
+      description: |
+        Include child relations of the CompanyUser object, format is comma separated. 
+        
+        > ### **Note**: it is possible to chain multiple includes together, ie. include=account,token
+
       required: false
       schema:
         type: string
@@ -14798,7 +14796,7 @@ components:
       name: include_static
       in: query
       description: |
-        Static variables include:
+        This include will also return the full set of static variables used in the application including:
           - Currencies
           - Countries 
           - Languages
@@ -22157,10 +22155,18 @@ components:
           readOnly: true
       type: object
 tags:
-  - name: login
-    # description: |
-    #   Attempts to authenticate with the API using a email/password combination.
+  - name: auth
+    description: |
+      Attempts to authenticate with the API using a email/password combination.
     
+      After authenticating with the API, the returned object is a CompanyUser object which is a bridge linking the user to the company. 
+
+      The company user object contains the users permissions (admin/owner or fine grained permissions) You will most likely want to 
+        also include in the response of this object both the company and the user object, this can be done by using the include parameter.
+
+      ```html
+      /api/v1/login?include=company,user
+      ```
   - name: clients
     x-tag-expanded: false
     # description: |

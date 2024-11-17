@@ -14,7 +14,6 @@
       required: true
       schema:
         type: string
-        readOnly: true
         example: XMLHttpRequest
     X-API-TOKEN:
       name: X-API-TOKEN
@@ -116,7 +115,11 @@
     login_include:
       name: include
       in: query
-      description: Include child relations of the CompanyUser object, format is comma separated. **Note** it is possible to chain multiple includes together, ie. include=account,token
+      description: |
+        Include child relations of the CompanyUser object, format is comma separated. 
+        
+        > ### **Note**: it is possible to chain multiple includes together, ie. include=account,token
+
       required: false
       schema:
         type: string
@@ -161,7 +164,7 @@
       name: include_static
       in: query
       description: |
-        Static variables include:
+        This include will also return the full set of static variables used in the application including:
           - Currencies
           - Countries 
           - Languages

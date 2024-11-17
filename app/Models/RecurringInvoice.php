@@ -679,6 +679,8 @@ class RecurringInvoice extends BaseModel
                 return Carbon::parse($date)->copy();
 
             default:
+            
+                $date = now()->addSeconds($this->client->timezone_offset());
                 return $this->setDayOfMonth($date, $this->due_date_days);
         }
     }
