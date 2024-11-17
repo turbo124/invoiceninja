@@ -999,6 +999,7 @@ class CompanySettings extends BaseSettings
             'credit_details' => [
                 '$credit.number',
                 '$credit.po_number',
+                '$credit.valid_until',
                 '$credit.date',
                 '$credit.balance',
                 '$credit.total',
