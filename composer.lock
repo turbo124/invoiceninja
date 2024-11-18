@@ -535,16 +535,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.328.0",
+            "version": "3.328.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "a99b58e166ae367f2b067937afb04e843e900745"
+                "reference": "52d8219935146c3261181de2da4d36bf04c76298"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a99b58e166ae367f2b067937afb04e843e900745",
-                "reference": "a99b58e166ae367f2b067937afb04e843e900745",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/52d8219935146c3261181de2da4d36bf04c76298",
+                "reference": "52d8219935146c3261181de2da4d36bf04c76298",
                 "shasum": ""
             },
             "require": {
@@ -627,9 +627,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.328.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.328.1"
             },
-            "time": "2024-11-15T19:06:57+00:00"
+            "time": "2024-11-18T19:13:28+00:00"
         },
         {
             "name": "babenkoivan/elastic-adapter",
@@ -2858,16 +2858,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.381.0",
+            "version": "v0.382.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "e26fd3ea9c1931f205481843519b8fdc166e7026"
+                "reference": "9d9d154c8fc3c4b300c27e492f0e917d8ac35124"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/e26fd3ea9c1931f205481843519b8fdc166e7026",
-                "reference": "e26fd3ea9c1931f205481843519b8fdc166e7026",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/9d9d154c8fc3c4b300c27e492f0e917d8ac35124",
+                "reference": "9d9d154c8fc3c4b300c27e492f0e917d8ac35124",
                 "shasum": ""
             },
             "require": {
@@ -2896,9 +2896,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.381.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.382.0"
             },
-            "time": "2024-11-11T01:08:23+00:00"
+            "time": "2024-11-15T01:10:24+00:00"
         },
         {
             "name": "google/auth",
@@ -3886,16 +3886,16 @@
         },
         {
             "name": "horstoeko/zugferd",
-            "version": "v1.0.79",
+            "version": "v1.0.80",
             "source": {
                 "type": "git",
                 "url": "https://github.com/horstoeko/zugferd.git",
-                "reference": "6e5901e9ba1afb1097ddd315c18f1058af2a2cb5"
+                "reference": "720cb7e971d611061cef0b05442c9b74ee4a8f74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/6e5901e9ba1afb1097ddd315c18f1058af2a2cb5",
-                "reference": "6e5901e9ba1afb1097ddd315c18f1058af2a2cb5",
+                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/720cb7e971d611061cef0b05442c9b74ee4a8f74",
+                "reference": "720cb7e971d611061cef0b05442c9b74ee4a8f74",
                 "shasum": ""
             },
             "require": {
@@ -3916,6 +3916,7 @@
                 "goetas-webservices/xsd2php": "^0",
                 "nette/php-generator": "*",
                 "pdepend/pdepend": "^2",
+                "phpdocumentor/reflection-docblock": "^5.3",
                 "phploc/phploc": "^7",
                 "phpmd/phpmd": "^2",
                 "phpstan/phpstan": "^1.8",
@@ -3955,9 +3956,9 @@
             ],
             "support": {
                 "issues": "https://github.com/horstoeko/zugferd/issues",
-                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.79"
+                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.80"
             },
-            "time": "2024-11-16T06:41:07+00:00"
+            "time": "2024-11-17T15:34:05+00:00"
         },
         {
             "name": "horstoeko/zugferdvisualizer",
@@ -4512,28 +4513,28 @@
         },
         {
             "name": "jean85/pretty-package-versions",
-            "version": "2.0.6",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jean85/pretty-package-versions.git",
-                "reference": "f9fdd29ad8e6d024f52678b570e5593759b550b4"
+                "reference": "3c4e5f62ba8d7de1734312e4fff32f67a8daaf10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/f9fdd29ad8e6d024f52678b570e5593759b550b4",
-                "reference": "f9fdd29ad8e6d024f52678b570e5593759b550b4",
+                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/3c4e5f62ba8d7de1734312e4fff32f67a8daaf10",
+                "reference": "3c4e5f62ba8d7de1734312e4fff32f67a8daaf10",
                 "shasum": ""
             },
             "require": {
-                "composer-runtime-api": "^2.0.0",
-                "php": "^7.1|^8.0"
+                "composer-runtime-api": "^2.1.0",
+                "php": "^7.4|^8.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.2",
                 "jean85/composer-provided-replaced-stub-package": "^1.0",
                 "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": "^7.5|^8.5|^9.4",
-                "vimeo/psalm": "^4.3"
+                "phpunit/phpunit": "^7.5|^8.5|^9.6",
+                "vimeo/psalm": "^4.3 || ^5.0"
             },
             "type": "library",
             "extra": {
@@ -4565,9 +4566,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Jean85/pretty-package-versions/issues",
-                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.0.6"
+                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.0"
             },
-            "time": "2024-03-08T09:58:59+00:00"
+            "time": "2024-11-18T16:19:46+00:00"
         },
         {
             "name": "jms/metadata",
@@ -7054,16 +7055,16 @@
         },
         {
             "name": "mpdf/mpdf",
-            "version": "v8.2.4",
+            "version": "v8.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mpdf/mpdf.git",
-                "reference": "9e3ff91606fed11cd58a130eabaaf60e56fdda88"
+                "reference": "e175b05e3e00977b85feb96a8cccb174ac63621f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/9e3ff91606fed11cd58a130eabaaf60e56fdda88",
-                "reference": "9e3ff91606fed11cd58a130eabaaf60e56fdda88",
+                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/e175b05e3e00977b85feb96a8cccb174ac63621f",
+                "reference": "e175b05e3e00977b85feb96a8cccb174ac63621f",
                 "shasum": ""
             },
             "require": {
@@ -7073,7 +7074,7 @@
                 "mpdf/psr-log-aware-trait": "^2.0 || ^3.0",
                 "myclabs/deep-copy": "^1.7",
                 "paragonie/random_compat": "^1.4|^2.0|^9.99.99",
-                "php": "^5.6 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+                "php": "^5.6 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
                 "psr/http-message": "^1.0 || ^2.0",
                 "psr/log": "^1.0 || ^2.0 || ^3.0",
                 "setasign/fpdi": "^2.1"
@@ -7121,7 +7122,7 @@
                 "utf-8"
             ],
             "support": {
-                "docs": "http://mpdf.github.io",
+                "docs": "https://mpdf.github.io",
                 "issues": "https://github.com/mpdf/mpdf/issues",
                 "source": "https://github.com/mpdf/mpdf"
             },
@@ -7131,7 +7132,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-06-14T16:06:41+00:00"
+            "time": "2024-11-18T15:30:42+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",
@@ -15266,16 +15267,16 @@
         },
         {
             "name": "twig/intl-extra",
-            "version": "v3.13.0",
+            "version": "v3.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/intl-extra.git",
-                "reference": "1b8d78c5db08bdc61015fd55009d2e84b3aa7e38"
+                "reference": "92a127a58857597acc6eca2e34d5ef90057dcc59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/intl-extra/zipball/1b8d78c5db08bdc61015fd55009d2e84b3aa7e38",
-                "reference": "1b8d78c5db08bdc61015fd55009d2e84b3aa7e38",
+                "url": "https://api.github.com/repos/twigphp/intl-extra/zipball/92a127a58857597acc6eca2e34d5ef90057dcc59",
+                "reference": "92a127a58857597acc6eca2e34d5ef90057dcc59",
                 "shasum": ""
             },
             "require": {
@@ -15314,7 +15315,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/twigphp/intl-extra/tree/v3.13.0"
+                "source": "https://github.com/twigphp/intl-extra/tree/v3.15.0"
             },
             "funding": [
                 {
@@ -15326,20 +15327,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-03T13:08:40+00:00"
+            "time": "2024-09-16T10:21:35+00:00"
         },
         {
             "name": "twig/twig",
-            "version": "v3.14.2",
+            "version": "v3.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "0b6f9d8370bb3b7f1ce5313ed8feb0fafd6e399a"
+                "reference": "2d5b3964cc21d0188633d7ddce732dc8e874db02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/0b6f9d8370bb3b7f1ce5313ed8feb0fafd6e399a",
-                "reference": "0b6f9d8370bb3b7f1ce5313ed8feb0fafd6e399a",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/2d5b3964cc21d0188633d7ddce732dc8e874db02",
+                "reference": "2d5b3964cc21d0188633d7ddce732dc8e874db02",
                 "shasum": ""
             },
             "require": {
@@ -15393,7 +15394,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v3.14.2"
+                "source": "https://github.com/twigphp/Twig/tree/v3.15.0"
             },
             "funding": [
                 {
@@ -15405,7 +15406,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-07T12:36:22+00:00"
+            "time": "2024-11-17T15:59:19+00:00"
         },
         {
             "name": "twilio/sdk",
@@ -17410,16 +17411,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.10",
+            "version": "1.12.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "fc463b5d0fe906dcf19689be692c65c50406a071"
+                "reference": "0d1fc20a962a91be578bcfe7cf939e6e1a2ff733"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/fc463b5d0fe906dcf19689be692c65c50406a071",
-                "reference": "fc463b5d0fe906dcf19689be692c65c50406a071",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0d1fc20a962a91be578bcfe7cf939e6e1a2ff733",
+                "reference": "0d1fc20a962a91be578bcfe7cf939e6e1a2ff733",
                 "shasum": ""
             },
             "require": {
@@ -17464,7 +17465,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-11T15:37:09+00:00"
+            "time": "2024-11-17T14:08:01+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -19344,16 +19345,16 @@
         },
         {
             "name": "spatie/backtrace",
-            "version": "1.6.2",
+            "version": "1.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/backtrace.git",
-                "reference": "1a9a145b044677ae3424693f7b06479fc8c137a9"
+                "reference": "7c18db2bc667ac84e5d7c18e33f16c38ff2d8838"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/backtrace/zipball/1a9a145b044677ae3424693f7b06479fc8c137a9",
-                "reference": "1a9a145b044677ae3424693f7b06479fc8c137a9",
+                "url": "https://api.github.com/repos/spatie/backtrace/zipball/7c18db2bc667ac84e5d7c18e33f16c38ff2d8838",
+                "reference": "7c18db2bc667ac84e5d7c18e33f16c38ff2d8838",
                 "shasum": ""
             },
             "require": {
@@ -19391,7 +19392,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/backtrace/tree/1.6.2"
+                "source": "https://github.com/spatie/backtrace/tree/1.6.3"
             },
             "funding": [
                 {
@@ -19403,7 +19404,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2024-07-22T08:21:24+00:00"
+            "time": "2024-11-18T14:58:58+00:00"
         },
         {
             "name": "spatie/error-solutions",

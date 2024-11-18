@@ -1075,7 +1075,7 @@ class SubscriptionService
         $recurring_invoice->frequency_id = $this->subscription->frequency_id ?: RecurringInvoice::FREQUENCY_MONTHLY;
         $recurring_invoice->remaining_cycles = $this->subscription->remaining_cycles ?? -1;
         $recurring_invoice->date = now();
-        $recurring_invoice->auto_bill = $client->getSetting('auto_bill');
+        $recurring_invoice->auto_bill = $this->subscription->auto_bill ?? $client->getSetting('auto_bill');
         $recurring_invoice->auto_bill_enabled =  $this->setAutoBillFlag($recurring_invoice->auto_bill);
         $recurring_invoice->due_date_days = 'terms';
         $recurring_invoice->next_send_date = now()->format('Y-m-d');
@@ -1108,7 +1108,7 @@ class SubscriptionService
         $recurring_invoice->frequency_id = $this->subscription->frequency_id ?: RecurringInvoice::FREQUENCY_MONTHLY;
         $recurring_invoice->date = now()->addSeconds($client->timezone_offset());
         $recurring_invoice->remaining_cycles = $this->subscription->remaining_cycles ?? -1;
-        $recurring_invoice->auto_bill = $client->getSetting('auto_bill');
+        $recurring_invoice->auto_bill = $this->subscription->auto_bill ?? $client->getSetting('auto_bill');
         $recurring_invoice->auto_bill_enabled =  $this->setAutoBillFlag($recurring_invoice->auto_bill);
         $recurring_invoice->due_date_days = 'terms';
         $recurring_invoice->next_send_date = now()->addSeconds($client->timezone_offset())->format('Y-m-d');

@@ -98,6 +98,8 @@ class BulkInvoiceJob implements ShouldQueue
                         $mo->vendor_id = $invitation->contact->vendor_id ?? null;
                     
                         Email::dispatch($mo, $invitation->company->withoutRelations());
+                        
+                        sleep(1); // this is needed to slow down the amount of data that is pushed into cache
                     }
                 });
 
