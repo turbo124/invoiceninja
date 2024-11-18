@@ -1,49 +1,92 @@
 <?php
 
 return [
-    'title' => 'E-Invoicing Activation',
-    'subject' => 'Important: Your E-Invoicing Service is Now Active',
+    'title' => 'Активирање на Електронско Фактурирање',
+    'subject' => 'Важно: Вашата Услуга за Електронско Фактурирање е Сега Активна',
 
-    'greeting' => 'Welcome to E-Invoicing, :name!',
+    'greeting' => 'Добредојдовте во системот за електронско фактурирање, :name!',
 
-    'intro' => "This service enables you to:",
+    'intro' => "Оваа услуга ви овозможува да:",
     'intro_items' => "
-        • Send and receive invoices electronically<br>
-        • Ensure compliance with tax regulations<br>
-        • Speed up payment processing<br>
-        • Reduce manual data entry and errors<br>
-    ",   
-    
-    'requirements_title' => 'Important Requirements', 
-    'requirements_intro' => 'To ensure successful e-invoicing, please verify these critical business details:',
-    'requirements_items' => "
-            • Legal Business Name - Must exactly match your official registration<br>
-            • Tax/VAT Number - Must be current and validated<br>
-            • Business Identifiers (ABN/EORI/GLN) - Must be accurate and active<br>
-            • Business Address - Must match official records<br>
-            • Contact Details - Must be up to date and monitored<br>
-        ",
-
-    'validation_title' => 'Why Accurate Information Matters',
-    'validation_items' => "
-            • Incorrect details may cause invoice rejection<br>
-            • Tax authorities require exact matching of registration numbers<br>
-            • Payment systems rely on correct business identifiers<br>
-            • Legal compliance depends on accurate business information<br>
-        ",
-
-    'next_steps' => 'Next Steps',
-    'next_steps_items' => "
-            1. Review your company details in account settings<br>
-            2. Update any outdated information<br>
-            3. Verify tax registration numbers<br>
-            4. Send a test e-invoice<br>
-        ",
-    'support_title' => 'Need Assistance?',
-    'support_message' => "Our support team is ready to help with any questions about e-invoicing requirements or setup.<br>
-                    Contact support: :email<br>
-                    Thank you for choosing our e-invoicing service.<br>
+        • Испраќате и примате фактури електронски<br>
+        • Обезбедите усогласеност со даночните прописи<br>
+        • Забрзате обработка на плаќања<br>
+        • Намалите рачно внесување податоци и грешки<br>
     ",
-    
+
+    'requirements_title' => 'Важни Барања',
+    'requirements_intro' => 'За успешно електронско фактурирање, ве молиме потврдете ги овие важни деловни податоци:',
+    'requirements_items' => "
+            • Име на Компанијата - Мора точно да одговара на официјалната регистрација<br>
+            • ЕДБ/ЕМБС - Мора да биде ажуриран и потврден<br>
+            • Деловни Идентификатори (EORI/GLN) - Мора да бидат точни и активни<br>
+            • Адреса на Седиште - Мора да одговара на официјалните записи<br>
+            • Контакт Информации - Мора да бидат ажурирани и следени<br>
+        ",
+
+    'validation_title' => 'Зошто се Важни Точните Информации',
+    'validation_items' => "
+            • Неточни податоци може да доведат до одбивање на фактури<br>
+            • УЈП бара точно совпаѓање на регистрациските броеви<br>
+            • Платежните системи се потпираат на точни деловни идентификатори<br>
+            • Правната усогласеност зависи од точни деловни информации<br>
+        ",
+
+    'next_steps' => 'Следни Чекори',
+    'next_steps_items' => "
+            1. Проверете ги деталите на компанијата во поставките на сметката<br>
+            2. Ажурирајте ги застарените информации<br>
+            3. Потврдете ги даночните регистрациски броеви<br>
+            4. Испратете тест електронска фактура<br>
+        ",
+    'support_title' => 'Ви Треба Помош?',
+    'support_message' => "Нашиот тим за поддршка е подготвен да помогне со било какви прашања околу барањата или поставувањето на електронското фактурирање.<br>
+                    Контактирајте поддршка: :email<br>
+                    Ви благодариме што ја избравте нашата услуга за електронско фактурирање.<br>
+    ",
+    "text" => "
+    Активирање на Електронско Фактурирање
+
+Добредојдовте во системот за електронско фактурирање!
+
+Оваа услуга ви овозможува да:
+
+• Испраќате и примате фактури електронски
+• Обезбедите усогласеност со даночните прописи
+• Забрзате обработка на плаќања
+• Намалите рачно внесување податоци и грешки
+
+Важни Барања
+
+За успешно електронско фактурирање, ве молиме потврдете ги овие важни деловни податоци:
+
+• Име на Компанијата - Мора точно да одговара на официјалната регистрација
+• ЕДБ/ЕМБС - Мора да биде ажуриран и потврден
+• Деловни Идентификатори (EORI/GLN) - Мора да бидат точни и активни
+• Адреса на Седиште - Мора да одговара на официјалните записи
+• Контакт Информации - Мора да бидат ажурирани и следени
+
+Зошто се Важни Точните Информации
+
+• Неточни податоци може да доведат до одбивање на фактури
+• УЈП бара точно совпаѓање на регистрациските броеви
+• Платежните системи се потпираат на точни деловни идентификатори
+• Правната усогласеност зависи од точни деловни информации
+
+Следни Чекори
+
+1. Проверете ги деталите на компанијата во поставките на сметката
+2. Ажурирајте ги застарените информации
+3. Потврдете ги даночните регистрациски броеви
+4. Испратете тест електронска фактура
+
+Ви Треба Помош?
+
+Нашиот тим за поддршка е подготвен да помогне со било какви прашања околу барањата или поставувањето на електронското фактурирање.
+
+Контактирајте поддршка: contact@invoiceninja.com
+
+Ви благодариме што ја избравте нашата услуга за електронско фактурирање.
+    "
 
 ];
