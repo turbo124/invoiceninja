@@ -5470,6 +5470,7 @@ $lang = array(
     'notification_no_credits' => 'Warning! Your credit balance is empty.',
     'notification_no_credits_text' => 'Please add credits to your account to avoid interruption of services.',
     'saved_comment' => 'Comment Saved',
+    'acts_as_must_be_true' => 'Either "Send E-Invoice" or "Receive E-Invoice" (or both) must be selected.'
 );
 
 return $lang;
