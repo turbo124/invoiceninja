@@ -16,6 +16,7 @@ use App\Models\Country;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateEntityRequest extends FormRequest
 {
