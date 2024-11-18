@@ -474,35 +474,28 @@ class Storecove
      * @return mixed
      */
 
-    public function removeAdditionalTaxIdentifier(int $legal_entity_id, string $tax_identifier)
+    public function removeAdditionalTaxIdentifier(int $legal_entity_id, string $tax_identifier): array|false|\Illuminate\Http\Client\Response
     {
         $legal_entity = $this->getLegalEntity($legal_entity_id);
 
-        if(isset($legal_entity['additional_tax_identifiers']) && is_array($legal_entity['additional_tax_identifiers']))
-        {
+        if(isset($legal_entity['additional_tax_identifiers']) && is_array($legal_entity['additional_tax_identifiers'])) {
+            $identifer = collect($legal_entity['additional_tax_identifiers'])
+                ->filter(fn ($id) => $id['identifier'] == $tax_identifier)
+                ->first();
 
-            foreach($legal_entity['additional_tax_identifiers'] as $ati)
-            {
-
-                if($ati['identifier'] == $tax_identifier)
-                {
-
-                    $uri = "legal_entities/{$legal_entity_id}/additional_tax_identifiers/{$ati['id']}";
-
-                    $r = $this->httpClient($uri, (HttpVerb::DELETE)->value, []);
-
-                    if ($r->successful()) {
-                        $data = $r->json();
-
-                        return $data;
-                    }
-
-                    return $r;
-
-                }
+            if (! $identifer) {
+                return false;
             }
 
+            $uri = "legal_entities/{$legal_entity_id}/additional_tax_identifiers/{$identifer['id']}";
 
+            $r = $this->httpClient($uri, (HttpVerb::DELETE)->value, []);
+
+            if ($r->successful()) {
+                return [];
+            }
+
+            return $r;
         }
 
         return false;
