@@ -5470,6 +5470,8 @@ $lang = array(
     'notification_no_credits' => 'Warning! Your credit balance is empty.',
     'notification_no_credits_text' => 'Please add credits to your account to avoid interruption of services.',
     'saved_comment' => 'Comment Saved',
+    'delete_identifier' => 'Delete identifier',
+    'delete_identifier_description' => 'Deleting this identifier will remove it from the system. Make sure this is the desired action before proceeding.',
 );
 
 return $lang;
