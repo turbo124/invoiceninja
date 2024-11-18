@@ -64,6 +64,7 @@
         "hyvor/php-json-exporter": "^0.0.3",
         "imdhemy/laravel-purchases": "^1.7",
         "intervention/image": "^2.5",
+        "invoiceninja/admin-package": "dev-main",
         "invoiceninja/einvoice": "dev-main",
         "invoiceninja/inspector": "^3.0",
         "invoiceninja/ubl_invoice": "^2",
@@ -109,8 +110,7 @@
         "twig/twig": "^3.14",
         "twilio/sdk": "^6.40",
         "wikimedia/composer-merge-plugin": "^2.1",
-        "wildbit/postmark-php": "^4.0",
-        "invoiceninja/admin-package": "*"
+        "wildbit/postmark-php": "^4.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
@@ -222,7 +222,10 @@
         },
         {
             "type": "path",
-            "url": "../admin-package"
+            "url": "../admin-package",
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "minimum-stability": "dev",
