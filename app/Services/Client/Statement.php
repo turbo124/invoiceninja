@@ -118,7 +118,7 @@ class Statement
             $pdf = null;
             $html = $maker->getCompiledHTML(true);
 
-            nlog($html);
+            // nlog($html);
             
             if ($this->rollback) {
                 \DB::connection(config('database.default'))->rollBack();
