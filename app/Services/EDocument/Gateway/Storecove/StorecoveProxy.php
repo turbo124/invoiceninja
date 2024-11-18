@@ -142,6 +142,23 @@ class StorecoveProxy
         return $this->remoteRequest('/api/einvoice/peppol/add_additional_legal_identifier', $data);
     }
 
+    public function removeAdditionalTaxIdentifier(array $data): array|false
+    {
+        $data['legal_entity_id'] = $this->company->legal_entity_id;
+
+        if (Ninja::isHosted()) {
+            $response = $this->storecove->removeAdditionalTaxIdentifier($data['legal_entity_id'], $data['vat_number']);
+
+            if (is_array($response) || is_bool($response)) {
+                return $response;
+            }
+
+            return $this->handleResponseError($response);
+        }
+
+        return $this->remoteRequest('/api/einvoice/peppol/remove_additional_legal_identifier', $data);
+    }
+
     /**
      * handleResponseError
      *
