@@ -66,27 +66,41 @@ class License extends StaticModel
         'created_at' => 'date',
         'entities' => AsTaxEntityCollection::class,
     ];
-
+    
+    /**
+     * expiry
+     *
+     * @return string
+     */
     public function expiry(): string
     {
         return $this->created_at->addYear()->format('Y-m-d');
     }
-
+    
+    /**
+     * recurring_invoice
+     *
+     */
     public function recurring_invoice()
     {
         return $this->belongsTo(RecurringInvoice::class);
     }
-
-    public function url()
-    {
-        $contact = $this->recurring_invoice->client->contacts()->where('email', $this->email)->first();
-    }
-
+    
+    /**
+     * e_invoicing_tokens
+     *
+     */
     public function e_invoicing_tokens()
     {
         return $this->hasMany(EInvoicingToken::class, 'license_key', 'license_key');
     }
-
+    
+    /**
+     * addEntity
+     *
+     * @param  mixed $entity
+     * @return void
+     */
     public function addEntity(TaxEntity $entity)
     {
         $entities = $this->entities;
@@ -102,7 +116,13 @@ class License extends StaticModel
         $this->save();
 
     }
-
+    
+    /**
+     * removeEntity
+     *
+     * @param  TaxEntity $entity
+     * @return void
+     */
     public function removeEntity(TaxEntity $entity)
     {
     
@@ -116,5 +136,15 @@ class License extends StaticModel
 
         $this->save();
 
+    }
+    
+    /**
+     * isValid
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->created_at->gte(now()->subYear());
     }
 }
