@@ -230,10 +230,14 @@ class EInvoicePeppolController extends BaseController
             // This is place to do some logging, inform user, etc.
         }
 
-        if ($request->country === 'GB') {
-            $tax_data->regions->UK->subregions->{$request->country}->vat_number = null;
-        } else {
-            $tax_data->regions->EU->subregions->{$request->country}->vat_number = null;
+        $country = $request->country;
+
+        if ($request->country === 'GB' && data_get($tax_data->regions->UK->subregions, "{$country}.vat_number")) {
+            $tax_data->regions->UK->subregions->{$country}->vat_number = null;
+        }
+
+        if ($request->country !== 'GB' && data_get($tax_data->regions->EU->subregions, "{$country}.vat_number")) {
+            $tax_data->regions->EU->subregions->{$country}->vat_number = null;
         }
 
         $company->tax_data = $tax_data;
