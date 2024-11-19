@@ -17,6 +17,7 @@ use App\Http\Requests\EInvoice\Peppol\StoreEntityRequest;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
 use App\Http\Requests\EInvoice\Peppol\DisconnectRequest;
 use App\Http\Requests\EInvoice\Peppol\AddTaxIdentifierRequest;
+use App\Http\Requests\EInvoice\Peppol\RemoveTaxIdentifierRequest;
 use App\Http\Requests\EInvoice\Peppol\ShowEntityRequest;
 use App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest;
 
@@ -205,6 +206,40 @@ class EInvoicePeppolController extends BaseController
         $company->save();
 
         return response()->json(['message' => 'ok'], 200);
+    }
+
+    public function removeAdditionalTaxIdentifier(RemoveTaxIdentifierRequest $request, Storecove $storecove): JsonResponse
+    {
+        /** @var \App\Models\Company $company */
+        $company = auth()->user()->company();
+        $tax_data = $company->tax_data;
+
+        $response = $storecove
+            ->proxy
+            ->setCompany($company)
+            ->removeAdditionalTaxIdentifier($request->validated());
+
+        if (data_get($response, 'status') === 'error') {
+            return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
+        }
+
+        if (is_bool($response)) {
+            // This means we run into "internal error" which means user request disconnect for VAT,
+            // that wasn't found on legal entity and Storecove network.
+
+            // This is place to do some logging, inform user, etc.
+        }
+
+        if ($request->country === 'GB') {
+            $tax_data->regions->UK->subregions->{$request->country}->vat_number = null;
+        } else {
+            $tax_data->regions->EU->subregions->{$request->country}->vat_number = null;
+        }
+
+        $company->tax_data = $tax_data;
+        $company->save();
+
+        return response()->json([]);
     }
 
     private function unsetVatNumbers(mixed $taxData): mixed
