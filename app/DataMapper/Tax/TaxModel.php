@@ -22,11 +22,11 @@ class TaxModel
     /** @var object $regions */
     public object $regions;
     
-    /** @var bool $act_as_sender */
-    public bool $act_as_sender = false;
+    /** @var bool $acts_as_sender */
+    public bool $acts_as_sender = false;
     
-    /** @var bool $act_as_receiver */
-    public bool $act_as_receiver = false;
+    /** @var bool $acts_as_receiver */
+    public bool $acts_as_receiver = false;
     
     /**
      * __construct
@@ -42,8 +42,8 @@ class TaxModel
         } else {
             
             $this->seller_subregion = $model->seller_subregion ?? '';
-            $this->act_as_sender = $model->act_as_sender ?? false;
-            $this->act_as_receiver = $model->act_as_receiver ?? false;
+            $this->acts_as_sender = $model->acts_as_sender ?? false;
+            $this->acts_as_receiver = $model->acts_as_receiver ?? false;
             
             $modelArray = get_object_vars($model);
             foreach ($modelArray as $key => $value) {

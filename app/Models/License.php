@@ -11,7 +11,9 @@
 
 namespace App\Models;
 
+use App\Casts\AsTaxEntityCollection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 
 /**
  * App\Models\License
@@ -30,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $recurring_invoice_id
  * @property int|null $e_invoice_quota
  * @property bool $is_flagged
+ * @property object|null $entities 
  * @property-read \App\Models\RecurringInvoice $recurring_invoice
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
@@ -59,6 +62,7 @@ class License extends StaticModel
 
     protected $casts = [
         'created_at' => 'date',
+        'entities' => AsTaxEntityCollection::class,
     ];
 
     public function expiry(): string
@@ -80,4 +84,5 @@ class License extends StaticModel
     {
         return $this->hasMany(EInvoicingToken::class, 'license_key', 'license_key');
     }
+
 }

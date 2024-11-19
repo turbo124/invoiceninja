@@ -232,21 +232,9 @@ class Storecove
 
     /**
      * Get Sending Evidence
-     *
      * 
      * "guid" => "661c079d-0c2b-4b45-8263-678ed81224af",
-    "sender" => "9930:DE923356489",
-    "receiver" => "9930:DE321281763",
-    "documents" => [
-      [
-        "mime_type" => "application/xml",
-        "document" => "html URL to fileg",
-        "expires_at" => "2024-11-17 21:46:47+00:00",
-      ],
-    ],
-    "evidence" => [
-      "receiving_accesspoint" => "CN=PNL000151, OU=PEPPOL TEST AP, O=Storecove (Datajust B.V.), C=NL",
-      
+     *
      * @param  string $guid
      * @return mixed
      */

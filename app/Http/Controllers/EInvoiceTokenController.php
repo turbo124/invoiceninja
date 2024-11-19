@@ -17,7 +17,7 @@ use App\Http\Requests\EInvoice\UpdateTokenRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 
-class EInvoiceTokenController extends BaseController
+class EInvoiceTokenController extends BaseController //@ben - can we remove this?
 {
     public function __invoke(UpdateTokenRequest $request): Response
     {

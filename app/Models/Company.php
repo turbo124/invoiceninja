@@ -228,7 +228,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|Company find($query)
  * @property-read int|null $webhooks_count
  * @property int $calculate_taxes
- * @property mixed $tax_data
+ * @property \App\DataMapper\Tax\TaxModel $tax_data
  * @method \App\Models\User|null owner()
  * @mixin \Eloquent
  */

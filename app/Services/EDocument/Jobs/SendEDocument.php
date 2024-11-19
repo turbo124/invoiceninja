@@ -162,7 +162,15 @@ class SendEDocument implements ShouldQueue
 
             // Successful send - update quota!
             if(is_string($r)){
-                $model->company->account->decrement('e_invoice_quota', 1);
+                                
+                $account = $model->company->account;
+                $account->decrement('e_invoice_quota', 1);
+                $account->refresh(); 
+
+                if($account->e_invoice_quota == 0 && class_exists(\Modules\Admin\Jobs\Account\SuspendESendReceive::class)){
+                    \Modules\Admin\Jobs\Account\SuspendESendReceive::dispatch($account->key);
+                }
+
                 return $this->writeActivity($model, $r);
             }
                 
