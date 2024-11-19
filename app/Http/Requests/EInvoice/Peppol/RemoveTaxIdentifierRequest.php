@@ -48,8 +48,8 @@ class RemoveTaxIdentifierRequest extends FormRequest
                 $country = $this->country;
 
                 $vat = $this->input('region') === 'GB'
-                    ? data_get($tax_data->regions->UK->subregions->{$country}, 'vat_number')
-                    : data_get($tax_data->regions->EU->subregions->{$country}, 'vat_number');
+                    ? data_get($tax_data->regions->UK->subregions, "{$country}.vat_number")
+                    : data_get($tax_data->regions->EU->subregions, "{$country}.vat_number");
 
                 if ($vat === null) {
                     $fail('VAT number not found.');
