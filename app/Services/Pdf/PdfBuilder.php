@@ -1478,6 +1478,11 @@ class PdfBuilder
     {
         $variables = $this->service->config->pdf_variables['invoice_details'];
 
+        // $_v = $this->service->html_variables;
+
+        // $_v['labels']['$invoice.date_label'] = ctrans('text.date');
+        // $this->service->html_variables = $_v;
+
         $variables = array_filter($variables, function ($m) {
             return !in_array($m, ['$invoice.balance_due', '$invoice.total']);
         });

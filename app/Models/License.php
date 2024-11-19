@@ -89,20 +89,23 @@ class License extends StaticModel
 
     public function addEntity(TaxEntity $entity)
     {
+        $entities = $this->entities;
 
-        if (is_array($this->entities)) {
-            $this->entities[] = $entity;
+        if (is_array($entities)) {
+            $entities[] = $entity;
         } else {
-            $this->entities = [$entity];
+            $entities = [$entity];
         }
 
+        $this->entities = $entities;
+        
         $this->save();
 
     }
 
     public function removeEntity(TaxEntity $entity)
     {
-                
+    
         if (!is_array($this->entities)) {
             return;
         }
