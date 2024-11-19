@@ -1022,4 +1022,17 @@ class Client extends BaseModel implements HasLocalePreference
     {
         return $use_react_url ? config('ninja.react_url'). "/#/clients/{$this->hashed_id}" : config('ninja.app_url');
     }
+        
+    /**
+     * peppolSendingEnabled
+     * 
+     * Determines the sending status of the company
+     * 
+     * @return bool
+     */
+    public function peppolSendingEnabled(): bool
+    {
+        return $this->getSetting('e_invoice_type') == 'PEPPOL' && $this->company->peppolSendingEnabled();
+
+    }
 }

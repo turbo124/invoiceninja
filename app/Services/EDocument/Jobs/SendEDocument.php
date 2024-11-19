@@ -86,14 +86,10 @@ class SendEDocument implements ShouldQueue
             'routing' => $identifiers['routing'],
             'account_key' => $model->company->account->key,
             'e_invoicing_token' => $model->company->account->e_invoicing_token,
-            // 'identifiers' => $identifiers,
         ];
-        
-        nlog($payload);
 
-        nlog(json_encode($payload));
-
-        if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->legal_entity_id)
+        //Self Hosted Sending Code Path 
+        if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->peppolSendingEnabled())
         {
             
             $r = Http::withHeaders($this->getHeaders())
@@ -114,27 +110,35 @@ class SendEDocument implements ShouldQueue
             }
 
         }
+        elseif(Ninja::isSelfHost())
+            return;
+        
+        //Run this check outside of the next loop as it will never send otherwise.
+        if ($model->company->account->e_invoice_quota == 0 && $model->company->legal_entity_id) {
+            $key = "e_invoice_quota_exhausted_{$model->company->account->key}";
 
-        if(Ninja::isHosted() && ($model instanceof Invoice) && !$model->company->account->is_flagged && $model->company->legal_entity_id)
+            if (! Cache::has($key)) {
+                $mo = new EmailObject();
+                $mo->subject = ctrans('texts.notification_no_credits');
+                $mo->body = ctrans('texts.notification_no_credits_text');
+                $mo->text_body = ctrans('texts.notification_no_credits_text');
+                $mo->company_key = $model->company->company_key;
+                $mo->html_template = 'email.template.generic';
+                $mo->to = [new Address($model->company->account->owner()->email, $model->company->account->owner()->name())];
+                $mo->email_template_body = 'notification_no_credits';
+                $mo->email_template_subject = 'notification_no_credits_text';
+
+                Email::dispatch($mo, $model->company);
+                Cache::put($key, true, now()->addHours(24));
+            }
+
+            return;
+        } 
+
+        //Hosted Sending Code Path.
+        if(($model instanceof Invoice) && $model->company->peppolSendingEnabled())
         {
-            if ($model->company->account->e_invoice_quota === 0) {
-                $key = "e_invoice_quota_exhausted_{$model->company->account->key}";
-
-                if (! Cache::has($key)) {
-                    $mo = new EmailObject();
-                    $mo->subject = ctrans('texts.notification_no_credits');
-                    $mo->body = ctrans('texts.notification_no_credits_text');
-                    $mo->text_body = ctrans('texts.notification_no_credits_text');
-                    $mo->company_key = $model->company->company_key;
-                    $mo->html_template = 'email.template.generic';
-                    $mo->to = [new Address($model->company->account->owner()->email, $model->company->account->owner()->name())];
-                    $mo->email_template_body = 'notification_no_credits';
-                    $mo->email_template_subject = 'notification_no_credits_text';
-
-                    Email::dispatch($mo, $model->company);
-                    Cache::put($key, true, now()->addHours(24));
-                }
-            } else if ($model->company->account->e_invoice_quota <= config('ninja.e_invoice_quota_warning')) {
+            if ($model->company->account->e_invoice_quota <= config('ninja.e_invoice_quota_warning')) {
                 $key = "e_invoice_quota_low_{$model->company->account->key}";
 
                 if (! Cache::has($key)) {
@@ -156,8 +160,11 @@ class SendEDocument implements ShouldQueue
             $sc = new \App\Services\EDocument\Gateway\Storecove\Storecove();
             $r = $sc->sendJsonDocument($payload);
 
-            if(is_string($r))
+            // Successful send - update quota!
+            if(is_string($r)){
+                $model->company->account->decrement('e_invoice_quota', 1);
                 return $this->writeActivity($model, $r);
+            }
                 
             if($r->failed()) {
                 nlog("Model {$model->number} failed to be accepted by invoice ninja, error follows:");
