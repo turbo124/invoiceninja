@@ -548,10 +548,14 @@ class DesignController extends BaseController
         $group_settings_id = $request->input('group_settings_id', false);
         $client_id = $request->input('client_id', false);
 
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
         $company = $user->getCompany();
+
+        nlog("Design Change {$company->id}");
+        nlog($request->all());
 
         $design = Design::where('company_id', $company->id)
                         ->orWhereNull('company_id')

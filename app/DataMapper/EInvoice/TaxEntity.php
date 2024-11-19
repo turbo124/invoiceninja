@@ -16,14 +16,21 @@ class TaxEntity
 {
     /** @var string $version */
     public string $version = 'alpha';
-
+    
+    /** @var ?int $legal_entity_id */
     public ?int $legal_entity_id = null;
-
+    
+    /** @var string $company_key */
     public string $company_key = '';
 
-    /** @var array<mixed> */
+    /** @var array<string> */
     public array $received_documents = [];
-
+    
+    /** @var bool $acts_as_sender */
+    public bool $acts_as_sender = true;
+    
+    /** @var bool $acts_as_receiver */
+    public bool $acts_as_receiver = true;
     /**
      * __construct
      *

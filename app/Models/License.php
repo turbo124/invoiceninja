@@ -98,7 +98,7 @@ class License extends StaticModel
     /**
      * addEntity
      *
-     * @param  mixed $entity
+     * @param  TaxEntity $entity
      * @return void
      */
     public function addEntity(TaxEntity $entity)
