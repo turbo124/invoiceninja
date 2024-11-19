@@ -62,8 +62,7 @@ class SendRecurring implements ShouldQueue
         // Generate Standard Invoice
         $invoice = RecurringInvoiceToInvoiceFactory::create($this->recurring_invoice, $this->recurring_invoice->client);
 
-        $date = now()->addSeconds($this->recurring_invoice->client->timezone_offset())->format('Y-m-d');
-        // $date = date('Y-m-d');
+        $date = date('Y-m-d'); //@todo this will always pull UTC date.
         $invoice->date = $date;
 
         nlog("Recurring Invoice Date Set on Invoice = {$invoice->date} - ". now()->format('Y-m-d'));
@@ -85,7 +84,6 @@ class SendRecurring implements ShouldQueue
                                ->save();
         }
 
-        //12-01-2023 i moved this block after fillDefaults to handle if standard invoice auto bill config has been enabled, recurring invoice should override.
         if ($this->recurring_invoice->auto_bill == 'always') {
             $invoice->auto_bill_enabled = true;
             $invoice->saveQuietly();

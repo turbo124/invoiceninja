@@ -152,21 +152,6 @@ class ClientFilters extends QueryFilters
         });
 
 
-        // return  $this->builder->where(function ($query) use ($filter) {
-        //     $query->where('name', 'like', '%'.$filter.'%')
-        //                   ->orWhere('id_number', 'like', '%'.$filter.'%')
-        //                   ->orWhere('number', 'like', '%'.$filter.'%')
-        //                   ->orWhereHas('contacts', function ($query) use ($filter) {
-        //                       $query->where('first_name', 'like', '%'.$filter.'%');
-        //                       $query->orWhere('last_name', 'like', '%'.$filter.'%');
-        //                       $query->orWhere('email', 'like', '%'.$filter.'%');
-        //                       $query->orWhere('phone', 'like', '%'.$filter.'%');
-        //                   })
-        //                   ->orWhere('custom_value1', 'like', '%'.$filter.'%')
-        //                   ->orWhere('custom_value2', 'like', '%'.$filter.'%')
-        //                   ->orWhere('custom_value3', 'like', '%'.$filter.'%')
-        //                   ->orWhere('custom_value4', 'like', '%'.$filter.'%');
-        // });
     }
 
     /**

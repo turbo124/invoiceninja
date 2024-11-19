@@ -328,7 +328,7 @@ class BaseModel extends Model
         }
 
         // special catch here for einvoicing eventing
-        if($event_id == Webhook::EVENT_SENT_INVOICE && ($this instanceof Invoice) && is_null($this->backup) && $this->client->getSetting('e_invoice_type') == 'PEPPOL'){
+        if($event_id == Webhook::EVENT_SENT_INVOICE && ($this instanceof Invoice) && is_null($this->backup) && $this->client->peppolSendingEnabled()){
             \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($this), $this->id, $this->company->db);
         }
 

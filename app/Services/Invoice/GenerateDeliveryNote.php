@@ -83,6 +83,8 @@ class GenerateDeliveryNote
 
         $variables = $html->generateLabelsAndValues();
         $variables['labels']['$entity_label'] = ctrans('texts.delivery_note');
+        $variables['labels']['$invoice.date_label'] = ctrans('texts.date');
+        $variables['labels']['$invoice.number_label'] = ctrans('texts.number');
 
         $state = [
             'template' => $template->elements([

@@ -380,7 +380,7 @@ class Design extends BaseDesign
         // We don't want to show account balance or invoice total on PDF.. or any amount with currency.
         if ($this->type == self::DELIVERY_NOTE) {
             $variables = array_filter($variables, function ($m) {
-                return !in_array($m, ['$invoice.balance_due', '$invoice.total']);
+                return !in_array($m, ['$invoice.balance_due', '$invoice.total', '$invoice.amount']);
             });
         }
         

@@ -65,8 +65,8 @@ class CompanyTaxRate implements ShouldQueue
                     nlog("could not calculate state from postal code => {$this->company->settings->postal_code} or from state {$this->company->settings->state}");
                 }
 
-                if(!$calculated_state && $this->company->tax_data?->seller_subregion) {
-                    $calculated_state = $this->company->tax_data?->seller_subregion;
+                if(!$calculated_state && $this->company->tax_data?->seller_subregion) { //@phpstan-ignore-line
+                    $calculated_state = $this->company->tax_data->seller_subregion;
                 }
 
                 if(!$calculated_state) {

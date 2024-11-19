@@ -119,7 +119,7 @@ class QuoteReminderJob implements ShouldQueue
         $t->replace(Ninja::transformTranslations($quote->client->getMergedSettings()));
         App::setLocale($quote->client->locale());
 
-        if ($quote->isPayable()) {
+        if ($quote->canRemind()) {
             //Attempts to prevent duplicates from sending
             if ($quote->reminder_last_sent && Carbon::parse($quote->reminder_last_sent)->startOfDay()->eq(now()->startOfDay())) {
                 nrlog("caught a duplicate reminder for quote {$quote->number}");

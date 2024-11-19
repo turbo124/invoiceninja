@@ -85,7 +85,7 @@ class SendEmailRequest extends Request
             $input['template'] = '';
         }
 
-        if (! property_exists($settings, $input['template'])) {
+        if (is_string($input['template']) && ! property_exists($settings, $input['template'])) {
             unset($input['template']);
         }
 

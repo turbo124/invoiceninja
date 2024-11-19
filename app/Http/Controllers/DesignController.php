@@ -548,10 +548,14 @@ class DesignController extends BaseController
         $group_settings_id = $request->input('group_settings_id', false);
         $client_id = $request->input('client_id', false);
 
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
         $company = $user->getCompany();
+
+        nlog("Design Change {$company->id}");
+        nlog($request->all());
 
         $design = Design::where('company_id', $company->id)
                         ->orWhereNull('company_id')
@@ -567,14 +571,15 @@ class DesignController extends BaseController
 
                 $company->invoices()
                         ->when($settings_level == 'company', function ($query){
+                            $query->where(function ($query) {
+                                $query->whereDoesntHave('client.group_settings')
+                                    ->orWhereHas('client.group_settings', function ($q){
+                                    
+                                        $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
+                                        ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
 
-                            $query->whereDoesntHave('client.group_settings')
-                                ->orWhereHas('client.group_settings', function ($q){
-                                
-                                    $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
-                                    ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
-
-                                });
+                                    });
+                            });
                         })
                         ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use($group_settings_id){
                            
@@ -599,14 +604,15 @@ class DesignController extends BaseController
                 
                 $company->quotes()
                         ->when($settings_level == 'company', function ($query){
+                            $query->where(function ($query) {
+                                $query->whereDoesntHave('client.group_settings')
+                                    ->orWhereHas('client.group_settings', function ($q){
+                                    
+                                        $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
+                                        ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
 
-                            $query->whereDoesntHave('client.group_settings')
-                                ->orWhereHas('client.group_settings', function ($q){
-                                
-                                    $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
-                                    ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
-
-                                });
+                                    });
+                            });
                         })
                         ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use($group_settings_id){
                            
@@ -627,14 +633,15 @@ class DesignController extends BaseController
 
                 $company->credits()
                         ->when($settings_level == 'company', function ($query){
+                            $query->where(function ($query) {
+                                $query->whereDoesntHave('client.group_settings')
+                                    ->orWhereHas('client.group_settings', function ($q){
+                                    
+                                        $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
+                                        ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
 
-                            $query->whereDoesntHave('client.group_settings')
-                                ->orWhereHas('client.group_settings', function ($q){
-                                
-                                    $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
-                                    ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
-
-                                });
+                                    });
+                            });
                         })
                         ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use($group_settings_id){
                            
