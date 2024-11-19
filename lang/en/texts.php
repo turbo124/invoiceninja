@@ -5473,6 +5473,7 @@ $lang = array(
     'acts_as_must_be_true' => 'Either "Send E-Invoice" or "Receive E-Invoice" (or both) must be selected.',
     'delete_identifier' => 'Delete identifier',
     'delete_identifier_description' => 'Deleting this identifier will remove it from the system. Make sure this is the desired action before proceeding.',
+    'einvoice_something_went_wrong' => 'Oops! Something went wrong. Contact us at contact@invoiceninja.com for more information.',
 );
 
 return $lang;
