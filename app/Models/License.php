@@ -12,6 +12,7 @@
 namespace App\Models;
 
 use App\Casts\AsTaxEntityCollection;
+use App\DataMapper\EInvoice\TaxEntity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 
@@ -32,8 +33,9 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
  * @property int|null $recurring_invoice_id
  * @property int|null $e_invoice_quota
  * @property bool $is_flagged
- * @property object|null $entities 
+ * @property array|null $entities 
  * @property-read \App\Models\RecurringInvoice $recurring_invoice
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EInvoiceToken> $e_invoicing_tokens
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel exclude($columns)
  * @method static \Illuminate\Database\Eloquent\Builder|License newModelQuery()
@@ -85,4 +87,31 @@ class License extends StaticModel
         return $this->hasMany(EInvoicingToken::class, 'license_key', 'license_key');
     }
 
+    public function addEntity(TaxEntity $entity)
+    {
+
+        if (is_array($this->entities)) {
+            $this->entities[] = $entity;
+        } else {
+            $this->entities = [$entity];
+        }
+
+        $this->save();
+
+    }
+
+    public function removeEntity(TaxEntity $entity)
+    {
+                
+        if (!is_array($this->entities)) {
+            return;
+        }
+
+        $this->entities = array_filter($this->entities, function ($existingEntity) use ($entity) {
+            return $existingEntity->legal_entity_id !== $entity->legal_entity_id;
+        });
+
+        $this->save();
+
+    }
 }

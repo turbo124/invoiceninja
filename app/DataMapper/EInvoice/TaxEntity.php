@@ -33,7 +33,7 @@ class TaxEntity
     {
         if (!$entity) {
             $this->init();
-            return $this;
+            return;
         }
 
         $entityArray = is_object($entity) ? get_object_vars($entity) : $entity;
