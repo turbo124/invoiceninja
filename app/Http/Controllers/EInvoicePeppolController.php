@@ -89,6 +89,7 @@ class EInvoicePeppolController extends BaseController
         $company->tax_data = $tax_data;
         $company->settings = $settings;
 
+        $company->enabled_tax_rates = 0;
         $company->enabled_item_tax_rates = 1;
 
         $company->save();
