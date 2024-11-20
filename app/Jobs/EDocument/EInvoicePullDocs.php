@@ -41,6 +41,8 @@ class EInvoicePullDocs implements ShouldQueue
 
     public function handle() 
     {
+        nlog("Pulling Peppol Docs ". now()->format('Y-m-d h:i:s'));
+        
         if (Ninja::isHosted()) {
             return;
         }
