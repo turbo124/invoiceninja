@@ -65,6 +65,7 @@
         "imdhemy/laravel-purchases": "^1.7",
         "intervention/image": "^2.5",
         "invoiceninja/admin-package": "dev-main",
+        "invoiceninja/admin-api": "dev-main",
         "invoiceninja/einvoice": "dev-main",
         "invoiceninja/inspector": "^3.0",
         "invoiceninja/ubl_invoice": "^2",
@@ -123,10 +124,10 @@
         "laravel/framework": "^v11.0",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.1",
-        "phpstan/phpstan": "^1.9",
+        "phpstan/phpstan": "^1.12",
         "phpunit/phpunit": "^11",
         "spatie/laravel-ignition": "^2.0",
-        "spaze/phpstan-stripe": "^3.0"
+        "spaze/phpstan-stripe": "^3"
     },
     "autoload": {
         "psr-4": {
@@ -223,6 +224,13 @@
         {
             "type": "path",
             "url": "../admin-package",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../admin-api",
             "options": {
                 "symlink": true
             }
