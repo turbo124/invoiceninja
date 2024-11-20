@@ -137,6 +137,50 @@ class License extends StaticModel
         $this->save();
 
     }
+    
+    /**
+     * updateEntity
+     *
+     * @param  TaxEntity $entity
+     * @return void
+     */
+    public function updateEntity(TaxEntity $entity, string $search_key = 'legal_entity_id')
+    {
+                
+        if (!is_array($this->entities)) {
+            return;
+        }
+
+        $entities = $this->entities;
+
+        foreach ($entities as $key => $existingEntity) {
+            if ($existingEntity->{$search_key} === $entity->{$search_key}) {
+                $entities[$key] = $entity;
+                break;
+            }
+        }
+
+        $this->setAttribute('entities', $entities);
+        $this->save();
+
+    }
+
+    public function findEntity(string $key, mixed $value): ?TaxEntity
+    {
+                
+        if (!is_array($this->entities)) {
+            return null;
+        }
+
+        foreach ($this->entities as $entity) {
+            if (property_exists($entity, $key) && $entity->{$key} === $value) {
+                return $entity;
+            }
+        }
+
+        return null;
+
+    }
 
     /**
      * isValid
