@@ -91,7 +91,7 @@ class ProcessMailgunWebhook implements ShouldQueue
     {
         nlog($this->request);
 
-        if(!$this->request['event-data']['tags'][0] ?? false) { //@phpstan-ignore-line
+        if (!$this->request['event-data']['tags'][0] ?? false) { //@phpstan-ignore-line
             return;
         }
 
@@ -185,7 +185,7 @@ class ProcessMailgunWebhook implements ShouldQueue
         $sl = $this->getSystemLog($this->request['MessageID']);
 
         /** Prevents Gmail tracking from firing inappropriately */
-        if(!$sl || $this->request['signature']['timestamp'] < $sl->log['signature']['timestamp'] + 3) {
+        if (!$sl || $this->request['signature']['timestamp'] < $sl->log['signature']['timestamp'] + 3) {
             return;
         }
 
@@ -199,7 +199,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl instanceof SystemLog) {
+        if ($sl instanceof SystemLog) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -277,7 +277,7 @@ class ProcessMailgunWebhook implements ShouldQueue
 
         $sl = $this->getSystemLog($this->request['MessageID']);
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $this->getEvent();
             $this->updateSystemLog($sl, $data);
@@ -382,7 +382,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -456,7 +456,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -490,7 +490,7 @@ class ProcessMailgunWebhook implements ShouldQueue
 
     private function fetchMessage(): array
     {
-        if(strlen($this->message_id) < 2) {
+        if (strlen($this->message_id) < 2) {
             return $this->default_response;
         }
 

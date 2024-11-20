@@ -100,7 +100,7 @@ class ClientBalanceReport extends BaseExport
     {
         $headers = [];
 
-        foreach($this->report_keys as $key) {
+        foreach ($this->report_keys as $key) {
             $headers[] = ctrans("texts.{$key}");
         }
 

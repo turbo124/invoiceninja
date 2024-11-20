@@ -68,7 +68,7 @@ class SendToAdmin implements ShouldQueue
 
         $user = $this->company->owner();
 
-        if(isset($this->request['user_id'])) {
+        if (isset($this->request['user_id'])) {
             $user = User::find($this->request['user_id']) ?? $this->company->owner();
         }
 
@@ -77,7 +77,7 @@ class SendToAdmin implements ShouldQueue
         $nmo->company = $this->company;
         $nmo->settings = $this->company->settings;
         $nmo->to_user = $user;
-    
+
         try {
             (new NinjaMailerJob($nmo))->handle();
         } catch (\Throwable $th) {

@@ -38,7 +38,7 @@ class SendEDocument implements ShouldQueue
     use SerializesModels;
 
     public $tries = 5;
-    
+
     public $deleteWhenMissingModels = true;
 
     public function __construct(private string $entity, private int $id, private string $db)
@@ -53,12 +53,12 @@ class SendEDocument implements ShouldQueue
     public function handle(Storecove $storecove)
     {
         MultiDB::setDB($this->db);
-    
+
         nlog("trying");
 
         $model = $this->entity::find($this->id);
 
-        if($model->company->account->is_flagged){
+        if ($model->company->account->is_flagged) {
             nlog("Bad Actor");
             return; //Bad Actor present.
         }
@@ -74,7 +74,7 @@ class SendEDocument implements ShouldQueue
             nlog($result);
             return $result['errors'];
         }
-        
+
         $payload = [
             'legal_entity_id' => $model->company->legal_entity_id,
             "idempotencyGuid" => \Illuminate\Support\Str::uuid(),
@@ -88,31 +88,30 @@ class SendEDocument implements ShouldQueue
             'e_invoicing_token' => $model->company->account->e_invoicing_token,
         ];
 
-        //Self Hosted Sending Code Path 
-        if(Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->peppolSendingEnabled())
-        {
-            
+        //Self Hosted Sending Code Path
+        if (Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->peppolSendingEnabled()) {
+
             $r = Http::withHeaders($this->getHeaders())
                 ->post(config('ninja.hosted_ninja_url')."/api/einvoice/submission", $payload);
 
-            if($r->successful()) {
+            if ($r->successful()) {
                 nlog("Model {$model->number} was successfully sent for third party processing via hosted Invoice Ninja");
-            
+
                 $data = $r->json();
                 return $this->writeActivity($model, $data['guid']);
 
             }
 
-            if($r->failed()) {
+            if ($r->failed()) {
                 nlog("Model {$model->number} failed to be accepted by invoice ninja, error follows:");
                 nlog($r->getBody()->getContents());
                 return response()->json(['message' => "Model {$model->number} failed to be accepted by invoice ninja"], 400);
             }
 
-        }
-        elseif(Ninja::isSelfHost())
+        } elseif (Ninja::isSelfHost()) {
             return;
-        
+        }
+
         //Run this check outside of the next loop as it will never send otherwise.
         if ($model->company->account->e_invoice_quota == 0 && $model->company->legal_entity_id) {
             $key = "e_invoice_quota_exhausted_{$model->company->account->key}";
@@ -133,11 +132,10 @@ class SendEDocument implements ShouldQueue
             }
 
             return;
-        } 
+        }
 
         //Hosted Sending Code Path.
-        if(($model instanceof Invoice) && $model->company->peppolSendingEnabled())
-        {
+        if (($model instanceof Invoice) && $model->company->peppolSendingEnabled()) {
             if ($model->company->account->e_invoice_quota <= config('ninja.e_invoice_quota_warning')) {
                 $key = "e_invoice_quota_low_{$model->company->account->key}";
 
@@ -161,20 +159,20 @@ class SendEDocument implements ShouldQueue
             $r = $sc->sendJsonDocument($payload);
 
             // Successful send - update quota!
-            if(is_string($r)){
-                                
+            if (is_string($r)) {
+
                 $account = $model->company->account;
                 $account->decrement('e_invoice_quota', 1);
-                $account->refresh(); 
+                $account->refresh();
 
-                if($account->e_invoice_quota == 0 && class_exists(\Modules\Admin\Jobs\Account\SuspendESendReceive::class)){
+                if ($account->e_invoice_quota == 0 && class_exists(\Modules\Admin\Jobs\Account\SuspendESendReceive::class)) {
                     \Modules\Admin\Jobs\Account\SuspendESendReceive::dispatch($account->key);
                 }
 
                 return $this->writeActivity($model, $r);
             }
-                
-            if($r->failed()) {
+
+            if ($r->failed()) {
                 nlog("Model {$model->number} failed to be accepted by invoice ninja, error follows:");
                 nlog($r->getBody()->getContents());
             }
@@ -196,17 +194,17 @@ class SendEDocument implements ShouldQueue
 
         $activity->save();
 
-        $std = new \stdClass;
+        $std = new \stdClass();
         $std->guid = str_replace('"', '', $guid);
         $model->backup = $std;
         $model->saveQuietly();
 
     }
-    
+
     /**
      * Self hosted request headers
      *
-     * 
+     *
      **/
     private function getHeaders(): array
     {

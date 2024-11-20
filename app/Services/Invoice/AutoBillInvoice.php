@@ -75,7 +75,7 @@ class AutoBillInvoice extends AbstractService
             $this->applyCreditPayment();
         }
 
-        if($this->client->getSetting('use_unapplied_payment') != 'off') {
+        if ($this->client->getSetting('use_unapplied_payment') != 'off') {
             $this->applyUnappliedPayment();
         }
 
@@ -156,7 +156,7 @@ class AutoBillInvoice extends AbstractService
         ]);
 
         nlog("Payment hash created => {$payment_hash->id}");
-       
+
         $payment = false;
         try {
             $payment = $gateway_token->gateway
@@ -180,9 +180,8 @@ class AutoBillInvoice extends AbstractService
                 'auto_bill_tries' => 0
             ]);
 
-        }
-        else {
-            
+        } else {
+
             \App\Models\Invoice::where('id', $this->invoice->id)->update([
                 'auto_bill_tries' => $this->invoice->auto_bill_tries
             ]);
@@ -276,7 +275,7 @@ class AutoBillInvoice extends AbstractService
         event(new PaymentWasCreated($payment, $payment->company, Ninja::eventVars()));
 
         //if we have paid the invoice in full using credits, then we need to fire the event
-        if($this->invoice->balance == 0) {
+        if ($this->invoice->balance == 0) {
             event(new InvoiceWasPaid($this->invoice, $payment, $payment->company, Ninja::eventVars()));
         }
 
@@ -363,7 +362,7 @@ class AutoBillInvoice extends AbstractService
                 }
             }
 
-            if((int)$this->invoice->balance == 0) {
+            if ((int)$this->invoice->balance == 0) {
                 event(new InvoiceWasPaid($this->invoice, $payment, $payment->company, Ninja::eventVars()));
                 return $this;
             }

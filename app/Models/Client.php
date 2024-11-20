@@ -240,15 +240,16 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function toSearchableArray()
     {
-        
+
         $locale = $this->locale();
         App::setLocale($locale);
 
         $name = ctrans('texts.client') . " | " . $this->present()->name();
 
-        if(strlen($this->vat_number ?? '') > 1)
+        if (strlen($this->vat_number ?? '') > 1) {
             $name .= " | ". $this->vat_number;
-        
+        }
+
         return [
             'name' => $name,
             'is_deleted' => $this->is_deleted,
@@ -280,10 +281,10 @@ class Client extends BaseModel implements HasLocalePreference
         ];
     }
 
-   public function getScoutKey()
-   {
-       return $this->hashed_id;
-   }
+    public function getScoutKey()
+    {
+        return $this->hashed_id;
+    }
 
     public function getEntityType()
     {
@@ -522,7 +523,7 @@ class Client extends BaseModel implements HasLocalePreference
                 return $this->settings->{$setting};
             } elseif (is_int($this->settings->{$setting})) {
                 return $this->settings->{$setting};
-            } elseif(is_float($this->settings->{$setting})) {
+            } elseif (is_float($this->settings->{$setting})) {
                 return $this->settings->{$setting};
             }
         }
@@ -532,8 +533,7 @@ class Client extends BaseModel implements HasLocalePreference
             return $this->group_settings->settings->{$setting};
         }
 
-        /*Company Settings*/
-        elseif ((property_exists($this->company->settings, $setting) !== false) && (isset($this->company->settings->{$setting}) !== false)) {
+        /*Company Settings*/ elseif ((property_exists($this->company->settings, $setting) !== false) && (isset($this->company->settings->{$setting}) !== false)) {
             return $this->company->settings->{$setting};
         } elseif (property_exists(CompanySettings::defaults(), $setting)) {
             return CompanySettings::defaults()->{$setting};
@@ -590,7 +590,7 @@ class Client extends BaseModel implements HasLocalePreference
 
                 $cg = CompanyGateway::query()->find($pm['company_gateway_id']);
 
-                if($cg->gateway_key == '80af24a6a691230bbec33e930ab40666') { //ensure we don't attempt to authorize paypal platform - yet.
+                if ($cg->gateway_key == '80af24a6a691230bbec33e930ab40666') { //ensure we don't attempt to authorize paypal platform - yet.
                     continue;
                 }
 
@@ -708,7 +708,7 @@ class Client extends BaseModel implements HasLocalePreference
         }
 
         if (in_array($this->currency()->code, ['CAD','USD']) && in_array(GatewayType::ACSS, array_column($pms, 'gateway_type_id'))) {
-        // if ($this->currency()->code == 'CAD' && in_array(GatewayType::ACSS, array_column($pms, 'gateway_type_id'))) {
+            // if ($this->currency()->code == 'CAD' && in_array(GatewayType::ACSS, array_column($pms, 'gateway_type_id'))) {
             foreach ($pms as $pm) {
                 if ($pm['gateway_type_id'] == GatewayType::ACSS) {
                     $cg = CompanyGateway::query()->find($pm['company_gateway_id']);
@@ -720,7 +720,7 @@ class Client extends BaseModel implements HasLocalePreference
             }
         }
 
-        
+
         if (in_array($this->currency()->code, ['GBP']) && in_array(GatewayType::BACS, array_column($pms, 'gateway_type_id'))) {
             // if ($this->currency()->code == 'CAD' && in_array(GatewayType::ACSS, array_column($pms, 'gateway_type_id'))) {
             foreach ($pms as $pm) {
@@ -769,11 +769,9 @@ class Client extends BaseModel implements HasLocalePreference
 
                     if ($cg && $cg->fees_and_limits->{GatewayType::SEPA}->is_enabled) {
                         return GatewayType::SEPA;
-                    }
-                    else if ($cg && $cg->fees_and_limits->{GatewayType::BANK_TRANSFER}->is_enabled) {
+                    } elseif ($cg && $cg->fees_and_limits->{GatewayType::BANK_TRANSFER}->is_enabled) {
                         return GatewayType::BANK_TRANSFER;
-                    }
-                    else if ($cg && $cg->fees_and_limits->{GatewayType::DIRECT_DEBIT}->is_enabled) {
+                    } elseif ($cg && $cg->fees_and_limits->{GatewayType::DIRECT_DEBIT}->is_enabled) {
                         return GatewayType::DIRECT_DEBIT;
                     }
 
@@ -936,13 +934,13 @@ class Client extends BaseModel implements HasLocalePreference
         $terms = &$data['terms'];
         $footer = &$data['footer'];
 
-        if(empty($terms)) {
+        if (empty($terms)) {
             $defaults['terms'] = $this->getSetting($entity_name.'_terms');
         } elseif ($terms) {
             $defaults['terms'] = $data['terms'];
         }
 
-        if(empty($footer)) {
+        if (empty($footer)) {
             $defaults['footer'] = $this->getSetting($entity_name.'_footer');
         } elseif ($footer) {
             $defaults['footer'] = $data['footer'];
@@ -989,8 +987,7 @@ class Client extends BaseModel implements HasLocalePreference
 
         if ($entity_send_time == 0) { //Send UTC time
             return 0;
-        }
-        elseif($entity_send_time == 24) { // Step back a few seconds to ensure we do not send exactly at hour 24 as that will be the next day - technically.
+        } elseif ($entity_send_time == 24) { // Step back a few seconds to ensure we do not send exactly at hour 24 as that will be the next day - technically.
             $offset -= 10;
         }
 
@@ -1022,12 +1019,12 @@ class Client extends BaseModel implements HasLocalePreference
     {
         return $use_react_url ? config('ninja.react_url'). "/#/clients/{$this->hashed_id}" : config('ninja.app_url');
     }
-        
+
     /**
      * peppolSendingEnabled
-     * 
+     *
      * Determines the sending status of the company
-     * 
+     *
      * @return bool
      */
     public function peppolSendingEnabled(): bool

@@ -570,61 +570,62 @@ class DesignController extends BaseController
             case 'invoice':
 
                 $company->invoices()
-                        ->when($settings_level == 'company', function ($query){
+                        ->when($settings_level == 'company', function ($query) {
                             $query->where(function ($query) {
                                 $query->whereDoesntHave('client.group_settings')
-                                    ->orWhereHas('client.group_settings', function ($q){
-                                    
+                                    ->orWhereHas('client.group_settings', function ($q) {
+
                                         $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
                                         ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
 
                                     });
                             });
                         })
-                        ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use($group_settings_id){
-                           
-                                $query->whereHas('client', function ($q) use ($group_settings_id) {
-                                    $q->where('group_settings_id', $group_settings_id);
-                                });
+                        ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use ($group_settings_id) {
+
+                            $query->whereHas('client', function ($q) use ($group_settings_id) {
+                                $q->where('group_settings_id', $group_settings_id);
+                            });
 
                         })
-                        ->when($settings_level == 'client' && $client_id, function ($query) use($client_id){
-            
+                        ->when($settings_level == 'client' && $client_id, function ($query) use ($client_id) {
+
                             $query->where('client_id', $client_id);
-            
+
                         })
                         ->update(['design_id' => $design_id]);
 
 
-                if($settings_level == 'company')    
+                if ($settings_level == 'company') {
                     $company->recurring_invoices()->update(['design_id' => $design_id]);
+                }
 
                 break;
             case 'quote':
-                
+
                 $company->quotes()
-                        ->when($settings_level == 'company', function ($query){
+                        ->when($settings_level == 'company', function ($query) {
                             $query->where(function ($query) {
                                 $query->whereDoesntHave('client.group_settings')
-                                    ->orWhereHas('client.group_settings', function ($q){
-                                    
+                                    ->orWhereHas('client.group_settings', function ($q) {
+
                                         $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
                                         ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
 
                                     });
                             });
                         })
-                        ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use($group_settings_id){
-                           
-                                $query->whereHas('client', function ($q) use ($group_settings_id) {
-                                    $q->where('group_settings_id', $group_settings_id);
-                                });
+                        ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use ($group_settings_id) {
+
+                            $query->whereHas('client', function ($q) use ($group_settings_id) {
+                                $q->where('group_settings_id', $group_settings_id);
+                            });
 
                         })
-                        ->when($settings_level == 'client' && $client_id, function ($query) use($client_id){
-            
+                        ->when($settings_level == 'client' && $client_id, function ($query) use ($client_id) {
+
                             $query->where('client_id', $client_id);
-            
+
                         })
                         ->update(['design_id' => $design_id]);
 
@@ -632,31 +633,31 @@ class DesignController extends BaseController
             case 'credit':
 
                 $company->credits()
-                        ->when($settings_level == 'company', function ($query){
+                        ->when($settings_level == 'company', function ($query) {
                             $query->where(function ($query) {
                                 $query->whereDoesntHave('client.group_settings')
-                                    ->orWhereHas('client.group_settings', function ($q){
-                                    
+                                    ->orWhereHas('client.group_settings', function ($q) {
+
                                         $q->whereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') IS NULL")
                                         ->orWhereRaw("JSON_EXTRACT(settings, '$.invoice_design_id') = ''");
 
                                     });
                             });
                         })
-                        ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use($group_settings_id){
-                           
-                                $query->whereHas('client', function ($q) use ($group_settings_id) {
-                                    $q->where('group_settings_id', $group_settings_id);
-                                });
+                        ->when($settings_level == 'group_settings' && $group_settings_id, function ($query) use ($group_settings_id) {
+
+                            $query->whereHas('client', function ($q) use ($group_settings_id) {
+                                $q->where('group_settings_id', $group_settings_id);
+                            });
 
                         })
-                        ->when($settings_level == 'client' && $client_id, function ($query) use($client_id){
-            
+                        ->when($settings_level == 'client' && $client_id, function ($query) use ($client_id) {
+
                             $query->where('client_id', $client_id);
-            
+
                         })
                         ->update(['design_id' => $design_id]);
-                        
+
                 break;
 
             case 'purchase_order':

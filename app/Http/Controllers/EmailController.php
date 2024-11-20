@@ -74,7 +74,7 @@ class EmailController extends BaseController
 
         if ($request->cc_email && (Ninja::isSelfHost() || $user->account->isPremium())) {
 
-            foreach($request->cc_email as $email) {
+            foreach ($request->cc_email as $email) {
                 $mo->cc[] = new Address($email);
             }
 
@@ -141,7 +141,7 @@ class EmailController extends BaseController
         return $this->itemResponse($entity_obj->fresh());
     }
 
-   private function resolveClass(string $entity): string
+    private function resolveClass(string $entity): string
     {
         $class = '';
 

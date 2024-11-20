@@ -41,7 +41,7 @@ class ContactLoginController extends Controller
         $company = false;
         $account = false;
 
-        if($request->query('intended')) {
+        if ($request->query('intended')) {
             $request->session()->put('url.intended', $request->query('intended'));
         }
 
@@ -143,7 +143,7 @@ class ContactLoginController extends Controller
 
         $this->setRedirectPath();
 
-        if($intended) {
+        if ($intended) {
             $this->redirectTo = $intended;
         }
 

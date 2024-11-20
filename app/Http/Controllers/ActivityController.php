@@ -62,7 +62,7 @@ class ActivityController extends BaseController
                                 ->company()
                                 ->take($default_activities);
 
-        if($request->has('reactv2')) {
+        if ($request->has('reactv2')) {
 
             /** @var \App\Models\User auth()->user() */
             $user = auth()->user();

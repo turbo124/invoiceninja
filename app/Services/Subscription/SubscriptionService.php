@@ -253,7 +253,7 @@ class SubscriptionService
         // Redirects from here work just fine. Livewire will respect it.
         $client_contact = ClientContact::find($this->decodePrimaryKey($data['contact_id']));
 
-        if(is_string($data['client_id'])) {
+        if (is_string($data['client_id'])) {
             $data['client_id'] = $this->decodePrimaryKey($data['client_id']);
         }
 
@@ -987,7 +987,7 @@ class SubscriptionService
                             ->fillDefaults()
                             ->save();
 
-        if($invoice->fresh()->balance == 0) {
+        if ($invoice->fresh()->balance == 0) {
             $invoice->service()->markPaid()->save();
         }
 

@@ -38,7 +38,7 @@ class CreditsTable extends Component
 
     public function render()
     {
-        
+
         $query = Credit::query()
             ->where('company_id', auth()->guard('contact')->user()->company_id)
             ->where('client_id', auth()->guard('contact')->user()->client_id)

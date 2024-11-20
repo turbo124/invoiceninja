@@ -64,7 +64,7 @@ class AutoBill implements ShouldQueue
         } catch (\Exception $e) {
             nlog("Failed to capture payment for {$this->invoice_id} ->".$e->getMessage());
 
-            if($this->send_email_on_failure && $invoice) {
+            if ($this->send_email_on_failure && $invoice) {
 
                 $invoice->invitations->each(function ($invitation) use ($invoice) {
                     if ($invitation->contact && ! $invitation->contact->trashed() && strlen($invitation->contact->email) >= 1 && $invoice->client->getSetting('auto_email_invoice')) {

@@ -34,7 +34,7 @@ class ZipInvoices implements ShouldQueue
     use SerializesModels;
 
     public $tries = 1;
-    
+
     public $timeout = 3600;
 
     /**
@@ -70,7 +70,7 @@ class ZipInvoices implements ShouldQueue
         $zipFile = new \PhpZip\ZipFile();
         $file_name = date('Y-m-d').'_'.str_replace(' ', '_', trans('texts.invoices')).'.zip';
         $invitation = $this->invoices->first()->invitations->first();
-        
+
         if (!$invitation) {
             nlog("no Invoice Invitations");
             return;
@@ -86,8 +86,7 @@ class ZipInvoices implements ShouldQueue
                     try {
                         $xml = $invoice->service()->getEDocument();
                         $zipFile->addFromString($invoice->getFileName("xml"), $xml);
-                    }
-                    catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         nlog("could not create e invoice for {$invoice->id}");
                         nlog($e->getMessage());
                     }

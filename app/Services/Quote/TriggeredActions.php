@@ -84,9 +84,9 @@ class TriggeredActions extends AbstractService
         // $reminder_template = 'email_template_quote';
         // $quote_template = 'email_template_reminder1
         $reminder_template = "email_template_{$reminder_template}";
-        
+
         $this->quote->invitations->load('contact.client.country', 'quote.client.country', 'quote.company')->each(function ($invitation) use ($reminder_template) {
-            
+
             $mo = new EmailObject();
             $mo->entity_id = $invitation->quote_id;
             $mo->template = $reminder_template; //full template name in use

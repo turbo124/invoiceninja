@@ -51,7 +51,7 @@ class Blockonomics implements LivewireMethodInterface
     {
         $api_key = $this->blockonomics->company_gateway->getConfigField('apiKey');
 
-        // $params = config('ninja.environment') == 'development' ? '?reset=1' : ''; 
+        // $params = config('ninja.environment') == 'development' ? '?reset=1' : '';
         $url = 'https://www.blockonomics.co/api/new_address';
 
         $r = Http::withToken($api_key)
@@ -59,8 +59,9 @@ class Blockonomics implements LivewireMethodInterface
 
         nlog($r->body());
 
-        if($r->successful())
+        if ($r->successful()) {
             return $r->object()->address ?? 'Something went wrong';
+        }
 
         return $r->object()->message ?? 'Something went wrong';
 
@@ -72,12 +73,12 @@ class Blockonomics implements LivewireMethodInterface
         $r = Http::get('https://www.blockonomics.co/api/price', ['currency' => $this->blockonomics->client->getCurrencyCode()]);
 
         return $r->successful() ? $r->object()->price : 'Something went wrong';
-        
+
     }
 
     public function paymentData(array $data): array
     {
-    
+
         $btc_price = $this->getBTCPrice();
         $btc_address = $this->getBTCAddress();
         $fiat_amount = $data['total']['amount_with_fee'];
@@ -129,7 +130,7 @@ class Blockonomics implements LivewireMethodInterface
 
             $statusId = Payment::STATUS_PENDING;
             $payment = $this->blockonomics->createPayment($data, $statusId);
-            
+
             SystemLogger::dispatch(
                 ['response' => $payment, 'data' => $data],
                 SystemLog::CATEGORY_GATEWAY_RESPONSE,
@@ -138,7 +139,7 @@ class Blockonomics implements LivewireMethodInterface
                 $this->blockonomics->client,
                 $this->blockonomics->client->company,
             );
-            
+
             return redirect()->route('client.payments.show', ['payment' => $payment->hashed_id]);
 
         } catch (\Throwable $e) {

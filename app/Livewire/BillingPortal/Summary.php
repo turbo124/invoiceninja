@@ -82,12 +82,12 @@ class Summary extends Component
         }
 
         $this->dispatch('purchase.context', property: 'bundle', value: $bundle);
-       
+
     }
 
-   /**
-     * Base calculations for one-time purchases
-     */
+    /**
+      * Base calculations for one-time purchases
+      */
     #[Computed]
     public function oneTimePurchasesTotal(): float
     {
@@ -142,17 +142,17 @@ class Summary extends Component
     #[Computed]
     public function discount(): float
     {
-        if (!isset($this->context['valid_coupon']) || 
+        if (!isset($this->context['valid_coupon']) ||
             $this->context['valid_coupon'] != $this->subscription()->promo_code) {
             return 0.0;
         }
 
         $subscription = $this->subscription();
         $discount = $subscription->promo_discount;
-        
-        return $subscription->is_amount_discount 
-            ? $discount 
-            : ($this->calculateSubtotal() * $discount/100);
+
+        return $subscription->is_amount_discount
+            ? $discount
+            : ($this->calculateSubtotal() * $discount / 100);
     }
 
     /**
@@ -232,7 +232,7 @@ class Summary extends Component
         return $products;
     }
 
-    #[On('summary.refresh')] 
+    #[On('summary.refresh')]
     public function refresh()
     {
         // nlog("am i refreshing here?");

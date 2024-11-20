@@ -328,18 +328,18 @@ class BaseModel extends Model
         }
 
         // special catch here for einvoicing eventing
-        if($event_id == Webhook::EVENT_SENT_INVOICE && ($this instanceof Invoice) && is_null($this->backup) && $this->client->peppolSendingEnabled()){
+        if ($event_id == Webhook::EVENT_SENT_INVOICE && ($this instanceof Invoice) && is_null($this->backup) && $this->client->peppolSendingEnabled()) {
             \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($this), $this->id, $this->company->db);
         }
 
     }
 
-    
+
     /**
      * arrayFilterRecursive nee filterNullsRecursive
      *
      * Removes null properties from an array
-     * 
+     *
      * @param  array $array
      * @return array
      */
@@ -394,7 +394,7 @@ class BaseModel extends Model
      */
     public function parseHtmlVariables(string $field, array $variables): string
     {
-        if(!$this->{$field}) {
+        if (!$this->{$field}) {
             return '';
         }
 
@@ -442,7 +442,7 @@ class BaseModel extends Model
             $pdf = (new PdfMerge($files->flatten()->toArray()))->run();
             return $pdf;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog("Exception:: BaseModel:: PdfMerge::" . $e->getMessage());
         }
 

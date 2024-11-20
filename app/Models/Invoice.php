@@ -266,10 +266,10 @@ class Invoice extends BaseModel
         ];
     }
 
-   public function getScoutKey()
-   {
-       return $this->hashed_id;
-   }
+    public function getScoutKey()
+    {
+        return $this->hashed_id;
+    }
 
     public function getEntityType()
     {
@@ -467,7 +467,7 @@ class Invoice extends BaseModel
 
     public function isPayable(): bool
     {
-        if($this->is_deleted || $this->status_id == self::STATUS_PAID || $this->balance < 0) {
+        if ($this->is_deleted || $this->status_id == self::STATUS_PAID || $this->balance < 0) {
             return false;
         } elseif ($this->status_id == self::STATUS_DRAFT && $this->is_deleted == false) {
             return true;
@@ -794,25 +794,25 @@ class Invoice extends BaseModel
         $days_endless = \App\Models\RecurringInvoice::frequencyForKey($settings->endless_reminder_frequency_id);
         $label_endless = ctrans('texts.reminder_endless');
 
-        if($schedule_1 == ctrans('texts.disabled') || $settings->schedule_reminder1 == 'disabled' || $settings->schedule_reminder1 == '') {
+        if ($schedule_1 == ctrans('texts.disabled') || $settings->schedule_reminder1 == 'disabled' || $settings->schedule_reminder1 == '') {
             $reminder_schedule .= "{$label_1}: " . ctrans('texts.disabled') ."<br>";
         } else {
             $reminder_schedule .= "{$label_1}: {$days_1} {$schedule_1} [{$sends_email_1}]<br>";
         }
 
-        if($schedule_2 == ctrans('texts.disabled') || $settings->schedule_reminder2 == 'disabled' || $settings->schedule_reminder2 == '') {
+        if ($schedule_2 == ctrans('texts.disabled') || $settings->schedule_reminder2 == 'disabled' || $settings->schedule_reminder2 == '') {
             $reminder_schedule .= "{$label_2}: " . ctrans('texts.disabled') ."<br>";
         } else {
             $reminder_schedule .= "{$label_2}: {$days_2} {$schedule_2} [{$sends_email_2}]<br>";
         }
 
-        if($schedule_3 == ctrans('texts.disabled') || $settings->schedule_reminder3 == 'disabled' || $settings->schedule_reminder3 == '') {
+        if ($schedule_3 == ctrans('texts.disabled') || $settings->schedule_reminder3 == 'disabled' || $settings->schedule_reminder3 == '') {
             $reminder_schedule .= "{$label_3}: " . ctrans('texts.disabled') ."<br>";
         } else {
             $reminder_schedule .= "{$label_3}: {$days_3} {$schedule_3} [{$sends_email_3}]<br>";
         }
 
-        if($sends_email_endless == ctrans('texts.disabled') || $settings->endless_reminder_frequency_id == '0' || $settings->endless_reminder_frequency_id == '') {
+        if ($sends_email_endless == ctrans('texts.disabled') || $settings->endless_reminder_frequency_id == '0' || $settings->endless_reminder_frequency_id == '') {
             $reminder_schedule .= "{$label_endless}: " . ctrans('texts.disabled') ."<br>";
         } else {
             $reminder_schedule .= "{$label_endless}: {$days_endless} [{$sends_email_endless}]<br>";

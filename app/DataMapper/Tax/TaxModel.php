@@ -21,13 +21,13 @@ class TaxModel
 
     /** @var object $regions */
     public object $regions;
-    
+
     /** @var bool $acts_as_sender */
     public bool $acts_as_sender = false;
-    
+
     /** @var bool $acts_as_receiver */
     public bool $acts_as_receiver = false;
-    
+
     /**
      * __construct
      *
@@ -37,14 +37,14 @@ class TaxModel
     public function __construct(public mixed $model = null)
     {
 
-        if(!$model) {
+        if (!$model) {
             $this->regions = $this->init();
         } else {
-            
+
             $this->seller_subregion = $model->seller_subregion ?? '';
             $this->acts_as_sender = $model->acts_as_sender ?? false;
             $this->acts_as_receiver = $model->acts_as_receiver ?? false;
-            
+
             $modelArray = get_object_vars($model);
             foreach ($modelArray as $key => $value) {
                 $this->{$key} = $value;
@@ -58,7 +58,7 @@ class TaxModel
     public function migrate(): self
     {
 
-        if($this->version == 'alpha') {
+        if ($this->version == 'alpha') {
             $this->regions->EU->subregions->PL = new \stdClass();
             $this->regions->EU->subregions->PL->tax_rate = 23;
             $this->regions->EU->subregions->PL->tax_name = 'VAT';
@@ -68,7 +68,7 @@ class TaxModel
             $this->version = 'beta';
         }
 
-        if($this->version == 'beta') {
+        if ($this->version == 'beta') {
 
             //CEUTA
             $this->regions->EU->subregions->{'ES-CE'} = new \stdClass();
@@ -138,7 +138,7 @@ class TaxModel
         $this->usRegion()
              ->euRegion()
              ->auRegion();
-            //  ->ukRegion();
+        //  ->ukRegion();
 
 
         return $this->regions;
@@ -149,9 +149,9 @@ class TaxModel
 
         // Add new UK region
         $this->regions->UK = new \stdClass();
-        $this->regions->UK->has_sales_above_threshold = false;  
-        $this->regions->UK->tax_threshold = 85000;             
-        $this->regions->UK->tax_all_subregions = false;        
+        $this->regions->UK->has_sales_above_threshold = false;
+        $this->regions->UK->tax_threshold = 85000;
+        $this->regions->UK->tax_all_subregions = false;
         $this->regions->UK->subregions = new \stdClass();
 
         // Great Britain (England, Scotland, Wales)
@@ -178,7 +178,7 @@ class TaxModel
         return $this;
 
     }
-    
+
     /**
      * Builds the model for Australian Taxes
      *
@@ -577,7 +577,7 @@ class TaxModel
         $this->regions->EU->subregions->IE->tax_name = 'VAT';
         $this->regions->EU->subregions->IE->reduced_tax_rate = 0;
         $this->regions->EU->subregions->IE->apply_tax = false;
-        
+
         $this->regions->EU->subregions->IS = new \stdClass();
         $this->regions->EU->subregions->IS->tax_rate = 24;
         $this->regions->EU->subregions->IS->tax_name = 'VSK';
@@ -589,7 +589,7 @@ class TaxModel
         $this->regions->EU->subregions->IT->tax_name = 'IVA';
         $this->regions->EU->subregions->IT->reduced_tax_rate = 10;
         $this->regions->EU->subregions->IT->apply_tax = false;
-        
+
         $this->regions->EU->subregions->LI = new \stdClass();
         $this->regions->EU->subregions->LI->tax_rate = 7.7;
         $this->regions->EU->subregions->LI->tax_name = 'MWST';
@@ -619,7 +619,7 @@ class TaxModel
         $this->regions->EU->subregions->MT->tax_name = 'VAT';
         $this->regions->EU->subregions->MT->reduced_tax_rate = 5;
         $this->regions->EU->subregions->MT->apply_tax = false;
-        
+
         $this->regions->EU->subregions->NO = new \stdClass();
         $this->regions->EU->subregions->NO->tax_rate = 25;
         $this->regions->EU->subregions->NO->tax_name = 'MVA';
@@ -682,7 +682,7 @@ class TaxModel
             }
 
             $subregions[$region_code] = [];
-            
+
             foreach ($region->subregions as $subregion_code => $subregion) {
                 $subregions[$region_code][] = $subregion_code;
             }
@@ -697,7 +697,7 @@ class TaxModel
             if (!isset($region->subregions)) {
                 continue;
             }
-            
+
             if (isset($region->subregions->{$subregion_code})) {
                 return $region_code;
             }

@@ -421,7 +421,7 @@ class StripePaymentDriver extends BaseDriver
 
     public function processPaymentViewData(array $data): array
     {
-        $data = $this->payment_method->paymentData($data); 
+        $data = $this->payment_method->paymentData($data);
 
         $data['stripe_account_id'] = $this->company_gateway->getConfigField('account_id');
 
@@ -433,7 +433,7 @@ class StripePaymentDriver extends BaseDriver
 
         $token_billing_string = 'true';
 
-        if($this->company_gateway->token_billing == 'off' || $this->company_gateway->token_billing == 'optin') {
+        if ($this->company_gateway->token_billing == 'off' || $this->company_gateway->token_billing == 'optin') {
             $token_billing_string = 'false';
         }
 
@@ -728,7 +728,7 @@ class StripePaymentDriver extends BaseDriver
 
             return response()->json([], 200);
         }
-        
+
         if ($request->type === 'charge.refunded' && $request->data['object']['status'] == 'succeeded') {
             ChargeRefunded::dispatch($request->data, $request->company_key)->delay(now()->addSeconds(5));
 
@@ -742,15 +742,15 @@ class StripePaymentDriver extends BaseDriver
                     ->where('company_id', $this->company_gateway->company_id)
                     ->where(function ($query) use ($transaction) {
 
-                        if(isset($transaction['payment_intent'])) {
+                        if (isset($transaction['payment_intent'])) {
                             $query->where('transaction_reference', $transaction['payment_intent']);
                         }
 
-                        if(isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                        if (isset($transaction['payment_intent']) && isset($transaction['id'])) {
                             $query->orWhere('transaction_reference', $transaction['id']);
                         }
 
-                        if(!isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                        if (!isset($transaction['payment_intent']) && isset($transaction['id'])) {
                             $query->where('transaction_reference', $transaction['id']);
                         }
 
@@ -760,7 +760,7 @@ class StripePaymentDriver extends BaseDriver
 
                 if ($payment) {
 
-                    if(isset($transaction['payment_method_details']['au_becs_debit'])) {
+                    if (isset($transaction['payment_method_details']['au_becs_debit'])) {
                         $payment->transaction_reference = $transaction['id'];
                     }
 
@@ -789,15 +789,15 @@ class StripePaymentDriver extends BaseDriver
                         ->where('company_id', $this->company_gateway->company_id)
                         ->where(function ($query) use ($transaction) {
 
-                            if(isset($transaction['payment_intent'])) {
+                            if (isset($transaction['payment_intent'])) {
                                 $query->where('transaction_reference', $transaction['payment_intent']);
                             }
 
-                            if(isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                            if (isset($transaction['payment_intent']) && isset($transaction['id'])) {
                                 $query->orWhere('transaction_reference', $transaction['id']);
                             }
 
-                            if(!isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                            if (!isset($transaction['payment_intent']) && isset($transaction['id'])) {
                                 $query->where('transaction_reference', $transaction['id']);
                             }
 
@@ -838,7 +838,7 @@ class StripePaymentDriver extends BaseDriver
                     ->where('token', $request->data['object']['payment_method'])
                     ->first();
 
-                if($clientgateway) {
+                if ($clientgateway) {
                     $clientgateway->delete();
                 }
 
@@ -1041,7 +1041,7 @@ class StripePaymentDriver extends BaseDriver
         try {
             $this->verifyConnect();
             return true;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
         }
 
@@ -1050,4 +1050,3 @@ class StripePaymentDriver extends BaseDriver
     }
 
 }
-

@@ -29,7 +29,7 @@ class InvoiceSummary extends Component
 
     public function mount()
     {
-       
+
         $contact = $this->getContext()['contact'] ?? auth()->guard('contact')->user();
         $this->invoices = $this->getContext()['payable_invoices'];
         $this->amount = Number::formatMoney($this->getContext()['amount'], $contact->client);
@@ -48,10 +48,10 @@ class InvoiceSummary extends Component
 
     }
 
-    #[On('payment-view-rendered')] 
+    #[On('payment-view-rendered')]
     public function handlePaymentViewRendered()
     {
-        
+
         $contact = $this->getContext()['contact'] ?? auth()->guard('contact')->user();
         $this->amount = Number::formatMoney($this->getContext()['amount'], $contact->client);
         $this->gateway_fee = isset($this->getContext()['gateway_fee']) ? Number::formatMoney($this->getContext()['gateway_fee'], $contact->client) : false;
@@ -63,7 +63,7 @@ class InvoiceSummary extends Component
 
         $contact = $this->getContext()['contact'] ?? auth()->guard('contact')->user();
         $_invoices = $this->getContext()['invoices'];
-        $i = $_invoices->first(function ($i) use($invoice_hashed_id){
+        $i = $_invoices->first(function ($i) use ($invoice_hashed_id) {
             return $i->hashed_id == $invoice_hashed_id;
         });
 
@@ -82,10 +82,10 @@ class InvoiceSummary extends Component
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
         $contact = $this->getContext()['contact'] ?? auth()->guard('contact')->user();
-        
+
         return render('flow2.invoices-summary', [
             'client' => $contact->client,
         ]);
-        
+
     }
 }

@@ -20,7 +20,6 @@ use App\Services\Email\EmailObject;
 
 class SendEmail
 {
-
     public function __construct(public Quote $quote, public ?string $reminder_template = null, protected ?ClientContact $contact = null)
     {
     }
@@ -41,7 +40,7 @@ class SendEmail
 
         $this->quote->invitations->each(function ($invitation) {
             if (! $invitation->contact->trashed() && $invitation->contact->email) {
-                
+
                 //@refactor 2024-11-10
                 $mo = new EmailObject();
                 $mo->entity_id = $invitation->quote_id;

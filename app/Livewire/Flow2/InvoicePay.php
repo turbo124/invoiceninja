@@ -41,7 +41,7 @@ class InvoicePay extends Component
         'client_postal_code' => 'postal_code',
         'client_country_id' => 'country_id',
 
-        'client_shipping_address_line_1' => 'shipping_address1',  
+        'client_shipping_address_line_1' => 'shipping_address1',
         'client_shipping_address_line_2' => 'shipping_address2',
         'client_shipping_city' => 'shipping_city',
         'client_shipping_state' => 'shipping_state',
@@ -178,7 +178,7 @@ class InvoicePay extends Component
                 }
             }
         }
-        
+
         if ($company_gateway->always_show_required_fields) {
             return $this->required_fields = true;
         }
@@ -212,7 +212,7 @@ class InvoicePay extends Component
         }
 
         return ProcessPayment::class;
-        
+
     }
 
     #[Computed()]
@@ -223,14 +223,14 @@ class InvoicePay extends Component
 
     public function mount()
     {
-        
+
         $this->resetContext();
 
         MultiDB::setDb($this->db);
 
         // @phpstan-ignore-next-line
         $invite = \App\Models\InvoiceInvitation::with('contact.client', 'company')->withTrashed()->find($this->invitation_id);
-        
+
         $client = $invite->contact->client;
         $settings = $client->getMergedSettings();
         $this->setContext('contact', $invite->contact); // $this->context['contact'] = $invite->contact;
@@ -284,9 +284,9 @@ class InvoicePay extends Component
         return render('flow2.invoice-pay');
     }
 
-    public function exception($e, $stopPropagation) 
+    public function exception($e, $stopPropagation)
     {
-        
+
         app('sentry')->captureException($e);
         nlog($e->getMessage());
         $stopPropagation();

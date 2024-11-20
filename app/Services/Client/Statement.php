@@ -69,7 +69,7 @@ class Statement
 
             $custom_statement_template = \App\Models\Design::where('id', $this->decodePrimaryKey($this->client->getSetting('statement_design_id')))->where('is_template', true)->first();
 
-            if($custom_statement_template || $option_template && $option_template != '') {
+            if ($custom_statement_template || $option_template && $option_template != '') {
 
                 $variables['values']['$start_date'] = $this->translateDate($this->options['start_date'], $this->client->date_format(), $this->client->locale());
                 $variables['values']['$end_date'] = $this->translateDate($this->options['end_date'], $this->client->date_format(), $this->client->locale());
@@ -119,7 +119,7 @@ class Statement
             $html = $maker->getCompiledHTML(true);
 
             // nlog($html);
-            
+
             if ($this->rollback) {
                 \DB::connection(config('database.default'))->rollBack();
                 $this->rollback = false;
@@ -133,9 +133,8 @@ class Statement
             $state = null;
 
             return $pdf;
-        }
-        catch(\Throwable $th){
-            
+        } catch (\Throwable $th) {
+
             nlog("STATEMENT:: Throwable::" . $th->getMessage());
 
             if ($this->rollback) {
@@ -162,7 +161,7 @@ class Statement
 
     private function templateStatement($variables)
     {
-        if(isset($this->options['template'])) {
+        if (isset($this->options['template'])) {
             $statement_design_id = $this->options['template'];
         } else {
             $statement_design_id = $this->client->getSetting('statement_design_id');
@@ -222,7 +221,7 @@ class Statement
             DB::connection(config('database.default'))->beginTransaction();
 
             $this->rollback = true;
-            
+
             $invoice = InvoiceFactory::create($this->client->company->id, $this->client->user->id);
             $invoice->client_id = $this->client->id;
             $invoice->line_items = $this->buildLineItems();
@@ -456,7 +455,7 @@ class Statement
             ->where('balance', '>', 0)
             ->where('is_deleted', 0);
 
-        if($range == '0') {
+        if ($range == '0') {
             $query->where(function ($q) use ($to, $from) {
                 $q->whereBetween('due_date', [$to, $from])->orWhereNull('due_date');
             });

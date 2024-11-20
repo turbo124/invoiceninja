@@ -35,7 +35,7 @@ class TriggeredActions extends AbstractService
         if ($this->request->has('auto_bill') && $this->request->input('auto_bill') == 'true') {
             try {
                 $this->invoice->service()->autoBill();
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 nlog("Exception:: TriggeredActions::" . $e->getMessage());
             } //update notification sends automatically for this.
         }
