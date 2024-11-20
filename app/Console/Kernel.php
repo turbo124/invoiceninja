@@ -15,6 +15,7 @@ use App\Jobs\Cron\AutoBillCron;
 use App\Jobs\Cron\RecurringExpensesCron;
 use App\Jobs\Cron\RecurringInvoicesCron;
 use App\Jobs\Cron\SubscriptionCron;
+use App\Jobs\EDocument\EInvoicePullDocs;
 use App\Jobs\Invoice\InvoiceCheckLateWebhook;
 use App\Jobs\Ninja\AdjustEmailQuota;
 use App\Jobs\Ninja\BankTransactionSync;
@@ -108,6 +109,9 @@ class Kernel extends ConsoleKernel
             $schedule->call(function () {
                 Account::query()->whereNotNull('id')->update(['is_scheduler_running' => true]);
             })->everyFiveMinutes();
+
+            $schedule->job(new EInvoicePullDocs())->everyFourHours(rand(0, 59))->withoutOverlapping();
+
         }
 
         /* Run hosted specific jobs */
