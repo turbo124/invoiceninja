@@ -23,10 +23,9 @@ use App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest;
 
 class EInvoicePeppolController extends BaseController
 {
-    
     /**
      * Returns the legal entity ID
-     * 
+     *
      * @param  ShowEntityRequest $request
      * @return JsonResponse
      */
@@ -100,7 +99,7 @@ class EInvoicePeppolController extends BaseController
 
     /**
      * Update legal properties such as acting as sender or receiver.
-     * 
+     *
      * @param \App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest $request
      * @return JsonResponse
      */
@@ -133,8 +132,8 @@ class EInvoicePeppolController extends BaseController
      * Removed the legal identity from the Peppol network
      *
      * @param  DisconnectRequest $request
-     * 
-     */ 
+     *
+     */
     public function disconnect(DisconnectRequest $request, Storecove $storecove): JsonResponse
     {
         /**
@@ -167,7 +166,7 @@ class EInvoicePeppolController extends BaseController
     /**
      * Add an additional tax identifier to
      * an existing legal entity id
-     * 
+     *
      * Response will be the same as show()
      *
      * @param  AddTaxIdentifierRequest $request
@@ -176,17 +175,18 @@ class EInvoicePeppolController extends BaseController
      */
     public function addAdditionalTaxIdentifier(AddTaxIdentifierRequest $request, Storecove $storecove): JsonResponse
     {
-        
+
         $company = auth()->user()->company();
         $tax_data = $company->tax_data;
 
         $vat_number = $request->vat_number;
         $country = $request->country;
 
-        if($country == 'GB')
+        if ($country == 'GB') {
             $additional_vat = $tax_data->regions->UK->subregions->{$country}->vat_number ?? null;
-        else
+        } else {
             $additional_vat = $tax_data->regions->EU->subregions->{$country}->vat_number ?? null;
+        }
 
         if (!is_null($additional_vat) && !empty($additional_vat)) {
             return response()->json(['message' => 'Identifier already exists for this region.'], 400);
@@ -201,11 +201,12 @@ class EInvoicePeppolController extends BaseController
             return response()->json(data_get($response, 'errors', 'message'), status: $response['code']);
         }
 
-        if($country == 'GB')
+        if ($country == 'GB') {
             $tax_data->regions->UK->subregions->{$country}->vat_number = $vat_number;
-        else
+        } else {
             $tax_data->regions->EU->subregions->{$country}->vat_number = $vat_number;
-        
+        }
+
         $company->tax_data = $tax_data;
         $company->save();
 

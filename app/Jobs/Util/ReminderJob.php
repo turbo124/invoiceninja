@@ -74,7 +74,7 @@ class ReminderJob implements ShouldQueue
                  ->with('invitations')
                  ->cursor()
                  ->each(function ($invoice) {
-                        $this->sendReminderForInvoice($invoice);
+                     $this->sendReminderForInvoice($invoice);
                  });
         } else {
             //multiDB environment, need to
@@ -97,14 +97,14 @@ class ReminderJob implements ShouldQueue
                      ->whereHas('company', function ($query) {
                          $query->where('is_disabled', 0);
                      })
-                    ->whereHas('company.account', function ($q){
+                    ->whereHas('company.account', function ($q) {
                         $q->whereNotNull('plan')->where('plan_expires', '>', now()->subDays(2));
                     })
                      ->with('invitations')
                      ->cursor()
                      ->each(function ($invoice) {
-                        $this->sendReminderForInvoice($invoice);
-                    });
+                         $this->sendReminderForInvoice($invoice);
+                     });
             }
         }
     }
@@ -128,7 +128,7 @@ class ReminderJob implements ShouldQueue
             $invoice->service()->touchReminder($reminder_template)->save();
             $fees = $this->calcLateFee($invoice, $reminder_template);
 
-            if($invoice->isLocked()) {
+            if ($invoice->isLocked()) {
                 return $this->addFeeToNewInvoice($invoice, $reminder_template, $fees);
             }
 
@@ -208,7 +208,7 @@ class ReminderJob implements ShouldQueue
                     ->save();
         }
 
-        if(!$invoice) {
+        if (!$invoice) {
             $invoice = $over_due_invoice;
         }
 

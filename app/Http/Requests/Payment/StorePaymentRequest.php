@@ -82,7 +82,7 @@ class StorePaymentRequest extends Request
 
         $client_id = is_string($this->input('client_id', '')) ? $this->input('client_id') : '';
 
-        if(\Illuminate\Support\Facades\Cache::has($this->ip()."|".$this->input('amount', 0)."|".$client_id."|".$user->company()->company_key)) {
+        if (\Illuminate\Support\Facades\Cache::has($this->ip()."|".$this->input('amount', 0)."|".$client_id."|".$user->company()->company_key)) {
             throw new DuplicatePaymentException('Duplicate request.', 429);
         }
 

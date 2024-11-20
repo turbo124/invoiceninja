@@ -20,7 +20,6 @@ use Illuminate\Validation\Validator;
 
 class UpdateEntityRequest extends FormRequest
 {
-  
     public function authorize(): bool
     {
         /**

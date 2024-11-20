@@ -118,7 +118,7 @@ class ClientTransformer extends BaseTransformer
         $client['contacts'] = $contacts;
 
         nlog($client);
-        
+
         return $client;
 
     }

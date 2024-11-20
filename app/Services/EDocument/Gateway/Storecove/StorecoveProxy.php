@@ -41,8 +41,9 @@ class StorecoveProxy
         if (Ninja::isHosted()) {
             $response = $this->storecove->getLegalEntity($legal_entity_id);
 
-            if (is_array($response)) //successful response is the array
+            if (is_array($response)) { //successful response is the array
                 return $response;
+            }
 
             return $this->handleResponseError($response); //otherwise need to handle the http response returned
         }
@@ -129,9 +130,9 @@ class StorecoveProxy
         ];
 
         if (Ninja::isHosted()) {
-            
+
             $response = $this->storecove->addAdditionalTaxIdentifier($data['legal_entity_id'], $data['vat_number'], $scheme);
-        
+
             if (is_array($response)) {
                 return $response;
             }
@@ -163,7 +164,7 @@ class StorecoveProxy
      * handleResponseError
      *
      * Generic error handler that can return an array response
-     * 
+     *
      * @param  mixed $response
      * @return array
      */
@@ -214,8 +215,9 @@ class StorecoveProxy
             ->withHeaders($this->getHeaders())
             ->post($uri, $payload);
 
-        if ($response->successful())
+        if ($response->successful()) {
             return $response->json();
+        }
 
         return $this->handleResponseError($response);
     }

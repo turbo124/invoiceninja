@@ -109,7 +109,7 @@ class PaymentRepository extends BaseRepository
         /*Fill the payment*/
         $fill_data = $data;
 
-        if($this->import_mode && isset($fill_data['invoices'])) {
+        if ($this->import_mode && isset($fill_data['invoices'])) {
             unset($fill_data['invoices']);
         }
 

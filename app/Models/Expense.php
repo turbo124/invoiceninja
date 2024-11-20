@@ -243,15 +243,15 @@ class Expense extends BaseModel
 
     public function stringStatus()
     {
-        if($this->is_deleted) {
+        if ($this->is_deleted) {
             return ctrans('texts.deleted');
-        } elseif($this->payment_date) {
+        } elseif ($this->payment_date) {
             return ctrans('texts.paid');
-        } elseif($this->invoice_id) {
+        } elseif ($this->invoice_id) {
             return ctrans('texts.invoiced');
-        } elseif($this->should_be_invoiced) {
+        } elseif ($this->should_be_invoiced) {
             return ctrans('texts.pending');
-        } elseif($this->trashed()) {
+        } elseif ($this->trashed()) {
             return ctrans('texts.archived');
         }
 

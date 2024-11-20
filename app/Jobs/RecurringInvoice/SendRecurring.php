@@ -117,7 +117,7 @@ class SendRecurring implements ShouldQueue
             AutoBill::dispatch($invoice->id, $this->db, true)->delay(rand(1, 2));
 
             //04-08-2023 edge case to support where online payment notifications are not enabled
-            if(!$invoice->client->getSetting('client_online_payment_notification')) {
+            if (!$invoice->client->getSetting('client_online_payment_notification')) {
                 $this->sendRecurringEmails($invoice);
                 $invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
             }
@@ -126,7 +126,7 @@ class SendRecurring implements ShouldQueue
             AutoBill::dispatch($invoice->id, $this->db, true)->delay(rand(1, 2));
 
             //04-08-2023 edge case to support where online payment notifications are not enabled
-            if(!$invoice->client->getSetting('client_online_payment_notification')) {
+            if (!$invoice->client->getSetting('client_online_payment_notification')) {
                 $this->sendRecurringEmails($invoice);
                 $invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
             }

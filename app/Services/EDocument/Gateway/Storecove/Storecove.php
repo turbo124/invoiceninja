@@ -29,10 +29,10 @@ enum HttpVerb: string
 }
 
 class Storecove
-{    
+{
     /** @var string $base_url */
     private string $base_url = 'https://api.storecove.com/api/v2/';
-    
+
     /** @var array $peppol_discovery */
     private array $peppol_discovery = [
             "documentTypes" =>  ["invoice"],
@@ -41,7 +41,7 @@ class Storecove
             // "scheme" =>  "de:lwid",
             // "identifier" => "DE:VAT",
     ];
-    
+
     /** @var array $dbn_discovery */
     private array $dbn_discovery = [
         "documentTypes" =>  ["invoice"],
@@ -71,7 +71,7 @@ class Storecove
         $this->expense = new StorecoveExpense($this);
         $this->proxy = new StorecoveProxy($this);
     }
-        
+
     /**
      * build
      *
@@ -80,7 +80,7 @@ class Storecove
      */
     public function build($model): self
     {
-        // return 
+        // return
         $this->adapter
              ->transform($model)
              ->decorate()
@@ -124,7 +124,7 @@ class Storecove
         };
 
         $uri =  "discovery/receives";
-       
+
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
 
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
@@ -164,12 +164,12 @@ class Storecove
      */
     public function sendJsonDocument(array $payload): string|\Illuminate\Http\Client\Response
     {
-        
+
         $uri = "document_submissions";
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $payload, $this->getHeaders());
 
-        if($r->successful()) {
+        if ($r->successful()) {
             nlog("sent! GUID = {$r->json()['guid']}");
             return $r->json()['guid'];
         }
@@ -180,14 +180,14 @@ class Storecove
         return $r;
 
     }
-    
+
     /**
      * Send Raw UBL Document via StoreCove
      *
      * @param  string $document
      * @param  int $routing_id
      * @param  array $override_payload
-     * 
+     *
      * @return string|\Illuminate\Http\Client\Response
      */
     public function sendDocument(string $document, int $routing_id, array $override_payload = [])
@@ -219,7 +219,7 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $payload, $this->getHeaders());
 
-        if($r->successful()) {
+        if ($r->successful()) {
             return $r->json()['guid'];
         }
 
@@ -229,7 +229,7 @@ class Storecove
 
     /**
      * Get Sending Evidence
-     * 
+     *
      * "guid" => "661c079d-0c2b-4b45-8263-678ed81224af",
      *
      * @param  string $guid
@@ -241,8 +241,9 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::GET)->value, [], $this->getHeaders());
 
-        if($r->successful())
+        if ($r->successful()) {
             return $r->json();
+        }
 
         return $r;
     }
@@ -259,7 +260,7 @@ class Storecove
 
         $add_identifier_response = $this->addIdentifier(
             legal_entity_id: $legal_entity_response['id'],
-            identifier: $data['classification'] === 'individual' ? str_replace('/','', $data['id_number']) : str_replace(" ", "", $data['vat_number']),
+            identifier: $data['classification'] === 'individual' ? str_replace('/', '', $data['id_number']) : str_replace(" ", "", $data['vat_number']),
             scheme: $scheme,
         );
 
@@ -279,21 +280,21 @@ class Storecove
     /**
      * CreateLegalEntity
      *
-     * Creates a legal entity for a Company. 
-     * 
+     * Creates a legal entity for a Company.
+     *
      * Following creation, you will also need to create a Peppol Identifier
-     * 
+     *
      * @url https://www.storecove.com/docs/#_openapi_legalentitycreate
-     * 
+     *
      * @return mixed
      */
     public function createLegalEntity(array $data, ?Company $company = null)
     {
         $uri = 'legal_entities';
 
-        if($company){
+        if ($company) {
 
-            $data = array_merge([            
+            $data = array_merge([
                 'city' => $company->settings->city,
                 'country' => $company->country()->iso_3166_2,
                 'county' => $company->settings->state,
@@ -318,7 +319,7 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $payload);
 
-        if($r->successful()) {
+        if ($r->successful()) {
             $data = $r->object();
             LightLogs::create(new LegalEntityCreated($data->id, $data->tenant_id))->batch();
             return $r->json();
@@ -327,7 +328,7 @@ class Storecove
         return $r;
 
     }
-    
+
     /**
      * GetLegalEntity
      *
@@ -341,14 +342,14 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::GET)->value, []);
 
-        if($r->successful()) {
+        if ($r->successful()) {
             return $r->json();
         }
 
         return $r;
 
     }
-    
+
     /**
      * UpdateLegalEntity
      *
@@ -363,17 +364,17 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::PATCH)->value, $data);
 
-        if($r->successful()) {
+        if ($r->successful()) {
             return $r->json();
         }
 
         return $r;
 
     }
-    
+
     /**
      * AddIdentifier
-     * 
+     *
      * Add a Peppol identifier to the legal entity
      *
      * @param  int $legal_entity_id
@@ -393,16 +394,16 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $data);
 
-        if($r->successful()) {
+        if ($r->successful()) {
             $data = $r->json();
-            
+
             return $data;
         }
         nlog($r->body());
 
         return $r;
     }
-    
+
     /**
      * addAdditionalTaxIdentifier
      *
@@ -455,7 +456,7 @@ class Storecove
     {
         $legal_entity = $this->getLegalEntity($legal_entity_id);
 
-        if(isset($legal_entity['additional_tax_identifiers']) && is_array($legal_entity['additional_tax_identifiers'])) {
+        if (isset($legal_entity['additional_tax_identifiers']) && is_array($legal_entity['additional_tax_identifiers'])) {
             $identifer = collect($legal_entity['additional_tax_identifiers'])
                 ->filter(fn ($id) => $id['identifier'] == $tax_identifier)
                 ->first();
@@ -480,7 +481,7 @@ class Storecove
 
     /**
      * Delete Legal Entity Identifier
-     * 
+     *
      * Remove the entity from the network
      *
      * @param  int $legal_entity_id
@@ -498,7 +499,7 @@ class Storecove
 
         return $r;
     }
-    
+
     /**
      * getDocument
      *
@@ -523,13 +524,13 @@ class Storecove
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-        
+
+
     /**
      * getHeaders
-     * 
+     *
      * Base request headers
-     * 
+     *
      * @param  array $headers
      * @return array
      */
@@ -541,7 +542,7 @@ class Storecove
         ], $headers);
 
     }
-    
+
     /**
      * Http Client
      *
@@ -554,26 +555,25 @@ class Storecove
     private function httpClient(string $uri, string $verb, array $data, ?array $headers = [])
     {
 
-        try {            
+        try {
             $r = Http::withToken(config('ninja.storecove_api_key'))
                 ->withHeaders($this->getHeaders($headers))
             ->{$verb}("{$this->base_url}{$uri}", $data)->throw();
-        }
-        catch (ClientException $e) {
+        } catch (ClientException $e) {
             // 4xx errors
             nlog("LEI:: {$this->legal_entity_id}");
             nlog("Client error: " . $e->getMessage());
             nlog("Response body: " . $e->getResponse()->getBody()->getContents());
         } catch (ServerException $e) {
             // 5xx errors
-            
+
             nlog("LEI:: {$this->legal_entity_id}");
             nlog("Server error: " . $e->getMessage());
             nlog("Response body: " . $e->getResponse()->getBody()->getContents());
         } catch (\Illuminate\Http\Client\RequestException $e) {
 
             nlog("LEI:: {$this->legal_entity_id}");
-            nlog("Request error: {$e->getCode()}: " . $e->getMessage());       
+            nlog("Request error: {$e->getCode()}: " . $e->getMessage());
             $responseBody = $e->response->body();
             nlog("Response body: " . $responseBody);
 

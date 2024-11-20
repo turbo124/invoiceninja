@@ -500,7 +500,7 @@ class Account extends BaseModel
             return 0;
         }
 
-        if($this->email_quota) {
+        if ($this->email_quota) {
             return (int)$this->email_quota;
         }
 

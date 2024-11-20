@@ -9,7 +9,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-
 namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
@@ -19,7 +18,7 @@ class AsTaxEntityCollection implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes)
     {
-        if (!$value || (is_string($value) && $value =="null")) {
+        if (!$value || (is_string($value) && $value == "null")) {
             return [];
         }
 
@@ -33,7 +32,7 @@ class AsTaxEntityCollection implements CastsAttributes
         if (!$value) {
             return '[]';
         }
-        
+
         if ($value instanceof TaxEntity) {
             $value = [$value];
         }

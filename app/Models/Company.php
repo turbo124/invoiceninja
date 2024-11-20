@@ -554,8 +554,8 @@ class Company extends BaseModel
     }
 
     public function activities(): HasMany
-    {   
-        return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);     
+    {
+        return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);
     }
 
     /**
@@ -985,7 +985,7 @@ class Company extends BaseModel
         return Ninja::isHosted() && $this->account->isPaid() && $this->account->isEnterpriseClient() && $this->account->e_invoice_quota > 0 && $this->settings->e_invoice_type == 'PEPPOL' && $this->tax_data->acts_as_sender;
     }
 
-    
+
     /**
      * peppolSendingEnabled
      *

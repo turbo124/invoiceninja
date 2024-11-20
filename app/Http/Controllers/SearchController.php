@@ -27,17 +27,17 @@ class SearchController extends Controller
     private array $invoices = [];
 
     private array $quotes = [];
-    
+
     public function __invoke(GenericSearchRequest $request)
     {
-        if(config('scout.driver') == 'elastic') {
-            try{
+        if (config('scout.driver') == 'elastic') {
+            try {
                 return $this->search($request->input('search', '*'));
-            } catch(\Exception $e) {
-               nlog("elk down?" . $e->getMessage());
+            } catch (\Exception $e) {
+                nlog("elk down?" . $e->getMessage());
             }
         }
-        
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
@@ -57,7 +57,7 @@ class SearchController extends Controller
     {
         $user = auth()->user();
         $company = $user->company();
-        
+
         \Illuminate\Support\Facades\App::setLocale($company->locale());
 
         $elastic = ClientBuilder::fromConfig(config('elastic.client.connections.default'));
@@ -101,12 +101,13 @@ class SearchController extends Controller
     private function mapResults(array $results)
     {
 
-        foreach($results as $result) {
-            switch($result['_index']) {
+        foreach ($results as $result) {
+            switch ($result['_index']) {
                 case 'clients':
 
-                    if($result['_source']['is_deleted']) //do not return deleted results
+                    if ($result['_source']['is_deleted']) { //do not return deleted results
                         break;
+                    }
 
                     $this->clients[] = [
                         'name' => $result['_source']['name'],
@@ -118,9 +119,10 @@ class SearchController extends Controller
                     break;
                 case 'invoices':
 
-                    if ($result['_source']['is_deleted'])  //do not return deleted invoices
+                    if ($result['_source']['is_deleted']) {  //do not return deleted invoices
                         break;
-                    
+                    }
+
 
                     $this->invoices[] = [
                         'name' => $result['_source']['name'],
@@ -131,8 +133,9 @@ class SearchController extends Controller
                     break;
                 case 'client_contacts':
 
-                    if($result['_source']['__soft_deleted']) // do not return deleted contacts
+                    if ($result['_source']['__soft_deleted']) { // do not return deleted contacts
                         break;
+                    }
 
                     $this->client_contacts[] = [
                         'name' => $result['_source']['name'],
@@ -172,7 +175,7 @@ class SearchController extends Controller
                      ->take(1000)
                      ->get();
 
-        foreach($clients as $client) {
+        foreach ($clients as $client) {
             $this->clients[] = [
                 'name' => $client->present()->name(),
                 'type' => '/client',
@@ -210,7 +213,7 @@ class SearchController extends Controller
                     ->take(3000)
                     ->get();
 
-        foreach($invoices as $invoice) {
+        foreach ($invoices as $invoice) {
             $this->invoices[] = [
                 'name' => $invoice->client->present()->name() . ' - ' . $invoice->number,
                 'type' => '/invoice',
@@ -295,11 +298,11 @@ class SearchController extends Controller
 
         $data = [];
 
-        foreach($paths as $key => $value) {
+        foreach ($paths as $key => $value) {
 
             $translation = '';
 
-            foreach(explode(",", $key) as $transkey) {
+            foreach (explode(",", $key) as $transkey) {
                 $translation .= ctrans("texts.{$transkey}")." ";
             }
 

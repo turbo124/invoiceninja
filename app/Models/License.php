@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
  * @property int|null $recurring_invoice_id
  * @property int|null $e_invoice_quota
  * @property bool $is_flagged
- * @property array|null $entities 
+ * @property array|null $entities
  * @property-read \App\Models\RecurringInvoice $recurring_invoice
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EInvoiceToken> $e_invoicing_tokens
  * @method static \Illuminate\Database\Eloquent\Builder|StaticModel company()
@@ -66,7 +66,7 @@ class License extends StaticModel
         'created_at' => 'date',
         'entities' => AsTaxEntityCollection::class,
     ];
-    
+
     /**
      * expiry
      *
@@ -76,7 +76,7 @@ class License extends StaticModel
     {
         return $this->created_at->addYear()->format('Y-m-d');
     }
-    
+
     /**
      * recurring_invoice
      *
@@ -85,7 +85,7 @@ class License extends StaticModel
     {
         return $this->belongsTo(RecurringInvoice::class);
     }
-    
+
     /**
      * e_invoicing_tokens
      *
@@ -94,7 +94,7 @@ class License extends StaticModel
     {
         return $this->hasMany(EInvoicingToken::class, 'license_key', 'license_key');
     }
-    
+
     /**
      * addEntity
      *
@@ -112,11 +112,11 @@ class License extends StaticModel
         }
 
         $this->entities = $entities;
-        
+
         $this->save();
 
     }
-    
+
     /**
      * removeEntity
      *
@@ -125,7 +125,7 @@ class License extends StaticModel
      */
     public function removeEntity(TaxEntity $entity)
     {
-    
+
         if (!is_array($this->entities)) {
             return;
         }
@@ -137,7 +137,7 @@ class License extends StaticModel
         $this->save();
 
     }
-    
+
     /**
      * isValid
      *

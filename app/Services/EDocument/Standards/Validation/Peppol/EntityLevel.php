@@ -130,8 +130,8 @@ class EntityLevel
         $this->errors['client'] = $this->testClientState($invoice->client);
         $this->errors['company'] = $this->testCompanyState($invoice->client); // uses client level settings which is what we want
 
-        if(count($this->errors['client']) > 0){
-            
+        if (count($this->errors['client']) > 0) {
+
             $this->errors['passes'] = false;
             return $this->errors;
 
@@ -141,35 +141,32 @@ class EntityLevel
 
         $xml = false;
 
-        try{
+        try {
             $xml = $p->run()->toXml();
 
-            if(count($p->getErrors()) >= 1){
+            if (count($p->getErrors()) >= 1) {
 
-                foreach($p->getErrors() as $error)
-                {
+                foreach ($p->getErrors() as $error) {
                     $this->errors['invoice'][] = $error;
                 }
             }
 
-        }
-        catch(PeppolValidationException $e) {
+        } catch (PeppolValidationException $e) {
             $this->errors['invoice'] = ['field' => $e->getInvalidField(), 'label' => $e->getInvalidField()];
-        }
-        catch(\Throwable $th){
+        } catch (\Throwable $th) {
 
         }
 
-        if($xml){
+        if ($xml) {
             // Second pass through the XSLT validator
             $xslt = new XsltDocumentValidator($xml);
             $errors = $xslt->validate()->getErrors();
 
-            if(isset($errors['stylesheet']) && count($errors['stylesheet']) > 0){
+            if (isset($errors['stylesheet']) && count($errors['stylesheet']) > 0) {
                 $this->errors['invoice'] = array_merge($this->errors['invoice'], $errors['stylesheet']);
             }
-        
-            if(isset($errors['general']) && count($errors['general']) > 0) {
+
+            if (isset($errors['general']) && count($errors['general']) > 0) {
                 $this->errors['invoice'] = array_merge($this->errors['invoice'], $errors['general']);
             }
 
@@ -190,14 +187,15 @@ class EntityLevel
 
         $errors = [];
 
-        foreach($this->client_fields as $field)
-        {
+        foreach ($this->client_fields as $field) {
 
-            if($this->validString($client->{$field}))
+            if ($this->validString($client->{$field})) {
                 continue;
+            }
 
-            if($field == 'country_id' && $client->country_id >=1)
+            if ($field == 'country_id' && $client->country_id >= 1) {
                 continue;
+            }
 
             $errors[] = ['field' => $field, 'label' => ctrans("texts.{$field}")];
 
@@ -214,32 +212,28 @@ class EntityLevel
 
     private function testCompanyState(mixed $entity): array
     {
-        
+
         $client = false;
         $vendor = false;
         $settings_object = false;
-        $company =false;
+        $company = false;
 
-        if($entity instanceof Client){
+        if ($entity instanceof Client) {
             $client = $entity;
             $company = $entity->company;
             $settings_object = $client;
-        }
-        elseif($entity instanceof Company){
+        } elseif ($entity instanceof Company) {
             $company = $entity;
-            $settings_object = $company;    
-        }
-        elseif($entity instanceof Vendor){
-            $vendor = $entity;    
+            $settings_object = $company;
+        } elseif ($entity instanceof Vendor) {
+            $vendor = $entity;
             $company = $entity->company;
             $settings_object = $company;
-        }
-        elseif($entity instanceof Invoice || $entity instanceof Credit || $entity instanceof Quote){
+        } elseif ($entity instanceof Invoice || $entity instanceof Credit || $entity instanceof Quote) {
             $client = $entity->client;
             $company = $entity->company;
             $settings_object = $entity->client;
-        }
-        elseif($entity instanceof PurchaseOrder){
+        } elseif ($entity instanceof PurchaseOrder) {
             $vendor = $entity->vendor;
             $company = $entity->company;
             $settings_object = $company;
@@ -247,26 +241,25 @@ class EntityLevel
 
         $errors = [];
 
-        foreach($this->company_settings_fields as $field)
-        {
+        foreach ($this->company_settings_fields as $field) {
 
-            if($this->validString($settings_object->getSetting($field)))
+            if ($this->validString($settings_object->getSetting($field))) {
                 continue;
-    
+            }
+
             $errors[] = ['field' => $field, 'label' => ctrans("texts.{$field}")];
 
         }
 
         //test legal entity id present
-        if(!is_int($company->legal_entity_id))
+        if (!is_int($company->legal_entity_id)) {
             $errors[] = ['field' => "You have not registered a legal entity id as yet."];
+        }
 
         //If not an individual, you MUST have a VAT number
-        if($company->getSetting('classification') != 'individual' && !$this->validString($company->getSetting('vat_number')))
-        {
+        if ($company->getSetting('classification') != 'individual' && !$this->validString($company->getSetting('vat_number'))) {
             $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
-        }
-        elseif ($company->getSetting('classification') == 'individual' && !$this->validString($company->getSetting('id_number'))) {
+        } elseif ($company->getSetting('classification') == 'individual' && !$this->validString($company->getSetting('id_number'))) {
             $errors[] = ['field' => 'id_number', 'label' => ctrans("texts.id_number")];
         }
 

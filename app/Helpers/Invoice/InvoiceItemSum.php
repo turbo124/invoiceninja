@@ -67,7 +67,7 @@ class InvoiceItemSum
         'NO', //NORWAY - EEA
         'IS', //ICELAND - EEA
         'LI', //Liechtenstein - EEA
-        
+
     ];
 
     private array $tax_jurisdictions = [
@@ -198,11 +198,11 @@ class InvoiceItemSum
         if (in_array($this->client->company->country()->iso_3166_2, $this->tax_jurisdictions)) { //only calculate for supported tax jurisdictions
 
             /** @var \App\DataMapper\Tax\BaseRule $class */
-            $class = "App\DataMapper\Tax\\".str_replace("-","_",$this->client->company->country()->iso_3166_2)."\\Rule";
+            $class = "App\DataMapper\Tax\\".str_replace("-", "_", $this->client->company->country()->iso_3166_2)."\\Rule";
 
             $this->rule = new $class();
 
-            if($this->rule->regionWithNoTaxCoverage($this->client->country->iso_3166_2)) {
+            if ($this->rule->regionWithNoTaxCoverage($this->client->country->iso_3166_2)) {
                 return $this;
             }
 
@@ -292,7 +292,7 @@ class InvoiceItemSum
             $this->calcTaxesAutomatically();
         }
 
-        if($this->client->is_tax_exempt){
+        if ($this->client->is_tax_exempt) {
             $this->item->tax_rate1 = 0;
             $this->item->tax_rate2 = 0;
             $this->item->tax_rate3 = 0;
@@ -340,8 +340,9 @@ class InvoiceItemSum
 
     private function getPeppolSurchargeTaxes(): self
     {
-        if(!$this->client->getSetting('e_invoice_type') == 'PEPPOL')
+        if (!$this->client->getSetting('e_invoice_type') == 'PEPPOL') {
             return $this;
+        }
 
         collect($this->invoice->line_items)
             ->flatMap(function ($item) {
@@ -355,32 +356,33 @@ class InvoiceItemSum
             })
             ->unique(fn ($tax) => $tax['percentage'] . '_' . $tax['name'])
             ->values()
-            ->each(function ($tax){
-                    
-            $tax_component = 0;
+            ->each(function ($tax) {
 
-            if ($this->invoice->custom_surcharge1) {
-                $tax_component += round($this->invoice->custom_surcharge1 * ($tax['percentage'] / 100), 2);
-            }
+                $tax_component = 0;
 
-            if ($this->invoice->custom_surcharge2) {
-                $tax_component += round($this->invoice->custom_surcharge2 * ($tax['percentage'] / 100), 2);
-            }
+                if ($this->invoice->custom_surcharge1) {
+                    $tax_component += round($this->invoice->custom_surcharge1 * ($tax['percentage'] / 100), 2);
+                }
 
-            if ($this->invoice->custom_surcharge3) {
-                $tax_component += round($this->invoice->custom_surcharge3 * ($tax['percentage'] / 100), 2);
-            }
+                if ($this->invoice->custom_surcharge2) {
+                    $tax_component += round($this->invoice->custom_surcharge2 * ($tax['percentage'] / 100), 2);
+                }
 
-            if ($this->invoice->custom_surcharge4) {
-                $tax_component += round($this->invoice->custom_surcharge4 * ($tax['percentage'] / 100), 2);
-            }
+                if ($this->invoice->custom_surcharge3) {
+                    $tax_component += round($this->invoice->custom_surcharge3 * ($tax['percentage'] / 100), 2);
+                }
 
-            $amount = $this->invoice->custom_surcharge4 + $this->invoice->custom_surcharge3 + $this->invoice->custom_surcharge2 + $this->invoice->custom_surcharge1;
+                if ($this->invoice->custom_surcharge4) {
+                    $tax_component += round($this->invoice->custom_surcharge4 * ($tax['percentage'] / 100), 2);
+                }
 
-            if($tax_component > 0)
-                $this->groupTax($tax['name'], $tax['percentage'], $tax_component, $amount, $tax['tax_id']);
+                $amount = $this->invoice->custom_surcharge4 + $this->invoice->custom_surcharge3 + $this->invoice->custom_surcharge2 + $this->invoice->custom_surcharge1;
 
-        });
+                if ($tax_component > 0) {
+                    $this->groupTax($tax['name'], $tax['percentage'], $tax_component, $amount, $tax['tax_id']);
+                }
+
+            });
 
         return $this;
     }
@@ -482,7 +484,7 @@ class InvoiceItemSum
 
             try {
                 $amount = $this->item->line_total - ($this->item->line_total * ($this->invoice->discount / $this->sub_total));
-            } catch(\DivisionByZeroError $e) {
+            } catch (\DivisionByZeroError $e) {
                 $amount = $this->item->line_total;
             }
 

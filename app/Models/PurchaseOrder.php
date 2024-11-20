@@ -255,7 +255,7 @@ class PurchaseOrder extends BaseModel
     }
 
     public function activities(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {   
+    {
         return $this->hasMany(Activity::class)->where('company_id', $this->company_id)->where('vendor_id', $this->vendor_id)->orderBy('id', 'DESC')->take(50);
     }
 

@@ -29,13 +29,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class EInvoicingToken extends Model
 {
-
     protected $fillable = [
         'license',
         'token',
         'account_key',
     ];
-    
+
     /**
      * license_relation
      *

@@ -102,7 +102,7 @@ class GoCardlessPaymentDriver extends BaseDriver
                 'access_token' => $this->company_gateway->getConfigField('accessToken'),
                 'environment'  => $this->company_gateway->getConfigField('testMode') ? \GoCardlessPro\Environment::SANDBOX : \GoCardlessPro\Environment::LIVE,
             ]);
-        } catch(\GoCardlessPro\Core\Exception\AuthenticationException $e) {
+        } catch (\GoCardlessPro\Core\Exception\AuthenticationException $e) {
 
             throw new \Exception('GoCardless: Invalid Access Token', 403);
 
@@ -165,7 +165,7 @@ class GoCardlessPaymentDriver extends BaseDriver
             ]);
 
             if (in_array($payment->status, ['submitted', 'pending_submission'])) {
-                
+
                 $data = [
                     'payment_method' => $cgt->hashed_id,
                     'payment_type' => PaymentType::ACH,
@@ -267,9 +267,8 @@ class GoCardlessPaymentDriver extends BaseDriver
 
         foreach ($request->events as $event) {
             if (
-            ($event['resource_type'] == 'payments' && $event['action'] == 'confirmed') || 
-            $event['action'] === 'paid_out') 
-            {
+                ($event['resource_type'] == 'payments' && $event['action'] == 'confirmed') ||
+                $event['action'] === 'paid_out') {
                 nlog('Searching for transaction reference');
 
                 $payment = Payment::query()
@@ -407,7 +406,7 @@ class GoCardlessPaymentDriver extends BaseDriver
             $this->init();
             $mandate = $this->gateway->mandates()->get($token);
 
-            if(!in_array($mandate->status, ['pending_submission', 'submitted', 'active','pending_customer_approval'])) {
+            if (!in_array($mandate->status, ['pending_submission', 'submitted', 'active','pending_customer_approval'])) {
 
                 // if ($mandate->status !== 'active') {
                 throw new \Exception(ctrans('texts.gocardless_mandate_not_ready'));
@@ -568,7 +567,7 @@ class GoCardlessPaymentDriver extends BaseDriver
         try {
             $customers = $this->init()->gateway->customers()->list();
             return true;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
         }
 

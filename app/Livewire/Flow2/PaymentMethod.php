@@ -76,7 +76,7 @@ class PaymentMethod extends Component
         return render('flow2.payment-method', ['methods' => $this->methods]);
     }
 
-    public function exception($e, $stopPropagation) 
+    public function exception($e, $stopPropagation)
     {
         app('sentry')->captureException($e);
         $stopPropagation();
