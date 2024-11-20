@@ -175,12 +175,6 @@ class FacturaEInvoice extends AbstractService
              ->setBillingPeriod()
              ->signDocument();
 
-        // $disk = config('filesystems.default');
-
-        // if (!Storage::disk($disk)->exists($this->invoice->client->e_invoice_filepath($this->invoice->invitations->first()))) {
-        //     Storage::makeDirectory($this->invoice->client->e_invoice_filepath($this->invoice->invitations->first()));
-        // }
-
         return $this->fac->export();
 
     }

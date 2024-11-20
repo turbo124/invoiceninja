@@ -45,7 +45,6 @@ class TaxEntity
 
         $entityArray = is_object($entity) ? get_object_vars($entity) : $entity;
 
-        // $entityArray = get_object_vars($entity);
         foreach ($entityArray as $key => $value) {
             $this->{$key} = $value;
         }

@@ -76,9 +76,9 @@ class Storecove
      * build
      *
      * @param  \App\Models\Invoice $model
-     * @return mixed
+     * @return self
      */
-    public function build($model): mixed
+    public function build($model): self
     {
         // return 
         $this->adapter
@@ -124,10 +124,8 @@ class Storecove
         };
 
         $uri =  "discovery/receives";
+       
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
-        // nlog($network_data);
-        // nlog($r->json());
-        // nlog($r->body());
 
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
@@ -155,7 +153,6 @@ class Storecove
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $network_data, $this->getHeaders());
 
-        // nlog($r->json());
         return ($r->successful() && $r->json()['code'] == 'OK') ? true : false;
 
     }
@@ -423,14 +420,6 @@ class Storecove
 
         $uri = "legal_entities/{$legal_entity_id}/additional_tax_identifiers";
 
-        // if(
-        // stripos($identifier, 'AT') !== false  
-        // stripos($identifier, 'BE') !== false  
-        // || stripos($identifier, 'IS') !== false
-        // ){
-            // $identifier = preg_replace('/^[^0-9]{2}/', '', $identifier);
-        // }
-
         $data = [
             "identifier" => $identifier,
             "scheme" => $scheme,
@@ -459,7 +448,7 @@ class Storecove
      *
      * @param  int $legal_entity_id
      * @param  string $tax_identifier
-     * @return mixed
+     * @return array|false|\Illuminate\Http\Client\Response
      */
 
     public function removeAdditionalTaxIdentifier(int $legal_entity_id, string $tax_identifier): array|false|\Illuminate\Http\Client\Response
@@ -515,9 +504,9 @@ class Storecove
      *
      * @param  string $guid
      * @param  string $format json|original
-     * @return mixed
+     * @return array|\Illuminate\Http\Client\Response
      */
-    public function getDocument(string $guid, string $format = 'json')
+    public function getDocument(string $guid, string $format = 'json'): array|\Illuminate\Http\Client\Response
     {
 
         $uri = "/received_documents/{$guid}/{$format}";
@@ -525,11 +514,8 @@ class Storecove
         $r = $this->httpClient($uri, (HttpVerb::GET)->value, []);
 
         if ($r->successful()) {
-            $data = $r->json();
-// nlog($data);
-// nlog(json_encode($data));
-nlog($r->body());
-    return $data;
+            nlog($r->json());
+            return $r->json();
         }
 
         return $r;
