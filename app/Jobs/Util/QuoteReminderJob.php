@@ -61,10 +61,10 @@ class QuoteReminderJob implements ShouldQueue
             nrlog("Sending quote reminders on ".now()->format('Y-m-d h:i:s'));
 
             Quote::query()
-                 ->where('quotes.is_deleted', 0)
-                 ->whereIn('quotes.status_id', [Invoice::STATUS_SENT])
-                 ->whereNull('quotes.deleted_at')
-                 ->where('quotes.next_send_date', '<=', now()->toDateTimeString())
+                 ->where('is_deleted', 0)
+                 ->whereIn('status_id', [Invoice::STATUS_SENT])
+                 ->whereNull('deleted_at')
+                 ->where('next_send_date', '<=', now()->toDateTimeString())
                  ->whereHas('client', function ($query) {
                      $query->where('is_deleted', 0)
                            ->where('deleted_at', null);
@@ -88,10 +88,10 @@ class QuoteReminderJob implements ShouldQueue
                 nrlog("Sending quote reminders on db {$db} ".now()->format('Y-m-d h:i:s'));
 
                 Quote::query()
-                     ->where('quotes.is_deleted', 0)
-                     ->whereIn('quotes.status_id', [Invoice::STATUS_SENT])
-                     ->whereNull('quotes.deleted_at')
-                     ->where('quotes.next_send_date', '<=', now()->toDateTimeString())
+                     ->where('is_deleted', 0)
+                     ->whereIn('status_id', [Invoice::STATUS_SENT])
+                     ->whereNull('deleted_at')
+                     ->where('next_send_date', '<=', now()->toDateTimeString())
                      ->whereHas('client', function ($query) {
                          $query->where('is_deleted', 0)
                                ->where('deleted_at', null);
@@ -99,7 +99,7 @@ class QuoteReminderJob implements ShouldQueue
                      ->whereHas('company', function ($query) {
                          $query->where('is_disabled', 0);
                      })
-                    
+
                      ->with('invitations')->chunk(50, function ($quotes) {
 
                          foreach ($quotes as $quote) {
@@ -119,7 +119,7 @@ class QuoteReminderJob implements ShouldQueue
         $t->replace(Ninja::transformTranslations($quote->client->getMergedSettings()));
         App::setLocale($quote->client->locale());
 
-        if ($quote->isPayable()) {
+        if ($quote->canRemind()) {
             //Attempts to prevent duplicates from sending
             if ($quote->reminder_last_sent && Carbon::parse($quote->reminder_last_sent)->startOfDay()->eq(now()->startOfDay())) {
                 nrlog("caught a duplicate reminder for quote {$quote->number}");
@@ -142,7 +142,7 @@ class QuoteReminderJob implements ShouldQueue
         (Ninja::isSelfHost() || $quote->company->account->isPaidHostedClient())) {
                 $quote->invitations->each(function ($invitation) use ($quote, $reminder_template) {
                     if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                        EmailEntity::dispatch($invitation, $invitation->company, $reminder_template);
+                        EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                         nrlog("Firing reminder email for quote {$quote->number} - {$reminder_template}");
                         $quote->entityEmailEvent($invitation, $reminder_template);
                         $quote->sendEvent(Webhook::EVENT_REMIND_QUOTE, "client");

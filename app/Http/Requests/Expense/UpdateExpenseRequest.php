@@ -56,7 +56,7 @@ class UpdateExpenseRequest extends Request
         $rules['invoice_id'] = 'bail|sometimes|nullable|exists:invoices,id,company_id,'.$user->company()->id;
         $rules['documents'] = 'bail|sometimes|array';
         $rules['amount'] = ['sometimes', 'bail', 'nullable', 'numeric', 'max:99999999999999'];
-        
+
         return $this->globalRules($rules);
     }
 
@@ -76,6 +76,10 @@ class UpdateExpenseRequest extends Request
 
         if (! array_key_exists('currency_id', $input) || strlen($input['currency_id']) == 0) {
             $input['currency_id'] = (string) $user->company()->settings->currency_id;
+        }
+
+        if (isset($input['exchange_rate']) && $input['exchange_rate'] == 0) {
+            $input['exchnage_rate'] = 1;
         }
 
         /* Ensure the project is related */

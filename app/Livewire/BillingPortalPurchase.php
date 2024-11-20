@@ -285,7 +285,7 @@ class BillingPortalPurchase extends Component
         }
 
         if (array_key_exists('currency_id', $this->request_data)) {
-            
+
             /** @var \Illuminate\Support\Collection<\App\Models\Currency> */
             $currencies = app('currencies');
 
@@ -312,7 +312,7 @@ class BillingPortalPurchase extends Component
 
         if (array_key_exists('locale', $this->request_data)) {
             $request = $this->request_data;
-            
+
             /** @var \Illuminate\Support\Collection<\App\Models\Language> */
             $languages = app('languages');
             $record = $languages->first(function ($item) use ($request) {
@@ -349,20 +349,24 @@ class BillingPortalPurchase extends Component
         }
 
         if ((int)$this->price == 0) {
+
             $this->steps['payment_required'] = false;
+            $this->steps['fetched_payment_methods'] = false;
+            $this->heading_text = ctrans('texts.payment_methods');
+            return $this;
         } else {
             // $this->steps['fetched_payment_methods'] = true;
         }
 
         $this->methods = $contact->client->service()->getPaymentMethods($this->price);
 
-        foreach($this->methods as $method){
+        $method_values = array_column($this->methods, 'is_paypal');
+        $is_paypal = in_array('1', $method_values);
 
-            if($method['is_paypal'] == '1' && !$this->steps['check_rff']){
-                $this->rff();
-                break;
-            }
-
+        if ($is_paypal && !$this->steps['check_rff']) {
+            $this->rff();
+        } elseif (!$this->steps['check_rff']) {
+            $this->steps['fetched_payment_methods'] = true;
         }
 
         $this->heading_text = ctrans('texts.payment_methods');
@@ -419,7 +423,7 @@ class BillingPortalPurchase extends Component
         $this->payment_method_id = $gateway_type_id;
 
         $this->handleBeforePaymentEvents();
-        
+
     }
 
     /**
@@ -465,8 +469,12 @@ class BillingPortalPurchase extends Component
 
         $context = 'purchase';
 
-        if (Ninja::isHosted() && $this->subscription->service()->recurring_products()->first()?->product_key == 'whitelabel') {
+        if (config('ninja.ninja_default_company_id') == $this->subscription->company_id && $this->subscription->service()->recurring_products()->first()?->product_key == 'whitelabel') {
             $context = 'whitelabel';
+        }
+
+        if (config('ninja.ninja_default_company_id') == $this->subscription->company_id && in_array($this->subscription->service()->products()->first()?->product_key, ['peppol_500','peppol_1000','selfhost_peppol_500','selfhost_peppol_1000'])) {
+            $context = $this->subscription->service()->products()->first()?->product_key;
         }
 
         Cache::put($this->hash, [
@@ -476,6 +484,7 @@ class BillingPortalPurchase extends Component
             'invoice_id' => $this->invoice->hashed_id,
             'context' => $context,
             'campaign' => $this->campaign,
+            'request_data' => $this->request_data,
         ], now()->addMinutes(60));
 
         $this->dispatch('beforePaymentEventsCompleted');

@@ -11,23 +11,24 @@
 
 namespace Tests\Unit;
 
-use App\Models\Account;
-use App\Models\Client;
-use App\Models\ClientContact;
-use App\Models\Company;
-use App\Models\Invoice;
-use App\Models\Quote;
+use Tests\TestCase;
 use App\Models\User;
-use App\Utils\Traits\GeneratesConvertedQuoteCounter;
+use App\Models\Quote;
+use App\Models\Client;
+use App\Models\Account;
+use App\Models\Company;
+use App\Models\Country;
+use App\Models\Invoice;
+use App\Models\ClientContact;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Session;
-use Tests\TestCase;
+use App\Utils\Traits\GeneratesConvertedQuoteCounter;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
- * @test
- * @covers  App\Utils\Traits\GeneratesConvertedQuoteCounter
+ * 
+ *   App\Utils\Traits\GeneratesConvertedQuoteCounter
  */
 class GeneratesConvertedQuoteCounterTest extends TestCase
 {
@@ -40,13 +41,18 @@ class GeneratesConvertedQuoteCounterTest extends TestCase
     protected $client;
     protected $company;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         Session::start();
         $this->faker = \Faker\Factory::create();
         Model::reguard();
+
+        if (\App\Models\Country::count() == 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        }
+
     }
 
     public function testCounterExtraction()

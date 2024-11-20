@@ -58,10 +58,6 @@ class EmailPayment implements ShouldQueue
      */
     public function handle()
     {
-        if ($this->company->is_disabled || (!$this->contact?->email ?? false)) {
-            nlog("company disabled - or - contact email not found");
-            return;
-        }
 
         MultiDB::setDb($this->company->db);
 
@@ -71,11 +67,16 @@ class EmailPayment implements ShouldQueue
             $this->contact = $this->payment->client->contacts()->orderBy('is_primary', 'desc')->first();
         }
 
+        if ($this->company->is_disabled || (!$this->contact?->email ?? false)) {
+            nlog("company disabled - or - contact email not found");
+            return;
+        }
+
         $this->contact->load('client');
 
         $email_builder = (new PaymentEmailEngine($this->payment, $this->contact))->build();
 
-        if($this->payment->client->getSetting('payment_email_all_contacts') && $this->payment->invoices && $this->payment->invoices->count() >= 1) {
+        if ($this->payment->client->getSetting('payment_email_all_contacts') && $this->payment->invoices && $this->payment->invoices->count() >= 1) {
             $this->emailAllContacts($email_builder);
             return;
         }
@@ -86,13 +87,13 @@ class EmailPayment implements ShouldQueue
 
         if ($this->payment->invoices && $this->payment->invoices->count() >= 1) {
 
-            if($this->contact) {
+            if ($this->contact) {
                 $invitation = $this->payment->invoices->first()->invitations()->where('client_contact_id', $this->contact->id)->first();
             } else {
                 $invitation = $this->payment->invoices->first()->invitations()->first();
             }
 
-            if($invitation) {
+            if ($invitation) {
                 $nmo->invitation = $invitation;
             }
         }

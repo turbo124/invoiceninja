@@ -63,7 +63,7 @@ class InvoiceExport extends BaseExport
                         ->where('company_id', $this->company->id);
 
 
-        if(!$this->input['include_deleted'] ?? false) {// @phpstan-ignore-line
+        if (!$this->input['include_deleted'] ?? false) {// @phpstan-ignore-line
             $query->where('is_deleted', 0);
         }
 
@@ -71,16 +71,20 @@ class InvoiceExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
-        if($this->input['status'] ?? false) {
+        if ($this->input['status'] ?? false) {
             $query = $this->addInvoiceStatusFilter($query, $this->input['status']);
         }
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
+        }
+
+        if ($this->input['pdf_email_attachment'] ?? false) {
+            $this->queuePdfs($query);
         }
 
         return $query;
@@ -99,7 +103,7 @@ class InvoiceExport extends BaseExport
 
         $report = $query->cursor()
                 ->map(function ($resource) {
-                    
+
                     /** @var \App\Models\Invoice $resource */
                     $row = $this->buildRow($resource);
                     return $this->processMetaData($row, $resource);
@@ -121,7 +125,7 @@ class InvoiceExport extends BaseExport
 
         $query->cursor()
             ->each(function ($invoice) {
-                
+
                 /** @var \App\Models\Invoice $invoice */
                 $this->csv->insertOne($this->buildRow($invoice));
             });
@@ -147,7 +151,8 @@ class InvoiceExport extends BaseExport
 
         }
 
-        return $this->decorateAdvancedFields($invoice, $entity);
+        $entity = $this->decorateAdvancedFields($invoice, $entity);
+        return  $this->convertFloats($entity);
     }
 
     private function decorateAdvancedFields(Invoice $invoice, array $entity): array

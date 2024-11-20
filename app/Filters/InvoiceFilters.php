@@ -125,7 +125,14 @@ class InvoiceFilters extends QueryFilters
                                 ->orWhere('last_name', 'like', '%'.$filter.'%')
                                 ->orWhere('email', 'like', '%'.$filter.'%');
                           })
-                          ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')) LIKE ?", ['%'.$filter.'%']);
+                          ->orWhereRaw("
+                            JSON_UNQUOTE(JSON_EXTRACT(
+                                JSON_ARRAY(
+                                    JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')), 
+                                    JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].product_key'))
+                                ), '$[*]')
+                            ) LIKE ?", ['%'.$filter.'%']);
+            //   ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')) LIKE ?", ['%'.$filter.'%']);
         });
     }
 
@@ -231,7 +238,7 @@ class InvoiceFilters extends QueryFilters
 
             try {
                 $date = Carbon::parse($date);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 return $this->builder;
             }
         }
@@ -260,58 +267,6 @@ class InvoiceFilters extends QueryFilters
     }
 
     /**
-     * Filter by date range
-     *
-     * @param string $date_range
-     * @return Builder
-     */
-    public function date_range(string $date_range = ''): Builder
-    {
-        $parts = explode(",", $date_range);
-
-        if (count($parts) != 2) {
-            return $this->builder;
-        }
-
-        try {
-
-            $start_date = Carbon::parse($parts[0]);
-            $end_date = Carbon::parse($parts[1]);
-
-            return $this->builder->whereBetween('date', [$start_date, $end_date]);
-        } catch(\Exception $e) {
-            return $this->builder;
-        }
-
-    }
-
-    /**
-     * Filter by due date range
-     *
-     * @param string $date_range
-     * @return Builder
-     */
-    public function due_date_range(string $date_range = ''): Builder
-    {
-        $parts = explode(",", $date_range);
-
-        if (count($parts) != 2) {
-            return $this->builder;
-        }
-        try {
-
-            $start_date = Carbon::parse($parts[0]);
-            $end_date = Carbon::parse($parts[1]);
-
-            return $this->builder->whereBetween('due_date', [$start_date, $end_date]);
-        } catch(\Exception $e) {
-            return $this->builder;
-        }
-
-    }
-
-
-    /**
      * Sorts the list based on $sort.
      *
      * @param string $sort formatted as column|asc
@@ -321,7 +276,7 @@ class InvoiceFilters extends QueryFilters
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2 || in_array($sort_col[0], ['documents'])) {
+        if (!is_array($sort_col) || count($sort_col) != 2 || !in_array($sort_col[0], \Illuminate\Support\Facades\Schema::getColumnListing($this->builder->getModel()->getTable()))) {
             return $this->builder;
         }
 
@@ -334,10 +289,7 @@ class InvoiceFilters extends QueryFilters
 
         }
 
-        if($sort_col[0] == 'number') {
-            // return $this->builder->orderByRaw('CAST(number AS UNSIGNED), number ' . $dir);
-            // return $this->builder->orderByRaw("number REGEXP '^[A-Za-z]+$',CAST(number as SIGNED INTEGER),CAST(REPLACE(number,'-','')AS SIGNED INTEGER) ,number");
-            // return $this->builder->orderByRaw('ABS(number) ' . $dir);
+        if ($sort_col[0] == 'number') {
             return $this->builder->orderByRaw("REGEXP_REPLACE(invoices.number,'[^0-9]+','')+0 " . $dir);
         }
 

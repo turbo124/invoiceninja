@@ -123,24 +123,24 @@ trait MakesDates
     public function calculateStartAndEndDates(array $data, ?Company $company = null): array
     {
         //override for financial years
-        if($data['date_range'] == 'this_year') {
+        if ($data['date_range'] == 'this_year') {
             $first_month_of_year = $company ? $company?->first_month_of_year : 1;
             $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
-            if(now()->lt($fin_year_start)) {
+            if (now()->lt($fin_year_start)) {
                 $fin_year_start->subYearNoOverflow();
             }
 
         }
 
         //override for financial years
-        if($data['date_range'] == 'last_year') {
+        if ($data['date_range'] == 'last_year') {
             $first_month_of_year = $company ? $company?->first_month_of_year : 1;
             $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
             $fin_year_start->subYearNoOverflow();
 
-            if(now()->subYear()->lt($fin_year_start)) {
+            if (now()->subYear()->lt($fin_year_start)) {
                 $fin_year_start->subYearNoOverflow();
             }
 
@@ -165,19 +165,19 @@ trait MakesDates
     {
 
         //override for financial years
-        if($data['date_range'] == 'this_year') {
+        if ($data['date_range'] == 'this_year') {
 
             $first_month_of_year = $company ? $company?->first_month_of_year : 1;
             $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
             $fin_year_start->subYearNoOverflow();
 
-            if(now()->subYear()->lt($fin_year_start)) {
+            if (now()->subYear()->lt($fin_year_start)) {
                 $fin_year_start->subYearNoOverflow();
             }
 
         }
-                
+
         return match ($data['date_range']) {
             EmailStatement::LAST7 => [now()->startOfDay()->subDays(14)->format('Y-m-d'), now()->subDays(7)->startOfDay()->format('Y-m-d')],
             EmailStatement::LAST30 => [now()->startOfDay()->subDays(60)->format('Y-m-d'), now()->subDays(30)->startOfDay()->format('Y-m-d')],

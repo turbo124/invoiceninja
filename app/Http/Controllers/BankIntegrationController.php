@@ -217,7 +217,7 @@ class BankIntegrationController extends BaseController
         }
 
         if (config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key') && (Ninja::isSelfHost() || (Ninja::isHosted() && $user_account->isEnterprisePaidClient()))) {
-            $user_account->bank_integrations->where("integration_type", BankIntegration::INTEGRATION_TYPE_NORDIGEN)->each(function ($bank_integration) {                
+            $user_account->bank_integrations->where("integration_type", BankIntegration::INTEGRATION_TYPE_NORDIGEN)->each(function ($bank_integration) {
                 /** @var \App\Models\BankIntegration $bank_integration */
                 ProcessBankTransactionsNordigen::dispatch($bank_integration);
             });
@@ -242,6 +242,7 @@ class BankIntegrationController extends BaseController
             if ($bi = BankIntegration::withTrashed()->where("integration_type", BankIntegration::INTEGRATION_TYPE_YODLEE)->where('bank_account_id', $account['id'])->where('company_id', $user->company()->id)->first()) {
                 $bi->balance = $account['current_balance'];
                 $bi->currency = $account['account_currency'];
+                $bi->disabled_upstream = false;
                 $bi->save();
             } else {
                 $bank_integration = new BankIntegration();

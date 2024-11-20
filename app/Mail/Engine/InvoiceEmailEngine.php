@@ -131,7 +131,7 @@ class InvoiceEmailEngine extends BaseEmailEngine
         if ($this->client->getSetting('pdf_email_attachment') !== false && $this->invoice->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
             $pdf = ((new CreateRawPdf($this->invitation))->handle());
 
-            if($this->client->getSetting('embed_documents') && ($this->invoice->documents()->where('is_public', true)->count() > 0 || $this->invoice->company->documents()->where('is_public', true)->count() > 0)) {
+            if ($this->client->getSetting('embed_documents') && ($this->invoice->documents()->where('is_public', true)->count() > 0 || $this->invoice->company->documents()->where('is_public', true)->count() > 0)) {
                 $pdf = $this->invoice->documentMerge($pdf);
             }
 
@@ -218,7 +218,7 @@ class InvoiceEmailEngine extends BaseEmailEngine
                                            $task->documents()->where('is_public', true)->cursor()->each(function ($document) {
                                                if ($document->size > $this->max_attachment_size) {
 
-                                                   $hash = Str::random(64);
+                                                   $hash = Str::random(64); //allows document has to persist
                                                    Cache::put($hash, ['db' => $this->invoice->company->db, 'doc_hash' => $document->hash], now()->addDays(7));
 
                                                    $this->setAttachmentLinks(["<a class='doc_links' href='" . URL::signedRoute('documents.hashed_download', ['hash' => $hash]) ."'>". $document->name ."</a>"]);

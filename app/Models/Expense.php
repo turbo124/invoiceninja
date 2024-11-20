@@ -145,6 +145,20 @@ class Expense extends BaseModel
         'e_invoice' => 'object',
     ];
 
+    public static array $bulk_update_columns = [
+        'tax1',
+        'tax2',
+        'tax3',
+        'custom_value1',
+        'custom_value2',
+        'custom_value3',
+        'custom_value4',
+        'should_be_invoiced',
+        'uses_inclusive_taxes',
+        'private_notes',
+        'public_notes',
+    ];
+
     protected $touches = [];
 
     public function getEntityType()
@@ -152,9 +166,6 @@ class Expense extends BaseModel
         return self::class;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document>
-     */
     public function documents(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
@@ -232,18 +243,33 @@ class Expense extends BaseModel
 
     public function stringStatus()
     {
-        if($this->is_deleted) {
+        if ($this->is_deleted) {
             return ctrans('texts.deleted');
-        } elseif($this->payment_date) {
+        } elseif ($this->payment_date) {
             return ctrans('texts.paid');
-        } elseif($this->invoice_id) {
+        } elseif ($this->invoice_id) {
             return ctrans('texts.invoiced');
-        } elseif($this->should_be_invoiced) {
+        } elseif ($this->should_be_invoiced) {
             return ctrans('texts.pending');
-        } elseif($this->trashed()) {
+        } elseif ($this->trashed()) {
             return ctrans('texts.archived');
         }
 
         return ctrans('texts.logged');
+    }
+
+    public function calculatedTaxRate($tax_amount, $tax_rate): float
+    {
+
+        if ($this->calculate_tax_by_amount) {
+            if ($this->uses_inclusive_taxes) {
+                return round((($tax_amount / $this->amount) * 100 * 1000) / 10) / 100;
+            }
+
+            return round((($tax_amount / $this->amount) * 1000) / 10) / 1;
+        }
+
+        return $tax_rate;
+
     }
 }

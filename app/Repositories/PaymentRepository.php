@@ -109,7 +109,7 @@ class PaymentRepository extends BaseRepository
         /*Fill the payment*/
         $fill_data = $data;
 
-        if($this->import_mode && isset($fill_data['invoices'])) {
+        if ($this->import_mode && isset($fill_data['invoices'])) {
             unset($fill_data['invoices']);
         }
 
@@ -133,7 +133,7 @@ class PaymentRepository extends BaseRepository
         }
 
         /*Ensure payment number generated*/
-        if (! $payment->number || strlen($payment->number) == 0) {
+        if (! $payment->number || strlen($payment->number ?? '') == 0) { //@phpstan-ignore-line
             $payment->service()->applyNumber();
         }
 
@@ -154,7 +154,6 @@ class PaymentRepository extends BaseRepository
                 if ($invoice) {
 
                     //25-06-2023
-
                     $paymentable = new Paymentable();
                     $paymentable->payment_id = $payment->id;
                     $paymentable->paymentable_id = $invoice->id;

@@ -55,7 +55,7 @@ class UpdateQuoteRequest extends Request
         } elseif ($this->file('file')) {
             $rules['file'] = $this->fileValidation();
         }
-        
+
         $rules['invitations'] = 'sometimes|bail|array';
         $rules['invitations.*.client_contact_id'] = 'bail|required|distinct';
 
@@ -96,9 +96,23 @@ class UpdateQuoteRequest extends Request
             $input['exchange_rate'] = 1;
         }
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
+
+        if (isset($input['footer']) && $this->hasHeader('X-REACT')) {
+            $input['footer'] = str_replace("\n", "", $input['footer']);
+        }
+        if (isset($input['public_notes']) && $this->hasHeader('X-REACT')) {
+            $input['public_notes'] = str_replace("\n", "", $input['public_notes']);
+        }
+        if (isset($input['private_notes']) && $this->hasHeader('X-REACT')) {
+            $input['private_notes'] = str_replace("\n", "", $input['private_notes']);
+        }
+        if (isset($input['terms']) && $this->hasHeader('X-REACT')) {
+            $input['terms'] = str_replace("\n", "", $input['terms']);
+        }
+
 
         $this->replace($input);
     }

@@ -46,6 +46,7 @@ class MultiDB
     public const DB_PREFIX = 'db-ninja-';
 
     public static $dbs = ['db-ninja-01', 'db-ninja-02'];
+    // public static $dbs = ['db-ninja-01', 'db-ninja-02', 'db-ninja-03'];
 
     private static $protected_domains = [
         'www',
@@ -73,6 +74,8 @@ class MultiDB
         'socket',
     ];
 
+    private static $protected_expense_mailboxes = [];
+
     /**
      * @return array
      */
@@ -84,7 +87,7 @@ class MultiDB
     public static function checkDomainAvailable($subdomain): bool
     {
 
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return Company::whereSubdomain($subdomain)->count() == 0;
         }
 
@@ -107,9 +110,35 @@ class MultiDB
         return true;
     }
 
+    public static function checkExpenseMailboxAvailable($expense_mailbox): bool
+    {
+
+        if (!config('ninja.db.multi_db_enabled')) {
+            return !Company::where("expense_mailbox", $expense_mailbox)->exists();
+        }
+
+        if (in_array($expense_mailbox, self::$protected_expense_mailboxes)) {
+            return false;
+        }
+
+        $current_db = config('database.default');
+
+        foreach (self::$dbs as $db) {
+            if (Company::on($db)->where("expense_mailbox", $expense_mailbox)->exists()) {
+                self::setDb($current_db);
+
+                return false;
+            }
+        }
+
+        self::setDb($current_db);
+
+        return true;
+    }
+
     public static function checkUserEmailExists($email): bool
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return User::where(['email' => $email])->withTrashed()->exists();
         } // true >= 1 emails found / false -> == emails found
 
@@ -170,7 +199,7 @@ class MultiDB
      */
     public static function hasUser(array $data): ?User
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return User::where($data)->withTrashed()->first();
         }
 
@@ -194,7 +223,7 @@ class MultiDB
      */
     public static function hasContact(string $email): ?ClientContact
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return ClientContact::where('email', $email)->withTrashed()->first();
         }
 
@@ -221,7 +250,7 @@ class MultiDB
      */
     public static function findContact(array $search): ?ClientContact
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return ClientContact::where($search)->first();
         }
 
@@ -363,6 +392,23 @@ class MultiDB
         return null;
     }
 
+    public static function findAndSetDbByLegalEntityId($legal_entity_id): ?Company
+    {
+        $current_db = config('database.default');
+
+        foreach (self::$dbs as $db) {
+            if ($c = Company::on($db)->where('legal_entity_id', $legal_entity_id)->first()) {
+                self::setDb($db);
+
+                return $c;
+            }
+        }
+
+        self::setDB($current_db);
+
+        return null;
+    }
+
     public static function findAndSetDbByAccountKey($account_key): bool
     {
         $current_db = config('database.default');
@@ -485,7 +531,7 @@ class MultiDB
 
     public static function findAndSetDbByDomain($query_array)
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return Company::where($query_array)->first();
         }
 
@@ -504,9 +550,30 @@ class MultiDB
         return false;
     }
 
+    public static function findAndSetDbByExpenseMailbox($expense_mailbox)
+    {
+        if (!config('ninja.db.multi_db_enabled')) {
+            return Company::where("expense_mailbox", $expense_mailbox)->first();
+        }
+
+        $current_db = config('database.default');
+
+        foreach (self::$dbs as $db) {
+            if ($company = Company::on($db)->where("expense_mailbox", $expense_mailbox)->first()) {
+                self::setDb($db);
+
+                return $company;
+            }
+        }
+
+        self::setDB($current_db);
+
+        return false;
+    }
+
     public static function findAndSetByPaymentHash(string $hash)
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return PaymentHash::with('fee_invoice')->where('hash', $hash)->first();
         }
 
@@ -527,7 +594,7 @@ class MultiDB
 
     public static function findAndSetDbByInvitation($entity, $invitation_key)
     {
-        $class = 'App\Models\\'.ucfirst(Str::camel($entity)).'Invitation';
+        $class = 'App\Models\\' . ucfirst(Str::camel($entity)) . 'Invitation';
         $current_db = config('database.default');
 
         foreach (self::$dbs as $db) {
@@ -549,13 +616,13 @@ class MultiDB
      */
     public static function hasPhoneNumber(string $phone): bool
     {
-        if (! config('ninja.db.multi_db_enabled')) {
+        if (!config('ninja.db.multi_db_enabled')) {
             return Account::where('account_sms_verification_number', $phone)->where('account_sms_verified', true)->exists();
         }
 
         $current_db = config('database.default');
 
-        if(SMSNumbers::hasNumber($phone)) { // @phpstan-ignore-line
+        if (SMSNumbers::hasNumber($phone)) { // @phpstan-ignore-line
             return true;
         }
 
@@ -583,8 +650,26 @@ class MultiDB
             $string = '';
             $vowels = ['a', 'e', 'i', 'o', 'u', 'y'];
             $consonants = [
-                'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm',
-                'n', 'p', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z',
+                'b',
+                'c',
+                'd',
+                'f',
+                'g',
+                'h',
+                'j',
+                'k',
+                'l',
+                'm',
+                'n',
+                'p',
+                'r',
+                's',
+                't',
+                'v',
+                'w',
+                'x',
+                'y',
+                'z',
             ];
 
             $max = $length / 2;
@@ -592,7 +677,7 @@ class MultiDB
                 $string .= $consonants[rand(0, 19)];
                 $string .= $vowels[rand(0, 5)];
             }
-        } while (! self::checkDomainAvailable($string));
+        } while (!self::checkDomainAvailable($string));
 
         self::setDb($current_db);
 

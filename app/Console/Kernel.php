@@ -15,6 +15,7 @@ use App\Jobs\Cron\AutoBillCron;
 use App\Jobs\Cron\RecurringExpensesCron;
 use App\Jobs\Cron\RecurringInvoicesCron;
 use App\Jobs\Cron\SubscriptionCron;
+use App\Jobs\EDocument\EInvoicePullDocs;
 use App\Jobs\Invoice\InvoiceCheckLateWebhook;
 use App\Jobs\Ninja\AdjustEmailQuota;
 use App\Jobs\Ninja\BankTransactionSync;
@@ -67,7 +68,7 @@ class Kernel extends ConsoleKernel
 
         /* Checks Rotessa Transactions */
         $schedule->job(new TransactionReport())->dailyAt('01:48')->withoutOverlapping()->name('rotessa-transaction-report')->onOneServer();
-        
+
         /* Stale Invoice Cleanup*/
         $schedule->job(new CleanStaleInvoiceOrder())->hourlyAt(30)->withoutOverlapping()->name('stale-invoice-job')->onOneServer();
 
@@ -102,12 +103,15 @@ class Kernel extends ConsoleKernel
         $schedule->job(new InvoiceCheckLateWebhook())->dailyAt('07:00')->withoutOverlapping()->name('invoice-overdue-job')->onOneServer();
 
         /* Pulls in bank transactions from third party services */
-        $schedule->job(new BankTransactionSync())->everyFourHours()->withoutOverlapping()->name('bank-trans-sync-job')->onOneServer();
+        $schedule->job(new BankTransactionSync())->twiceDaily(1, 13)->withoutOverlapping()->name('bank-trans-sync-job')->onOneServer();
 
         if (Ninja::isSelfHost()) {
             $schedule->call(function () {
                 Account::query()->whereNotNull('id')->update(['is_scheduler_running' => true]);
             })->everyFiveMinutes();
+
+            $schedule->job(new EInvoicePullDocs())->everyFourHours(rand(0, 59))->withoutOverlapping();
+
         }
 
         /* Run hosted specific jobs */

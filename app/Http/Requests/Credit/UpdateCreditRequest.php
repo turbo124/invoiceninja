@@ -65,7 +65,7 @@ class UpdateCreditRequest extends Request
         $rules['number'] = ['bail', 'sometimes', 'nullable', Rule::unique('credits')->where('company_id', $user->company()->id)->ignore($this->credit->id)];
 
         $rules['client_id'] = ['bail', 'sometimes',Rule::in([$this->credit->client_id])];
-        
+
         $rules['invitations'] = 'sometimes|bail|array';
         $rules['invitations.*.client_contact_id'] = 'bail|required|distinct';
 
@@ -93,7 +93,7 @@ class UpdateCreditRequest extends Request
 
         $input = $this->decodePrimaryKeys($input);
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 
@@ -108,6 +108,19 @@ class UpdateCreditRequest extends Request
         }
 
         $input['id'] = $this->credit->id;
+
+        if (isset($input['footer']) && $this->hasHeader('X-REACT')) {
+            $input['footer'] = str_replace("\n", "", $input['footer']);
+        }
+        if (isset($input['public_notes']) && $this->hasHeader('X-REACT')) {
+            $input['public_notes'] = str_replace("\n", "", $input['public_notes']);
+        }
+        if (isset($input['private_notes']) && $this->hasHeader('X-REACT')) {
+            $input['private_notes'] = str_replace("\n", "", $input['private_notes']);
+        }
+        if (isset($input['terms']) && $this->hasHeader('X-REACT')) {
+            $input['terms'] = str_replace("\n", "", $input['terms']);
+        }
 
         $this->replace($input);
     }

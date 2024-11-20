@@ -30,6 +30,8 @@ class PdfBuilder
     private CommonMarkConverter $commonmark;
 
     private float $payment_amount_total = 0;
+
+    private float $unapplied_total = 0;
     /**
      * an array of sections to be injected into the template
      *
@@ -131,7 +133,7 @@ class PdfBuilder
 
         }
 
-        foreach($contents as $key => $content) {
+        foreach ($contents as $key => $content) {
             $content->parentNode->replaceChild($replacements[$key], $content);
         }
 
@@ -230,6 +232,14 @@ class PdfBuilder
             'statement-payment-table' => [
                 'id' => 'statement-payment-table',
                 'elements' => $this->statementPaymentTable(),
+            ],
+            'statement-unapplied-payment-table' => [
+                'id' => 'statement-unapplied-payment-table',
+                'elements' => $this->statementUnappliedPaymentTable(),
+            ],
+            'statement-unapplied-payment-table-totals' => [
+                'id' => 'statement-unapplied-payment-table-totals',
+                'elements' => $this->statementUnappliedPaymentTableTotals(),
             ],
             'statement-payment-table-totals' => [
                 'id' => 'statement-payment-table-totals',
@@ -356,6 +366,37 @@ class PdfBuilder
                 $tbody[] = $element;
 
                 $this->payment_amount_total += $payment->pivot->amount;
+
+                if ($payment->pivot->refunded > 0) {
+
+                    $refund_date = $payment->date;
+
+                    if ($payment->refund_meta && is_array($payment->refund_meta)) {
+
+                        $refund_array = collect($payment->refund_meta)->first(function ($meta) use ($invoice) {
+                            foreach ($meta['invoices'] as $refunded_invoice) {
+
+                                if ($refunded_invoice['invoice_id'] == $invoice->id) {
+                                    return true;
+                                }
+
+                            }
+                        });
+
+                        $refund_date = $refund_array['date'];
+                    }
+
+                    $element = ['element' => 'tr', 'elements' => []];
+                    $element['elements'][] = ['element' => 'td', 'content' => $invoice->number];
+                    $element['elements'][] = ['element' => 'td', 'content' => $this->translateDate($refund_date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;'];
+                    $element['elements'][] = ['element' => 'td', 'content' => ctrans('texts.refund')];
+                    $element['elements'][] = ['element' => 'td', 'content' => $this->service->config->formatMoney($payment->pivot->refunded) ?: '&nbsp;'];
+
+                    $tbody[] = $element;
+
+                    $this->payment_amount_total -= $payment->pivot->refunded;
+
+                }
             }
         }
 
@@ -387,6 +428,71 @@ class PdfBuilder
             ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.amount_paid'), $this->service->config->formatMoney($this->payment_amount_total))],
             ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
             ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
+        ];
+    }
+
+    public function statementUnappliedPaymentTableTotals(): array
+    {
+
+        if (is_null($this->service->options['unapplied']) || !$this->service->options['unapplied']->first()) {
+            return [];
+        }
+
+        if (\array_key_exists('show_payments_table', $this->service->options) && $this->service->options['show_payments_table'] === false) {
+            return [];
+        }
+
+        $payment = $this->service->options['unapplied']->first();
+
+        return [
+            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_balance'), $this->service->config->formatMoney($this->unapplied_total))],
+            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
+            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
+        ];
+
+    }
+
+
+    /**
+     * Generates the statement unapplied payments table
+     *
+     * @return array
+     *
+     */
+    public function statementUnappliedPaymentTable(): array
+    {
+        if (is_null($this->service->options['unapplied']) || !$this->service->options['unapplied']->first()) {
+            return [];
+        }
+
+        if (\array_key_exists('show_payments_table', $this->service->options) && $this->service->options['show_payments_table'] === false) {
+            return [];
+        }
+
+        $tbody = [];
+
+        //24-03-2022 show payments per invoice
+        foreach ($this->service->options['unapplied'] as $unapplied_payment) {
+            if ($unapplied_payment->is_deleted) {
+                continue;
+            }
+
+            $element = ['element' => 'tr', 'elements' => []];
+
+            $element['elements'][] = ['element' => 'td', 'content' => $unapplied_payment->number];
+            $element['elements'][] = ['element' => 'td', 'content' => $this->translateDate($unapplied_payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;'];
+            $element['elements'][] = ['element' => 'td', 'content' => $this->service->config->formatMoney($unapplied_payment->amount) ?: '&nbsp;'];
+            $element['elements'][] = ['element' => 'td', 'content' => $this->service->config->formatMoney($unapplied_payment->amount - $unapplied_payment->applied) ?: '&nbsp;'];
+
+            $tbody[] = $element;
+
+            $this->unapplied_total += round($unapplied_payment->amount - $unapplied_payment->applied, 2);
+
+        }
+
+        return [
+            ['element' => 'thead', 'elements' => $this->buildTableHeader('statement_unapplied')],
+            ['element' => 'tbody', 'elements' => $tbody],
         ];
     }
 
@@ -1032,6 +1138,11 @@ class PdfBuilder
         // Some variables don't map 1:1 to table columns. This gives us support for such cases.
         $aliases = [
             '$quote.balance_due' => 'partial',
+            '$purchase_order.po_number' => 'number',
+            '$purchase_order.total' => 'amount',
+            '$purchase_order.due_date' => 'due_date',
+            '$purchase_order.balance_due' => 'balance_due',
+            '$credit.valid_until' => 'due_date',
         ];
 
         try {
@@ -1366,6 +1477,11 @@ class PdfBuilder
     public function deliveryNoteDetails(): array
     {
         $variables = $this->service->config->pdf_variables['invoice_details'];
+
+        // $_v = $this->service->html_variables;
+
+        // $_v['labels']['$invoice.date_label'] = ctrans('text.date');
+        // $this->service->html_variables = $_v;
 
         $variables = array_filter($variables, function ($m) {
             return !in_array($m, ['$invoice.balance_due', '$invoice.total']);

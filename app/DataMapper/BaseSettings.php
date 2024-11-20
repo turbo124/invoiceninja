@@ -16,14 +16,6 @@ namespace App\DataMapper;
  */
 class BaseSettings
 {
-    // //@deprecated
-    // public function __construct($obj)
-    // {
-    //     // foreach ($obj as $key => $value) {
-    //     //     $obj->{$key} = $value;
-    //     // }
-    // }
-
     public static function setCasts($obj, $casts)
     {
         foreach ($casts as $key => $value) {

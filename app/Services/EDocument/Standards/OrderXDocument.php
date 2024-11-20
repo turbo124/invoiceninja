@@ -100,7 +100,7 @@ class OrderXDocument extends AbstractService
             $this->orderxdocument->setDocumentShipToAddress($settings_entity->shipping_address1, $settings_entity->shipping_address2, "", $settings_entity->shipping_postal_code, $settings_entity->shipping_city, $settings_entity->shipping_country->iso_3166_2, $settings_entity->shipping_state);
         }
 
-        $this->orderxdocument->addDocumentPaymentMean(68, ctrans("texts.xinvoice_online_payment"));
+        $this->orderxdocument->addDocumentPaymentMean('68', ctrans("texts.xinvoice_online_payment"));
 
         if (str_contains($company->getSetting('vat_number'), "/")) {
             $this->orderxdocument->addDocumentSellerTaxRegistration("FC", $company->getSetting('vat_number'));
@@ -115,7 +115,7 @@ class OrderXDocument extends AbstractService
             /** @var \App\DataMapper\InvoiceItem $item **/
             $this->orderxdocument->addNewPosition($index)
                 ->setDocumentPositionGrossPrice($item->gross_line_total)
-                ->setDocumentPositionNetPrice($item->line_total);
+                ->setDocumentPositionNetPrice($item->cost);
             if (!empty($item->product_key)) {
                 if (!empty($item->notes)) {
                     $this->orderxdocument->setDocumentPositionProductDetails($item->product_key, $item->notes);

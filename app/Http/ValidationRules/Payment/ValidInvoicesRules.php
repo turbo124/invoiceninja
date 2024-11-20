@@ -67,8 +67,6 @@ class ValidInvoicesRules implements Rule
             /////
             $inv = $inv_collection->firstWhere('id', $invoice['invoice_id']);
 
-            // $inv = Invoice::withTrashed()->whereId($invoice['invoice_id'])->first();
-
             if (! $inv) {
                 $this->error_msg = ctrans('texts.invoice_not_found');
 
@@ -89,7 +87,7 @@ class ValidInvoicesRules implements Rule
             } elseif (floatval($invoice['amount']) > floatval($inv->balance)) {
                 $this->error_msg = ctrans('texts.amount_greater_than_balance_v5');
                 return false;
-            } elseif($inv->is_deleted){
+            } elseif ($inv->is_deleted) {
                 $this->error_msg = 'One or more invoices in this request have since been deleted';
                 return false;
             }

@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $user_id
  * @property int|null $assigned_user_id
  * @property int $company_id
+ * @property int $remaining_cycles
  * @property string|null $product_ids
  * @property int|null $frequency_id
  * @property string|null $auto_bill
@@ -117,6 +118,7 @@ class Subscription extends BaseModel
         'optional_recurring_product_ids',
         'use_inventory_management',
         'steps',
+        'remaining_cycles',
     ];
 
     protected $casts = [
@@ -198,5 +200,28 @@ class Subscription extends BaseModel
             default:
                 return null;
         }
+    }
+
+    /**
+     * Calculates the maximum product quantity available
+     *
+     * @param  mixed $product
+     * @return int
+     */
+    public function maxQuantity(mixed $product): int
+    {
+        $max_quantity = data_get($product, 'max_quantity', 0);
+        $in_stock_quantity = data_get($product, 'in_stock_quantity', 0);
+        $max_limit = 100;
+
+        if (!$this->use_inventory_management) {
+            return min($max_limit, $max_quantity > 0 ? $max_quantity : $max_limit);
+        }
+
+        if ($max_quantity > 0) {
+            return min($max_limit, $max_quantity);
+        }
+
+        return min($max_limit, $in_stock_quantity);
     }
 }

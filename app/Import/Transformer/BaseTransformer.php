@@ -47,7 +47,7 @@ class BaseTransformer
 
     public function parseDate($date)
     {
-        if(stripos($date, "/") !== false && $this->company->settings->country_id != 840) {
+        if (stripos($date, "/") !== false && $this->company->settings->country_id != 840) {
             $date = str_replace('/', '-', $date);
         }
 
@@ -55,7 +55,7 @@ class BaseTransformer
             $parsed_date = Carbon::parse($date);
 
             return $parsed_date->format('Y-m-d');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $parsed_date = date('Y-m-d', strtotime($date));
 
             if ($parsed_date == '1970-01-01') {
@@ -70,11 +70,11 @@ class BaseTransformer
     {
         $date = &$data[$field];
 
-        if(!$date || strlen($date) <= 1) {
+        if (!$date || strlen($date) <= 1) {
             return null;
         }
 
-        if(stripos($date, "/") !== false && $this->company->settings->country_id != 840) {
+        if (stripos($date, "/") !== false && $this->company->settings->country_id != 840) {
             $date = str_replace('/', '-', $date);
         }
 
@@ -82,7 +82,7 @@ class BaseTransformer
             $parsed_date = Carbon::parse($date);
 
             return $parsed_date->format('Y-m-d');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $parsed_date = date('Y-m-d', strtotime($date));
 
             if ($parsed_date == '1970-01-01') {
@@ -95,19 +95,19 @@ class BaseTransformer
 
     }
 
-    public function getInvoiceTypeId($data, $field)
+    public function getInvoiceTypeId($data, $field, $default = '1')
     {
-        return isset($data[$field]) && $data[$field] ? (string)$data[$field] : '1';
+        return isset($data[$field]) && $data[$field] ? (string)$data[$field] : $default;
     }
 
-    public function getNumber($data, $field)
+    public function getNumber($data, $field, $default = 0)
     {
-        return (isset($data->$field) && $data->$field) ? (int)$data->$field : 0;
+        return (isset($data->$field) && $data->$field) ? (int)$data->$field : $default;
     }
 
-    public function getString($data, $field)
+    public function getString($data, $field, $default = '')
     {
-        return isset($data[$field]) && $data[$field] ? trim($data[$field]) : '';
+        return isset($data[$field]) && $data[$field] ? trim($data[$field]) : $default;
     }
 
     public function getValueOrNull($data, $field)
@@ -119,8 +119,9 @@ class BaseTransformer
     {
         $code = array_key_exists($key, $data) ? $data[$key] : false;
 
-        if(!$code)
+        if (!$code) {
             return $this->company->settings->currency_id;
+        }
 
         /** @var \Illuminate\Support\Collection<\App\Models\Currency> */
         $currencies = app('currencies');
@@ -210,7 +211,7 @@ class BaseTransformer
     public function getClient($client_name, $client_email)
     {
 
-        if (! empty($client_name)) {
+        if (strlen($client_name ?? '') >= 1) {
             $client_id_search = Client::query()->where('company_id', $this->company->id)
                 ->where('is_deleted', false)
                 ->where('id_number', $client_name);
@@ -229,7 +230,7 @@ class BaseTransformer
                 return $client_name_search->first()->id;
             }
         }
-        if (! empty($client_email)) {
+        if (strlen($client_email ?? '') >= 1) {
             $contacts = ClientContact::query()->whereHas('client', function ($query) {
                 $query->where('is_deleted', false);
             })
@@ -274,12 +275,14 @@ class BaseTransformer
     public function hasClient($name)
     {
 
-        return Client::query()->where('company_id', $this->company->id)
+        $x = Client::query()
+            ->where('company_id', $this->company->id)
             ->where('is_deleted', false)
             ->whereRaw("LOWER(REPLACE(`name`, ' ' , '')) = ?", [
                 strtolower(str_replace(' ', '', $name)),
-            ])
-            ->exists();
+            ]);
+
+        return $x->exists();
     }
 
     public function hasClientIdNumber($id_number)
@@ -344,11 +347,41 @@ class BaseTransformer
      */
     public function getFloat($data, $field)
     {
+
         if (array_key_exists($field, $data)) {
+
+            if ($this->company->use_comma_as_decimal_place) {
+                return $this->parseCommaFloat($data, $field);
+            }
+
             return Number::parseFloat($data[$field]);
         }
 
         return 0;
+
+    }
+
+    private function parseCommaFloat($data, $field): float
+    {
+
+        $amount = $data[$field] ?? '';
+
+        // Remove any non-numeric characters except for the decimal and thousand separators
+        $amount = preg_replace('/[^\d' . preg_quote(",") . preg_quote(".") . '-]/', '', $amount);
+
+        // Handle negative numbers
+        $isNegative = strpos($amount, '-') !== false;
+        $amount = str_replace('-', '', $amount);
+
+        // Remove thousand separators
+        $amount = str_replace(".", "", $amount);
+
+        $amount = str_replace(",", '.', $amount);
+
+        // Convert to float and apply negative sign if necessary
+        $result = (float) $amount;
+        return $isNegative ? -$result : $result;
+
 
     }
 
@@ -409,7 +442,8 @@ class BaseTransformer
      */
     public function getContact($email): ?ClientContact
     {
-        $contact = ClientContact::query()->where('company_id', $this->company->id)
+        $contact = ClientContact::query()
+            ->where('company_id', $this->company->id)
             ->whereRaw("LOWER(REPLACE(`email`, ' ' ,''))  = ?", [
                 strtolower(str_replace(' ', '', $email)),
             ])
@@ -666,7 +700,7 @@ class BaseTransformer
             ])
             ->first();
 
-        if($ec) {
+        if ($ec) {
             return $ec->id;
         }
 
@@ -703,7 +737,7 @@ class BaseTransformer
      */
     public function getProjectId($name, $clientId = null)
     {
-        if(strlen($name) == 0) {
+        if (strlen($name) == 0) {
             return null;
         }
 

@@ -63,7 +63,7 @@ class PurchaseOrderExport extends BaseExport
                         })
                         ->where('company_id', $this->company->id);
 
-        if(!$this->input['include_deleted'] ?? false) { // @phpstan-ignore-line
+        if (!$this->input['include_deleted'] ?? false) { // @phpstan-ignore-line
             $query->where('is_deleted', 0);
         }
 
@@ -72,14 +72,18 @@ class PurchaseOrderExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
         $query = $this->addPurchaseOrderStatusFilter($query, $this->input['status'] ?? '');
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
+        }
+
+        if ($this->input['pdf_email_attachment'] ?? false) {
+            $this->queuePdfs($query);
         }
 
         return $query;
@@ -98,7 +102,7 @@ class PurchaseOrderExport extends BaseExport
 
         $report = $query->cursor()
                 ->map(function ($resource) {
-                    
+
                     /** @var \App\Models\PurchaseOrder $resource */
                     $row = $this->buildRow($resource);
                     return $this->processMetaData($row, $resource);
@@ -121,9 +125,9 @@ class PurchaseOrderExport extends BaseExport
 
         $query->cursor()
             ->each(function ($purchase_order) {
-                
-            /** @var \App\Models\PurchaseOrder $purchase_order */
-            $this->csv->insertOne($this->buildRow($purchase_order));
+
+                /** @var \App\Models\PurchaseOrder $purchase_order */
+                $this->csv->insertOne($this->buildRow($purchase_order));
             });
 
         return $this->csv->toString();
@@ -142,17 +146,16 @@ class PurchaseOrderExport extends BaseExport
             if (is_array($parts) && $parts[0] == 'purchase_order' && array_key_exists($parts[1], $transformed_purchase_order)) {
                 $entity[$key] = $transformed_purchase_order[$parts[1]];
             } else {
-                nlog($key);
                 $entity[$key] = $this->decorator->transform($key, $purchase_order);
-                // $entity[$key] = '';
-
-                // $entity[$key] = $this->resolveKey($key, $purchase_order, $this->purchase_order_transformer);
             }
 
 
         }
-        // return $entity;
-        return $this->decorateAdvancedFields($purchase_order, $entity);
+
+        $entity = $this->decorateAdvancedFields($purchase_order, $entity);
+
+        return $this->convertFloats($entity);
+
     }
 
     private function decorateAdvancedFields(PurchaseOrder $purchase_order, array $entity): array

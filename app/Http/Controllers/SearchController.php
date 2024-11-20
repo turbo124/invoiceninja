@@ -11,10 +11,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Search\GenericSearchRequest;
+use App\Models\User;
+use App\Utils\Ninja;
 use App\Models\Client;
 use App\Models\Invoice;
-use App\Models\User;
+use Elastic\Elasticsearch\ClientBuilder;
+use App\Http\Requests\Search\GenericSearchRequest;
 
 class SearchController extends Controller
 {
@@ -24,8 +26,18 @@ class SearchController extends Controller
 
     private array $invoices = [];
 
+    private array $quotes = [];
+
     public function __invoke(GenericSearchRequest $request)
     {
+        if (config('scout.driver') == 'elastic') {
+            try {
+                return $this->search($request->input('search', '*'));
+            } catch (\Exception $e) {
+                nlog("elk down?" . $e->getMessage());
+            }
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
@@ -41,6 +53,115 @@ class SearchController extends Controller
 
     }
 
+    public function search(string $search)
+    {
+        $user = auth()->user();
+        $company = $user->company();
+
+        \Illuminate\Support\Facades\App::setLocale($company->locale());
+
+        $elastic = ClientBuilder::fromConfig(config('elastic.client.connections.default'));
+
+        $params = [
+            'index' => 'clients,invoices,client_contacts',
+            'body'  => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            'multi_match' => [
+                                'query' => $search,
+                                'fields' => ['*'],
+                                'fuzziness' => 'AUTO',
+                            ],
+                        ],
+                        'filter' => [
+                            'match' => [
+                                'company_key' => $company->company_key,
+                            ],
+                        ],
+                    ],
+                ],
+                'size' => 100,
+            ],
+        ];
+
+        $results = $elastic->search($params);
+
+        $this->mapResults($results['hits']['hits'] ?? []);
+
+        return response()->json([
+            'clients' => $this->clients,
+            'client_contacts' => $this->client_contacts,
+            'invoices' => $this->invoices,
+            'settings' => $this->settingsMap(),
+        ], 200);
+
+    }
+
+    private function mapResults(array $results)
+    {
+
+        foreach ($results as $result) {
+            switch ($result['_index']) {
+                case 'clients':
+
+                    if ($result['_source']['is_deleted']) { //do not return deleted results
+                        break;
+                    }
+
+                    $this->clients[] = [
+                        'name' => $result['_source']['name'],
+                        'type' => '/client',
+                        'id' => $result['_source']['hashed_id'],
+                        'path' => "/clients/{$result['_source']['hashed_id']}"
+                    ];
+
+                    break;
+                case 'invoices':
+
+                    if ($result['_source']['is_deleted']) {  //do not return deleted invoices
+                        break;
+                    }
+
+
+                    $this->invoices[] = [
+                        'name' => $result['_source']['name'],
+                        'type' => '/invoice',
+                        'id' => $result['_source']['hashed_id'],
+                        'path' => "/invoices/{$result['_source']['hashed_id']}/edit"
+                    ];
+                    break;
+                case 'client_contacts':
+
+                    if ($result['_source']['__soft_deleted']) { // do not return deleted contacts
+                        break;
+                    }
+
+                    $this->client_contacts[] = [
+                        'name' => $result['_source']['name'],
+                        'type' => '/client',
+                        'id' => $result['_source']['hashed_id'],
+                        'path' => "/clients/{$result['_source']['hashed_id']}"
+                    ];
+                    break;
+                case 'quotes':
+
+                    if ($result['_source']['__soft_deleted']) { // do not return deleted contacts
+                        break;
+                    }
+
+                    $this->quotes[] = [
+                        'name' => $result['_source']['name'],
+                        'type' => '/quote',
+                        'id' => $result['_source']['hashed_id'],
+                        'path' => "/quotes/{$result['_source']['hashed_id']}"
+                    ];
+
+                    break;
+            }
+        }
+    }
+
     private function clientMap(User $user)
     {
 
@@ -54,7 +175,7 @@ class SearchController extends Controller
                      ->take(1000)
                      ->get();
 
-        foreach($clients as $client) {
+        foreach ($clients as $client) {
             $this->clients[] = [
                 'name' => $client->present()->name(),
                 'type' => '/client',
@@ -81,24 +202,18 @@ class SearchController extends Controller
         $invoices = Invoice::query()
                      ->company()
                      ->with('client')
-                     ->where('invoices.is_deleted', 0)
-                    //  ->whereHas('client', function ($q) {
-                    //      $q->where('is_deleted', 0);
-                    //  })
-                
-                    ->leftJoin('clients', function ($join) {
-                        $join->on('invoices.client_id', '=', 'clients.id')
-                            ->where('clients.is_deleted', 0);
-                    })
-                     
+                     ->where('is_deleted', 0)
+                     ->whereHas('client', function ($q) {
+                         $q->where('is_deleted', 0);
+                     })
                      ->when(!$user->hasPermission('view_all') || !$user->hasPermission('view_invoice'), function ($query) use ($user) {
                          $query->where('invoices.user_id', $user->id);
                      })
-                     ->orderBy('invoices.id', 'desc')
+                     ->orderBy('id', 'desc')
                     ->take(3000)
                     ->get();
 
-        foreach($invoices as $invoice) {
+        foreach ($invoices as $invoice) {
             $this->invoices[] = [
                 'name' => $invoice->client->present()->name() . ' - ' . $invoice->number,
                 'type' => '/invoice',
@@ -157,8 +272,6 @@ class SearchController extends Controller
             'custom_fields,vendors' => '/settings/custom_fields/vendors',
             'custom_fields,expenses' => '/settings/custom_fields/expenses',
             'custom_fields,users' => '/settings/custom_fields/users',
-            'custom_fields,quotes' => '/settings/custom_fields/quotes',
-            'custom_fields,credits' => '/settings/custom_fields/credits',
             'generated_numbers' => '/settings/generated_numbers',
             'client_portal' => '/settings/client_portal',
             'email_settings' => '/settings/email_settings',
@@ -180,16 +293,16 @@ class SearchController extends Controller
             'gateways' => '/settings/online_payments',
             'gateways,create' => '/settings/gateways/create',
             'bank_accounts,transaction_rules' => '/settings/bank_accounts/transaction_rules',
-            'bank_accounts,transaction_rules/create' => '/settings/bank_accounts/transaction_rules/create',
+            'bank_accounts,transaction_rules,create' => '/settings/bank_accounts/transaction_rules/create',
         ];
 
         $data = [];
 
-        foreach($paths as $key => $value) {
+        foreach ($paths as $key => $value) {
 
             $translation = '';
 
-            foreach(explode(",", $key) as $transkey) {
+            foreach (explode(",", $key) as $transkey) {
                 $translation .= ctrans("texts.{$transkey}")." ";
             }
 

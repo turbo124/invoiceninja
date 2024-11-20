@@ -66,9 +66,9 @@ class PdfMock
         $pdf_config->setPdfVariables();
         $pdf_config->setCurrency(Currency::find($this->settings->currency_id));
         $pdf_config->setCountry(Country::find($this->settings->country_id ?: 840));
-        $pdf_config->currency_entity = $this->mock->client;
+        $pdf_config->currency_entity = $this->mock->client ?? $this->mock->vendor;
 
-        if(isset($this->request['design_id']) && $design  = Design::withTrashed()->find($this->request['design_id'])) {
+        if (isset($this->request['design_id']) && $design  = Design::withTrashed()->find($this->request['design_id'])) {
             $pdf_config->design = $design;
             $pdf_config->entity_design_id = $design->hashed_id;
         } else {
@@ -77,7 +77,7 @@ class PdfMock
 
         $pdf_service->config = $pdf_config;
 
-        if(isset($this->request['design'])) {
+        if (isset($this->request['design'])) {
             $pdf_designer = (new PdfDesigner($pdf_service))->buildFromPartials($this->request['design']);
         } else {
             $pdf_designer = (new PdfDesigner($pdf_service))->build();
@@ -171,11 +171,11 @@ class PdfMock
     {
         $settings = $this->company->settings;
 
-        match ($this->request['settings_type']) {
+        match ($this->request['settings_type'] ?? '') {
             'group' => $settings = ClientSettings::buildClientSettings($this->company->settings, $this->request['settings']),
             'client' => $settings = ClientSettings::buildClientSettings($this->company->settings, $this->request['settings']),
             'company' => $settings = (object)$this->request['settings'],
-            default => $settings = (object)$this->request['settings'],
+            default => $settings = (object)$this->company->settings,
         };
 
         $settings = CompanySettings::setProperties($settings);
@@ -262,6 +262,7 @@ class PdfMock
     '$client.billing_city' => 'Aufderharchester',
     '$secondary_font_name' => isset($this->settings?->secondary_font) ? $this->settings->secondary_font : 'Roboto',
     '$secondary_font_url' => isset($this->settings?->secondary_font) ? \App\Utils\Helpers::resolveFont($this->settings->secondary_font)['url'] : 'https://fonts.googleapis.com/css2?family=Roboto&display=swap',
+    '$credit.valid_until' => '2024-12-11',
     '$product.line_total' => '',
     '$product.tax_amount' => '',
     '$company.vat_number' => $this->settings->vat_number,
@@ -596,6 +597,7 @@ class PdfMock
             '$invoice.invoice_no_label' => ctrans('texts.invoice_no'),
             '$contact.first_name_label' => ctrans('texts.first_name'),
             '$secondary_font_url_label' => ctrans('texts.secondary_font'),
+            '$credit.valid_until_label' => ctrans('texts.valid_until'),
             '$contact.signature_label' => ctrans('texts.signature'),
             '$product.tax_name1_label' => ctrans('texts.tax_name1'),
             '$product.tax_name2_label' => ctrans('texts.tax_name2'),

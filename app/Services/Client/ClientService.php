@@ -61,7 +61,7 @@ class ClientService
             nlog("DB ERROR " . $throwable->getMessage());
         }
 
-        if($invoice && floatval($this->client->balance)  != floatval($pre_client_balance)) {
+        if ($invoice && floatval($this->client->balance)  != floatval($pre_client_balance)) {
             $diff = $this->client->balance - $pre_client_balance;
             $invoice->ledger()->insertInvoiceBalance($diff, $this->client->balance, "Update Adjustment Invoice # {$invoice->number} => {$diff}");
         }
@@ -89,11 +89,6 @@ class ClientService
                 DB::connection(config('database.default'))->rollBack();
             }
 
-        } catch(\Exception $exception) {
-
-            if (DB::connection(config('database.default'))->transactionLevel() > 0) {
-                DB::connection(config('database.default'))->rollBack();
-            }
         }
 
         return $this;
@@ -101,6 +96,37 @@ class ClientService
 
     public function updateBalanceAndPaidToDate(float $balance, float $paid_to_date)
     {
+
+        // refactor to calculated balances.
+        // $ib = Invoice::withTrashed()
+        //             ->where('client_id', $this->client->id)
+        //             ->whereIn('status_id', [2,3])
+        //             ->where('is_deleted',0)
+        //             ->where('is_proforma',0)
+        //             ->sum('balance');
+
+        // $payments = Payment::withTrashed()
+        // ->where('client_id', $this->client->id)
+        // ->whereIn('status_id', [1,4,5,6])
+        // ->where('is_deleted',0)
+        // ->sum(\DB::raw('amount - refunded'));
+
+        // $credit_payments = Payment::where('client_id', $this->client->id)
+        //     ->where('is_deleted', 0)
+        //     ->join('paymentables', 'payments.id', '=', 'paymentables.payment_id')
+        //     ->where('paymentables.paymentable_type', \App\Models\Credit::class)
+        //     ->whereNull('paymentables.deleted_at')
+        //     ->where('paymentables.amount', '>', 0)
+        //     ->sum(DB::raw('paymentables.amount - paymentables.refunded'));
+
+        // $credits_from_reversal = \App\Models\Credit::withTrashed()
+        //                         ->where('client_id', $this->client->id)
+        //                         ->where('is_deleted', 0)
+        //                         ->whereNotNull('invoice_id')
+        //                         ->sum('amount');
+
+        // $paid_to_date = $payments+$credit_payments-$credits_from_reversal;
+
         try {
             DB::connection(config('database.default'))->transaction(function () use ($balance, $paid_to_date) {
                 $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
@@ -115,12 +141,6 @@ class ClientService
                 DB::connection(config('database.default'))->rollBack();
             }
 
-        } catch(\Exception $exception) {
-            nlog("DB ERROR " . $exception->getMessage());
-
-            if (DB::connection(config('database.default'))->transactionLevel() > 0) {
-                DB::connection(config('database.default'))->rollBack();
-            }
         }
 
         return $this;
@@ -141,12 +161,6 @@ class ClientService
                 DB::connection(config('database.default'))->rollBack();
             }
 
-        } catch(\Exception $exception) {
-            nlog("DB ERROR " . $exception->getMessage());
-
-            if (DB::connection(config('database.default'))->transactionLevel() > 0) {
-                DB::connection(config('database.default'))->rollBack();
-            }
         }
 
         return $this;
@@ -156,7 +170,7 @@ class ClientService
     {
         $x = 1;
 
-        if(isset($this->client->number)) {
+        if (isset($this->client->number)) {
             return $this;
         }
 
@@ -185,7 +199,7 @@ class ClientService
                         ->where('client_id', $this->client->id)
                         ->where('is_deleted', 0)
                         ->whereIn('status_id', [Payment::STATUS_COMPLETED, Payment::STATUS_PENDING, Payment::STATUS_PARTIALLY_REFUNDED, Payment::STATUS_REFUNDED])
-                        ->selectRaw('SUM(payments.amount - payments.applied - payments.refunded) as amount')->first()->amount ?? 0;
+                        ->selectRaw('SUM(payments.amount - payments.applied) as amount')->first()->amount ?? 0;
 
         DB::connection(config('database.default'))->transaction(function () use ($amount) {
             $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
@@ -253,7 +267,7 @@ class ClientService
 
         $pdf = $statement->run();
 
-        if ($send_email) {
+        if ($send_email && $pdf) {
             // If selected, ignore clients that don't have any invoices to put on the statement.
             if (!empty($options['only_clients_with_invoices']) && $statement->getInvoices()->count() == 0) {
                 return false;
@@ -310,6 +324,8 @@ class ClientService
         }
 
         $invoice = $this->client->invoices()->whereHas('invitations')->first();
+
+        $invoice = \App\Models\Invoice::where('client_id', $this->client->id)->whereHas('invitations')->first();
 
         $email_object->attachments = [['file' => base64_encode($pdf), 'name' => ctrans('texts.statement') . ".pdf"]];
         $email_object->client_id = $this->client->id;

@@ -78,7 +78,7 @@ class ClientRepository extends BaseRepository
 
         $client->save();
 
-        if (! isset($client->number) || empty($client->number) || strlen($client->number) == 0) {
+        if (! isset($client->number) || empty($client->number) || strlen($client->number ?? '') == 0) {//@phpstan-ignore-line
             $x = 1;
 
             do {
@@ -106,6 +106,7 @@ class ClientRepository extends BaseRepository
         if (array_key_exists('contacts', $contact_data) || $client->contacts()->count() == 0) {
             $this->contact_repo->save($contact_data, $client);
         }
+
 
         return $client;
     }

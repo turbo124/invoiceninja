@@ -17,7 +17,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class GenericReportRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -37,6 +36,7 @@ class GenericReportRequest extends Request
             'report_keys' => 'present|array',
             'send_email' => 'required|bool',
             'document_email_attachment' => 'sometimes|bool',
+            'pdf_email_attachment' => 'sometimes|bool',
             'include_deleted' => 'required|bool',
             // 'status' => 'sometimes|string|nullable|in:all,draft,sent,viewed,paid,unpaid,overdue',
         ];
@@ -67,13 +67,14 @@ class GenericReportRequest extends Request
 
         $input['user_id'] = auth()->user()->id;
 
-        if(!$this->checkAuthority()) {
+        if (!$this->checkAuthority()) {
             $input['date_range'] = '';
             $input['start_date'] = '';
             $input['end_date'] = '';
             $input['send_email'] = true;
             $input['report_keys'] = [];
             $input['document_email_attachment'] = false;
+            $input['pdf_email_attachment'] = false;
         }
 
         $this->replace($input);

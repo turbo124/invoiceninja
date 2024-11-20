@@ -106,8 +106,10 @@ class Gateway extends StaticModel
         } elseif ($this->id == 62) {
             $link = 'https://docs.btcpayserver.org/InvoiceNinja/';
         } elseif ($this->id == 63) {
-	        $link = 'https://rotessa.com';	
-	      }
+            $link = 'https://rotessa.com';
+        } elseif ($this->id == 64) {
+            $link = 'https://blockonomics.co';
+        }
 
         return $link;
     }
@@ -232,9 +234,17 @@ class Gateway extends StaticModel
                         'refund' => false,
                         'token_billing' => true,
                         'webhooks' => [],
-                        ],  
+                        ],
                     GatewayType::ACSS => ['refund' => false, 'token_billing' => true, 'webhooks' => []]
                 ]; // Rotessa
+            case 64: //b67581d804dbad1743b61c57285142ad - powerboard
+                return [
+                    GatewayType::CREDIT_CARD => ['refund' => true, 'token_billing' => true],
+                ];
+            case 65:
+                return [
+                    GatewayType::CRYPTO => ['refund' => false, 'token_billing' => false, 'webhooks' => ['confirmed', 'paid_out', 'failed', 'fulfilled']],
+                ]; //Blockonomics
             default:
                 return [];
         }

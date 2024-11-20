@@ -34,7 +34,7 @@ use League\Csv\Reader;
 use Tests\TestCase;
 
 /**
- * @test
+ * 
  */
 class ReportCsvGenerationTest extends TestCase
 {
@@ -42,7 +42,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class ReportCsvGenerationTest extends TestCase
         );
 
         $this->withoutExceptionHandling();
-        
+
         Invoice::withTrashed()->cursor()->each(function ($i) { $i->forceDelete();});
 
         $this->buildData();
@@ -191,6 +191,7 @@ class ReportCsvGenerationTest extends TestCase
      */
     private function buildData()
     {
+        /** @var \App\Models\Account $account */
         $this->account = Account::factory()->create([
             'hosted_client_count' => 1000,
             'hosted_company_count' => 1000,
@@ -225,7 +226,7 @@ class ReportCsvGenerationTest extends TestCase
 
         $this->token = \Illuminate\Support\Str::random(64);
 
-        $company_token = new CompanyToken;
+        $company_token = new CompanyToken();
         $company_token->user_id = $this->user->id;
         $company_token->company_id = $this->company->id;
         $company_token->account_id = $this->account->id;
@@ -270,12 +271,12 @@ class ReportCsvGenerationTest extends TestCase
     {
         Invoice::factory()->count(5)->create(
             [
-                'client_id'=> $this->client->id,
+                'client_id' => $this->client->id,
                 'company_id' => $this->company->id,
                 'user_id' => $this->user->id
             ]
         );
-        
+
         $data = [
             'date_range' => 'all',
             'report_keys' => ['invoice.number','client.name', 'contact.email'],
@@ -308,13 +309,13 @@ class ReportCsvGenerationTest extends TestCase
 
         $report_keys = ['invoice.number','client.name', 'invoice.amount'];
         $array = array_merge($report_keys, array_diff($forced, $report_keys));
-        
+
         $this->assertEquals('client.name', $array[1]);
 
         $report_keys = ['invoice.number','invoice.amount'];
         $array = array_merge($report_keys, array_diff($forced, $report_keys));
 
-        $this->assertEquals('client.name', $array[2]);
+        $this->assertEquals('client.name', $array[2]); //@phpstan-ignore-line
 
     }
 
@@ -325,7 +326,7 @@ class ReportCsvGenerationTest extends TestCase
                         'X-API-SECRET' => config('ninja.api_secret'),
                         'X-API-TOKEN' => $this->token,
                     ])->post(config('ninja.app_url')."/api/v1/exports/preview/{$hash}");
-        
+
         return $response;
     }
 
@@ -372,7 +373,7 @@ class ReportCsvGenerationTest extends TestCase
         $item->product_key = 'batman';
 
         $line_items = [];
-        
+
         $line_items[] = $item;
         $item = InvoiceItemFactory::create();
         $item->product_key = 'bob the builder';
@@ -395,7 +396,7 @@ class ReportCsvGenerationTest extends TestCase
                 $q->orWhereJsonContains('line_items', ['product_key' => $product]);
             }
         });
-            
+
         $this->assertEquals(1, $query->count());
 
         $query = Invoice::query();
@@ -433,9 +434,9 @@ class ReportCsvGenerationTest extends TestCase
         );
 
         $this->assertEquals(1, $q->count());
-        
+
         $q->forceDelete();
-        
+
         Invoice::factory()->create(
             [
                 'company_id' => $this->company->id,
@@ -480,7 +481,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testVendorCsvGeneration()
     {
-    
+
         $vendor =
         \App\Models\Vendor::factory()->create(
             [
@@ -509,7 +510,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/vendors', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -517,7 +518,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
         $this->assertEquals('Vendor 1', $this->getFirstValueByColumn($csv, 'Vendor Name'));
@@ -545,7 +546,7 @@ class ReportCsvGenerationTest extends TestCase
         $data = $export->returnJson();
 
         $this->assertNotNull($data);
-        
+
         $this->assertEquals('Vendor Name', $this->traverseJson($data, 'columns.9.display_value'));
         $this->assertEquals('vendor', $this->traverseJson($data, '0.0.entity'));
         $this->assertEquals('address1', $this->traverseJson($data, '0.0.id'));
@@ -557,7 +558,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testVendorCustomColumnCsvGeneration()
     {
-        
+
         \App\Models\Vendor::query()->cursor()->each(function ($t) {
             $t->forceDelete();
         });
@@ -591,7 +592,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/vendors', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -599,7 +600,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
@@ -683,7 +684,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/tasks', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -691,10 +692,10 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
-// nlog($csv);
+        // nlog($csv);
         $this->assertEquals(3600, $this->getFirstValueByColumn($csv, 'Task Duration'));
         $this->assertEquals('test1', $this->getFirstValueByColumn($csv, 'Task Description'));
         $this->assertEquals('16/Jul/2023', $this->getFirstValueByColumn($csv, 'Task Start Date'));
@@ -752,7 +753,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
@@ -789,7 +790,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/tasks', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -797,7 +798,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
         $this->assertEquals(3600, $this->getFirstValueByColumn($csv, 'Task Duration'));
@@ -838,7 +839,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/products', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -846,7 +847,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
 
@@ -920,7 +921,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/payments', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -928,7 +929,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
         // nlog($csv);
@@ -940,7 +941,7 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals('bob', $this->getFirstValueByColumn($csv, 'Client Name'));
         $this->assertEquals(0, $this->getFirstValueByColumn($csv, 'Client Balance'));
         $this->assertEquals(100, $this->getFirstValueByColumn($csv, 'Client Paid to Date'));
-            
+
         $export = new PaymentExport($this->company, $data);
         $data = $export->returnJson();
 
@@ -975,7 +976,7 @@ class ReportCsvGenerationTest extends TestCase
         ])->post('/api/v1/reports/payments', $data)->assertStatus(200);
 
 
-        
+
         $data = [
             'date_range' => 'all',
             'report_keys' => array_merge(["payment.amount","payment.date"], $this->all_invoice_report_keys),
@@ -994,7 +995,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
 
@@ -1023,7 +1024,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/payments', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1031,7 +1032,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
 
@@ -1040,7 +1041,7 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals(0, $this->getFirstValueByColumn($csv, 'Payment Refunded'));
         $this->assertEquals('2020-01-01', $this->getFirstValueByColumn($csv, 'Payment Date'));
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Payment Transaction Reference'));
-    
+
     }
 
 
@@ -1057,7 +1058,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/clients', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1065,12 +1066,12 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
         $reader = Reader::createFromString($csv);
         $reader->setHeaderOffset(0);
-        
+
         $res = $reader->fetchColumnByName('Street');
         $res = iterator_to_array($res, true);
 
@@ -1096,7 +1097,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/clients', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1104,7 +1105,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
 
@@ -1163,7 +1164,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testCreditCustomColumnsCsvGeneration()
     {
-        
+
         Credit::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1189,7 +1190,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/credits', $data);
-       
+
         $response->assertStatus(200);
         $arr = $response->json();
         $hash = $arr['message'];
@@ -1221,7 +1222,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testInvoiceCustomColumnsCsvGeneration()
     {
-        
+
         \App\Models\Invoice::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1247,7 +1248,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/invoices', $data);
-        
+
         $response->assertStatus(200);
         $arr = $response->json();
         $hash = $arr['message'];
@@ -1282,10 +1283,10 @@ class ReportCsvGenerationTest extends TestCase
         ])->post('/api/v1/reports/invoices', $data)->assertStatus(200);
 
     }
-    
+
     public function testRecurringInvoiceCustomColumnsCsvGeneration()
     {
-        
+
         \App\Models\RecurringInvoice::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1312,7 +1313,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/recurring_invoices', $data);
-            
+
         $response->assertStatus(200);
         $arr = $response->json();
         $hash = $arr['message'];
@@ -1340,7 +1341,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testRecurringInvoiceColumnsCsvGeneration()
     {
-        
+
         \App\Models\RecurringInvoice::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1367,7 +1368,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/recurring_invoices', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1375,7 +1376,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Recurring Invoice Invoice Number'));
@@ -1387,7 +1388,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testInvoiceItemsCustomColumnsCsvGeneration()
     {
-        
+
         \App\Models\Invoice::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1431,7 +1432,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/invoice_items', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1495,7 +1496,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testQuoteItemsCustomColumnsCsvGeneration()
     {
-        
+
         $q = \App\Models\Quote::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1539,7 +1540,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/quote_items', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1547,7 +1548,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
@@ -1625,12 +1626,12 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Purchase Order Amount'));
-        $this->assertEquals('50', $this->getFirstValueByColumn($csv, 'Purchase Order Balance'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Purchase Order Discount'));
+        $this->assertEquals('100.00', $this->getFirstValueByColumn($csv, 'Purchase Order Amount'));
+        $this->assertEquals('50.00', $this->getFirstValueByColumn($csv, 'Purchase Order Balance'));
+        $this->assertEquals('10.00', $this->getFirstValueByColumn($csv, 'Purchase Order Discount'));
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Purchase Order Number'));
         $this->assertEquals('Public', $this->getFirstValueByColumn($csv, 'Purchase Order Public Notes'));
         $this->assertEquals('Private', $this->getFirstValueByColumn($csv, 'Purchase Order Private Notes'));
@@ -1640,7 +1641,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testPurchaseOrderItemsCustomColumnsCsvGeneration()
     {
-        
+
         $vendor =
         \App\Models\Vendor::factory()->create(
             [
@@ -1695,7 +1696,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/purchase_order_items', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1703,7 +1704,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
@@ -1723,7 +1724,7 @@ class ReportCsvGenerationTest extends TestCase
 
     public function testQuoteCustomColumnsCsvGeneration()
     {
-        
+
         \App\Models\Quote::factory()->create([
            'user_id' => $this->user->id,
            'company_id' => $this->company->id,
@@ -1749,7 +1750,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/quotes', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1757,13 +1758,13 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
         $this->assertEquals('bob', $this->getFirstValueByColumn($csv, 'Client Name'));
-        $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Quote Number'));
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Quote Amount'));
+        $this->assertEquals(floatval(1234), $this->getFirstValueByColumn($csv, 'Quote Number'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Quote Amount'));
 
 
         $data = [
@@ -1813,7 +1814,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/invoices', $data);
-       
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1821,7 +1822,7 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
         $this->assertEquals('bob', $this->getFirstValueByColumn($csv, 'Client Name'));
@@ -1844,7 +1845,7 @@ class ReportCsvGenerationTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->post('/api/v1/reports/contacts', $data);
-        
+
         $response->assertStatus(200);
 
         $arr = $response->json();
@@ -1852,13 +1853,13 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-        
+
         $csv = $response->body();
 
 
         $reader = Reader::createFromString($csv);
         $reader->setHeaderOffset(0);
-        
+
         $res = $reader->fetchColumnByName('Contact First Name');
         $res = iterator_to_array($res, true);
 
@@ -1887,7 +1888,7 @@ class ReportCsvGenerationTest extends TestCase
     {
         $reader = Reader::createFromString($csv);
         $reader->setHeaderOffset(0);
-        
+
         $res = $reader->fetchColumnByName($column);
         $res = iterator_to_array($res, true);
 
@@ -1931,13 +1932,13 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Credit Amount'));
-        $this->assertEquals('50', $this->getFirstValueByColumn($csv, 'Credit Balance'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Credit Discount'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Credit Amount'));
+        $this->assertEquals(floatval(50), $this->getFirstValueByColumn($csv, 'Credit Balance'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Credit Discount'));
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Credit PO Number'));
         $this->assertEquals('Public', $this->getFirstValueByColumn($csv, 'Credit Public Notes'));
         $this->assertEquals('Private', $this->getFirstValueByColumn($csv, 'Credit Private Notes'));
@@ -2025,13 +2026,13 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Invoice Amount'));
-        $this->assertEquals('50', $this->getFirstValueByColumn($csv, 'Invoice Balance'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Invoice Discount'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Invoice Amount'));
+        $this->assertEquals(floatval(50), $this->getFirstValueByColumn($csv, 'Invoice Balance'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Invoice Discount'));
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Invoice PO Number'));
         $this->assertEquals('Public', $this->getFirstValueByColumn($csv, 'Invoice Public Notes'));
         $this->assertEquals('Private', $this->getFirstValueByColumn($csv, 'Invoice Private Notes'));
@@ -2039,18 +2040,18 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals('2020-01-01', $this->getFirstValueByColumn($csv, 'Invoice Date'));
         $this->assertEquals('2021-01-02', $this->getFirstValueByColumn($csv, 'Invoice Due Date'));
         $this->assertEquals('2021-01-03', $this->getFirstValueByColumn($csv, 'Invoice Partial Due Date'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Invoice Partial/Deposit'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Invoice Partial/Deposit'));
         $this->assertEquals('Custom 1', $this->getFirstValueByColumn($csv, 'Invoice Custom Value 1'));
         $this->assertEquals('Custom 2', $this->getFirstValueByColumn($csv, 'Invoice Custom Value 2'));
         $this->assertEquals('Custom 3', $this->getFirstValueByColumn($csv, 'Invoice Custom Value 3'));
         $this->assertEquals('Custom 4', $this->getFirstValueByColumn($csv, 'Invoice Custom Value 4'));
         $this->assertEquals('Footer', $this->getFirstValueByColumn($csv, 'Invoice Footer'));
         $this->assertEquals('Tax 1', $this->getFirstValueByColumn($csv, 'Invoice Tax Name 1'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Invoice Tax Rate 1'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Invoice Tax Rate 1'));
         $this->assertEquals('Tax 2', $this->getFirstValueByColumn($csv, 'Invoice Tax Name 2'));
-        $this->assertEquals('20', $this->getFirstValueByColumn($csv, 'Invoice Tax Rate 2'));
+        $this->assertEquals(floatval(20), $this->getFirstValueByColumn($csv, 'Invoice Tax Rate 2'));
         $this->assertEquals('Tax 3', $this->getFirstValueByColumn($csv, 'Invoice Tax Name 3'));
-        $this->assertEquals('30', $this->getFirstValueByColumn($csv, 'Invoice Tax Rate 3'));
+        $this->assertEquals(floatval(30), $this->getFirstValueByColumn($csv, 'Invoice Tax Rate 3'));
         $this->assertEquals('Sent', $this->getFirstValueByColumn($csv, 'Invoice Status'));
 
     }
@@ -2107,13 +2108,13 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
 
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Recurring Invoice Amount'));
-        $this->assertEquals('50', $this->getFirstValueByColumn($csv, 'Recurring Invoice Balance'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Recurring Invoice Discount'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Recurring Invoice Amount'));
+        $this->assertEquals(floatval(50), $this->getFirstValueByColumn($csv, 'Recurring Invoice Balance'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Recurring Invoice Discount'));
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Recurring Invoice PO Number'));
         $this->assertEquals('Public', $this->getFirstValueByColumn($csv, 'Recurring Invoice Public Notes'));
         $this->assertEquals('Private', $this->getFirstValueByColumn($csv, 'Recurring Invoice Private Notes'));
@@ -2121,18 +2122,18 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals('2020-01-01', $this->getFirstValueByColumn($csv, 'Recurring Invoice Date'));
         $this->assertEquals('2021-01-02', $this->getFirstValueByColumn($csv, 'Recurring Invoice Due Date'));
         $this->assertEquals('2021-01-03', $this->getFirstValueByColumn($csv, 'Recurring Invoice Partial Due Date'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Recurring Invoice Partial/Deposit'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Recurring Invoice Partial/Deposit'));
         $this->assertEquals('Custom 1', $this->getFirstValueByColumn($csv, 'Recurring Invoice Custom Value 1'));
         $this->assertEquals('Custom 2', $this->getFirstValueByColumn($csv, 'Recurring Invoice Custom Value 2'));
         $this->assertEquals('Custom 3', $this->getFirstValueByColumn($csv, 'Recurring Invoice Custom Value 3'));
         $this->assertEquals('Custom 4', $this->getFirstValueByColumn($csv, 'Recurring Invoice Custom Value 4'));
         $this->assertEquals('Footer', $this->getFirstValueByColumn($csv, 'Recurring Invoice Footer'));
         $this->assertEquals('Tax 1', $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Name 1'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Rate 1'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Rate 1'));
         $this->assertEquals('Tax 2', $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Name 2'));
-        $this->assertEquals('20', $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Rate 2'));
+        $this->assertEquals(floatval(20), $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Rate 2'));
         $this->assertEquals('Tax 3', $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Name 3'));
-        $this->assertEquals('30', $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Rate 3'));
+        $this->assertEquals(floatval(30), $this->getFirstValueByColumn($csv, 'Recurring Invoice Tax Rate 3'));
         $this->assertEquals('Daily', $this->getFirstValueByColumn($csv, 'Recurring Invoice How Often'));
 
     }
@@ -2190,12 +2191,12 @@ class ReportCsvGenerationTest extends TestCase
         $hash = $arr['message'];
 
         $response = $this->poll($hash);
-                
+
         $csv = $response->body();
 
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Quote Amount'));
-        $this->assertEquals('50', $this->getFirstValueByColumn($csv, 'Quote Balance'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Quote Discount'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Quote Amount'));
+        $this->assertEquals(floatval(50), $this->getFirstValueByColumn($csv, 'Quote Balance'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Quote Discount'));
         $this->assertEquals('1234', $this->getFirstValueByColumn($csv, 'Quote PO Number'));
         $this->assertEquals('Public', $this->getFirstValueByColumn($csv, 'Quote Public Notes'));
         $this->assertEquals('Private', $this->getFirstValueByColumn($csv, 'Quote Private Notes'));
@@ -2203,18 +2204,18 @@ class ReportCsvGenerationTest extends TestCase
         $this->assertEquals('2020-01-01', $this->getFirstValueByColumn($csv, 'Quote Date'));
         $this->assertEquals('2020-01-01', $this->getFirstValueByColumn($csv, 'Quote Valid Until'));
         $this->assertEquals('2021-01-03', $this->getFirstValueByColumn($csv, 'Quote Partial Due Date'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Quote Partial/Deposit'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Quote Partial/Deposit'));
         $this->assertEquals('Custom 1', $this->getFirstValueByColumn($csv, 'Quote Custom Value 1'));
         $this->assertEquals('Custom 2', $this->getFirstValueByColumn($csv, 'Quote Custom Value 2'));
         $this->assertEquals('Custom 3', $this->getFirstValueByColumn($csv, 'Quote Custom Value 3'));
         $this->assertEquals('Custom 4', $this->getFirstValueByColumn($csv, 'Quote Custom Value 4'));
         $this->assertEquals('Footer', $this->getFirstValueByColumn($csv, 'Quote Footer'));
         $this->assertEquals('Tax 1', $this->getFirstValueByColumn($csv, 'Quote Tax Name 1'));
-        $this->assertEquals('10', $this->getFirstValueByColumn($csv, 'Quote Tax Rate 1'));
+        $this->assertEquals(floatval(10), $this->getFirstValueByColumn($csv, 'Quote Tax Rate 1'));
         $this->assertEquals('Tax 2', $this->getFirstValueByColumn($csv, 'Quote Tax Name 2'));
-        $this->assertEquals('20', $this->getFirstValueByColumn($csv, 'Quote Tax Rate 2'));
+        $this->assertEquals(floatval(20), $this->getFirstValueByColumn($csv, 'Quote Tax Rate 2'));
         $this->assertEquals('Tax 3', $this->getFirstValueByColumn($csv, 'Quote Tax Name 3'));
-        $this->assertEquals('30', $this->getFirstValueByColumn($csv, 'Quote Tax Rate 3'));
+        $this->assertEquals(floatval(30), $this->getFirstValueByColumn($csv, 'Quote Tax Rate 3'));
         $this->assertEquals('Expired', $this->getFirstValueByColumn($csv, 'Quote Status'));
 
     }
@@ -2247,11 +2248,11 @@ class ReportCsvGenerationTest extends TestCase
         $response = $this->poll($hash);
         $csv = $response->body();
 
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Expense Amount'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Expense Amount'));
         $this->assertEquals('Public', $this->getFirstValueByColumn($csv, 'Expense Public Notes'));
         $this->assertEquals('Private', $this->getFirstValueByColumn($csv, 'Expense Private Notes'));
         $this->assertEquals($this->user->present()->name(), $this->getFirstValueByColumn($csv, 'Expense User'));
-    
+
         $data = [
             'date_range' => 'all',
             'report_keys' => $this->all_client_report_keys,
@@ -2312,9 +2313,9 @@ class ReportCsvGenerationTest extends TestCase
 
         $this->assertEquals('bob', $this->getFirstValueByColumn($csv, 'Client Name'));
         $this->assertEquals('Vendor 1', $this->getFirstValueByColumn($csv, 'Vendor Name'));
-        $this->assertEquals('100', $this->getFirstValueByColumn($csv, 'Expense Amount'));
+        $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Expense Amount'));
         $this->assertEquals('USD', $this->getFirstValueByColumn($csv, 'Expense Currency'));
-        
+
     }
 
 

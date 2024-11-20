@@ -554,7 +554,7 @@ class CreditController extends BaseController
         }
 
 
-        if($action == 'template' && $user->can('view', $credits->first())) {
+        if ($action == 'template' && $user->can('view', $credits->first())) {
 
             $hash_or_response = $request->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 
@@ -615,7 +615,7 @@ class CreditController extends BaseController
                 return response()->streamDownload(function () use ($file) {
                     echo $file;
                 }, $credit->numberFormatter() . '.pdf', ['Content-Type' => 'application/pdf']);
-                
+
             case 'archive':
                 $this->credit_repository->archive($credit);
 
@@ -641,10 +641,8 @@ class CreditController extends BaseController
             case 'send_email':
 
                 $credit->invitations->load('contact.client.country', 'credit.client.country', 'credit.company')->each(function ($invitation) use ($credit) {
-                    EmailEntity::dispatch($invitation, $credit->company, 'credit');
+                    EmailEntity::dispatch($invitation->withoutRelations(), $credit->company->db, 'credit');
                 });
-
-                // $credit->sendEvent(Webhook::EVENT_SENT_CREDIT, "client");
 
                 if (! $bulk) {
                     return response()->json(['message' => 'email sent'], 200);

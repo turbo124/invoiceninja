@@ -18,9 +18,10 @@ use App\Models\GatewayType;
 use App\Models\Payment;
 use App\Models\PaymentType;
 use App\Models\SystemLog;
+use App\PaymentDrivers\Common\LivewireMethodInterface;
 use App\PaymentDrivers\StripePaymentDriver;
 
-class Klarna
+class Klarna implements LivewireMethodInterface
 {
     /** @var StripePaymentDriver */
     public StripePaymentDriver $stripe;
@@ -36,6 +37,90 @@ class Klarna
     }
 
     public function paymentView(array $data)
+    {
+        $data = $this->paymentData($data);
+
+        return render('gateways.stripe.klarna.pay', $data);
+    }
+
+    private function buildReturnUrl(): string
+    {
+        return route('client.payments.response', [
+            'company_gateway_id' => $this->stripe->company_gateway->id,
+            'payment_hash' => $this->stripe->payment_hash->hash,
+            'payment_method_id' => GatewayType::KLARNA,
+        ]);
+    }
+
+    public function paymentResponse($request)
+    {
+        $this->stripe->payment_hash->data = array_merge((array) $this->stripe->payment_hash->data, $request->all());
+        $this->stripe->payment_hash->save();
+
+        if (in_array($request->redirect_status, ['succeeded', 'pending'])) {
+            return $this->processSuccessfulPayment($request->payment_intent);
+        }
+
+        return $this->processUnsuccessfulPayment();
+    }
+
+    public function processSuccessfulPayment(string $payment_intent)
+    {
+        $this->stripe->init();
+
+        //catch duplicate submissions.
+        if ($pay_exists = Payment::query()->where('transaction_reference', $payment_intent)->first()) {
+
+            return redirect()->route('client.payments.show', ['payment' => $pay_exists->hashed_id]);
+
+        }
+
+        $data = [
+            'payment_method' => $payment_intent,
+            'payment_type' => PaymentType::KLARNA,
+            'amount' => $this->stripe->convertFromStripeAmount($this->stripe->payment_hash->data->stripe_amount, $this->stripe->client->currency()->precision, $this->stripe->client->currency()),
+            'transaction_reference' => $payment_intent,
+            'gateway_type_id' => GatewayType::KLARNA,
+        ];
+
+        $payment = $this->stripe->createPayment($data, Payment::STATUS_PENDING);
+
+        SystemLogger::dispatch(
+            ['response' => $this->stripe->payment_hash->data, 'data' => $data],
+            SystemLog::CATEGORY_GATEWAY_RESPONSE,
+            SystemLog::EVENT_GATEWAY_SUCCESS,
+            SystemLog::TYPE_STRIPE,
+            $this->stripe->client,
+            $this->stripe->client->company,
+        );
+
+        return redirect()->route('client.payments.show', ['payment' => $payment->hashed_id]);
+    }
+
+    public function processUnsuccessfulPayment()
+    {
+        $server_response = $this->stripe->payment_hash->data;
+
+        $this->stripe->sendFailureMail($server_response);
+
+        $message = [
+            'server_response' => $server_response,
+            'data' => $this->stripe->payment_hash->data,
+        ];
+
+        SystemLogger::dispatch(
+            $message,
+            SystemLog::CATEGORY_GATEWAY_RESPONSE,
+            SystemLog::EVENT_GATEWAY_FAILURE,
+            SystemLog::TYPE_STRIPE,
+            $this->stripe->client,
+            $this->stripe->client->company,
+        );
+
+        throw new PaymentFailed(ctrans('texts.gateway_error'), 500);
+    }
+
+    public function paymentData(array $data): array
     {
         $this->stripe->init();
 
@@ -65,81 +150,11 @@ class Klarna
         $this->stripe->payment_hash->data = array_merge((array) $this->stripe->payment_hash->data, ['stripe_amount' => $data['stripe_amount']]);
         $this->stripe->payment_hash->save();
 
-        return render('gateways.stripe.klarna.pay', $data);
+        return $data;
     }
 
-    private function buildReturnUrl(): string
+    public function livewirePaymentView(array $data): string
     {
-        return route('client.payments.response', [
-            'company_gateway_id' => $this->stripe->company_gateway->id,
-            'payment_hash' => $this->stripe->payment_hash->hash,
-            'payment_method_id' => GatewayType::KLARNA,
-        ]);
-    }
-
-    public function paymentResponse($request)
-    {
-        $this->stripe->payment_hash->data = array_merge((array) $this->stripe->payment_hash->data, $request->all());
-        $this->stripe->payment_hash->save();
-
-        if (in_array($request->redirect_status, ['succeeded','pending'])) {
-            return $this->processSuccessfulPayment($request->payment_intent);
-        }
-
-        return $this->processUnsuccessfulPayment();
-    }
-
-    public function processSuccessfulPayment(string $payment_intent)
-    {
-        $this->stripe->init();
-
-        //catch duplicate submissions.
-        if (Payment::where('transaction_reference', $payment_intent)->exists()) {
-            return redirect()->route('client.payments.index');
-        }
-
-        $data = [
-            'payment_method' => $payment_intent,
-            'payment_type' => PaymentType::KLARNA,
-            'amount' => $this->stripe->convertFromStripeAmount($this->stripe->payment_hash->data->stripe_amount, $this->stripe->client->currency()->precision, $this->stripe->client->currency()),
-            'transaction_reference' => $payment_intent,
-            'gateway_type_id' => GatewayType::KLARNA,
-        ];
-
-        $this->stripe->createPayment($data, Payment::STATUS_PENDING);
-
-        SystemLogger::dispatch(
-            ['response' => $this->stripe->payment_hash->data, 'data' => $data],
-            SystemLog::CATEGORY_GATEWAY_RESPONSE,
-            SystemLog::EVENT_GATEWAY_SUCCESS,
-            SystemLog::TYPE_STRIPE,
-            $this->stripe->client,
-            $this->stripe->client->company,
-        );
-
-        return redirect()->route('client.payments.index');
-    }
-
-    public function processUnsuccessfulPayment()
-    {
-        $server_response = $this->stripe->payment_hash->data;
-
-        $this->stripe->sendFailureMail($server_response);
-
-        $message = [
-            'server_response' => $server_response,
-            'data' => $this->stripe->payment_hash->data,
-        ];
-
-        SystemLogger::dispatch(
-            $message,
-            SystemLog::CATEGORY_GATEWAY_RESPONSE,
-            SystemLog::EVENT_GATEWAY_FAILURE,
-            SystemLog::TYPE_STRIPE,
-            $this->stripe->client,
-            $this->stripe->client->company,
-        );
-
-        throw new PaymentFailed(ctrans('texts.gateway_error'), 500);
+        return 'gateways.stripe.klarna.pay_livewire';
     }
 }

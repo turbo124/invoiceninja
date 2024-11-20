@@ -118,6 +118,19 @@ return [
             'visibility' => 'public', // optional: public|private
         ],
 
+        's3p' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_IDP'),
+            'secret' => env('AWS_SECRET_ACCESS_KEYP'),
+            'region' => env('AWS_DEFAULT_REGIONP'),
+            'bucket' => env('AWS_BUCKETP'),
+            'url' => env('AWS_URLP'),
+            'visibility' => 'private',
+            'endpoint' => env('AWS_ENDPOINTP'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINTP', false),
+            'throw' => false,
+        ],
+
     ],
 
     /*
