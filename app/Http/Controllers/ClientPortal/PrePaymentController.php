@@ -35,11 +35,17 @@ class PrePaymentController extends Controller
     /**
      * Show the list of payments.
      *
-     * @return Factory|View
+     * @return Factory|View|\Illuminate\Http\RedirectResponse
      */
     public function index()
     {
+
         $client = auth()->guard('contact')->user()->client;
+
+        if (!$client->getSetting('client_initiated_payments')) {
+            return redirect()->route('client.dashboard');
+        }
+
         $minimum = $client->getSetting('client_initiated_payments_minimum');
         $minimum_amount = $minimum == 0 ? "" : Number::formatMoney($minimum, $client);
 
@@ -111,7 +117,7 @@ class PrePaymentController extends Controller
 
         $variables = false;
 
-        if(($invitation = $invoices->first()->invitations()->first() ?? false) && $invoice->client->getSetting('show_accept_invoice_terms')) {
+        if (($invitation = $invoices->first()->invitations()->first() ?? false) && $invoice->client->getSetting('show_accept_invoice_terms')) {
             $variables = (new HtmlEngine($invitation))->generateLabelsAndValues();
         }
 

@@ -71,12 +71,10 @@ class ReminderJob implements ShouldQueue
                  ->whereHas('company', function ($query) {
                      $query->where('is_disabled', 0);
                  })
-                 ->with('invitations')->chunk(200, function ($invoices) {
-                     foreach ($invoices as $invoice) {
-                         $this->sendReminderForInvoice($invoice);
-                     }
-
-                     sleep(1);
+                 ->with('invitations')
+                 ->cursor()
+                 ->each(function ($invoice) {
+                     $this->sendReminderForInvoice($invoice);
                  });
         } else {
             //multiDB environment, need to
@@ -99,13 +97,13 @@ class ReminderJob implements ShouldQueue
                      ->whereHas('company', function ($query) {
                          $query->where('is_disabled', 0);
                      })
-                     ->with('invitations')->chunk(200, function ($invoices) {
-
-                         foreach ($invoices as $invoice) {
-                             $this->sendReminderForInvoice($invoice);
-                         }
-
-                         sleep(1);
+                    ->whereHas('company.account', function ($q) {
+                        $q->whereNotNull('plan')->where('plan_expires', '>', now()->subDays(2));
+                    })
+                     ->with('invitations')
+                     ->cursor()
+                     ->each(function ($invoice) {
+                         $this->sendReminderForInvoice($invoice);
                      });
             }
         }
@@ -130,7 +128,7 @@ class ReminderJob implements ShouldQueue
             $invoice->service()->touchReminder($reminder_template)->save();
             $fees = $this->calcLateFee($invoice, $reminder_template);
 
-            if($invoice->isLocked()) {
+            if ($invoice->isLocked()) {
                 return $this->addFeeToNewInvoice($invoice, $reminder_template, $fees);
             }
 
@@ -148,10 +146,11 @@ class ReminderJob implements ShouldQueue
         (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
                 $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
                     if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                        EmailEntity::dispatch($invitation, $invitation->company, $reminder_template);
+                        EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                         nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                         $invoice->entityEmailEvent($invitation, $reminder_template);
                         $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
+                        usleep(300000);
                     }
                 });
             }
@@ -209,7 +208,7 @@ class ReminderJob implements ShouldQueue
                     ->save();
         }
 
-        if(!$invoice) {
+        if (!$invoice) {
             $invoice = $over_due_invoice;
         }
 
@@ -224,10 +223,11 @@ class ReminderJob implements ShouldQueue
                 (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
             $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
                 if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                    EmailEntity::dispatch($invitation, $invitation->company, $reminder_template);
+                    EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                     nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                     $invoice->entityEmailEvent($invitation, $reminder_template);
                     $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
+                    usleep(300000);
                 }
             });
         }

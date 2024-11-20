@@ -94,7 +94,30 @@ class DeletePayment
 
                 nlog("net deletable amount - refunded = {$net_deletable}");
 
-                if (! $paymentable_invoice->is_deleted) {
+                if ($paymentable_invoice->status_id == Invoice::STATUS_CANCELLED) {
+
+                    $is_trashed = false;
+
+                    if ($paymentable_invoice->trashed()) {
+                        $is_trashed = true;
+                        $paymentable_invoice->restore();
+                    }
+
+                    $paymentable_invoice->service()
+                                        ->updatePaidToDate($net_deletable * -1)
+                                        ->save();
+
+                    $this->payment
+                         ->client
+                         ->service()
+                         ->updatePaidToDate($net_deletable * -1)
+                         ->save();
+
+                    if ($is_trashed) {
+                        $paymentable_invoice->delete();
+                    }
+
+                } elseif (! $paymentable_invoice->is_deleted) {
                     $paymentable_invoice->restore();
 
                     $paymentable_invoice->service()
@@ -115,7 +138,7 @@ class DeletePayment
 
                     if ($paymentable_invoice->balance == $paymentable_invoice->amount) {
                         $paymentable_invoice->service()->setStatus(Invoice::STATUS_SENT)->save();
-                    } elseif($paymentable_invoice->balance == 0) {
+                    } elseif ($paymentable_invoice->balance == 0) {
                         $paymentable_invoice->service()->setStatus(Invoice::STATUS_PAID)->save();
                     } else {
                         $paymentable_invoice->service()->setStatus(Invoice::STATUS_PARTIAL)->save();
@@ -133,11 +156,16 @@ class DeletePayment
 
         //sometimes the payment is NOT created properly, this catches the payment and prevents the paid to date reducing inappropriately.
         if ($this->update_client_paid_to_date) {
+
+            $reduced_paid_to_date = $this->payment->amount < 0 ? $this->payment->amount * -1 : min(0, ($this->payment->amount - $this->payment->refunded - $this->_paid_to_date_deleted) * -1);
+
+            // $reduced_paid_to_date = min(0, ($this->payment->amount - $this->payment->refunded - $this->_paid_to_date_deleted) * -1);
+
             $this->payment
-            ->client
-            ->service()
-            ->updatePaidToDate(min(0, ($this->payment->amount - $this->payment->refunded - $this->_paid_to_date_deleted) * -1))
-            ->save();
+                ->client
+                ->service()
+                ->updatePaidToDate($reduced_paid_to_date)
+                ->save();
         }
 
         return $this;

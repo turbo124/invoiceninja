@@ -5,7 +5,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -17,6 +17,53 @@ use App\Models\Company;
 
 class ForteCustomerFactory
 {
+    public function convertToForte(Client $client): array
+    {
+
+        return [
+            "first_name" => $client->present()->first_name(),
+            "last_name" => $client->present()->last_name(),
+            "company_name" => $client->present()->name(),
+            "addresses" => [
+                [
+                    "label" => "Billing Address",
+                    "first_name" => $client->present()->first_name(),
+                    "last_name" => $client->present()->last_name(),
+                    "company_name" => $client->present()->name(),
+                    "phone" => $client->present()->phone(),
+                    "email" => $client->present()->email(),
+                    "shipping_address_type" => "commercial",
+                    "address_type" => "default_shipping",
+                    "physical_address" => [
+                        "street_line1" => $client->address2,
+                        "street_line2" => $client->address1,
+                        "locality" => $client->city,
+                        "region" => $client->state,
+                        "postal_code" => $client->postal_code
+                    ]
+                ],
+                // [
+                //     "label" => "Brown Billing",
+                //     "first_name" => "Emmett",
+                //     "last_name" => "Brown",
+                //     "company_name" => "Brown Associates",
+                //     "phone" => "444-444-4444",
+                //     "email" => "e.brown@forte.net",
+                //     "shipping_address_type" => "commercial",
+                //     "address_type" => "default_billing",
+                //     "physical_address" => [
+                //         "street_line1" => "500 Delorean Dr",
+                //         "street_line2" => "Suite 200",
+                //         "locality" => "Hill Valley",
+                //         "region" => "CA",
+                //         "postal_code" => "95420"
+                //     ]
+                // ]
+            ]
+        ];
+
+    }
+
     public function convertToNinja(array $customer, Company $company): array
     {
         return
@@ -46,11 +93,12 @@ class ForteCustomerFactory
 
     private function getBillingAddress(array $customer): array
     {
-        if(isset($customer['default_billing_address_token'])) {
+        nlog($customer);
+        if (isset($customer['default_billing_address_token']) && isset($customer['addresses'])) {
 
-            foreach($customer['addresses'] as $address) {
+            foreach ($customer['addresses'] as $address) {
 
-                if($address['address_token'] != $customer['default_billing_address_token']) {
+                if ($address['address_token'] != $customer['default_billing_address_token']) {
                     continue;
                 }
 
@@ -69,7 +117,7 @@ class ForteCustomerFactory
 
         }
 
-        if(isset($customer['addresses'][0])) {
+        if (isset($customer['addresses'][0])) {
 
             $address = $customer['addresses'][0];
 
@@ -93,11 +141,11 @@ class ForteCustomerFactory
     private function getShippingAddress(array $customer): array
     {
 
-        if(isset($customer['default_shipping_address_token'])) {
+        if (isset($customer['default_shipping_address_token'])) {
 
-            foreach($customer['addresses'] as $address) {
+            foreach ($customer['addresses'] as $address) {
 
-                if($address['address_token'] != $customer['default_shipping_address_token']) {
+                if ($address['address_token'] != $customer['default_shipping_address_token']) {
                     continue;
                 }
 
@@ -114,7 +162,7 @@ class ForteCustomerFactory
 
         }
 
-        if(isset($customer['addresses'][1])) {
+        if (isset($customer['addresses'][1])) {
 
             $address = $customer['addresses'][1];
 

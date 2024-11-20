@@ -19,7 +19,7 @@ class ProcessInvoicesInBulkRequest extends FormRequest
 {
     public function authorize()
     {
-        
+
         auth()->guard('contact')->user()->loadMissing(['company']);
 
         return (bool)(auth()->guard('contact')->user()->company->enabled_modules & PortalComposer::MODULE_INVOICES);
@@ -36,7 +36,7 @@ class ProcessInvoicesInBulkRequest extends FormRequest
     {
         $input = $this->all();
 
-        if(isset($input['invoices'])) {
+        if (isset($input['invoices'])) {
             $input['invoices'] = array_unique($input['invoices']);
         }
 

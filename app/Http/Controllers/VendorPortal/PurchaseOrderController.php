@@ -11,23 +11,25 @@
 
 namespace App\Http\Controllers\VendorPortal;
 
-use App\Events\Misc\InvitationWasViewed;
-use App\Events\PurchaseOrder\PurchaseOrderWasAccepted;
-use App\Events\PurchaseOrder\PurchaseOrderWasViewed;
+use App\Utils\Ninja;
+use App\Models\Webhook;
+use Illuminate\View\View;
+use App\Models\PurchaseOrder;
+use App\Utils\Traits\MakesHash;
+use App\Utils\Traits\MakesDates;
+use App\Jobs\Entity\CreateRawPdf;
+use App\Jobs\Util\WebhookHandler;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\VendorPortal\PurchaseOrders\ProcessPurchaseOrdersInBulkRequest;
+use App\Jobs\Invoice\InjectSignature;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\View\Factory;
+use App\Models\PurchaseOrderInvitation;
+use App\Events\Misc\InvitationWasViewed;
+use App\Events\PurchaseOrder\PurchaseOrderWasViewed;
+use App\Events\PurchaseOrder\PurchaseOrderWasAccepted;
 use App\Http\Requests\VendorPortal\PurchaseOrders\ShowPurchaseOrderRequest;
 use App\Http\Requests\VendorPortal\PurchaseOrders\ShowPurchaseOrdersRequest;
-use App\Jobs\Entity\CreateRawPdf;
-use App\Jobs\Invoice\InjectSignature;
-use App\Models\PurchaseOrder;
-use App\Models\PurchaseOrderInvitation;
-use App\Utils\Ninja;
-use App\Utils\Traits\MakesDates;
-use App\Utils\Traits\MakesHash;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\View\View;
+use App\Http\Requests\VendorPortal\PurchaseOrders\ProcessPurchaseOrdersInBulkRequest;
 
 class PurchaseOrderController extends Controller
 {
@@ -139,7 +141,7 @@ class PurchaseOrderController extends Controller
         // $data[] = [ 'title' => ctrans('texts.dashboard'), 'url' => 'client.dashboard', 'icon' => 'activity'];
 
         if (self::MODULE_PURCHASE_ORDERS & $enabled_modules) {
-            $data[] = ['title' => ctrans('texts.purchase_orders'), 'url' => 'vendor.purchase_orders.index', 'icon' => 'file-text'];
+            $data[] = ['title' => ctrans('texts.purchase_orders'), 'url' => 'vendor.purchase_orders.index', 'icon' => 'file-text', 'id' => 'purchase_orders'];
         }
 
         // $data[] = ['title' => ctrans('texts.documents'), 'url' => 'client.documents.index', 'icon' => 'download'];
@@ -187,6 +189,9 @@ class PurchaseOrderController extends Controller
                             }
 
                             event(new PurchaseOrderWasAccepted($purchase_order, auth()->guard('vendor')->user(), $purchase_order->company, Ninja::eventVars()));
+
+                            WebhookHandler::dispatch(Webhook::EVENT_ACCEPTED_PURCHASE_ORDER, $purchase_order, $purchase_order->company, 'vendor')->delay(0);
+
                         });
 
         if ($purchase_count_query->count() == 1) {

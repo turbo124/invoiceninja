@@ -22,16 +22,15 @@ class TaskDecorator extends Decorator implements DecoratorInterface
     public function transform(string $key, mixed $entity): mixed
     {
         $task = false;
-
-        if($entity instanceof Task) {
+        if ($entity instanceof Task) {
             $task = $entity;
-        } elseif($entity->task) {
+        } elseif ($entity->task) {
             $task = $entity->task;
         }
 
-        if($task && method_exists($this, $key)) {
+        if ($task && method_exists($this, $key)) {
             return $this->{$key}($task);
-        } elseif($task && $task->{$key} ?? false) {
+        } elseif ($task && $task->{$key} ?? false) {
             return $task->{$key};
         }
 
@@ -59,7 +58,7 @@ class TaskDecorator extends Decorator implements DecoratorInterface
             $date_format_default = $date_format->format;
         }
 
-        if(is_array($logs)) {
+        if (is_array($logs)) {
             $item = $logs[0];
             return Carbon::createFromTimeStamp((int)$item[0])->setTimezone($timezone_name)->format($date_format_default);
         }
@@ -88,7 +87,7 @@ class TaskDecorator extends Decorator implements DecoratorInterface
             $date_format_default = $date_format->format;
         }
 
-        if(is_array($logs)) {
+        if (is_array($logs)) {
             $item = $logs[1];
             return Carbon::createFromTimeStamp((int)$item[1])->setTimezone($timezone_name)->format($date_format_default);
         }
@@ -96,7 +95,7 @@ class TaskDecorator extends Decorator implements DecoratorInterface
         return '';
 
     }
-    
+
     /**
      * billable
      *
@@ -106,7 +105,7 @@ class TaskDecorator extends Decorator implements DecoratorInterface
     {
         return '';
     }
-    
+
     /**
      * items_notes
      * @todo
@@ -115,7 +114,7 @@ class TaskDecorator extends Decorator implements DecoratorInterface
     {
         return '';
     }
-    
+
     public function duration(Task $task)
     {
         return $task->calcDuration();
@@ -131,5 +130,13 @@ class TaskDecorator extends Decorator implements DecoratorInterface
         return $task->project()->exists() ? $task->project->name : '';
     }
 
+    public function assigned_user_id(Task $task)
+    {
+        return $task->assigned_user ? $task->assigned_user->present()->name() : '';
+    }
 
+    public function user_id(Task $task)
+    {
+        return $task->user ? $task->user->present()->name() : '';
+    }
 }

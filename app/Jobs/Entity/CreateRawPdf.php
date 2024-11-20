@@ -78,7 +78,7 @@ class CreateRawPdf
 
     private function resolveType(): string
     {
-        if($this->type) {
+        if ($this->type) {
             return $this->type;
         }
 
@@ -102,7 +102,6 @@ class CreateRawPdf
      */
     public function handle()
     {
-        /** Testing this override to improve PDF generation performance */
         $ps = new PdfService($this->invitation, $this->resolveType(), [
             'client' => $this->entity->client ?? false,
             'vendor' => $this->entity->vendor ?? false,
@@ -118,11 +117,11 @@ class CreateRawPdf
 
         if ($this->entity_string == "invoice" && $this->entity->client->getSetting("merge_e_invoice_to_pdf")) {
             $pdf = (new MergeEDocument($this->entity, $pdf))->handle();
-        }        
+        }
 
         $merge_docs = isset($this->entity->client) ? $this->entity->client->getSetting('embed_documents') : $this->company->getSetting('embed_documents');
 
-        if($merge_docs && ($this->entity->documents()->where('is_public', true)->count() > 0 || $this->company->documents()->where('is_public', true)->count() > 0)) {
+        if ($merge_docs && ($this->entity->documents()->where('is_public', true)->count() > 0 || $this->company->documents()->where('is_public', true)->count() > 0)) {
             $pdf = $this->entity->documentMerge($pdf);
         }
 

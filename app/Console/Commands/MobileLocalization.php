@@ -63,7 +63,7 @@ class MobileLocalization extends Command
     {
         $resources = (array)$this->getResources();
 
-        if(is_iterable($resources)) {
+        if (is_iterable($resources)) {
             foreach ($resources as $key => $val) {
                 $transKey = "texts.{$key}";
                 if (trans($transKey) == $transKey) {
@@ -75,7 +75,7 @@ class MobileLocalization extends Command
 
     private function flutterResources()
     {
-        $languages = cache('languages');
+        $languages = app('languages');
         $resources = $this->getResources();
 
         foreach ($languages as $language) {

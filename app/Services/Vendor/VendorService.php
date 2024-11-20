@@ -17,7 +17,6 @@ use Illuminate\Database\QueryException;
 
 class VendorService
 {
-    
     use GeneratesCounter;
 
     private bool $completed = true;
@@ -30,7 +29,7 @@ class VendorService
     {
         $x = 1;
 
-        if(isset($this->vendor->number)) {
+        if (isset($this->vendor->number)) {
             return $this;
         }
 
@@ -48,6 +47,13 @@ class VendorService
                 }
             }
         } while ($this->completed);
+
+        return $this;
+    }
+
+    public function merge(Vendor $mergable_vendor)
+    {
+        $this->vendor = (new Merge($this->vendor, $mergable_vendor))->run();
 
         return $this;
     }

@@ -515,10 +515,14 @@ class CompanySettings extends BaseSettings
     public $quote_schedule_reminder1 = ''; //before_valid_until_date,after_valid_until_date,after_quote_date
     public $quote_late_fee_amount1 = 0;
     public $quote_late_fee_percent1 = 0;
-    
 
+    public string $payment_flow = 'smooth'; //smooth
+
+    public string $email_subject_payment_failed = '';
+    public string $email_template_payment_failed = '';
 
     public static $casts = [
+        'payment_flow'                       => 'string',
         'enable_quote_reminder1'             => 'bool',
         'quote_num_days_reminder1'           => 'int',
         'quote_schedule_reminder1'           => 'string',
@@ -768,6 +772,8 @@ class CompanySettings extends BaseSettings
         'portal_custom_js' => 'string',
         'client_portal_enable_uploads' => 'bool',
         'purchase_order_number_counter' => 'integer',
+        'email_template_payment_failed'      => 'string',
+        'email_subject_payment_failed'       => 'string',
     ];
 
     public static $free_plan_casts = [
@@ -993,6 +999,7 @@ class CompanySettings extends BaseSettings
             'credit_details' => [
                 '$credit.number',
                 '$credit.po_number',
+                '$credit.valid_until',
                 '$credit.date',
                 '$credit.balance',
                 '$credit.total',
@@ -1065,6 +1072,12 @@ class CompanySettings extends BaseSettings
                 '$product.item',
                 '$product.description',
                 '$product.quantity',
+            ],
+            'statement_unapplied_columns' => [
+                '$payment.number',
+                '$payment.date',
+                '$payment.amount',
+                '$payment.payment_balance',
             ],
         ];
 

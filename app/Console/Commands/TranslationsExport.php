@@ -76,6 +76,7 @@ class TranslationsExport extends Command
         'sv',
         'th',
         'tr_TR',
+        'vi',
         'zh_TW',
     ];
 
@@ -138,7 +139,7 @@ class TranslationsExport extends Command
             Storage::disk('local')->makeDirectory("lang/{$lang}");
 
             $translations = Lang::getLoader()->load($lang, 'texts');
-            foreach($translations as $key => $value) {
+            foreach ($translations as $key => $value) {
                 $translations[$key] = html_entity_decode($value);
             }
 

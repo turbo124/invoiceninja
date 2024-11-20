@@ -14,7 +14,7 @@ namespace App\Http\Controllers\VendorPortal;
 use App\Http\Controllers\Controller;
 use App\Models\VendorContact;
 use App\Utils\Traits\MakesHash;
-use App\Utils\TranslationHelper;
+use Illuminate\Http\Request;
 
 class VendorContactController extends Controller
 {
@@ -52,20 +52,25 @@ class VendorContactController extends Controller
 
     public function edit(VendorContact $vendor_contact)
     {
+
+        if (!$vendor_contact->vendor->country_id) {
+            $vendor_contact->vendor->country_id = auth()->guard('vendor')->user()->company->country()->id ?? 840;
+        }
+
         return $this->render('vendor_profile.edit', [
             'contact' => $vendor_contact,
             'vendor' => $vendor_contact->vendor,
             'settings' => $vendor_contact->vendor->company->settings,
             'company' => $vendor_contact->vendor->company,
             'sidebar' => $this->sidebarMenu(),
-            'countries' => TranslationHelper::getCountries(),
+            'countries' => app('countries'),
         ]);
     }
 
-    public function update(VendorContact $vendor_contact)
+    public function update(Request $request, VendorContact $vendor_contact)
     {
-        $vendor_contact->fill(request()->all());
-        $vendor_contact->vendor->fill(request()->all());
+        $vendor_contact->fill($request->all());
+        $vendor_contact->vendor->fill($request->all());
         $vendor_contact->push();
 
         return back()->withSuccess(ctrans('texts.profile_updated_successfully'));
@@ -76,15 +81,9 @@ class VendorContactController extends Controller
         $enabled_modules = auth()->guard('vendor')->user()->company->enabled_modules;
         $data = [];
 
-        // TODO: Enable dashboard once it's completed.
-        // $this->settings->enable_client_portal_dashboard
-        // $data[] = [ 'title' => ctrans('texts.dashboard'), 'url' => 'client.dashboard', 'icon' => 'activity'];
-
         if (self::MODULE_PURCHASE_ORDERS & $enabled_modules) {
-            $data[] = ['title' => ctrans('texts.purchase_orders'), 'url' => 'vendor.purchase_orders.index', 'icon' => 'file-text'];
+            $data[] = ['title' => ctrans('texts.purchase_orders'), 'url' => 'vendor.purchase_orders.index', 'icon' => 'file-text', 'id' => 'purchase_orders'];
         }
-
-        // $data[] = ['title' => ctrans('texts.documents'), 'url' => 'client.documents.index', 'icon' => 'download'];
 
         return $data;
     }

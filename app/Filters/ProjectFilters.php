@@ -60,7 +60,7 @@ class ProjectFilters extends QueryFilters
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (!is_array($sort_col) || count($sort_col) != 2 || !in_array($sort_col[0], \Illuminate\Support\Facades\Schema::getColumnListing('projects'))) {
             return $this->builder;
         }
 
@@ -71,7 +71,7 @@ class ProjectFilters extends QueryFilters
                     ->whereColumn('clients.id', 'projects.client_id'), $dir);
         }
 
-        if($sort_col[0] == 'number') {
+        if ($sort_col[0] == 'number') {
             return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
         }
 

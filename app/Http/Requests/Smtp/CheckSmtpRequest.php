@@ -36,10 +36,10 @@ class CheckSmtpRequest extends Request
     public function rules()
     {
         return [
-            'smtp_host' => 'sometimes|nullable|string|min:3',
-            'smtp_port' => 'sometimes|nullable|integer',
-            'smtp_username' => 'sometimes|nullable|string|min:3',
-            'smtp_password' => 'sometimes|nullable|string|min:3',
+            'smtp_host' => 'required|string|min:3',
+            'smtp_port' => 'required|integer',
+            'smtp_username' => 'required|min:3',
+            'smtp_password' => 'required|min:3',
         ];
     }
 
@@ -52,29 +52,24 @@ class CheckSmtpRequest extends Request
 
         $input = $this->input();
 
-        if(isset($input['smtp_username']) && $input['smtp_username'] == '********') {
-            // unset($input['smtp_username']);
+        if (isset($input['smtp_username']) && $input['smtp_username'] == '********') {
+
             $input['smtp_username'] = $company->smtp_username;
         }
 
-        if(isset($input['smtp_password']) && $input['smtp_password'] == '********') {
-            // unset($input['smtp_password']);
+        if (isset($input['smtp_password']) && $input['smtp_password'] == '********') {
             $input['smtp_password'] = $company->smtp_password;
         }
 
-        if(isset($input['smtp_host']) && strlen($input['smtp_host']) >= 3) {
+        if (isset($input['smtp_host']) && strlen($input['smtp_host']) >= 3) {
 
         } else {
             $input['smtp_host'] = $company->smtp_host;
         }
 
-
-        if(isset($input['smtp_port']) && strlen($input['smtp_port']) >= 3) {
-
-        } else {
-            $input['smtp_port'] = $company->smtp_port;
+        if (!isset($input['smtp_port']) || !is_numeric($input['smtp_port'])) {
+            $input['smtp_port'] = $company->smtp_port ?? 0;
         }
-
 
         $this->replace($input);
     }

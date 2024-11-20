@@ -671,7 +671,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $locale = $this->language->locale ?? null;
 
-        if($locale) {
+        if ($locale) {
             App::setLocale($locale);
         }
 

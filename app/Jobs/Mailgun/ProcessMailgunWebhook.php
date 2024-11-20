@@ -68,7 +68,9 @@ class ProcessMailgunWebhook implements ShouldQueue
         return SystemLog::query()
                 ->where('company_id', $this->invitation->company_id)
                 ->where('type_id', SystemLog::TYPE_WEBHOOK_RESPONSE)
-                ->whereJsonContains('log', ['MessageID' => $this->message_id])
+                ->where('category_id', SystemLog::CATEGORY_MAIL)
+                ->where('log->MessageID', $message_id)
+                // ->whereJsonContains('log', ['MessageID' => $this->message_id])
                 ->orderBy('id', 'desc')
                 ->first();
 
@@ -89,7 +91,7 @@ class ProcessMailgunWebhook implements ShouldQueue
     {
         nlog($this->request);
 
-        if(!$this->request['event-data']['tags'][0]) {
+        if (!$this->request['event-data']['tags'][0] ?? false) { //@phpstan-ignore-line
             return;
         }
 
@@ -178,12 +180,12 @@ class ProcessMailgunWebhook implements ShouldQueue
     private function processOpen()
     {
         $this->invitation->opened_date = now();
-        $this->invitation->save();
+        $this->invitation->saveQuietly();
 
         $sl = $this->getSystemLog($this->request['MessageID']);
 
         /** Prevents Gmail tracking from firing inappropriately */
-        if(!$sl || $this->request['signature']['timestamp'] < $sl->log['signature']['timestamp'] + 3) {
+        if (!$sl || $this->request['signature']['timestamp'] < $sl->log['signature']['timestamp'] + 3) {
             return;
         }
 
@@ -197,7 +199,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl instanceof SystemLog) {
+        if ($sl instanceof SystemLog) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -271,11 +273,11 @@ class ProcessMailgunWebhook implements ShouldQueue
     private function processDelivery()
     {
         $this->invitation->email_status = 'delivered';
-        $this->invitation->save();
+        $this->invitation->saveQuietly();
 
         $sl = $this->getSystemLog($this->request['MessageID']);
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $this->getEvent();
             $this->updateSystemLog($sl, $data);
@@ -358,11 +360,11 @@ class ProcessMailgunWebhook implements ShouldQueue
     private function processBounce()
     {
         $this->invitation->email_status = 'bounced';
-        $this->invitation->save();
+        $this->invitation->saveQuietly();
 
         $bounce = new EmailBounce(
             $this->request['event-data']['tags'][0],
-            $this->request['event-data']['envelope']['sender'],
+            $this->request['event-data']['envelope']['sender'] ?? $this->request['event-data']['envelope']['from'],
             $this->message_id
         );
 
@@ -380,7 +382,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -432,7 +434,7 @@ class ProcessMailgunWebhook implements ShouldQueue
     private function processSpamComplaint()
     {
         $this->invitation->email_status = 'spam';
-        $this->invitation->save();
+        $this->invitation->saveQuietly();
 
         $spam = new EmailSpam(
             $this->request['event-data']['tags'][0],
@@ -454,7 +456,7 @@ class ProcessMailgunWebhook implements ShouldQueue
             'date' => \Carbon\Carbon::parse($this->request['event-data']['timestamp'])->format('Y-m-d H:i:s') ?? '',
         ];
 
-        if($sl) {
+        if ($sl) {
             $data = $sl->log;
             $data['history']['events'][] = $event;
             $this->updateSystemLog($sl, $data);
@@ -488,7 +490,7 @@ class ProcessMailgunWebhook implements ShouldQueue
 
     private function fetchMessage(): array
     {
-        if(strlen($this->message_id) < 2) {
+        if (strlen($this->message_id) < 2) {
             return $this->default_response;
         }
 

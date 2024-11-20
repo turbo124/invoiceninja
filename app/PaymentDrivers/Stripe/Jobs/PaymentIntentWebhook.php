@@ -68,15 +68,15 @@ class PaymentIntentWebhook implements ShouldQueue
                 ->where('company_id', $company->id)
                 ->where(function ($query) use ($transaction) {
 
-                    if(isset($transaction['payment_intent'])) {
+                    if (isset($transaction['payment_intent'])) {
                         $query->where('transaction_reference', $transaction['payment_intent']);
                     }
 
-                    if(isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                    if (isset($transaction['payment_intent']) && isset($transaction['id'])) {
                         $query->orWhere('transaction_reference', $transaction['id']);
                     }
 
-                    if(!isset($transaction['payment_intent']) && isset($transaction['id'])) {
+                    if (!isset($transaction['payment_intent']) && isset($transaction['id'])) {
                         $query->where('transaction_reference', $transaction['id']);
                     }
 
@@ -100,7 +100,7 @@ class PaymentIntentWebhook implements ShouldQueue
 
         $company_gateway = CompanyGateway::query()->find($this->company_gateway_id);
 
-        if(!$company_gateway) {
+        if (!$company_gateway) {
             return;
         }
 
@@ -278,7 +278,7 @@ class PaymentIntentWebhook implements ShouldQueue
             }
 
             $driver->storeGatewayToken($data, $additional_data);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog("failed to import payment methods");
             nlog($e->getMessage());
         }

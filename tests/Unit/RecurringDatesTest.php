@@ -27,8 +27,8 @@ use Tests\MockAccountData;
 use Tests\TestCase;
 
 /**
- * @test
- * @covers \App\Models\RecurringInvoice
+ * 
+ *  \App\Models\RecurringInvoice
  */
 class RecurringDatesTest extends TestCase
 {
@@ -36,13 +36,95 @@ class RecurringDatesTest extends TestCase
     use MockAccountData;
     use DatabaseTransactions;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
     }
 
+    public function testDueDateDaysCalculationsTZ2()
+    {
+        
+        $settings = CompanySettings::defaults();
+        $settings->timezone_id = '15'; // New York
+
+        $company = Company::factory()->create([
+            'account_id'=>$this->account->id,
+            'settings' => $settings,
+        ]);
+
+        $client = Client::factory()->create([
+            'company_id' =>$company->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $this->travelTo(\Carbon\Carbon::create(2024, 12, 1, 17, 0, 0));
+
+        $recurring_invoice = RecurringInvoiceFactory::create($company->id, $this->user->id);
+        $recurring_invoice->line_items = $this->buildLineItems();
+        $recurring_invoice->client_id = $client->id;
+        $recurring_invoice->status_id = RecurringInvoice::STATUS_DRAFT;
+        $recurring_invoice->frequency_id = RecurringInvoice::FREQUENCY_MONTHLY;
+        $recurring_invoice->remaining_cycles = 5;
+        $recurring_invoice->due_date_days = '1';
+        $recurring_invoice->next_send_date = now();
+        $recurring_invoice->save();
+        $recurring_invoice = $recurring_invoice->calc()->getInvoice();
+        $recurring_invoice->service()->sendNow();
+        $invoice = $recurring_invoice->invoices()->latest()->first();
+
+        $this->assertGreaterThan(0, $recurring_invoice->invoices()->count());
+        $this->assertEquals('2025-01-01', $invoice->due_date);
+
+    }
+
+    public function testDueDateDaysCalculationsTZ()
+    {
+        $this->travelTo(\Carbon\Carbon::create(2024, 11, 15, 17, 0, 0));
+
+        $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
+        $recurring_invoice->line_items = $this->buildLineItems();
+        $recurring_invoice->client_id = $this->client->id;
+        $recurring_invoice->status_id = RecurringInvoice::STATUS_DRAFT;
+        $recurring_invoice->frequency_id = RecurringInvoice::FREQUENCY_MONTHLY;
+        $recurring_invoice->remaining_cycles = 5;
+        $recurring_invoice->due_date_days = '1';
+        $recurring_invoice->next_send_date = now();
+        $recurring_invoice->save();
+        $recurring_invoice = $recurring_invoice->calc()->getInvoice();
+        $recurring_invoice->service()->sendNow();
+        $invoice = $recurring_invoice->invoices()->latest()->first();
+
+        $this->assertGreaterThan(0, $recurring_invoice->invoices()->count());
+        $this->assertEquals('2024-12-01', $invoice->due_date);
+
+    }
+    
+
+    public function testDueDateDaysCalculations()
+    {
+
+        $recurring_invoice = RecurringInvoiceFactory::create($this->company->id, $this->user->id);
+        $recurring_invoice->line_items = $this->buildLineItems();
+        $recurring_invoice->client_id = $this->client->id;
+        $recurring_invoice->status_id = RecurringInvoice::STATUS_DRAFT;
+        $recurring_invoice->frequency_id = RecurringInvoice::FREQUENCY_MONTHLY;
+        $recurring_invoice->remaining_cycles = 5;
+        $recurring_invoice->due_date_days = '1';
+        $recurring_invoice->next_send_date = now();
+        $recurring_invoice->save();
+        $recurring_invoice = $recurring_invoice->calc()->getInvoice();
+
+        $recurring_invoice->service()->sendNow();
+
+        $invoice = $recurring_invoice->invoices()->latest()->first();
+
+        $this->assertGreaterThan(0, $recurring_invoice->invoices()->count());
+        $expected_due_date = now()->addMonth()->startOfMonth()->format('Y-m-d');
+        $this->assertEquals($expected_due_date, $invoice->due_date);
+
+    }
 
     public function testDailyFrequencyCalc6()
     {
@@ -141,7 +223,7 @@ class RecurringDatesTest extends TestCase
 
     public function testDailyFrequencyCalc5()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -226,7 +308,7 @@ class RecurringDatesTest extends TestCase
 
     public function testDailyFrequencyCalc4()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();
@@ -310,7 +392,7 @@ class RecurringDatesTest extends TestCase
 
     public function testDailyFrequencyCalc3()
     {
-        
+
         $account = Account::factory()->create();
 
         $settings = CompanySettings::defaults();

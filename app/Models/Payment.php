@@ -219,7 +219,7 @@ class Payment extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<Paymentable>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function invoices(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
@@ -227,7 +227,7 @@ class Payment extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<Paymentable>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function credits(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
@@ -235,7 +235,7 @@ class Payment extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<CompanyLedger>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function company_ledger(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
@@ -325,7 +325,7 @@ class Payment extends BaseModel
                 return '<h6><span class="badge badge-danger">'.ctrans('texts.payment_status_3').'</span></h6>';
             case self::STATUS_COMPLETED:
 
-                if($this->amount > $this->applied) {
+                if ($this->amount > $this->applied) {
                     return '<h6><span class="badge badge-info">' . ctrans('texts.partially_unapplied') . '</span></h6>';
                 }
 

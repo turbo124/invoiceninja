@@ -246,6 +246,21 @@ class RecurringInvoice extends BaseModel
 
     protected $touches = [];
 
+    public static array $bulk_update_columns = [
+        'tax1',
+        'tax2',
+        'tax3',
+        'custom_value1',
+        'custom_value2',
+        'custom_value3',
+        'custom_value4',
+        'uses_inclusive_taxes',
+        'private_notes',
+        'public_notes',
+        'terms',
+        'footer',
+    ];
+
     public function getEntityType()
     {
         return self::class;
@@ -285,7 +300,7 @@ class RecurringInvoice extends BaseModel
 
     public function activities()
     {
-        return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);
+        return $this->hasMany(Activity::class)->where('company_id', $this->company_id)->where('client_id', $this->client_id)->orderBy('id', 'DESC')->take(50);
     }
 
     public function history()
@@ -355,11 +370,11 @@ class RecurringInvoice extends BaseModel
     public function calculateStatus(bool $new_model = false) //15-02-2024 - $new_model needed
     {
 
-        if($this->remaining_cycles == 0) {
+        if ($this->remaining_cycles == 0) {
             return self::STATUS_COMPLETED;
         } elseif ($new_model && $this->status_id == self::STATUS_ACTIVE && Carbon::parse($this->next_send_date)->isFuture()) {
             return self::STATUS_PENDING;
-        } elseif($this->remaining_cycles != 0 && ($this->status_id == self::STATUS_COMPLETED)) {
+        } elseif ($this->remaining_cycles != 0 && ($this->status_id == self::STATUS_COMPLETED)) {
             return self::STATUS_ACTIVE;
         }
 
@@ -664,6 +679,8 @@ class RecurringInvoice extends BaseModel
                 return Carbon::parse($date)->copy();
 
             default:
+
+                $date = now()->addSeconds($this->client->timezone_offset());
                 return $this->setDayOfMonth($date, $this->due_date_days);
         }
     }

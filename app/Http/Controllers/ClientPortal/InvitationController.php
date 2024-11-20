@@ -114,9 +114,10 @@ class InvitationController extends Controller
                             'invitation_key' => $invitation_key
                         ]);
             }
-            
-            if(!auth()->guard('contact')->check()){
+
+            if (!auth()->guard('contact')->check()) {
                 $this->middleware('auth:contact');
+                /** @var \App\Models\InvoiceInvitation | \App\Models\QuoteInvitation | \App\Models\CreditInvitation | \App\Models\RecurringInvoiceInvitation $invitation */
                 return redirect()->route('client.login', ['intended' => route('client.'.$entity.'.show', [$entity => $this->encodePrimaryKey($invitation->{$key}), 'silent' => $is_silent])]);
             }
 
@@ -146,7 +147,7 @@ class InvitationController extends Controller
 
     }
 
-    
+
     private function fireEntityViewedEvent($invitation, $entity_string)
     {
         switch ($entity_string) {
@@ -281,6 +282,18 @@ class InvitationController extends Controller
         auth()->guard('contact')->loginUsingId($invitation->contact->id, true);
 
         $invoice = $invitation->invoice->service()->removeUnpaidGatewayFees()->save();
+
+        if (! $invitation->viewed_date) {
+            $invitation->markViewed();
+
+            if (!session()->get('is_silent')) {
+                event(new InvitationWasViewed($invitation->invoice, $invitation, $invitation->invoice->company, Ninja::eventVars()));
+            }
+
+            if (!session()->get('is_silent')) {
+                $this->fireEntityViewedEvent($invitation, $invoice);
+            }
+        }
 
         if ($invoice->partial > 0) {
             $amount = round($invoice->partial, (int)$invoice->client->currency()->precision);

@@ -24,7 +24,7 @@ use Tests\MockAccountData;
 use Tests\TestCase;
 
 /**
- * @test
+ * 
  */
 class UsTaxTest extends TestCase
 {
@@ -83,7 +83,7 @@ class UsTaxTest extends TestCase
 
     private function invoiceStub(?string $postal_code = '')
     {
-                
+
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
 
@@ -150,7 +150,7 @@ class UsTaxTest extends TestCase
 
     public function testTaxAuNoExemption()
     {
-       
+
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
 
@@ -217,12 +217,12 @@ class UsTaxTest extends TestCase
         $invoice = $invoice->calc()->getInvoice()->service()->markSent()->save();
 
         $this->assertEquals(110, $invoice->amount);
-        
+
     }
 
     public function testTaxAuClientExemption()
     {
-       
+
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
 
@@ -289,12 +289,12 @@ class UsTaxTest extends TestCase
         $invoice = $invoice->calc()->getInvoice()->service()->markSent()->save();
 
         $this->assertEquals(100, $invoice->amount);
-        
+
     }
 
     public function testTaxAuProductExemption()
     {
-       
+
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
 
@@ -361,12 +361,12 @@ class UsTaxTest extends TestCase
         $invoice = $invoice->calc()->getInvoice()->service()->markSent()->save();
 
         $this->assertEquals(100, $invoice->amount);
-        
+
     }
 
     public function testTaxAuProductOverride()
     {
-       
+
         $settings = CompanySettings::defaults();
         $settings->country_id = '840'; // germany
 
@@ -433,9 +433,9 @@ class UsTaxTest extends TestCase
         $invoice = $invoice->calc()->getInvoice()->service()->markSent()->save();
 
         $this->assertEquals(120, $invoice->amount);
-        
+
     }
-    
+
     public function testInterstateFreightNoTaxWithProductTax()
     {
 
@@ -1025,6 +1025,10 @@ class UsTaxTest extends TestCase
         $tax_data->seller_subregion = 'CA';
         $tax_data->regions->US->has_sales_above_threshold = true;
         $tax_data->regions->US->tax_all_subregions = true;
+        
+        $tax_data->regions->US->subregions->CA->tax_rate = 6;
+        $tax_data->regions->US->subregions->CA->tax_name = 'Sales Tax';
+
         $tax_data->regions->EU->has_sales_above_threshold = true;
         $tax_data->regions->EU->tax_all_subregions = true;
         $tax_data->regions->EU->subregions->DE->tax_rate = 21;
@@ -1045,6 +1049,7 @@ class UsTaxTest extends TestCase
             'has_valid_vat_number' => false,
             'postal_code' => 'xx',
             'tax_data' => new Response($this->mock_response),
+            'is_tax_exempt' => false,
         ]);
 
         $invoice = Invoice::factory()->create([
@@ -1161,7 +1166,7 @@ class UsTaxTest extends TestCase
 
     public function testHasValidVatMakesNoDifferenceToTaxCalc()
     {
-        
+
         $invoice = $this->invoiceStub('92582');
         $client = $invoice->client;
         $client->has_valid_vat_number = true;
@@ -1191,7 +1196,7 @@ class UsTaxTest extends TestCase
     {
 
         $invoice = $this->invoiceStub();
-        
+
 
         $this->assertEquals(8.75, $invoice->line_items[0]->tax_rate1);
         $this->assertEquals(108.75, $invoice->amount);

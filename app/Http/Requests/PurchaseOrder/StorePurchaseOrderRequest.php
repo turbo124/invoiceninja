@@ -50,7 +50,7 @@ class StorePurchaseOrderRequest extends Request
 
         $rules['number'] = ['nullable', Rule::unique('purchase_orders')->where('company_id', $user->company()->id)];
 
-        
+
         $rules['invitations'] = 'sometimes|bail|array';
         $rules['invitations.*.vendor_contact_id'] = 'bail|required|distinct';
 
@@ -89,18 +89,32 @@ class StorePurchaseOrderRequest extends Request
         $input['amount'] = 0;
         $input['balance'] = 0;
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 
         if (isset($input['line_items']) && is_array($input['line_items'])) {
             $input['line_items'] = isset($input['line_items']) ? $this->cleanItems($input['line_items']) : [];
+            $input['line_items'] = $this->cleanFeeItems($input['line_items']);
             $input['amount'] = $this->entityTotalAmount($input['line_items']);
 
         }
 
         if (array_key_exists('exchange_rate', $input) && is_null($input['exchange_rate'])) {
             $input['exchange_rate'] = 1;
+        }
+
+        if (isset($input['footer']) && $this->hasHeader('X-REACT')) {
+            $input['footer'] = str_replace("\n", "", $input['footer']);
+        }
+        if (isset($input['public_notes']) && $this->hasHeader('X-REACT')) {
+            $input['public_notes'] = str_replace("\n", "", $input['public_notes']);
+        }
+        if (isset($input['private_notes']) && $this->hasHeader('X-REACT')) {
+            $input['private_notes'] = str_replace("\n", "", $input['private_notes']);
+        }
+        if (isset($input['terms']) && $this->hasHeader('X-REACT')) {
+            $input['terms'] = str_replace("\n", "", $input['terms']);
         }
 
         $this->replace($input);

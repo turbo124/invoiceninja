@@ -11,6 +11,7 @@
 
 namespace App\Models;
 
+use App\DataMapper\ProductSync;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use League\CommonMark\CommonMarkConverter;
@@ -30,6 +31,7 @@ use League\CommonMark\CommonMarkConverter;
  * @property string|null $custom_value4
  * @property string|null $product_key
  * @property string|null $notes
+ * @property string|null $hash
  * @property float $cost
  * @property float $price
  * @property float $quantity
@@ -42,6 +44,7 @@ use League\CommonMark\CommonMarkConverter;
  * @property int|null $deleted_at
  * @property int|null $created_at
  * @property int|null $updated_at
+ * @property object|null $sync
  * @property bool $is_deleted
  * @property float $in_stock_quantity
  * @property bool $stock_notification
@@ -74,6 +77,7 @@ class Product extends BaseModel
     public const PRODUCT_TYPE_OVERRIDE_TAX = 7;
     public const PRODUCT_TYPE_ZERO_RATED = 8;
     public const PRODUCT_TYPE_REVERSE_TAX = 9;
+    public const PRODUCT_INTRA_COMMUNITY = 10;
 
     protected $fillable = [
         'custom_value1',
@@ -97,6 +101,13 @@ class Product extends BaseModel
         'max_quantity',
         'product_image',
         'tax_id',
+    ];
+
+    protected $casts = [
+        'updated_at' => 'timestamp',
+        'created_at' => 'timestamp',
+        'deleted_at' => 'timestamp',
+        'sync' => ProductSync::class,
     ];
 
     public array $ubl_tax_map = [
@@ -206,7 +217,7 @@ class Product extends BaseModel
         return $converter->convert($this->notes ?? '');
     }
 
-    public static function markdownHelp(string $notes = '')
+    public static function markdownHelp(?string $notes = '')
     {
 
         $converter = new CommonMarkConverter([
@@ -216,7 +227,7 @@ class Product extends BaseModel
             ],
         ]);
 
-        return $converter->convert($notes);
+        return $converter->convert($notes ?? '');
 
     }
 

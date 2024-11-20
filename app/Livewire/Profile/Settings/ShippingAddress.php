@@ -6,8 +6,6 @@ use Livewire\Component;
 
 class ShippingAddress extends Component
 {
-    public $profile;
-
     public $shipping_address1;
 
     public $shipping_address2;
@@ -20,8 +18,6 @@ class ShippingAddress extends Component
 
     public $shipping_country_id;
 
-    public $countries;
-
     public $saved;
 
     protected $rules = [
@@ -33,18 +29,16 @@ class ShippingAddress extends Component
         'shipping_country_id' => ['sometimes'],
     ];
 
-    public function mount($countries)
+    public function mount()
     {
         $this->fill([
-            'profile' => auth()->guard('contact')->user()->client,
+            // 'profile' => auth()->guard('contact')->user()->client,
             'shipping_address1' => auth()->guard('contact')->user()->client->shipping_address1,
             'shipping_address2' => auth()->guard('contact')->user()->client->shipping_address2,
             'shipping_city' => auth()->guard('contact')->user()->client->shipping_city,
             'shipping_state' => auth()->guard('contact')->user()->client->shipping_state,
             'shipping_postal_code' => auth()->guard('contact')->user()->client->shipping_postal_code,
             'shipping_country_id' => auth()->guard('contact')->user()->client->shipping_country_id,
-
-            'countries' => $countries,
             'saved' => ctrans('texts.save'),
         ]);
     }
@@ -62,7 +56,9 @@ class ShippingAddress extends Component
             $data['shipping_country_id'] = null;
         }
 
-        $this->profile
+        $profile = auth()->guard('contact')->user()->client;
+
+        $profile
             ->fill($data)
             ->save();
 

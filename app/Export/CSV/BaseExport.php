@@ -11,6 +11,7 @@
 
 namespace App\Export\CSV;
 
+use App\Jobs\Credit\ZipCredits;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Quote;
@@ -31,6 +32,9 @@ use Illuminate\Support\Carbon;
 use App\Utils\Traits\MakesHash;
 use App\Models\RecurringInvoice;
 use App\Jobs\Document\ZipDocuments;
+use App\Jobs\Invoice\ZipInvoices;
+use App\Jobs\PurchaseOrder\ZipPurchaseOrders;
+use App\Jobs\Quote\ZipQuotes;
 use App\Transformers\TaskTransformer;
 use App\Transformers\PaymentTransformer;
 use Illuminate\Database\Eloquent\Builder;
@@ -451,6 +455,10 @@ class BaseExport
         'project' => 'task.project_id',
         'billable' => 'task.billable',
         'item_notes' => 'task.item_notes',
+        'time_log' => 'task.time_log',
+        'log_duration_words' => 'task.time_log_duration_words',
+        'user' => 'task.user_id',
+        'assigned_user' => 'task.assigned_user_id',
     ];
 
     protected array $forced_client_fields = [
@@ -465,20 +473,20 @@ class BaseExport
     {
         if (isset($this->input['client_id']) && $this->input['client_id'] != 'all') {
 
-            if(!is_int($this->input['client_id'])) {
+            if (!is_int($this->input['client_id'])) {
                 $this->input['client_id'] = $this->decodePrimaryKey($this->input['client_id']);
             }
 
             $client = Client::withTrashed()->find($this->input['client_id']);
 
-            if(!$client) {
+            if (!$client) {
                 return $query;
             }
 
             $this->client_description = $client->present()->name;
             return $query->where('client_id', $this->input['client_id']);
 
-        } elseif(isset($this->input['clients']) && count($this->input['clients']) > 0) {
+        } elseif (isset($this->input['clients']) && count($this->input['clients']) > 0) {
 
             $this->client_description = 'Multiple Clients';
             return $query->whereIn('client_id', $this->input['clients']);
@@ -490,7 +498,7 @@ class BaseExport
     {
         $parts = explode(".", $key);
 
-        if(!is_array($parts) || count($parts) < 2) {
+        if (!is_array($parts) || count($parts) < 2) {
             return '';
         }
 
@@ -517,7 +525,7 @@ class BaseExport
     private function resolveClientContactKey($column, $entity, $transformer)
     {
 
-        if(!$entity->client) {
+        if (!$entity->client) {
             return "";
         }
 
@@ -529,7 +537,7 @@ class BaseExport
 
     private function resolveVendorContactKey($column, $entity, $transformer)
     {
-        if(!$entity->vendor) {
+        if (!$entity->vendor) {
             return "";
         }
 
@@ -543,19 +551,19 @@ class BaseExport
     private function resolveExpenseKey($column, $entity, $transformer)
     {
 
-        if($column == 'user' && $entity?->expense?->user) {
+        if ($column == 'user' && $entity?->expense?->user) {
             return $entity->expense->user->present()->name() ?? ' ';
         }
 
-        if($column == 'assigned_user' && $entity?->expense?->assigned_user) {
+        if ($column == 'assigned_user' && $entity?->expense?->assigned_user) {
             return $entity->expense->assigned_user->present()->name() ?? ' ';
         }
 
-        if($column == 'category' && $entity->expense) {
+        if ($column == 'category' && $entity->expense) {
             return $entity->expense->category?->name ?? ' ';
         }
 
-        if($entity instanceof Expense) {
+        if ($entity instanceof Expense) {
             return '';
         }
 
@@ -565,11 +573,11 @@ class BaseExport
         $manager->setSerializer(new ArraySerializer());
         $transformed_entity = $manager->createData($transformed_entity)->toArray();
 
-        if(array_key_exists($column, $transformed_entity)) {
+        if (array_key_exists($column, $transformed_entity)) {
             return $transformed_entity[$column];
         }
 
-        if(property_exists($entity, $column)) {
+        if (property_exists($entity, $column)) {
             return $entity?->{$column} ?? '';
         }
 
@@ -585,7 +593,7 @@ class BaseExport
 
         $transformed_entity = $transformer->transform($entity);
 
-        if(array_key_exists($column, $transformed_entity)) {
+        if (array_key_exists($column, $transformed_entity)) {
             return $transformed_entity[$column];
         }
 
@@ -598,7 +606,7 @@ class BaseExport
     private function resolveVendorKey($column, $entity, $transformer)
     {
 
-        if(!$entity->vendor) {
+        if (!$entity->vendor) {
             return '';
         }
 
@@ -608,15 +616,15 @@ class BaseExport
         $manager->setSerializer(new ArraySerializer());
         $transformed_entity = $manager->createData($transformed_entity)->toArray();
 
-        if($column == 'name') {
+        if ($column == 'name') {
             return $entity->vendor->present()->name() ?: '';
         }
 
-        if($column == 'user_id') {
+        if ($column == 'user_id') {
             return $entity->vendor->user->present()->name() ?: '';
         }
 
-        if($column == 'country_id') {
+        if ($column == 'country_id') {
             return $entity->vendor->country ? ctrans("texts.country_{$entity->vendor->country->name}") : '';
         }
 
@@ -624,11 +632,11 @@ class BaseExport
             return $entity->vendor->currency() ? $entity->vendor->currency()->code : $entity->company->currency()->code;
         }
 
-        if($column == 'status') {
+        if ($column == 'status') {
             return $entity->stringStatus($entity->status_id) ?: '';
         }
 
-        if(array_key_exists($column, $transformed_entity)) {
+        if (array_key_exists($column, $transformed_entity)) {
             return $transformed_entity[$column];
         }
 
@@ -642,7 +650,7 @@ class BaseExport
     private function resolveClientKey($column, $entity, $transformer)
     {
 
-        if(!$entity->client) {
+        if (!$entity->client) {
             return '';
         }
 
@@ -652,31 +660,31 @@ class BaseExport
         $manager->setSerializer(new ArraySerializer());
         $transformed_client = $manager->createData($transformed_client)->toArray();
 
-        if(in_array($column, ['client.name', 'name'])) {
+        if (in_array($column, ['client.name', 'name'])) {
             return $transformed_client['display_name'];
         }
 
-        if(in_array($column, ['client.user_id', 'user_id'])) {
+        if (in_array($column, ['client.user_id', 'user_id'])) {
             return $entity->client->user ? $entity->client->user->present()->name() : '';
         }
 
-        if(in_array($column, ['client.assigned_user_id', 'assigned_user_id'])) {
+        if (in_array($column, ['client.assigned_user_id', 'assigned_user_id'])) {
             return $entity->client->assigned_user ? $entity->client->assigned_user->present()->name() : '';
         }
 
-        if(in_array($column, ['client.country_id', 'country_id'])) {
+        if (in_array($column, ['client.country_id', 'country_id'])) {
             return $entity->client->country ? ctrans("texts.country_{$entity->client->country->name}") : '';
         }
 
-        if(in_array($column, ['client.shipping_country_id', 'shipping_country_id'])) {
+        if (in_array($column, ['client.shipping_country_id', 'shipping_country_id'])) {
             return $entity->client->shipping_country ? ctrans("texts.country_{$entity->client->shipping_country->name}") : '';
         }
 
-        if(in_array($column, ['client.size_id', 'size_id'])) {
+        if (in_array($column, ['client.size_id', 'size_id'])) {
             return $entity->client->size?->name ?? '';
         }
 
-        if(in_array($column, ['client.industry_id', 'industry_id'])) {
+        if (in_array($column, ['client.industry_id', 'industry_id'])) {
             return $entity->client->industry?->name ?? '';
         }
 
@@ -684,12 +692,12 @@ class BaseExport
             return $entity->client->currency() ? $entity->client->currency()->code : $entity->company->currency()->code;
         }
 
-        if(in_array($column, ['payment_terms', 'client.payment_terms'])) {
+        if (in_array($column, ['payment_terms', 'client.payment_terms'])) {
             return $entity->client->getSetting('payment_terms');
         }
 
 
-        if(array_key_exists($column, $transformed_client)) {
+        if (array_key_exists($column, $transformed_client)) {
             return $transformed_client[$column];
         }
 
@@ -705,7 +713,7 @@ class BaseExport
 
         $transformed_entity = $transformer->transform($entity);
 
-        if($column == 'status') {
+        if ($column == 'status') {
             return $entity->stringStatus($entity->status_id);
         }
 
@@ -718,7 +726,7 @@ class BaseExport
 
         $transformed_entity = $transformer->transform($entity);
 
-        if(array_key_exists($column, $transformed_entity)) {
+        if (array_key_exists($column, $transformed_entity)) {
             return $transformed_entity[$column];
         }
 
@@ -731,24 +739,24 @@ class BaseExport
         // nlog("searching for {$column}");
         $transformed_invoice = false;
 
-        if($transformer instanceof PaymentTransformer && ($entity->invoices ?? false)) {
+        if ($transformer instanceof PaymentTransformer && ($entity->invoices ?? false)) {
             $transformed_invoices = $transformer->includeInvoices($entity);
 
             $manager = new Manager();
             $manager->setSerializer(new ArraySerializer());
             $transformed_invoices = $manager->createData($transformed_invoices)->toArray();
 
-            if(!isset($transformed_invoices['App\\Models\\Invoice'])) {
+            if (!isset($transformed_invoices['App\\Models\\Invoice'])) {
                 return '';
             }
 
             $transformed_invoices = $transformed_invoices['App\\Models\\Invoice'];
 
-            if(count($transformed_invoices) == 1 && array_key_exists($column, $transformed_invoices[0])) {
+            if (count($transformed_invoices) == 1 && array_key_exists($column, $transformed_invoices[0])) {
                 return $transformed_invoices[0][$column];
             }
 
-            if(count($transformed_invoices) > 1 && array_key_exists($column, $transformed_invoices[0])) {
+            if (count($transformed_invoices) > 1 && array_key_exists($column, $transformed_invoices[0])) {
                 return implode(', ', array_column($transformed_invoices, $column));
             }
 
@@ -756,10 +764,10 @@ class BaseExport
 
         }
 
-        if($transformer instanceof TaskTransformer && ($entity->invoice ?? false)) {
+        if ($transformer instanceof TaskTransformer && ($entity->invoice ?? false)) {
             $transformed_invoice = $transformer->includeInvoice($entity);
 
-            if(!$transformed_invoice) {
+            if (!$transformed_invoice) {
                 return '';
             }
 
@@ -769,7 +777,7 @@ class BaseExport
 
         }
 
-        if($transformed_invoice && array_key_exists($column, $transformed_invoice)) {
+        if ($transformed_invoice && array_key_exists($column, $transformed_invoice)) {
             return $transformed_invoice[$column];
         } elseif ($transformed_invoice && array_key_exists(str_replace("invoice.", "", $column), $transformed_invoice)) {
             return $transformed_invoice[$column];
@@ -781,11 +789,11 @@ class BaseExport
     private function resolvePaymentKey($column, $entity, $transformer)
     {
 
-        if($entity instanceof Payment) {
+        if ($entity instanceof Payment) {
 
             $transformed_payment = $transformer->transform($entity);
 
-            if(array_key_exists($column, $transformed_payment)) {
+            if (array_key_exists($column, $transformed_payment)) {
                 return $transformed_payment[$column];
             } elseif (array_key_exists(str_replace("payment.", "", $column), $transformed_payment)) {
                 return $transformed_payment[$column];
@@ -797,15 +805,15 @@ class BaseExport
 
         }
 
-        if($column == 'amount') {
+        if ($column == 'amount') {
             return $entity->payments()->exists() ? $entity->payments()->withoutTrashed()->sum('paymentables.amount') : ctrans('texts.unpaid');
         }
 
-        if($column == 'refunded') {
+        if ($column == 'refunded') {
             return $entity->payments()->exists() ? $entity->payments()->withoutTrashed()->sum('paymentables.refunded') : '';
         }
 
-        if($column == 'applied') {
+        if ($column == 'applied') {
             $refunded = $entity->payments()->withoutTrashed()->sum('paymentables.refunded');
             $amount = $entity->payments()->withoutTrashed()->sum('paymentables.amount');
 
@@ -814,26 +822,26 @@ class BaseExport
 
         $payment = $entity->payments()->withoutTrashed()->first();
 
-        if(!$payment) {
+        if (!$payment) {
             return '';
         }
 
-        if($column == 'method') {
+        if ($column == 'method') {
             return $payment->translatedType();
         }
 
-        if($column == 'currency') {
+        if ($column == 'currency') {
             return $payment?->currency?->code ?? '';
         }
 
         $payment_transformer = new PaymentTransformer();
         $transformed_payment = $payment_transformer->transform($payment);
 
-        if($column == 'status') {
+        if ($column == 'status') {
             return $payment->stringStatus($transformed_payment['status_id']);
         }
 
-        if(array_key_exists($column, $transformed_payment)) {
+        if (array_key_exists($column, $transformed_payment)) {
             return $transformed_payment[$column];
         }
 
@@ -844,19 +852,19 @@ class BaseExport
     /**
      * Apply Product Filters
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      *
      * @return Builder
      */
     public function applyProductFilters(Builder $query): Builder
     {
 
-        if(isset($this->input['product_key'])) {
+        if (isset($this->input['product_key'])) {
 
             $products = explode(",", $this->input['product_key']);
 
             $query->where(function ($q) use ($products) {
-                foreach($products as $product) {
+                foreach ($products as $product) {
                     $q->orWhereJsonContains('line_items', ['product_key' => $product]);
                 }
             });
@@ -869,20 +877,20 @@ class BaseExport
     /**
      * Add Client Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  mixed $clients
      *
      * @return Builder
      */
     protected function addClientFilter(Builder $query, $clients): Builder
     {
-        if(is_string($clients)) {
+        if (is_string($clients)) {
             $clients = explode(',', $clients);
         }
 
         $transformed_clients = $this->transformKeys($clients);
 
-        if(count($transformed_clients) > 0) {
+        if (count($transformed_clients) > 0) {
             $query->whereIn('client_id', $transformed_clients);
         }
 
@@ -892,7 +900,7 @@ class BaseExport
     /**
      * Add Vendor Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $vendors
      *
      * @return Builder
@@ -900,13 +908,13 @@ class BaseExport
     protected function addVendorFilter(Builder$query, string $vendors): Builder
     {
 
-        if(is_string($vendors)) {
+        if (is_string($vendors)) {
             $vendors =  explode(',', $vendors);
         }
 
         $transformed_vendors = $this->transformKeys($vendors);
 
-        if(count($transformed_vendors) > 0) {
+        if (count($transformed_vendors) > 0) {
             $query->whereIn('vendor_id', $transformed_vendors);
         }
 
@@ -916,7 +924,7 @@ class BaseExport
     /**
      * AddProjectFilter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $projects
      *
      * @return Builder
@@ -924,13 +932,13 @@ class BaseExport
     protected function addProjectFilter(Builder $query, string $projects): Builder
     {
 
-        if(is_string($projects)) {
+        if (is_string($projects)) {
             $projects =  explode(',', $projects);
         }
 
         $transformed_projects = $this->transformKeys($projects);
 
-        if(count($transformed_projects) > 0) {
+        if (count($transformed_projects) > 0) {
             $query->whereIn('project_id', $transformed_projects);
         }
 
@@ -940,7 +948,7 @@ class BaseExport
     /**
      * Add Category Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $expense_categories
      *
      * @return Builder
@@ -948,14 +956,14 @@ class BaseExport
     protected function addCategoryFilter(Builder $query, string $expense_categories): Builder
     {
 
-        if(is_string($expense_categories)) {
+        if (is_string($expense_categories)) {
             $expense_categories =  explode(',', $expense_categories);
         }
 
         $transformed_expense_categories = $this->transformKeys($expense_categories);
 
 
-        if(count($transformed_expense_categories) > 0) {
+        if (count($transformed_expense_categories) > 0) {
             $query->whereIn('category_id', $transformed_expense_categories);
         }
 
@@ -965,7 +973,7 @@ class BaseExport
     /**
      * Add Payment Status Filters
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $status
      *
      * @return Builder
@@ -976,7 +984,7 @@ class BaseExport
         /** @var array $status_parameters */
         $status_parameters = explode(',', $status);
 
-        if((count($status_parameters) == 0) || in_array('all', $status_parameters)) {
+        if ((count($status_parameters) == 0) || in_array('all', $status_parameters)) {
             return $query;
         }
 
@@ -1011,7 +1019,7 @@ class BaseExport
                 $query->whereIn('status_id', $payment_filters);
             }
 
-            if(in_array('partially_unapplied', $status_parameters)) {
+            if (in_array('partially_unapplied', $status_parameters)) {
                 $query->whereColumn('amount', '>', 'applied')->where('refunded', 0);
             }
         });
@@ -1023,10 +1031,10 @@ class BaseExport
     /**
      * Add RecurringInvoice Status Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $status
      *
-     * @return Builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function addRecurringInvoiceStatusFilter(Builder $query, string $status): Builder
     {
@@ -1040,7 +1048,7 @@ class BaseExport
 
         $recurring_filters = [];
 
-        if($this->company->getSetting('report_include_drafts')){
+        if ($this->company->getSetting('report_include_drafts')) {
             $recurring_filters[] = RecurringInvoice::STATUS_DRAFT;
         }
 
@@ -1066,7 +1074,7 @@ class BaseExport
     /**
      * Add QuoteStatus Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $status
      *
      * @return Builder
@@ -1119,7 +1127,7 @@ class BaseExport
                 });
             }
 
-            if(in_array('converted', $status_parameters)) {
+            if (in_array('converted', $status_parameters)) {
                 $query->orWhere(function ($q) {
                     $q->whereNotNull('invoice_id');
                 });
@@ -1132,7 +1140,7 @@ class BaseExport
     /**
      * Add PurchaseOrder Status Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $status
      *
      * @return Builder
@@ -1182,17 +1190,17 @@ class BaseExport
     /**
      * Add Invoice Status Filter
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  string $status
      * @return Builder
      */
     protected function addInvoiceStatusFilter(Builder $query, string $status): Builder
     {
-               
+
         /** @var array $status_parameters */
         $status_parameters = explode(',', $status);
 
-        if(in_array('all', $status_parameters) || count($status_parameters) == 0) {
+        if (in_array('all', $status_parameters) || count($status_parameters) == 0) {
             return $query;
         }
 
@@ -1231,7 +1239,7 @@ class BaseExport
                                 ->orWhere('partial_due_date', '<', Carbon::now());
             }
 
-            if(in_array('viewed', $status_parameters)) {
+            if (in_array('viewed', $status_parameters)) {
 
                 $nested->whereHas('invitations', function ($q) {
                     $q->whereNotNull('viewed_date')->whereNotNull('deleted_at');
@@ -1248,7 +1256,7 @@ class BaseExport
     /**
      * Add Date Range
      *
-     * @param  Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param ?string $table_name
      * @return Builder
      */
@@ -1269,7 +1277,7 @@ class BaseExport
             $custom_start_date = now()->startOfYear();
             $custom_end_date = now();
         }
-        
+
         switch ($date_range) {
             case 'all':
                 $this->start_date = 'All available data';
@@ -1308,7 +1316,7 @@ class BaseExport
                 $first_month_of_year = $this->company->getSetting('first_month_of_year') ?? 1;
                 $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
 
-                if(now()->lt($fin_year_start)) {
+                if (now()->lt($fin_year_start)) {
                     $fin_year_start->subYearNoOverflow();
                 }
 
@@ -1321,7 +1329,7 @@ class BaseExport
                 $fin_year_start = now()->createFromDate(now()->year, $first_month_of_year, 1);
                 $fin_year_start->subYearNoOverflow();
 
-                if(now()->subYear()->lt($fin_year_start)) {
+                if (now()->subYear()->lt($fin_year_start)) {
                     $fin_year_start->subYearNoOverflow();
                 }
 
@@ -1349,7 +1357,7 @@ class BaseExport
      */
     public function mergeItemsKeys(string $entity_report_keys): array
     {
-        return array_merge($this->{$entity_report_keys}, $this->item_report_keys);
+        return array_merge(array_values($this->{$entity_report_keys}), array_values($this->item_report_keys));
     }
 
     public function buildHeader(): array
@@ -1366,71 +1374,71 @@ class BaseExport
             // nlog("{$key} => {$value}");
             $prefix = '';
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = stripos($value, 'client.') !== false ? ctrans('texts.client')." " : ctrans('texts.contact')." ";
                 $key = array_search($value, $this->client_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.invoice')." ";
                 $key = array_search($value, $this->invoice_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.recurring_invoice')." ";
                 $key = array_search($value, $this->recurring_invoice_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.payment')." ";
                 $key = array_search($value, $this->payment_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.quote')." ";
                 $key = array_search($value, $this->quote_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.credit')." ";
                 $key = array_search($value, $this->credit_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.item')." ";
                 $key = array_search($value, $this->item_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.expense')." ";
                 $key = array_search($value, $this->expense_report_keys);
 
-                if(!$key && $value == 'expense.category') {
+                if (!$key && $value == 'expense.category') {
                     $key = 'category';
                 }
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.task')." ";
                 $key = array_search($value, $this->task_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.vendor')." ";
                 $key = array_search($value, $this->vendor_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = ctrans('texts.purchase_order')." ";
                 $key = array_search($value, $this->purchase_order_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = '';
                 $key = array_search($value, $this->product_report_keys);
             }
 
-            if(!$key) {
+            if (!$key) {
                 $prefix = '';
             }
 
@@ -1451,29 +1459,29 @@ class BaseExport
             $key = str_replace('product.', '', $key);
             $key = str_replace('task.', '', $key);
 
-            if(stripos($value, 'custom_value') !== false) {
+            if (stripos($value, 'custom_value') !== false) {
                 $parts = explode(".", $value);
 
-                if(count($parts) == 2 && in_array($parts[0], ['credit','quote','invoice','purchase_order','recurring_invoice'])) {
+                if (count($parts) == 2 && in_array($parts[0], ['credit','quote','invoice','purchase_order','recurring_invoice'])) {
                     $entity = "invoice".substr($parts[1], -1);
                     $prefix = ctrans("texts.".$parts[0]);
                     $fallback = "custom_value".substr($parts[1], -1);
                     $custom_field_label = $helper->makeCustomField($this->company->custom_fields, $entity);
 
-                    if(strlen($custom_field_label) > 1) {
+                    if (strlen($custom_field_label) > 1) {
                         $header[] = $custom_field_label;
                     } else {
                         $header[] = $prefix . " ". ctrans("texts.{$fallback}");
                     }
 
-                } elseif(count($parts) == 2 && (stripos($parts[0], 'vendor_contact') !== false || stripos($parts[0], 'contact') !== false)) {
+                } elseif (count($parts) == 2 && (stripos($parts[0], 'vendor_contact') !== false || stripos($parts[0], 'contact') !== false)) {
                     $parts[0] = str_replace('vendor_contact', 'contact', $parts[0]);
 
                     $entity = "contact".substr($parts[1], -1);
                     $custom_field_string = strlen($helper->makeCustomField($this->company->custom_fields, $entity)) > 1 ? $helper->makeCustomField($this->company->custom_fields, $entity) : ctrans("texts.{$parts[1]}");
                     $header[] = ctrans("texts.{$parts[0]}") . " " . $custom_field_string;
 
-                } elseif(count($parts) == 2 && in_array(substr($original_key, 0, -1), ['credit','quote','invoice','purchase_order','recurring_invoice','task'])) {
+                } elseif (count($parts) == 2 && in_array(substr($original_key, 0, -1), ['credit','quote','invoice','purchase_order','recurring_invoice','task'])) {
                     $custom_field_string = strlen($helper->makeCustomField($this->company->custom_fields, "product".substr($original_key, -1))) > 1 ? $helper->makeCustomField($this->company->custom_fields, "product".substr($original_key, -1)) : ctrans("texts.{$parts[1]}");
                     $header[] = ctrans("texts.{$parts[0]}") . " " . $custom_field_string;
                 } else {
@@ -1520,12 +1528,12 @@ class BaseExport
 
             $column_key = $value;
 
-            if($value == 'product_image') {
+            if ($value == 'product_image') {
                 $column_key = 'image';
                 $value = 'image';
             }
 
-            if($value == 'tax_id') {
+            if ($value == 'tax_id') {
                 $column_key = 'tax_category';
                 $value = 'tax_category';
             }
@@ -1567,11 +1575,11 @@ class BaseExport
 
             $column_key = $value;
 
-            if($value == 'type_id' || $value == 'item.type_id') {
+            if ($value == 'type_id' || $value == 'item.type_id') {
                 $column_key = 'type';
             }
 
-            if($value == 'tax_id' || $value == 'item.tax_id') {
+            if ($value == 'tax_id' || $value == 'item.tax_id') {
                 $column_key = 'tax_category';
             }
 
@@ -1587,10 +1595,42 @@ class BaseExport
         return $clean_row;
     }
 
+    public function queuePdfs(Builder $query)
+    {
+
+        if (in_array(get_class($query->getModel()), [Invoice::class, Quote::class, Credit::class, PurchaseOrder::class]) && $query->count() > 0) {
+
+            $user = $this->company->owner();
+
+            if ($this->input['user_id'] ?? false) {
+                $user = User::where('id', $this->input['user_id'])->where('account_id', $this->company->account_id)->first();
+            }
+
+            switch (get_class($query->getModel())) {
+                case Invoice::class:
+                    nlog("zipping invoices");
+                    ZipInvoices::dispatch($query->pluck('id'), $this->company, $user);
+                    break;
+                case Quote::class:
+                    ZipQuotes::dispatch($query->pluck('id'), $this->company, $user);
+                    break;
+                case Credit::class:
+                    ZipCredits::dispatch($query->pluck('id'), $this->company, $user);
+                    break;
+                case PurchaseOrder::class:
+                    ZipPurchaseOrders::dispatch($query->pluck('id'), $this->company, $user);
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
+    }
+
     public function queueDocuments(Builder $query)
     {
 
-        if($query->getModel() instanceof Document) {
+        if ($query->getModel() instanceof Document) {
             $documents = $query->pluck('id')->toArray();
         } else {
             $documents = $query->cursor()
@@ -1600,25 +1640,25 @@ class BaseExport
                                ->toArray();
         }
 
-        if(count($documents) > 0) {
+        if (count($documents) > 0) {
 
             $user = $this->company->owner();
 
-            if(auth()->user() && auth()->user()->account_id == $this->company->account_id) {
+            if (auth()->user() && auth()->user()->account_id == $this->company->account_id) {
                 $user = auth()->user();
             }
 
-            if($this->input['user_id'] ?? false) {
+            if ($this->input['user_id'] ?? false) {
                 $user = User::where('id', $this->input['user_id'])->where('account_id', $this->company->account_id)->first();
             }
 
             ZipDocuments::dispatch($documents, $this->company, $user);
         }
     }
-    
+
     /**
      * Tests that the column exists
-     * on the table prior to adding it to 
+     * on the table prior to adding it to
      * the query builder
      *
      * @param  string $table
@@ -1628,5 +1668,19 @@ class BaseExport
     public function columnExists($table, $column): bool
     {
         return \Illuminate\Support\Facades\Schema::hasColumn($table, $column);
+    }
+
+    public function convertFloats(iterable $entity): iterable
+    {
+        $currency = $this->company->currency();
+
+        foreach ($entity as $key => $value) {
+            if (is_float($value)) {
+                $entity[$key] = \App\Utils\Number::formatValue($value, $currency);
+            }
+        }
+
+        return $entity;
+
     }
 }

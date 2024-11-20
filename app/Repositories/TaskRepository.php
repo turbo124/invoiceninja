@@ -46,13 +46,14 @@ class TaskRepository extends BaseRepository
             $this->new_task = false;
         }
 
-        if(!is_numeric($task->rate) && !isset($data['rate']))
+        if (!is_numeric($task->rate) && !isset($data['rate'])) {
             $data['rate'] = 0;
-        
+        }
+
         $task->fill($data);
         $task->saveQuietly();
 
-        if(isset($data['assigned_user_id']) && $data['assigned_user_id'] != $task->assigned_user_id) {
+        if (isset($data['assigned_user_id']) && $data['assigned_user_id'] != $task->assigned_user_id) {
             TaskAssigned::dispatch($task, $task->company->db)->delay(2);
         }
 
@@ -62,7 +63,7 @@ class TaskRepository extends BaseRepository
             $task->status_id = $this->setDefaultStatus($task);
         }
 
-        if($this->new_task && (!$task->rate || $task->rate <= 0)) {
+        if ($this->new_task && (!$task->rate || $task->rate <= 0)) {
             $task->rate = $task->getRate();
         }
 
@@ -117,14 +118,16 @@ class TaskRepository extends BaseRepository
         }
 
         $key_values = array_column($time_log, 0);
-        
-        if(count($key_values) > 0)
+
+        if (count($key_values) > 0) {
             array_multisort($key_values, SORT_ASC, $time_log);
+        }
 
-        foreach($time_log as $key => $value) {
+        foreach ($time_log as $key => $value) {
 
-            if(is_array($time_log[$key]) && count($time_log[$key]) >=2)
+            if (is_array($time_log[$key]) && count($time_log[$key]) >= 2) {
                 $time_log[$key][1] = $this->roundTimeLog($time_log[$key][0], $time_log[$key][1]);
+            }
 
         }
 
@@ -147,6 +150,10 @@ class TaskRepository extends BaseRepository
 
         $task->calculated_start_date = $this->harvestStartDate($time_log, $task);
 
+        if (isset(end($time_log)[1])) {
+            $task->is_running = end($time_log)[1] == 0;
+        }
+
         $task->time_log = json_encode($time_log);
 
         $task->saveQuietly();
@@ -163,7 +170,7 @@ class TaskRepository extends BaseRepository
     private function harvestStartDate($time_log, $task)
     {
 
-        if(isset($time_log[0][0])) {
+        if (isset($time_log[0][0])) {
             return \Carbon\Carbon::createFromTimestamp((int)$time_log[0][0])->addSeconds($task->company->utc_offset());
         }
 
@@ -205,11 +212,10 @@ class TaskRepository extends BaseRepository
     /**
      * Sorts the task status order IF the old status has changed between requests
      *
-     * @param  \stdCLass $old_task The old task object
      * @param  Task     $new_task The new Task model
      * @return void
      */
-    public function sortStatuses($old_task, $new_task)
+    public function sortStatuses($new_task)
     {
         if (! $new_task->project()->exists()) {
             return;
@@ -259,7 +265,7 @@ class TaskRepository extends BaseRepository
 
             $log = array_merge($log, [$new]);
             $task->time_log = json_encode($log);
-
+            $task->is_running = true;
             $task->saveQuietly();
         }
 
@@ -270,17 +276,17 @@ class TaskRepository extends BaseRepository
 
     public function roundTimeLog(int $start_time, int $end_time): int
     {
-        if(in_array($this->task_round_to_nearest, [0,1]) || $end_time == 0) {
+        if (in_array($this->task_round_to_nearest, [0,1]) || $end_time == 0) {
             return $end_time;
         }
 
         $interval = $end_time - $start_time;
 
-        if($this->task_round_up) {
+        if ($this->task_round_up) {
             return $start_time + (int)ceil($interval / $this->task_round_to_nearest) * $this->task_round_to_nearest;
         }
 
-        if($interval <= $this->task_round_to_nearest) {
+        if ($interval <= $this->task_round_to_nearest) {
             return $start_time;
         }
 
@@ -303,11 +309,12 @@ class TaskRepository extends BaseRepository
             $log = array_merge($log, [$last]);//check at this point, it may be prepending here.
 
             $task->time_log = json_encode($log);
+            $task->is_running = false;
             $task->saveQuietly();
         }
 
         $this->calculateProjectDuration($task);
-        
+
         return $task;
 
     }
@@ -344,7 +351,7 @@ class TaskRepository extends BaseRepository
                 $task->number = $this->getNextTaskNumber($task);
                 $task->saveQuietly();
                 $this->completed = false;
-            } catch(QueryException $e) {
+            } catch (QueryException $e) {
                 $x++;
 
                 if ($x > 50) {
@@ -356,20 +363,20 @@ class TaskRepository extends BaseRepository
         return $task->number;
     }
 
-    private function calculateProjectDuration(Task $task) 
+    private function calculateProjectDuration(Task $task)
     {
 
-        if($task->project) {
+        if ($task->project) {
 
             $duration = 0;
 
-            $task->project->tasks->each(function ($task) use (&$duration) {
+            $task->project->tasks()->withTrashed()->where('is_deleted', 0)->each(function ($task) use (&$duration) {
 
-                if(is_iterable(json_decode($task->time_log))) {
+                if (is_iterable(json_decode($task->time_log))) {
 
-                    foreach(json_decode($task->time_log) as $log) {
+                    foreach (json_decode($task->time_log) as $log) {
 
-                        if(!is_array($log)) {
+                        if (!is_array($log)) {
                             continue;
                         }
 
@@ -411,7 +418,7 @@ class TaskRepository extends BaseRepository
         if ($task->is_deleted) {
             return;
         }
-        
+
         parent::delete($task);
 
         $this->calculateProjectDuration($task);

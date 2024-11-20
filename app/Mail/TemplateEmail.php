@@ -26,8 +26,8 @@ class TemplateEmail extends Mailable
 
 
     /** @var \App\Models\Client $client */
-        private $client;
-        
+    private $client;
+
     /** @var \App\Models\ClientContact | \App\Models\VendorContact $contact */
     private $contact;
 
@@ -65,7 +65,7 @@ class TemplateEmail extends Mailable
         }
 
         $link_string = '<ul>';
-            $link_string .= "<li>{ctrans('texts.download_files')}</li>";
+        $link_string .= "<li>{ctrans('texts.download_files')}</li>";
         foreach ($this->build_email->getAttachmentLinks() as $link) {
             $link_string .= "<li>{$link}</li>";
         }
@@ -83,7 +83,7 @@ class TemplateEmail extends Mailable
             $template_name = 'email.template.client';
         }
 
-        if($this->build_email->getTemplate() == 'premium') {
+        if ($this->build_email->getTemplate() == 'premium') {
             $template_name = 'email.template.client_premium';
         }
 
@@ -119,7 +119,7 @@ class TemplateEmail extends Mailable
         if (strlen($settings->bcc_email) > 1) {
             if (Ninja::isHosted()) {
 
-                if($company->account->isPaid()) {
+                if ($company->account->isPaid()) {
                     $bccs = explode(',', str_replace(' ', '', $settings->bcc_email));
                     $this->bcc(array_slice($bccs, 0, 5));
                 }
@@ -159,7 +159,7 @@ class TemplateEmail extends Mailable
             }
         }
 
-        if(!$this->invitation) {
+        if (!$this->invitation) {
             return $this;
         }
 
@@ -191,7 +191,7 @@ class TemplateEmail extends Mailable
 
             }
         } elseif ($this->invitation->quote) {//@phpstan-ignore-line
-            if ($this->invitation->quote->client->getSetting('enable_e_invoice') && $this->invitation->invoice->client->getSetting('ubl_email_attachment') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
+            if ($this->invitation->quote->client->getSetting('enable_e_invoice') && $this->invitation->quote->client->getSetting('ubl_email_attachment') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
                 $xml_string = $this->invitation->quote->service()->getEQuote($this->invitation->contact);
 
                 if ($xml_string) {
@@ -200,7 +200,7 @@ class TemplateEmail extends Mailable
 
             }
         } elseif ($this->invitation->purchase_order) {
-            if ($this->invitation->purchase_order->vendor->getSetting('enable_e_invoice') && $this->invitation->invoice->client->getSetting('ubl_email_attachment') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
+            if ($this->invitation->purchase_order->vendor->getSetting('enable_e_invoice') && $this->invitation->purchase_order->vendor->getSetting('ubl_email_attachment') && $this->company->account->hasFeature(Account::FEATURE_PDF_ATTACHMENT)) {
                 $xml_string = $this->invitation->purchase_order->service()->getEPurchaseOrder($this->invitation->contact);
 
                 if ($xml_string) {
