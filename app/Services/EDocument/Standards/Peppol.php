@@ -579,7 +579,7 @@ class Peppol extends AbstractService
 
         $pa = new PayableAmount();
         $pa->currencyID = $this->invoice->client->currency()->code;
-        $pa->amount = $this->invoice->amount;
+        $pa->amount = number_format($this->invoice->amount, 2, '.', '');;
         $lmt->PayableAmount = $pa;
 
         $am = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\AllowanceTotalAmount();
@@ -1088,7 +1088,7 @@ class Peppol extends AbstractService
         ?? $this->invoice->client->vat_number 
         ?? $this->invoice->client->id_number
         ?? 'fallback1234';
-        
+
         $id->schemeID = $this->resolveScheme(true);
         $party->EndpointID = $id;
         
