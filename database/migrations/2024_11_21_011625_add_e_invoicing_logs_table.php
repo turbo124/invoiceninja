@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('e_invoicing_logs', function (Blueprint $table){
             $table->id();
-            $table->string('tenant_id');
+            $table->string('tenant_id')->nullable();
             $table->unsignedInteger('legal_entity_id')->index();
             $table->string('license_key')->nullable();
             $table->string('direction')->default('sent');

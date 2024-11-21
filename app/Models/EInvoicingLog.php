@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @package App\Models
  * @property int $id
- * @property string $tenant_id
+ * @property string $tenant_id (sent|received)
  * @property string $direction
  * @property int $legal_entity_id
  * @property string|null $license_key The license key string
@@ -36,7 +36,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class EInvoicingLog extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
+        'tenant_id',
+        'direction',
+        'legal_entity_id',
+        'license_key',
+        'notes',
+        'counter',
     ];
 
     protected $casts = [
