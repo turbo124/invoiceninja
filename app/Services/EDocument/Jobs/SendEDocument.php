@@ -91,7 +91,7 @@ class SendEDocument implements ShouldQueue
         //Self Hosted Sending Code Path
         if (Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->peppolSendingEnabled()) {
 
-            $r = Http::withHeaders($this->getHeaders())
+            $r = Http::withHeaders([...$this->getHeaders(), 'X-EInvoice-Token' => $model->company->account->e_invoicing_token])
                 ->post(config('ninja.hosted_ninja_url')."/api/einvoice/submission", $payload);
 
             if ($r->successful()) {
