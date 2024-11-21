@@ -190,7 +190,7 @@ class ClientContact extends Authenticatable implements HasLocalePreference
         return $this->hashed_id;
     }
 
-    public function scoutKeyName()
+    public function getScoutKeyName()
     {
         return 'hashed_id';
     }

@@ -2381,7 +2381,7 @@ $this->account->forceDelete();
         $this->assertEquals(floatval(100), $this->getFirstValueByColumn($csv, 'Expense Amount'));
         $this->assertEquals('USD', $this->getFirstValueByColumn($csv, 'Expense Currency'));
 
-$this->account->forceDelete();
+        $this->account->forceDelete();
 
     }
 
