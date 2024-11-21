@@ -271,6 +271,11 @@ class Invoice extends BaseModel
         return $this->hashed_id;
     }
 
+    public function scoutKeyName()
+    {
+        return 'hashed_id';
+    }
+    
     public function getEntityType()
     {
         return self::class;
