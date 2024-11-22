@@ -408,14 +408,14 @@ class EInvoiceValidationTest extends TestCase
         ]);
 
         
-$cc = ClientContact::factory()->create([
-          'client_id' => $client->id,
-          'user_id' => $this->user->id,
-          'company_id' => $company->id,
-          'first_name' => 'Bob',
-          'last_name' => 'Doe',
-          'email' => 'wasa@b.com',
-      ]);
+        $cc = ClientContact::factory()->create([
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'company_id' => $company->id,
+            'first_name' => 'Bob',
+            'last_name' => 'Doe',
+            'email' => 'wasa@b.com',
+        ]);
 
 
         $el = new EntityLevel();
@@ -446,14 +446,14 @@ $cc = ClientContact::factory()->create([
         ]);
 
         
-$cc = ClientContact::factory()->create([
-          'client_id' => $client->id,
-          'user_id' => $this->user->id,
-          'company_id' => $company->id,
-          'first_name' => 'Bob',
-          'last_name' => 'Doe',
-          'email' => 'wasa@b.com',
-      ]);
+        $cc = ClientContact::factory()->create([
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'company_id' => $company->id,
+            'first_name' => 'Bob',
+            'last_name' => 'Doe',
+            'email' => 'wasa@b.com',
+        ]);
 
         $el = new EntityLevel();
         $validation = $el->checkClient($client);
