@@ -66,8 +66,6 @@ class EInvoiceController extends BaseController
 
         $payment_means_array = $request->input('payment_means', []);
 
-        nlog($payment_means_array);
-
         $einvoice->PaymentMeans = [];
 
         foreach ($payment_means_array as $payment_means) {
