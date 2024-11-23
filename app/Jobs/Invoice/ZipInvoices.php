@@ -112,9 +112,10 @@ class ZipInvoices implements ShouldQueue
 
             UnlinkFile::dispatch(config('filesystems.default'), $path.$file_name)->delay(now()->addHours(1));
 
-            $message = count($this->invoices). " ". ctrans('texts.invoices'). " " . ctrans('texts.download_files');
+            $message = count($this->invoices). " ". ctrans('texts.invoices');
+            $message = ctrans('texts.download_ready', ['message' => $message]);
 
-            broadcast(new DownloadAvailable($storage_url, $message, $this->company->locale(), $this->user));
+            broadcast(new DownloadAvailable($storage_url, $message, $this->user));
 
         } catch (\PhpZip\Exception\ZipException $e) {
             nlog('could not make zip => '.$e->getMessage());

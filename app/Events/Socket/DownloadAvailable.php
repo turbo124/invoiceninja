@@ -29,7 +29,6 @@ class DownloadAvailable implements ShouldBroadcast
 
     public function __construct(public string $url, public string $message, public User $user)
     {
-        
     }
 
     public function broadcastOn()
@@ -43,7 +42,7 @@ class DownloadAvailable implements ShouldBroadcast
     {
 
         ctrans('texts.document_download_subject');
-        
+
         return [
             'message' => $this->message,
             'url' => $this->url,
