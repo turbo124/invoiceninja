@@ -42,6 +42,7 @@ class SearchController extends Controller
         $user = auth()->user();
 
         $this->clientMap($user);
+        
         $this->invoiceMap($user);
 
         return response()->json([
