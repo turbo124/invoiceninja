@@ -66,7 +66,7 @@ return [
 
         'debian_docker' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/storage'),
+            'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'permissions' => [
                 'file' => [
