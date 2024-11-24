@@ -42,6 +42,7 @@ class SearchController extends Controller
         $user = auth()->user();
 
         $this->clientMap($user);
+
         $this->invoiceMap($user);
 
         return response()->json([
@@ -63,7 +64,7 @@ class SearchController extends Controller
         $elastic = ClientBuilder::fromConfig(config('elastic.client.connections.default'));
 
         $params = [
-            'index' => 'clients,invoices,client_contacts',
+            'index' => 'clients,invoices,client_contacts,quotes,expenses,credits,recurring_invoices,vendors,vendor_contacts,purchase_orders',
             'body'  => [
                 'query' => [
                     'bool' => [
@@ -93,6 +94,7 @@ class SearchController extends Controller
             'clients' => $this->clients,
             'client_contacts' => $this->client_contacts,
             'invoices' => $this->invoices,
+            'quotes' => $this->quotes,
             'settings' => $this->settingsMap(),
         ], 200);
 
