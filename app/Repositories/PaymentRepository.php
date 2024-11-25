@@ -198,7 +198,7 @@ class PaymentRepository extends BaseRepository
             event(new PaymentWasCreated($payment, $payment->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
         }
 
-        $payment->applied += ($invoice_totals - $credit_totals); //wont work because - check tests
+        $payment->applied += ($invoice_totals - $credit_totals); 
 
         $payment->saveQuietly();
 
