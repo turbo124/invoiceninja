@@ -363,7 +363,7 @@ class EInvoiceValidationTest extends TestCase
             'company_id' => $company->id,
             'classification' => 'individual',
             'vat_number' => '',
-            'country_id' => 2763,
+            'country_id' => 276,
             'address1' => '10 Wallaby Way',
             'address2' => '',
             'city' => 'Sydney',
