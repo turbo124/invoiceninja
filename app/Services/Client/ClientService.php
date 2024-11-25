@@ -143,7 +143,7 @@ class ClientService
 
         return $this;
     }
-    
+
     public function updatePaymentBalance()
     {
         $amount = Payment::query()
@@ -165,9 +165,8 @@ class ClientService
 
     public function adjustCreditBalance(float $amount)
     {
-        // $this->client->credit_balance += $amount;
 
-        $this->client->increment('credit_balance', $amount);
+        $this->client->credit_balance += $amount;
 
         return $this;
     }
