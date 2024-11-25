@@ -130,12 +130,8 @@ class QuoteReminderJob implements ShouldQueue
             nrlog("#{$quote->number} => reminder template = {$reminder_template}");
             $quote->service()->touchReminder($reminder_template)->save();
 
-            //20-04-2022 fixes for endless reminders - generic template naming was wrong
             $enabled_reminder = 'enable_quote_'.$reminder_template;
-            // if ($reminder_template == 'endless_reminder') {
-            //     $enabled_reminder = 'enable_reminder_endless';
-            // }
-
+            
             if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3', 'reminder_endless', 'endless_reminder']) &&
         $quote->client->getSetting($enabled_reminder) &&
         $quote->client->getSetting('send_reminders') &&

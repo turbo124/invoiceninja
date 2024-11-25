@@ -11,6 +11,7 @@
 
 namespace App\Models;
 
+use App\Utils\Ninja;
 use App\Utils\Number;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
@@ -19,10 +20,12 @@ use App\Helpers\Invoice\InvoiceSum;
 use Illuminate\Support\Facades\App;
 use App\Services\Quote\QuoteService;
 use App\Utils\Traits\MakesReminders;
+use App\Events\Quote\QuoteWasEmailed;
 use App\Utils\Traits\MakesInvoiceValues;
 use App\Models\Presenters\QuotePresenter;
 use Laracasts\Presenter\PresentableTrait;
 use App\Helpers\Invoice\InvoiceSumInclusive;
+use App\Events\Quote\QuoteReminderWasEmailed;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -463,5 +466,34 @@ class Quote extends BaseModel
         return true;
 
     }
+    
+    /**
+     * entityEmailEvent
+     *
+     * Translates the email type into an activity + notification 
+     * that matches.
+     */
+    public function entityEmailEvent($invitation, $reminder_template)
+    {
+        
+        switch ($reminder_template) {
+            case 'quote':
+                event(new QuoteWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                break;
+            case 'email_quote_template_reminder1':
+                event(new QuoteReminderWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                break;
+            case 'custom1':
+            case 'custom2':
+            case 'custom3':
+                event(new QuoteWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                break;
+            default:
+                // code...
+                break;
+        }
+    }
 
+    
+    
 }

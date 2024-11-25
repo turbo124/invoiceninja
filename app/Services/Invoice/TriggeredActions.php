@@ -100,7 +100,7 @@ class TriggeredActions extends AbstractService
         });
 
         if ($this->invoice->invitations->count() > 0) {
-            event(new InvoiceWasEmailed($this->invoice->invitations->first(), $this->invoice->company, Ninja::eventVars(), 'invoice'));
+            $this->invoice->entityEmailEvent($this->invoice->invitations->first(), $reminder_template);
             $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
         }
     }

@@ -3899,7 +3899,7 @@ $lang = array(
     'notification_invoice_reminder1_sent_subject' => 'Reminder 1 for Invoice :invoice was sent to :client',
     'notification_invoice_reminder2_sent_subject' => 'Reminder 2 for Invoice :invoice was sent to :client',
     'notification_invoice_reminder3_sent_subject' => 'Reminder 3 for Invoice :invoice was sent to :client',
-    'notification_invoice_custom_sent_subject' => 'Custom reminder for Invoice :invoice was sent to :client',
+    'notification_invoice_custom_sent_subject' => 'Custom reminder was sent to :client',
     'notification_invoice_reminder_endless_sent_subject' => 'Endless reminder for Invoice :invoice was sent to :client',
     'assigned_user' => 'Assigned User',
     'setup_steps_notice' => 'To proceed to next step, make sure you test each section.',
@@ -5322,7 +5322,7 @@ $lang = array(
     'applies_to' => 'Applies To',
     'accept_purchase_order' => 'Accept Purchase Order',
     'round_to_seconds' => 'Round To Seconds',
-    'activity_142' => 'Quote :number reminder 1 sent',
+    'activity_142' => 'Quote :quote reminder 1 sent',
     'activity_143' => 'Auto Bill succeeded for invoice :invoice',
     'activity_144' => 'Auto Bill failed for invoice :invoice. :notes',
     'activity_145' => 'E-Invoice :invoice for :client was sent. :notes',
@@ -5475,6 +5475,8 @@ $lang = array(
     'delete_identifier_description' => 'Deleting this identifier will remove it from the system. Make sure this is the desired action before proceeding.',
     'einvoice_something_went_wrong' => 'Oops! Something went wrong. Contact us at contact@invoiceninja.com for more information.',
     'download_ready' => 'Your Download is now ready! [ :message ]',
+    'notification_quote_reminder1_sent_subject' => 'Reminder 1 for Quote :invoice was sent to :client',
+    'custom_reminder_sent' => 'Custom reminder was sent to :client',
 );
 
 return $lang;
