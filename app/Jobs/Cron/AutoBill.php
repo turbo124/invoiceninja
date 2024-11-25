@@ -77,7 +77,7 @@ class AutoBill implements ShouldQueue
                             nlog($e->getMessage());
                         }
 
-                        nlog("Firing email for invoice {$invoice->number}");
+                        nlog("Firing email for invoice {$invoice->number} which failed to capture payment");
                     }
                 });
 
