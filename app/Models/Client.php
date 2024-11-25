@@ -1047,6 +1047,9 @@ class Client extends BaseModel implements HasLocalePreference
     public function checkDeliveryNetwork(): ?string
     {
 
+        if(!isset($this->country->iso_3166_2))
+            return "Client has no country set!";
+        
         $br = new \App\DataMapper\Tax\BaseRule();
 
         $government_countries = array_merge($br->peppol_business_countries, $br->peppol_government_countries);

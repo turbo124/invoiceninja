@@ -363,7 +363,7 @@ class EInvoiceValidationTest extends TestCase
             'company_id' => $company->id,
             'classification' => 'individual',
             'vat_number' => '',
-            'country_id' => 1,
+            'country_id' => 276,
             'address1' => '10 Wallaby Way',
             'address2' => '',
             'city' => 'Sydney',
@@ -382,6 +382,9 @@ class EInvoiceValidationTest extends TestCase
 
         $el = new EntityLevel();
         $validation = $el->checkClient($client);
+
+        if(!$validation['passes'])
+            nlog($validation);
 
         $this->assertTrue($validation['passes']);
 
