@@ -77,19 +77,21 @@ class ClientService
      */
     public function updateBalance(float $amount)
     {
-        try {
-            DB::connection(config('database.default'))->transaction(function () use ($amount) {
-                $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
-                $this->client->balance += $amount;
-                $this->client->saveQuietly();
-            }, 2); 
-        } catch (\Throwable $throwable) {
+        // try {
+        //     DB::connection(config('database.default'))->transaction(function () use ($amount) {
+        //         $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
+        //         $this->client->balance += $amount;
+        //         $this->client->saveQuietly();
+        //     }, 2); 
+        // } catch (\Throwable $throwable) {
 
-            if (DB::connection(config('database.default'))->transactionLevel() > 0) {
-                DB::connection(config('database.default'))->rollBack();
-            }
+        //     if (DB::connection(config('database.default'))->transactionLevel() > 0) {
+        //         DB::connection(config('database.default'))->rollBack();
+        //     }
 
-        }
+        // }
+
+        $this->client->increment('balance', $amount);
 
         return $this;
     }
@@ -97,60 +99,10 @@ class ClientService
     public function updateBalanceAndPaidToDate(float $balance, float $paid_to_date)
     {
 
-        // refactor to calculated balances.
-        // $ib = Invoice::withTrashed()
-        //             ->where('client_id', $this->client->id)
-        //             ->whereIn('status_id', [2,3])
-        //             ->where('is_deleted',0)
-        //             ->where('is_proforma',0)
-        //             ->sum('balance');
+        $this->client->increment('balance', $balance);
+        $this->client->increment('paid_to_date', $paid_to_date);
 
-        // $payments = Payment::withTrashed()
-        // ->where('client_id', $this->client->id)
-        // ->whereIn('status_id', [1,4,5,6])
-        // ->where('is_deleted',0)
-        // ->sum(\DB::raw('amount - refunded'));
-
-        // $credit_payments = Payment::where('client_id', $this->client->id)
-        //     ->where('is_deleted', 0)
-        //     ->join('paymentables', 'payments.id', '=', 'paymentables.payment_id')
-        //     ->where('paymentables.paymentable_type', \App\Models\Credit::class)
-        //     ->whereNull('paymentables.deleted_at')
-        //     ->where('paymentables.amount', '>', 0)
-        //     ->sum(DB::raw('paymentables.amount - paymentables.refunded'));
-
-        // $credits_from_reversal = \App\Models\Credit::withTrashed()
-        //                         ->where('client_id', $this->client->id)
-        //                         ->where('is_deleted', 0)
-        //                         ->whereNotNull('invoice_id')
-        //                         ->sum('amount');
-
-        // $paid_to_date = $payments+$credit_payments-$credits_from_reversal;
-
-
-
-
-        
-try {
-    DB::connection(config('database.default'))->transaction(function () use ($balance, $paid_to_date) {
-        Client::withTrashed()
-            ->where('id', $this->client->id)
-            ->lockForUpdate()
-            ->update([
-                'balance' => DB::raw("balance + {$balance}"),
-                'paid_to_date' => DB::raw("paid_to_date + {$paid_to_date}")
-            ]);
-    }, 2);
-} catch (\Throwable $throwable) {
-    nlog("DB ERROR " . $throwable->getMessage());
-
-    if (DB::connection(config('database.default'))->transactionLevel() > 0) {
-        DB::connection(config('database.default'))->rollBack();
-    }
-
-}
-
-        /* switch to increment/decrement
+        /* 
         try {
             DB::connection(config('database.default'))->transaction(function () use ($balance, $paid_to_date) {
                 $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
@@ -172,23 +124,54 @@ try {
 
     public function updatePaidToDate(float $amount)
     {
-        try {
-            DB::connection(config('database.default'))->transaction(function () use ($amount) {
-                $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
-                $this->client->paid_to_date += $amount;
-                $this->client->saveQuietly();
-            }, 2);
-        } catch (\Throwable $throwable) {
-            nlog("DB ERROR " . $throwable->getMessage());
+        // try {
+        //     DB::connection(config('database.default'))->transaction(function () use ($amount) {
+        //         $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
+        //         $this->client->paid_to_date += $amount;
+        //         $this->client->saveQuietly();
+        //     }, 2);
+        // } catch (\Throwable $throwable) {
+        //     nlog("DB ERROR " . $throwable->getMessage());
 
-            if (DB::connection(config('database.default'))->transactionLevel() > 0) {
-                DB::connection(config('database.default'))->rollBack();
-            }
+        //     if (DB::connection(config('database.default'))->transactionLevel() > 0) {
+        //         DB::connection(config('database.default'))->rollBack();
+        //     }
 
-        }
+        // }
+
+        $this->client->increment('paid_to_date', $amount);
 
         return $this;
     }
+    
+    public function updatePaymentBalance()
+    {
+        $amount = Payment::query()
+                        ->withTrashed()
+                        ->where('client_id', $this->client->id)
+                        ->where('is_deleted', 0)
+                        ->whereIn('status_id', [Payment::STATUS_COMPLETED, Payment::STATUS_PENDING, Payment::STATUS_PARTIALLY_REFUNDED, Payment::STATUS_REFUNDED])
+                        ->selectRaw('SUM(payments.amount - payments.applied) as amount')->first()->amount ?? 0;
+
+        DB::connection(config('database.default'))->transaction(function () use ($amount) {
+            $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
+            $this->client->payment_balance = $amount;
+            $this->client->saveQuietly();
+        }, 2);
+
+        return $this;
+    }
+
+
+    public function adjustCreditBalance(float $amount)
+    {
+        // $this->client->credit_balance += $amount;
+
+        $this->client->increment('credit_balance', $amount);
+
+        return $this;
+    }
+
 
     public function applyNumber(): self
     {
@@ -212,32 +195,6 @@ try {
                 }
             }
         } while ($this->completed);
-
-        return $this;
-    }
-
-    public function updatePaymentBalance()
-    {
-        $amount = Payment::query()
-                        ->withTrashed()
-                        ->where('client_id', $this->client->id)
-                        ->where('is_deleted', 0)
-                        ->whereIn('status_id', [Payment::STATUS_COMPLETED, Payment::STATUS_PENDING, Payment::STATUS_PARTIALLY_REFUNDED, Payment::STATUS_REFUNDED])
-                        ->selectRaw('SUM(payments.amount - payments.applied) as amount')->first()->amount ?? 0;
-
-        DB::connection(config('database.default'))->transaction(function () use ($amount) {
-            $this->client = Client::withTrashed()->where('id', $this->client->id)->lockForUpdate()->first();
-            $this->client->payment_balance = $amount;
-            $this->client->saveQuietly();
-        }, 2);
-
-        return $this;
-    }
-
-
-    public function adjustCreditBalance(float $amount)
-    {
-        $this->client->credit_balance += $amount;
 
         return $this;
     }
