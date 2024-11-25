@@ -81,8 +81,11 @@ class TriggeredActions extends AbstractService
             $company->save();
         }
 
+        if($this->request->has('retry_e_send') && $this->request->input('retry_e_send') == 'true' && is_null($this->invoice->backup) && $this->invoice->client->peppolSendingEnabled()) {    
+            \App\Services\EDocument\Jobs\SendEDocument::dispatch(get_class($this->invoice), $this->invoice->id, $this->invoice->company->db);
+        }
+
         if ($this->updated) {
-            // event('eloquent.updated: App\Models\Invoice', $this->invoice);
             $this->invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
 
         }

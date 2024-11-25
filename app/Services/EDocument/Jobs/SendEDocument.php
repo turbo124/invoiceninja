@@ -97,23 +97,20 @@ class SendEDocument implements ShouldQueue
 
             if ($r->hasHeader('X-EINVOICE-QUOTA')) {
                 $account = $model->company->account;
-
                 $account->e_invoice_quota = (int) $r->header('X-EINVOICE-QUOTA');
                 $account->save();
             }
 
             if ($r->successful()) {
                 nlog("Model {$model->number} was successfully sent for third party processing via hosted Invoice Ninja");
-
                 $data = $r->json();
-
-                return $this->writeActivity($model, $data['guid']);
+                return $this->writeActivity($model, Activity::EINVOICE_DELIVERY_SUCCESS, $data['guid']);
             }
 
             if ($r->failed()) {
                 nlog("Model {$model->number} failed to be accepted by invoice ninja, error follows:");
-                nlog($r->getBody()->getContents());
-                return response()->json(['message' => "Model {$model->number} failed to be accepted by invoice ninja"], 400);
+                nlog($r->json());
+                $this->writeActivity($model, Activity::EINVOICE_DELIVERY_FAILURE, data_get($r->json(), 'errors.0.details', 'Unhandled error, check logs'));
             }
 
         } elseif (Ninja::isSelfHost()) {
@@ -185,35 +182,41 @@ class SendEDocument implements ShouldQueue
                     \Modules\Admin\Jobs\Account\SuspendESendReceive::dispatch($account->key);
                 }
 
-                return $this->writeActivity($model, $r);
+                return $this->writeActivity($model, Activity::EINVOICE_DELIVERY_SUCCESS, $r);
             }
 
             if ($r->failed()) {
                 nlog("Model {$model->number} failed to be accepted by invoice ninja, error follows:");
-                nlog($r->getBody()->getContents());
+                $notes = data_get($r->json(), 'errors.0.details', 'Unhandled errors, check logs');
+                return $this->writeActivity($model, Activity::EINVOICE_DELIVERY_FAILURE, $notes);
             }
 
         }
 
     }
 
-    private function writeActivity($model, string $guid)
+    private function writeActivity($model, int $activity_id, string $notes = '')
     {
         $activity = new Activity();
         $activity->user_id = $model->user_id;
         $activity->client_id = $model->client_id ?? $model->vendor_id;
         $activity->company_id = $model->company_id;
         $activity->account_id = $model->company->account_id;
-        $activity->activity_type_id = Activity::EINVOICE_SENT;
+        $activity->activity_type_id = $activity_id;
         $activity->invoice_id = $model->id;
-        $activity->notes = str_replace('"', '', $guid);
+        $activity->notes = str_replace('"', '', $notes);
+        $activity->is_system = true;
 
         $activity->save();
 
-        $std = new \stdClass();
-        $std->guid = str_replace('"', '', $guid);
-        $model->backup = $std;
-        $model->saveQuietly();
+        if($activity_id == Activity::EINVOICE_DELIVERY_SUCCESS){
+
+            $std = new \stdClass();
+            $std->guid = str_replace('"', '', $notes);
+            $model->backup = $std;
+            $model->saveQuietly();
+
+        }
 
     }
 

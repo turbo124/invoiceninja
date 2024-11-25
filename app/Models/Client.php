@@ -1033,7 +1033,32 @@ class Client extends BaseModel implements HasLocalePreference
      */
     public function peppolSendingEnabled(): bool
     {
-        return $this->getSetting('e_invoice_type') == 'PEPPOL' && $this->company->peppolSendingEnabled();
+        return $this->getSetting('e_invoice_type') == 'PEPPOL' && $this->company->peppolSendingEnabled() && is_null($this->checkDeliveryNetwork());
+    }
+    
+    /**
+     * checkDeliveryNetwork
+     *
+     * Checks whether the client country is supported
+     * for sending over the PEPPOL network.
+     * 
+     * @return string|null
+     */
+    public function checkDeliveryNetwork(): ?string
+    {
+
+        $br = new \App\DataMapper\Tax\BaseRule();
+
+        $government_countries = array_merge($br->peppol_business_countries, $br->peppol_government_countries);
+
+        if(in_array($this->country->iso_3166_2, $government_countries) && $this->classification == 'government'){
+            return null;
+        }
+
+        if(in_array($this->country->iso_3166_2, $br->peppol_business_countries))
+            return null;
+
+        return "Country {$this->country->full_name} ( {$this->country->iso_3166_2} ) is not supported by the PEPPOL network for e-delivery.";
 
     }
 }
