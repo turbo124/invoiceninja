@@ -163,24 +163,20 @@ class AutoBillInvoice extends AbstractService
 
             nlog('payment NOT captured for '.$this->invoice->number.' with error '.$e->getMessage());
             event(new InvoiceAutoBillFailed($this->invoice, $this->invoice->company, Ninja::eventVars(), $e->getMessage()));
+            
+            $this->invoice->increment('auto_bill_tries', 1);
+            $this->invoice->refresh();
 
-        }
+            if ($this->invoice->auto_bill_tries == 3) {
 
-        $this->invoice = $this->invoice->fresh();
-        $this->invoice->auto_bill_tries += 1;
+                \App\Models\Invoice::where('id', $this->invoice->id)->update([
+                    'auto_bill_enabled' => false,
+                    'auto_bill_tries' => 0
+                ]);
 
-        if ($this->invoice->auto_bill_tries == 3) {
+            }
 
-            \App\Models\Invoice::where('id', $this->invoice->id)->update([
-                'auto_bill_enabled' => false,
-                'auto_bill_tries' => 0
-            ]);
-
-        } else {
-
-            \App\Models\Invoice::where('id', $this->invoice->id)->update([
-                'auto_bill_tries' => $this->invoice->auto_bill_tries
-            ]);
+            throw $e;
 
         }
 
