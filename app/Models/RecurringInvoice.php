@@ -539,6 +539,40 @@ class RecurringInvoice extends BaseModel
         }
     }
 
+
+    public function nextDateByFrequencyNoOffset(Carbon $carbon)
+    {
+
+        switch ($this->frequency_id) {
+            case self::FREQUENCY_DAILY:
+                return $carbon->startOfDay()->addDay();
+            case self::FREQUENCY_WEEKLY:
+                return $carbon->startOfDay()->addWeek();
+            case self::FREQUENCY_TWO_WEEKS:
+                return $carbon->startOfDay()->addWeeks(2);
+            case self::FREQUENCY_FOUR_WEEKS:
+                return $carbon->startOfDay()->addWeeks(4);
+            case self::FREQUENCY_MONTHLY:
+                return $carbon->startOfDay()->addMonthNoOverflow();
+            case self::FREQUENCY_TWO_MONTHS:
+                return $carbon->startOfDay()->addMonthsNoOverflow(2);
+            case self::FREQUENCY_THREE_MONTHS:
+                return $carbon->startOfDay()->addMonthsNoOverflow(3);
+            case self::FREQUENCY_FOUR_MONTHS:
+                return $carbon->startOfDay()->addMonthsNoOverflow(4);
+            case self::FREQUENCY_SIX_MONTHS:
+                return $carbon->addMonthsNoOverflow(6);
+            case self::FREQUENCY_ANNUALLY:
+                return $carbon->startOfDay()->addYear();
+            case self::FREQUENCY_TWO_YEARS:
+                return $carbon->startOfDay()->addYears(2);
+            case self::FREQUENCY_THREE_YEARS:
+                return $carbon->startOfDay()->addYears(3);
+            default:
+                return null;
+        }
+    }
+
     public function remainingCycles(): int
     {
         if ($this->remaining_cycles == 0) {
@@ -673,26 +707,26 @@ class RecurringInvoice extends BaseModel
             return $data;
         }
 
-        $next_send_date = Carbon::parse($this->next_send_date_client)->copy();
+        $next_send_date = Carbon::parse($this->next_send_date_client)->startOfDay()->copy();
 
         for ($x = 0; $x < $iterations; $x++) {
             // we don't add the days... we calc the day of the month!!
             $next_due_date = $this->calculateDueDate($next_send_date->copy()->format('Y-m-d'));
             $next_due_date_string = $next_due_date ? $next_due_date->format('Y-m-d') : '';
 
-            $next_send_date = Carbon::parse($next_send_date);
+            // $next_send_date = Carbon::parse($next_send_date);
 
             $data[] = [
                 'send_date' => $next_send_date->format('Y-m-d'),
                 'due_date' => $next_due_date_string,
             ];
 
-            /* Fixes the timeshift in case the offset is negative which cause a infinite loop due to UTC +0*/
-            if ($this->client->timezone_offset() < 0) {
-                $next_send_date = $this->nextDateByFrequency($next_send_date->addDay()->format('Y-m-d'));
-            } else {
-                $next_send_date = $this->nextDateByFrequency($next_send_date->format('Y-m-d'));
-            }
+            // /* Fixes the timeshift in case the offset is negative which cause a infinite loop due to UTC +0*/
+            // if ($this->client->timezone_offset() < 0) {
+            //     $next_send_date = $this->nextSendDateClient($next_send_date->addDay()->format('Y-m-d'));
+            // } else {
+                $next_send_date = $this->nextDateByFrequencyNoOffset($next_send_date);
+            // }
         }
 
         return $data;
