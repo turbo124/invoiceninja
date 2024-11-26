@@ -7,7 +7,7 @@
 <meta name="error" content="{{ $error }}" />
 
     @if ($error)
-        <div class="alert alert-danger my-10 mx-4">{{ $error }}</div>
+        <div class="alert alert-danger my-10 mx-4">{!! $error !!}</div>
     @else
     <div class="alert alert-failure mb-4" hidden id="errors"></div>
     <div class="blockonomics-payment-wrapper">

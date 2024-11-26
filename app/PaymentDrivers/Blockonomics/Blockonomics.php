@@ -55,6 +55,7 @@ class Blockonomics implements LivewireMethodInterface
             return ['success' => false, 'message' => 'Please enter a valid API key'];
         }
 
+        // $params = config('ninja.environment') == 'development' ? '?reset=1' : '';
         $url = 'https://www.blockonomics.co/api/new_address';
 
         $response = Http::withToken($api_key)
@@ -73,8 +74,9 @@ class Blockonomics implements LivewireMethodInterface
                 return ['success' => false, 'message' => 'Address not returned'];
             }
         } else {
-            return ['success' => false, 'message' => $response->object()->message ?? 'Something went wrong'];
+            return ['success' => false, 'message' => "Could not generate new address (This may be a temporary error. Please try again). \n\n<br><br> If this continues, please ask website administrator to check blockonomics registered email address for error messages"];
         }
+        return ['success' => false, 'message' => 'Something went wrong'];
     }
 
     public function getBTCPrice()
