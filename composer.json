@@ -168,6 +168,9 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
         "post-create-project-cmd": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
@@ -215,8 +218,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/turbo124/snappdf"
+        },
+        {
+            "type": "vcs",
+            "url": "https://invoiceninja.repman.invoiceninja.com"
         }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true
+}
+e
+}
+refer-stable": true
 }
