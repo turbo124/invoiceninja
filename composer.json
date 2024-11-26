@@ -218,16 +218,8 @@
         {
             "type": "vcs",
             "url": "https://github.com/turbo124/snappdf"
-        },
-        {
-            "type": "vcs",
-            "url": "https://invoiceninja.repman.invoiceninja.com"
         }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true
-}
-e
-}
-refer-stable": true
 }
