@@ -144,13 +144,23 @@
 
                             @includeWhen(!empty($register_company->settings->client_portal_terms), 'portal.ninja2020.auth.includes.register.popup', ['property' => 'terms_of_service', 'title' => ctrans('texts.terms_of_service'), 'content' => $register_company->settings->client_portal_terms])
                             @includeWhen(!empty($register_company->settings->client_portal_privacy_policy), 'portal.ninja2020.auth.includes.register.popup', ['property' => 'privacy_policy', 'title' => ctrans('texts.privacy_policy'), 'content' => $register_company->settings->client_portal_privacy_policy])
-
                             @error('terms')
                                 <p class="text-red-600">{{ $message }}</p>
                             @enderror
                         </span>
                     </span>
 
+                    @if(config('ninja.cloudflare.turnstile.site_key'))
+                        <div class="col-span-12 flex justify-center mt-4">
+                            <div class="cf-turnstile" data-sitekey="{{ config('ninja.cloudflare.turnstile.site_key') }}"></div>
+                            @error('cf-turnstile-response')
+                                <div class="validation validation-fail">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    @endif
+                    
                     <button class="button button-primary bg-blue-600" :disabled={{ $submitsForm == 'true' ? 'isSubmitted' : 'busy'}}>
                         {{ ctrans('texts.register')}}
                     </button>
@@ -160,3 +170,6 @@
         </div>
     </div>
 @endsection
+@push('footer')
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endpush
