@@ -125,7 +125,7 @@ class CreateUbl implements ShouldQueue
 
         if ($company->country_id) {
             $country = new Country();
-            $country->setIdentificationCode($company->country->iso_3166_2);
+            $country->setIdentificationCode($company->country()->iso_3166_2);
             $address->setCountry($country);
         }
 
