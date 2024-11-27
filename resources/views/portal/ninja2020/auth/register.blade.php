@@ -150,7 +150,7 @@
                         </span>
                     </span>
 
-                    @if(config('ninja.cloudflare.turnstile.site_key'))
+                    @if($show_turnstile)
                         <div class="col-span-12 flex justify-center mt-4">
                             <div class="cf-turnstile" data-sitekey="{{ config('ninja.cloudflare.turnstile.site_key') }}"></div>
                             @error('cf-turnstile-response')

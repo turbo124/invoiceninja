@@ -44,7 +44,16 @@ class ContactRegisterController extends Controller
         $t = app('translator');
         $t->replace(Ninja::transformTranslations($company->settings));
 
-        return render('auth.register', ['register_company' => $company, 'account' => $company->account, 'submitsForm' => false]);
+        $domain_name = request()->getHost();
+
+        
+        $show_turnstile = false;
+
+        if (config('ninja.cloudflare.turnstile.site_key') && strpos($domain_name, config('ninja.app_domain')) !== false) {
+            $show_turnstile = true;
+        }
+
+        return render('auth.register', ['register_company' => $company, 'account' => $company->account, 'submitsForm' => false, 'show_turnstile' => $show_turnstile]);
     }
 
     public function register(RegisterRequest $request)

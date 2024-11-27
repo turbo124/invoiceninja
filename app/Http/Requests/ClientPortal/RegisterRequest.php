@@ -59,6 +59,8 @@ class RegisterRequest extends FormRequest
             $rules['terms'] = ['required'];
         }
 
+        $rules['cf-turnstile-response'] = ['sometimes', new \App\Http\ValidationRules\Turnstile\Turnstile];
+
         return $rules;
     }
 
