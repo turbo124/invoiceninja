@@ -191,6 +191,9 @@ class ReportCsvGenerationTest extends TestCase
      */
     private function buildData()
     {
+        if($this->account)
+            $this->account->forceDelete();
+        
         /** @var \App\Models\Account $account */
         $this->account = Account::factory()->create([
             'hosted_client_count' => 1000,
@@ -301,7 +304,7 @@ class ReportCsvGenerationTest extends TestCase
 
         $this->assertEquals('john@doe.com', $this->getFirstValueByColumn($csv, 'Contact Email'));
 
-$this->account->forceDelete();
+        $this->account->forceDelete();
 
     }
 
@@ -472,17 +475,6 @@ $this->account->forceDelete();
         );
 
         $this->assertEquals(1, $q->count());
-
-        // $q = Invoice::whereJsonContains('line_items', ['product_key' => 'Bob the builder']);
-        // $this->assertEquals(0, $q->count());
-
-        // $q = Invoice::whereJsonContains('line_items', ['product_key' => 'bob']);
-        // $this->assertEquals(0, $q->count());
-
-        // $q->forceDelete();
-
-        // Invoice::withTrashed()->cursor()->each(function ($i) { $i->forceDelete();});
-
 
 $this->account->forceDelete();
 

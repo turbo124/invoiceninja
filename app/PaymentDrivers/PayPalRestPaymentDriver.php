@@ -404,6 +404,7 @@ class PayPalRestPaymentDriver extends PayPalBasePaymentDriver
                 $this->client->company,
             );
 
+            return $payment;
         }
 
         $this->processInternallyFailedPayment($this, new \Exception('Auto billing failed.', 400));

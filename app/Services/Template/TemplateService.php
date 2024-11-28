@@ -461,7 +461,7 @@ class TemplateService
 
             $processed = [];
 
-            if (in_array($key, ['tasks', 'projects', 'aging', 'unapplied']) || !$value->first()) {
+            if (in_array($key, ['aging', 'unapplied']) || !$value->first() || (in_array($key, ['projects','tasks']) && !$value->first()->client)) {
                 return $processed;
             }
 
@@ -471,15 +471,12 @@ class TemplateService
                 'quotes' => $processed = (new HtmlEngine($value->first()->invitations()->first()))->setSettings($this->getSettings())->generateLabelsAndValues() ?? [],
                 'credits' => $processed = (new HtmlEngine($value->first()->invitations()->first()))->setSettings($this->getSettings())->generateLabelsAndValues() ?? [],
                 'payments' => $processed = (new PaymentHtmlEngine($value->first(), $value->first()->client->contacts()->first()))->setSettings($this->getSettings())->generateLabelsAndValues() ?? [], //@phpstan-ignore-line
-                'tasks' => $processed = [],
-                'projects' => $processed = [],
+                'tasks' => $processed = (new HtmlEngine($value->first()->client->invoices()->first()->invitations()->first()))->setSettings($this->getSettings())->generateLabelsAndValues() ?? [],
+                'projects' => $processed = (new HtmlEngine($value->first()->client->invoices()->first()->invitations()->first()))->setSettings($this->getSettings())->generateLabelsAndValues() ?? [],
                 'purchase_orders' => (new VendorHtmlEngine($value->first()->invitations()->first()))->setSettings($this->getSettings())->generateLabelsAndValues() ?? [],
                 'aging' => $processed = [],
                 default => $processed = [],
             };
-
-            // nlog($key);
-            // nlog($processed);
 
             return $processed;
 

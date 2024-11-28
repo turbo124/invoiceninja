@@ -106,11 +106,11 @@ class EInvoiceController extends BaseController
                 $pm->InstructionNote = $payment_means['information'];
             }
 
-            nlog($pm);
+            // nlog($pm);
             $einvoice->PaymentMeans[] = $pm;
         }
 
-        nlog($einvoice);
+        // nlog($einvoice);
 
         $stub = new \stdClass();
         $stub->Invoice = $einvoice;

@@ -70,7 +70,7 @@ class ImportCustomers
         } while ($customers->has_more);
     }
 
-    private function addCustomer(Customer $customer)
+    public function addCustomer(Customer $customer)
     {
         $account = $this->stripe->company_gateway->company->account;
 

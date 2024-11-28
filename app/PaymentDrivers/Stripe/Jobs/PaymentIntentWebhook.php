@@ -28,6 +28,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Modules\Admin\Jobs\Stripe\CampaignCharge;
 
 class PaymentIntentWebhook implements ShouldQueue
 {
@@ -59,10 +60,17 @@ class PaymentIntentWebhook implements ShouldQueue
     public function handle()
     {
         MultiDB::findAndSetDbByCompanyKey($this->company_key);
-
+        
         $company = Company::query()->where('company_key', $this->company_key)->first();
 
         foreach ($this->stripe_request as $transaction) {
+
+            $ninja_promo = data_get($transaction, 'charges.data.0.metadata.product', false);
+
+            if ($ninja_promo && class_exists(\Modules\Admin\Jobs\Stripe\CampaignCharge::class)) {
+                \Modules\Admin\Jobs\Stripe\CampaignCharge::dispatch(data_get($transaction, 'charges.data.0'));
+                continue;
+            }
 
             $payment = Payment::query()
                 ->where('company_id', $company->id)

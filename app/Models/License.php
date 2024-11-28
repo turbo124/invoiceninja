@@ -165,6 +165,16 @@ class License extends StaticModel
 
     }
 
+    public function countEntities(): int
+    {
+                
+        if (!is_array($this->entities)) {
+            return 0;
+        }
+
+        return count($this->entities);
+    }
+
     public function findEntity(string $key, mixed $value): ?TaxEntity
     {
                 

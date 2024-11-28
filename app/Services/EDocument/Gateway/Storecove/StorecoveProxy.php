@@ -67,6 +67,11 @@ class StorecoveProxy
             $response = $this->storecove->setupLegalEntity($data);
 
             if (is_array($response)) {
+
+                if ($this->company->account->companies()->whereNotNull('legal_entity_id')->count() == 1) {
+                    \Modules\Admin\Jobs\Storecove\SendWelcomeEmail::dispatch($this->company);
+                }
+
                 return $response;
             }
 

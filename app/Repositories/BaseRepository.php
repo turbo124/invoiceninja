@@ -208,7 +208,7 @@ class BaseRepository
 
         /* Model now persisted, now lets do some child tasks */
 
-        if ($model instanceof Invoice) {
+        if ($model instanceof Invoice || $model instanceof Quote) {
             $model->service()->setReminder()->save();
         }
 

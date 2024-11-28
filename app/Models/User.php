@@ -11,6 +11,8 @@
 
 namespace App\Models;
 
+use App\Casts\AsReferralEarningCollection;
+use App\DataMapper\Referral\ReferralEarning;
 use App\Jobs\Mail\NinjaMailer;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
@@ -78,6 +80,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property Carbon|null $oauth_user_token_expiry
  * @property string|null $sms_verification_code
  * @property bool $verified_phone_number
+ * @property ReferralEarning|null #referral_earnings
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\Company $company
  * @property-read mixed $hashed_id
@@ -173,6 +176,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'google_2fa_phone',
         'remember_2fa_token',
         'slack_webhook_url',
+        'referral_earnings',
     ];
 
     protected $casts = [
@@ -183,6 +187,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'deleted_at'       => 'timestamp',
         'oauth_user_token_expiry' => 'datetime',
         'referral_meta' => 'object',
+        'referral_earnings' => AsReferralEarningCollection::class,
     ];
 
     public function name()
@@ -682,5 +687,35 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return ctrans('texts.user');
     }
+
+
+
+    ////////////////////// Referral earnings ////////////////////////////////////
+
+
+
+    /**
+     * addEntity
+     *
+     * @param  ReferralEarning $entity
+     * @return void
+     */
+    public function addEntity(ReferralEarning $entity)
+    {
+        $entities = $this->referral_earnings;
+
+        if (is_array($entities)) {
+            $entities[] = $entity;
+        } else {
+            $entities = [$entity];
+        }
+
+        $this->referral_earnings = $entities;
+
+        $this->save();
+
+    }
+
+
 
 }

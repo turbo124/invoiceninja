@@ -245,6 +245,7 @@ return [
     'cloudflare' => [
         'turnstile' => [
             'secret' => env('CLOUDFLARE_SECRET', null),
+            'site_key' => env('CLOUDFLARE_SITE_KEY', false),
         ]
     ],
     'encryption' => [
