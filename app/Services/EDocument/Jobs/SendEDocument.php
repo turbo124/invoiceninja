@@ -57,7 +57,7 @@ class SendEDocument implements ShouldQueue
 
         nlog("trying");
 
-        $model = $this->entity::find($this->id);
+        $model = $this->entity::withTrashed()->find($this->id);
 
         if(isset($model->backup->guid) && is_string($model->backup->guid)){
             nlog("already sent!");
