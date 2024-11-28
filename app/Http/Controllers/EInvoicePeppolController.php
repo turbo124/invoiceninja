@@ -18,8 +18,10 @@ use App\Services\EDocument\Gateway\Storecove\Storecove;
 use App\Http\Requests\EInvoice\Peppol\DisconnectRequest;
 use App\Http\Requests\EInvoice\Peppol\AddTaxIdentifierRequest;
 use App\Http\Requests\EInvoice\Peppol\RemoveTaxIdentifierRequest;
+use App\Http\Requests\EInvoice\Peppol\RetrySendRequest;
 use App\Http\Requests\EInvoice\Peppol\ShowEntityRequest;
 use App\Http\Requests\EInvoice\Peppol\UpdateEntityRequest;
+use App\Services\EDocument\Jobs\SendEDocument;
 
 class EInvoicePeppolController extends BaseController
 {
@@ -249,6 +251,14 @@ class EInvoicePeppolController extends BaseController
         $company->save();
 
         return response()->json([]);
+    }
+
+    public function retrySend(RetrySendRequest $request)
+    {
+        
+        SendEDocument::dispatch($request->entity, $request->entity_id, auth()->user()->company()->db);
+
+        return response()->json(['message' => 'trying....', 200]);
     }
 
     private function unsetVatNumbers(mixed $taxData): mixed

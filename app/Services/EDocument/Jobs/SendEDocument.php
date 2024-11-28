@@ -59,6 +59,11 @@ class SendEDocument implements ShouldQueue
 
         $model = $this->entity::find($this->id);
 
+        if(isset($model->backup->guid) && is_string($model->backup->guid)){
+            nlog("already sent!");
+            return;
+        }
+
         if ($model->company->account->is_flagged) {
             nlog("Bad Actor");
             return; //Bad Actor present.
