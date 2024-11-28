@@ -58,6 +58,13 @@ class ContactRegisterController extends Controller
 
     public function register(RegisterRequest $request)
     {
+        
+        $company = $request->company();
+
+        if (! $company->client_can_register) {
+            abort(403, 'This page is restricted');
+        }
+
         $request->merge(['company' => $request->company()]);
 
         $service = new ClientRegisterService(
