@@ -24,6 +24,7 @@
                 <input type="hidden" name="company_key" value="{{ $register_company->company_key }}">
                 @endif
 
+                <fieldset :disabled="{{ $formed_disabled ?? 'false' }}">
                 @csrf
 
                 <div class="grid grid-cols-12 gap-4 mt-10">
@@ -166,6 +167,7 @@
                     </button>
 
                 </div>
+                </fieldset>
             </form>
         </div>
     </div>

@@ -46,14 +46,21 @@ class ContactRegisterController extends Controller
 
         $domain_name = request()->getHost();
 
-        
         $show_turnstile = false;
 
         if (config('ninja.cloudflare.turnstile.site_key') && strpos($domain_name, config('ninja.app_domain')) !== false) {
             $show_turnstile = true;
         }
 
-        return render('auth.register', ['register_company' => $company, 'account' => $company->account, 'submitsForm' => false, 'show_turnstile' => $show_turnstile]);
+        $data = [
+            'formed_disabled' => $company->account->isFreeHostedClient(),
+            'register_company' => $company, 
+            'account' => $company->account, 
+            'submitsForm' => false, 
+            'show_turnstile' => $show_turnstile
+        ];
+
+        return render('auth.register', $data);
     }
 
     public function register(RegisterRequest $request)
@@ -61,7 +68,7 @@ class ContactRegisterController extends Controller
         
         $company = $request->company();
 
-        if (! $company->client_can_register) {
+        if (! $company->client_can_register || $company->account->isFreeHostedClient()) {
             abort(403, 'This page is restricted');
         }
 
