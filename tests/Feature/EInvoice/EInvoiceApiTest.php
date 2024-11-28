@@ -50,4 +50,38 @@ class EInvoiceApiTest extends TestCase
         $response->assertStatus(200);
 
     }
+
+    public function testValidationOnRoutes()
+    {
+                
+        $data = [
+            'entity' => 'invoiceBLAH',
+            'entity_id' => $this->invoice->hashed_id
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/peppol/send', $data);
+
+        $response->assertStatus(422);
+
+    }
+
+    public function testValidationOnRoutes2()
+    {
+                
+        $data = [
+            'entity' => 'invoice',
+            'entity_id' => 'ddf8hjdfh8'
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/einvoice/peppol/send', $data);
+
+        $response->assertStatus(422);
+
+    }
 }
