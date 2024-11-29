@@ -700,7 +700,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @param  ReferralEarning $entity
      * @return void
      */
-    public function addEntity(ReferralEarning $entity)
+    public function addReferral(ReferralEarning $entity)
     {
         $entities = $this->referral_earnings;
 
@@ -716,6 +716,36 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
 
+    public function findLatestReferral(string $account_key)
+    {
 
+        return collect($this->referral_earning)
+                    ->filter(function ($earning) use ($account_key) {
+                        return $earning->account_key === $account_key;
+                    })
+                    ->sortByDesc('period_ending')
+                    ->first();
+
+    }
+
+    public function updateReferral(ReferralEarning $entity)
+    {
+        
+        $earnings = collect($this->referral_earnings);
+
+        $updated_earnings = $earnings->map(function ($earning) use ($entity) {
+            if ($earning->account_key === $entity->account_key &&
+                $earning->period_ending === $entity->period_ending) {
+                return $entity;
+            }
+
+            return $earning;
+        })->toArray();
+
+        $this->referral_earnings = $updated_earnings;
+
+        $this->save();
+
+    }
 
 }

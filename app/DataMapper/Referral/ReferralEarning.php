@@ -19,16 +19,19 @@ class ReferralEarning
 
     public string $referral_start_date = ''; // The date this referral was registered.
     
+    public string $qualifies_after = ''; // The date the payout qualifies after (5 months / 1 year)
+     
     public string $period_ending = ''; // The Date this set relates to. ie 2024-07-31 = July 2024
 
     public string $account_key = '';
 
-    public string $payout_status = ''; //pending //qualified //paidout
+    public string $payout_status = 'pending'; //pending //qualified //paidout //invalid
 
     public float $gross_amount = 0;
 
     public float $commission_amount = 0;
 
+    public string $notes = '';
     /**
      * __construct
      *
