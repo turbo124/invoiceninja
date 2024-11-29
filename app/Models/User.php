@@ -719,7 +719,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function findLatestReferral(string $account_key)
     {
 
-        return = collect($this->referral_earning)
+        return collect($this->referral_earning)
                     ->filter(function ($earning) use ($account_key) {
                         return $earning->account_key === $account_key;
                     })
