@@ -700,7 +700,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @param  ReferralEarning $entity
      * @return void
      */
-    public function addEntity(ReferralEarning $entity)
+    public function addReferral(ReferralEarning $entity)
     {
         $entities = $this->referral_earnings;
 

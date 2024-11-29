@@ -24,7 +24,6 @@ use App\Jobs\Mail\NinjaMailerObject;
 use App\Utils\Traits\User\LoginCache;
 use App\Events\Account\AccountCreated;
 use Turbo124\Beacon\Facades\LightLogs;
-use App\Jobs\Account\NewReferredAccount;
 use App\Jobs\Company\CreateCompanyToken;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\DataMapper\Analytics\AccountPlatform;
@@ -132,8 +131,8 @@ class CreateAccount
 
             (new \Modules\Admin\Jobs\Account\NinjaUser([], $sp035a66))->handle();
 
-            if($sp794f3f->referral_code)
-                NewReferredAccount::dispatch($sp794f3f->key);
+            if($sp794f3f->referral_code && Ninja::isHosted())
+                \Modules\Admin\Jobs\Account\NewReferredAccount::dispatch($sp794f3f->key);
         }
 
         VersionCheck::dispatch();
