@@ -131,8 +131,8 @@ class CreateAccount
 
             (new \Modules\Admin\Jobs\Account\NinjaUser([], $sp035a66))->handle();
 
-            if($sp794f3f->referral_code && Ninja::isHosted())
-                \Modules\Admin\Jobs\Account\NewReferredAccount::dispatch($sp794f3f->key);
+            // if($sp794f3f->referral_code && Ninja::isHosted()) //2024-11-29 - pausing on this.
+            //     \Modules\Admin\Jobs\Account\NewReferredAccount::dispatch($sp794f3f->key);
         }
 
         VersionCheck::dispatch();
