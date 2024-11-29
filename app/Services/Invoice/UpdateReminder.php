@@ -37,6 +37,8 @@ class UpdateReminder extends AbstractService
             return $this->invoice; //exit early
         }
 
+nlog($this->invoice->next_send_date);
+
         if ($this->invoice->next_send_date) {
             $this->invoice->next_send_date = null;
         }
@@ -48,6 +50,10 @@ class UpdateReminder extends AbstractService
         if (is_null($this->invoice->reminder1_sent) &&
             $this->settings->schedule_reminder1 == 'after_invoice_date') {
             $reminder_date = Carbon::parse($this->invoice->date)->startOfDay()->addDays((int)$this->settings->num_days_reminder1)->addSeconds($offset);
+
+nlog("aa");
+nlog($reminder_date->format('Y-m-d h:i:s'));
+nlog(now()->format('Y-m-d h:i:s'));
 
             if ($reminder_date->gt(now())) {
                 $date_collection->push($reminder_date);
@@ -82,6 +88,11 @@ class UpdateReminder extends AbstractService
         if (is_null($this->invoice->reminder2_sent) &&
             $this->settings->schedule_reminder2 == 'after_invoice_date') {
             $reminder_date = Carbon::parse($this->invoice->date)->startOfDay()->addDays((int)$this->settings->num_days_reminder2)->addSeconds($offset);
+
+            
+nlog("bb");
+nlog($reminder_date->format('Y-m-d h:i:s'));
+nlog(now()->format('Y-m-d h:i:s'));
 
             if ($reminder_date->gt(now())) {
                 $date_collection->push($reminder_date);
@@ -139,6 +150,11 @@ class UpdateReminder extends AbstractService
         if (is_null($this->invoice->reminder3_sent) &&
             ($this->invoice->partial_due_date || $this->invoice->due_date) &&
             $this->settings->schedule_reminder3 == 'after_due_date') {
+
+                
+nlog("cc");
+nlog($reminder_date->format('Y-m-d h:i:s'));
+nlog(now()->format('Y-m-d h:i:s'));
 
             $partial_or_due_date = ($this->invoice->partial > 0 && isset($this->invoice->partial_due_date)) ? $this->invoice->partial_due_date : $this->invoice->due_date;
             $reminder_date = Carbon::parse($partial_or_due_date)->startOfDay()->addDays((int)$this->settings->num_days_reminder3)->addSeconds($offset);

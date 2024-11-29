@@ -287,6 +287,8 @@ class TemplateService
     public function processData($data): self
     {
         $this->data = $this->preProcessDataBlocks($data);
+        
+        // nlog($this->data);
 
         return $this;
     }
