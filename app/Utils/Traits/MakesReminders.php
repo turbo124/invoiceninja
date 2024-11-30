@@ -25,7 +25,7 @@ trait MakesReminders
      * @param string $num_days_reminder
      * @return ?bool
      */
- public function inReminderWindow($schedule_reminder, $num_days_reminder)
+    public function inReminderWindow($schedule_reminder, $num_days_reminder)
     {
         /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this **/
         $offset = $this->client->timezone_offset();
@@ -33,40 +33,39 @@ trait MakesReminders
         switch ($schedule_reminder) {
             case 'after_invoice_date':
                 // return Carbon::parse($this->date)->addDays((int)$num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
-return Carbon::parse($this->date)
-->addDays((int)$num_days_reminder)
-->startOfDay()
-->toDateString() ===
-    now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
+
+                return Carbon::parse($this->date)
+                            ->addDays((int)$num_days_reminder)
+                            ->startOfDay()
+                            ->toDateString() ===
+                                now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
 
             case 'before_due_date':
                 $partial_or_due_date = ($this->partial > 0 && isset($this->partial_due_date)) ? $this->partial_due_date : $this->due_date;
                 // return Carbon::parse($partial_or_due_date)->subDays((int)$num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
 
-                
-                
-return Carbon::parse($partial_or_due_date)
-->subDays((int)$num_days_reminder)
-->startOfDay()
-->toDateString() ===
-    now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
+                return Carbon::parse($partial_or_due_date)
+                            ->subDays((int)$num_days_reminder)
+                            ->startOfDay()
+                            ->toDateString() ===
+                                now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
 
 
             case 'after_due_date':
                 $partial_or_due_date = ($this->partial > 0 && isset($this->partial_due_date)) ? $this->partial_due_date : $this->due_date;
                 // return Carbon::parse($partial_or_due_date)->addDays((int)$num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
 
-
-return Carbon::parse($partial_or_due_date)
-->addDays((int)$num_days_reminder)
-->startOfDay()
-->toDateString() ===
-    now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
+                return Carbon::parse($partial_or_due_date)
+                            ->addDays((int)$num_days_reminder)
+                            ->startOfDay()
+                            ->toDateString() ===
+                                now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
 
             default:
                 return null;
         }
     }
+
     public function calculateTemplate(string $entity_string): string
     {
 
