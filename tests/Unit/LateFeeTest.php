@@ -404,7 +404,9 @@ class LateFeeTest extends TestCase
     public function testLateFeeAdded()
     {
 
-        $this->travelTo(now()->subDays(15));
+        $this->travelTo(now()->startOfDay()->subDays(10));
+        nlog("travelling back to ");
+        nlog(now()->toDateTimeString());
 
         $settings = CompanySettings::defaults();
         $settings->client_online_payment_notification = false;
@@ -427,8 +429,8 @@ class LateFeeTest extends TestCase
             'balance' => 0,
             'status_id' => 2,
             'total_taxes' => 1,
-            'date' => now()->format('Y-m-d'),
-            'due_date' => now()->addDays(10)->format('Y-m-d'),
+            'date' => now()->startOfDay()->format('Y-m-d'),
+            'due_date' => now()->startOfDay()->addDays(10)->format('Y-m-d'),
             'terms' => 'nada',
             'discount' => 0,
             'tax_rate1' => 0,
@@ -439,13 +441,23 @@ class LateFeeTest extends TestCase
             'tax_name3' => '',
             'uses_inclusive_taxes' => false,
             'line_items' => $this->buildLineItems(),
+            'last_sent_date' => now()->format('Y-m-d'),
         ]);
 
         $i = $i->calc()->getInvoice();
-        $i->service()->markSent()->setReminder()->applyNumber()->createInvitations()->save();
+        $i->service()->markSent()->setReminder($client->getMergedSettings())->applyNumber()->createInvitations()->save();
 
-        // $this->travelBack();
-        $this->travelTo(now()->addDays(20)->startOfDay()->format('Y-m-d'));
+        $this->assertNotNull($i->next_send_date);
+
+        nlog($i->withoutRelations()->toArray());
+
+        $this->travelBack();
+        // $this->travelTo(now()->addDays(20)->startOfDay()->format('Y-m-d'));
+        $this->travelTo(now()->addDays(20)->startOfDay());
+
+        nlog("time traveller");
+        nlog(now()->format('Y-m-d h:i:s A'));
+
         $i = $i->fresh();
 
         $this->assertEquals(10, $i->amount);
@@ -455,8 +467,9 @@ class LateFeeTest extends TestCase
         $reflectionMethod->setAccessible(true);
         $reflectionMethod->invokeArgs(new ReminderJob(), [$i]);
 
-        $i->fresh();
+        $i = $i->refresh();
 
+        $this->assertNotNull($i->reminder1_sent);
         $this->assertEquals(20, $i->balance);
 
         $this->travelBack();

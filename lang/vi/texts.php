@@ -3899,7 +3899,7 @@ $lang = array(
     'notification_invoice_reminder1_sent_subject' => 'Nhắc nhở 1 cho Hóa đơn :invoice đã được gửi đến :client',
     'notification_invoice_reminder2_sent_subject' => 'Lời nhắc 2 cho Hóa đơn :invoice đã được gửi đến :client',
     'notification_invoice_reminder3_sent_subject' => 'Nhắc nhở 3 cho Hóa đơn :invoice đã được gửi đến :client',
-    'notification_invoice_custom_sent_subject' => 'Custom reminder was sent to :client',
+    'notification_invoice_custom_sent_subject' => 'Lời nhắc Phong tục đã được gửi đến :client',
     'notification_invoice_reminder_endless_sent_subject' => 'Nhắc nhở vô tận cho Hóa đơn :invoice đã được gửi đến :client',
     'assigned_user' => 'Người dùng được chỉ định',
     'setup_steps_notice' => 'Để tiến hành bước tiếp theo, hãy đảm bảo bạn kiểm tra từng phần.',
@@ -5322,7 +5322,7 @@ $lang = array(
     'applies_to' => 'Áp dụng cho',
     'accept_purchase_order' => 'Chấp nhận đặt hàng',
     'round_to_seconds' => 'Làm tròn đến giây',
-    'activity_142' => 'Quote :quote reminder 1 sent',
+    'activity_142' => 'báo giá :quote lời nhắc 1 đã gửi',
     'activity_143' => 'Hóa đơn tự động đã thành công cho hóa đơn :invoice',
     'activity_144' => 'Hóa đơn tự động không thành công cho hóa đơn :invoice . :notes',
     'activity_145' => 'E- Hóa đơn :invoice cho :client đã được gửi. :ghi chú',
@@ -5475,8 +5475,8 @@ $lang = array(
     'delete_identifier_description' => 'Xóa mã định danh này sẽ xóa mã định danh khỏi hệ thống. Hãy đảm bảo đây là hành động mong muốn trước khi tiếp tục.',
     'einvoice_something_went_wrong' => 'Ối! Đã xảy ra lỗi. liên hệ với chúng tôi tại liên hệ @invoiceninja.com để biết thêm thông tin.',
     'download_ready' => 'Tải xuống của bạn đã sẵn sàng! [ :message ]',
-    'notification_quote_reminder1_sent_subject' => 'Reminder 1 for Quote :invoice was sent to :client',
-    'custom_reminder_sent' => 'Custom reminder was sent to :client',
+    'notification_quote_reminder1_sent_subject' => 'Lời nhắc 1 cho báo giá :invoice đã được gửi đến :client',
+    'custom_reminder_sent' => 'Lời nhắc Phong tục đã được gửi đến :client',
 );
 
 return $lang;

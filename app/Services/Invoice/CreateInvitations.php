@@ -33,12 +33,9 @@ class CreateInvitations extends AbstractService
 
         if ($contacts->count() == 0) {
             $this->createBlankContact();
-
-            $this->invoice->refresh();
-            $contacts = $this->invoice->client->contacts;
         }
 
-        $contacts->each(function ($contact) {
+        $this->invoice->client->contacts()->each(function ($contact) {
             $invitation = InvoiceInvitation::query()->where('company_id', $this->invoice->company_id)
                                         ->where('client_contact_id', $contact->id)
                                         ->where('invoice_id', $this->invoice->id)
@@ -81,6 +78,9 @@ class CreateInvitations extends AbstractService
             $ii->client_contact_id = $contact->id;
             $ii->save();
         }
+
+nlog("invitations");
+nlog($this->invoice->next_send_date);
 
         return $this->invoice;
     }
