@@ -79,9 +79,6 @@ class CreateInvitations extends AbstractService
             $ii->save();
         }
 
-nlog("invitations");
-nlog($this->invoice->next_send_date);
-
         return $this->invoice;
     }
 

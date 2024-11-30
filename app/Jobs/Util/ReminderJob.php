@@ -126,14 +126,13 @@ class ReminderJob implements ShouldQueue
             $reminder_template = $invoice->calculateTemplate('invoice');
             nrlog("#{$invoice->number} => reminder template = {$reminder_template}");
             $invoice->service()->touchReminder($reminder_template)->save();
+
             $fees = $this->calcLateFee($invoice, $reminder_template);
-nlog($fees);
+
             if ($invoice->isLocked()) {
-            nlog("invoice is locked - adding fee to new invoice");
+                nlog("invoice is locked - adding fee to new invoice");
                 return $this->addFeeToNewInvoice($invoice, $reminder_template, $fees);
             }
-
-            nlog("add fee to existing invoice");
 
             $invoice = $this->setLateFee($invoice, $fees[0], $fees[1]);
 
@@ -288,7 +287,7 @@ nlog($fees);
      */
     private function setLateFee($invoice, $amount, $percent): Invoice
     {
-nlog("woot");
+        
         $temp_invoice_balance = $invoice->balance;
 
         if ($amount <= 0 && $percent <= 0) {
