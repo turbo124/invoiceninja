@@ -368,7 +368,8 @@ nlog("dk");
         $this->assertNotNull($invoice->reminder_last_sent);
 
         //check next send date is on day "10"
-        $this->assertEquals(now()->addDays(5), $invoice->next_send_date);
+        $this->assertEquals(now()->addDays(5)->toDateTimeString(), \Carbon\Carbon::parse($invoice->next_send_date)->subSeconds($invoice->client->timezone_offset()));
+
 
         $this->travelTo(now()->copy()->addDays(5)->startOfDay()->addHours(5));
         $this->assertEquals('2024-03-11', now()->format('Y-m-d'));

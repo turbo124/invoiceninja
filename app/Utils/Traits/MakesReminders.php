@@ -38,15 +38,15 @@ trait MakesReminders
         switch ($schedule_reminder) {
             case 'after_invoice_date':
                 // return Carbon::parse($this->date)->addDays((int)$num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
-  
-return Carbon::parse($this->date)
+nlog("insideXX");
+$hit = Carbon::parse($this->date)
 ->addDays((int)$num_days_reminder)
 ->startOfDay()
-->eq(
-    now()->setTimezone($this->client->timezone()->name)->startOfDay()
-);
+->toDateString() ===
+    now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
 
-
+    nlog($hit);
+    return $hit;
             case 'before_due_date':
                 $partial_or_due_date = ($this->partial > 0 && isset($this->partial_due_date)) ? $this->partial_due_date : $this->due_date;
                 // return Carbon::parse($partial_or_due_date)->subDays((int)$num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
@@ -56,9 +56,8 @@ return Carbon::parse($this->date)
 return Carbon::parse($partial_or_due_date)
 ->addDays((int)$num_days_reminder)
 ->startOfDay()
-->eq(
-    now()->setTimezone($this->client->timezone()->name)->startOfDay()
-);
+->toDateString() ===
+    now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
 
 
             case 'after_due_date':
@@ -69,9 +68,8 @@ return Carbon::parse($partial_or_due_date)
 return Carbon::parse($partial_or_due_date)
 ->addDays((int)$num_days_reminder)
 ->startOfDay()
-->eq(
-    now()->setTimezone($this->client->timezone()->name)->startOfDay()
-);
+->toDateString() ===
+    now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
 
             default:
                 return null;
@@ -92,21 +90,31 @@ return Carbon::parse($partial_or_due_date)
             $client->getSetting('schedule_reminder1'),
             $client->getSetting('num_days_reminder1')
         ) && ! $this->reminder1_sent) {
+            nlog("reminder1 miss");
             return 'reminder1';
         } elseif ($this->inReminderWindow(
             $client->getSetting('schedule_reminder2'),
             $client->getSetting('num_days_reminder2')
         ) && ! $this->reminder2_sent) {
+            
+nlog("reminder2 hti");
+
             return 'reminder2';
         } elseif ($this->inReminderWindow(
             $client->getSetting('schedule_reminder3'),
             $client->getSetting('num_days_reminder3')
         ) && ! $this->reminder3_sent) {
+            
+nlog("reminder3 hti");
+
             return 'reminder3';
         } elseif ($this->checkEndlessReminder(
             $this->reminder_last_sent,
             $client->getSetting('endless_reminder_frequency_id')
         )) {
+            
+nlog("endless reminder1 hti");
+
             return 'endless_reminder';
         } else {
             return $entity_string;
