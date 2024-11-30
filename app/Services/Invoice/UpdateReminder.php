@@ -151,11 +151,6 @@ nlog(now()->format('Y-m-d h:i:s'));
             ($this->invoice->partial_due_date || $this->invoice->due_date) &&
             $this->settings->schedule_reminder3 == 'after_due_date') {
 
-                
-nlog("cc");
-nlog($reminder_date->format('Y-m-d h:i:s'));
-nlog(now()->format('Y-m-d h:i:s'));
-
             $partial_or_due_date = ($this->invoice->partial > 0 && isset($this->invoice->partial_due_date)) ? $this->invoice->partial_due_date : $this->invoice->due_date;
             $reminder_date = Carbon::parse($partial_or_due_date)->startOfDay()->addDays((int)$this->settings->num_days_reminder3)->addSeconds($offset);
             // nlog("6. {$reminder_date->format('Y-m-d')}");

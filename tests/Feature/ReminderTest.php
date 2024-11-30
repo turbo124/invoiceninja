@@ -164,7 +164,7 @@ class ReminderTest extends TestCase
 
     public function testReminderScheduleNyEmailTemplate()
     {
-             nlog("1");   
+         
         $settings = CompanySettings::defaults();
         $settings->timezone_id = '15';
         $settings->entity_send_time = 6;
@@ -208,9 +208,7 @@ class ReminderTest extends TestCase
 
     public function testReminderScheduleNy()
     {
-                
-nlog("2");
-
+          
         $settings = CompanySettings::defaults();
         $settings->timezone_id = '15';
         $settings->entity_send_time = 6;
@@ -330,8 +328,6 @@ nlog("2");
             'last_sent_date' => '2024-03-01',
         ]);
 
-nlog("dk");       
-
         //baseline checks pass
         $invoice->service()->createInvitations()->markSent()->save();
         $this->assertGreaterThan(0, $invoice->balance);
@@ -361,15 +357,12 @@ nlog("dk");
             $x = (bool)$invoice->reminder1_sent;
             $xx++;
 
-        } while($x === false || $xx<500);
-
-        nlog($invoice->toArray());
+        } while($x === false);
 
         $this->assertNotNull($invoice->reminder_last_sent);
 
         //check next send date is on day "10"
-        $this->assertEquals(now()->addDays(5)->toDateTimeString(), \Carbon\Carbon::parse($invoice->next_send_date)->subSeconds($invoice->client->timezone_offset()));
-
+        $this->assertEquals(now()->addDays(5)->toDateTimeString(), $invoice->next_send_date);
 
         $this->travelTo(now()->copy()->addDays(5)->startOfDay()->addHours(5));
         $this->assertEquals('2024-03-11', now()->format('Y-m-d'));
@@ -727,6 +720,8 @@ nlog("dk");
         $this->invoice->next_send_date = null;
         $this->invoice->date = now()->format('Y-m-d');
         $this->invoice->due_date = Carbon::now()->addDays(5)->format('Y-m-d');
+        $this->invoice->last_sent_date = now()->format('Y-m-d');
+        $this->invoice->status_id;
         $this->invoice->save();
 
         $settings = $this->company->settings;
@@ -755,14 +750,16 @@ nlog("dk");
         $this->invoice = $this->invoice->service()->markSent()->save();
         $this->invoice->service()->setReminder($client_settings)->save();
 
+        $this->assertTrue($this->invoice->isPayable());
+
         $next_send_date = Carbon::parse($this->invoice->next_send_date);
         $calculatedReminderDate = Carbon::parse($this->invoice->due_date)->subDays(4)->addSeconds($this->invoice->client->timezone_offset());
 
-        // nlog($next_send_date->format('Y-m-d h:i:s'));
-        // nlog($calculatedReminderDate->format('Y-m-d h:i:s'));
+        $this->assertEquals($calculatedReminderDate->toDateTimeString(), $this->invoice->next_send_date);
 
-        $this->travelTo($calculatedReminderDate);
+        $this->travelTo($next_send_date);
 
+        nlog("xcx");
         $reminder_template = $this->invoice->calculateTemplate('invoice');
 
         $this->assertEquals('reminder1', $reminder_template);
@@ -770,6 +767,7 @@ nlog("dk");
         $this->assertTrue($next_send_date->eq($calculatedReminderDate));
 
         $this->invoice->service()->touchReminder($reminder_template)->save();
+
 
         $this->assertNotNull($this->invoice->last_sent_date);
         $this->assertNotNull($this->invoice->reminder1_sent);

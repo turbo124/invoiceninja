@@ -38,8 +38,7 @@ trait MakesReminders
         switch ($schedule_reminder) {
             case 'after_invoice_date':
                 // return Carbon::parse($this->date)->addDays((int)$num_days_reminder)->startOfDay()->addSeconds($offset)->isSameDay(Carbon::now());
-nlog("insideXX");
-$hit = Carbon::parse($this->date)
+return Carbon::parse($this->date)
 ->addDays((int)$num_days_reminder)
 ->startOfDay()
 ->toDateString() ===
@@ -54,7 +53,7 @@ $hit = Carbon::parse($this->date)
                 
                 
 return Carbon::parse($partial_or_due_date)
-->addDays((int)$num_days_reminder)
+->subDays((int)$num_days_reminder)
 ->startOfDay()
 ->toDateString() ===
     now()->setTimezone($this->client->timezone()->name)->startOfDay()->toDateString();
