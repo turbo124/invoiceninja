@@ -80,7 +80,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property Carbon|null $oauth_user_token_expiry
  * @property string|null $sms_verification_code
  * @property bool $verified_phone_number
- * @property ReferralEarning|null $referral_earnings
+ * @property array|null $referral_earnings
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\Company $company
  * @property-read mixed $hashed_id
