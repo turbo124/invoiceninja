@@ -89,7 +89,7 @@ class StorePurchaseOrderRequest extends Request
         $input['amount'] = 0;
         $input['balance'] = 0;
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
 
@@ -103,7 +103,7 @@ class StorePurchaseOrderRequest extends Request
         if (array_key_exists('exchange_rate', $input) && is_null($input['exchange_rate'])) {
             $input['exchange_rate'] = 1;
         }
-        
+
         if (isset($input['footer']) && $this->hasHeader('X-REACT')) {
             $input['footer'] = str_replace("\n", "", $input['footer']);
         }

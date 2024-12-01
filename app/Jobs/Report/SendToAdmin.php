@@ -61,14 +61,14 @@ class SendToAdmin implements ShouldQueue
         $files = [];
         $files[] = ['file' => $csv, 'file_name' => "{$this->file_name}", 'mime' => 'text/csv'];
 
-        if(in_array(get_class($export), [ARDetailReport::class, ARSummaryReport::class])) {
-            $pdf = base64_encode($export->getPdf());
-            $files[] = ['file' => $pdf, 'file_name' => str_replace(".csv", ".pdf", $this->file_name), 'mime' => 'application/pdf'];
-        }
+        // if(in_array(get_class($export), [ARDetailReport::class, ARSummaryReport::class])) {
+        //     $pdf = base64_encode($export->getPdf());
+        //     $files[] = ['file' => $pdf, 'file_name' => str_replace(".csv", ".pdf", $this->file_name), 'mime' => 'application/pdf'];
+        // }
 
         $user = $this->company->owner();
 
-        if(isset($this->request['user_id'])) {
+        if (isset($this->request['user_id'])) {
             $user = User::find($this->request['user_id']) ?? $this->company->owner();
         }
 
@@ -77,7 +77,7 @@ class SendToAdmin implements ShouldQueue
         $nmo->company = $this->company;
         $nmo->settings = $this->company->settings;
         $nmo->to_user = $user;
-    
+
         try {
             (new NinjaMailerJob($nmo))->handle();
         } catch (\Throwable $th) {

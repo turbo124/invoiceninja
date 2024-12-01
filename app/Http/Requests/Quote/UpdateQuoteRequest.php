@@ -96,10 +96,10 @@ class UpdateQuoteRequest extends Request
             $input['exchange_rate'] = 1;
         }
 
-        if(isset($input['partial']) && $input['partial'] == 0) {
+        if (isset($input['partial']) && $input['partial'] == 0) {
             $input['partial_due_date'] = null;
         }
-        
+
         if (isset($input['footer']) && $this->hasHeader('X-REACT')) {
             $input['footer'] = str_replace("\n", "", $input['footer']);
         }

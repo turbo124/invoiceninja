@@ -67,6 +67,7 @@ class Backup extends BaseModel
         Storage::disk(config('filesystems.default'))->put($file_path, $html);
 
         $this->filename = $file_path;
+        $this->disk = config('filesystems.default');
         $this->save();
     }
 

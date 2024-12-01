@@ -133,7 +133,7 @@ class PdfBuilder
 
         }
 
-        foreach($contents as $key => $content) {
+        foreach ($contents as $key => $content) {
             $content->parentNode->replaceChild($replacements[$key], $content);
         }
 
@@ -367,15 +367,15 @@ class PdfBuilder
 
                 $this->payment_amount_total += $payment->pivot->amount;
 
-                if($payment->pivot->refunded > 0){
+                if ($payment->pivot->refunded > 0) {
 
                     $refund_date = $payment->date;
 
-                    if($payment->refund_meta && is_array($payment->refund_meta)){
+                    if ($payment->refund_meta && is_array($payment->refund_meta)) {
 
-                        $refund_array = collect($payment->refund_meta)->first(function ($meta) use($invoice){
-                            foreach($meta['invoices'] as $refunded_invoice){
-                                
+                        $refund_array = collect($payment->refund_meta)->first(function ($meta) use ($invoice) {
+                            foreach ($meta['invoices'] as $refunded_invoice) {
+
                                 if ($refunded_invoice['invoice_id'] == $invoice->id) {
                                     return true;
                                 }
@@ -431,9 +431,9 @@ class PdfBuilder
         ];
     }
 
-    public function statementUnappliedPaymentTableTotals():array
+    public function statementUnappliedPaymentTableTotals(): array
     {
-                
+
         if (is_null($this->service->options['unapplied']) || !$this->service->options['unapplied']->first()) {
             return [];
         }
@@ -486,10 +486,10 @@ class PdfBuilder
 
             $tbody[] = $element;
 
-            $this->unapplied_total += round($unapplied_payment->amount - $unapplied_payment->applied,2);
+            $this->unapplied_total += round($unapplied_payment->amount - $unapplied_payment->applied, 2);
 
         }
-            
+
         return [
             ['element' => 'thead', 'elements' => $this->buildTableHeader('statement_unapplied')],
             ['element' => 'tbody', 'elements' => $tbody],
@@ -1138,6 +1138,11 @@ class PdfBuilder
         // Some variables don't map 1:1 to table columns. This gives us support for such cases.
         $aliases = [
             '$quote.balance_due' => 'partial',
+            '$purchase_order.po_number' => 'number',
+            '$purchase_order.total' => 'amount',
+            '$purchase_order.due_date' => 'due_date',
+            '$purchase_order.balance_due' => 'balance_due',
+            '$credit.valid_until' => 'due_date',
         ];
 
         try {
@@ -1472,6 +1477,11 @@ class PdfBuilder
     public function deliveryNoteDetails(): array
     {
         $variables = $this->service->config->pdf_variables['invoice_details'];
+
+        // $_v = $this->service->html_variables;
+
+        // $_v['labels']['$invoice.date_label'] = ctrans('text.date');
+        // $this->service->html_variables = $_v;
 
         $variables = array_filter($variables, function ($m) {
             return !in_array($m, ['$invoice.balance_due', '$invoice.total']);

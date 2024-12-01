@@ -37,7 +37,7 @@ class RegisterOrLogin extends Component
 
     public ?int $otp;
 
-    public array $formData = []; 
+    public array $formData = [];
 
     public array $state = [
         'otp' => false, // Use as preference. E-mail/password or OTP.
@@ -173,7 +173,7 @@ class RegisterOrLogin extends Component
 
     public function register(array $data): void
     {
-        
+
         $data = array_merge($data, [
            'country_id' => $this->formData['country_id'] ?? null,
            'shipping_country_id' => $this->formData['shipping_country_id'] ?? null,
@@ -260,7 +260,7 @@ class RegisterOrLogin extends Component
 
     public function mount()
     {
-        
+
         if (auth()->guard('contact')->check()) {
             // $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');

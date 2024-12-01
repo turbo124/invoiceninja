@@ -62,7 +62,7 @@ class ActivityController extends BaseController
                                 ->company()
                                 ->take($default_activities);
 
-        if($request->has('reactv2')) {
+        if ($request->has('reactv2')) {
 
             /** @var \App\Models\User auth()->user() */
             $user = auth()->user();
@@ -143,7 +143,7 @@ class ActivityController extends BaseController
             } else {
                 $html_backup = file_get_contents(Storage::disk(config('filesystems.default'))->path($backup->filename));
             }
-        } else { //failed
+        } else { 
             return response()->json(['message' => ctrans('texts.no_backup_exists'), 'errors' => new stdClass()], 404);
         }
 

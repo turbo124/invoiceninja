@@ -90,7 +90,7 @@ trait ChartQueries
 
         $user_filter = $this->is_admin ? '' : 'AND expenses.user_id = '.$this->user->id;
 
-        
+
         return DB::select("
                     SELECT
                     sum(expenses.amount) as total,
@@ -207,8 +207,8 @@ trait ChartQueries
 
         $user_filter = $this->is_admin ? '' : 'AND payments.user_id = '.$this->user->id;
 
-        
-return DB::select("
+
+        return DB::select("
             SELECT
             sum(payments.amount - payments.refunded) as total,
             payments.date
@@ -221,12 +221,12 @@ return DB::select("
             AND IFNULL(payments.currency_id, :company_currency) = :currency_id
             GROUP BY payments.date
         ", [
-    'company_currency' => $this->company->settings->currency_id,
-    'currency_id' => $currency_id,
-    'company_id' => $this->company->id,
-    'start_date' => $start_date,
-    'end_date' => $end_date,
-]);
+            'company_currency' => $this->company->settings->currency_id,
+            'currency_id' => $currency_id,
+            'company_id' => $this->company->id,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ]);
 
         // return DB::select("
         //     SELECT
@@ -421,8 +421,8 @@ return DB::select("
     {
         $user_filter = $this->is_admin ? '' : 'AND clients.user_id = '.$this->user->id;
 
-        
-return DB::select("
+
+        return DB::select("
             SELECT
             sum(invoices.balance) as total,
             invoices.date
@@ -438,12 +438,12 @@ return DB::select("
             AND IFNULL(CAST(JSON_UNQUOTE(JSON_EXTRACT(clients.settings, '$.currency_id')) AS SIGNED), :company_currency) = :currency_id
             GROUP BY invoices.date
         ", [
-    'company_currency' => (int) $this->company->settings->currency_id,
-    'currency_id' => $currency_id,
-    'company_id' => $this->company->id,
-    'start_date' => $start_date,
-    'end_date' => $end_date,
-]);
+            'company_currency' => (int) $this->company->settings->currency_id,
+            'currency_id' => $currency_id,
+            'company_id' => $this->company->id,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ]);
 
         // return DB::select("
         //     SELECT

@@ -240,6 +240,8 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::post('einvoice/peppol/disconnect', [EInvoicePeppolController::class, 'disconnect'])->name('einvoice.peppol.disconnect');
     Route::put('einvoice/peppol/update', [EInvoicePeppolController::class, 'updateLegalEntity'])->name('einvoice.peppol.update_legal_entity');
     Route::post('einvoice/peppol/add_additional_legal_identifier', [EInvoicePeppolController::class, 'addAdditionalTaxIdentifier'])->name('einvoice.peppol.add_additional_legal_identifier');
+    Route::delete('einvoice/peppol/remove_additional_legal_identifier', [EInvoicePeppolController::class, 'removeAdditionalTaxIdentifier'])->name('einvoice.peppol.remove_additional_legal_identifier');
+    Route::post('einvoice/peppol/send', [EInvoicePeppolController::class, 'retrySend'])->name('einvoice.peppol.retry_send');
 
     Route::post('einvoice/token/update', EInvoiceTokenController::class)->name('einvoice.token.update');
     Route::get('einvoice/quota', [EInvoiceController::class, 'quota'])->name('einvoice.quota');
@@ -264,7 +266,7 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::post('import', [ImportController::class, 'import'])->name('import.import');
     Route::post('import_json', [ImportJsonController::class, 'import'])->name('import.import_json');
     Route::post('preimport', [ImportController::class, 'preimport'])->name('import.preimport');
-    ;
+    
     Route::resource('invoices', InvoiceController::class); // name = (invoices. index / create / show / update / destroy / edit
     Route::get('invoices/{invoice}/delivery_note', [InvoiceController::class, 'deliveryNote'])->name('invoices.delivery_note');
     Route::get('invoices/{invoice}/{action}', [InvoiceController::class, 'action'])->name('invoices.action');

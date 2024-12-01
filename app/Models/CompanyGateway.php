@@ -451,7 +451,7 @@ class CompanyGateway extends BaseModel
                 } else {
                     $fee += round(($amount * $fees_and_limits->fee_percent / 100), 2);
                 }
-                
+
             }
         }
         /* Cap fee if we have to here. */
@@ -481,7 +481,7 @@ class CompanyGateway extends BaseModel
 
     public function getSettings()
     {
-        return $this->settings ?? new \stdClass;
+        return $this->settings ?? new \stdClass();
     }
 
     public function setSettings($settings)

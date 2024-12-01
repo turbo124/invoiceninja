@@ -80,7 +80,7 @@ class BlockonomicsPaymentDriver extends BaseDriver
 
     public function processPaymentResponse($request)
     {
-        
+
         $this->init();
 
         return $this->payment_method->paymentResponse($request);
@@ -88,7 +88,7 @@ class BlockonomicsPaymentDriver extends BaseDriver
 
     public function processWebhookRequest(PaymentWebhookRequest $request)
     {
-        
+
         $company = $request->getCompany();
 
         $url_callback_secret = $request->secret;
@@ -102,12 +102,12 @@ class BlockonomicsPaymentDriver extends BaseDriver
         $value = $request->value;
         $status = $request->status;
         $addr = $request->addr;
-                
+
         $payment = Payment::query()
                             ->where('company_id', $company->id)
                             ->where('transaction_reference', $txid)
                             ->firstOrFail();
-        
+
         if (!$payment) {
             return response()->json([], 200);
             // TODO: Implement logic to create new payment in case user sends payment to the address after closing the payment page
@@ -127,7 +127,7 @@ class BlockonomicsPaymentDriver extends BaseDriver
                 break;
         }
 
-        if($payment->status_id == $statusId) {
+        if ($payment->status_id == $statusId) {
             return response()->json([], 200);
         } else {
             $payment->status_id = $statusId;

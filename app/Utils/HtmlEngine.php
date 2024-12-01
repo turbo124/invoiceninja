@@ -229,8 +229,9 @@ class HtmlEngine
 
             $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> ' . ctrans('texts.paid') .'</div>', 'label' => ''];
 
-            if($this->entity->status_id == 5)
+            if ($this->entity->status_id == 5) {
                 $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> ' . ctrans('texts.cancelled') .'</div>', 'label' => ''];
+            }
 
             $data['$show_paid_stamp'] = ['value' => in_array($this->entity->status_id, [4,5]) && $this->settings->show_paid_stamp ? 'flex' : 'none', 'label' => ''];
 
@@ -239,7 +240,7 @@ class HtmlEngine
             if (strlen($this->company->getSetting('qr_iban')) > 5) {
                 try {
                     $data['$swiss_qr'] = ['value' => (new SwissQrGenerator($this->entity, $this->company))->run(), 'label' => ''];
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $data['$swiss_qr'] = ['value' => '', 'label' => ''];
                 }
             }
@@ -394,6 +395,8 @@ class HtmlEngine
         $data['$credit.total'] = &$data['$credit.total'];
         $data['$credit.po_number'] = &$data['$invoice.po_number'];
         $data['$credit.date'] = ['value' => $this->translateDate($this->entity->date, $this->client->date_format(), $this->client->locale()), 'label' => ctrans('texts.credit_date')];
+        $data['$credit.valid_until'] = ['value' => $this->translateDate($this->entity->due_date, $this->client->date_format(), $this->client->locale()), 'label' => ctrans('texts.valid_until')];
+
         $data['$balance'] = ['value' => Number::formatMoney($this->getBalance(), $this->client) ?: ' ', 'label' => ctrans('texts.balance')];
         $data['$credit.balance'] = ['value' => Number::formatMoney($this->entity_calc->getBalance(), $this->client) ?: ' ', 'label' => ctrans('texts.credit_balance')];
         $data['$client.credit_balance'] = &$data['$credit.balance'];
@@ -571,7 +574,7 @@ class HtmlEngine
 
         $data['$spc_qr_code'] = ['value' => $this->company->present()->getSpcQrCode($this->client->currency()->code, $this->entity->number, $this->entity->balance, $this->helpers->formatCustomFieldValue($this->company->custom_fields, 'company1', $this->settings->custom_value1, $this->client)), 'label' => ''];
 
-        if(Ninja::isHosted()) {
+        if (Ninja::isHosted()) {
             $logo = $this->company->present()->logo($this->settings);
         } else {
             $logo = $this->company->present()->logo_base64($this->settings);
@@ -642,7 +645,7 @@ class HtmlEngine
         $data['$task.task4'] = ['value' => '', 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'task4')];
 
 
-        if($this->entity->vendor) {
+        if ($this->entity->vendor) {
 
             $data['$vendor_name'] = ['value' => $this->entity->vendor->present()->name() ?: '&nbsp;', 'label' => ctrans('texts.vendor_name')];
             $data['$vendor.name'] = &$data['$vendor_name'];
@@ -672,6 +675,10 @@ class HtmlEngine
             $data['$contact.signature'] = ['value' => $this->invitation->signature_base64, 'label' => ctrans('texts.signature')];
         } else {
             $data['$contact.signature'] = ['value' => '', 'label' => ''];
+        }
+
+        if($this->entity->quote){
+            $data['$quote.reference'] = ['value' => $this->entity->quote->number ?: '&nbsp;', 'label' => ctrans('texts.quote_number')];
         }
 
         $data['$contact.signature_raw'] = ['value' => $this->invitation->signature_base64, 'label' => ctrans('texts.signature')];
@@ -756,8 +763,7 @@ class HtmlEngine
 
             $payment = $this->entity->net_payments()->first();
 
-            if($payment)
-            {
+            if ($payment) {
                 $data['$payment.custom1'] = ['value' => $payment->custom_value1, 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'payment1')];
                 $data['$payment.custom2'] = ['value' => $payment->custom_value2, 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'payment2')];
                 $data['$payment.custom3'] = ['value' => $payment->custom_value3, 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'payment3')];
@@ -784,7 +790,7 @@ class HtmlEngine
     private function getPaymentMeta(\App\Models\Payment $payment)
     {
 
-        if(!is_array($payment->refund_meta)) {
+        if (!is_array($payment->refund_meta)) {
             return '';
         }
 
@@ -797,13 +803,14 @@ class HtmlEngine
 
                     $map = [];
 
-                    foreach($refund['invoices'] as $refunded_invoice) {
+                    foreach ($refund['invoices'] as $refunded_invoice) {
                         $invoice = \App\Models\Invoice::withTrashed()->find($refunded_invoice['invoice_id']);
                         $amount = Number::formatMoney($refunded_invoice['amount'], $payment->client);
                         $notes = ctrans('texts.status_partially_refunded_amount', ['amount' => $amount]);
 
-                        if($invoice)
+                        if ($invoice) {
                             array_push($map, "{$date} {$entity} #{$invoice->number} {$notes}\n");
+                        }
 
                     }
 
@@ -825,15 +832,15 @@ class HtmlEngine
             $tax_label .= ctrans('texts.reverse_tax_info') . "<br>";
         }
 
-        if((int)$this->client->country_id !== (int)$this->company->settings->country_id) {
+        if ((int)$this->client->country_id !== (int)$this->company->settings->country_id) {
             $tax_label .= ctrans('texts.intracommunity_tax_info') . "<br>";
 
-            if($this->entity_calc->getTotalTaxes() > 0) {
+            if ($this->entity_calc->getTotalTaxes() > 0) {
                 $tax_label = '';
             }
         }
 
-        if (isset($this->entity->company->tax_data->regions->EU->has_sales_above_threshold) && !$this->entity->company->tax_data->regions->EU->has_sales_above_threshold){ 
+        if (isset($this->entity->company->tax_data->regions->EU->has_sales_above_threshold) && !$this->entity->company->tax_data->regions->EU->has_sales_above_threshold) {
             $tax_label .= ctrans('text.small_company_info') ."<br>";
         }
 
@@ -842,7 +849,7 @@ class HtmlEngine
 
     private function getBalance()
     {
-        if($this->entity->status_id == 1) {
+        if ($this->entity->status_id == 1) {
             return $this->entity->amount;
         }
 
