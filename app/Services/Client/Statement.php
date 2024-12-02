@@ -31,7 +31,6 @@ use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\Pdf\PdfMaker as PdfMakerTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class Statement
 {
@@ -40,11 +39,9 @@ class Statement
     use MakesDates;
 
     /**
-     * @var Invoice|Payment|null
+     * @var ?Invoice
      */
     protected $entity;
-
-    protected bool $rollback = false;
 
     private array $variables = [];
 
@@ -56,11 +53,16 @@ class Statement
     {
 
         try {
-            $this
-                ->setupOptions()
-                ->setupEntity();
+            $this->setupOptions();
 
-            $html = new HtmlEngine($this->getInvitation());
+            $this->setupEntity();
+
+            $invitation = $this->getInvitation();
+
+            if(!$invitation)
+                return null;
+
+            $html = new HtmlEngine($invitation);
 
             $variables = [];
             $variables = $html->generateLabelsAndValues();
@@ -74,12 +76,15 @@ class Statement
                 $variables['labels']['$start_date_label'] = ctrans('texts.start_date');
                 $variables['labels']['$end_date_label'] = ctrans('texts.end_date');
                 
-                if ($this->rollback) {
-                    \DB::connection(config('database.default'))->rollBack();
-                    $this->rollback = false;
-                }
+                $pdf = null;
 
-                $pdf = $this->templateStatement($variables);
+                try{
+                    $pdf = $this->templateStatement($variables);
+                }
+                catch(\Throwable $e){
+                    nlog("wrapped");
+                    nlog($e->getMessage());
+                }
 
                 return $pdf;
             }
@@ -92,7 +97,6 @@ class Statement
                 $template = new PdfMakerDesign(strtolower($this->getDesign()->name), $this->options);
             }
 
-            // $variables = $html->generateLabelsAndValues();
             $variables['values']['$show_paid_stamp'] = 'none'; //do not show paid stamp on statement
 
             $state = [
@@ -125,11 +129,6 @@ class Statement
 
             // nlog($html);
 
-            if ($this->rollback) {
-                \DB::connection(config('database.default'))->rollBack();
-                $this->rollback = false;
-            }
-
             $pdf = $this->convertToPdf($html);
 
             $this->setVariables($variables);
@@ -138,14 +137,9 @@ class Statement
             $state = null;
 
             return $pdf;
+
         } catch (\Throwable $th) {
-
-            nlog("STATEMENT:: Throwable::" . $th->getMessage());
-
-            if ($this->rollback) {
-                \DB::connection(config('database.default'))->rollBack();
-            }
-
+            nlog("Statement threw => ". $th->getMessage());
         }
 
         return null;
@@ -224,25 +218,28 @@ class Statement
     protected function setupEntity(): self
     {
         if ($this->getInvoices()->count() >= 1) {
-            $this->entity = $this->getInvoices()->first();
+            $this->entity = $this->getInvoices()->first();//@phpstan-ignore-line
+        }
+        else {
+            nlog("fall back to any invoice/invitation");
+            $this->entity = $this->client->invoices()->whereHas('invitations')->first();
         }
 
-        if (\is_null($this->entity)) {
-            DB::connection(config('database.default'))->beginTransaction();
+        if(\is_null($this->entity)){
+                        
+            $settings = new \stdClass();
+            $settings->entity = \App\Models\Client::class;
+            $settings->currency_id = '1';
+            $settings->industry_id = '';
+            $settings->size_id = '';
 
-            $this->rollback = true;
+            $this->entity = \App\Models\Invoice::factory()->make(); //@phpstan-ignore-line
+            $this->entity->client = \App\Models\Client::factory()->make(['settings' => $settings]); //@phpstan-ignore-line
+            $this->entity->client->setRelation('company', $this->client->company);
+            $this->entity->invitation = \App\Models\InvoiceInvitation::factory()->make(); //@phpstan-ignore-line
+            $this->entity->setRelation('company', $this->client->company);
+            $this->entity->setRelation('user', $this->client->user);
 
-            $invoice = InvoiceFactory::create($this->client->company->id, $this->client->user->id);
-            $invoice->client_id = $this->client->id;
-            $invoice->line_items = $this->buildLineItems();
-            $invoice->save();
-
-            $invitation = InvoiceInvitationFactory::create($invoice->company_id, $invoice->user_id);
-            $invitation->invoice_id = $invoice->id;
-            $invitation->client_contact_id = $this->client->contacts->first()->id;
-            $invitation->save();
-
-            $this->entity = $invoice;
         }
 
         return $this;
@@ -421,8 +418,18 @@ class Statement
      */
     protected function getInvitation()
     {
-        if ($this->entity instanceof Invoice || $this->entity instanceof Payment) {
-            return $this->entity->invitations->first();
+        if($this->entity instanceof Invoice) {
+        // if ($this->entity instanceof Invoice || $this->entity instanceof Payment) {
+            $invitation = $this->entity->whereHas('invitations')->first()->invitations->first();
+            
+            if($invitation)
+                return $invitation;
+
+        $invitation = $this->client->invoice()->whereHas('invitations')->first()->invitations->first();
+        
+        if ($invitation) 
+            return $invitation;
+
         }
 
         return false;
