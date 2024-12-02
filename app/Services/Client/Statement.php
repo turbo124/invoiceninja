@@ -65,18 +65,23 @@ class Statement
             $variables = [];
             $variables = $html->generateLabelsAndValues();
 
-            $option_template = &$this->options['template'];
-
             $custom_statement_template = \App\Models\Design::where('id', $this->decodePrimaryKey($this->client->getSetting('statement_design_id')))->where('is_template', true)->first();
 
-            if ($custom_statement_template || $option_template && $option_template != '') {
+            if ($custom_statement_template || (isset($this->options['template']) && $this->options['template'] != '')) {
 
                 $variables['values']['$start_date'] = $this->translateDate($this->options['start_date'], $this->client->date_format(), $this->client->locale());
                 $variables['values']['$end_date'] = $this->translateDate($this->options['end_date'], $this->client->date_format(), $this->client->locale());
                 $variables['labels']['$start_date_label'] = ctrans('texts.start_date');
                 $variables['labels']['$end_date_label'] = ctrans('texts.end_date');
+                
+                if ($this->rollback) {
+                    \DB::connection(config('database.default'))->rollBack();
+                    $this->rollback = false;
+                }
 
-                return $this->templateStatement($variables);
+                $pdf = $this->templateStatement($variables);
+
+                return $pdf;
             }
 
             if ($this->getDesign()->is_custom) {
@@ -87,7 +92,7 @@ class Statement
                 $template = new PdfMakerDesign(strtolower($this->getDesign()->name), $this->options);
             }
 
-            $variables = $html->generateLabelsAndValues();
+            // $variables = $html->generateLabelsAndValues();
             $variables['values']['$show_paid_stamp'] = 'none'; //do not show paid stamp on statement
 
             $state = [
@@ -167,27 +172,32 @@ class Statement
             $statement_design_id = $this->client->getSetting('statement_design_id');
         }
 
+        $html = '';
+
         $template = Design::query()
                             ->where('id', $this->decodePrimaryKey($statement_design_id))
                             ->where('company_id', $this->client->company_id)
                             ->first();
 
-        $ts = $template->service();
-        $ts->addGlobal(['show_credits' => $this->options['show_credits_table']]);
-        $ts->addGlobal(['show_aging' => $this->options['show_aging_table']]);
-        $ts->addGlobal(['show_payments' => $this->options['show_payments_table']]);
-        $ts->addGlobal(['currency_code' => $this->client->company->currency()->code]);
+        if($template)
+        {
+            $ts = $template->service();
+            $ts->addGlobal(['show_credits' => $this->options['show_credits_table']]);
+            $ts->addGlobal(['show_aging' => $this->options['show_aging_table']]);
+            $ts->addGlobal(['show_payments' => $this->options['show_payments_table']]);
+            $ts->addGlobal(['currency_code' => $this->client->company->currency()->code]);
 
-        $ts->build([
-            'variables' => collect([$variables]),
-            'invoices' => $this->getInvoices()->get(),
-            'payments' => $this->options['show_payments_table'] ? $this->getPayments()->get() : collect([]),
-            'credits' => $this->options['show_credits_table'] ? $this->getCredits()->get() : collect([]),
-            'aging' => $this->options['show_aging_table'] ? $this->getAging() : collect([]),
-            'unapplied' => $this->options['show_payments_table'] ? $this->getPayments()->get() : collect([]),
-        ]);
+            $ts->build([
+                'variables' => collect([$variables]),
+                'invoices' => $this->getInvoices()->get(),
+                'payments' => $this->options['show_payments_table'] ? $this->getPayments()->get() : collect([]),
+                'credits' => $this->options['show_credits_table'] ? $this->getCredits()->get() : collect([]),
+                'aging' => $this->options['show_aging_table'] ? $this->getAging() : collect([]),
+                'unapplied' => $this->options['show_payments_table'] ? $this->getPayments()->get() : collect([]),
+            ]);
 
-        $html = $ts->getHtml();
+            $html = $ts->getHtml();
+        }
 
         return $this->convertToPdf($html);
     }
