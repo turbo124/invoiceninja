@@ -5477,6 +5477,8 @@ $lang = array(
     'download_ready' => 'Your Download is now ready! [ :message ]',
     'notification_quote_reminder1_sent_subject' => 'Reminder 1 for Quote :invoice was sent to :client',
     'custom_reminder_sent' => 'Custom reminder was sent to :client',
+    'change_plan_title' => 'Change Plan',
+    'change_plan_to' => 'Change Plan To:',
 );
 
 return $lang;

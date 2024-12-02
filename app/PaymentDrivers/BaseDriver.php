@@ -91,6 +91,13 @@ class BaseDriver extends AbstractPaymentDriver
     /** @var array */
     public $required_fields = [];
 
+    /**
+     * Indicates if returning responses should be headless or classic redirect.
+     * 
+     * @var bool
+     */
+    public bool $headless = false;
+
     public function __construct(CompanyGateway $company_gateway, ?Client $client = null, $invitation = null)
     {
         $this->company_gateway = $company_gateway;
@@ -101,6 +108,13 @@ class BaseDriver extends AbstractPaymentDriver
 
     public function init()
     {
+        return $this;
+    }
+
+    public function setHeadless(bool $headless): self
+    {
+        $this->headless = $headless;
+
         return $this;
     }
 
