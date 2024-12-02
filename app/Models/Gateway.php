@@ -108,7 +108,7 @@ class Gateway extends StaticModel
         } elseif ($this->id == 63) {
             $link = 'https://rotessa.com';
         } elseif ($this->id == 64) {
-            $link = 'https://blockonomics.co';
+            $link = 'https://help.blockonomics.co/a/solutions/articles/33000291849';
         }
 
         return $link;
