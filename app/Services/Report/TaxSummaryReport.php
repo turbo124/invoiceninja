@@ -170,17 +170,25 @@ class TaxSummaryReport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
         $this->csv->insertOne([ctrans('texts.cash_vs_accrual')]);
 
-        foreach ($accrual_map as $key => $value) {
-            $this->csv->insertOne([$key, Number::formatMoney($value['tax_amount'], $this->company), Number::formatValue($value['tax_amount'], $this->company->currency())]);
+        foreach ($accrual_map as $key => &$value) {
+            $formatted_value = Number::formatValue($value['tax_amount'], $this->company->currency());
+            $formatted_money = Number::formatMoney($value['tax_amount'], $this->company);
+            $value['tax_amount'] = $formatted_money;
+            $this->csv->insertOne([$key, $formatted_money, $formatted_value]);
         }
+        unset($value);
 
         $this->csv->insertOne([]);
         $this->csv->insertOne([ctrans('texts.cash_accounting')]);
         $this->csv->insertOne($this->buildHeader());
 
-        foreach ($cash_map as $key => $value) {
-            $this->csv->insertOne([$key, Number::formatMoney($value['tax_amount'], $this->company), Number::formatValue($value['tax_amount'], $this->company->currency())]);
+        foreach ($cash_map as $key => &$value) {
+            $formatted_value = Number::formatValue($value['tax_amount'], $this->company->currency());
+            $formatted_money = Number::formatMoney($value['tax_amount'], $this->company);
+            $value['tax_amount'] = $formatted_money;
+            $this->csv->insertOne([$key, $formatted_money, $formatted_value]);
         }
+        unset($value);
 
         $this->csv->insertOne([]);
         $this->csv->insertOne([]);
