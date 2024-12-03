@@ -28,7 +28,7 @@ class PaymentLibrariesSeeder extends Seeder
         // Generate a random callback secret for Blockonomics users
         $callbackSecret = Str::random(32);
         // Generate a callback URL for Blockonomics users
-        $callbackUrl = config('ninja.app_url') . '/payment_webhook/?secret=' . $callbackSecret;
+        $callbackUrl = '/payment_webhook/?secret=' . $callbackSecret;
 
         $gateways = [
             ['id' => 1, 'name' => 'Authorize.Net', 'provider' => 'Authorize', 'sort_order' => 5, 'key' => '3b6621f970ab18887c4f6dca78d3f8bb', 'fields' => '{"apiLoginId":"","transactionKey":"","testMode":false,"developerMode":false,"liveEndpoint":"https:\/\/api2.authorize.net\/xml\/v1\/request.api","developerEndpoint":"https:\/\/apitest.authorize.net\/xml\/v1\/request.api"}
