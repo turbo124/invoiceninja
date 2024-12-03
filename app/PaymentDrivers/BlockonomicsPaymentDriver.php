@@ -12,18 +12,19 @@
 
 namespace App\PaymentDrivers;
 
-use App\Utils\Traits\MakesHash;
-use App\Models\PaymentHash;
-use App\Models\GatewayType;
-use App\PaymentDrivers\Blockonomics\Blockonomics;
-use App\Models\SystemLog;
-use App\Models\Payment;
-use App\Models\Gateway;
 use App\Models\Client;
-use App\Exceptions\PaymentFailed;
-use App\Models\PaymentType;
-use App\Http\Requests\Payments\PaymentWebhookRequest;
+use App\Models\Gateway;
 use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\SystemLog;
+use App\Models\GatewayType;
+use App\Models\PaymentHash;
+use App\Models\PaymentType;
+use App\Utils\Traits\MakesHash;
+use App\Exceptions\PaymentFailed;
+use Illuminate\Support\Facades\Http;
+use App\PaymentDrivers\Blockonomics\Blockonomics;
+use App\Http\Requests\Payments\PaymentWebhookRequest;
 
 class BlockonomicsPaymentDriver extends BaseDriver
 {
@@ -147,8 +148,8 @@ class BlockonomicsPaymentDriver extends BaseDriver
     public function auth(): bool
     {
         try {
-            // TODO: Add check /api/new_address?reset=1 to see if the API key is valid
-            $this->company_gateway->getConfigField('apiKey');
+        
+            $api_key = $this->company_gateway->getConfigField('apiKey');
             $url = $this->NEW_ADDRESS_URL . '?reset=1';
             $response = Http::withToken($api_key)
                 ->post($url, []);
@@ -159,6 +160,6 @@ class BlockonomicsPaymentDriver extends BaseDriver
         } catch (\Exception $e) {
             return false;
         }
-        return false;
+
     }
 }
