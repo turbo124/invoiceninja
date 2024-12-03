@@ -47,24 +47,36 @@ class Blockonomics implements LivewireMethodInterface
     }
 
 
-    public function getBTCAddress(): string
+    public function getBTCAddress(): array
     {
         $api_key = $this->blockonomics->company_gateway->getConfigField('apiKey');
+
+        if (!$api_key) {
+            return ['success' => false, 'message' => 'Please enter a valid API key'];
+        }
 
         // $params = config('ninja.environment') == 'development' ? '?reset=1' : '';
         $url = 'https://www.blockonomics.co/api/new_address';
 
-        $r = Http::withToken($api_key)
-                    ->post($url, []);
+        $response = Http::withToken($api_key)
+                        ->post($url, []);
 
-        nlog($r->body());
+        nlog($response->body());
 
-        if ($r->successful()) {
-            return $r->object()->address ?? 'Something went wrong';
+        if ($response->status() == 401) { 
+            return ['success' => false, 'message' => 'API Key is incorrect'];
+        };
+
+        if ($response->successful()) {
+            if (isset($response->object()->address)) {
+                return ['success' => true, 'address' => $response->object()->address];
+            } else {
+                return ['success' => false, 'message' => 'Address not returned'];
+            }
+        } else {
+            return ['success' => false, 'message' => "Could not generate new address (This may be a temporary error. Please try again). \n\n<br><br> If this continues, please ask website administrator to check blockonomics registered email address for error messages"];
         }
-
-        return $r->object()->message ?? 'Something went wrong';
-
+        return ['success' => false, 'message' => 'Something went wrong'];
     }
 
     public function getBTCPrice()
@@ -81,6 +93,10 @@ class Blockonomics implements LivewireMethodInterface
 
         $btc_price = $this->getBTCPrice();
         $btc_address = $this->getBTCAddress();
+        $data['error'] = null;
+        if (!$btc_address['success']) {
+            $data['error'] = $btc_address['message'];
+        }
         $fiat_amount = $data['total']['amount_with_fee'];
         $btc_amount = $fiat_amount / $btc_price;
         $_invoice = collect($this->blockonomics->payment_hash->data->invoices)->first();
@@ -89,7 +105,7 @@ class Blockonomics implements LivewireMethodInterface
         $data['amount'] = $fiat_amount;
         $data['currency'] = $this->blockonomics->client->getCurrencyCode();
         $data['btc_amount'] = number_format($btc_amount, 10, '.', '');
-        $data['btc_address'] = $btc_address;
+        $data['btc_address'] = $btc_address['address'] ?? '';
         $data['btc_price'] = $btc_price;
         $data['invoice_number'] = $_invoice->invoice_number;
 

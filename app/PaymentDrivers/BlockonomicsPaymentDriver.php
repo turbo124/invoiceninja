@@ -143,4 +143,22 @@ class BlockonomicsPaymentDriver extends BaseDriver
         $this->setPaymentMethod(GatewayType::CRYPTO);
         return $this->payment_method->refund($payment, $amount); //this is your custom implementation from here
     }
+
+    public function auth(): bool
+    {
+        try {
+            // TODO: Add check /api/new_address?reset=1 to see if the API key is valid
+            $this->company_gateway->getConfigField('apiKey');
+            $url = $this->NEW_ADDRESS_URL . '?reset=1';
+            $response = Http::withToken($api_key)
+                ->post($url, []);
+            if($response->successful()) {
+                return true;
+            }
+            return false;
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
+    }
 }
