@@ -119,7 +119,6 @@ class Email implements ShouldQueue
 
         /** Send the email */
         $this->email();
-
         /** Perform cleanups */
         $this->tearDown();
     }
@@ -574,11 +573,11 @@ class Email implements ShouldQueue
             case 'default':
                 $this->mailer = config('mail.default');
                 // $this->setHostedMailgunMailer(); //should only be activated if hosted platform needs to fall back to mailgun
-                break;
+                return $this;
             case 'mailgun':
                 $this->mailer = 'mailgun';
                 $this->setHostedMailgunMailer();
-                break;
+                return $this;
             case 'gmail':
                 $this->mailer = 'gmail';
                 $this->setGmailMailer();
@@ -604,16 +603,16 @@ class Email implements ShouldQueue
                 $this->mailer = 'smtp';
                 $this->configureSmtpMailer();
                 return $this;
-            default:
+            default:                
                 $this->mailer = config('mail.default');
-                return $this;
-        }
+                break;
 
-        if (Ninja::isSelfHost()) {
-            $this->setSelfHostMultiMailer();
         }
-
+        
+        $this->mailer = config('mail.default');
+        
         return $this;
+
     }
 
     private function configureSmtpMailer()
@@ -659,30 +658,6 @@ class Email implements ShouldQueue
         $this->mailable
             ->from($sending_email, $sending_user);
 
-    }
-
-    /**
-     * Allows configuration of multiple mailers
-     * per company for use by self hosted users
-     */
-    private function setSelfHostMultiMailer(): void
-    {
-        if (env($this->company->id . '_MAIL_HOST')) {
-            config([
-                'mail.mailers.smtp' => [
-                    'transport' => 'smtp',
-                    'host' => env($this->company->id . '_MAIL_HOST'),
-                    'port' => env($this->company->id . '_MAIL_PORT'),
-                    'username' => env($this->company->id . '_MAIL_USERNAME'),
-                    'password' => env($this->company->id . '_MAIL_PASSWORD'),
-                ],
-            ]);
-
-            if (env($this->company->id . '_MAIL_FROM_ADDRESS')) {
-                $this->mailable
-                    ->from(env($this->company->id . '_MAIL_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')), env($this->company->id . '_MAIL_FROM_NAME', env('MAIL_FROM_NAME')));
-            }
-        }
     }
 
     /**
