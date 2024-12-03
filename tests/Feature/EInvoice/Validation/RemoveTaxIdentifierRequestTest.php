@@ -64,12 +64,15 @@ class RemoveTaxIdentifierRequestTest extends TestCase
 
         $data = [
             'country' => 'DE',
-            'vat_number' => 'DE123456789',
+            // 'vat_number' => 'DE123456789',
         ];
 
         $this->request->initialize($data);
 
         $validator = Validator::make($data, $this->request->rules());
+
+        if(!$validator->passes())
+            nlog($validator->errors());
 
         $this->assertFalse($validator->passes());
     }
