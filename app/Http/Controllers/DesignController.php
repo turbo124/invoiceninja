@@ -595,7 +595,8 @@ class DesignController extends BaseController
                         })
                         ->update(['design_id' => $design_id]);
 
-
+                
+                // Recurring Invoice Designs are set using the global company level.
                 if ($settings_level == 'company') {
                     $company->recurring_invoices()->update(['design_id' => $design_id]);
                 }
