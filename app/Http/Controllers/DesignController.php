@@ -570,6 +570,7 @@ class DesignController extends BaseController
             case 'invoice':
 
                 $company->invoices()
+                        ->withTrashed()
                         ->when($settings_level == 'company', function ($query) {
                             $query->where(function ($query) {
                                 $query->whereDoesntHave('client.group_settings')
@@ -592,19 +593,19 @@ class DesignController extends BaseController
 
                             $query->where('client_id', $client_id);
 
-                        })
-                        ->update(['design_id' => $design_id]);
+                        })->update(['design_id' => $design_id]);
 
                 
                 // Recurring Invoice Designs are set using the global company level.
                 if ($settings_level == 'company') {
-                    $company->recurring_invoices()->update(['design_id' => $design_id]);
+                    $company->recurring_invoices()->withTrashed()->update(['design_id' => $design_id]);
                 }
 
                 break;
             case 'quote':
 
                 $company->quotes()
+                        ->withTrashed()
                         ->when($settings_level == 'company', function ($query) {
                             $query->where(function ($query) {
                                 $query->whereDoesntHave('client.group_settings')
@@ -634,6 +635,7 @@ class DesignController extends BaseController
             case 'credit':
 
                 $company->credits()
+                        ->withTrashed()
                         ->when($settings_level == 'company', function ($query) {
                             $query->where(function ($query) {
                                 $query->whereDoesntHave('client.group_settings')
@@ -662,10 +664,10 @@ class DesignController extends BaseController
                 break;
 
             case 'purchase_order':
-                $company->purchase_orders()->update(['design_id' => $design_id]);
+                $company->purchase_orders()->withTrashed()->update(['design_id' => $design_id]);
                 break;
             case 'recurring_invoice':
-                $company->recurring_invoices()->update(['design_id' => $design_id]);
+                $company->recurring_invoices()->withTrashed()->update(['design_id' => $design_id]);
 
                 break;
             default:

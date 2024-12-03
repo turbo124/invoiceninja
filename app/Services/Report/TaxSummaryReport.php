@@ -11,16 +11,18 @@
 
 namespace App\Services\Report;
 
-use App\Export\CSV\BaseExport;
-use App\Libraries\MultiDB;
-use App\Models\Client;
-use App\Models\Company;
-use App\Models\Invoice;
+use App\Models\User;
 use App\Utils\Ninja;
 use App\Utils\Number;
+use App\Models\Client;
+use League\Csv\Writer;
+use App\Models\Company;
+use App\Models\Invoice;
+use App\Libraries\MultiDB;
+use App\Export\CSV\BaseExport;
 use App\Utils\Traits\MakesDates;
 use Illuminate\Support\Facades\App;
-use League\Csv\Writer;
+use App\Services\Template\TemplateService;
 
 class TaxSummaryReport extends BaseExport
 {
@@ -33,6 +35,10 @@ class TaxSummaryReport extends BaseExport
     public Writer $csv;
 
     public string $date_key = 'created_at';
+
+    private array $taxes = [];
+
+    private string $template = '/views/templates/reports/tax_summary_report.html';
 
     public array $report_keys = [
         'tax_name',
@@ -164,17 +170,25 @@ class TaxSummaryReport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
         $this->csv->insertOne([ctrans('texts.cash_vs_accrual')]);
 
-        foreach ($accrual_map as $key => $value) {
-            $this->csv->insertOne([$key, Number::formatMoney($value['tax_amount'], $this->company), Number::formatValue($value['tax_amount'], $this->company->currency())]);
+        foreach ($accrual_map as $key => &$value) {
+            $formatted_value = Number::formatValue($value['tax_amount'], $this->company->currency());
+            $formatted_money = Number::formatMoney($value['tax_amount'], $this->company);
+            $value['tax_amount'] = $formatted_money;
+            $this->csv->insertOne([$key, $formatted_money, $formatted_value]);
         }
+        unset($value);
 
         $this->csv->insertOne([]);
         $this->csv->insertOne([ctrans('texts.cash_accounting')]);
         $this->csv->insertOne($this->buildHeader());
 
-        foreach ($cash_map as $key => $value) {
-            $this->csv->insertOne([$key, Number::formatMoney($value['tax_amount'], $this->company), Number::formatValue($value['tax_amount'], $this->company->currency())]);
+        foreach ($cash_map as $key => &$value) {
+            $formatted_value = Number::formatValue($value['tax_amount'], $this->company->currency());
+            $formatted_money = Number::formatMoney($value['tax_amount'], $this->company);
+            $value['tax_amount'] = $formatted_money;
+            $this->csv->insertOne([$key, $formatted_money, $formatted_value]);
         }
+        unset($value);
 
         $this->csv->insertOne([]);
         $this->csv->insertOne([]);
@@ -192,10 +206,40 @@ class TaxSummaryReport extends BaseExport
             $this->csv->insertOne($map);
         }
 
+        $this->taxes['accrual_map'] = $accrual_map;
+        $this->taxes['accrual_invoice_map'] = $accrual_invoice_map;
+
+        $this->taxes['cash_map'] = $cash_map;
+        $this->taxes['cash_invoice_map'] = $cash_invoice_map;
+        
         return $this->csv->toString();
 
     }
 
+    public function getPdf()
+    {
+        $user = isset($this->input['user_id']) ? User::withTrashed()->find($this->input['user_id']) : $this->company->owner();
+
+        $user_name = $user ? $user->present()->name() : '';
+
+        $data = [
+            'taxes' => $this->taxes,
+            'company_logo' => $this->company->present()->logo(),
+            'company_name' => $this->company->present()->name(),
+            'created_on' => $this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale()),
+            'created_by' => $user_name,
+        ];
+
+        $ts = new TemplateService();
+
+        $ts_instance = $ts->setCompany($this->company)
+                    ->setData($data)
+                    ->setRawTemplate(file_get_contents(resource_path($this->template)))
+                    ->parseNinjaBlocks()
+                    ->save();
+
+        return $ts_instance->getPdf();
+    }
 
     public function buildHeader(): array
     {

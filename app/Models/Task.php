@@ -46,6 +46,7 @@ use App\Libraries\Currency\Conversion\CurrencyApi;
  * @property string|null $time_log
  * @property string|null $number
  * @property float $rate
+ * @property string $calculated_start_date
  * @property bool $invoice_documents
  * @property int $is_date_based
  * @property int|null $status_order

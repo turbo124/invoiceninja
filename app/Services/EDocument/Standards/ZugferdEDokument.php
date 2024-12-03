@@ -281,7 +281,7 @@ class ZugferdEDokument extends AbstractService
                     $bic = $pm->PayeeFinancialAccount->FinancialInstitutionBranch->FinancialInstitution->ID->value ?? '';
                     $typecode = $pm->PaymentMeansCode->value;
 
-                    $this->xdocument->addDocumentPaymentMean(typecode: $typecode, payeeIban: $iban, payeeAccountName: $name, payeeBic: $bic);
+                    $this->xdocument->addDocumentPaymentMean(typeCode: $typecode, payeeIban: $iban, payeeAccountName: $name, payeeBic: $bic);
 
                     return $this;
                 
@@ -296,7 +296,7 @@ class ZugferdEDokument extends AbstractService
         //BR-DE-23 - If „Payment means type code“ (BT-81) contains a code for credit transfer (30, 58), „CREDIT TRANSFER“ (BG-17) shall be provided.
         //Payment Means - Switcher
         if (isset($custom_value1) && !empty($custom_value1) && ($custom_value1 == '30' || $custom_value1 == '58')) {
-            $this->xdocument->addDocumentPaymentMean(typecode: $company->settings->custom_value1, payeeIban: $company->settings->custom_value2, payeeAccountName: $company->settings->custom_value4, payeeBic: $company->settings->custom_value3);
+            $this->xdocument->addDocumentPaymentMean(typeCode: $company->settings->custom_value1, payeeIban: $company->settings->custom_value2, payeeAccountName: $company->settings->custom_value4, payeeBic: $company->settings->custom_value3);
         } else {
             $this->xdocument->addDocumentPaymentMean('68', ctrans("texts.xinvoice_online_payment"));
         }

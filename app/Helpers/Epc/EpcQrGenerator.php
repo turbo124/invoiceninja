@@ -103,11 +103,11 @@ class EpcQrGenerator
     private function validateFields()
     {
         if (Ninja::isSelfHost() && isset($this->company?->custom_fields?->company2)) {
-            nlog('The BIC field is not present and _may_ be a required fields for EPC QR codes');
+            // nlog('The BIC field is not present and _may_ be a required fields for EPC QR codes');
         }
 
         if (Ninja::isSelfHost() && isset($this->company?->custom_fields?->company1)) {
-            nlog('The IBAN field is required');
+            // nlog('The IBAN field is required');
         }
 
     }
