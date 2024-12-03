@@ -95,31 +95,31 @@ class TaxModel
         }
 
         //@pending Flutter AP upgrade - deploying this breaks the AP.
-        // if($this->version == 'gamma') {
+        if($this->version == 'gamma') {
 
-        //     $this->regions->EU->subregions->IS = new \stdClass();
-        //     $this->regions->EU->subregions->IS->tax_rate = 24;
-        //     $this->regions->EU->subregions->IS->tax_name = 'VSK';
-        //     $this->regions->EU->subregions->IS->reduced_tax_rate = 11;
-        //     $this->regions->EU->subregions->IS->apply_tax = false;
+            $this->regions->EU->subregions->IS = new \stdClass();
+            $this->regions->EU->subregions->IS->tax_rate = 24;
+            $this->regions->EU->subregions->IS->tax_name = 'VSK';
+            $this->regions->EU->subregions->IS->reduced_tax_rate = 11;
+            $this->regions->EU->subregions->IS->apply_tax = false;
 
-        //     $this->regions->EU->subregions->LI = new \stdClass();
-        //     $this->regions->EU->subregions->LI->tax_rate = 8.1;
-        //     $this->regions->EU->subregions->LI->tax_name = 'MWST';
-        //     $this->regions->EU->subregions->LI->reduced_tax_rate = 2.6;
-        //     $this->regions->EU->subregions->LI->apply_tax = false;
+            $this->regions->EU->subregions->LI = new \stdClass();
+            $this->regions->EU->subregions->LI->tax_rate = 8.1;
+            $this->regions->EU->subregions->LI->tax_name = 'MWST';
+            $this->regions->EU->subregions->LI->reduced_tax_rate = 2.6;
+            $this->regions->EU->subregions->LI->apply_tax = false;
 
-        //     $this->regions->EU->subregions->NO = new \stdClass();
-        //     $this->regions->EU->subregions->NO->tax_rate = 25;
-        //     $this->regions->EU->subregions->NO->tax_name = 'MVA';
-        //     $this->regions->EU->subregions->NO->reduced_tax_rate = 12;
-        //     $this->regions->EU->subregions->NO->apply_tax = false;
+            $this->regions->EU->subregions->NO = new \stdClass();
+            $this->regions->EU->subregions->NO->tax_rate = 25;
+            $this->regions->EU->subregions->NO->tax_name = 'MVA';
+            $this->regions->EU->subregions->NO->reduced_tax_rate = 12;
+            $this->regions->EU->subregions->NO->apply_tax = false;
 
-        //     $this->ukRegion();
+            $this->ukRegion();
 
-        //     $this->version = 'delta';
+            $this->version = 'delta';
 
-        // }
+        }
 
         return $this;
     }
