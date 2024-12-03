@@ -80,7 +80,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property Carbon|null $oauth_user_token_expiry
  * @property string|null $sms_verification_code
  * @property bool $verified_phone_number
- * @property ReferralEarning|null #referral_earnings
+ * @property array|null $referral_earnings
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\Company $company
  * @property-read mixed $hashed_id
@@ -719,7 +719,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function findLatestReferral(string $account_key)
     {
 
-        return collect($this->referral_earning)
+        return collect($this->referral_earnings)
                     ->filter(function ($earning) use ($account_key) {
                         return $earning->account_key === $account_key;
                     })

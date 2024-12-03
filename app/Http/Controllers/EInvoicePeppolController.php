@@ -258,7 +258,7 @@ class EInvoicePeppolController extends BaseController
         
         SendEDocument::dispatch($request->entity, $request->entity_id, auth()->user()->company()->db);
 
-        return response()->json(['message' => 'trying....', 200]);
+        return response()->json(['message' => 'trying....'], 200);
     }
 
     private function unsetVatNumbers(mixed $taxData): mixed
