@@ -18,7 +18,6 @@ return new class extends Migration
             $fields =  new \stdClass;
             $fields->apiKey  = "";
             $fields->callbackSecret = "";
-            $fields->callbackUrl = "";
 
             $gateway = new Gateway;
             $gateway->id = 65;
