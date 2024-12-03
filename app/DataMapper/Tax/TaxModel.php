@@ -95,31 +95,35 @@ class TaxModel
         }
 
         //@pending Flutter AP upgrade - deploying this breaks the AP.
-        // if($this->version == 'gamma') {
+        if($this->version == 'gamma') {
 
-        //     $this->regions->EU->subregions->IS = new \stdClass();
-        //     $this->regions->EU->subregions->IS->tax_rate = 24;
-        //     $this->regions->EU->subregions->IS->tax_name = 'VSK';
-        //     $this->regions->EU->subregions->IS->reduced_tax_rate = 11;
-        //     $this->regions->EU->subregions->IS->apply_tax = false;
+            $this->regions->EU->subregions->IS = new \stdClass();
+            $this->regions->EU->subregions->IS->tax_rate = 24;
+            $this->regions->EU->subregions->IS->tax_name = 'VSK';
+            $this->regions->EU->subregions->IS->reduced_tax_rate = 11;
+            $this->regions->EU->subregions->IS->apply_tax = false;
+            $this->regions->EU->subregions->IS->vat_number = '';
 
-        //     $this->regions->EU->subregions->LI = new \stdClass();
-        //     $this->regions->EU->subregions->LI->tax_rate = 8.1;
-        //     $this->regions->EU->subregions->LI->tax_name = 'MWST';
-        //     $this->regions->EU->subregions->LI->reduced_tax_rate = 2.6;
-        //     $this->regions->EU->subregions->LI->apply_tax = false;
+            $this->regions->EU->subregions->LI = new \stdClass();
+            $this->regions->EU->subregions->LI->tax_rate = 8.1;
+            $this->regions->EU->subregions->LI->tax_name = 'MWST';
+            $this->regions->EU->subregions->LI->reduced_tax_rate = 2.6;
+            $this->regions->EU->subregions->LI->apply_tax = false;
+            $this->regions->EU->subregions->LI->vat_number = '';
 
-        //     $this->regions->EU->subregions->NO = new \stdClass();
-        //     $this->regions->EU->subregions->NO->tax_rate = 25;
-        //     $this->regions->EU->subregions->NO->tax_name = 'MVA';
-        //     $this->regions->EU->subregions->NO->reduced_tax_rate = 12;
-        //     $this->regions->EU->subregions->NO->apply_tax = false;
+            $this->regions->EU->subregions->NO = new \stdClass();
+            $this->regions->EU->subregions->NO->tax_rate = 25;
+            $this->regions->EU->subregions->NO->tax_name = 'MVA';
+            $this->regions->EU->subregions->NO->reduced_tax_rate = 12;
+            $this->regions->EU->subregions->NO->apply_tax = false;
+            $this->regions->EU->subregions->NO->vat_number = '';
 
-        //     $this->ukRegion();
+            $this->ukRegion();
+            $this->stubVatNumbersOnSubregions();
 
-        //     $this->version = 'delta';
+            $this->version = 'delta';
 
-        // }
+        }
 
         return $this;
     }
@@ -159,6 +163,7 @@ class TaxModel
         $this->regions->UK->subregions->GB->tax_name = 'VAT';
         $this->regions->UK->subregions->GB->reduced_tax_rate = 5;
         $this->regions->UK->subregions->GB->apply_tax = false;
+        $this->regions->UK->subregions->GB->vat_number = '';
 
         // Northern Ireland (special case due to NI Protocol)
         $this->regions->UK->subregions->{'GB-NIR'} = new \stdClass();
@@ -166,6 +171,7 @@ class TaxModel
         $this->regions->UK->subregions->{'GB-NIR'}->tax_name = 'VAT';
         $this->regions->UK->subregions->{'GB-NIR'}->reduced_tax_rate = 5;
         $this->regions->UK->subregions->{'GB-NIR'}->apply_tax = false;
+        $this->regions->UK->subregions->{'GB-NIR'}->vat_number = '';
 
         // Isle of Man (follows UK VAT rules)
         $this->regions->UK->subregions->{'IM'} = new \stdClass();
@@ -173,9 +179,111 @@ class TaxModel
         $this->regions->UK->subregions->{'IM'}->tax_name = 'VAT';
         $this->regions->UK->subregions->{'IM'}->reduced_tax_rate = 5;
         $this->regions->UK->subregions->{'IM'}->apply_tax = false;
+        $this->regions->UK->subregions->{'IM'}->vat_number = '';
 
         return $this;
 
+    }
+
+    public function stubVatNumbersOnSubregions(): self
+    {
+                
+        // US Subregions
+        $this->regions->US->subregions->AL->vat_number = '';
+        $this->regions->US->subregions->AK->vat_number = '';
+        $this->regions->US->subregions->AZ->vat_number = '';
+        $this->regions->US->subregions->AR->vat_number = '';
+        $this->regions->US->subregions->CA->vat_number = '';
+        $this->regions->US->subregions->CO->vat_number = '';
+        $this->regions->US->subregions->CT->vat_number = '';
+        $this->regions->US->subregions->DE->vat_number = '';
+        $this->regions->US->subregions->FL->vat_number = '';
+        $this->regions->US->subregions->GA->vat_number = '';
+        $this->regions->US->subregions->HI->vat_number = '';
+        $this->regions->US->subregions->ID->vat_number = '';
+        $this->regions->US->subregions->IL->vat_number = '';
+        $this->regions->US->subregions->IN->vat_number = '';
+        $this->regions->US->subregions->IA->vat_number = '';
+        $this->regions->US->subregions->KS->vat_number = '';
+        $this->regions->US->subregions->KY->vat_number = '';
+        $this->regions->US->subregions->LA->vat_number = '';
+        $this->regions->US->subregions->ME->vat_number = '';
+        $this->regions->US->subregions->MD->vat_number = '';
+        $this->regions->US->subregions->MA->vat_number = '';
+        $this->regions->US->subregions->MI->vat_number = '';
+        $this->regions->US->subregions->MN->vat_number = '';
+        $this->regions->US->subregions->MS->vat_number = '';
+        $this->regions->US->subregions->MO->vat_number = '';
+        $this->regions->US->subregions->MT->vat_number = '';
+        $this->regions->US->subregions->NE->vat_number = '';
+        $this->regions->US->subregions->NV->vat_number = '';
+        $this->regions->US->subregions->NH->vat_number = '';
+        $this->regions->US->subregions->NJ->vat_number = '';
+        $this->regions->US->subregions->NM->vat_number = '';
+        $this->regions->US->subregions->NY->vat_number = '';
+        $this->regions->US->subregions->NC->vat_number = '';
+        $this->regions->US->subregions->ND->vat_number = '';
+        $this->regions->US->subregions->OH->vat_number = '';
+        $this->regions->US->subregions->OK->vat_number = '';
+        $this->regions->US->subregions->OR->vat_number = '';
+        $this->regions->US->subregions->PA->vat_number = '';
+        $this->regions->US->subregions->RI->vat_number = '';
+        $this->regions->US->subregions->SC->vat_number = '';
+        $this->regions->US->subregions->SD->vat_number = '';
+        $this->regions->US->subregions->TN->vat_number = '';
+        $this->regions->US->subregions->TX->vat_number = '';
+        $this->regions->US->subregions->UT->vat_number = '';
+        $this->regions->US->subregions->VT->vat_number = '';
+        $this->regions->US->subregions->VA->vat_number = '';
+        $this->regions->US->subregions->WA->vat_number = '';
+        $this->regions->US->subregions->WV->vat_number = '';
+        $this->regions->US->subregions->WI->vat_number = '';
+        $this->regions->US->subregions->WY->vat_number = '';
+
+        // EU Subregions
+        $this->regions->EU->subregions->AT->vat_number = '';
+        $this->regions->EU->subregions->BE->vat_number = '';
+        $this->regions->EU->subregions->BG->vat_number = '';
+        $this->regions->EU->subregions->CY->vat_number = '';
+        $this->regions->EU->subregions->CZ->vat_number = '';
+        $this->regions->EU->subregions->DE->vat_number = '';
+        $this->regions->EU->subregions->DK->vat_number = '';
+        $this->regions->EU->subregions->EE->vat_number = '';
+        $this->regions->EU->subregions->ES->vat_number = '';
+        $this->regions->EU->subregions->{'ES-CE'}->vat_number = '';
+        $this->regions->EU->subregions->{'ES-ML'}->vat_number = '';
+        $this->regions->EU->subregions->{'ES-CN'}->vat_number = '';
+        $this->regions->EU->subregions->FI->vat_number = '';
+        $this->regions->EU->subregions->FR->vat_number = '';
+        $this->regions->EU->subregions->GR->vat_number = '';
+        $this->regions->EU->subregions->HR->vat_number = '';
+        $this->regions->EU->subregions->HU->vat_number = '';
+        $this->regions->EU->subregions->IE->vat_number = '';
+        $this->regions->EU->subregions->IS->vat_number = '';
+        $this->regions->EU->subregions->IT->vat_number = '';
+        $this->regions->EU->subregions->LI->vat_number = '';
+        $this->regions->EU->subregions->LT->vat_number = '';
+        $this->regions->EU->subregions->LU->vat_number = '';
+        $this->regions->EU->subregions->LV->vat_number = '';
+        $this->regions->EU->subregions->MT->vat_number = '';
+        $this->regions->EU->subregions->NO->vat_number = '';
+        $this->regions->EU->subregions->NL->vat_number = '';
+        $this->regions->EU->subregions->PL->vat_number = '';
+        $this->regions->EU->subregions->PT->vat_number = '';
+        $this->regions->EU->subregions->RO->vat_number = '';
+        $this->regions->EU->subregions->SE->vat_number = '';
+        $this->regions->EU->subregions->SI->vat_number = '';
+        $this->regions->EU->subregions->SK->vat_number = '';
+
+        // UK Subregions
+        $this->regions->UK->subregions->GB->vat_number = '';
+        $this->regions->UK->subregions->{'GB-NIR'}->vat_number = '';
+        $this->regions->UK->subregions->IM->vat_number = '';
+
+        // AU Subregions
+        $this->regions->AU->subregions->AU->vat_number = '';
+
+        return $this;
     }
 
     /**
