@@ -12,13 +12,15 @@
 
 namespace App\Livewire\BillingPortal;
 
-use App\Models\RecurringInvoice;
-use App\Models\Subscription;
+use App\Utils\Ninja;
 use App\Utils\Number;
-use App\Utils\Traits\MakesHash;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\Attributes\On;
+use App\Models\Subscription;
+use App\Utils\Traits\MakesHash;
+use App\Models\RecurringInvoice;
+use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\App;
 
 class Summary extends Component
 {
@@ -37,6 +39,11 @@ class Summary extends Component
     public function mount()
     {
         $subscription = Subscription::find($this->decodePrimaryKey($this->subscription_id));
+
+        App::forgetInstance('translator');
+        $t = app('translator');
+        $t->replace(Ninja::transformTranslations($subscription->company->settings));
+        App::setLocale($subscription->company->locale());
 
         $bundle = $this->context['bundle'] ?? [
             'recurring_products' => [],
@@ -190,7 +197,7 @@ class Summary extends Component
         foreach ($this->context['bundle']['recurring_products'] as $key => $item) {
             $products[] = [
                 'product_key' => $item['product']['product_key'],
-                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'])),
+                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'] ?? '')),
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
                 'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription()->frequency_id),
@@ -200,7 +207,7 @@ class Summary extends Component
         foreach ($this->context['bundle']['optional_recurring_products'] as $key => $item) {
             $products[] = [
                 'product_key' => $item['product']['product_key'],
-                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'])),
+                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'] ?? '')),
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
                 'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company) . ' / ' . RecurringInvoice::frequencyForKey($this->subscription()->frequency_id),
@@ -210,7 +217,7 @@ class Summary extends Component
         foreach ($this->context['bundle']['one_time_products'] as $key => $item) {
             $products[] = [
                 'product_key' => $item['product']['product_key'],
-                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'])),
+                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'] ?? '')),
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
                 'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company),
@@ -220,7 +227,7 @@ class Summary extends Component
         foreach ($this->context['bundle']['optional_one_time_products'] as $key => $item) {
             $products[] = [
                 'product_key' => $item['product']['product_key'],
-                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'])),
+                'notes' => strip_tags(\Illuminate\Support\Str::markdown($item['product']['notes'] ?? '')),
                 'quantity' => $item['quantity'],
                 'total_raw' => $item['product']['price'] * $item['quantity'],
                 'total' => Number::formatMoney($item['product']['price'] * $item['quantity'], $this->subscription()->company),
@@ -235,17 +242,6 @@ class Summary extends Component
     #[On('summary.refresh')]
     public function refresh()
     {
-        // nlog("am i refreshing here?");
-
-        // $this->oneTimePurchasesTotal = $this->oneTimePurchasesTotal();
-        // $this->recurringPurchasesTotal = $this->recurringPurchasesTotal();
-        // $this->discount = $this->discount();
-
-        // nlog($this->oneTimePurchasesTotal);
-        // nlog($this->recurringPurchasesTotal);
-        // nlog($this->discount);
-
-
 
     }
 

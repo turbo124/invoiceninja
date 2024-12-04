@@ -63,6 +63,22 @@ class RegisterOrLogin extends Component
 
         $this->state['initial_completed'] = true;
 
+
+        if(!$this->subscription()->registration_required){
+                    
+            $service = new ClientRegisterService(
+                company: $this->subscription()->company,
+                additional: $this->additional_fields,
+            );
+
+            $client = $service->createClient([]);
+            $contact = $service->createClientContact(['email' => $this->email], $client);
+            auth()->guard('contact')->loginUsingId($contact->id, true);
+            $this->dispatch('purchase.next');
+            return;
+            
+        }
+
         if ($this->state['otp']) {
             return $this->withOtp();
         }
@@ -112,7 +128,6 @@ class RegisterOrLogin extends Component
 
         if ($contact === null) {
             $this->registerForm();
-
             return;
         }
 
@@ -262,11 +277,10 @@ class RegisterOrLogin extends Component
     {
 
         if (auth()->guard('contact')->check()) {
-            // $this->dispatch('purchase.context', property: 'contact', value: auth()->guard('contact')->user());
             $this->dispatch('purchase.next');
-
             return;
         }
+        
     }
 
     public function render()
