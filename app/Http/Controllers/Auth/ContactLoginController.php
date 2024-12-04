@@ -63,6 +63,9 @@ class ContactLoginController extends Controller
             return $company;
         }
 
+        if(Ninja::isSelfHost())
+            return Company::first();
+
         return false;
     }
 

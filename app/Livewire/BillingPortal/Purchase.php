@@ -12,18 +12,20 @@
 
 namespace App\Livewire\BillingPortal;
 
+use App\Utils\Ninja;
+use Livewire\Component;
 use App\Libraries\MultiDB;
-use App\Livewire\BillingPortal\Authentication\Login;
-use App\Livewire\BillingPortal\Authentication\Register;
-use App\Livewire\BillingPortal\Authentication\RegisterOrLogin;
-use App\Livewire\BillingPortal\Cart\Cart;
-use App\Livewire\BillingPortal\Payments\Methods;
+use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use App\Models\Subscription;
 use App\Utils\Traits\MakesHash;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use Livewire\Component;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
+use App\Livewire\BillingPortal\Cart\Cart;
+use App\Livewire\BillingPortal\Payments\Methods;
+use App\Livewire\BillingPortal\Authentication\Login;
+use App\Livewire\BillingPortal\Authentication\Register;
+use App\Livewire\BillingPortal\Authentication\RegisterOrLogin;
 
 class Purchase extends Component
 {
@@ -114,7 +116,6 @@ class Purchase extends Component
     {
         return "summary-{$this->id}";
     }
-
 
     #[Computed()]
     public function subscription()

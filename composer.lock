@@ -535,16 +535,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.332.0",
+            "version": "3.334.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "3b4972a465b66fe3da461a3febdcc363954a0969"
+                "reference": "8afe50cb2a93051dafef21eb616e297a449764aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3b4972a465b66fe3da461a3febdcc363954a0969",
-                "reference": "3b4972a465b66fe3da461a3febdcc363954a0969",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/8afe50cb2a93051dafef21eb616e297a449764aa",
+                "reference": "8afe50cb2a93051dafef21eb616e297a449764aa",
                 "shasum": ""
             },
             "require": {
@@ -627,9 +627,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.332.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.334.0"
             },
-            "time": "2024-12-02T03:48:16+00:00"
+            "time": "2024-12-04T19:09:04+00:00"
         },
         {
             "name": "babenkoivan/elastic-adapter",
@@ -2902,16 +2902,16 @@
         },
         {
             "name": "google/auth",
-            "version": "v1.43.0",
+            "version": "v1.44.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-auth-library-php.git",
-                "reference": "b6a80acd906492086db59aada9196dcfb9c512fe"
+                "reference": "5670e56307d7a2eac931f677c0e59a4f8abb2e43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/b6a80acd906492086db59aada9196dcfb9c512fe",
-                "reference": "b6a80acd906492086db59aada9196dcfb9c512fe",
+                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/5670e56307d7a2eac931f677c0e59a4f8abb2e43",
+                "reference": "5670e56307d7a2eac931f677c0e59a4f8abb2e43",
                 "shasum": ""
             },
             "require": {
@@ -2956,9 +2956,9 @@
             "support": {
                 "docs": "https://googleapis.github.io/google-auth-library-php/main/",
                 "issues": "https://github.com/googleapis/google-auth-library-php/issues",
-                "source": "https://github.com/googleapis/google-auth-library-php/tree/v1.43.0"
+                "source": "https://github.com/googleapis/google-auth-library-php/tree/v1.44.0"
             },
-            "time": "2024-11-07T19:35:20+00:00"
+            "time": "2024-12-04T15:34:58+00:00"
         },
         {
             "name": "graham-campbell/result-type",
@@ -3667,16 +3667,16 @@
         },
         {
             "name": "horstoeko/mimedb",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/horstoeko/mimedb.git",
-                "reference": "5242e42662848be5dcee3dd87a915d34fa9f61df"
+                "reference": "2d50f2b6bf63f14741514682869b53fc97232308"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/horstoeko/mimedb/zipball/5242e42662848be5dcee3dd87a915d34fa9f61df",
-                "reference": "5242e42662848be5dcee3dd87a915d34fa9f61df",
+                "url": "https://api.github.com/repos/horstoeko/mimedb/zipball/2d50f2b6bf63f14741514682869b53fc97232308",
+                "reference": "2d50f2b6bf63f14741514682869b53fc97232308",
                 "shasum": ""
             },
             "require": {
@@ -3716,9 +3716,9 @@
             ],
             "support": {
                 "issues": "https://github.com/horstoeko/mimedb/issues",
-                "source": "https://github.com/horstoeko/mimedb/tree/v1.0.7"
+                "source": "https://github.com/horstoeko/mimedb/tree/v1.0.8"
             },
-            "time": "2024-11-22T10:02:51+00:00"
+            "time": "2024-12-03T10:57:28+00:00"
         },
         {
             "name": "horstoeko/orderx",
@@ -3886,16 +3886,16 @@
         },
         {
             "name": "horstoeko/zugferd",
-            "version": "v1.0.89",
+            "version": "v1.0.90",
             "source": {
                 "type": "git",
                 "url": "https://github.com/horstoeko/zugferd.git",
-                "reference": "f728e974d7a1c2593d11357eabe4b0686263a69c"
+                "reference": "2dfebcb9c3acbfd62dd20214de817fd764365d7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/f728e974d7a1c2593d11357eabe4b0686263a69c",
-                "reference": "f728e974d7a1c2593d11357eabe4b0686263a69c",
+                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/2dfebcb9c3acbfd62dd20214de817fd764365d7e",
+                "reference": "2dfebcb9c3acbfd62dd20214de817fd764365d7e",
                 "shasum": ""
             },
             "require": {
@@ -3952,9 +3952,9 @@
             ],
             "support": {
                 "issues": "https://github.com/horstoeko/zugferd/issues",
-                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.89"
+                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.90"
             },
-            "time": "2024-12-02T16:48:08+00:00"
+            "time": "2024-12-03T04:52:07+00:00"
         },
         {
             "name": "horstoeko/zugferdvisualizer",
@@ -4408,12 +4408,12 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "InvoiceNinja\\Inspector\\InspectorServiceProvider"
-                    ],
                     "aliases": {
                         "Inspector": "InvoiceNinja\\Inspector\\InspectorFacade"
-                    }
+                    },
+                    "providers": [
+                        "InvoiceNinja\\Inspector\\InspectorServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -5200,13 +5200,13 @@
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "10.x-dev"
-                },
                 "laravel": {
                     "providers": [
                         "Laravel\\Scout\\ScoutServiceProvider"
                     ]
+                },
+                "branch-alias": {
+                    "dev-master": "10.x-dev"
                 }
             },
             "autoload": {
@@ -7913,12 +7913,12 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "Nwidart\\Modules\\LaravelModulesServiceProvider"
-                    ],
                     "aliases": {
                         "Module": "Nwidart\\Modules\\Facades\\Module"
-                    }
+                    },
+                    "providers": [
+                        "Nwidart\\Modules\\LaravelModulesServiceProvider"
+                    ]
                 },
                 "branch-alias": {
                     "dev-master": "11.0-dev"
