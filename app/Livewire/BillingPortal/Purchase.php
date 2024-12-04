@@ -166,7 +166,8 @@ class Purchase extends Component
             ->handleContext('hash', $this->hash)
             ->handleContext('quantity', 1)
             ->handleContext('request_data', $this->request_data)
-            ->handleContext('campaign', $this->campaign);
+            ->handleContext('campaign', $this->campaign)
+            ->handleContext('subcription_id', $this->subscription_id);
     }
 
     public function render()
