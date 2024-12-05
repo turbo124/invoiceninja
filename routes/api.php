@@ -465,7 +465,7 @@ Route::match(['get', 'post'], 'payment_notification_webhook/{company_key}/{compa
     ->name('payment_notification_webhook');
 
 
-Route::post('api/v1/postmark_webhook', [PostMarkController::class, 'webhook'])->middleware('throttle:1000,1');
+Route::post('api/v1/postmark_webhook', [PostMarkController::class, 'webhook'])->middleware('throttle:2000,1');
 Route::post('api/v1/postmark_inbound_webhook', [PostMarkController::class, 'inboundWebhook'])->middleware('throttle:1000,1');
 Route::post('api/v1/mailgun_webhook', [MailgunController::class, 'webhook'])->middleware('throttle:1000,1');
 Route::post('api/v1/mailgun_inbound_webhook', [MailgunController::class, 'inboundWebhook'])->middleware('throttle:1000,1');

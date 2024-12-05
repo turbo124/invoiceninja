@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78204384d93510032f337ee6dd5311ff",
+    "content-hash": "ad637e8aaf7d9585c6ef18ddba1987e3",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -535,16 +535,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.334.0",
+            "version": "3.334.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "8afe50cb2a93051dafef21eb616e297a449764aa"
+                "reference": "3938b3467f64a30fed7ee1762a6785f808a5ae4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/8afe50cb2a93051dafef21eb616e297a449764aa",
-                "reference": "8afe50cb2a93051dafef21eb616e297a449764aa",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3938b3467f64a30fed7ee1762a6785f808a5ae4d",
+                "reference": "3938b3467f64a30fed7ee1762a6785f808a5ae4d",
                 "shasum": ""
             },
             "require": {
@@ -627,9 +627,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.334.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.334.1"
             },
-            "time": "2024-12-04T19:09:04+00:00"
+            "time": "2024-12-05T01:17:41+00:00"
         },
         {
             "name": "babenkoivan/elastic-adapter",
@@ -3886,16 +3886,16 @@
         },
         {
             "name": "horstoeko/zugferd",
-            "version": "v1.0.90",
+            "version": "v1.0.91",
             "source": {
                 "type": "git",
                 "url": "https://github.com/horstoeko/zugferd.git",
-                "reference": "2dfebcb9c3acbfd62dd20214de817fd764365d7e"
+                "reference": "d66ee795a4d7cda871a41f0dcaf7fd389cf59fa2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/2dfebcb9c3acbfd62dd20214de817fd764365d7e",
-                "reference": "2dfebcb9c3acbfd62dd20214de817fd764365d7e",
+                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/d66ee795a4d7cda871a41f0dcaf7fd389cf59fa2",
+                "reference": "d66ee795a4d7cda871a41f0dcaf7fd389cf59fa2",
                 "shasum": ""
             },
             "require": {
@@ -3952,9 +3952,9 @@
             ],
             "support": {
                 "issues": "https://github.com/horstoeko/zugferd/issues",
-                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.90"
+                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.91"
             },
-            "time": "2024-12-03T04:52:07+00:00"
+            "time": "2024-12-05T04:40:27+00:00"
         },
         {
             "name": "horstoeko/zugferdvisualizer",
@@ -6952,16 +6952,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "3.8.0",
+            "version": "3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "32e515fdc02cdafbe4593e30a9350d486b125b67"
+                "reference": "aef6ee73a77a66e404dd6540934a9ef1b3c855b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/32e515fdc02cdafbe4593e30a9350d486b125b67",
-                "reference": "32e515fdc02cdafbe4593e30a9350d486b125b67",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/aef6ee73a77a66e404dd6540934a9ef1b3c855b4",
+                "reference": "aef6ee73a77a66e404dd6540934a9ef1b3c855b4",
                 "shasum": ""
             },
             "require": {
@@ -7039,7 +7039,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/3.8.0"
+                "source": "https://github.com/Seldaek/monolog/tree/3.8.1"
             },
             "funding": [
                 {
@@ -7051,7 +7051,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-12T13:57:08+00:00"
+            "time": "2024-12-05T17:15:07+00:00"
         },
         {
             "name": "mpdf/mpdf",
@@ -11500,21 +11500,21 @@
         },
         {
             "name": "symfony/brevo-mailer",
-            "version": "v7.2.0",
+            "version": "v7.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/brevo-mailer.git",
-                "reference": "f8eaa8d16fda38ce31548130aee8e90d5d94d32d"
+                "reference": "91d6317b13e4eb4973f7b8387dc8d373f338cce4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/brevo-mailer/zipball/f8eaa8d16fda38ce31548130aee8e90d5d94d32d",
-                "reference": "f8eaa8d16fda38ce31548130aee8e90d5d94d32d",
+                "url": "https://api.github.com/repos/symfony/brevo-mailer/zipball/91d6317b13e4eb4973f7b8387dc8d373f338cce4",
+                "reference": "91d6317b13e4eb4973f7b8387dc8d373f338cce4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
-                "symfony/mailer": "^7.2"
+                "symfony/mailer": "^5.4.21|^6.2.7|^7.0"
             },
             "conflict": {
                 "symfony/mime": "<6.2"
@@ -11549,7 +11549,7 @@
             "description": "Symfony Brevo Mailer Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/brevo-mailer/tree/v7.2.0"
+                "source": "https://github.com/symfony/brevo-mailer/tree/v7.1.6"
             },
             "funding": [
                 {
@@ -11565,7 +11565,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-28T08:24:38+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "symfony/clock",
@@ -12680,16 +12680,16 @@
         },
         {
             "name": "symfony/mailer",
-            "version": "v7.2.0",
+            "version": "v7.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mailer.git",
-                "reference": "e4d358702fb66e4c8a2af08e90e7271a62de39cc"
+                "reference": "69c9948451fb3a6a4d47dc8261d1794734e76cdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mailer/zipball/e4d358702fb66e4c8a2af08e90e7271a62de39cc",
-                "reference": "e4d358702fb66e4c8a2af08e90e7271a62de39cc",
+                "url": "https://api.github.com/repos/symfony/mailer/zipball/69c9948451fb3a6a4d47dc8261d1794734e76cdd",
+                "reference": "69c9948451fb3a6a4d47dc8261d1794734e76cdd",
                 "shasum": ""
             },
             "require": {
@@ -12698,7 +12698,7 @@
                 "psr/event-dispatcher": "^1",
                 "psr/log": "^1|^2|^3",
                 "symfony/event-dispatcher": "^6.4|^7.0",
-                "symfony/mime": "^7.2",
+                "symfony/mime": "^6.4|^7.0",
                 "symfony/service-contracts": "^2.5|^3"
             },
             "conflict": {
@@ -12740,7 +12740,7 @@
             "description": "Helps sending emails",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/mailer/tree/v7.2.0"
+                "source": "https://github.com/symfony/mailer/tree/v7.1.6"
             },
             "funding": [
                 {
@@ -12756,25 +12756,25 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-25T15:21:05+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "symfony/mailgun-mailer",
-            "version": "v7.2.0",
+            "version": "v7.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mailgun-mailer.git",
-                "reference": "3c1dfd9ff0a487a4116baec42d11ae21a061e3f1"
+                "reference": "b0117bf42b6dd8dfcfcab2a7e18508b594520b5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mailgun-mailer/zipball/3c1dfd9ff0a487a4116baec42d11ae21a061e3f1",
-                "reference": "3c1dfd9ff0a487a4116baec42d11ae21a061e3f1",
+                "url": "https://api.github.com/repos/symfony/mailgun-mailer/zipball/b0117bf42b6dd8dfcfcab2a7e18508b594520b5a",
+                "reference": "b0117bf42b6dd8dfcfcab2a7e18508b594520b5a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
-                "symfony/mailer": "^7.2"
+                "symfony/mailer": "^6.4|^7.0"
             },
             "conflict": {
                 "symfony/http-foundation": "<6.4"
@@ -12809,7 +12809,7 @@
             "description": "Symfony Mailgun Mailer Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/mailgun-mailer/tree/v7.2.0"
+                "source": "https://github.com/symfony/mailgun-mailer/tree/v7.1.6"
             },
             "funding": [
                 {
@@ -12825,7 +12825,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-28T08:24:38+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "symfony/mime",
@@ -13852,22 +13852,22 @@
         },
         {
             "name": "symfony/postmark-mailer",
-            "version": "v7.2.0",
+            "version": "v7.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/postmark-mailer.git",
-                "reference": "3a43a9dee2f474ebf7c0328d3cd55d8c17b5df6f"
+                "reference": "91c86a65dec04bc8313094087671486eac6ed3c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/postmark-mailer/zipball/3a43a9dee2f474ebf7c0328d3cd55d8c17b5df6f",
-                "reference": "3a43a9dee2f474ebf7c0328d3cd55d8c17b5df6f",
+                "url": "https://api.github.com/repos/symfony/postmark-mailer/zipball/91c86a65dec04bc8313094087671486eac6ed3c1",
+                "reference": "91c86a65dec04bc8313094087671486eac6ed3c1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
                 "psr/event-dispatcher": "^1",
-                "symfony/mailer": "^7.2"
+                "symfony/mailer": "^6.4|^7.0"
             },
             "conflict": {
                 "symfony/http-foundation": "<6.4"
@@ -13902,7 +13902,7 @@
             "description": "Symfony Postmark Mailer Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/postmark-mailer/tree/v7.2.0"
+                "source": "https://github.com/symfony/postmark-mailer/tree/v7.1.6"
             },
             "funding": [
                 {
@@ -13918,7 +13918,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-28T08:24:38+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "symfony/process",
@@ -16007,16 +16007,16 @@
         },
         {
             "name": "brianium/paratest",
-            "version": "v7.6.0",
+            "version": "v7.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paratestphp/paratest.git",
-                "reference": "68ff89a8de47d086588e391a516d2a5b5fde6254"
+                "reference": "9ac8eda68f17acda4dad4aa02ecdcc327d7e6675"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/68ff89a8de47d086588e391a516d2a5b5fde6254",
-                "reference": "68ff89a8de47d086588e391a516d2a5b5fde6254",
+                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/9ac8eda68f17acda4dad4aa02ecdcc327d7e6675",
+                "reference": "9ac8eda68f17acda4dad4aa02ecdcc327d7e6675",
                 "shasum": ""
             },
             "require": {
@@ -16025,26 +16025,26 @@
                 "ext-reflection": "*",
                 "ext-simplexml": "*",
                 "fidry/cpu-core-counter": "^1.2.0",
-                "jean85/pretty-package-versions": "^2.0.6",
+                "jean85/pretty-package-versions": "^2.1.0",
                 "php": "~8.2.0 || ~8.3.0 || ~8.4.0",
                 "phpunit/php-code-coverage": "^11.0.7",
                 "phpunit/php-file-iterator": "^5.1.0",
                 "phpunit/php-timer": "^7.0.1",
-                "phpunit/phpunit": "^11.4.1",
+                "phpunit/phpunit": "^11.4.4",
                 "sebastian/environment": "^7.2.0",
-                "symfony/console": "^6.4.11 || ^7.1.5",
-                "symfony/process": "^6.4.8 || ^7.1.5"
+                "symfony/console": "^6.4.14 || ^7.1.7",
+                "symfony/process": "^6.4.14 || ^7.1.7"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^12.0.0",
                 "ext-pcov": "*",
                 "ext-posix": "*",
-                "phpstan/phpstan": "^1.12.6",
-                "phpstan/phpstan-deprecation-rules": "^1.2.1",
-                "phpstan/phpstan-phpunit": "^1.4.0",
-                "phpstan/phpstan-strict-rules": "^1.6.1",
-                "squizlabs/php_codesniffer": "^3.10.3",
-                "symfony/filesystem": "^6.4.9 || ^7.1.5"
+                "phpstan/phpstan": "^2",
+                "phpstan/phpstan-deprecation-rules": "^2",
+                "phpstan/phpstan-phpunit": "^2",
+                "phpstan/phpstan-strict-rules": "^2",
+                "squizlabs/php_codesniffer": "^3.11.1",
+                "symfony/filesystem": "^6.4.13 || ^7.1.6"
             },
             "bin": [
                 "bin/paratest",
@@ -16084,7 +16084,7 @@
             ],
             "support": {
                 "issues": "https://github.com/paratestphp/paratest/issues",
-                "source": "https://github.com/paratestphp/paratest/tree/v7.6.0"
+                "source": "https://github.com/paratestphp/paratest/tree/v7.6.1"
             },
             "funding": [
                 {
@@ -16096,7 +16096,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2024-10-15T12:38:31+00:00"
+            "time": "2024-12-05T10:55:39+00:00"
         },
         {
             "name": "clue/ndjson-react",
@@ -16948,16 +16948,16 @@
         },
         {
             "name": "maximebf/debugbar",
-            "version": "v1.23.3",
+            "version": "v1.23.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maximebf/php-debugbar.git",
-                "reference": "687400043d77943ef95e8417cb44e1673ee57844"
+                "reference": "0815f47bdd867b816b4bf2ca1c7bd7f89e1527ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/687400043d77943ef95e8417cb44e1673ee57844",
-                "reference": "687400043d77943ef95e8417cb44e1673ee57844",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/0815f47bdd867b816b4bf2ca1c7bd7f89e1527ca",
+                "reference": "0815f47bdd867b816b4bf2ca1c7bd7f89e1527ca",
                 "shasum": ""
             },
             "require": {
@@ -17010,9 +17010,9 @@
             ],
             "support": {
                 "issues": "https://github.com/maximebf/php-debugbar/issues",
-                "source": "https://github.com/maximebf/php-debugbar/tree/v1.23.3"
+                "source": "https://github.com/maximebf/php-debugbar/tree/v1.23.4"
             },
-            "time": "2024-10-29T12:24:25+00:00"
+            "time": "2024-12-05T10:36:51+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -17314,16 +17314,16 @@
         },
         {
             "name": "phpmyadmin/sql-parser",
-            "version": "5.10.1",
+            "version": "5.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpmyadmin/sql-parser.git",
-                "reference": "b14fd66496a22d8dd7f7e2791edd9e8674422f17"
+                "reference": "72afbce7e4b421593b60d2eb7281e37a50734df8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/b14fd66496a22d8dd7f7e2791edd9e8674422f17",
-                "reference": "b14fd66496a22d8dd7f7e2791edd9e8674422f17",
+                "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/72afbce7e4b421593b60d2eb7281e37a50734df8",
+                "reference": "72afbce7e4b421593b60d2eb7281e37a50734df8",
                 "shasum": ""
             },
             "require": {
@@ -17397,7 +17397,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2024-11-10T04:10:31+00:00"
+            "time": "2024-12-05T15:04:09+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -18848,16 +18848,16 @@
         },
         {
             "name": "sebastian/exporter",
-            "version": "6.1.3",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "c414673eee9a8f9d51bbf8d61fc9e3ef1e85b20e"
+                "reference": "3473f61172093b2da7de1fb5782e1f24cc036dc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/c414673eee9a8f9d51bbf8d61fc9e3ef1e85b20e",
-                "reference": "c414673eee9a8f9d51bbf8d61fc9e3ef1e85b20e",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/3473f61172093b2da7de1fb5782e1f24cc036dc3",
+                "reference": "3473f61172093b2da7de1fb5782e1f24cc036dc3",
                 "shasum": ""
             },
             "require": {
@@ -18866,7 +18866,7 @@
                 "sebastian/recursion-context": "^6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^11.2"
+                "phpunit/phpunit": "^11.3"
             },
             "type": "library",
             "extra": {
@@ -18914,7 +18914,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
                 "security": "https://github.com/sebastianbergmann/exporter/security/policy",
-                "source": "https://github.com/sebastianbergmann/exporter/tree/6.1.3"
+                "source": "https://github.com/sebastianbergmann/exporter/tree/6.3.0"
             },
             "funding": [
                 {
@@ -18922,7 +18922,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-03T04:56:19+00:00"
+            "time": "2024-12-05T09:17:50+00:00"
         },
         {
             "name": "sebastian/global-state",
