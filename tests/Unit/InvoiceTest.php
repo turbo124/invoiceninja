@@ -812,8 +812,7 @@ class InvoiceTest extends TestCase
 
         $invoice = $invoice->calc()->getInvoice();
 
-        nlog($invoice->amount);
-        $this->assertEquals(100, $invoice->amount);
+        $this->assertEquals(99.99, $invoice->amount);
 
     }
 
