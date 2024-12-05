@@ -218,6 +218,7 @@ trait ChartQueries
     {
 
         $user_filter = $this->is_admin ? '' : 'AND clients.user_id = '.$this->user->id;
+            //            AND invoices.balance > 0
 
         return DB::select("
             SELECT
@@ -232,7 +233,7 @@ trait ChartQueries
             AND clients.is_deleted = 0
             {$user_filter}
             AND invoices.is_deleted = 0
-            AND invoices.balance > 0
+
             AND (invoices.date BETWEEN :start_date AND :end_date)
             GROUP BY currency_id
         ", ['company_currency' => $this->company->settings->currency_id, 'company_id' => $this->company->id, 'start_date' => $start_date, 'end_date' => $end_date]);
@@ -242,7 +243,7 @@ trait ChartQueries
     {
 
         $user_filter = $this->is_admin ? '' : 'AND clients.user_id = '.$this->user->id;
-
+//AND invoices.balance > 0
         return DB::select("
             SELECT
             SUM(invoices.balance / COALESCE(NULLIF(invoices.exchange_rate, 0), 1)) as amount,
@@ -255,7 +256,7 @@ trait ChartQueries
             AND clients.is_deleted = 0
             {$user_filter}
             AND invoices.is_deleted = 0
-            AND invoices.balance > 0
+            
             AND (invoices.date BETWEEN :start_date AND :end_date)
         ", [
          'company_id' => $this->company->id,
