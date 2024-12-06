@@ -76,11 +76,11 @@ class UpdatePurchaseOrderRequest extends Request
         $rules['status_id'] = 'sometimes|integer|in:1,2,3,4,5';
         $rules['exchange_rate'] = 'bail|sometimes|numeric';
         $rules['amount'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
-
-        $rules['custom_surcharge1'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
-        $rules['custom_surcharge2'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
-        $rules['custom_surcharge3'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
-        $rules['custom_surcharge4'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
+       
+        $rules['custom_surcharge1'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
+        $rules['custom_surcharge2'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
+        $rules['custom_surcharge3'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
+        $rules['custom_surcharge4'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
 
         return $rules;
     }
