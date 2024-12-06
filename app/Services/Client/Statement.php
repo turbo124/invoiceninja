@@ -160,6 +160,7 @@ class Statement
 
     private function templateStatement($variables)
     {
+
         if (isset($this->options['template'])) {
             $statement_design_id = $this->options['template'];
         } else {
@@ -221,12 +222,10 @@ class Statement
             $this->entity = $this->getInvoices()->first();//@phpstan-ignore-line
         }
         else {
-            nlog("fall back to any invoice/invitation");
             $this->entity = $this->client->invoices()->whereHas('invitations')->first();
         }
 
         if(\is_null($this->entity)){
-                        
             $settings = new \stdClass();
             $settings->entity = \App\Models\Client::class;
             $settings->currency_id = '1';
@@ -419,13 +418,12 @@ class Statement
     protected function getInvitation()
     {
         if($this->entity instanceof Invoice) {
-        // if ($this->entity instanceof Invoice || $this->entity instanceof Payment) {
-            $invitation = $this->entity->whereHas('invitations')->first()->invitations->first();
+            $invitation = $this->entity->invitations->first();
             
             if($invitation)
                 return $invitation;
 
-        $invitation = $this->client->invoice()->whereHas('invitations')->first()->invitations->first();
+        $invitation = $this->client->invoices()->whereHas('invitations')->first()->invitations->first();
         
         if ($invitation) 
             return $invitation;
