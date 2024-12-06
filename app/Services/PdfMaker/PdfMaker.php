@@ -29,8 +29,6 @@ class PdfMaker
 
     private $options;
 
-    public $xpath;
-    
     /** @var CommonMarkConverter */
     protected $commonmark;
 
