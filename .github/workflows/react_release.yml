@@ -49,7 +49,6 @@ jobs:
           cd ui
           git checkout develop
           sed -i 's/VITE_IS_TEST=true/VITE_IS_TEST=false/' .env.example
-          sed -i 's/VITE_ENABLE_PEPPOL_STANDARD=false/VITE_ENABLE_PEPPOL_STANDARD=true/' .env.example
           
           cp .env.example .env
           cp ../vite.config.ts.react ./vite.config.js
