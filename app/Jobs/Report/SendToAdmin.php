@@ -20,6 +20,9 @@ use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
 use App\Services\Report\ARDetailReport;
 use App\Services\Report\ARSummaryReport;
+use App\Services\Report\ClientBalanceReport;
+use App\Services\Report\ClientSalesReport;
+use App\Services\Report\TaxSummaryReport;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -61,10 +64,10 @@ class SendToAdmin implements ShouldQueue
         $files = [];
         $files[] = ['file' => $csv, 'file_name' => "{$this->file_name}", 'mime' => 'text/csv'];
 
-        // if(in_array(get_class($export), [ARDetailReport::class, ARSummaryReport::class])) {
-        //     $pdf = base64_encode($export->getPdf());
-        //     $files[] = ['file' => $pdf, 'file_name' => str_replace(".csv", ".pdf", $this->file_name), 'mime' => 'application/pdf'];
-        // }
+        if(in_array(get_class($export), [ARDetailReport::class, ARSummaryReport::class, ClientBalanceReport::class, ClientSalesReport::class, TaxSummaryReport::class])) {
+            $pdf = base64_encode($export->getPdf());
+            $files[] = ['file' => $pdf, 'file_name' => str_replace(".csv", ".pdf", $this->file_name), 'mime' => 'application/pdf'];
+        }
 
         $user = $this->company->owner();
 

@@ -15,7 +15,6 @@ use Laravel\Scout\Searchable;
 use App\DataMapper\ClientSync;
 use App\Utils\Traits\AppSetup;
 use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\MakesDates;
 use App\DataMapper\FeesAndLimits;
 use App\Models\Traits\Excludable;
 use App\DataMapper\ClientSettings;
@@ -120,7 +119,6 @@ class Client extends BaseModel implements HasLocalePreference
 {
     use PresentableTrait;
     use MakesHash;
-    use MakesDates;
     use SoftDeletes;
     use Filterable;
     use GeneratesCounter;
@@ -251,6 +249,7 @@ class Client extends BaseModel implements HasLocalePreference
         }
 
         return [
+            'id' => $this->id,
             'name' => $name,
             'is_deleted' => $this->is_deleted,
             'hashed_id' => $this->hashed_id,
@@ -285,6 +284,11 @@ class Client extends BaseModel implements HasLocalePreference
     {
         return $this->hashed_id;
     }
+
+    // public function getScoutKeyName()
+    // {
+    //     return 'hashed_id';
+    // }
 
     public function getEntityType()
     {
@@ -1029,7 +1033,35 @@ class Client extends BaseModel implements HasLocalePreference
      */
     public function peppolSendingEnabled(): bool
     {
-        return $this->getSetting('e_invoice_type') == 'PEPPOL' && $this->company->peppolSendingEnabled();
+        return $this->getSetting('e_invoice_type') == 'PEPPOL' && $this->company->peppolSendingEnabled() && is_null($this->checkDeliveryNetwork());
+    }
+    
+    /**
+     * checkDeliveryNetwork
+     *
+     * Checks whether the client country is supported
+     * for sending over the PEPPOL network.
+     * 
+     * @return string|null
+     */
+    public function checkDeliveryNetwork(): ?string
+    {
+
+        if(!isset($this->country->iso_3166_2))
+            return "Client has no country set!";
+        
+        $br = new \App\DataMapper\Tax\BaseRule();
+
+        $government_countries = array_merge($br->peppol_business_countries, $br->peppol_government_countries);
+
+        if(in_array($this->country->iso_3166_2, $government_countries) && $this->classification == 'government'){
+            return null;
+        }
+
+        if(in_array($this->country->iso_3166_2, $br->peppol_business_countries))
+            return null;
+
+        return "Country {$this->country->full_name} ( {$this->country->iso_3166_2} ) is not supported by the PEPPOL network for e-delivery.";
 
     }
 }

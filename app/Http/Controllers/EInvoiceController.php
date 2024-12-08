@@ -64,7 +64,11 @@ class EInvoiceController extends BaseController
     {
         $einvoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
 
-        foreach ($request->input('payment_means', []) as $payment_means) {
+        $payment_means_array = $request->input('payment_means', []);
+
+        $einvoice->PaymentMeans = [];
+
+        foreach ($payment_means_array as $payment_means) {
             $pm = new PaymentMeans();
 
             $pmc = new PaymentMeansCode();
@@ -102,8 +106,11 @@ class EInvoiceController extends BaseController
                 $pm->InstructionNote = $payment_means['information'];
             }
 
+            // nlog($pm);
             $einvoice->PaymentMeans[] = $pm;
         }
+
+        // nlog($einvoice);
 
         $stub = new \stdClass();
         $stub->Invoice = $einvoice;
@@ -137,7 +144,6 @@ class EInvoiceController extends BaseController
                 'account_key' => $company->account->key,
             ]);
 
-
         if ($response->status() == 422) {
             return response()->json(['message' => $response->json('message')], 422);
         }
@@ -146,8 +152,13 @@ class EInvoiceController extends BaseController
             return response()->json(['message' => $response->json('message')], 400);
         }
 
+        $account = $company->account;
+
+        $account->e_invoice_quota = (int) $response->body();
+        $account->save();
+
         return response()->json([
-            'quota' => $response->body(),
+            'quota' => $account->e_invoice_quota,
         ]);
     }
 }

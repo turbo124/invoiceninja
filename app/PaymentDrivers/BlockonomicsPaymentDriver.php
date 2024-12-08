@@ -12,18 +12,19 @@
 
 namespace App\PaymentDrivers;
 
-use App\Utils\Traits\MakesHash;
-use App\Models\PaymentHash;
-use App\Models\GatewayType;
-use App\PaymentDrivers\Blockonomics\Blockonomics;
-use App\Models\SystemLog;
-use App\Models\Payment;
-use App\Models\Gateway;
 use App\Models\Client;
-use App\Exceptions\PaymentFailed;
-use App\Models\PaymentType;
-use App\Http\Requests\Payments\PaymentWebhookRequest;
+use App\Models\Gateway;
 use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\SystemLog;
+use App\Models\GatewayType;
+use App\Models\PaymentHash;
+use App\Models\PaymentType;
+use App\Utils\Traits\MakesHash;
+use App\Exceptions\PaymentFailed;
+use Illuminate\Support\Facades\Http;
+use App\PaymentDrivers\Blockonomics\Blockonomics;
+use App\Http\Requests\Payments\PaymentWebhookRequest;
 
 class BlockonomicsPaymentDriver extends BaseDriver
 {
@@ -142,5 +143,23 @@ class BlockonomicsPaymentDriver extends BaseDriver
     {
         $this->setPaymentMethod(GatewayType::CRYPTO);
         return $this->payment_method->refund($payment, $amount); //this is your custom implementation from here
+    }
+
+    public function auth(): bool
+    {
+        try {
+        
+            $api_key = $this->company_gateway->getConfigField('apiKey');
+            $url = $this->NEW_ADDRESS_URL . '?reset=1';
+            $response = Http::withToken($api_key)
+                ->post($url, []);
+            if($response->successful()) {
+                return true;
+            }
+            return false;
+        } catch (\Exception $e) {
+            return false;
+        }
+
     }
 }

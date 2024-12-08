@@ -15,7 +15,6 @@ use App\Utils\Ninja;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
 use App\DataMapper\InvoiceSync;
-use App\Utils\Traits\MakesDates;
 use App\Helpers\Invoice\InvoiceSum;
 use Illuminate\Support\Facades\App;
 use App\Utils\Traits\MakesReminders;
@@ -143,7 +142,6 @@ class Invoice extends BaseModel
     use SoftDeletes;
     use Filterable;
     use NumberFormatter;
-    use MakesDates;
     use PresentableTrait;
     use MakesInvoiceValues;
     use MakesReminders;
@@ -249,6 +247,7 @@ class Invoice extends BaseModel
         App::setLocale($locale);
 
         return [
+            'id' => $this->id,
             'name' => ctrans('texts.invoice') . " " . $this->number . " | " . $this->client->present()->name() .  ' | ' . Number::formatMoney($this->amount, $this->company) . ' | ' . $this->translateDate($this->date, $this->company->date_format(), $locale),
             'hashed_id' => $this->hashed_id,
             'number' => $this->number,
@@ -644,10 +643,10 @@ class Invoice extends BaseModel
 
     public function entityEmailEvent($invitation, $reminder_template, $template = '')
     {
-
+        
         switch ($reminder_template) {
             case 'invoice':
-                event(new InvoiceWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $template));
+                event(new InvoiceWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
                 break;
             case 'reminder1':
                 event(new InvoiceReminderWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
@@ -665,7 +664,7 @@ class Invoice extends BaseModel
             case 'custom1':
             case 'custom2':
             case 'custom3':
-                event(new InvoiceWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $template));
+                event(new InvoiceWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
                 break;
             default:
                 // code...

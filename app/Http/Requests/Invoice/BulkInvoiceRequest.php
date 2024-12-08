@@ -44,7 +44,7 @@ class BulkInvoiceRequest extends Request
             throw new DuplicatePaymentException('Action still processing, please wait. ', 429);
         }
 
-        $delay = $this->input('action', 'delete') == 'delete' ? (ceil(count($this->input('ids', 4)))) : 1;
+        $delay = $this->input('action', 'delete') == 'delete' ? (ceil(count($this->input('ids', 2)))) : 1;
         \Illuminate\Support\Facades\Cache::put(($this->ip()."|".$this->input('action', 0)."|".$user->company()->company_key), true, $delay);
 
     }

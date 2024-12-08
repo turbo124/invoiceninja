@@ -582,8 +582,7 @@ class Mutator implements MutatorInterface
             return $this->invoice->client->id_number;
         }
 
-        // elseif($this->invoice->client->classification == 'business')
-        return $this->invoice->client->vat_number;
+        return $this->invoice->client->vat_number ?? '';
     }
 
     public function setClientRoutingCode(): self

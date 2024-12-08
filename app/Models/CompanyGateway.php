@@ -129,7 +129,6 @@ class CompanyGateway extends BaseModel
     // const TYPE_AUTHORIZE = 305;
     // const TYPE_CUSTOM = 306;
     // const TYPE_BRAINTREE = 307;
-    // const TYPE_WEPAY = 309;
     // const TYPE_PAYFAST = 310;
     // const TYPE_PAYTRACE = 311;
     // const TYPE_MOLLIE = 312;

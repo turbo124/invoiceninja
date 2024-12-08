@@ -88,6 +88,4 @@ Contact support: contact@invoiceninja.com
 
 Thank you for choosing our e-invoicing service.
     "
-    
-
 ];

@@ -79,7 +79,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateExchangeRates())->dailyAt('23:30')->withoutOverlapping()->name('exchange-rate-job')->onOneServer();
 
         /* Runs cleanup code for subscriptions */
-        $schedule->job(new SubscriptionCron())->dailyAt('00:01')->withoutOverlapping()->name('subscription-job')->onOneServer();
+        $schedule->job(new SubscriptionCron())->hourlyAt(1)->withoutOverlapping()->name('subscription-job')->onOneServer();
 
         /* Sends recurring expenses*/
         $schedule->job(new RecurringExpensesCron())->dailyAt('00:10')->withoutOverlapping()->name('recurring-expense-job')->onOneServer();

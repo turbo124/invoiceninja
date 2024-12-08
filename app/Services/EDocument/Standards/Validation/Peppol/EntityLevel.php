@@ -143,7 +143,7 @@ class EntityLevel
 
         try {
             $xml = $p->run()->toXml();
-
+             
             if (count($p->getErrors()) >= 1) {
 
                 foreach ($p->getErrors() as $error) {
@@ -176,6 +176,8 @@ class EntityLevel
 
         }
 
+        $this->checkNexus($invoice->client);
+
         $this->errors['passes'] = count($this->errors['invoice']) == 0 && count($this->errors['client']) == 0 && count($this->errors['company']) == 0;
 
         return $this->errors;
@@ -205,6 +207,18 @@ class EntityLevel
         if (!in_array($client->classification, ['government', 'individual']) && in_array($client->country->iso_3166_2, $this->eu_country_codes) && !$this->validString($client->vat_number)) {
             $errors[] = ['field' => 'vat_number', 'label' => ctrans("texts.vat_number")];
         }
+        
+        //Primary contact email is present.
+        if($client->present()->email() == 'No Email Set'){
+            $errors[] = ['field' => 'email', 'label' => ctrans("texts.email")];
+        }
+
+        $delivery_network_supported = $client->checkDeliveryNetwork();
+
+        if(is_string($delivery_network_supported))
+            $errors[] = ['field' => ctrans("texts.country"), 'label' => $delivery_network_supported];
+
+        
 
         return $errors;
 
@@ -297,4 +311,47 @@ class EntityLevel
         return iconv_strlen($string) >= 1;
     }
 
+    private function checkNexus(Client $client): self
+    {
+
+        $company_country_code = $client->company->country()->iso_3166_2;
+        $client_country_code = $client->country->iso_3166_2;
+        $br = new \App\DataMapper\Tax\BaseRule();
+        $eu_countries = $br->eu_country_codes;
+
+        if ($client_country_code == $company_country_code) {
+        } elseif (in_array($company_country_code, $eu_countries) && !in_array($client_country_code, $eu_countries)) {
+        } elseif (in_array($client_country_code, $eu_countries)) {
+
+            // First, determine if we're over threshold
+            $is_over_threshold = isset($client->company->tax_data->regions->EU->has_sales_above_threshold) &&
+                                $client->company->tax_data->regions->EU->has_sales_above_threshold;
+
+            // Is this B2B or B2C?
+            $is_b2c = strlen($client->vat_number) < 2 ||
+                    !($client->has_valid_vat_number ?? false) ||
+                    $client->classification == 'individual';
+
+            // B2C, under threshold, no Company VAT Registerd - must charge origin country VAT
+            if ($is_b2c && !$is_over_threshold && strlen($client->company->settings->vat_number) < 2) {
+               
+            } elseif ($is_b2c) {
+                if ($is_over_threshold) {
+                    // B2C over threshold - need destination VAT number
+                    if (!isset($client->company->tax_data->regions->EU->subregions->{$client_country_code}->vat_number)) {                        
+                        $this->errors['invoice'][] = "Tax Nexus is client country ({$client_country_code}) - however VAT number not present for this region.";
+                    }
+                } 
+                
+            } elseif ($is_over_threshold && !in_array($company_country_code, $eu_countries)) {
+               
+            } 
+            
+
+        }
+
+        return $this;
+    }
+
+    
 }

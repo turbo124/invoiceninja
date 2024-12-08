@@ -399,8 +399,7 @@ class Storecove
 
             return $data;
         }
-        nlog($r->body());
-
+       
         return $r;
     }
 
@@ -426,8 +425,6 @@ class Storecove
             "scheme" => $scheme,
             "superscheme" => "iso6523-actorid-upis",
         ];
-
-        nlog($data);
 
         $r = $this->httpClient($uri, (HttpVerb::POST)->value, $data);
 
@@ -515,7 +512,6 @@ class Storecove
         $r = $this->httpClient($uri, (HttpVerb::GET)->value, []);
 
         if ($r->successful()) {
-            nlog($r->json());
             return $r->json();
         }
 
