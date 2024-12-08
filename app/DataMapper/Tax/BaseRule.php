@@ -126,7 +126,7 @@ class BaseRule implements RuleInterface
         'LU',
         'NL',
         'NO',
-        'PL',
+        // 'PL',
         'SE',
         'IE',
     ];
