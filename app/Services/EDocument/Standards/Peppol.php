@@ -345,7 +345,7 @@ class Peppol extends AbstractService
 
         $xml .= $suffix;
 
-        nlog($xml);
+        // nlog($xml);
         return $xml;
 
     }
