@@ -178,11 +178,11 @@ class Expense extends BaseModel
             'number' => $this->number,
             'is_deleted' => $this->is_deleted,
             'amount' => (float) $this->amount,
-            'date' => $this->date,
-            'custom_value1' => (string)$this->custom_value1,
-            'custom_value2' => (string)$this->custom_value2,
-            'custom_value3' => (string)$this->custom_value3,
-            'custom_value4' => (string)$this->custom_value4,
+            'date' => $this->date ?? null,
+            'custom_value1' => (string)$this->custom_value1 ?? '',
+            'custom_value2' => (string)$this->custom_value2 ?? '',
+            'custom_value3' => (string)$this->custom_value3 ?? '',
+            'custom_value4' => (string)$this->custom_value4 ?? '',
             'company_key' => $this->company->company_key,
         ];
     }
