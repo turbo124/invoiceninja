@@ -488,8 +488,6 @@ class InvoiceItemSum
                 $amount = $this->item->line_total;
             }
 
-            // $amount = round($amount,2);
-
             $item_tax_rate1_total = $this->calcAmountLineTax($this->item->tax_rate1, $amount);
 
             $item_tax += $item_tax_rate1_total;
@@ -523,7 +521,7 @@ class InvoiceItemSum
 
         }
 
-
+        $this->getPeppolSurchargeTaxes();
 
         return $this;
     }

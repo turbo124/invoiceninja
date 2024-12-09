@@ -873,7 +873,7 @@ class PdfBuilder
         }
 
         //nlog(microtime(true) - $start);
-
+        
         return $data;
     }
 
