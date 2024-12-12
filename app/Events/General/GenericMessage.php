@@ -1,14 +1,14 @@
 <?php
 
 /**
-* Invoice Ninja (https://invoiceninja.com).
-*
-* @link https://github.com/invoiceninja/invoiceninja source repository
-*
-* @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
-*
-* @license https://www.elastic.co/licensing/elastic-license
-*/
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
 namespace App\Events\General;
 
@@ -20,9 +20,14 @@ class GenericMessage implements ShouldBroadcast
 {
     use SerializesModels;
 
+    public const CHANNEL_HOSTED = 'general_hosted';
+
+    public const CHANNEL_SELFHOSTED = 'general_selfhosted';
+
     public function __construct(
         public string $message,
         public ?string $link = null,
+        public ?array $channels = [self::CHANNEL_HOSTED, self::CHANNEL_SELFHOSTED],
     ) {
         //
     }
@@ -32,8 +37,16 @@ class GenericMessage implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [
-            new Channel('general'),
-        ];
+        $channels = [];
+
+        if (\in_array(self::CHANNEL_HOSTED, $this->channels)) {
+            $channels[] = new Channel(self::CHANNEL_HOSTED);
+        }
+
+        if (\in_array(self::CHANNEL_SELFHOSTED, $this->channels)) {
+            $channels[] = new Channel(self::CHANNEL_SELFHOSTED);
+        }
+
+        return $channels;
     }
 }
