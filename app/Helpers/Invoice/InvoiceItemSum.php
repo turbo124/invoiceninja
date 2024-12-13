@@ -419,7 +419,7 @@ class InvoiceItemSum
 
     public function getLineTotal()
     {
-        return $this->item->line_total;
+        return round($this->item->line_total,2);
     }
 
     public function getGrossLineTotal()
