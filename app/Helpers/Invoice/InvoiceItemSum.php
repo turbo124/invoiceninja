@@ -224,9 +224,6 @@ class InvoiceItemSum
 
         $this->gross_sub_total += $this->getGrossLineTotal();
 
-        // $this->item->line_total = round($this->item->line_total, $this->currency->precision);
-        // $this->item->gross_line_total = round($this->item->gross_line_total, $this->currency->precision);
-
         $this->line_items[] = $this->item;
 
         return $this;
@@ -242,11 +239,11 @@ class InvoiceItemSum
     private function setDiscount()
     {
         if ($this->invoice->is_amount_discount) {
-            $this->setLineTotal(round($this->getLineTotal() - $this->formatValue($this->item->discount, $this->currency->precision),2));
+            $this->setLineTotal($this->getLineTotal() - $this->formatValue($this->item->discount, $this->currency->precision));
         } else {
             $discount = ($this->item->line_total * ($this->item->discount / 100));
 
-            $this->setLineTotal(round($this->formatValue(($this->getLineTotal() - $discount), $this->currency->precision),2));
+            $this->setLineTotal($this->formatValue(($this->getLineTotal() - $discount), $this->currency->precision));
         }
 
         $this->item->is_amount_discount = $this->invoice->is_amount_discount;
@@ -419,7 +416,7 @@ class InvoiceItemSum
 
     public function getLineTotal()
     {
-        return round($this->item->line_total,2);
+        return $this->item->line_total;
     }
 
     public function getGrossLineTotal()
