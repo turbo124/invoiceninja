@@ -5477,8 +5477,9 @@ $lang = array(
     'download_ready' => 'Your Download is now ready! [ :message ]',
     'notification_quote_reminder1_sent_subject' => 'Reminder 1 for Quote :invoice was sent to :client',
     'custom_reminder_sent' => 'Custom reminder was sent to :client',
-    'use_system_fonts' => 'Use browser default fonts',
+    'use_system_fonts' => 'Use System Fonts',
     'use_system_fonts_help' => 'Override the standard fonts with those from the web browser',
+    'active_tasks' => 'Active Tasks',
 );
 
 return $lang;
