@@ -411,8 +411,8 @@ class InvoiceItemSum
     }
 
     public function setLineTotal($total)
-    {
-        $this->item->line_total = (float) $total;
+    {   //Here we go! Epsilon in PHP, who would have thunk it....
+        $this->item->line_total = (float) $total + 0.000000000000004;
 
         return $this;
     }
