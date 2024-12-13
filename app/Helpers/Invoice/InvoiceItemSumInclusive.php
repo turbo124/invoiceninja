@@ -298,21 +298,21 @@ class InvoiceItemSumInclusive
 
     public function setLineTotal($total)
     {
-        $this->item->gross_line_total = $total + + 0.000000000000004;
+        $this->item->gross_line_total = $total + 0.000000000000004;
 
-        $this->item->line_total = $total + + 0.000000000000004;
+        $this->item->line_total = $total + 0.000000000000004;
 
         return $this;
     }
 
     public function getLineTotal()
     {
-        return $this->item->line_total;
+        return round($this->item->line_total,2);
     }
 
     public function getGrossLineTotal()
     {
-        return $this->item->line_total;
+        return round($this->item->line_total,2);
     }
 
     public function getLineItems()
