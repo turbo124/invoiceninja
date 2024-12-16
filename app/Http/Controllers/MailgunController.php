@@ -138,9 +138,9 @@ class MailgunController extends BaseController
             return response()->json(['message' => 'Failed. Missing Parameters. Use store and notify!'], 400);
         }
 
-        // Spam protection
         $inboundEngine = new InboundMailEngine();
 
+        // Spam protection
         if ($inboundEngine->isInvalidOrBlocked($input["sender"], $input["recipient"])) {
             return;
         }
