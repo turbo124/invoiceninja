@@ -139,10 +139,13 @@ class MailgunController extends BaseController
         }
 
         // Spam protection
-        if (new InboundMailEngine()->isInvalidOrBlocked($input["sender"], $input["recipient"])) {
+        $inboundEngine = new InboundMailEngine();
+
+        if ($inboundEngine->isInvalidOrBlocked($input["sender"], $input["recipient"])) {
             return;
         }
 
+        // Dispatch Job for processing
         ProcessMailgunInboundWebhook::dispatch($input["sender"], $input["recipient"], $input["message-url"])->delay(rand(2, 10));
 
         return response()->json(['message' => 'Success.'], 200);
