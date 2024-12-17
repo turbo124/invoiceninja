@@ -252,8 +252,8 @@ class NordigenController extends BaseController
             } else {
 
                 // resetting metadata for account status
-                $existing_bank_integration->balance = $account['current_balance'];
-                $existing_bank_integration->bank_account_status = $account['account_status'];
+                $existing_bank_integration->balance = $nordigen_account['current_balance'];
+                $existing_bank_integration->bank_account_status = $nordigen_account['account_status'];
                 $existing_bank_integration->disabled_upstream = false;
                 $existing_bank_integration->auto_sync = true;
                 $existing_bank_integration->from_date = now()->subDays(90); // default max-fetch interval of nordigen is 90 days
