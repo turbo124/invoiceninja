@@ -61,13 +61,18 @@ class Nordigen
     }
 
     // requisition-section
-    public function createRequisition(string $redirect, string $institutionId, string $reference, string $userLanguage)
+    public function createRequisition(string $redirect, array $institution, string $reference, string $userLanguage)
     {
-        if ($this->test_mode && $institutionId != $this->sandbox_institutionId) {
+        if ($this->test_mode && $institution['id'] != $this->sandbox_institutionId) {
             throw new \Exception('invalid institutionId while in test-mode');
         }
 
-        return $this->client->requisition->createRequisition($redirect, $institutionId, $this->getExtendedEndUserAggreementId($institutionId), $reference, $userLanguage);
+        $eua = $this->client->endUserAgreement->createEndUserAgreement(
+            maxHistoricalDays: $institution['transaction_total_days'],
+            institutionId: $institution['id'],
+        );
+
+        return $this->client->requisition->createRequisition($redirect, $institution['id'], $eua['id'], $reference, $userLanguage);
     }
 
     private function getExtendedEndUserAggreementId(string $institutionId): string|null

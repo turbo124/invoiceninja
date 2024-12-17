@@ -79,6 +79,7 @@ class NordigenController extends BaseController
         }
 
         $nordigen = new Nordigen();
+        $institutions = $nordigen->getInstitutions();
 
         // show bank_selection_screen, when institution_id is not present
         if (!array_key_exists("institution_id", $data)) {
@@ -86,14 +87,18 @@ class NordigenController extends BaseController
                 'lang' => $lang,
                 'company' => $company,
                 'account' => $company->account,
-                'institutions' => $nordigen->getInstitutions(),
+                'institutions' => $institutions,
                 'redirectUrl' => $context["redirect"] . "?action=nordigen_connect&status=user-aborted"
             ]);
         }
 
+        $institution = array_values(array_filter($institutions, function ($institution) use ($data) {
+            return $institution['id'] == $data['institution_id'];
+        }))[0];
+
         // redirect to requisition flow
         try {
-            $requisition = $nordigen->createRequisition(config('ninja.app_url') . '/nordigen/confirm', $data['institution_id'], $request->token, $lang);
+            $requisition = $nordigen->createRequisition(config('ninja.app_url') . '/nordigen/confirm', $institution, $request->token, $lang);
         } catch (NordigenException $e) { // TODO: property_exists returns null in these cases... => why => therefore we just get unknown error everytime $responseBody is typeof GuzzleHttp\Psr7\Stream
             $responseBody = (string) $e->getResponse()->getBody();
 
