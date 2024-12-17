@@ -61,13 +61,13 @@ class Nordigen
     }
 
     // requisition-section
-    public function createRequisition(string $redirect, string $initutionId, string $reference, string $userLanguage)
+    public function createRequisition(string $redirect, string $institutionId, string $reference, string $userLanguage)
     {
-        if ($this->test_mode && $initutionId != $this->sandbox_institutionId) {
+        if ($this->test_mode && $institutionId != $this->sandbox_institutionId) {
             throw new \Exception('invalid institutionId while in test-mode');
         }
 
-        return $this->client->requisition->createRequisition($redirect, $initutionId, null, $reference, $userLanguage);
+        return $this->client->requisition->createRequisition($redirect, $institutionId, null, $reference, $userLanguage);
     }
 
     public function getRequisition(string $requisitionId)
