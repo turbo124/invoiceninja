@@ -77,6 +77,10 @@ class StoreEntityRequest extends FormRequest
         $input['acts_as_receiver'] = $input['acts_as_receiver'] ?? true;
         $input['acts_as_sender'] = $input['acts_as_sender'] ?? true;
 
+        if(isset($input['vat_number'])){
+            $input['vat_number'] = str_ireplace('BE', '', $input['vat_number']);
+        }
+
         $this->replace($input);
     }
 
