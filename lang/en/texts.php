@@ -5477,13 +5477,15 @@ $lang = array(
     'download_ready' => 'Your Download is now ready! [ :message ]',
     'notification_quote_reminder1_sent_subject' => 'Reminder 1 for Quote :invoice was sent to :client',
     'custom_reminder_sent' => 'Custom reminder was sent to :client',
+    'use_system_fonts' => 'Use System Fonts',
+    'use_system_fonts_help' => 'Override the standard fonts with those from the web browser',
+    'active_tasks' => 'Active Tasks',
     'enable_public_notifications_1' => 'Hello! You can now receive real-time notifications from Invoice Ninja!',
     'enable_public_notifications_2' => 'This means you will be connected to the official Invoice Ninja servers, so we\'d like to ask for your preference.',
     'enable_public_notifications_3' => 'Please note, you\'ll only see this modal once. If you\'d like to change your settings, you can do so in settings menu.',
     'enable_notifications' => 'Enable Notifications',
     'enable_public_notifications' => 'Enable Public Notifications',
     'navigate' => 'Navigate',
-    'active_tasks' => 'Active Tasks',
 );
 
 return $lang;

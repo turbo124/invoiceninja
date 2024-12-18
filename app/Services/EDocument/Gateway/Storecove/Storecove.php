@@ -386,6 +386,7 @@ class Storecove
     {
         $uri = "legal_entities/{$legal_entity_id}/peppol_identifiers";
 
+        $identifier = str_ireplace('BE', '', $identifier);
         $data = [
             "identifier" => $identifier,
             "scheme" => $scheme,
