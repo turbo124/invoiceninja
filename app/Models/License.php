@@ -92,7 +92,7 @@ class License extends StaticModel
      */
     public function e_invoicing_tokens()
     {
-        return $this->hasMany(EInvoicingToken::class, 'license_key', 'license_key');
+        return $this->hasMany(EInvoicingToken::class, 'license', 'license_key');
     }
 
     /**
