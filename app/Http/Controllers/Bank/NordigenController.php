@@ -218,7 +218,7 @@ class NordigenController extends BaseController
 
             $nordigen_account = $nordigen->getAccount($nordigenAccountId);
 
-            if (!$nordigen_account) {
+            if (isset($nordigen_account['error'])) {
                 continue;
             }
 
