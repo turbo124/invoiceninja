@@ -108,7 +108,7 @@ class Nordigen
         } catch (\Exception $e) {
 
             nlog("Nordigen getAccount() failed => {$account_id} => " . $e->getMessage());
-            return ['error' => $e->getMessage()];
+            return ['error' => $e->getMessage(), 'requisition' => true];
 
         }
     }
