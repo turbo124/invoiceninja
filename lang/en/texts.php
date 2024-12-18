@@ -5485,7 +5485,7 @@ $lang = array(
     'enable_public_notifications_3' => 'Please note, you\'ll only see this modal once. If you\'d like to change your settings, you can do so in settings menu.',
     'enable_notifications' => 'Enable Notifications',
     'enable_public_notifications' => 'Enable Public Notifications',
-
+    'navigate' => 'Navigate',
 );
 
 return $lang;
