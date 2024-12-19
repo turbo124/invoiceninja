@@ -182,9 +182,11 @@ class StorecoveProxy
         ];
 
         if ($response->json()) {
-            $body = $response->json();
+            $body = gettype($response->json()) === 'string' 
+                ? \json_decode($response->json(), associative: true)
+                : $response->json();
 
-            $error['message'] = $body['error'] ?? $body['message'] ?? $response->body();
+            $error['message'] = $body['error'] ?? $body['message'] ?? $body;
 
             if (isset($body['errors']) && is_array($body['errors'])) {
                 $error['errors'] = $body['errors'];
@@ -209,6 +211,10 @@ class StorecoveProxy
                 'body' => $response->body(),
                 'error' => $error,
             ],
+        ]);
+
+        nlog([
+            'Storecove API Error (local)' => $error,
         ]);
 
         return $error;
