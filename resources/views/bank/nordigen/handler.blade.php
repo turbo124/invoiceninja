@@ -47,9 +47,10 @@
         }
     };
 
-    const failedReason = "{{ $failed_reason ?? '' }}".trim();
+    const failedReason = "{{ $failed_reason ?? '' }}".trim(),
+        institutions = @json($institutions ?? []);
 
-    new institutionSelector(@json($institutions ?? []), 'institution-modal-content', config);
+    new institutionSelector(institutions, 'institution-modal-content', config);
 
     if (!failedReason) {
         const observer = new MutationObserver((event) => {
@@ -59,11 +60,36 @@
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
 
-                    const institutionId = button.getAttribute('data-institution'),
+                    const clone = button.parentElement.cloneNode(true),
+                        container = document.querySelector('.institution-container'),
+                        institutionId = button.getAttribute('data-institution'),
+                        institution = institutions.find(i => i.id == institutionId),
+                        max_history = parseInt(institution.transaction_total_days),
                         url = new URL(window.location.href);
 
+                    container.innerHTML = '';
+                    _changeHeading('Select your transaction history');
+
+                    clone.classList.replace('ob-list-institution', 'ob-history-option');
                     url.searchParams.set('institution_id', institutionId);
-                    window.location.href = url.href;
+
+                    for (let i = 30; i <= max_history; i += 30) {
+                        const option = clone.cloneNode(true);
+
+                        url.searchParams.set('tx_days', i);
+
+                        option.querySelector('span').innerText = `${i} days`;
+                        option.querySelector('a').href = url.href;
+                        container.append(option);
+                    }
+
+                    if (max_history % 30 !== 0) {
+                        url.searchParams.set('tx_days', max_history);
+
+                        clone.querySelector('span').innerText = `${max_history} days`;
+                        clone.querySelector('a').href = url.href;
+                        container.append(clone);
+                    }
                 });
             });
         });
@@ -136,7 +162,6 @@
         returnButton.innerHTML = `<a class="button button-primary bg-blue-600 my-4" href="${restartFlow ? restartUrl.href : config.redirectUrl}">${restartFlow ? "{{ ctrans('texts.nordigen_handler_restart', [], $lang ?? 'en') }}" : "{{ ctrans('texts.nordigen_handler_return', [], $lang ?? 'en') }}"}</a>`
         wrapper.appendChild(returnButton);
     }
-
 </script>
 
 @endpush
