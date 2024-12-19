@@ -89,7 +89,13 @@ class Nordigen
         foreach ($endUserAggreements["results"] as $row) {
             $endUserAgreement = $row;
 
+            // Validate Institution
             if ($endUserAgreement["institution_id"] != $institutionId)
+                continue;
+
+            // Validate Access Scopes
+            $requiredScopes = ["balances", "details", "transactions"];
+            if (isset($endUserAgreement['access_scope']) && array_diff($requiredScopes, $endUserAgreement['access_scope']))
                 continue;
 
             // try to accept the endUserAgreement when not already accepted
