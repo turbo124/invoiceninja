@@ -73,9 +73,17 @@ class Nordigen
     private function getExtendedEndUserAggreementId(string $institutionId): string|null
     {
 
-        $endUserAggreements = $this->client->endUserAgreement->getEndUserAgreements();
-
+        $endUserAggreements = null;
         $endUserAgreement = null;
+
+        // try to fetch endUserAgreements
+        try {
+            $endUserAggreements = $this->client->endUserAgreement->getEndUserAgreements();
+        } catch (\Exception $e) { // not able to accept it
+            nlog("Nordigen: Was not able to fetch endUserAgreements. We continue with defaults to setup bank_integration. {$institutionId} {$e->getMessage()} {$e->getCode()}");
+
+            return null;
+        }
 
         // try to find an existing valid endUserAgreement
         foreach ($endUserAggreements as $row) {
@@ -104,7 +112,7 @@ class Nordigen
                 $endUserAgreement = $this->client->endUserAgreement->createEndUserAgreement($institutionId, ['details', 'balances', 'transactions'], 90, 180);
                 $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
             } catch (\Exception $e) { // not able to create this for this institution
-                nlog("Nordigen: Was not able to create and confirm a new endUserAgreement for this institution. We continues with defaults to setup bank_integration. {$institutionId} {$e->getMessage()} {$e->getCode()}");
+                nlog("Nordigen: Was not able to create and confirm a new endUserAgreement for this institution. We continue with defaults to setup bank_integration. {$institutionId} {$e->getMessage()} {$e->getCode()}");
 
                 return null;
             }
