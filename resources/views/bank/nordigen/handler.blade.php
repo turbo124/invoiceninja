@@ -27,7 +27,7 @@
         // Logo URL that will be shown below the modal form.
         logoUrl: "{{ ($account ?? false) && !$account->isPaid() ? asset('images/invoiceninja-black-logo-2.png') : (isset($company) && !is_null($company) ? $company->present()->logo() : asset('images/invoiceninja-black-logo-2.png')) }}",
         // Will display country list with corresponding institutions. When `countryFilter` is set to `false`, only list of institutions will be shown.
-        countryFilter: false,
+        countryFilter: true,
         // style configs
         styles: {
             // Primary
@@ -52,17 +52,24 @@
     new institutionSelector(@json($institutions ?? []), 'institution-modal-content', config);
 
     if (!failedReason) {
+        const observer = new MutationObserver((event) => {
+            const institutionButtons = document.querySelectorAll('.ob-list-institution > a');
 
-        const institutionList = Array.from(document.querySelectorAll('.ob-list-institution > a'));
+            Array.from(institutionButtons).forEach((button) => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
 
-        institutionList.forEach((institution) => {
-            institution.addEventListener('click', (e) => {
-                e.preventDefault()
-                const institutionId = institution.getAttribute('data-institution');
-                const url = new URL(window.location.href);
-                url.searchParams.set('institution_id', institutionId);
-                window.location.href = url.href;
+                    const institutionId = button.getAttribute('data-institution'),
+                        url = new URL(window.location.href);
+
+                    url.searchParams.set('institution_id', institutionId);
+                    window.location.href = url.href;
+                });
             });
+        });
+
+        observer.observe(document.querySelector('.institution-container'), {
+            childList: true,
         });
     } else {
         document.getElementsByClassName("institution-search-container")[0].remove();
