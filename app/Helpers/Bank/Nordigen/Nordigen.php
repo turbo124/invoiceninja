@@ -97,7 +97,7 @@ class Nordigen
                 try {
                     $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
                 } catch (\Exception $e) { // not able to accept it
-                    nlog("Nordigen: Was not able to confirm an existing outstanding endUserAgreement for this institution. We now try to find another or will create and confirm a new one. {$institutionId} {$e->getMessage()} {$e->getCode()}");
+                    nlog("Nordigen: Was not able to confirm an existing outstanding endUserAgreement for this institution. We now try to find another or will create and confirm a new one. {$institutionId} {$endUserAgreement["id"]} {$e->getMessage()} {$e->getCode()}");
                     $endUserAgreement = null;
 
                     continue;
