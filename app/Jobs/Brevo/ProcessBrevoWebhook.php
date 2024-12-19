@@ -55,7 +55,7 @@ class ProcessBrevoWebhook implements ShouldQueue
         'events' => [],
     ];
 
-    
+
     /** @var ?\App\Models\Company $company*/
     private ?Company $company = null;
 
@@ -93,8 +93,7 @@ class ProcessBrevoWebhook implements ShouldQueue
     {
         MultiDB::findAndSetDbByCompanyKey($this->request['tags'][0]);
 
-        /** @phpstan-ignore-next-line */
-        $this->company = Company::where('company_key', $this->request['tags'][0])->first();
+        $this->company = Company::query()->where('company_key', $this->request['tags'][0])->first();
 
         $this->invitation = $this->discoverInvitation($this->request['message-id']);
 
@@ -427,7 +426,7 @@ class ProcessBrevoWebhook implements ShouldQueue
     public function getRawMessage(string $message_id)
     {
 
-        $brevo_secret = !empty ($this->company->settings->brevo_secret) ? $this->company->settings->brevo_secret : config('services.brevo.secret');
+        $brevo_secret = !empty($this->company->settings->brevo_secret) ? $this->company->settings->brevo_secret : config('services.brevo.secret');
 
         $brevo = new TransactionalEmailsApi(null, Configuration::getDefaultConfiguration()->setApiKey('api-key', $brevo_secret));
         $messageDetail = $brevo->getTransacEmailContent($message_id);

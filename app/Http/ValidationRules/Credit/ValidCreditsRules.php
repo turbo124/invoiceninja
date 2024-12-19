@@ -51,7 +51,8 @@ class ValidCreditsRules implements Rule
 
         $unique_array = [];
 
-        $total_credit_amount = array_sum(array_column($this->input['credits'], 'amount'));
+        // $total_credit_amount = array_sum(array_column($this->input['credits'], 'amount'));
+        $total_credit_amount = array_sum(array_map('floatval', array_column($this->input['credits'], 'amount')));
 
         if ($total_credit_amount <= 0) {
             $this->error_msg = "Total of credits must be more than zero.";
@@ -76,12 +77,12 @@ class ValidCreditsRules implements Rule
                 return false;
             }
 
-            if($cred->status_id == Credit::STATUS_DRAFT) {
+            if ($cred->status_id == Credit::STATUS_DRAFT) {
                 $cred->service()->markSent()->save();
                 $cred = $cred->fresh();
             }
 
-            if($cred->balance < $credit['amount']) {
+            if ($cred->balance < $credit['amount']) {
                 $this->error_msg = ctrans('texts.insufficient_credit_balance');
                 return false;
             }

@@ -97,7 +97,15 @@ class CreditFilters extends QueryFilters
                               $q->where('first_name', 'like', '%'.$filter.'%')
                                 ->orWhere('last_name', 'like', '%'.$filter.'%')
                                 ->orWhere('email', 'like', '%'.$filter.'%');
-                          });
+                          })
+                                                    ->orWhereRaw("
+                            JSON_UNQUOTE(JSON_EXTRACT(
+                                JSON_ARRAY(
+                                    JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')), 
+                                    JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].product_key'))
+                                ), '$[*]')
+                            ) LIKE ?", ['%'.$filter.'%']);
+            //   ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')) LIKE ?", ['%'.$filter.'%']);
         });
     }
 
@@ -147,7 +155,7 @@ class CreditFilters extends QueryFilters
         }
 
 
-        if($sort_col[0] == 'number') {
+        if ($sort_col[0] == 'number') {
             return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
         }
 

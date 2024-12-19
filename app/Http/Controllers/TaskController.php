@@ -273,14 +273,16 @@ class TaskController extends BaseController
             return $request->disallowUpdate();
         }
 
-        $old_task = json_decode(json_encode($task));
+        $old_task_status_order = $task->status_order;
+        // $old_task = json_decode(json_encode($task));
 
         $task = $this->task_repo->save($request->all(), $task);
 
         $task = $this->task_repo->triggeredActions($request, $task);
 
-        if ($task->status_order != $old_task->status_order) {
-            $this->task_repo->sortStatuses($old_task, $task);
+        if ($task->status_order != $old_task_status_order) {
+            // if ($task->status_order != $old_task->status_order) {
+            $this->task_repo->sortStatuses($task);
         }
 
         event(new TaskWasUpdated($task, $task->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null)));
@@ -510,7 +512,7 @@ class TaskController extends BaseController
 
         $tasks = Task::withTrashed()->whereIn('id', $this->transformKeys($ids))->company()->get();
 
-        if($action == 'template' && $user->can('view', $tasks->first())) {
+        if ($action == 'template' && $user->can('view', $tasks->first())) {
 
             $hash_or_response = request()->boolean('send_email') ? 'email sent' : \Illuminate\Support\Str::uuid();
 

@@ -17,10 +17,16 @@ class TaxModel
     public string $seller_subregion = 'CA';
 
     /** @var string $version */
-    public string $version = 'alpha';
+    public string $version = 'gamma';
 
     /** @var object $regions */
     public object $regions;
+
+    /** @var bool $acts_as_sender */
+    public bool $acts_as_sender = false;
+
+    /** @var bool $acts_as_receiver */
+    public bool $acts_as_receiver = false;
 
     /**
      * __construct
@@ -28,15 +34,98 @@ class TaxModel
      * @param  TaxModel $model
      * @return void
      */
-    public function __construct(public ?TaxModel $model = null)
+    public function __construct(public mixed $model = null)
     {
 
-        if(!$this->model) {
+        if (!$model) {
             $this->regions = $this->init();
         } else {
-            $this->regions = $model;
+
+            $this->seller_subregion = $model->seller_subregion ?? '';
+            $this->acts_as_sender = $model->acts_as_sender ?? false;
+            $this->acts_as_receiver = $model->acts_as_receiver ?? false;
+
+            $modelArray = get_object_vars($model);
+            foreach ($modelArray as $key => $value) {
+                $this->{$key} = $value;
+            }
+
         }
 
+        $this->migrate();
+    }
+
+    public function migrate(): self
+    {
+
+        if ($this->version == 'alpha') {
+            $this->regions->EU->subregions->PL = new \stdClass();
+            $this->regions->EU->subregions->PL->tax_rate = 23;
+            $this->regions->EU->subregions->PL->tax_name = 'VAT';
+            $this->regions->EU->subregions->PL->reduced_tax_rate = 8;
+            $this->regions->EU->subregions->PL->apply_tax = false;
+
+            $this->version = 'beta';
+        }
+
+        if ($this->version == 'beta') {
+
+            //CEUTA
+            $this->regions->EU->subregions->{'ES-CE'} = new \stdClass();
+            $this->regions->EU->subregions->{'ES-CE'}->tax_rate = 4;
+            $this->regions->EU->subregions->{'ES-CE'}->tax_name = 'IGIC';
+            $this->regions->EU->subregions->{'ES-CE'}->reduced_tax_rate = 4;
+            $this->regions->EU->subregions->{'ES-CE'}->apply_tax = false;
+
+            //MELILLA ML 4
+            $this->regions->EU->subregions->{'ES-ML'} = new \stdClass();
+            $this->regions->EU->subregions->{'ES-ML'}->tax_rate = 4;
+            $this->regions->EU->subregions->{'ES-ML'}->tax_name = 'IGIC';
+            $this->regions->EU->subregions->{'ES-ML'}->reduced_tax_rate = 4;
+            $this->regions->EU->subregions->{'ES-ML'}->apply_tax = false;
+
+            //CANARIAS CN 7/3
+            $this->regions->EU->subregions->{'ES-CN'} = new \stdClass();
+            $this->regions->EU->subregions->{'ES-CN'}->tax_rate = 7;
+            $this->regions->EU->subregions->{'ES-CN'}->tax_name = 'IGIC';
+            $this->regions->EU->subregions->{'ES-CN'}->reduced_tax_rate = 4;
+            $this->regions->EU->subregions->{'ES-CN'}->apply_tax = false;
+
+            $this->version = 'gamma';
+        }
+
+        //@pending Flutter AP upgrade - deploying this breaks the AP.
+        if($this->version == 'gamma') {
+
+            $this->regions->EU->subregions->IS = new \stdClass();
+            $this->regions->EU->subregions->IS->tax_rate = 24;
+            $this->regions->EU->subregions->IS->tax_name = 'VSK';
+            $this->regions->EU->subregions->IS->reduced_tax_rate = 11;
+            $this->regions->EU->subregions->IS->apply_tax = false;
+            $this->regions->EU->subregions->IS->vat_number = '';
+
+            $this->regions->EU->subregions->LI = new \stdClass();
+            $this->regions->EU->subregions->LI->tax_rate = 8.1;
+            $this->regions->EU->subregions->LI->tax_name = 'MWST';
+            $this->regions->EU->subregions->LI->reduced_tax_rate = 2.6;
+            $this->regions->EU->subregions->LI->apply_tax = false;
+            $this->regions->EU->subregions->LI->vat_number = '';
+
+            $this->regions->EU->subregions->NO = new \stdClass();
+            $this->regions->EU->subregions->NO->tax_rate = 25;
+            $this->regions->EU->subregions->NO->tax_name = 'MVA';
+            $this->regions->EU->subregions->NO->reduced_tax_rate = 12;
+            $this->regions->EU->subregions->NO->apply_tax = false;
+            $this->regions->EU->subregions->NO->vat_number = '';
+
+            $this->ukRegion();
+            $this->stubVatNumbersOnSubregions();
+
+            $this->version = 'delta';
+
+        }
+
+        return $this;
     }
 
     /**
@@ -56,6 +145,145 @@ class TaxModel
 
 
         return $this->regions;
+    }
+
+    private function ukRegion(): self
+    {
+
+        // Add new UK region
+        $this->regions->UK = new \stdClass();
+        $this->regions->UK->has_sales_above_threshold = false;
+        $this->regions->UK->tax_threshold = 85000;
+        $this->regions->UK->tax_all_subregions = false;
+        $this->regions->UK->subregions = new \stdClass();
+
+        // Great Britain (England, Scotland, Wales)
+        $this->regions->UK->subregions->GB = new \stdClass();
+        $this->regions->UK->subregions->GB->tax_rate = 20;
+        $this->regions->UK->subregions->GB->tax_name = 'VAT';
+        $this->regions->UK->subregions->GB->reduced_tax_rate = 5;
+        $this->regions->UK->subregions->GB->apply_tax = false;
+        $this->regions->UK->subregions->GB->vat_number = '';
+
+        // Northern Ireland (special case due to NI Protocol)
+        $this->regions->UK->subregions->{'GB-NIR'} = new \stdClass();
+        $this->regions->UK->subregions->{'GB-NIR'}->tax_rate = 20;
+        $this->regions->UK->subregions->{'GB-NIR'}->tax_name = 'VAT';
+        $this->regions->UK->subregions->{'GB-NIR'}->reduced_tax_rate = 5;
+        $this->regions->UK->subregions->{'GB-NIR'}->apply_tax = false;
+        $this->regions->UK->subregions->{'GB-NIR'}->vat_number = '';
+
+        // Isle of Man (follows UK VAT rules)
+        $this->regions->UK->subregions->{'IM'} = new \stdClass();
+        $this->regions->UK->subregions->{'IM'}->tax_rate = 20;
+        $this->regions->UK->subregions->{'IM'}->tax_name = 'VAT';
+        $this->regions->UK->subregions->{'IM'}->reduced_tax_rate = 5;
+        $this->regions->UK->subregions->{'IM'}->apply_tax = false;
+        $this->regions->UK->subregions->{'IM'}->vat_number = '';
+
+        return $this;
+
+    }
+
+    public function stubVatNumbersOnSubregions(): self
+    {
+                
+        // US Subregions
+        $this->regions->US->subregions->AL->vat_number = '';
+        $this->regions->US->subregions->AK->vat_number = '';
+        $this->regions->US->subregions->AZ->vat_number = '';
+        $this->regions->US->subregions->AR->vat_number = '';
+        $this->regions->US->subregions->CA->vat_number = '';
+        $this->regions->US->subregions->CO->vat_number = '';
+        $this->regions->US->subregions->CT->vat_number = '';
+        $this->regions->US->subregions->DE->vat_number = '';
+        $this->regions->US->subregions->FL->vat_number = '';
+        $this->regions->US->subregions->GA->vat_number = '';
+        $this->regions->US->subregions->HI->vat_number = '';
+        $this->regions->US->subregions->ID->vat_number = '';
+        $this->regions->US->subregions->IL->vat_number = '';
+        $this->regions->US->subregions->IN->vat_number = '';
+        $this->regions->US->subregions->IA->vat_number = '';
+        $this->regions->US->subregions->KS->vat_number = '';
+        $this->regions->US->subregions->KY->vat_number = '';
+        $this->regions->US->subregions->LA->vat_number = '';
+        $this->regions->US->subregions->ME->vat_number = '';
+        $this->regions->US->subregions->MD->vat_number = '';
+        $this->regions->US->subregions->MA->vat_number = '';
+        $this->regions->US->subregions->MI->vat_number = '';
+        $this->regions->US->subregions->MN->vat_number = '';
+        $this->regions->US->subregions->MS->vat_number = '';
+        $this->regions->US->subregions->MO->vat_number = '';
+        $this->regions->US->subregions->MT->vat_number = '';
+        $this->regions->US->subregions->NE->vat_number = '';
+        $this->regions->US->subregions->NV->vat_number = '';
+        $this->regions->US->subregions->NH->vat_number = '';
+        $this->regions->US->subregions->NJ->vat_number = '';
+        $this->regions->US->subregions->NM->vat_number = '';
+        $this->regions->US->subregions->NY->vat_number = '';
+        $this->regions->US->subregions->NC->vat_number = '';
+        $this->regions->US->subregions->ND->vat_number = '';
+        $this->regions->US->subregions->OH->vat_number = '';
+        $this->regions->US->subregions->OK->vat_number = '';
+        $this->regions->US->subregions->OR->vat_number = '';
+        $this->regions->US->subregions->PA->vat_number = '';
+        $this->regions->US->subregions->RI->vat_number = '';
+        $this->regions->US->subregions->SC->vat_number = '';
+        $this->regions->US->subregions->SD->vat_number = '';
+        $this->regions->US->subregions->TN->vat_number = '';
+        $this->regions->US->subregions->TX->vat_number = '';
+        $this->regions->US->subregions->UT->vat_number = '';
+        $this->regions->US->subregions->VT->vat_number = '';
+        $this->regions->US->subregions->VA->vat_number = '';
+        $this->regions->US->subregions->WA->vat_number = '';
+        $this->regions->US->subregions->WV->vat_number = '';
+        $this->regions->US->subregions->WI->vat_number = '';
+        $this->regions->US->subregions->WY->vat_number = '';
+
+        // EU Subregions
+        $this->regions->EU->subregions->AT->vat_number = '';
+        $this->regions->EU->subregions->BE->vat_number = '';
+        $this->regions->EU->subregions->BG->vat_number = '';
+        $this->regions->EU->subregions->CY->vat_number = '';
+        $this->regions->EU->subregions->CZ->vat_number = '';
+        $this->regions->EU->subregions->DE->vat_number = '';
+        $this->regions->EU->subregions->DK->vat_number = '';
+        $this->regions->EU->subregions->EE->vat_number = '';
+        $this->regions->EU->subregions->ES->vat_number = '';
+        $this->regions->EU->subregions->{'ES-CE'}->vat_number = '';
+        $this->regions->EU->subregions->{'ES-ML'}->vat_number = '';
+        $this->regions->EU->subregions->{'ES-CN'}->vat_number = '';
+        $this->regions->EU->subregions->FI->vat_number = '';
+        $this->regions->EU->subregions->FR->vat_number = '';
+        $this->regions->EU->subregions->GR->vat_number = '';
+        $this->regions->EU->subregions->HR->vat_number = '';
+        $this->regions->EU->subregions->HU->vat_number = '';
+        $this->regions->EU->subregions->IE->vat_number = '';
+        $this->regions->EU->subregions->IS->vat_number = '';
+        $this->regions->EU->subregions->IT->vat_number = '';
+        $this->regions->EU->subregions->LI->vat_number = '';
+        $this->regions->EU->subregions->LT->vat_number = '';
+        $this->regions->EU->subregions->LU->vat_number = '';
+        $this->regions->EU->subregions->LV->vat_number = '';
+        $this->regions->EU->subregions->MT->vat_number = '';
+        $this->regions->EU->subregions->NO->vat_number = '';
+        $this->regions->EU->subregions->NL->vat_number = '';
+        $this->regions->EU->subregions->PL->vat_number = '';
+        $this->regions->EU->subregions->PT->vat_number = '';
+        $this->regions->EU->subregions->RO->vat_number = '';
+        $this->regions->EU->subregions->SE->vat_number = '';
+        $this->regions->EU->subregions->SI->vat_number = '';
+        $this->regions->EU->subregions->SK->vat_number = '';
+
+        // UK Subregions
+        $this->regions->UK->subregions->GB->vat_number = '';
+        $this->regions->UK->subregions->{'GB-NIR'}->vat_number = '';
+        $this->regions->UK->subregions->IM->vat_number = '';
+
+        // AU Subregions
+        $this->regions->AU->subregions->AU->vat_number = '';
+
+        return $this;
     }
 
     /**
@@ -397,6 +625,25 @@ class TaxModel
         $this->regions->EU->subregions->ES->reduced_tax_rate = 10;
         $this->regions->EU->subregions->ES->apply_tax = false;
 
+        $this->regions->EU->subregions->{'ES-CE'} = new \stdClass();
+        $this->regions->EU->subregions->{'ES-CE'}->tax_rate = 4;
+        $this->regions->EU->subregions->{'ES-CE'}->tax_name = 'IGIC';
+        $this->regions->EU->subregions->{'ES-CE'}->reduced_tax_rate = 4;
+        $this->regions->EU->subregions->{'ES-CE'}->apply_tax = false;
+
+        $this->regions->EU->subregions->{'ES-ML'} = new \stdClass();
+        $this->regions->EU->subregions->{'ES-ML'}->tax_rate = 4;
+        $this->regions->EU->subregions->{'ES-ML'}->tax_name = 'IGIC';
+        $this->regions->EU->subregions->{'ES-ML'}->reduced_tax_rate = 4;
+        $this->regions->EU->subregions->{'ES-ML'}->apply_tax = false;
+
+        $this->regions->EU->subregions->{'ES-CN'} = new \stdClass();
+        $this->regions->EU->subregions->{'ES-CN'}->tax_rate = 7;
+        $this->regions->EU->subregions->{'ES-CN'}->tax_name = 'IGIC';
+        $this->regions->EU->subregions->{'ES-CN'}->reduced_tax_rate = 3;
+        $this->regions->EU->subregions->{'ES-CN'}->apply_tax = false;
+
+
         $this->regions->EU->subregions->FI = new \stdClass();
         $this->regions->EU->subregions->FI->tax_rate = 24;
         $this->regions->EU->subregions->FI->tax_name = 'ALV';
@@ -438,11 +685,23 @@ class TaxModel
         $this->regions->EU->subregions->IE->reduced_tax_rate = 0;
         $this->regions->EU->subregions->IE->apply_tax = false;
 
+        $this->regions->EU->subregions->IS = new \stdClass();
+        $this->regions->EU->subregions->IS->tax_rate = 24;
+        $this->regions->EU->subregions->IS->tax_name = 'VSK';
+        $this->regions->EU->subregions->IS->reduced_tax_rate = 11;
+        $this->regions->EU->subregions->IS->apply_tax = false;
+
         $this->regions->EU->subregions->IT = new \stdClass();
         $this->regions->EU->subregions->IT->tax_rate = 22;
         $this->regions->EU->subregions->IT->tax_name = 'IVA';
         $this->regions->EU->subregions->IT->reduced_tax_rate = 10;
         $this->regions->EU->subregions->IT->apply_tax = false;
+
+        $this->regions->EU->subregions->LI = new \stdClass();
+        $this->regions->EU->subregions->LI->tax_rate = 7.7;
+        $this->regions->EU->subregions->LI->tax_name = 'MWST';
+        $this->regions->EU->subregions->LI->reduced_tax_rate = 2.5;
+        $this->regions->EU->subregions->LI->apply_tax = false;
 
         $this->regions->EU->subregions->LT = new \stdClass();
         $this->regions->EU->subregions->LT->tax_rate = 21;
@@ -468,11 +727,23 @@ class TaxModel
         $this->regions->EU->subregions->MT->reduced_tax_rate = 5;
         $this->regions->EU->subregions->MT->apply_tax = false;
 
+        $this->regions->EU->subregions->NO = new \stdClass();
+        $this->regions->EU->subregions->NO->tax_rate = 25;
+        $this->regions->EU->subregions->NO->tax_name = 'MVA';
+        $this->regions->EU->subregions->NO->reduced_tax_rate = 15;
+        $this->regions->EU->subregions->NO->apply_tax = false;
+
         $this->regions->EU->subregions->NL = new \stdClass();
         $this->regions->EU->subregions->NL->tax_rate = 21;
         $this->regions->EU->subregions->NL->tax_name = 'BTW';
         $this->regions->EU->subregions->NL->reduced_tax_rate = 9;
         $this->regions->EU->subregions->NL->apply_tax = false;
+
+        $this->regions->EU->subregions->PL = new \stdClass();
+        $this->regions->EU->subregions->PL->tax_rate = 23;
+        $this->regions->EU->subregions->PL->tax_name = 'VAT';
+        $this->regions->EU->subregions->PL->reduced_tax_rate = 8;
+        $this->regions->EU->subregions->PL->apply_tax = false;
 
         $this->regions->EU->subregions->PT = new \stdClass();
         $this->regions->EU->subregions->PT->tax_rate = 23;
@@ -506,6 +777,40 @@ class TaxModel
 
         return $this;
 
+    }
+
+    public function getSubregions(): array
+    {
+        $subregions = [];
+
+        foreach ($this->regions as $region_code => $region) {
+            if (!isset($region->subregions)) {
+                continue;
+            }
+
+            $subregions[$region_code] = [];
+
+            foreach ($region->subregions as $subregion_code => $subregion) {
+                $subregions[$region_code][] = $subregion_code;
+            }
+        }
+
+        return $subregions;
+    }
+
+    public function getRegionBySubregion(string $subregion_code): ?string
+    {
+        foreach ($this->regions as $region_code => $region) {
+            if (!isset($region->subregions)) {
+                continue;
+            }
+
+            if (isset($region->subregions->{$subregion_code})) {
+                return $region_code;
+            }
+        }
+
+        return null;
     }
 
 }

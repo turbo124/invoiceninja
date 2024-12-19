@@ -77,7 +77,6 @@ class SubscriptionPurchaseController extends Controller
 
     public function v3(Subscription $subscription, Request $request)
     {
-        // Todo: Prerequirement checks for subscription.
 
         return view('billing-portal.v3.index', [
             'subscription' => $subscription,
@@ -94,7 +93,7 @@ class SubscriptionPurchaseController extends Controller
      */
     private function setLocale(string $locale): string
     {
-        
+
         /** @var \Illuminate\Support\Collection<\App\Models\Language> */
         $languages = app('languages');
 
@@ -104,6 +103,6 @@ class SubscriptionPurchaseController extends Controller
         });
 
         return $record ? $record->locale : 'en';
-        
+
     }
 }

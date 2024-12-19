@@ -152,9 +152,9 @@ class CreditService
         return $this;
     }
 
-    public function markSent()
+    public function markSent($fire_event = false)
     {
-        $this->credit = (new MarkSent($this->credit->client, $this->credit))->run();
+        $this->credit = (new MarkSent($this->credit->client, $this->credit))->run($fire_event);
 
         return $this;
     }
@@ -267,7 +267,7 @@ class CreditService
 
     public function restoreCredit()
     {
-        
+
         $paid_to_date = $this->credit->invoice_id ? $this->credit->balance : 0;
 
         $this->credit

@@ -4,7 +4,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -25,7 +25,8 @@ class Office365MailTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $symfony_message = MessageConverter::toEmail($message->getOriginalMessage());
+        $symfony_message = MessageConverter::toEmail($message->getOriginalMessage()); //@phpstan-ignore-line
+
 
         $graph = new Graph();
 

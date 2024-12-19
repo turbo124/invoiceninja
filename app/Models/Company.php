@@ -13,6 +13,7 @@ namespace App\Models;
 
 use App\Casts\EncryptedCast;
 use App\DataMapper\CompanySettings;
+use App\DataMapper\QuickbooksSettings;
 use App\Models\Presenters\CompanyPresenter;
 use App\Services\Company\CompanyService;
 use App\Services\Notification\NotificationService;
@@ -40,10 +41,10 @@ use Laracasts\Presenter\PresentableTrait;
  * @property bool $update_products
  * @property bool $show_product_details
  * @property bool $client_can_register
- * @property int $custom_surcharge_taxes1
- * @property int $custom_surcharge_taxes2
- * @property int $custom_surcharge_taxes3
- * @property int $custom_surcharge_taxes4
+ * @property bool $custom_surcharge_taxes1
+ * @property bool $custom_surcharge_taxes2
+ * @property bool $custom_surcharge_taxes3
+ * @property bool $custom_surcharge_taxes4
  * @property int $show_product_cost
  * @property int $enabled_tax_rates
  * @property int $enabled_modules
@@ -119,14 +120,18 @@ use Laracasts\Presenter\PresentableTrait;
  * @property bool $inbound_mailbox_allow_unknown
  * @property string|null $inbound_mailbox_whitelist
  * @property string|null $inbound_mailbox_blacklist
+ * @property string|null $e_invoice_certificate_passphrase
+ * @property string|null $e_invoice_certificate
  * @property int $deleted_at
  * @property string|null $smtp_username
  * @property string|null $smtp_password
  * @property string|null $smtp_host
- * @property string|null $smtp_port
+ * @property int|null $smtp_port
  * @property string|null $smtp_encryption
  * @property string|null $smtp_local_domain
+ * @property \App\DataMapper\QuickbooksSettings|null $quickbooks
  * @property boolean $smtp_verify_peer
+ * @property int|null $legal_entity_id
  * @property-read \App\Models\Account $account
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
  * @property-read int|null $activities_count
@@ -223,7 +228,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|Company find($query)
  * @property-read int|null $webhooks_count
  * @property int $calculate_taxes
- * @property mixed $tax_data
+ * @property \App\DataMapper\Tax\TaxModel $tax_data
  * @method \App\Models\User|null owner()
  * @mixin \Eloquent
  */
@@ -234,30 +239,6 @@ class Company extends BaseModel
     use CompanySettingsSaver;
     use AppSetup;
     use \Awobaz\Compoships\Compoships;
-
-    // const ENTITY_RECURRING_INVOICE = 'recurring_invoice';
-
-    // const ENTITY_CREDIT = 'credit';
-
-    // const ENTITY_QUOTE = 'quote';
-
-    // const ENTITY_TASK = 'task';
-
-    // const ENTITY_EXPENSE = 'expense';
-
-    // const ENTITY_PROJECT = 'project';
-
-    // const ENTITY_VENDOR = 'vendor';
-
-    // const ENTITY_TICKET = 'ticket';
-
-    // const ENTITY_PROPOSAL = 'proposal';
-
-    // const ENTITY_RECURRING_EXPENSE = 'recurring_expense';
-
-    // const ENTITY_RECURRING_TASK = 'task';
-
-    // const ENTITY_RECURRING_QUOTE = 'recurring_quote';
 
     /** @var CompanyPresenter */
     protected $presenter = CompanyPresenter::class;
@@ -368,7 +349,7 @@ class Company extends BaseModel
         'tax_data',
         'e_invoice_certificate_passphrase',
         'expense_mailbox_active',
-        'expense_mailbox', // TODO: @turbo124 custom validation: self-hosted => free change, hosted => not changeable, only changeable with env-mask
+        'expense_mailbox',
         'inbound_mailbox_allow_company_users',
         'inbound_mailbox_allow_vendors',
         'inbound_mailbox_allow_clients',
@@ -380,7 +361,8 @@ class Company extends BaseModel
         'smtp_encryption',
         'smtp_local_domain',
         'smtp_verify_peer',
-        'e_invoice',
+        // 'e_invoice',
+        // 'e_invoicing_token',
     ];
 
     protected $hidden = [
@@ -389,6 +371,7 @@ class Company extends BaseModel
         'ip',
         'smtp_username',
         'smtp_password',
+        'quickbooks',
     ];
 
     protected $casts = [
@@ -406,6 +389,8 @@ class Company extends BaseModel
         'smtp_username' => 'encrypted',
         'smtp_password' => 'encrypted',
         'e_invoice' => 'object',
+        'quickbooks' => QuickbooksSettings::class,
+        'smtp_port' => 'int',
     ];
 
     protected $with = [];
@@ -431,7 +416,7 @@ class Company extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function documents()
     {
@@ -470,7 +455,7 @@ class Company extends BaseModel
 
     public function bank_transactions(): HasMany
     {
-        return $this->hasMany(BankTransaction::class);
+        return $this->hasMany(BankTransaction::class)->withTrashed();
     }
 
     public function bank_transaction_rules(): HasMany
@@ -995,4 +980,21 @@ class Company extends BaseModel
         return new CompanyService($this);
     }
 
+    public function isPeppolSender()
+    {
+        return Ninja::isHosted() && $this->account->isPaid() && $this->account->isEnterpriseClient() && $this->account->e_invoice_quota > 0 && $this->settings->e_invoice_type == 'PEPPOL' && $this->tax_data->acts_as_sender;
+    }
+
+
+    /**
+     * peppolSendingEnabled
+     *
+     * Determines the sending status of the company
+     *
+     * @return bool
+     */
+    public function peppolSendingEnabled(): bool
+    {
+        return !$this->account->is_flagged && $this->account->e_invoice_quota > 0 && isset($this->legal_entity_id) && isset($this->tax_data->acts_as_sender) && $this->tax_data->acts_as_sender;
+    }
 }

@@ -203,15 +203,15 @@ class CompanyTransformer extends EntityTransformer
             'has_e_invoice_certificate_passphrase' => $company->e_invoice_certificate_passphrase ? true : false,
             'invoice_task_project_header' => (bool) $company->invoice_task_project_header,
             'invoice_task_item_description' => (bool) $company->invoice_task_item_description,
-            'origin_tax_data' => $company->origin_tax_data ?: new \stdClass,
+            'origin_tax_data' => $company->origin_tax_data ?: new \stdClass(),
             'expense_mailbox' => (string) $company->expense_mailbox,
             'expense_mailbox_active' => (bool) $company->expense_mailbox_active,
             'inbound_mailbox_allow_company_users' => (bool) $company->inbound_mailbox_allow_company_users,
             'inbound_mailbox_allow_vendors' => (bool) $company->inbound_mailbox_allow_vendors,
             'inbound_mailbox_allow_clients' => (bool) $company->inbound_mailbox_allow_clients,
             'inbound_mailbox_allow_unknown' => (bool) $company->inbound_mailbox_allow_unknown,
-            'inbound_mailbox_blacklist' => $company->inbound_mailbox_blacklist,
-            'inbound_mailbox_whitelist' => $company->inbound_mailbox_whitelist,
+            'inbound_mailbox_blacklist' => (string) $company->inbound_mailbox_blacklist,
+            'inbound_mailbox_whitelist' => (string) $company->inbound_mailbox_whitelist,
             'smtp_host' => (string) $company->smtp_host ?? '',
             'smtp_port' => (int) $company->smtp_port ?? 25,
             'smtp_encryption' => (string) $company->smtp_encryption ?? 'tls',
@@ -220,6 +220,9 @@ class CompanyTransformer extends EntityTransformer
             'smtp_local_domain' => (string) $company->smtp_local_domain ?? '',
             'smtp_verify_peer' => (bool) $company->smtp_verify_peer,
             'e_invoice' => $company->e_invoice ?: new \stdClass(),
+            'has_quickbooks_token' => $company->quickbooks ? true : false,
+            'is_quickbooks_token_active' => $company->quickbooks?->accessTokenKey ?? false,
+            'legal_entity_id' => $company->legal_entity_id ?? null,
         ];
     }
 

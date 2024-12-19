@@ -12,15 +12,35 @@
 
 namespace App\Livewire\BillingPortal\Cart;
 
+use Livewire\Component;
 use App\Libraries\MultiDB;
 use App\Models\Subscription;
-use Livewire\Component;
+use App\Utils\Traits\MakesHash;
+use Livewire\Attributes\Computed;
 
 class Cart extends Component
 {
-    public Subscription $subscription;
+    use MakesHash;
 
     public array $context;
+
+    public string $subscription_id;
+
+    public function mount()
+    {
+
+        \Illuminate\Support\Facades\App::forgetInstance('translator');
+        $t = app('translator');
+        $t->replace(\App\Utils\Ninja::transformTranslations($this->subscription()->company->settings));
+        \Illuminate\Support\Facades\App::setLocale($this->subscription()->company->locale());
+
+    }
+
+    #[Computed()]
+    public function subscription()
+    {
+        return Subscription::find($this->decodePrimaryKey($this->subscription_id))->withoutRelations()->makeHidden(['webhook_configuration','steps']);
+    }
 
     public function handleSubmit()
     {

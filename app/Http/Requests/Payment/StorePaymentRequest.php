@@ -46,7 +46,7 @@ class StorePaymentRequest extends Request
 
         $rules = [
             'client_id' => ['bail','required',Rule::exists('clients', 'id')->where('company_id', $user->company()->id)->where('is_deleted', 0)],
-            'invoices' => ['bail','sometimes', 'nullable', 'array', new ValidPayableInvoicesRule()],
+            'invoices' => ['bail', 'sometimes', 'nullable', 'array', new ValidPayableInvoicesRule()],
             'invoices.*.amount' => ['bail','required'],
             'invoices.*.invoice_id' => ['bail','required','distinct', new ValidInvoicesRules($this->all()),Rule::exists('invoices', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
             'credits.*.credit_id' => ['bail','required','distinct', new ValidCreditsRules($this->all()),Rule::exists('credits', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)],
@@ -80,11 +80,14 @@ class StorePaymentRequest extends Request
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if(\Illuminate\Support\Facades\Cache::has($this->ip()."|".$this->input('amount', 0)."|".$this->input('client_id', '')."|".$user->company()->company_key))
-            throw new DuplicatePaymentException('Duplicate request.', 429);
+        $client_id = is_string($this->input('client_id', '')) ? $this->input('client_id') : '';
 
-        \Illuminate\Support\Facades\Cache::put(($this->ip()."|".$this->input('amount', 0)."|".$this->input('client_id', '')."|".$user->company()->company_key), true, 1);
-        
+        if (\Illuminate\Support\Facades\Cache::has($this->ip()."|".$this->input('amount', 0)."|".$client_id."|".$user->company()->company_key)) {
+            throw new DuplicatePaymentException('Duplicate request.', 429);
+        }
+
+        \Illuminate\Support\Facades\Cache::put(($this->ip()."|".$this->input('amount', 0)."|".$client_id."|".$user->company()->company_key), true, 1);
+
         $input = $this->all();
 
         $invoices_total = 0;
@@ -104,7 +107,7 @@ class StorePaymentRequest extends Request
                     $input['invoices'][$key]['invoice_id'] = $this->decodePrimaryKey($value['invoice_id']);
                 }
 
-                if (array_key_exists('amount', $value)) {
+                if (array_key_exists('amount', $value) && is_numeric($value['amount'])) {
                     $invoices_total += $value['amount'];
                 }
             }
@@ -118,7 +121,10 @@ class StorePaymentRequest extends Request
             foreach ($input['credits'] as $key => $value) {
                 if (isset($value['credit_id']) && is_string($value['credit_id'])) {
                     $input['credits'][$key]['credit_id'] = $this->decodePrimaryKey($value['credit_id']);
-                    $credits_total += $value['amount'];
+
+                    if (array_key_exists('amount', $value) && is_numeric($value['amount'])) {
+                        $credits_total += $value['amount'];
+                    }
                 }
             }
         }
@@ -137,6 +143,10 @@ class StorePaymentRequest extends Request
 
         if (! isset($input['idempotency_key'])) {
             $input['idempotency_key'] = substr(time()."{$input['date']}{$input['amount']}{$credits_total}{$this->client_id}{$user->company()->company_key}", 0, 64);
+        }
+
+        if (array_key_exists('exchange_rate', $input) && $input['exchange_rate'] === null) {
+            unset($input['exchange_rate']);
         }
 
         $this->replace($input);

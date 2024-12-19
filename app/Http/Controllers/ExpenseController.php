@@ -497,6 +497,18 @@ class ExpenseController extends BaseController
 
         $expenses = Expense::withTrashed()->find($request->ids);
 
+        if ($request->action == 'bulk_update' && $user->can('edit', $expenses->first())) {
+
+            $expenses = Expense::withTrashed()
+                    ->company()
+                    ->whereIn('id', $request->ids);
+
+            $this->expense_repo->bulkUpdate($expenses, $request->column, $request->new_value);
+
+            return $this->listResponse(Expense::query()->withTrashed()->company()->whereIn('id', $request->ids));
+
+        }
+
         if ($request->action == 'bulk_categorize' && $user->can('edit', $expenses->first())) {
             $this->expense_repo->categorize($expenses, $request->category_id);
             $expenses = collect([]);
@@ -584,20 +596,60 @@ class ExpenseController extends BaseController
         return $this->itemResponse($expense->fresh());
     }
 
-    public function edocument(EDocumentRequest $request): string
+    /**
+     * @OA\Post(
+     *      path="/api/v1/expenses/edocument",
+     *      operationId="edocumentExpense",
+     *      tags={"expenses"},
+     *      summary="Uploads an electronic document to a expense",
+     *      description="Handles the uploading of an electronic document to a expense",
+     *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
+     *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
+     *      @OA\Parameter(ref="#/components/parameters/include"),
+     *      @OA\RequestBody(
+     *         description="User credentials",
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="string",
+     *                     format="binary",
+     *                     description="The files to be uploaded",
+     *                 ),
+     *             )
+     *         )
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Returns a HTTP status",
+     *          @OA\Header(header="X-MINIMUM-CLIENT-VERSION", ref="#/components/headers/X-MINIMUM-CLIENT-VERSION"),
+     *          @OA\Header(header="X-RateLimit-Remaining", ref="#/components/headers/X-RateLimit-Remaining"),
+     *          @OA\Header(header="X-RateLimit-Limit", ref="#/components/headers/X-RateLimit-Limit"),
+     *       ),
+     *       @OA\Response(
+     *          response=422,
+     *          description="Validation error",
+     *          @OA\JsonContent(ref="#/components/schemas/ValidationError"),
+     *
+     *       ),
+     *       @OA\Response(
+     *           response="default",
+     *           response="default",
+     *           description="Unexpected Error",
+     *           @OA\JsonContent(ref="#/components/schemas/Error"),
+     *       ),
+     *     )
+     */
+    public function edocument(EDocumentRequest $request)
     {
-        if ($request->hasFile("documents"))
-            try {
+        $user = auth()->user();
 
-                return (new ImportEDocument($request->file("documents")->get(), $request->file("documents")->getClientOriginalName(), $request->file("documents")->getMimeType()))->handle();
+        foreach ($request->file("documents") as $file) {
+            ImportEDocument::dispatch($file->get(), $file->getClientOriginalName(), $file->getMimeType(), $user->company());
+        }
 
-            } catch (\Exception $e) {
-                if ($e->getCode() == 409)
-                    return $e->getMessage();
-
-                throw $e;
-            }
-
-        return "No file found";
+        return response()->json(['message' => 'Processing....'], 200);
     }
 }

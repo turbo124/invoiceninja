@@ -108,13 +108,24 @@ class BankTransactionFilters extends QueryFilters
             }
 
             if (count($debit_or_withdrawal_array) >= 1) {
-                $query->orWhereIn('base_type', $debit_or_withdrawal_array);
+                $query->whereIn('base_type', $debit_or_withdrawal_array);
             }
         });
 
         return $this->builder;
     }
 
+    public function active_banks(string $value = ''): Builder
+    {
+
+        if (strlen($value) == 0 || $value != 'true') {
+            return $this->builder;
+        }
+
+        return $this->builder->whereHas('bank_integration', function ($query) {
+            $query->where('is_deleted', 0)->whereNull('deleted_at');
+        });
+    }
 
     /**
      * Filters the list based on Bank Accounts.
@@ -124,7 +135,7 @@ class BankTransactionFilters extends QueryFilters
      */
     public function bank_integration_ids(string $ids = ''): Builder
     {
-        if(strlen($ids) == 0) {
+        if (strlen($ids) == 0) {
             return $this->builder;
         }
 
@@ -155,11 +166,13 @@ class BankTransactionFilters extends QueryFilters
         $dir = ($sort_col[1] == 'asc') ? 'asc' : 'desc';
 
         if ($sort_col[0] == 'deposit') {
-            return $this->builder->where('base_type', 'CREDIT')->orderBy('amount', $dir);
+            return $this->builder->orderByRaw("(CASE WHEN base_type = 'CREDIT' THEN amount END) $dir")->orderBy('amount', $dir);
+            // return $this->builder->where('base_type', 'CREDIT')->orderBy('amount', $dir);
         }
 
         if ($sort_col[0] == 'withdrawal') {
-            return $this->builder->where('base_type', 'DEBIT')->orderBy('amount', $dir);
+            return $this->builder->orderByRaw("(CASE WHEN base_type = 'DEBIT' THEN amount END) $dir")->orderBy('amount', $dir);
+            // return $this->builder->where('base_type', 'DEBIT')->orderBy('amount', $dir);
         }
 
         if ($sort_col[0] == 'status') {

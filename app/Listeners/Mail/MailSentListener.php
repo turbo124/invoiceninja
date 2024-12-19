@@ -23,7 +23,7 @@ use App\Models\RecurringInvoiceInvitation;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Symfony\Component\Mime\MessageConverter;
 
-class MailSentListener implements ShouldQueue
+class MailSentListener
 {
     /**
      * Create the event listener.
@@ -46,7 +46,7 @@ class MailSentListener implements ShouldQueue
         try {
             $message_id = $event->sent->getMessageId();
 
-            $message = MessageConverter::toEmail($event->sent->getOriginalMessage());
+            $message = MessageConverter::toEmail($event->sent->getOriginalMessage()); //@phpstan-ignore-line
 
             if (!$message->getHeaders()->get('x-invitation')) {
                 return;

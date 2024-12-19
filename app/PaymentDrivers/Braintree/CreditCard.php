@@ -21,8 +21,9 @@ use App\Models\Payment;
 use App\Models\PaymentType;
 use App\Models\SystemLog;
 use App\PaymentDrivers\BraintreePaymentDriver;
+use App\PaymentDrivers\Common\LivewireMethodInterface;
 
-class CreditCard
+class CreditCard implements LivewireMethodInterface
 {
     /**
      * @var BraintreePaymentDriver
@@ -76,17 +77,7 @@ class CreditCard
 
     public function paymentView(array $data)
     {
-        $data['gateway'] = $this->braintree;
-        $data['client_token'] = $this->braintree->gateway->clientToken()->generate();
-        $data['threeds'] = $this->threeDParameters($data);
-        $data['threeds_enable'] = $this->braintree->company_gateway->getConfigField('threeds') ? "true" : "false";
-
-        if ($this->braintree->company_gateway->getConfigField('merchantAccountId')) {
-            /** https://developer.paypal.com/braintree/docs/reference/request/client-token/generate#merchant_account_id */
-            $data['client_token'] = $this->braintree->gateway->clientToken()->generate([
-                'merchantAccountId' => $this->braintree->company_gateway->getConfigField('merchantAccountId'),
-            ]);
-        }
+        $data = $this->paymentData($data);
 
         return render('gateways.braintree.credit_card.pay', $data);
     }
@@ -118,12 +109,13 @@ class CreditCard
         $token = $this->getPaymentToken($request->all(), $customer->id);
 
         $data = [
-            'amount' => $this->braintree->payment_hash->data->amount_with_fee,
+            'amount' => $this->braintree->payment_hash->data->amount_with_fee, //@phpstan-ignore-line
             'paymentMethodToken' => $token,
             'deviceData' => $state['client-data'],
             'options' => [
                 'submitForSettlement' => true,
             ],
+            'channel' => 'invoiceninja_BT',
             'billing' => [
                 'streetAddress' => $this->braintree->client->address1 ?: '',
                 'extendedAddress' => $this->braintree->client->address2 ?: '',
@@ -153,7 +145,7 @@ class CreditCard
         }
 
         if ($result->success) {
-            $this->braintree->logSuccessfulGatewayResponse(['response' => $request->server_response, 'data' => $this->braintree->payment_hash], SystemLog::TYPE_BRAINTREE);
+            $this->braintree->logSuccessfulGatewayResponse(['response' => $request->server_response, 'data' => $this->braintree->payment_hash->data], SystemLog::TYPE_BRAINTREE);
 
             if ($request->store_card && is_null($request->token)) {
                 $payment_method = $this->braintree->gateway->paymentMethod()->find($token);
@@ -277,5 +269,33 @@ class CreditCard
         } catch (\Exception $e) {
             return $this->braintree->processInternallyFailedPayment($this->braintree, $e);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function livewirePaymentView(array $data): string
+    {
+        return 'gateways.braintree.credit_card.pay_livewire';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function paymentData(array $data): array
+    {
+        $data['gateway'] = $this->braintree;
+        $data['client_token'] = $this->braintree->gateway->clientToken()->generate();
+        $data['threeds'] = $this->threeDParameters($data);
+        $data['threeds_enable'] = $this->braintree->company_gateway->getConfigField('threeds') ? "true" : "false";
+
+        if ($this->braintree->company_gateway->getConfigField('merchantAccountId')) {
+            /** https://developer.paypal.com/braintree/docs/reference/request/client-token/generate#merchant_account_id */
+            $data['client_token'] = $this->braintree->gateway->clientToken()->generate([ // @phpstan-ignore-line
+                'merchantAccountId' => $this->braintree->company_gateway->getConfigField('merchantAccountId'),
+            ]);
+        }
+
+        return $data;
     }
 }

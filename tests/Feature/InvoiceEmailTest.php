@@ -11,20 +11,22 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\Entity\EmailEntity;
+use Tests\TestCase;
 use App\Models\SystemLog;
+use Tests\MockAccountData;
+use App\Jobs\Entity\EmailEntity;
+use Illuminate\Support\Facades\Bus;
 use App\Utils\Traits\GeneratesCounter;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Email\SendEmailRequest;
 use Illuminate\Validation\ValidationException;
-use Tests\MockAccountData;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
- * @test
- * @covers App\Jobs\Invoice\EmailInvoice
+ * 
+ *  App\Jobs\Invoice\EmailInvoice
  */
 class InvoiceEmailTest extends TestCase
 {
@@ -34,7 +36,7 @@ class InvoiceEmailTest extends TestCase
 
     public $faker;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +48,35 @@ class InvoiceEmailTest extends TestCase
 
         $this->makeTestData();
 
-        // $this->withoutExceptionHandling();
+    }
+
+    public function testEmailTemplateValidation()
+    {
+        $this->user->setCompany($this->company);
+        $this->actingAs($this->user);
+    
+        $request = new SendEmailRequest();
+
+        collect($request->templates)->filter(function ($template){
+            return stripos($template, 'quote') === false;
+        })->each(function ($template) use($request){
+
+        
+            $data = [
+                "body" => "hey what's up",
+                "entity" => 'App\Models\Invoice',
+                "entity_id" => $this->invoice->id,
+                "subject" => 'Reminder $number',
+                "template" => $template
+            ];
+
+            $request->initialize($data);
+            $validator = Validator::make($data, $request->rules());
+    
+            $this->assertTrue($validator->passes());
+        
+        });
+
 
     }
 
@@ -56,7 +86,53 @@ class InvoiceEmailTest extends TestCase
 
         $this->assertTrue(strpos($email, '@example.com') !== false);
     }
-    
+
+
+     public function testTemplateValidationWhenArray()
+    {
+        $data = [
+            "body" => "hey what's up",
+            "entity" => 'blergen',
+            "entity_id" => $this->invoice->hashed_id,
+            "subject" => 'Reminder $number',
+            "template" => [
+                "email_template_invoice","noo",
+            ],
+        ];
+
+        $response = false;
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/emails', $data);
+
+        $response->assertStatus(422);
+
+    }
+
+
+    public function testEntityValidation()
+    {
+        $data = [
+            "body" => "hey what's up",
+            "entity" => 'blergen',
+            "entity_id" => $this->invoice->hashed_id,
+            "subject" => 'Reminder $number',
+            "template" => "email_template_invoice"
+        ];
+
+        $response = false;
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/emails', $data);
+
+        $response->assertStatus(422);
+
+    }
+
 
     public function testClientEmailHistory()
     {
@@ -69,7 +145,7 @@ class InvoiceEmailTest extends TestCase
         $system_log->log = [
             'history' => [
                 'entity_id' => $this->invoice->hashed_id,
-                'entity_type' => 'invoice',
+                'entity' => 'invoice',
                 'subject' => 'Invoice #1',
                 'events' => [
                     [
@@ -83,7 +159,7 @@ class InvoiceEmailTest extends TestCase
                 ],
             ]
         ];
-                
+
         $system_log->save();
 
 
@@ -96,7 +172,7 @@ class InvoiceEmailTest extends TestCase
 
         $arr = $response->json();
 
-        $this->assertEquals('invoice', $arr[0]['entity_type']);
+        $this->assertEquals('invoice', $arr[0]['entity']);
 
         $count = SystemLog::where('client_id', $this->client->id)
                 ->where('category_id', SystemLog::CATEGORY_MAIL)
@@ -117,7 +193,7 @@ class InvoiceEmailTest extends TestCase
         $system_log->log = [
             'history' => [
                 'entity_id' => $this->invoice->hashed_id,
-                'entity_type' => 'invoice',
+                'entity' => 'invoice',
                 'subject' => 'Invoice #1',
                 'events' => [
                     [
@@ -131,7 +207,7 @@ class InvoiceEmailTest extends TestCase
                 ],
             ]
         ];
-                
+
         $system_log->save();
 
         $data = [
@@ -148,7 +224,7 @@ class InvoiceEmailTest extends TestCase
 
         $arr = $response->json();
 
-        $this->assertEquals('invoice', $arr[0]['entity_type']);
+        $this->assertEquals('invoice', $arr[0]['entity']);
         $this->assertEquals($this->invoice->hashed_id, $arr[0]['entity_id']);
 
         $count = SystemLog::where('company_id', $this->company->id)
@@ -166,22 +242,18 @@ class InvoiceEmailTest extends TestCase
         $data = [
             "body" => "hey what's up",
             "entity" => 'invoice',
-            "entity_id"=> $this->invoice->hashed_id,
-            "subject"=> 'Reminder $number',
-            "template"=> "first_custom"
+            "entity_id" => $this->invoice->hashed_id,
+            "subject" => 'Reminder $number',
+            "template" => "first_custom"
         ];
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/emails', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/emails', $data);
+
 
         $response->assertStatus(422);
 
@@ -198,15 +270,11 @@ class InvoiceEmailTest extends TestCase
 
         $response = false;
 
-        try {
-            $response = $this->withHeaders([
-                'X-API-SECRET' => config('ninja.api_secret'),
-                'X-API-TOKEN' => $this->token,
-            ])->postJson('/api/v1/emails', $data);
-        } catch (ValidationException $e) {
-            $message = json_decode($e->validator->getMessageBag(), 1);
-            nlog($message);
-        }
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/emails', $data);
+
 
         $response->assertStatus(200);
 
@@ -264,7 +332,7 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
+
                 Bus::assertDispatched(EmailEntity::class);
 
             }
@@ -295,7 +363,7 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
+
                 Bus::assertDispatched(EmailEntity::class);
 
             }
@@ -321,7 +389,7 @@ class InvoiceEmailTest extends TestCase
             if ($invitation->contact->send_email && $invitation->contact->email) {
                 EmailEntity::dispatch($invitation, $invitation->company);
 
-                
+
                 Bus::assertDispatched(EmailEntity::class);
 
             }

@@ -124,18 +124,18 @@ class SubscriptionRepository extends BaseRepository
      *
      * Removing the nested keys of the items array
      *
-     * @param  array $bundle
+     * @param  mixed $bundle
      * @return array
      */
     private function convertV3Bundle($bundle): array
     {
-        if(is_object($bundle)) {
-            $bundle = json_decode(json_encode($bundle), 1);
+        if (is_object($bundle)) {
+            $bundle = json_decode(json_encode($bundle), true);
         }
 
         $items = [];
 
-        foreach($bundle['recurring_products'] as $key => $value) {
+        foreach ($bundle['recurring_products'] as $key => $value) {
 
             $line_item = new \stdClass();
             $line_item->product_key = $value['product']['product_key'];
@@ -146,7 +146,7 @@ class SubscriptionRepository extends BaseRepository
             $items[] = $line_item;
         }
 
-        foreach($bundle['recurring_products'] as $key => $value) {
+        foreach ($bundle['recurring_products'] as $key => $value) {
 
             $line_item = new \stdClass();
             $line_item->product_key = $value['product']['product_key'];
@@ -164,7 +164,7 @@ class SubscriptionRepository extends BaseRepository
     public function generateBundleLineItems($bundle, $is_recurring = false, $is_credit = false)
     {
 
-        if(isset($bundle->recurring_products)) {
+        if (isset($bundle->recurring_products)) {
             $bundle = $this->convertV3Bundle($bundle);
         }
 
@@ -218,7 +218,7 @@ class SubscriptionRepository extends BaseRepository
 
         $entity = $class::withTrashed()->find($request->entity_id);
 
-        if($entity) {
+        if ($entity) {
             $entity->subscription_id = $subscription->id;
             $entity->save();
         }

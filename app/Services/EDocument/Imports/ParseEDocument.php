@@ -11,19 +11,20 @@
 
 namespace App\Services\EDocument\Imports;
 
+use Exception;
+use App\Utils\Ninja;
+use App\Models\Company;
 use App\Models\Expense;
 use App\Services\AbstractService;
-use App\Utils\Ninja;
-use Exception;
 use Illuminate\Http\UploadedFile;
+use App\Services\EDocument\Imports\UblEDocument;
 
 class ParseEDocument extends AbstractService
 {
-
     /**
      * @throws Exception
      */
-    public function __construct(private UploadedFile $file)
+    public function __construct(private UploadedFile $file, private Company $company)
     {
 
     }
@@ -35,39 +36,55 @@ class ParseEDocument extends AbstractService
      * @developer the function should be implemented with local first aproach to save costs of external providers (like mindee ocr)
      *
      * @return Expense
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function run(): Expense
     {
+        nlog("starting");
+        nlog($this->company->id);
+        // nlog($this->file->get());
 
         /** @var \App\Models\Account $account */
-        $account = auth()->user()->account;
+        $account = $this->company->owner()->account;
+
+        $extension = $this->file->getClientOriginalExtension() ?: $this->file->getExtension();
+        $mimetype = $this->file->getClientMimeType() ?: $$this->file->getMimeType();
 
         // ZUGFERD - try to parse via Zugferd lib
         switch (true) {
-            case $this->file->getExtension() == 'pdf':
-            case $this->file->getExtension() == 'xml' && stristr($this->file->get(), "urn:cen.eu:en16931:2017"):
-            case $this->file->getExtension() == 'xml' && stristr($this->file->get(), "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0"):
-            case $this->file->getExtension() == 'xml' && stristr($this->file->get(), "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_2.1"):
-            case $this->file->getExtension() == 'xml' && stristr($this->file->get(), "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_2.0"):
+            case ($extension == 'pdf' || $mimetype == 'application/pdf'):
+            case ($extension == 'xml' || $mimetype == 'application/xml') && stristr($this->file->get(), "<rsm:CrossIndustryInvoice"):
                 try {
-                    return (new ZugferdEDocument($this->file))->run();
-                } catch (Exception $e) {
+                    return (new ZugferdEDocument($this->file, $this->company))->run();
+                } catch (\Throwable $e) {
                     nlog("Zugferd Exception: " . $e->getMessage());
+                    break;
+                }
+            case ($extension == 'xml' || $mimetype == 'application/xml') && stristr($this->file->get(), "<Invoice"):
+                try {
+                    return (new UblEDocument($this->file, $this->company))->run();
+                } catch (\Throwable $e) {
+                    nlog("UBL Import Exception: " . $e->getMessage());
+                    break;
                 }
         }
 
         // MINDEE OCR - try to parse via mindee external service
-        if (config('services.mindee.api_key') && !(Ninja::isHosted() && !($account->isPaid() && $account->plan == 'enterprise')))
-            try {
-                return (new MindeeEDocument($this->file))->run();
-            } catch (Exception $e) {
-                if (!($e->getMessage() == 'Unsupported document type'))
-                    nlog("Mindee Exception: " . $e->getMessage());
+        if (config('services.mindee.api_key') && !(Ninja::isHosted() && !($account->isPaid() && $account->plan == 'enterprise'))) {
+            switch (true) {
+                case ($extension == 'pdf' || $mimetype == 'application/pdf'):
+                case ($extension == 'heic' || $extension == 'heic' || $extension == 'png' || $extension == 'jpg' || $extension == 'jpeg' || $extension == 'webp' || str_starts_with($mimetype, 'image/')):
+                    try {
+                        return (new MindeeEDocument($this->file, $this->company))->run();
+                    } catch (Exception $e) {
+                        if (!($e->getMessage() == 'Unsupported document type')) {
+                            nlog("Mindee Exception: " . $e->getMessage());
+                        }
+                    }
             }
+        }
 
         // NO PARSER OR ERROR
         throw new Exception("File type not supported or issue while parsing", 409);
     }
 }
-

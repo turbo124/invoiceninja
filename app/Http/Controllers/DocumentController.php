@@ -150,6 +150,10 @@ class DocumentController extends BaseController
         $document->fill($request->all());
         $document->save();
 
+        if ($document->documentable) { //@phpstan-ignore-line
+            $document->documentable->touch();
+        }
+
         return $this->itemResponse($document->fresh());
     }
 
@@ -183,7 +187,7 @@ class DocumentController extends BaseController
         }
 
         if ($action == 'download') {
-            ZipDocuments::dispatch($documents->pluck('id'), $user->company(), auth()->user());
+            ZipDocuments::dispatch($documents->pluck('id'), $user->company(), auth()->user()); //@phpstan-ignore-line
 
             return response()->json(['message' => ctrans('texts.sent_message')], 200);
         }

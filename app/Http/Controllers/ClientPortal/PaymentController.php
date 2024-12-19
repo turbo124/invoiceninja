@@ -108,12 +108,6 @@ class PaymentController extends Controller
      */
     public function process(Request $request)
     {
-        $request->validate([
-            'contact_first_name' => ['required'],
-            'contact_last_name' => ['required'],
-            'contact_email' => ['required', 'email'],
-        ]);
-
         return (new InstantPayment($request))->run();
     }
 
@@ -123,13 +117,7 @@ class PaymentController extends Controller
         $gateway = CompanyGateway::findOrFail($request->input('company_gateway_id'));
         $payment_hash = PaymentHash::with('fee_invoice')->where('hash', $request->payment_hash)->firstOrFail();
 
-        // if($payment_hash)
         $invoice = $payment_hash->fee_invoice;
-        // else
-            // $invoice = Invoice::with('client')->where('id',$payment_hash->fee_invoice_id)->orderBy('id','desc')->first();
-
-        // $invoice = Invoice::with('client')->find($payment_hash->fee_invoice_id);
-
 
         $client = $invoice ? $invoice->client : auth()->guard('contact')->user()->client;
 
@@ -186,7 +174,7 @@ class PaymentController extends Controller
             $payment_hash->payment_id = $payment->id;
             $payment_hash->save();
         }
-
+        $payment->type_id = PaymentType::CREDIT;
         $payment = $payment->service()->applyCredits($payment_hash)->save();
 
         /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\Invoice> $invoices */
@@ -209,7 +197,7 @@ class PaymentController extends Controller
 
         if (property_exists($payment_hash->data, 'billing_context')) {
             $billing_subscription = \App\Models\Subscription::find($this->decodePrimaryKey($payment_hash->data->billing_context->subscription_id));
-
+            /** @var \App\Models\Subscription $billing_subscription */
             return (new SubscriptionService($billing_subscription))->completePurchase($payment_hash);
         }
 

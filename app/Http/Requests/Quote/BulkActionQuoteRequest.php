@@ -35,10 +35,11 @@ class BulkActionQuoteRequest extends Request
             'ids' => 'required|array',
             'template' => 'sometimes|string',
             'template_id' => 'sometimes|string',
-            'send_email' => 'sometimes|bool'
+            'send_email' => 'sometimes|bool',
+            'email_type' => 'sometimes|in:quote,reminder1,custom1,custom2,custom3',
         ];
 
-        if (in_array($input['action'], ['convert,convert_to_invoice'])) {
+        if (in_array($input['action'], ['convert','convert_to_invoice'])) {
             $rules['action'] = [new ConvertableQuoteRule()];
         }
 

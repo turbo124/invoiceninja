@@ -20,7 +20,6 @@ use Illuminate\Http\Request;
  */
 class BrevoController extends BaseController
 {
-
     public function __construct()
     {
     }
@@ -62,7 +61,7 @@ class BrevoController extends BaseController
     public function webhook(Request $request)
     {
         if ($request->has('token') && $request->get('token') == config('services.brevo.secret')) {
-            ProcessBrevoWebhook::dispatch($request->all())->delay(10);
+            ProcessBrevoWebhook::dispatch($request->all())->delay(rand(2, 10));
 
             return response()->json(['message' => 'Success'], 200);
         }
@@ -186,8 +185,9 @@ class BrevoController extends BaseController
     {
         $input = $request->all();
 
-        if (!($request->has('token') && $request->get('token') == config('ninja.inbound_mailbox.inbound_webhook_token')))
+        if (!($request->has('token') && $request->get('token') == config('ninja.inbound_mailbox.inbound_webhook_token'))) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         if (!array_key_exists('items', $input)) {
             nlog('Failed: Message could not be parsed, because required parameters are missing.');
@@ -201,7 +201,7 @@ class BrevoController extends BaseController
                 return response()->json(['message' => 'Failed. Invalid Parameters. At least one item was invalid.'], 400);
             }
 
-            ProcessBrevoInboundWebhook::dispatch($item)->delay(10);
+            ProcessBrevoInboundWebhook::dispatch($item)->delay(rand(2, 10));
 
         }
 

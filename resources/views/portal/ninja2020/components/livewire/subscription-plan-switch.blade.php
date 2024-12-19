@@ -51,7 +51,7 @@
             <div class="relative flex justify-center text-sm leading-5">
                 <span class="font-bold tracking-wide bg-gray-100 px-6 py-0">{{ ctrans('texts.select_payment_method')}}</span>
                 <h1 class="text-2xl font-bold tracking-wide bg-gray-100 px-6 py-0">
-                    {{ ctrans('texts.total') }}: {{ \App\Utils\Number::formatMoney($amount, $subscription->company) }}
+                    {{ ctrans('texts.total') }}: {{ \App\Utils\Number::formatMoney($amount, $this->subscription->company) }}
                 </h1>
             </div>
         </div>
@@ -71,9 +71,9 @@
                 <input type="hidden" name="action" value="payment">
                 <input type="hidden" name="company_gateway_id" value="{{ $state['company_gateway_id'] }}"/>
                 <input type="hidden" name="payment_method_id" value="{{ $state['payment_method_id'] }}"/>
-                <input type="hidden" name="contact_first_name" value="{{ $contact->first_name }}">
-                <input type="hidden" name="contact_last_name" value="{{ $contact->last_name }}">
-                <input type="hidden" name="contact_email" value="{{ $contact->email }}">
+                <input type="hidden" name="contact_first_name" value="{{ $this->contact()->first_name }}">
+                <input type="hidden" name="contact_last_name" value="{{ $this->contact()->last_name }}">
+                <input type="hidden" name="contact_email" value="{{ $this->contact()->email }}">
             </form>
 
     <!-- Payment methods -->
@@ -83,7 +83,7 @@
                 @if(!$state['payment_initialised'])
                     @foreach($this->methods as $method)
                         <button
-                            wire:click="handleMethodSelectingEvent('{{ $method['company_gateway_id'] }}', '{{ $method['gateway_type_id'] }}'); $wire.$refresh();"
+                            wire:click="handleMethodSelectingEvent('{{ $method['company_gateway_id'] }}', '{{ $method['gateway_type_id'] }}', '{{ $method['is_paypal'] }}'); $wire.$refresh();"
                             class="px-3 py-2 border bg-white rounded mr-4 hover:border-blue-600">
                             {{ $method['label'] }}
                         </button>
@@ -107,7 +107,7 @@
 
             <div class="relative flex justify-center text-sm leading-5">
                 <h1 class="text-2xl font-bold tracking-wide bg-gray-100 px-6 py-0">
-                    {{ ctrans('texts.total') }}: {{ \App\Utils\Number::formatMoney($amount, $subscription->company) }}
+                    {{ ctrans('texts.total') }}: {{ \App\Utils\Number::formatMoney($amount, $this->subscription()->company) }}
                 </h1>
             </div>
             <div class="relative flex justify-center text-sm leading-5 mt-10">

@@ -45,6 +45,13 @@ return [
         ],
     ],
 
+    'postmark-broadcast' => [
+        'token' => env('POSTMARK_BROADCAST_SECRET', ''),
+        'from' => [
+            'address' => env('POSTMARK_BROADCAST_FROM_ADDRESS', 'community@invoiceninja.com')
+        ],
+    ],
+
     'microsoft' => [
         'client_id' => env('MICROSOFT_CLIENT_ID'),
         'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
@@ -130,5 +137,20 @@ return [
     'chorus' => [
         'client_id' => env('CHORUS_CLIENT_ID', false),
         'secret' => env('CHORUS_SECRET', false),
-    ]
+    ],
+    'gocardless' => [
+        'client_id' => env('GOCARDLESS_CLIENT_ID', null),
+        'client_secret' => env('GOCARDLESS_CLIENT_SECRET', null),
+        'environment' => env('GOCARDLESS_ENVIRONMENT', 'production'),
+        'redirect_uri' => env('GOCARDLESS_REDIRECT_URI', 'https://invoicing.co/gocardless/oauth/connect/confirm'),
+        'testing_company' => env('GOCARDLESS_TESTING_COMPANY', null),
+    ],
+    'quickbooks' => [
+        'client_id' => env('QUICKBOOKS_CLIENT_ID', false),
+        'client_secret' => env('QUICKBOOKS_CLIENT_SECRET', false),
+        'debug' => env('APP_DEBUG',false)
+    ],
+    'quickbooks_webhook' => [
+        'verifier_token' => env('QUICKBOOKS_VERIFIER_TOKEN', false),
+    ],
 ];

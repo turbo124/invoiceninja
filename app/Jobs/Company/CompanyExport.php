@@ -108,7 +108,8 @@ class CompanyExport implements ShouldQueue
 
 
         $this->export_data['users'] = $this->company->users()->withTrashed()->cursor()->map(function ($user) {
-            $user->account_id = $this->encodePrimaryKey($user->account_id);
+            /** @var \App\Models\User $user */
+            $user->account_id = $this->encodePrimaryKey($user->account_id); //@phpstan-ignore-line
             return $user;
         })->all();
 
@@ -306,7 +307,7 @@ class CompanyExport implements ShouldQueue
             $invoice = $this->transformArrayOfKeys($invoice, ['recurring_id','client_id', 'vendor_id', 'project_id', 'design_id', 'subscription_id']);
             $invoice->tax_data = '';
 
-            return $invoice->makeVisible(['id',
+            return $invoice->makeHidden(['gateway_fee'])->makeVisible(['id',
                                         'private_notes',
                                         'user_id',
                                         'client_id',
@@ -467,7 +468,7 @@ class CompanyExport implements ShouldQueue
         $x->addItems($this->export_data['subscriptions']);
         $this->export_data = null;
 
-        
+
         $this->export_data['system_logs'] = $this->company->system_logs->map(function ($log) {
             $log->client_id = $this->encodePrimaryKey($log->client_id);/** @phpstan-ignore-line */
             $log->company_id = $this->encodePrimaryKey($log->company_id);/** @phpstan-ignore-line */
@@ -678,15 +679,15 @@ class CompanyExport implements ShouldQueue
 
         Storage::disk(config('filesystems.default'))->put('backups/'.str_replace(".json", ".zip", $this->file_name), file_get_contents($zip_path));
 
-        if(file_exists($zip_path)) {
+        if (file_exists($zip_path)) {
             unlink($zip_path);
         }
 
-        if(file_exists(sys_get_temp_dir().'/'.$this->file_name)) {
+        if (file_exists(sys_get_temp_dir().'/'.$this->file_name)) {
             unlink(sys_get_temp_dir().'/'.$this->file_name);
         }
 
-        if(Ninja::isSelfHost()) {
+        if (Ninja::isSelfHost()) {
             $storage_path = 'backups/'.str_replace(".json", ".zip", $this->file_name);
         } else {
             $storage_path = Storage::disk(config('filesystems.default'))->path('backups/'.str_replace(".json", ".zip", $this->file_name));
@@ -694,7 +695,7 @@ class CompanyExport implements ShouldQueue
 
         $url = Cache::get($this->hash);
 
-        Cache::put($this->hash, $storage_path, now()->addHour());
+        Cache::put($this->hash, $storage_path, 3600);
 
         App::forgetInstance('translator');
         $t = app('translator');
@@ -713,7 +714,7 @@ class CompanyExport implements ShouldQueue
         if (Ninja::isHosted()) {
             sleep(3);
 
-            if(file_exists(sys_get_temp_dir().'/'.$zip_path)) {
+            if (file_exists(sys_get_temp_dir().'/'.$zip_path)) {
                 unlink(sys_get_temp_dir().'/'.$zip_path);
             }
         }

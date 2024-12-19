@@ -46,12 +46,11 @@ class ExpenseRepository extends BaseRepository
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $payment_date = &$data['payment_date'];
-        $vendor_id = &$data['vendor_id'];
+        $payment_date = isset($data['payment_date']) ? $data['payment_date'] : false;
 
-        if($payment_date && $payment_date == $expense->payment_date) {
+        if ($payment_date && $payment_date == $expense->payment_date) {
             //do nothing
-        } elseif($payment_date && strlen($payment_date) > 1 && $user->company()->notify_vendor_when_paid && ($vendor_id || $expense->vendor_id)) {
+        } elseif ($payment_date && strlen($payment_date) > 1 && $user->company()->notify_vendor_when_paid && (isset($data['vendor_id']) || $expense->vendor_id)) {
             $this->notify_vendor = true;
         }
 
@@ -71,11 +70,11 @@ class ExpenseRepository extends BaseRepository
             $this->saveDocuments($data['documents'], $expense);
         }
 
-        if($this->notify_vendor) {
+        if ($this->notify_vendor) {
             VendorExpenseNotify::dispatch($expense, $expense->company->db);
         }
 
-        if($payment_date && strlen($payment_date) > 1 && $expense->purchase_order) {
+        if ($payment_date && strlen($payment_date) > 1 && $expense->purchase_order) {
             $purchase_order = $expense->purchase_order;
             $purchase_order->balance = round($purchase_order->amount - $expense->amount, 2);
             $purchase_order->paid_to_date = $expense->amount;
@@ -122,6 +121,7 @@ class ExpenseRepository extends BaseRepository
             $exchange_rate = new CurrencyApi();
 
             $expense->exchange_rate = $exchange_rate->exchangeRate($expense_currency, $company_currency, Carbon::parse($expense->date));
+            $expense->invoice_currency_id = $company_currency;
 
             return $expense;
         }
@@ -144,7 +144,7 @@ class ExpenseRepository extends BaseRepository
 
             $expense->transaction->expense_id = $exp_ids;
 
-            if(strlen($exp_ids) <= 2) {
+            if (strlen($exp_ids) <= 2) {
                 $expense->transaction->status_id = 1;
             }
 

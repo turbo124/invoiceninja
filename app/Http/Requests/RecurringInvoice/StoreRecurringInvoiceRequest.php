@@ -61,7 +61,8 @@ class StoreRecurringInvoiceRequest extends Request
 
         $rules['client_id'] = 'required|exists:clients,id,company_id,'.$user->company()->id;
 
-        $rules['invitations.*.client_contact_id'] = 'distinct';
+        $rules['invitations'] = 'sometimes|bail|array';
+        $rules['invitations.*.client_contact_id'] = 'bail|required|distinct';
 
         $rules['frequency_id'] = 'required|integer|digits_between:1,12';
 
@@ -94,7 +95,7 @@ class StoreRecurringInvoiceRequest extends Request
             $input['due_date_days'] = 'terms';
         }
 
-        if(!isset($input['next_send_date']) || $input['next_send_date'] == '') {
+        if (!isset($input['next_send_date']) || $input['next_send_date'] == '') {
             $input['next_send_date'] = now()->format('Y-m-d');
         }
 
@@ -147,6 +148,8 @@ class StoreRecurringInvoiceRequest extends Request
         }
 
         $input['line_items'] = isset($input['line_items']) ? $this->cleanItems($input['line_items']) : [];
+        $input['line_items'] = $this->cleanFeeItems($input['line_items']);
+
         $input['amount'] = $this->entityTotalAmount($input['line_items']);
 
         if (isset($input['auto_bill'])) {

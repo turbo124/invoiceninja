@@ -99,6 +99,7 @@ class QuoteReminderJob implements ShouldQueue
                      ->whereHas('company', function ($query) {
                          $query->where('is_disabled', 0);
                      })
+
                      ->with('invitations')->chunk(50, function ($quotes) {
 
                          foreach ($quotes as $quote) {
@@ -118,7 +119,7 @@ class QuoteReminderJob implements ShouldQueue
         $t->replace(Ninja::transformTranslations($quote->client->getMergedSettings()));
         App::setLocale($quote->client->locale());
 
-        if ($quote->isPayable()) {
+        if ($quote->canRemind()) {
             //Attempts to prevent duplicates from sending
             if ($quote->reminder_last_sent && Carbon::parse($quote->reminder_last_sent)->startOfDay()->eq(now()->startOfDay())) {
                 nrlog("caught a duplicate reminder for quote {$quote->number}");
@@ -129,19 +130,15 @@ class QuoteReminderJob implements ShouldQueue
             nrlog("#{$quote->number} => reminder template = {$reminder_template}");
             $quote->service()->touchReminder($reminder_template)->save();
 
-            //20-04-2022 fixes for endless reminders - generic template naming was wrong
             $enabled_reminder = 'enable_quote_'.$reminder_template;
-            // if ($reminder_template == 'endless_reminder') {
-            //     $enabled_reminder = 'enable_reminder_endless';
-            // }
-
+            
             if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3', 'reminder_endless', 'endless_reminder']) &&
         $quote->client->getSetting($enabled_reminder) &&
         $quote->client->getSetting('send_reminders') &&
         (Ninja::isSelfHost() || $quote->company->account->isPaidHostedClient())) {
                 $quote->invitations->each(function ($invitation) use ($quote, $reminder_template) {
                     if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                        EmailEntity::dispatch($invitation, $invitation->company, $reminder_template);
+                        EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                         nrlog("Firing reminder email for quote {$quote->number} - {$reminder_template}");
                         $quote->entityEmailEvent($invitation, $reminder_template);
                         $quote->sendEvent(Webhook::EVENT_REMIND_QUOTE, "client");

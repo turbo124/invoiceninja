@@ -25,11 +25,11 @@ trait AppSetup
             return Ninja::isNinja();
         }
 
-        $check = SystemHealth::check();
+        $check = SystemHealth::check(true, false);
 
         return $check['system_health'] == 'true';
     }
-    
+
     /**
      * @deprecated
      *

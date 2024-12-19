@@ -87,7 +87,7 @@ class PaymentMigrationRepository extends BaseRepository
 
         if (! array_key_exists('status_id', $data)) {
             info('payment with no status id?');
-            info(print_r($data, 1));
+            info(print_r($data, true));
         }
 
         $payment->status_id = $data['status_id'];
@@ -105,7 +105,7 @@ class PaymentMigrationRepository extends BaseRepository
         }
 
         /*Ensure payment number generated*/
-        if (! $payment->number || strlen($payment->number) == 0) {
+        if (! $payment->number || strlen($payment->number) == 0) {//@phpstan-ignore-line
             $payment->number = $payment->client->getNextPaymentNumber($payment->client, $payment);
         }
 

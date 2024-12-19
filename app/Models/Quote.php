@@ -11,17 +11,22 @@
 
 namespace App\Models;
 
-use App\Helpers\Invoice\InvoiceSum;
-use App\Helpers\Invoice\InvoiceSumInclusive;
-use App\Models\Presenters\QuotePresenter;
-use App\Services\Quote\QuoteService;
-use App\Utils\Traits\MakesDates;
-use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\MakesInvoiceValues;
-use App\Utils\Traits\MakesReminders;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Utils\Ninja;
+use App\Utils\Number;
+use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
+use App\Utils\Traits\MakesHash;
+use App\Helpers\Invoice\InvoiceSum;
+use Illuminate\Support\Facades\App;
+use App\Services\Quote\QuoteService;
+use App\Utils\Traits\MakesReminders;
+use App\Events\Quote\QuoteWasEmailed;
+use App\Utils\Traits\MakesInvoiceValues;
+use App\Models\Presenters\QuotePresenter;
 use Laracasts\Presenter\PresentableTrait;
+use App\Helpers\Invoice\InvoiceSumInclusive;
+use App\Events\Quote\QuoteReminderWasEmailed;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\Quote
@@ -113,12 +118,12 @@ use Laracasts\Presenter\PresentableTrait;
 class Quote extends BaseModel
 {
     use MakesHash;
-    use MakesDates;
     use Filterable;
     use SoftDeletes;
     use MakesReminders;
     use PresentableTrait;
     use MakesInvoiceValues;
+    use Searchable;
 
     protected $presenter = QuotePresenter::class;
 
@@ -187,6 +192,35 @@ class Quote extends BaseModel
 
     public const STATUS_EXPIRED = -1;
 
+    public function toSearchableArray()
+    {
+        $locale = $this->company->locale();
+        App::setLocale($locale);
+
+        return [
+            'id' => $this->id,
+            'name' => ctrans('texts.quote') . " " . ($this->number ?? '') . " | " . $this->client->present()->name() .  ' | ' . Number::formatMoney($this->amount, $this->company) . ' | ' . $this->translateDate($this->date, $this->company->date_format(), $locale),
+            'hashed_id' => $this->hashed_id,
+            'number' => $this->number,
+            'is_deleted' => $this->is_deleted,
+            'amount' => (float) $this->amount,
+            'balance' => (float) $this->balance,
+            'due_date' => $this->due_date,
+            'date' => $this->date,
+            'custom_value1' => (string)$this->custom_value1,
+            'custom_value2' => (string)$this->custom_value2,
+            'custom_value3' => (string)$this->custom_value3,
+            'custom_value4' => (string)$this->custom_value4,
+            'company_key' => $this->company->company_key,
+            'po_number' => (string)$this->po_number,
+        ];
+    }
+
+    public function getScoutKey()
+    {
+        return $this->hashed_id;
+    }
+
     public function getEntityType()
     {
         return self::class;
@@ -196,16 +230,6 @@ class Quote extends BaseModel
     {
         return $this->dateMutator($value);
     }
-
-    //    public function getDueDateAttribute($value)
-    //    {
-    //        return $value ? $this->dateMutator($value) : null;
-    //    }
-
-    // public function getPartialDueDateAttribute($value)
-    // {
-    //     return $this->dateMutator($value);
-    // }
 
     public function getStatusIdAttribute($value)
     {
@@ -227,7 +251,7 @@ class Quote extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<Backup>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function history(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
@@ -236,7 +260,7 @@ class Quote extends BaseModel
 
     public function activities(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Activity::class)->orderBy('id', 'DESC')->take(50);
+        return $this->hasMany(Activity::class)->where('company_id', $this->company_id)->where('client_id', $this->client_id)->orderBy('id', 'DESC')->take(50);
     }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -270,7 +294,7 @@ class Quote extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function documents(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
@@ -396,7 +420,7 @@ class Quote extends BaseModel
      */
     public function calculateTemplate(string $entity_string): string
     {
-                
+
         $client = $this->client;
 
         if ($entity_string != 'quote') {
@@ -408,38 +432,68 @@ class Quote extends BaseModel
             $client->getSetting('quote_num_days_reminder1')
         ) && ! $this->reminder1_sent) {
             return 'reminder1';
-        // } elseif ($this->inReminderWindow(
-        //     $client->getSetting('schedule_reminder2'),
-        //     $client->getSetting('num_days_reminder2')
-        // ) && ! $this->reminder2_sent) {
-        //     return 'reminder2';
-        // } elseif ($this->inReminderWindow(
-        //     $client->getSetting('schedule_reminder3'),
-        //     $client->getSetting('num_days_reminder3')
-        // ) && ! $this->reminder3_sent) {
-        //     return 'reminder3';
-        // } elseif ($this->checkEndlessReminder(
-        //     $this->reminder_last_sent,
-        //     $client->getSetting('endless_reminder_frequency_id')
-        // )) {
-        //     return 'endless_reminder';
+            // } elseif ($this->inReminderWindow(
+            //     $client->getSetting('schedule_reminder2'),
+            //     $client->getSetting('num_days_reminder2')
+            // ) && ! $this->reminder2_sent) {
+            //     return 'reminder2';
+            // } elseif ($this->inReminderWindow(
+            //     $client->getSetting('schedule_reminder3'),
+            //     $client->getSetting('num_days_reminder3')
+            // ) && ! $this->reminder3_sent) {
+            //     return 'reminder3';
+            // } elseif ($this->checkEndlessReminder(
+            //     $this->reminder_last_sent,
+            //     $client->getSetting('endless_reminder_frequency_id')
+            // )) {
+            //     return 'endless_reminder';
         } else {
             return $entity_string;
         }
 
     }
 
-        
+
     /**
      * @return bool
      */
     public function canRemind(): bool
     {
-        if (in_array($this->status_id, [self::STATUS_DRAFT, self::STATUS_APPROVED, self::STATUS_CONVERTED]) || $this->is_deleted) 
+        if (in_array($this->status_id, [self::STATUS_DRAFT, self::STATUS_APPROVED, self::STATUS_CONVERTED]) || $this->is_deleted) {
             return false;
+        }
 
         return true;
 
     }
+    
+    /**
+     * entityEmailEvent
+     *
+     * Translates the email type into an activity + notification 
+     * that matches.
+     */
+    public function entityEmailEvent($invitation, $reminder_template)
+    {
+        
+        switch ($reminder_template) {
+            case 'quote':
+                event(new QuoteWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                break;
+            case 'email_quote_template_reminder1':
+                event(new QuoteReminderWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                break;
+            case 'custom1':
+            case 'custom2':
+            case 'custom3':
+                event(new QuoteWasEmailed($invitation, $invitation->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                break;
+            default:
+                // code...
+                break;
+        }
+    }
 
+    
+    
 }

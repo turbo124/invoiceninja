@@ -11,15 +11,19 @@
 
 namespace App\Jobs\EDocument;
 
-use App\Models\Expense;
-use App\Services\EDocument\Imports\ParseEDocument;
-use App\Utils\TempFile;
 use Exception;
+use App\Models\Company;
+use App\Models\Expense;
+use App\Utils\TempFile;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\Services\EDocument\Imports\ParseEDocument;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+use App\Services\EDocument\Imports\ZugferdEDocument;
 
 class ImportEDocument implements ShouldQueue
 {
@@ -28,9 +32,7 @@ class ImportEDocument implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public $deleteWhenMissingModels = true;
-
-    public function __construct(private readonly string $file_content, private string $file_name, private string $file_mime_type)
+    public function __construct(private readonly string $file_content, private string $file_name, private string $file_mime_type, private Company $company)
     {
 
     }
@@ -43,10 +45,24 @@ class ImportEDocument implements ShouldQueue
      */
     public function handle(): Expense
     {
-
         $file = TempFile::UploadedFileFromRaw($this->file_content, $this->file_name, $this->file_mime_type);
 
-        return (new ParseEDocument($file))->run();
+        return (new ParseEDocument($file, $this->company))->run();
 
+    }
+
+    public function middleware()
+    {
+        return [new WithoutOverlapping($this->company->company_key."_expense_import_".$this->file_name)];
+    }
+
+    public function failed($exception = null)
+    {
+        if ($exception) {
+            nlog("EXCEPTION:: ImportEDocument:: " . $exception->getMessage());
+        }
+
+        $this->fail($exception); //manually fail - prevents future jobs with the same name from being discarded
+        config(['queue.failed.driver' => null]);
     }
 }

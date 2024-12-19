@@ -144,7 +144,7 @@ class StartMigration implements ShouldQueue
                 app('sentry')->captureException($e);
             }
 
-            if(!$this->silent_migration) {
+            if (!$this->silent_migration) {
                 Mail::to($this->user->email, $this->user->name())->send(new MigrationFailed($e, $this->company, $e->getMessage()));
             }
 
@@ -168,6 +168,6 @@ class StartMigration implements ShouldQueue
 
     public function failed($exception = null)
     {
-        info(print_r($exception->getMessage(), 1));
+        nlog($exception->getMessage());
     }
 }

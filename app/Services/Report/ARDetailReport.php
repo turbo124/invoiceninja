@@ -11,32 +11,31 @@
 
 namespace App\Services\Report;
 
-use App\Export\CSV\BaseExport;
-use App\Libraries\MultiDB;
-use App\Models\Client;
-use App\Models\Company;
-use App\Models\Invoice;
+use Carbon\Carbon;
 use App\Utils\Ninja;
 use App\Utils\Number;
-use App\Utils\Traits\MakesDates;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\App;
+use App\Models\Client;
 use League\Csv\Writer;
+use App\Models\Company;
+use App\Models\Invoice;
+use App\Libraries\MultiDB;
+use App\Export\CSV\BaseExport;
+use App\Models\User;
+use App\Utils\Traits\MakesDates;
+use Illuminate\Support\Facades\App;
+use App\Services\Template\TemplateService;
 
 class ARDetailReport extends BaseExport
 {
     use MakesDates;
-    //Date
-    //Invoice #
-    //Status
-    //Customer
-    //Age - Days
-    //Amount
-    //Balance
 
     public Writer $csv;
 
     public string $date_key = 'created_at';
+
+    private string $template = '/views/templates/reports/ar_detail_report.html';
+
+    private array $invoices = [];
 
     public array $report_keys = [
         'date',
@@ -90,15 +89,15 @@ class ARDetailReport extends BaseExport
         $this->csv->insertOne($this->buildHeader());
 
         $query = Invoice::query()
+                ->whereIn('invoices.status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
                 ->withTrashed()
                 ->whereHas('client', function ($query) {
                     $query->where('is_deleted', 0);
                 })
-                ->where('company_id', $this->company->id)
-                ->where('is_deleted', 0)
-                ->where('balance', '>', 0)
-                ->orderBy('due_date', 'ASC')
-                ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL]);
+                ->where('invoices.company_id', $this->company->id)
+                ->where('invoices.is_deleted', 0)
+                ->where('invoices.balance', '>', 0)
+                ->orderBy('invoices.due_date', 'ASC');
 
         $query = $this->addDateRange($query, 'invoices');
 
@@ -112,11 +111,36 @@ class ARDetailReport extends BaseExport
         return $this->csv->toString();
     }
 
+    public function getPdf()
+    {
+        $user = isset($this->input['user_id']) ? User::withTrashed()->find($this->input['user_id']) : $this->company->owner();
+
+        $user_name = $user ? $user->present()->name() : '';
+
+        $data = [
+            'invoices' => $this->invoices,
+            'company_logo' => $this->company->present()->logo(),
+            'company_name' => $this->company->present()->name(),
+            'created_on' => $this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale()),
+            'created_by' => $user_name,
+        ];
+
+        $ts = new TemplateService();
+
+        $ts_instance = $ts->setCompany($this->company)
+                    ->setData($data)
+                    ->setRawTemplate(file_get_contents(resource_path($this->template)))
+                    ->parseNinjaBlocks()
+                    ->save();
+
+        return $ts_instance->getPdf();
+    }
+
     private function buildRow(Invoice $invoice): array
     {
         $client = $invoice->client;
 
-        return [
+        $item = [
             $this->translateDate($invoice->date, $this->company->date_format(), $this->company->locale()),
             $this->translateDate($invoice->due_date, $this->company->date_format(), $this->company->locale()),
             $invoice->number,
@@ -125,9 +149,13 @@ class ARDetailReport extends BaseExport
             $client->number,
             $client->id_number,
             intval(abs(Carbon::parse($invoice->due_date)->diffInDays(now()))),
-            Number::formatMoney($invoice->amount, $client),
-            Number::formatMoney($invoice->balance, $client),
+            Number::formatMoney($invoice->amount, $this->company),
+            Number::formatMoney($invoice->balance, $this->company),
         ];
+
+        $this->invoices[] = $item;
+
+        return $item;
     }
 
     public function buildHeader(): array

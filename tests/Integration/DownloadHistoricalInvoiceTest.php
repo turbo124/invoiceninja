@@ -19,8 +19,8 @@ use Tests\MockAccountData;
 use Tests\TestCase;
 
 /**
- * @test
- * @covers App\Http\Controllers\ActivityController
+ * 
+ *  App\Http\Controllers\ActivityController
 */
 class DownloadHistoricalInvoiceTest extends TestCase
 {
@@ -28,14 +28,14 @@ class DownloadHistoricalInvoiceTest extends TestCase
     use DatabaseTransactions;
     use MakesHash;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->makeTestData();
 
         if (config('ninja.testvars.travis') !== false) {
-            $this->markTestSkipped('Skip test for Travis');
+            $this->markTestSkipped('Skip test for GH Actions');
         }
     }
 
@@ -115,7 +115,7 @@ class DownloadHistoricalInvoiceTest extends TestCase
     {
         $activity_repo = new ActivityRepository();
 
-        $obj = new \stdClass;
+        $obj = new \stdClass();
         $obj->invoice_id = $this->invoice->id;
         $obj->user_id = $this->invoice->user_id;
         $obj->company_id = $this->company->id;

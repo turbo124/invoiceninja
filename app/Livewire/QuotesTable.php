@@ -26,8 +26,6 @@ class QuotesTable extends Component
 
     public array $status = [];
 
-    public Company $company;
-
     public string $sort = 'status_id';
 
     public bool $sort_asc = true;
@@ -39,8 +37,6 @@ class QuotesTable extends Component
     public function mount()
     {
         MultiDB::setDb($this->db);
-
-        $this->company = Company::find($this->company_id);
     }
 
 
@@ -57,7 +53,14 @@ class QuotesTable extends Component
     {
         $query = Quote::query()
             ->with('client.contacts', 'company')
-            ->orderBy($this->sort, $this->sort_asc ? 'asc' : 'desc');
+            // ->orderBy($this->sort, $this->sort_asc ? 'asc' : 'desc');
+            ->when($this->sort == 'number', function ($q){
+                $q->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . ($this->sort_asc ? 'desc' : 'asc'));
+            })
+            ->when($this->sort != 'number', function ($q){
+                $q->orderBy($this->sort, ($this->sort_asc ? 'desc' : 'asc'));
+            });
+
 
         if (count($this->status) > 0) {
             /* Special filter for expired*/
@@ -82,7 +85,7 @@ class QuotesTable extends Component
         }
 
         $query = $query
-            ->where('company_id', $this->company->id)
+            ->where('company_id', auth()->guard('contact')->user()->company_id)
             ->where('client_id', auth()->guard('contact')->user()->client_id)
             ->where('is_deleted', 0)
             ->where('status_id', '<>', Quote::STATUS_DRAFT)

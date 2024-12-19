@@ -89,7 +89,7 @@ class Number
     public static function parseFloat($value)
     {
 
-        if(!$value) {
+        if (!$value) {
             return 0;
         }
 
@@ -99,17 +99,17 @@ class Number
         $decimal = strpos($value, '.');
         $comma = strpos($value, ',');
 
-        if($comma === false) { //no comma must be a decimal number already
+        if ($comma === false) { //no comma must be a decimal number already
             return (float) $value;
         }
 
-        if(!$decimal && substr($value, -3, 1) != ",") {
+        if (!$decimal && substr($value, -3, 1) != ",") {
             $value = $value.".00";
         }
 
         $decimal = strpos($value, '.');
 
-        if($decimal < $comma) { //decimal before a comma = euro
+        if ($decimal < $comma) { //decimal before a comma = euro
             $value = str_replace(['.',','], ['','.'], $value);
             return (float) $value;
         }
@@ -132,13 +132,13 @@ class Number
     public static function parseFloatXX($value)
     {
 
-        if(!$value) {
+        if (!$value) {
             return 0;
         }
 
         $multiplier = false;
 
-        if(substr($value, 0, 1) == '-') {
+        if (substr($value, 0, 1) == '-') {
             $multiplier = -1;
         }
 
@@ -152,7 +152,7 @@ class Number
 
         $s = str_replace('.', '', substr($s, 0, -3)).substr($s, -3);
 
-        if($multiplier) {
+        if ($multiplier) {
             $s = floatval($s) * -1;
         }
 
@@ -164,7 +164,7 @@ class Number
     public static function parseFloat2($value)
     {
 
-        if(!$value) {
+        if (!$value) {
             return 0;
         }
 
@@ -175,11 +175,11 @@ class Number
         $comma = strpos($value, ',');
 
         //check the 3rd last character
-        if(!in_array(substr($value, -3, 1), [".", ","])) {
+        if (!in_array(substr($value, -3, 1), [".", ","])) {
 
-            if($comma && (substr($value, -3, 1) != ".")) {
+            if ($comma && (substr($value, -3, 1) != ".")) {
                 $value .= ".00";
-            } elseif($decimal && (substr($value, -3, 1) != ",")) {
+            } elseif ($decimal && (substr($value, -3, 1) != ",")) {
                 $value .= ",00";
             }
 
@@ -188,11 +188,11 @@ class Number
         $decimal = strpos($value, '.');
         $comma = strpos($value, ',');
 
-        if($comma === false) { //no comma must be a decimal number already
+        if ($comma === false) { //no comma must be a decimal number already
             return (float) $value;
         }
 
-        if($decimal < $comma) { //decimal before a comma = euro
+        if ($decimal < $comma) { //decimal before a comma = euro
             $value = str_replace(['.',','], ['','.'], $value);
             return (float) $value;
         }
@@ -255,7 +255,7 @@ class Number
             $decimal = $country->decimal_separator;
         }
 
-        if (isset($country->swap_currency_symbol) && strlen($country->swap_currency_symbol) >= 1) {
+        if (isset($country->swap_currency_symbol) && $country->swap_currency_symbol == 1) {
             $swapSymbol = $country->swap_currency_symbol;
         }
 
@@ -277,7 +277,7 @@ class Number
 
             return "{$symbol}{$value}";
         } else {
-            return self::formatValue($value, $currency);
+            return self::formatValue($value, $currency); //@phpstan-ignore-line
         }
     }
 
@@ -323,23 +323,28 @@ class Number
         $v = rtrim(sprintf('%f', $value), '0');
         $parts = explode('.', $v);
 
-        /* 08-02-2023 special if block to render $0.5 to $0.50*/
-        if ($v < 1 && strlen($v) == 3) {
-            $precision = 2;
-        } elseif ($v < 1) {
-            $precision = strlen($v) - strrpos($v, '.') - 1;
+        /* 2024-12-09 improved decimal resolution        
+        if (strlen($parts[1] ?? '') > 2) {
+            $precision = strlen($parts[1]);
         }
 
-        if (is_array($parts) && $parts[0] != 0) {
-            $precision = 2;
-        }
+        /* 08-02-2023 special if block to render $0.5 to $0.50*/
+        // if ($v < 1 && strlen($v) == 3) {
+        //     $precision = 2;
+        // } elseif ($v < 1) {
+        //     $precision = strlen($v) - strrpos($v, '.') - 1;
+        // }
+
+        // if (is_array($parts) && $parts[0] != 0) {
+        //     $precision = 2;
+        // }
 
         //04-04-2023 if currency = JPY override precision to 0
-        if($currency->code == 'JPY') {
+        if ($currency->code == 'JPY') {
             $precision = 0;
         }
 
-        $value = number_format($v, $precision, $decimal, $thousand);
+        $value = number_format($v, $precision, $decimal, $thousand);//@phpstan-ignore-line
         $symbol = $currency->symbol;
 
         if ($entity->getSetting('show_currency_code') === true && $currency->code == 'CHF') {
@@ -356,7 +361,7 @@ class Number
 
             return "{$symbol}{$value}";
         } else {
-            return self::formatValue($value, $currency);
+            return self::formatValue($value, $currency); //@phpstan-ignore-line
         }
     }
 }

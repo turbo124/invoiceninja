@@ -46,6 +46,7 @@ class MultiDB
     public const DB_PREFIX = 'db-ninja-';
 
     public static $dbs = ['db-ninja-01', 'db-ninja-02'];
+    // public static $dbs = ['db-ninja-01', 'db-ninja-02', 'db-ninja-03'];
 
     private static $protected_domains = [
         'www',
@@ -113,7 +114,7 @@ class MultiDB
     {
 
         if (!config('ninja.db.multi_db_enabled')) {
-            return Company::where("expense_mailbox", $expense_mailbox)->exists();
+            return !Company::where("expense_mailbox", $expense_mailbox)->exists();
         }
 
         if (in_array($expense_mailbox, self::$protected_expense_mailboxes)) {
@@ -383,6 +384,23 @@ class MultiDB
                 self::setDb($db);
 
                 return $company;
+            }
+        }
+
+        self::setDB($current_db);
+
+        return null;
+    }
+
+    public static function findAndSetDbByLegalEntityId($legal_entity_id): ?Company
+    {
+        $current_db = config('database.default');
+
+        foreach (self::$dbs as $db) {
+            if ($c = Company::on($db)->where('legal_entity_id', $legal_entity_id)->first()) {
+                self::setDb($db);
+
+                return $c;
             }
         }
 

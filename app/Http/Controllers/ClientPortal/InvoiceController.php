@@ -62,6 +62,7 @@ class InvoiceController extends Controller
 
         $invitation = $invoice->invitations()->where('client_contact_id', auth()->guard('contact')->user()->id)->first();
 
+        // @phpstan-ignore-next-line
         if ($invitation && auth()->guard('contact') && ! session()->get('is_silent') && ! $invitation->viewed_date) {
             $invitation->markViewed();
 
@@ -77,22 +78,36 @@ class InvoiceController extends Controller
             'key' => $invitation ? $invitation->key : false,
             'hash' => $hash,
             'variables' => $variables,
+            'invoices' => [$invoice->hashed_id],
+            'db' => $invoice->company->db,
         ];
 
         if ($request->query('mode') === 'fullscreen') {
             return render('invoices.show-fullscreen', $data);
         }
 
-        return $this->render('invoices.show', $data);
+        if (!$invoice->isPayable()) {
+            return $this->render('invoices.show', $data);
+        }
+
+        return auth()->guard('contact')->user()->client->getSetting('payment_flow') == 'default' ? $this->render('invoices.show', $data) : $this->render('invoices.show_smooth', $data);
+
     }
 
     public function showBlob($hash)
     {
         $data = Cache::get($hash);
 
-        if(!$data) {
-            usleep(200000);
+        for ($x = 0; $x < 3; $x++) {
+
             $data = Cache::get($hash);
+
+            if ($data) {
+                break;
+            }
+
+            usleep(200000);
+
         }
 
         $invitation = false;
@@ -223,7 +238,7 @@ class InvoiceController extends Controller
         $settings = auth()->guard('contact')->user()->client->getMergedSettings();
         $variables = false;
 
-        if(($invitation = $invoices->first()->invitations()->first() ?? false) && $settings->show_accept_invoice_terms) {
+        if (($invitation = $invoices->first()->invitations()->first() ?? false) && $settings->show_accept_invoice_terms) {
             $variables = (new HtmlEngine($invitation))->generateLabelsAndValues();
         }
 
@@ -235,9 +250,12 @@ class InvoiceController extends Controller
             'hashed_ids' => $invoices->pluck('hashed_id'),
             'total' =>  $total,
             'variables' => $variables,
+            'invitation' => $invitation,
+            'db' => $invitation->company->db,
         ];
 
-        return $this->render('invoices.payment', $data);
+        // return $this->render('invoices.payment', $data);
+        return auth()->guard('contact')->user()->client->getSetting('payment_flow') === 'default' ? $this->render('invoices.payment', $data) : $this->render('invoices.show_smooth_multi', $data);
     }
 
     /**

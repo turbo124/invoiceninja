@@ -17,7 +17,7 @@ use Tests\MockUnitData;
 use Tests\TestCase;
 
 /**
- * @test
+ * 
  */
 class ClassificationTest extends TestCase
 {
@@ -25,14 +25,13 @@ class ClassificationTest extends TestCase
     use DatabaseTransactions;
     use MockUnitData;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->faker = \Faker\Factory::create();
 
         $this->makeTestData();
-
 
     }
 

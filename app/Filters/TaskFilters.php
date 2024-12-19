@@ -85,6 +85,10 @@ class TaskFilters extends QueryFilters
             $this->builder->whereNull('invoice_id');
         }
 
+        if (in_array('is_running', $status_parameters)) {
+            $this->builder->where('is_running', true);
+        }
+
         return $this->builder;
     }
 
@@ -142,7 +146,7 @@ class TaskFilters extends QueryFilters
                     ->whereColumn('users.id', 'tasks.user_id'), $dir);
         }
 
-        if($sort_col[0] == 'number') {
+        if ($sort_col[0] == 'number') {
             return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
         }
 
@@ -178,7 +182,7 @@ class TaskFilters extends QueryFilters
         /** @var array $status_parameters */
         $status_parameters = explode(',', $value);
 
-        if(count($status_parameters) >= 1) {
+        if (count($status_parameters) >= 1) {
 
             $this->builder->where(function ($query) use ($status_parameters) {
                 $query->whereIn('status_id', $this->transformKeys($status_parameters))->whereNull('invoice_id');

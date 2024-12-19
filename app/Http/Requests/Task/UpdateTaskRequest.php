@@ -64,18 +64,18 @@ class UpdateTaskRequest extends Request
 
         $rules['time_log'] = ['bail', function ($attribute, $values, $fail) {
 
-            if(is_string($values)) {
+            if (is_string($values)) {
                 $values = json_decode($values, true);
             }
 
-            if(!is_array($values)) {
+            if (!is_array($values)) {
                 $fail('The '.$attribute.' must be a valid array.');
                 return;
             }
 
             foreach ($values as $k) {
                 if (!is_int($k[0]) || !is_int($k[1])) {
-                    return $fail('The '.$attribute.' - '.print_r($k, 1).' is invalid. Unix timestamps only.');
+                    return $fail('The '.$attribute.' - '.print_r($k, true).' is invalid. Unix timestamps only.');
                 }
             }
 
@@ -124,16 +124,16 @@ class UpdateTaskRequest extends Request
             $input['color'] = '';
         }
 
-        if(isset($input['project_id']) && isset($input['client_id'])) {
+        if (isset($input['project_id']) && isset($input['client_id'])) {
             $search_project_with_client = Project::withTrashed()->where('id', $input['project_id'])->where('client_id', $input['client_id'])->company()->doesntExist();
 
-            if($search_project_with_client) {
+            if ($search_project_with_client) {
                 unset($input['project_id']);
             }
 
         }
 
-        if(!isset($input['time_log']) || empty($input['time_log']) || $input['time_log'] == '{}') {
+        if (!isset($input['time_log']) || empty($input['time_log']) || $input['time_log'] == '{}' || $input['time_log'] == '[""]') {
             $input['time_log'] = json_encode([]);
         }
 

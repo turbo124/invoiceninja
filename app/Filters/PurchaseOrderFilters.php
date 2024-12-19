@@ -96,7 +96,14 @@ class PurchaseOrderFilters extends QueryFilters
                 ->orWhere('custom_value4', 'like', '%'.$filter.'%')
                 ->orWhereHas('vendor', function ($q) use ($filter) {
                     $q->where('name', 'like', '%'.$filter.'%');
-                });
+                })
+                ->orWhereRaw("
+                JSON_UNQUOTE(JSON_EXTRACT(
+                    JSON_ARRAY(
+                        JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')), 
+                        JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].product_key'))
+                    ), '$[*]')
+                ) LIKE ?", ['%'.$filter.'%']);
         });
     }
 
@@ -130,7 +137,7 @@ class PurchaseOrderFilters extends QueryFilters
                     ->whereColumn('vendors.id', 'purchase_orders.vendor_id'), $dir);
         }
 
-        if($sort_col[0] == 'number') {
+        if ($sort_col[0] == 'number') {
             return $this->builder->orderByRaw("REGEXP_REPLACE(number,'[^0-9]+','')+0 " . $dir);
         }
 

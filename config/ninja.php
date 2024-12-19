@@ -17,8 +17,8 @@ return [
     'require_https' => env('REQUIRE_HTTPS', true),
     'app_url' => rtrim(env('APP_URL', ''), '/'),
     'app_domain' => env('APP_DOMAIN', 'invoicing.co'),
-    'app_version' => env('APP_VERSION', '5.10.4'),
-    'app_tag' => env('APP_TAG', '5.10.4'),
+    'app_version' => env('APP_VERSION', '5.11.3'),
+    'app_tag' => env('APP_TAG', '5.11.3'),
     'minimum_client_version' => '5.0.16',
     'terms_version' => '1.0.1',
     'api_secret' => env('API_SECRET', false),
@@ -45,6 +45,8 @@ return [
     'environment' => env('NINJA_ENVIRONMENT', 'selfhost'), // 'hosted', 'development', 'selfhost', 'reseller'
     'preconfigured_install' => env('PRECONFIGURED_INSTALL', false),
     'update_secret' => env('UPDATE_SECRET', ''),
+    'license_key' => env('LICENSE_KEY', false),
+    'hosted_ninja_url' => env('HOSTED_NINJA_URL', 'https://invoicing.co'),
     // Settings used by invoiceninja.com
     'disks' => [
         'backup' => env('BACKUP_DISK', 's3'),
@@ -83,6 +85,7 @@ return [
         'gocardless' => env('GOCARDLESS_KEYS', ''),
         'square' => env('SQUARE_KEYS', ''),
         'eway' => env('EWAY_KEYS', ''),
+        'mollie' => env('MOLLIE_KEYS', ''),
         'paytrace' => env('PAYTRACE_KEYS', ''),
         'stripe' => env('STRIPE_KEYS', ''),
         'paypal' => env('PAYPAL_KEYS', ''),
@@ -95,7 +98,6 @@ return [
         'test_email' => env('TEST_EMAIL', 'test@example.com'),
         'wepay' => env('WEPAY_KEYS', ''),
         'braintree' => env('BRAINTREE_KEYS', ''),
-        'mollie' => env('MOLLIE_KEYS', ''),
     ],
     'contact' => [
         'email' => env('MAIL_FROM_ADDRESS'),
@@ -230,8 +232,9 @@ return [
         'webhook_id' => env('PAYPAL_WEBHOOK_ID', null),
     ],
     'inbound_mailbox' => [
-        'expense_mailbox_endings' => env('EXPENSE_MAILBOX_ENDINGS', '@expense.invoicing.co'),
-        'inbound_webhook_key' => env('INBOUND_WEBHOOK_KEY', null),
+        'expense_mailbox_endings' => env('EXPENSE_MAILBOX_ENDINGS', false),
+        // 'expense_mailbox_endings' => env('EXPENSE_MAILBOX_ENDINGS', '@expense.invoicing.co'),
+        'inbound_webhook_token' => env('INBOUND_WEBHOOK_TOKEN', null),
         'global_inbound_blacklist' => env('GLOBAL_INBOUND_BLACKLIST', ''),
         'global_inbound_whitelist' => env('GLOBAL_INBOUND_WHITELIST', ''),
         'global_inbound_sender_block_mailcount' => env('GLOBAL_INBOUND_SENDER_BLOCK_MAILCOUNT', 1000),
@@ -242,6 +245,7 @@ return [
     'cloudflare' => [
         'turnstile' => [
             'secret' => env('CLOUDFLARE_SECRET', null),
+            'site_key' => env('CLOUDFLARE_SITE_KEY', false),
         ]
     ],
     'encryption' => [
@@ -249,5 +253,12 @@ return [
         'private_key' => env('NINJA_PRIVATE_KEY', false),
     ],
     'upload_extensions' => env('ADDITIONAL_UPLOAD_EXTENSIONS', ''),
-
+    'storecove_api_key' => env('STORECOVE_API_KEY', false), 
+    'storecove_email_catchall' => env('STORECOVE_CATCHALL_EMAIL',false),
+    'qvalia_api_key' => env('QVALIA_API_KEY', false),   
+    'qvalia_partner_number' => env('QVALIA_PARTNER_NUMBER', false), 
+    'pdf_page_numbering_x_alignment' => env('PDF_PAGE_NUMBER_X', 0),
+    'pdf_page_numbering_y_alignment' => env('PDF_PAGE_NUMBER_Y', -6),
+    'hosted_einvoice_secret' => env('HOSTED_EINVOICE_SECRET', null),
+    'e_invoice_quota_warning' => env('E_INVOICE_QUOTA_WARNING', 15),
 ];

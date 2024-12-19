@@ -4,13 +4,14 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2024. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://opensource.org/licenses/AAL
  */
 
 namespace App\PaymentDrivers;
 
+use App\Exceptions\PaymentFailed;
 use App\Models\Payment;
 use App\Models\SystemLog;
 use App\Models\GatewayType;
@@ -224,7 +225,7 @@ class FortePaymentDriver extends BaseDriver
         return $forte_base_uri;
     }
 
-    private function getOrganisationId(): string
+    public function getOrganisationId(): string
     {
         return $this->company_gateway->getConfigField('organizationId');
     }
@@ -247,10 +248,89 @@ class FortePaymentDriver extends BaseDriver
 
     private function getClient(?string $email)
     {
+        if (!$email) {
+            return false;
+        }
+
         return ClientContact::query()
                      ->where('company_id', $this->company_gateway->company_id)
                      ->where('email', $email)
                      ->first();
+    }
+
+    public function tokenBilling(\App\Models\ClientGatewayToken $cgt, \App\Models\PaymentHash $payment_hash)
+    {
+
+        $amount_with_fee = $payment_hash->data->amount_with_fee;
+        $fee_total = $payment_hash->fee_total;
+
+        $data =
+        [
+            "action" => "sale",
+            "authorization_amount" => $amount_with_fee,
+            "paymethod_token" => $cgt->token,
+            "billing_address" => [
+            "first_name" => $this->client->present()->first_name(),
+            "last_name" => $this->client->present()->last_name()
+            ],
+        ];
+
+        if ($fee_total > 0) {
+            $data["service_fee_amount"] = $fee_total;
+        }
+
+        $response = $this->stubRequest()
+        ->post("{$this->baseUri()}/organizations/{$this->getOrganisationId()}/locations/{$this->getLocationId()}/transactions", $data);
+
+        $forte_response = $response->object();
+
+        if ($response->successful()) {
+
+            $data = [
+                'payment_method' => $cgt->gateway_type_id,
+                'payment_type' => $cgt->gateway_type_id == 2 ? \App\Models\PaymentType::ACH : \App\Models\PaymentType::CREDIT_CARD_OTHER,
+                'amount' => $payment_hash->data->amount_with_fee,
+                'transaction_reference' => $forte_response->transaction_id,
+                'gateway_type_id' => $cgt->gateway_type_id,
+            ];
+
+            $payment = $this->createPayment($data, Payment::STATUS_COMPLETED);
+
+            $message = [
+                'server_message' => $forte_response->response->response_desc,
+                'server_response' => $response->json(),
+                'data' => $data,
+            ];
+
+            SystemLogger::dispatch(
+                $message,
+                SystemLog::CATEGORY_GATEWAY_RESPONSE,
+                SystemLog::EVENT_GATEWAY_SUCCESS,
+                SystemLog::TYPE_FORTE,
+                $this->client,
+                $this->client->company,
+            );
+
+            return $payment;
+        }
+
+        $message = [
+            'server_message' => $forte_response->response->response_desc,
+            'server_response' => $response->json(),
+            'data' => $data,
+        ];
+
+        SystemLogger::dispatch(
+            $message,
+            SystemLog::CATEGORY_GATEWAY_RESPONSE,
+            SystemLog::EVENT_GATEWAY_FAILURE,
+            SystemLog::TYPE_FORTE,
+            $this->client,
+            $this->client->company,
+        );
+
+        throw new PaymentFailed($forte_response->response->response_desc, 500);
+
     }
 
     public function getLocation()
@@ -260,9 +340,11 @@ class FortePaymentDriver extends BaseDriver
                     ->withQueryParameters(['page_size' => 10000])
                     ->get("{$this->baseUri()}/organizations/{$this->getOrganisationId()}/locations/{$this->getLocationId()}");
 
-        if($response->successful()) {
+        if ($response->successful()) {
             return $response->json();
         }
+
+        // return $response->body();
 
         return false;
     }
@@ -271,18 +353,18 @@ class FortePaymentDriver extends BaseDriver
     {
         $response = $this->getLocation();
 
-        if($response) {
+        if ($response && $response['services']) {
             $body = $response['services'];
 
             $fees_and_limits = $this->company_gateway->fees_and_limits;
 
-            if($body['card']['service_fee_percentage'] > 0 || $body['card']['service_fee_additional_amount'] > 0) {
+            if ((isset($body['card']['service_fee_percentage']) && $body['card']['service_fee_percentage'] > 0) || (isset($body['card']['service_fee_additional_amount']) && $body['card']['service_fee_additional_amount'] > 0)) {
 
                 $fees_and_limits->{1}->fee_amount = $body['card']['service_fee_additional_amount'];
                 $fees_and_limits->{1}->fee_percent = $body['card']['service_fee_percentage'];
             }
 
-            if($body['debit']['service_fee_percentage'] > 0 || $body['debit']['service_fee_additional_amount'] > 0) {
+            if ((isset($body['debit']['service_fee_percentage']) && $body['debit']['service_fee_percentage'] > 0) || (isset($body['card']['service_fee_additional_amount']) && $body['card']['service_fee_additional_amount'] > 0)) {
 
                 $fees_and_limits->{2}->fee_amount = $body['debit']['service_fee_additional_amount'];
                 $fees_and_limits->{2}->fee_percent = $body['debit']['service_fee_percentage'];
@@ -297,6 +379,42 @@ class FortePaymentDriver extends BaseDriver
 
     }
 
+    public function findOrCreateCustomer()
+    {
+
+        $client_gateway_token = \App\Models\ClientGatewayToken::query()
+                                                    ->where('client_id', $this->client->id)
+                                                    ->where('company_gateway_id', $this->company_gateway->id)
+                                                    ->whereNotLike('token', 'ott_%')
+                                                    ->first();
+
+        if ($client_gateway_token) {
+            return $client_gateway_token->gateway_customer_reference;
+        } else {
+
+            $factory = new ForteCustomerFactory();
+            $data = $factory->convertToForte($this->client);
+
+            $response = $this->stubRequest()
+                ->post("{$this->baseUri()}/organizations/{$this->getOrganisationId()}/locations/{$this->getLocationId()}/customers/", $data);
+
+
+            //create customer
+            if ($response->successful()) {
+                $customer = $response->object();
+                nlog($customer);
+                return $customer->customer_token;
+            }
+
+            nlog($response->body());
+
+            throw new PaymentFailed("Unable to create customer in Forte", 400);
+
+            //@todo add syslog here
+        }
+
+    }
+
     public function importCustomers()
     {
 
@@ -304,16 +422,16 @@ class FortePaymentDriver extends BaseDriver
                     ->withQueryParameters(['page_size' => 10000])
                     ->get("{$this->baseUri()}/organizations/{$this->getOrganisationId()}/locations/{$this->getLocationId()}/customers");
 
-        if($response->successful()) {
+        if ($response->successful()) {
 
-            foreach($response->json()['results'] as $customer) {
+            foreach ($response->json()['results'] as $customer) {
 
                 $client_repo = new ClientRepository(new ClientContactRepository());
                 $factory = new ForteCustomerFactory();
 
                 $data = $factory->convertToNinja($customer, $this->company_gateway->company);
 
-                if(strlen($data['email']) == 0 || $this->getClient($data['email'])) {
+                if (strlen($data['email']) == 0 || $this->getClient($data['email'])) {
                     continue;
                 }
 

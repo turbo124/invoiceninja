@@ -197,6 +197,7 @@ class BankIntegrationController extends BaseController
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
+        /** @var \App\Models\Account $user_account */
         $user_account = $user->account;
 
         $this->refreshAccountsYodlee($user);
@@ -210,12 +211,14 @@ class BankIntegrationController extends BaseController
         // Processing transactions for each bank account
         if (Ninja::isHosted() && $user->account->bank_integration_account_id) {
             $user_account->bank_integrations->where("integration_type", BankIntegration::INTEGRATION_TYPE_YODLEE)->each(function ($bank_integration) use ($user_account) {
-                ProcessBankTransactionsYodlee::dispatch($user_account->id, $bank_integration);
+                /** @var \App\Models\BankIntegration $bank_integration */
+                ProcessBankTransactionsYodlee::dispatch($user_account->bank_integration_account_id, $bank_integration);
             });
         }
 
         if (config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key') && (Ninja::isSelfHost() || (Ninja::isHosted() && $user_account->isEnterprisePaidClient()))) {
             $user_account->bank_integrations->where("integration_type", BankIntegration::INTEGRATION_TYPE_NORDIGEN)->each(function ($bank_integration) {
+                /** @var \App\Models\BankIntegration $bank_integration */
                 ProcessBankTransactionsNordigen::dispatch($bank_integration);
             });
         }
@@ -239,6 +242,7 @@ class BankIntegrationController extends BaseController
             if ($bi = BankIntegration::withTrashed()->where("integration_type", BankIntegration::INTEGRATION_TYPE_YODLEE)->where('bank_account_id', $account['id'])->where('company_id', $user->company()->id)->first()) {
                 $bi->balance = $account['current_balance'];
                 $bi->currency = $account['account_currency'];
+                $bi->disabled_upstream = false;
                 $bi->save();
             } else {
                 $bank_integration = new BankIntegration();
@@ -274,7 +278,7 @@ class BankIntegrationController extends BaseController
             $is_account_active = $nordigen->isAccountActive($bank_integration->nordigen_account_id);
             $account = $nordigen->getAccount($bank_integration->nordigen_account_id);
 
-            if (!$is_account_active || !$account) {
+            if (!$is_account_active || !$account || isset($account['requisition'])) {
                 $bank_integration->disabled_upstream = true;
                 $bank_integration->save();
 
@@ -345,7 +349,7 @@ class BankIntegrationController extends BaseController
 
         if (Ninja::isHosted() && $account->isPaid() && $account->plan == 'enterprise') {
             $account->bank_integrations()->where('integration_type', BankIntegration::INTEGRATION_TYPE_YODLEE)->where('auto_sync', true)->cursor()->each(function ($bank_integration) use ($account) {
-                (new ProcessBankTransactionsYodlee($account->id, $bank_integration))->handle();
+                (new ProcessBankTransactionsYodlee($account->bank_integration_account_id, $bank_integration))->handle();
             });
         }
 

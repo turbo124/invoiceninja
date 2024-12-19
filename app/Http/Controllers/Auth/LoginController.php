@@ -376,6 +376,7 @@ class LoginController extends BaseController
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
+        /** @var Builder $cu */
         $cu = CompanyUser::query()->where('user_id', $user->id);
 
         if ($cu->count() == 0) {
@@ -398,17 +399,14 @@ class LoginController extends BaseController
         $truth->setCompany($set_company);
 
         //21-03-2024
+
+
         $cu->each(function ($cu) {
-            if(CompanyToken::where('company_id', $cu->company_id)->where('user_id', $cu->user_id)->where('is_system', true)->doesntExist()) {
+            /** @var \App\Models\CompanyUser $cu */
+            if (CompanyToken::query()->where('company_id', $cu->company_id)->where('user_id', $cu->user_id)->where('is_system', true)->doesntExist()) {
                 (new CreateCompanyToken($cu->company, $cu->user, request()->server('HTTP_USER_AGENT')))->handle();
             }
         });
-
-        // $user->account->companies->each(function ($company) use ($user) {
-        //     if ($company->tokens()->where('user_id',$user->id)->where('is_system', true)->count() == 0) {
-        //         (new CreateCompanyToken($company, $user, request()->server('HTTP_USER_AGENT')))->handle();
-        //     }
-        // });
 
         $truth->setCompanyToken(CompanyToken::where('user_id', $user->id)->where('company_id', $set_company->id)->where('is_system', true)->first());
 
@@ -541,7 +539,7 @@ class LoginController extends BaseController
 
         if (request()->has('id_token')) {
             $user = $google->getTokenResponse(request()->input('id_token'));
-        } elseif(request()->has('access_token')) {
+        } elseif (request()->has('access_token')) {
             $user = $google->harvestUser(request()->input('access_token'));
         } else {
             return response()->json(['message' => 'Illegal request'], 403);
@@ -657,7 +655,7 @@ class LoginController extends BaseController
             $parameters = ['response_type' => 'code', 'redirect_uri' => config('ninja.app_url') . "/auth/microsoft"];
         }
 
-        if(request()->hasHeader('X-REACT') || request()->query('react')) {
+        if (request()->hasHeader('X-REACT') || request()->query('react')) {
             /**@var \App\Models\User $user */
             $user = auth()->user();
             Cache::put("react_redir:".$user?->account->key, 'true', 300);

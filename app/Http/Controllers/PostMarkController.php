@@ -24,7 +24,6 @@ use Illuminate\Http\Request;
  */
 class PostMarkController extends BaseController
 {
-
     public function __construct()
     {
     }
@@ -66,7 +65,7 @@ class PostMarkController extends BaseController
     public function webhook(Request $request)
     {
         if ($request->header('X-API-SECURITY') && $request->header('X-API-SECURITY') == config('services.postmark.token')) {
-            ProcessPostmarkWebhook::dispatch($request->all())->delay(10);
+            ProcessPostmarkWebhook::dispatch($request->all())->delay(15);
 
             return response()->json(['message' => 'Success'], 200);
         }
@@ -274,8 +273,9 @@ class PostMarkController extends BaseController
 
         $input = $request->all();
 
-        if (!($request->has('token') && $request->get('token') == config('ninja.inbound_mailbox.inbound_webhook_token')))
+        if (!$request->has('token') || $request->token != config('ninja.inbound_mailbox.inbound_webhook_token')) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         if (!(array_key_exists("MessageStream", $input) && $input["MessageStream"] == "inbound") || !array_key_exists("To", $input) || !array_key_exists("From", $input) || !array_key_exists("MessageID", $input)) {
             nlog('Failed: Message could not be parsed, because required parameters are missing.');
@@ -284,27 +284,31 @@ class PostMarkController extends BaseController
 
         $inboundEngine = new InboundMailEngine();
 
-        if ($inboundEngine->isInvalidOrBlocked($input["From"], $input["To"])) {
-            return response()->json(['message' => 'Blocked.'], 403);
-        }
-
-        $company = MultiDB::findAndSetDbByExpenseMailbox($input["To"]);
-        if (!$company) {
-            nlog('[PostmarkInboundWebhook] unknown Expense Mailbox occured while handling an inbound email from mailgun: ' . $input["To"]);
-            $inboundEngine->saveMeta($input["From"], $input["To"], true); // important to save this, to protect from spam
+        // Spam protection
+        if ($inboundEngine->isInvalidOrBlocked($input["From"], $input["ToFull"][0]["Email"])) {
             return;
         }
+
+        // match company
+        $company = MultiDB::findAndSetDbByExpenseMailbox($input["ToFull"][0]["Email"]);
+
+        if (!$company) {
+            nlog('[PostmarkInboundWebhook] unknown Expense Mailbox occured while handling an inbound email from postmark: ' . $input["To"]);
+            return response()->json(['message' => 'Ok'], 200);
+        }
+
+        $inboundEngine->setCompany($company);
 
         try { // important to save meta if something fails here to prevent spam
 
             // prepare data for ingresEngine
             $inboundMail = new InboundMail();
 
-            $inboundMail->from = $input["From"];
+            $inboundMail->from = $input["From"] ?? '';
             $inboundMail->to = $input["To"]; // usage of data-input, because we need a single email here
-            $inboundMail->subject = $input["Subject"];
-            $inboundMail->body = $input["HtmlBody"];
-            $inboundMail->text_body = $input["TextBody"];
+            $inboundMail->subject = $input["Subject"] ?? '';
+            $inboundMail->body = $input["HtmlBody"] ?? '';
+            $inboundMail->text_body = $input["TextBody"] ?? '';
             $inboundMail->date = Carbon::createFromTimeString($input["Date"]);
 
             // parse documents as UploadedFile from webhook-data
@@ -320,7 +324,17 @@ class PostMarkController extends BaseController
         }
 
         // perform
-        $inboundEngine->handleExpenseMailbox($inboundMail);
+        try {
+
+            $inboundEngine->handleExpenseMailbox($inboundMail);
+
+        } catch (\Exception $e) {
+            if ($e->getCode() == 409) {
+                return response()->json(['message' => $e->getMessage()], 409);
+            }
+
+            throw $e;
+        }
 
         return response()->json(['message' => 'Success'], 200);
     }

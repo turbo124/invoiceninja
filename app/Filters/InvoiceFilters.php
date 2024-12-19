@@ -124,7 +124,15 @@ class InvoiceFilters extends QueryFilters
                               $q->where('first_name', 'like', '%'.$filter.'%')
                                 ->orWhere('last_name', 'like', '%'.$filter.'%')
                                 ->orWhere('email', 'like', '%'.$filter.'%');
-                          });
+                          })
+                          ->orWhereRaw("
+                            JSON_UNQUOTE(JSON_EXTRACT(
+                                JSON_ARRAY(
+                                    JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')), 
+                                    JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].product_key'))
+                                ), '$[*]')
+                            ) LIKE ?", ['%'.$filter.'%']);
+            //   ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(line_items, '$[*].notes')) LIKE ?", ['%'.$filter.'%']);
         });
     }
 
@@ -152,22 +160,22 @@ class InvoiceFilters extends QueryFilters
     {
 
         return $this->builder->where(function ($query) {
-            $query->whereIn('invoices.status_id', [Invoice::STATUS_PARTIAL, Invoice::STATUS_SENT])
-            ->where('invoices.is_deleted', 0)
-            ->where('invoices.balance', '>', 0)
-            ->orWhere(function ($query) {
+            $query->whereIn('status_id', [Invoice::STATUS_PARTIAL, Invoice::STATUS_SENT])
+            ->where('is_deleted', 0)
+            ->where('balance', '>', 0)
+            ->where(function ($query) {
 
-                $query->whereNull('invoices.due_date')
+                $query->whereNull('due_date')
                     ->orWhere(function ($q) {
-                        $q->where('invoices.due_date', '>=', now()->startOfDay()->subSecond())->where('invoices.partial', 0);
+                        $q->where('due_date', '>=', now()->startOfDay()->subSecond())->where('partial', 0);
                     })
                     ->orWhere(function ($q) {
-                        $q->where('invoices.partial_due_date', '>=', now()->startOfDay()->subSecond())->where('invoices.partial', '>', 0);
+                        $q->where('partial_due_date', '>=', now()->startOfDay()->subSecond())->where('partial', '>', 0);
                     });
 
             })
-            ->orderByRaw('ISNULL(invoices.due_date), invoices.due_date ' . 'desc')
-            ->orderByRaw('ISNULL(invoices.partial_due_date), invoices.partial_due_date ' . 'desc');
+            ->orderByRaw('ISNULL(due_date), due_date ' . 'desc')
+            ->orderByRaw('ISNULL(partial_due_date), partial_due_date ' . 'desc');
         });
 
     }
@@ -230,7 +238,7 @@ class InvoiceFilters extends QueryFilters
 
             try {
                 $date = Carbon::parse($date);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 return $this->builder;
             }
         }
@@ -259,58 +267,6 @@ class InvoiceFilters extends QueryFilters
     }
 
     /**
-     * Filter by date range
-     *
-     * @param string $date_range
-     * @return Builder
-     */
-    public function date_range(string $date_range = ''): Builder
-    {
-        $parts = explode(",", $date_range);
-
-        if (count($parts) != 2) {
-            return $this->builder;
-        }
-
-        try {
-
-            $start_date = Carbon::parse($parts[0]);
-            $end_date = Carbon::parse($parts[1]);
-
-            return $this->builder->whereBetween('date', [$start_date, $end_date]);
-        } catch(\Exception $e) {
-            return $this->builder;
-        }
-
-    }
-
-    /**
-     * Filter by due date range
-     *
-     * @param string $date_range
-     * @return Builder
-     */
-    public function due_date_range(string $date_range = ''): Builder
-    {
-        $parts = explode(",", $date_range);
-
-        if (count($parts) != 2) {
-            return $this->builder;
-        }
-        try {
-
-            $start_date = Carbon::parse($parts[0]);
-            $end_date = Carbon::parse($parts[1]);
-
-            return $this->builder->whereBetween('due_date', [$start_date, $end_date]);
-        } catch(\Exception $e) {
-            return $this->builder;
-        }
-
-    }
-
-
-    /**
      * Sorts the list based on $sort.
      *
      * @param string $sort formatted as column|asc
@@ -320,7 +276,7 @@ class InvoiceFilters extends QueryFilters
     {
         $sort_col = explode('|', $sort);
 
-        if (!is_array($sort_col) || count($sort_col) != 2) {
+        if (!is_array($sort_col) || count($sort_col) != 2 || !in_array($sort_col[0], \Illuminate\Support\Facades\Schema::getColumnListing($this->builder->getModel()->getTable()))) {
             return $this->builder;
         }
 
@@ -333,10 +289,7 @@ class InvoiceFilters extends QueryFilters
 
         }
 
-        if($sort_col[0] == 'number') {
-            // return $this->builder->orderByRaw('CAST(number AS UNSIGNED), number ' . $dir);
-            // return $this->builder->orderByRaw("number REGEXP '^[A-Za-z]+$',CAST(number as SIGNED INTEGER),CAST(REPLACE(number,'-','')AS SIGNED INTEGER) ,number");
-            // return $this->builder->orderByRaw('ABS(number) ' . $dir);
+        if ($sort_col[0] == 'number') {
             return $this->builder->orderByRaw("REGEXP_REPLACE(invoices.number,'[^0-9]+','')+0 " . $dir);
         }
 

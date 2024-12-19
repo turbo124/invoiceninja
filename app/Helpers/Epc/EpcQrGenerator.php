@@ -58,10 +58,10 @@ class EpcQrGenerator
             return "<svg viewBox='0 0 200 200' width='200' height='200' x='0' y='0' xmlns='http://www.w3.org/2000/svg'>
           <rect x='0' y='0' width='100%'' height='100%' />{$qr}</svg>";
 
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             nlog("EPC QR failure => ".$e->getMessage());
             return '';
-        } 
+        }
 
     }
 
@@ -93,24 +93,21 @@ class EpcQrGenerator
             isset($this->company?->custom_fields?->company1) ? $this->company->settings->custom_value1 : '', // IBAN
             $this->formatMoney($this->amount), // Amount with EUR prefix
             '', // Reference
-            substr($this->invoice->number, 0, 34) // Unstructured remittance information
+            substr(($this->invoice->number ?? ''), 0, 34) // Unstructured remittance information
         ];
 
         return implode("\n", $data);
 
     }
 
-
-    //            substr("{$this->invoice->number} {$this->invoice->client->number}", 0,139),
-
     private function validateFields()
     {
         if (Ninja::isSelfHost() && isset($this->company?->custom_fields?->company2)) {
-            nlog('The BIC field is not present and _may_ be a required fields for EPC QR codes');
+            // nlog('The BIC field is not present and _may_ be a required fields for EPC QR codes');
         }
 
         if (Ninja::isSelfHost() && isset($this->company?->custom_fields?->company1)) {
-            nlog('The IBAN field is required');
+            // nlog('The IBAN field is required');
         }
 
     }

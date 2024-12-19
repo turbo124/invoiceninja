@@ -11,15 +11,18 @@
 
 namespace App\Services\Report;
 
-use App\Export\CSV\BaseExport;
-use App\Libraries\MultiDB;
+use App\Models\User;
+use App\Utils\Ninja;
+use App\Utils\Number;
 use App\Models\Client;
+use League\Csv\Writer;
 use App\Models\Company;
 use App\Models\Invoice;
-use App\Utils\Ninja;
+use App\Libraries\MultiDB;
+use App\Export\CSV\BaseExport;
 use App\Utils\Traits\MakesDates;
 use Illuminate\Support\Facades\App;
-use League\Csv\Writer;
+use App\Services\Template\TemplateService;
 
 class ClientBalanceReport extends BaseExport
 {
@@ -32,6 +35,10 @@ class ClientBalanceReport extends BaseExport
 
     public string $date_key = 'created_at';
 
+    private string $template = '/views/templates/reports/client_balance_report.html';
+
+    private array $clients = [];
+
     public array $report_keys = [
         'client_name',
         'client_number',
@@ -39,6 +46,7 @@ class ClientBalanceReport extends BaseExport
         'invoices',
         'invoice_balance',
         'credit_balance',
+        'payment_balance',
     ];
 
     /**
@@ -98,13 +106,39 @@ class ClientBalanceReport extends BaseExport
     {
         $headers = [];
 
-        foreach($this->report_keys as $key) {
+        foreach ($this->report_keys as $key) {
             $headers[] = ctrans("texts.{$key}");
         }
 
         return $headers;
 
     }
+
+    public function getPdf()
+    {
+        $user = isset($this->input['user_id']) ? User::withTrashed()->find($this->input['user_id']) : $this->company->owner();
+
+        $user_name = $user ? $user->present()->name() : '';
+
+        $data = [
+            'clients' => $this->clients,
+            'company_logo' => $this->company->present()->logo(),
+            'company_name' => $this->company->present()->name(),
+            'created_on' => $this->translateDate(now()->format('Y-m-d'), $this->company->date_format(), $this->company->locale()),
+            'created_by' => $user_name,
+        ];
+
+        $ts = new TemplateService();
+
+        $ts_instance = $ts->setCompany($this->company)
+                    ->setData($data)
+                    ->setRawTemplate(file_get_contents(resource_path($this->template)))
+                    ->parseNinjaBlocks()
+                    ->save();
+
+        return $ts_instance->getPdf();
+    }
+
     private function buildRow(Client $client): array
     {
         $query = Invoice::query()->where('client_id', $client->id)
@@ -112,13 +146,18 @@ class ClientBalanceReport extends BaseExport
 
         $query = $this->addDateRange($query, 'invoices');
 
-        return [
+        $item = [
             $client->present()->name(),
             $client->number,
             $client->id_number,
             $query->count(),
             $query->sum('balance'),
-            $client->credit_balance,
+            Number::formatMoney($client->credit_balance, $this->company),
+            Number::formatMoney($client->payment_balance, $this->company),
         ];
+
+        $this->clients[] = $item;
+
+        return $item;
     }
 }

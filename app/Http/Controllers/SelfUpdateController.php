@@ -28,6 +28,8 @@ class SelfUpdateController extends BaseController
 
     private string $filename = 'invoiceninja.tar';
 
+    private string $version = '';
+
     private array $purge_file_list = [
         'bootstrap/cache/compiled.php',
         'bootstrap/cache/config.php',
@@ -63,11 +65,21 @@ class SelfUpdateController extends BaseController
 
         $file_headers = @get_headers($this->getDownloadUrl());
 
-        if(!is_array($file_headers)) {
+        nlog("Download URL");
+        nlog($this->getDownloadUrl());
+
+        if (strlen($this->version) == 1) {
+            nlog("version server down, trying github");
+            $this->version = trim(file_get_contents('https://raw.githubusercontent.com/invoiceninja/invoiceninja/refs/heads/v5-develop/VERSION.txt'));
+        }
+
+        if (!is_array($file_headers)) {
+            nlog($file_headers);
             return response()->json(['message' => 'There was a problem reaching the update server, please try again in a little while.'], 410);
         }
 
         if (stripos($file_headers[0], "404 Not Found") > 0  || (stripos($file_headers[0], "302 Found") > 0 && stripos($file_headers[7], "404 Not Found") > 0)) {
+            nlog($file_headers);
             return response()->json(['message' => 'Download not yet available. Please try again shortly.'], 410);
         }
 
@@ -75,7 +87,7 @@ class SelfUpdateController extends BaseController
             if (copy($this->getDownloadUrl(), storage_path("app/{$this->filename}"))) {
                 nlog('Copied file from URL');
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog($e->getMessage());
             return response()->json(['message' => 'File exists on the server, however there was a problem downloading and copying to the local filesystem'], 500);
         }
@@ -102,7 +114,7 @@ class SelfUpdateController extends BaseController
             }
         }
 
-        if(Storage::disk('base')->directoryExists('resources/lang')) {
+        if (Storage::disk('base')->directoryExists('resources/lang')) {
             Storage::disk('base')->deleteDirectory('resources/lang');
         }
 
@@ -181,15 +193,19 @@ class SelfUpdateController extends BaseController
 
     public function checkVersion()
     {
+        if (Ninja::isHosted()) {
+            return '5.10.SaaS';
+        }
+
         return trim(file_get_contents(config('ninja.version_url')));
     }
 
     private function getDownloadUrl()
     {
 
-        $version = $this->checkVersion();
+        $this->version = $this->checkVersion();
 
-        return "https://github.com/invoiceninja/invoiceninja/releases/download/v{$version}/invoiceninja.tar";
+        return "https://github.com/invoiceninja/invoiceninja/releases/download/v{$this->version}/invoiceninja.tar";
 
     }
 }

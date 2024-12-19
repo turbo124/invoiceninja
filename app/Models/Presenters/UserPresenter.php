@@ -73,7 +73,7 @@ class UserPresenter extends EntityPresenter
             return 'No First Name Available';
         }
 
-        return $this->entity->first_name ?? 'First Name';
+        return $this->entity->first_name ?? ' ';
 
     }
 
@@ -94,5 +94,10 @@ class UserPresenter extends EntityPresenter
     public function phone(): string
     {
         return $this->entity->phone ?? ' ';
+    }
+
+    public function email(): string
+    {
+        return $this->entity->email ?? ' ';
     }
 }

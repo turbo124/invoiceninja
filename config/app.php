@@ -159,7 +159,6 @@ return [
          * Laravel Framework Service Providers...
          */
         Illuminate\Auth\AuthServiceProvider::class,
-        Illuminate\Broadcasting\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
         Illuminate\Cache\CacheServiceProvider::class,
         Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
@@ -193,7 +192,7 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
@@ -217,7 +216,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         'Collector' => Turbo124\Beacon\CollectorFacade::class,
         'CustomMessage' => App\Utils\ClientPortal\CustomMessage\CustomMessageFacade::class,
-        'Redis'        => Illuminate\Support\Facades\Redis::class,
+        'Redis'        => Illuminate\Support\Facades\Redis::class
     ])->toArray(),
 
 ];

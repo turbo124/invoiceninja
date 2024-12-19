@@ -62,7 +62,7 @@ class ActivityController extends BaseController
                                 ->company()
                                 ->take($default_activities);
 
-        if($request->has('reactv2')) {
+        if ($request->has('reactv2')) {
 
             /** @var \App\Models\User auth()->user() */
             $user = auth()->user();
@@ -117,7 +117,7 @@ class ActivityController extends BaseController
 
     }
 
-        
+
     /**
      * downloadHistoricalEntity
      *
@@ -130,22 +130,12 @@ class ActivityController extends BaseController
         $backup = $activity->backup;
         $html_backup = '';
 
-        /* Refactor 20-10-2021
-         *
-         * We have moved the backups out of the database and into object storage.
-         * In order to handle edge cases, we still check for the database backup
-         * in case the file no longer exists
-        */
+        $file = $backup->getFile();
 
-        if ($backup && $backup->filename && Storage::disk(config('filesystems.default'))->exists($backup->filename)) { //disk
-            if (Ninja::isHosted()) {
-                $html_backup = file_get_contents(Storage::disk(config('filesystems.default'))->url($backup->filename));
-            } else {
-                $html_backup = file_get_contents(Storage::disk(config('filesystems.default'))->path($backup->filename));
-            }
-        } else { //failed
+        $html_backup = $file;
+        
+        if(!$file)
             return response()->json(['message' => ctrans('texts.no_backup_exists'), 'errors' => new stdClass()], 404);
-        }
 
         if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
             $pdf = (new Phantom())->convertHtmlToPdf($html_backup);
@@ -204,7 +194,7 @@ class ActivityController extends BaseController
         $activity->user_id = $user->id;
         $activity->ip = $request->ip();
         $activity->activity_type_id = Activity::USER_NOTE;
-        
+
         switch (get_class($entity)) {
             case Invoice::class:
                 $activity->invoice_id = $entity->id;
@@ -254,17 +244,20 @@ class ActivityController extends BaseController
                 $activity->client_id = $entity->client_id;
                 $activity->project_id = $entity->project_id;
                 $activity->vendor_id = $entity->vendor_id;
+                // no break
             case Task::class:
                 $activity->task_id = $entity->id;
                 $activity->expense_id = $entity->id;
                 $activity->client_id = $entity->client_id;
                 $activity->project_id = $entity->project_id;
                 $activity->vendor_id = $entity->vendor_id;
+                // no break
             case Payment::class:
                 $activity->payment_id = $entity->id;
                 $activity->expense_id = $entity->id;
                 $activity->client_id = $entity->client_id;
                 $activity->project_id = $entity->project_id;
+                // no break
             default:
                 # code...
                 break;

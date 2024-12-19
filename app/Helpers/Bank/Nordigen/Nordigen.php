@@ -61,13 +61,13 @@ class Nordigen
     }
 
     // requisition-section
-    public function createRequisition(string $redirect, string $initutionId, string $reference, string $userLanguage)
+    public function createRequisition(string $redirect, string $institutionId, string $reference, string $userLanguage)
     {
-        if ($this->test_mode && $initutionId != $this->sandbox_institutionId) {
+        if ($this->test_mode && $institutionId != $this->sandbox_institutionId) {
             throw new \Exception('invalid institutionId while in test-mode');
         }
 
-        return $this->client->requisition->createRequisition($redirect, $initutionId, $this->getExtendedEndUserAggreementId($initutionId), $reference, $userLanguage);
+        return $this->client->requisition->createRequisition($redirect, $institutionId, $this->getExtendedEndUserAggreementId($institutionId), $reference, $userLanguage);
     }
 
     private function getExtendedEndUserAggreementId(string $institutionId): string|null
@@ -76,28 +76,35 @@ class Nordigen
         $endUserAggreements = $this->client->endUserAgreement->getEndUserAgreements();
 
         $endUserAgreement = null;
+
+        // try to find an existing valid endUserAgreement
         foreach ($endUserAggreements as $row) {
             if ($row["institution_id"] != $institutionId)
                 continue;
 
             $endUserAgreement = $row;
+
+            // try to accept the endUserAgreement when not already accepted
+            if (empty($endUserAgreement["accepted"]))
+                try {
+                    $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
+                } catch (\Exception $e) { // not able to accept it
+                    nlog("Nordigen: Was not able to confirm an existing outstanding endUserAgreement for this institution. We now try to find another or will create and confirm a new one. {$institutionId} {$e->getMessage()} {$e->getCode()}");
+                    $endUserAgreement = null;
+
+                    continue;
+                }
+
             break;
         }
 
-        // try to create an endUserAgreement
+        // try to create and accept an endUserAgreement
         if (!$endUserAgreement)
             try {
                 $endUserAgreement = $this->client->endUserAgreement->createEndUserAgreement($institutionId, ['details', 'balances', 'transactions'], 90, 180);
-            } catch (\Exception $e) { // not able to create this for this institution
-
-                return null;
-            }
-
-        // try to accept the endUserAgreement when not already accepted
-        if (!$endUserAgreement["accepted"] == null)
-            try {
                 $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
-            } catch (\Exception $e) { // not able to accept it
+            } catch (\Exception $e) { // not able to create this for this institution
+                nlog("Nordigen: Was not able to create and confirm a new endUserAgreement for this institution. We continues with defaults to setup bank_integration. {$institutionId} {$e->getMessage()} {$e->getCode()}");
 
                 return null;
             }
@@ -132,11 +139,18 @@ class Nordigen
             $it = new AccountTransformer();
             return $it->transform($out);
 
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $e->getResponse();
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode === 429) {
+                nlog("Nordigen Rate Limit hit for account {$account_id}");
+                return ['error' => 'Nordigen Institution Rate Limit Reached'];
+            }
         } catch (\Exception $e) {
 
             nlog("Nordigen getAccount() failed => {$account_id} => " . $e->getMessage());
-
-            return false;
+            return ['error' => $e->getMessage(), 'requisition' => true];
 
         }
     }
@@ -159,6 +173,9 @@ class Nordigen
 
             return true;
         } catch (\Exception $e) {
+
+            nlog("Nordigen:: AccountActiveStatus:: {$e->getMessage()} {$e->getCode()}");
+
             if (strpos($e->getMessage(), "Invalid Account ID") !== false) {
                 return false;
             }

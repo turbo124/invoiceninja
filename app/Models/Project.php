@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Project\ProjectService;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laracasts\Presenter\PresentableTrait;
@@ -37,6 +38,7 @@ use Laracasts\Presenter\PresentableTrait;
  * @property-read Project|null $project
  * @property-read int|null $tasks_count
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\User $assigned_user
  * @property-read \App\Models\Vendor|null $vendor
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel company()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel exclude($columns)
@@ -117,6 +119,11 @@ class Project extends BaseModel
         return $this->belongsTo(User::class)->withTrashed();
     }
 
+    public function assigned_user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_user_id', 'id')->withTrashed();
+    }
+
     public function tasks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Task::class);
@@ -129,7 +136,7 @@ class Project extends BaseModel
 
     public function invoices(): HasMany
     {
-        return $this->hasMany(Invoice::class);
+        return $this->hasMany(Invoice::class)->withTrashed();
     }
 
     public function quotes(): HasMany
@@ -137,6 +144,15 @@ class Project extends BaseModel
         return $this->hasMany(Quote::class);
     }
 
+     /**
+     * Service entry points.
+     *
+     * @return ProjectService
+     */
+    public function service(): ProjectService
+    {
+        return new ProjectService($this);
+    }
 
     public function translate_entity()
     {

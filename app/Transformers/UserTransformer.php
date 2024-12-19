@@ -40,7 +40,7 @@ class UserTransformer extends EntityTransformer
 
     public function transform(User $user)
     {
-        $ref = new \stdClass;
+        $ref = new \stdClass();
         $ref->free = 0;
         $ref->pro = 0;
         $ref->enterprise = 0;
@@ -118,7 +118,7 @@ class UserTransformer extends EntityTransformer
 
         $cu = $user->company_users()->where('company_id', $user->company_id)->first();
 
-        if(!$cu) {
+        if (!$cu) {
             return null;
         }
 

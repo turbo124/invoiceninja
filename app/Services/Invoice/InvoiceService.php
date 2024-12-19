@@ -109,6 +109,8 @@ class InvoiceService
 
     /**
      * Apply a payment amount to an invoice.
+     *
+     * *** does not create a paymentable ****
      * @param  Payment $payment        The Payment
      * @param  float   $payment_amount The Payment amount
      * @return InvoiceService          Parent class object
@@ -313,11 +315,11 @@ class InvoiceService
     public function checkReminderStatus(): self
     {
 
-        if($this->invoice->partial == 0) {
+        if ($this->invoice->partial == 0) {
             $this->invoice->partial_due_date = null;
         }
 
-        if($this->invoice->partial == 0 && $this->invoice->balance > 0) {
+        if ($this->invoice->partial == 0 && $this->invoice->balance > 0) {
             $this->invoice->reminder1_sent = null;
             $this->invoice->reminder2_sent = null;
             $this->invoice->reminder3_sent = null;
@@ -442,12 +444,12 @@ class InvoiceService
             return $this;
         }
 
-        $pre_count = count($this->invoice->line_items);
+        $pre_count = count((array)$this->invoice->line_items);
 
-        $items = collect($this->invoice->line_items)
-                                     ->reject(function ($item) {
-                                         return $item->type_id == '3';
-                                     })->toArray();
+        $items = collect((array)$this->invoice->line_items)
+                    ->filter(function ($item) {
+                        return $item->type_id != '3';
+                    })->toArray();
 
         $this->invoice->line_items = array_values($items);
 
@@ -629,7 +631,7 @@ class InvoiceService
 
         $sub_id = $this->decodePrimaryKey($subscription_id);
 
-        if(Subscription::withTrashed()->where('id', $sub_id)->where('company_id', $this->invoice->company_id)->exists()) {
+        if (Subscription::withTrashed()->where('id', $sub_id)->where('company_id', $this->invoice->company_id)->exists()) {
             $this->invoice->subscription_id = $sub_id;
         }
 

@@ -86,16 +86,24 @@ paths:
 
   /api/v1/login:
     post:
+      x-codeSamples:
+      - lang: php
+        label: php
+        source: |
+          $ninja = new InvoiceNinja("your_token");
+          
+      - lang: curl
+        label: curl
+        source: |
+          curl --request POST \
+            --url 'https://demo.invoiceninja.com/api/v1/login?include=company,token' \
+            --header 'X-API-TOKEN: YOUR_API_TOKEN_HERE' \
+            --header 'X-Requested-With: XMLHttpRequest' \
+            --header 'Accept: application/json'
       tags:
-        - login
-      summary: "Attempts authentication"
+        - auth
+      summary: "Login"
       description: |
-        After authenticating with the API, the returned object is a CompanyUser object which is a bridge linking the user to the company. 
-
-        The company user object itself contains the users permissions (admin/owner or fine grained permissions) You will most likely want to 
-        also include in the response of this object both the company and the user object, this can be done by using the include parameter.
-
-        /api/v1/login?include=company,user
 
       operationId: postLogin
       parameters:
@@ -106,7 +114,16 @@ paths:
         - $ref: "#/components/parameters/include_static"
         - $ref: "#/components/parameters/clear_cache"
       requestBody:
-        description: "User credentials"
+        description: |
+          User credentials
+
+          ```json
+          {
+            "email" : "fred@flintstonze.com",
+            "password" : "magicpassword123",
+            "one_time_password" : "12345",
+          }
+          ```
         required: true
         content:
           application/json:
@@ -998,7 +1015,7 @@ paths:
     post:
       tags:
         - bank_transactions
-      summary: "Performs bulk actions on an array of bank_transations"
+      summary: "Bulk actions"
       description: ""
       operationId: bulkBankTransactions
       parameters:
@@ -1042,8 +1059,30 @@ paths:
     post:
       tags:
         - bank_transactions
-      summary: "Performs match actions on an array of bank_transactions"
-      description: ""
+      summary: "Match transactions"
+      description: |
+        Matching invoices or a payment to a bank transactions.
+        
+        The API expects the id of the transaction along with either a comma separated list of invoice ids OR the payment id to associate the transaction to.
+
+        Example for matching a transaction to two invoices:
+
+        {"transactions":[{"id":"olejRl5ejN","invoice_ids":"JxboYBLegw,JxboYBLeXX"}]}
+
+        Example for matching a transaction and a paymente:
+
+        {"transactions":[{"id":"olejRl5ejN","payment_id":"JxboYBLeXf"}]}
+
+        Matching expenses.
+
+        You can match an existing expense within Invoice Ninja - or - create a new expense using the following:
+
+        {"transactions":[{"id":"open5pld7A","vendor_id":"gl9avJnaG1","ninja_category_id":""}]}
+
+        To match to an existing expense:
+
+        {"transactions":[{"id":"Jxbo2qKagw","expense_id":"7N1aMM1aWm"}]}
+
       operationId: matchBankTransactions
       parameters:
         - $ref: "#/components/parameters/X-API-TOKEN"
@@ -3025,7 +3064,23 @@ paths:
                 template:
                   description: "The template required"
                   type: string
-                  example: invoice,quote,credit,purchase_order,payment,payment_partial,reminder1,reminder2,reminder3,reminder_endless
+                  enum:
+                    - email_template_invoice
+                    - email_template_quote
+                    - email_template_credit
+                    - email_template_payment
+                    - email_template_payment_partial
+                    - email_template_statement
+                    - email_template_reminder1
+                    - email_template_reminder2
+                    - email_template_reminder3
+                    - email_template_reminder_endless
+                    - email_template_custom1
+                    - email_template_custom2
+                    - email_template_custom3
+                    - email_template_purchase_order
+                    - email_quote_template_reminder1
+                  example: invoice
               type: object
       responses:
         200:

@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Events\Contact\ContactLoggedIn;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientPortal\Contact\ContactLoginRequest;
 use App\Http\ViewComposers\PortalComposer;
 use App\Libraries\MultiDB;
 use App\Models\Account;
@@ -36,53 +37,64 @@ class ContactLoginController extends Controller
         $this->middleware('guest:contact', ['except' => ['logout']]);
     }
 
+    private function resolveCompany($request, $company_key)
+    {
+
+        if($company_key && MultiDB::findAndSetDbByCompanyKey($company_key))
+            return Company::where('company_key', $company_key)->first();
+
+        $domain_name = $request->getHost();
+
+        if (strpos($domain_name, config('ninja.app_domain')) !== false) {
+            $subdomain = explode('.', $domain_name)[0];
+            
+            $query = ['subdomain' => $subdomain];
+            
+            if($company = MultiDB::findAndSetDbByDomain($query))
+                return $company;
+        }
+
+        $query = [
+            'portal_domain' => $request->getSchemeAndHttpHost(),
+            'portal_mode' => 'domain',
+        ];
+
+        if ($company = MultiDB::findAndSetDbByDomain($query)) {
+            return $company;
+        }
+
+        if(Ninja::isSelfHost())
+            return Company::first();
+
+        return false;
+    }
+
     public function showLoginForm(Request $request, $company_key = false)
     {
         $company = false;
         $account = false;
-
-        if($request->query('intended'))
-            $request->session()->put('url.intended', $request->query('intended'));
+        $intended = $request->query('intended') ?: false;
         
-        if ($request->session()->has('company_key')) {
-            MultiDB::findAndSetDbByCompanyKey($request->session()->get('company_key'));
-            $company = Company::where('company_key', $request->session()->get('company_key'))->first();
-        } elseif ($request->has('company_key')) {
-            MultiDB::findAndSetDbByCompanyKey($request->input('company_key'));
-            $company = Company::where('company_key', $request->input('company_key'))->first();
-        } elseif ($company_key) {
-            MultiDB::findAndSetDbByCompanyKey($company_key);
-            $company = Company::where('company_key', $company_key)->first();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        if ($intended) {
+            $request->session()->put('url.intended', $intended);
         }
 
-        /** @var ?\App\Models\Company $company **/
+        $company = $this->resolveCompany($request, $company_key);
+
         if ($company) {
             $account = $company->account;
-        } elseif (! $company && strpos($request->getHost(), config('ninja.app_domain')) !== false) {
-            $subdomain = explode('.', $request->getHost())[0];
-            MultiDB::findAndSetDbByDomain(['subdomain' => $subdomain]);
-            $company = Company::where('subdomain', $subdomain)->first();
-        } elseif (Ninja::isHosted()) {
-            MultiDB::findAndSetDbByDomain(['portal_domain' => $request->getSchemeAndHttpHost()]);
-
-            $company = Company::where('portal_domain', $request->getSchemeAndHttpHost())->first();
-        } elseif (Ninja::isSelfHost()) {
-            /** @var \App\Models\Account $account **/
-            $account = Account::first();
-            $company = $account->default_company;
-        } else {
-            $company = null;
         }
-
-        if (! $account) {
-            $account_id = $request->get('account_id');
-            $account = Account::find($account_id);
+        else {
+            abort(404, "We could not find this site, if you think this is an error, please contact the administrator.");
         }
 
         return $this->render('auth.login', ['account' => $account, 'company' => $company]);
     }
 
-    public function login(Request $request)
+    public function login(ContactLoginRequest $request)
     {
 
         Auth::shouldUse('contact');
@@ -141,9 +153,10 @@ class ContactLoginController extends Controller
         }
 
         $this->setRedirectPath();
-        
-        if($intended)
+
+        if ($intended) {
             $this->redirectTo = $intended;
+        }
 
         return $request->wantsJson()
                     ? new JsonResponse([], 204)
@@ -169,6 +182,7 @@ class ContactLoginController extends Controller
     {
         Auth::guard('contact')->logout();
         request()->session()->invalidate();
+        request()->session()->regenerateToken();
 
         return redirect('/client/login');
     }

@@ -54,6 +54,10 @@ trait DesignHelpers
             $this->payments = $this->context['payments'];
         }
 
+        if (isset($this->context['unapplied'])) {
+            $this->unapplied_payments = $this->context['unapplied'];
+        }
+
         if (isset($this->context['credits'])) {
             $this->credits = $this->context['credits'];
         }
@@ -174,7 +178,7 @@ trait DesignHelpers
         // evaluating the variable.
 
         if (in_array(sprintf('%s%s.tax', '$', $type), (array) $this->context['pdf_variables']["{$column_type}_columns"])) {
-            $line_items = collect($this->entity->line_items)->filter(function ($item) use ($type_id) {
+            $line_items = collect($this->entity->line_items)->filter(function ($item) use ($type_id) { //@phpstan-ignore-line
                 return $item->type_id = $type_id;
             });
 
@@ -279,6 +283,7 @@ trait DesignHelpers
             '$purchase_order.total' => 'amount',
             '$purchase_order.due_date' => 'due_date',
             '$purchase_order.balance_due' => 'balance_due',
+            '$credit.valid_until' => 'due_date',
         ];
 
         try {
@@ -315,6 +320,11 @@ trait DesignHelpers
         // Some variables don't map 1:1 to table columns. This gives us support for such cases.
         $aliases = [
             '$quote.balance_due' => 'partial',
+            '$purchase_order.po_number' => 'number',
+            '$purchase_order.total' => 'amount',
+            '$purchase_order.due_date' => 'due_date',
+            '$purchase_order.balance_due' => 'balance_due',
+            '$credit.valid_until' => 'due_date',
         ];
 
         try {

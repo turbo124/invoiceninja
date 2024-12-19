@@ -52,6 +52,8 @@ class CreditExport extends BaseExport
 
         $report = $query->cursor()
                 ->map(function ($credit) {
+
+                    /** @var \App\Models\Credit $credit */
                     $row = $this->buildRow($credit);
                     return $this->processMetaData($row, $credit);
                 })->toArray();
@@ -73,7 +75,7 @@ class CreditExport extends BaseExport
             $clean_row[$key]['value'] = $row[$column_key];
             $clean_row[$key]['identifier'] = $value;
 
-            if(in_array($clean_row[$key]['id'], ['paid_to_date','total_taxes','amount', 'balance', 'partial', 'refunded', 'applied','unit_cost','cost','price'])) {
+            if (in_array($clean_row[$key]['id'], ['paid_to_date','total_taxes','amount', 'balance', 'partial', 'refunded', 'applied','unit_cost','cost','price'])) {
                 $clean_row[$key]['display_value'] = Number::formatMoney($row[$column_key], $resource->client);
             } else {
                 $clean_row[$key]['display_value'] = $row[$column_key];
@@ -112,16 +114,20 @@ class CreditExport extends BaseExport
 
         $clients = &$this->input['client_id'];
 
-        if($clients) {
+        if ($clients) {
             $query = $this->addClientFilter($query, $clients);
         }
 
-        if($this->input['status'] ?? false) {
+        if ($this->input['status'] ?? false) {
             $query = $this->addCreditStatusFilter($query, $this->input['status']);
         }
 
-        if($this->input['document_email_attachment'] ?? false) {
+        if ($this->input['document_email_attachment'] ?? false) {
             $this->queueDocuments($query);
+        }
+
+        if ($this->input['pdf_email_attachment'] ?? false) {
+            $this->queuePdfs($query);
         }
 
         return $query;
@@ -139,6 +145,7 @@ class CreditExport extends BaseExport
 
         $query->cursor()
             ->each(function ($credit) {
+                /** @var \App\Models\Credit $credit */
                 $this->csv->insertOne($this->buildRow($credit));
             });
 
@@ -161,19 +168,16 @@ class CreditExport extends BaseExport
                 $entity[$keyval] = $transformed_credit[$credit_key];
             } elseif (isset($transformed_credit[$keyval])) {
                 $entity[$keyval] = $transformed_credit[$keyval];
-            } elseif(isset($transformed_credit[$searched_credit_key])) {
+            } elseif (isset($transformed_credit[$searched_credit_key])) {
                 $entity[$keyval] = $transformed_credit[$searched_credit_key];
             } else {
-
-                // nlog($key);
                 $entity[$key] = $this->decorator->transform($key, $credit);
-                // $entity[$key] = '';
-                // $entity[$keyval] = $this->resolveKey($keyval, $credit, $this->credit_transformer);
             }
 
         }
 
-        return $this->decorateAdvancedFields($credit, $entity);
+        $entity = $this->decorateAdvancedFields($credit, $entity);
+        return $this->convertFloats($entity);
     }
 
     public function addCreditStatusFilter($query, $status): Builder

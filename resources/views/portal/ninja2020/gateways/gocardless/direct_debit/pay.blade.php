@@ -19,7 +19,7 @@
         @component('portal.ninja2020.components.general.card-element', ['title' => ctrans('texts.pay_with')])
             @if (count($tokens) > 0)
                 @foreach ($tokens as $token)
-                    <label class="mr-4">
+                    <label class="mr-4 block my-2">
                         <input type="radio" data-token="{{ $token->token }}" name="payment-type"
                             class="form-radio cursor-pointer toggle-payment-with-token" />
                         <span class="ml-1 cursor-pointer">{{ App\Models\GatewayType::getAlias($token->gateway_type_id) }}
@@ -52,7 +52,28 @@
             }));
 
         document.getElementById('pay-now').addEventListener('click', function() {
-            document.getElementById('server-response').submit();
+
+            const payNowButton = document.getElementById('pay-now');
+            if (payNowButton) {
+                payNowButton.addEventListener('click', function() {
+                    // Disable button and update UI
+                    this.disabled = true;
+                    this.querySelector('svg').classList.remove('hidden');
+                    this.querySelector('span').classList.add('hidden');
+
+                    // Submit form
+                    document.getElementById('server-response').submit();
+                });
+            }
+
         });
+
+
+const first = document.querySelector('input[name="payment-type"]');
+
+if (first) {
+    first.click();
+}
+
     </script>
 @endpush

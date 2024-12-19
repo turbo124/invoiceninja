@@ -212,7 +212,7 @@ class Import implements ShouldQueue
 
         $user->setCompany($this->company);
 
-        $array = json_decode(file_get_contents($this->file_path), 1);
+        $array = json_decode(file_get_contents($this->file_path), true);
         $data = $array['data'];
 
         foreach ($this->available_imports as $import) {
@@ -247,13 +247,14 @@ class Import implements ShouldQueue
             $this->company->account->companies()->update(['is_large' => true]);
         }
 
+        $this->company->smtp_port = (int)$this->company->smtp_port;
         $this->company->client_registration_fields = \App\DataMapper\ClientRegistrationFields::generate();
         $this->company->save();
 
         $this->setInitialCompanyLedgerBalances();
 
         // $this->fixClientBalances();
-        $check_data = (new CheckCompanyData($this->company, md5(time())))->handle();
+        $check_data = (new CheckCompanyData($this->company, md5(time())))->handle(); //@phpstan-ignore-line
 
         // if(Ninja::isHosted() && array_key_exists('ninja_tokens', $data))
         $this->processNinjaTokens($data['ninja_tokens']);
@@ -264,11 +265,11 @@ class Import implements ShouldQueue
             $t = app('translator');
             $t->replace(Ninja::transformTranslations($this->company->settings));
 
-            if(!$this->silent_migration) {
+            if (!$this->silent_migration) {
                 Mail::to($this->user->email, $this->user->name())->send(new MigrationCompleted($this->company->id, $this->company->db, implode("<br>", $check_data)));
             }
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog($e->getMessage());
         }
 
@@ -281,7 +282,7 @@ class Import implements ShouldQueue
 
         try {
             unlink($this->file_path);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             nlog("problem unsetting file");
         }
     }
@@ -368,7 +369,7 @@ class Import implements ShouldQueue
             }
         } else {
 
-            if(isset($data['plan'])) {
+            if (isset($data['plan'])) {
                 $account->plan = $data['plan'];
             }
 
@@ -431,13 +432,20 @@ class Import implements ShouldQueue
             }
         }
 
-        $rules = (new UpdateCompanyRequest())->rules();
+        // $rules = (new UpdateCompanyRequest())->rules();
 
-        $validator = Validator::make($data, $rules);
+        // unset($rules['expense_mailbox']);
+        // unset($rules['e_invoice']);
+        // unset($rules['smtp_port']);
+        // unset($rules['settings']);
 
-        if ($validator->fails()) {
-            throw new MigrationValidatorFailed(json_encode($validator->errors()));
-        }
+        // $validator = Validator::make($data, $rules);
+
+        // nlog($validator->errors());
+
+        // if ($validator->fails()) {
+        //     throw new MigrationValidatorFailed(json_encode($validator->errors()));
+        // }
 
         if (isset($data['account_id'])) {
             unset($data['account_id']);
@@ -1207,7 +1215,7 @@ class Import implements ShouldQueue
                 CreditFactory::create($this->company->id, $modified['user_id'])
             );
 
-            if($credit->status_id == 4) {
+            if ($credit->status_id == 4) {
 
                 $client = $credit->client;
                 $client->balance -= $credit->balance;
@@ -1501,7 +1509,7 @@ class Import implements ShouldQueue
                 try {
                     $invoice_id = $this->transformId('invoices', $resource['invoice_id']);
                     $entity = Invoice::query()->where('id', $invoice_id)->withTrashed()->first();
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     nlog("i couldn't find the invoice document {$resource['invoice_id']}, perhaps it is a quote?");
                     nlog($e->getMessage());
 
@@ -1512,7 +1520,7 @@ class Import implements ShouldQueue
                     try {
                         $quote_id = $this->transformId('quotes', $resource['invoice_id']);
                         $entity = Quote::query()->where('id', $quote_id)->withTrashed()->first();
-                    } catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         nlog("i couldn't find the quote document {$resource['invoice_id']}, perhaps it is a quote?");
                         nlog($e->getMessage());
                     }
@@ -1545,7 +1553,6 @@ class Import implements ShouldQueue
                     $file_path,
                     $file_name,
                     $file_info,
-                    filesize($file_path),
                     0,
                     false
                 );
@@ -1563,7 +1570,8 @@ class Import implements ShouldQueue
                 ))->handle();
 
 
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
+                nlog($e->getMessage());
                 //do nothing, gracefully :)
             }
         }
@@ -1632,7 +1640,7 @@ class Import implements ShouldQueue
                 $nmo->settings = $this->company->settings;
                 $nmo->to_user = $this->user;
 
-                if(!$this->silent_migration) {
+                if (!$this->silent_migration) {
                     NinjaMailerJob::dispatch($nmo, true);
                 }
 
@@ -2010,7 +2018,7 @@ class Import implements ShouldQueue
     public function transformId($resource, string $old): int
     {
         if (! array_key_exists($resource, $this->ids)) {
-            info(print_r($resource, 1));
+            nlog($resource);
             throw new Exception("Resource {$resource} not available.");
         }
 
@@ -2067,11 +2075,10 @@ class Import implements ShouldQueue
         LightLogs::create($job_failure)
                  ->queue();
 
-        nlog(print_r($exception->getMessage(), 1));
+        nlog($exception->getMessage());
 
-        // if (Ninja::isHosted()) {
         app('sentry')->captureException($exception);
-        // }
+
     }
 
 
@@ -2102,7 +2109,7 @@ class Import implements ShouldQueue
         if (Ninja::isHosted()) {
             try {
                 \Modules\Admin\Jobs\Account\NinjaUser::dispatch($data, $this->company);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 nlog($e->getMessage());
             }
         }

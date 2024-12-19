@@ -13,6 +13,7 @@ namespace App\Services\Invoice;
 
 use App\Jobs\Inventory\AdjustProductInventory;
 use App\Models\Invoice;
+use App\Models\Quote;
 use App\Services\AbstractService;
 use App\Utils\Traits\GeneratesCounter;
 
@@ -45,14 +46,14 @@ class MarkInvoiceDeleted extends AbstractService
              ->deletePaymentables()
              ->adjustPayments()
              ->adjustPaidToDateAndBalance()
-             ->adjustLedger();
+             ->adjustLedger()
+             ->triggeredActions();
 
         return $this->invoice;
     }
 
     private function adjustLedger()
     {
-        // $this->invoice->ledger()->updatePaymentBalance($this->adjustment_amount * -1, 'Invoice Deleted - reducing ledger balance'); //reduces the payment balance by payment totals
         $this->invoice->ledger()->updatePaymentBalance($this->balance_adjustment * -1, 'Invoice Deleted - reducing ledger balance'); //reduces the payment balance by payment totals
 
         return $this;
@@ -60,12 +61,12 @@ class MarkInvoiceDeleted extends AbstractService
 
     private function adjustPaidToDateAndBalance()
     {
-        // 06-09-2022
+
         $this->invoice
              ->client
              ->service()
              ->updateBalanceAndPaidToDate($this->balance_adjustment * -1, $this->adjustment_amount * -1)
-             ->save(); //reduces the paid to date by the payment totals
+             ->save();
 
         return $this;
     }
@@ -179,6 +180,17 @@ class MarkInvoiceDeleted extends AbstractService
                     ->where('paymentable_id', $this->invoice->id)
                     ->update(['deleted_at' => now()]);
         });
+
+        return $this;
+    }
+
+    private function triggeredActions(): self
+    {
+        if ($this->invoice->quote) {
+            $this->invoice->quote->invoice_id = null;
+            $this->invoice->quote->status_id = Quote::STATUS_SENT;
+            $this->invoice->pushQuietly();
+        }
 
         return $this;
     }

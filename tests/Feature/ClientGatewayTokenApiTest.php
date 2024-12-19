@@ -20,10 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-/**
- * @test
- * @covers App\Http\Controllers\ClientGatewayTokenController
- */
+
 class ClientGatewayTokenApiTest extends TestCase
 {
     use MakesHash;
@@ -32,8 +29,8 @@ class ClientGatewayTokenApiTest extends TestCase
 
     protected $faker;
     protected CompanyGateway $cg;
-    
-    protected function setUp() :void
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -87,7 +84,7 @@ class ClientGatewayTokenApiTest extends TestCase
         //disable ach here
         $json_config = json_decode(config('ninja.testvars.stripe'));
 
-        $this->cg = new CompanyGateway;
+        $this->cg = new CompanyGateway();
         $this->cg->company_id = $this->company->id;
         $this->cg->user_id = $this->user->id;
         $this->cg->gateway_key = 'd14dd26a37cecc30fdd65700bfb55b23';
@@ -99,6 +96,123 @@ class ClientGatewayTokenApiTest extends TestCase
         $this->cg->fees_and_limits = $data;
         $this->cg->save();
     }
+
+
+    public function testCompanyGatewaySettableOnToken()
+    {
+                
+        $data = [
+            'client_id' => $this->client->hashed_id,
+            'company_gateway_id' => $this->cg->hashed_id,
+            'gateway_type_id' => GatewayType::CREDIT_CARD,
+            'token' => 'tokey',
+            'gateway_customer_reference' => 'reffy',
+            'meta' => '{}',
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/client_gateway_tokens', $data);
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $t1 = $arr['data']['id'];
+
+        $this->assertEquals($data['company_gateway_id'], $arr['data']['company_gateway_id']);
+        $this->assertEquals($data['gateway_type_id'], $arr['data']['gateway_type_id']);
+        $this->assertEquals('tokey', $arr['data']['token']);
+        $this->assertEquals('reffy', $arr['data']['gateway_customer_reference']);
+
+        $this->assertNotNull($arr['data']['token']);
+
+    }
+
+    public function testClientGatewaySetDefault()
+    {
+        $data = [
+            'client_id' => $this->client->hashed_id,
+            'company_gateway_id' => $this->cg->hashed_id,
+            'gateway_type_id' => GatewayType::CREDIT_CARD,
+            'meta' => '{}',
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/client_gateway_tokens', $data);
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $t1 = $arr['data']['id'];
+
+        $this->assertNotNull($arr['data']['token']);
+
+
+        $data = [
+            'client_id' => $this->client->hashed_id,
+            'company_gateway_id' => $this->cg->hashed_id,
+            'gateway_type_id' => GatewayType::CREDIT_CARD,
+            'is_default' => false,
+            'meta' => '{}',
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/client_gateway_tokens', $data);
+
+        $response->assertStatus(200);
+        $arr = $response->json();
+
+        $t2 = $arr['data']['id'];
+
+        $this->assertNotNull($arr['data']['token']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson("/api/v1/client_gateway_tokens/{$t2}/setAsDefault", []);
+
+        $response->assertStatus(200);
+
+        $this->assertTrue($response->json()['data']['is_default']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson("/api/v1/client_gateway_tokens/{$t1}/setAsDefault", []);
+
+        $response->assertStatus(200);
+
+        $this->assertTrue($response->json()['data']['is_default']);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->getJson("/api/v1/clients/{$this->client->hashed_id}", []);
+
+        $response->assertStatus(200);
+
+        $arr = $response->json();
+
+        $this->assertCount(2,$arr['data']['gateway_tokens']);
+        
+        foreach($arr['data']['gateway_tokens'] as $token)
+        {
+            if($token['id'] == $t1){
+                $this->assertTrue($token['is_default']);
+            }
+            else {
+                $this->assertFalse($token['is_default']);
+            }
+        }
+
+    }
+
+
 
     public function testClientGatewayPostPost()
     {

@@ -261,13 +261,13 @@ class MigrationController extends BaseController
     {
         nlog('Starting Migration');
 
-        if($request->has('silent_migration')) {
+        if ($request->has('silent_migration')) {
             $this->silent_migration = true;
         }
 
         if ($request->companies) {
             //handle Laravel 5.5 UniHTTP
-            $companies = json_decode($request->companies, 1);
+            $companies = json_decode($request->companies, true);
         } else {
             //handle Laravel 6 Guzzle
             $companies = [];
@@ -275,7 +275,7 @@ class MigrationController extends BaseController
             foreach ($request->all() as $input) {
                 if ($input instanceof UploadedFile) {
                 } else {
-                    $companies[] = json_decode($input, 1);
+                    $companies[] = json_decode($input, true);
                 }
             }
         }
@@ -307,7 +307,7 @@ class MigrationController extends BaseController
                 $nmo->settings = $user->account->companies()->first()->settings;
                 $nmo->to_user = $user;
 
-                if(!$this->silent_migration) {
+                if (!$this->silent_migration) {
                     NinjaMailerJob::dispatch($nmo, true);
                 }
 
@@ -319,7 +319,7 @@ class MigrationController extends BaseController
                 $nmo->settings = $user->account->companies()->first()->settings;
                 $nmo->to_user = $user;
 
-                if(!$this->silent_migration) {
+                if (!$this->silent_migration) {
                     NinjaMailerJob::dispatch($nmo, true);
                 }
 
@@ -341,7 +341,7 @@ class MigrationController extends BaseController
                 $nmo->settings = $user->account->companies()->first();
                 $nmo->to_user = $user;
 
-                if(!$this->silent_migration) {
+                if (!$this->silent_migration) {
                     NinjaMailerJob::dispatch($nmo, true);
                 }
 
