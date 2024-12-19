@@ -61,14 +61,22 @@ class Nordigen
     }
 
     // requisition-section
-    public function createRequisition(string $redirect, array $institution, string $reference, string $userLanguage)
-    {
+    public function createRequisition(
+        string $redirect,
+        array $institution,
+        int $transactionDays,
+        string $reference,
+        string $userLanguage,
+    ): array {
         if ($this->test_mode && $institution['id'] != $this->sandbox_institutionId) {
             throw new \Exception('invalid institutionId while in test-mode');
         }
 
+        $txDays = $transactionDays < 30 ? 30 : $transactionDays;
+        $max = $institution['transaction_total_days'];
+
         $eua = $this->client->endUserAgreement->createEndUserAgreement(
-            maxHistoricalDays: $institution['transaction_total_days'],
+            maxHistoricalDays: $txDays > $max ? $max : $txDays,
             institutionId: $institution['id'],
         );
 
