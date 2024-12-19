@@ -98,7 +98,13 @@ class NordigenController extends BaseController
 
         // redirect to requisition flow
         try {
-            $requisition = $nordigen->createRequisition(config('ninja.app_url') . '/nordigen/confirm', $institution, $request->token, $lang);
+            $requisition = $nordigen->createRequisition(
+                config('ninja.app_url') . '/nordigen/confirm',
+                $institution,
+                (int) ($data['tx_days'] ?? 0),
+                $request->token,
+                $lang,
+            );
         } catch (NordigenException $e) { // TODO: property_exists returns null in these cases... => why => therefore we just get unknown error everytime $responseBody is typeof GuzzleHttp\Psr7\Stream
             $responseBody = (string) $e->getResponse()->getBody();
 
