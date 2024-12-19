@@ -86,11 +86,11 @@ class Nordigen
         }
 
         // try to find an existing valid endUserAgreement
-        foreach ($endUserAggreements as $row) {
-            if ($row["institution_id"] != $institutionId)
-                continue;
-
+        foreach ($endUserAggreements["results"] as $row) {
             $endUserAgreement = $row;
+
+            if ($endUserAgreement["institution_id"] != $institutionId)
+                continue;
 
             // try to accept the endUserAgreement when not already accepted
             if (empty($endUserAgreement["accepted"]))
@@ -117,7 +117,7 @@ class Nordigen
                 return null;
             }
 
-        return $endUserAgreement->id;
+        return $endUserAgreement["id"];
     }
 
     public function getRequisition(string $requisitionId)
