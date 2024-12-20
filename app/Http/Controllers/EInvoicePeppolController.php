@@ -81,8 +81,15 @@ class EInvoicePeppolController extends BaseController
         $settings->state = $request->county;
         $settings->postal_code = $request->zip;
 
+        $settings->tax_name1 = '';
+        $settings->tax_rate1 = 0;
+        $settings->tax_name2 = '';
+        $settings->tax_rate2 = 0;
+        $settings->tax_name3 = '';
+        $settings->tax_rate3 = 0;
+        
         $settings->e_invoice_type = 'PEPPOL';
-        $settings->vat_number = $request->vat_number ?? $company->settings->vat_number;
+        // $settings->vat_number = $request->vat_number ?? $company->settings->vat_number;
         $settings->id_number = $request->id_number ?? $company->settings->id_number;
         $settings->classification = $request->classification ?? $company->settings->classification;
         $settings->enable_e_invoice = true;
