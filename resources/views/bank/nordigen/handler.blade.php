@@ -4,6 +4,9 @@
 @push('head')
 
 <link href="https://unpkg.com/nordigen-bank-ui@1.5.2/package/src/selector.min.css" rel="stylesheet" />
+<style type="text/css">
+.institution-modal-close { left: calc(100% - 12px); }
+</style>
 
 @endpush
 
@@ -167,6 +170,21 @@
         returnButton.innerHTML = `<a class="button button-primary bg-blue-600 my-4" href="${restartFlow ? restartUrl.href : config.redirectUrl}">${restartFlow ? "{{ ctrans('texts.nordigen_handler_restart', [], $lang ?? 'en') }}" : "{{ ctrans('texts.nordigen_handler_return', [], $lang ?? 'en') }}"}</a>`
         wrapper.appendChild(returnButton);
     }
+
+    const backButton = document.querySelector('.institution-arrow-block');
+    const backButtonObserver = new MutationObserver((records) => {
+        const title = document.querySelector('#institution-modal-header h2').innerText;
+
+        backButton.style.visibility = title == 'Select your country' ? 'hidden' : 'visible';
+        backButton.style.display = 'flex';
+    });
+
+    backButton.style.display = 'flex';
+    backButton.style.visibility = 'hidden';
+
+    backButtonObserver.observe(document.querySelector('header h2'), {
+        childList: true,
+    });
 </script>
 
 @endpush
