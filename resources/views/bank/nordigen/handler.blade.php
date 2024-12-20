@@ -71,25 +71,30 @@
                     _changeHeading('Select your transaction history');
 
                     clone.classList.replace('ob-list-institution', 'ob-history-option');
+                    clone.querySelector('span').innerText = `${max_history} days`;
                     url.searchParams.set('institution_id', institutionId);
 
-                    for (let i = 30; i <= max_history; i += 30) {
+                    for (let i = 30, next = 30; i <= max_history; i += next) {
+                        // If we're close to max, just use the real value
+                        if (max_history - i < 15) {
+                            continue;
+                        }
+
                         const option = clone.cloneNode(true);
 
-                        url.searchParams.set('tx_days', i);
+                        url.searchParams.set('tx_days', i == 360 ? 365 : i);
 
-                        option.querySelector('span').innerText = `${i} days`;
+                        option.querySelector('span').innerText = `${i == 360 ? 365 : i} days`;
                         option.querySelector('a').href = url.href;
                         container.append(option);
+
+                        // 1, 2, 3, 4, 6, 9, 12, 14, 18, 24 months--as of 20/12/24, no bank exceeds 730 days of history
+                        next = i >= 500 ? 180 : i >= 400 ? 120 : i >= 360 ? 60 : i >= 180 ? 90 : i >= 120 ? 60 : 30;
                     }
 
-                    if (max_history % 30 !== 0) {
-                        url.searchParams.set('tx_days', max_history);
-
-                        clone.querySelector('span').innerText = `${max_history} days`;
-                        clone.querySelector('a').href = url.href;
-                        container.append(clone);
-                    }
+                    url.searchParams.set('tx_days', max_history);
+                    clone.querySelector('a').href = url.href;
+                    container.append(clone);
                 });
             });
         });
