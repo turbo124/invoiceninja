@@ -36,15 +36,15 @@ class NordigenController extends BaseController
 
         /** @var array $context */
         $context = $request->getTokenContent();
-        $company = $request->getCompany();
-        $lang = substr($company->locale(), 0, 2);
 
         if (!$context) {
-            return $this->failed('token-invalid', ['lang' => $lang]);
+            return $this->failed('token-invalid', ['lang' => 'en']);
         }
 
-        $context["lang"] = $lang;
+        $company = $request->getCompany();
         $context["redirect"] = $data["redirect"];
+        $context["lang"] = $lang = substr($company->locale(), 0, 2);
+
         if ($context["context"] != "nordigen" || array_key_exists("requisitionId", $context)) {
             return $this->failed('token-invalid', $context);
         }
