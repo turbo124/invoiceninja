@@ -60,7 +60,30 @@ class Nordigen
         return $this->client->institution->getInstitutions();
     }
 
-    // requisition-section
+    /**
+     * Get end user agreement details by ID.
+     *
+     * @return array{
+     *   id: string,
+     *   created: string,
+     *   institution_id: string,
+     *   max_historical_days: int,
+     *   access_valid_for_days: int,
+     *   access_scope: string[],
+     *   accepted: string
+     * } Agreement details
+     */
+    public function getAgreement(string $euaId): array {
+        $eua = $this->client->endUserAgreement->getEndUserAgreement($euaId);
+
+        return $eua;
+    }
+
+    /**
+     * Create a new Bank Requisition
+     *
+     * @param array{id: string} $institution
+     */
     public function createRequisition(
         string $redirect,
         array $institution,
