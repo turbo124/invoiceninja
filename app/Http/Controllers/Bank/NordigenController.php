@@ -17,8 +17,10 @@ use App\Http\Requests\Nordigen\ConfirmNordigenBankIntegrationRequest;
 use App\Http\Requests\Nordigen\ConnectNordigenBankIntegrationRequest;
 use App\Jobs\Bank\ProcessBankTransactionsNordigen;
 use App\Models\BankIntegration;
+use App\Models\Company;
 use App\Utils\Ninja;
 use Cache;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Nordigen\NordigenPHP\Exceptions\NordigenExceptions\NordigenException;
@@ -75,6 +77,21 @@ class NordigenController extends BaseController
         $institution = array_values(array_filter($institutions, function ($institution) use ($data) {
             return $institution['id'] == $data['institution_id'];
         }))[0];
+
+        // Renewals have an Institution ID, but bypass the history selection screen
+        // and thus lack the history setting, so we can find the Agreement ID here.
+        if (!isset($data['tx_days'])) {
+            // Query the integration so we get the correct Account ID
+            $integration = $this->findIntegrationBy('institution', $institution, $company);
+
+            // Extract the EUA ID from the expired account error
+            $match = '/End User Agreement \(EUA\) ([0-9a-f-]+) has expired/';
+            $nordigenAccount = $nordigen->getAccount($integration->nordigen_account_id);
+            $euaId = preg_replace($match, '${1}', $nordigenAccount['error']);
+
+            // Fetch the old agreement and maintain its history setting
+            $data['tx_days'] = $nordigen->getAgreement($euaId)['max_historical_days'];
+        }
 
         // redirect to requisition flow
         try {
@@ -156,18 +173,19 @@ class NordigenController extends BaseController
         // connect new accounts
         $bank_integration_ids = [];
         foreach ($requisition["accounts"] as $nordigenAccountId) {
-
             $nordigen_account = $nordigen->getAccount($nordigenAccountId);
 
             if (isset($nordigen_account['error'])) {
                 continue;
             }
 
-            $existing_bank_integration = BankIntegration::withTrashed()->where('nordigen_account_id', $nordigen_account['id'])->where('company_id', $company->id)->where('is_deleted', 0)->first();
+            try {
+                $bank_integration = $this->findIntegrationBy('account', $nordigen_account, $company);
 
-            if (!$existing_bank_integration) {
-
+                $bank_integration->deleted_at = null;
+            } catch (ModelNotFoundException $e) {
                 $bank_integration = new BankIntegration();
+
                 $bank_integration->integration_type = BankIntegration::INTEGRATION_TYPE_NORDIGEN;
                 $bank_integration->company_id = $company->id;
                 $bank_integration->account_id = $company->account_id;
@@ -175,42 +193,31 @@ class NordigenController extends BaseController
                 $bank_integration->nordigen_account_id = $nordigen_account['id'];
                 $bank_integration->bank_account_type = $nordigen_account['account_type'];
                 $bank_integration->bank_account_name = $nordigen_account['account_name'];
-                $bank_integration->bank_account_status = $nordigen_account['account_status'];
                 $bank_integration->bank_account_number = $nordigen_account['account_number'];
                 $bank_integration->nordigen_institution_id = $nordigen_account['provider_id'];
                 $bank_integration->provider_name = $nordigen_account['provider_name'];
                 $bank_integration->nickname = $nordigen_account['nickname'];
-                $bank_integration->balance = $nordigen_account['current_balance'];
                 $bank_integration->currency = $nordigen_account['account_currency'];
-                $bank_integration->disabled_upstream = false;
+            } finally {
                 $bank_integration->auto_sync = true;
+                $bank_integration->disabled_upstream = false;
+                $bank_integration->balance = $nordigen_account['current_balance'];
+                $bank_integration->bank_account_status = $nordigen_account['account_status'];
                 $bank_integration->from_date = now()->subDays($nordigen_account['provider_history']);
 
                 $bank_integration->save();
 
                 array_push($bank_integration_ids, $bank_integration->id);
-
-            } else {
-
-                // resetting metadata for account status
-                $existing_bank_integration->balance = $nordigen_account['current_balance'];
-                $existing_bank_integration->bank_account_status = $nordigen_account['account_status'];
-                $existing_bank_integration->disabled_upstream = false;
-                $existing_bank_integration->auto_sync = true;
-                $existing_bank_integration->from_date = now()->subDays($nordigen_account['provider_history']);
-                $existing_bank_integration->deleted_at = null;
-
-                $existing_bank_integration->save();
-
-                array_push($bank_integration_ids, $existing_bank_integration->id);
             }
-
         }
 
         // perform update in background
-        $company->account->bank_integrations->where("integration_type", BankIntegration::INTEGRATION_TYPE_NORDIGEN)->where('auto_sync', true)->each(function ($bank_integration) {
-            ProcessBankTransactionsNordigen::dispatch($bank_integration);
-        });
+        $company->account->bank_integrations
+            ->where("integration_type", BankIntegration::INTEGRATION_TYPE_NORDIGEN)
+            ->where('auto_sync', true)
+            ->each(function ($bank_integration) {
+                ProcessBankTransactionsNordigen::dispatch($bank_integration);
+            });
 
         // prevent rerun of this method with same ref
         Cache::delete($data["ref"]);
@@ -240,6 +247,24 @@ class NordigenController extends BaseController
             'failed_reason' => explode('&', $reason)[0],
             'redirectUrl' => $url . '?action=nordigen_connect&status=failed&reason=' . $reason,
         ]);
+    }
+
+    /**
+     * Find the first available Bank Integration from its Nordigen account or institution.
+     *
+     * @param 'account'|'institution' $key
+     * @param array{id: string} $accountOrInstitution
+     */
+    private function findIntegrationBy(
+        string $key,
+        array $accountOrInstitution,
+        Company $company,
+    ): BankIntegration {
+        return BankIntegration::withTrashed()
+            ->where("nordigen_{$key}_id", $accountOrInstitution['id'])
+            ->where('company_id', $company->id)
+            ->where('is_deleted', 0)
+            ->firstOrFail();
     }
 
     /**
