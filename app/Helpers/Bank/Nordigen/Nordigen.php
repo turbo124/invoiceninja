@@ -33,7 +33,7 @@ class Nordigen
 {
     public bool $test_mode; // https://developer.gocardless.com/bank-account-data/sandbox
 
-    public string $sandbox_institutionId = "SANDBOXFINANCE_SFIN0000";
+    public string $sandbox_institutionId = 'SANDBOXFINANCE_SFIN0000';
 
     protected \Nordigen\NordigenPHP\API\NordigenClient $client;
 
@@ -167,7 +167,7 @@ class Nordigen
         try {
             return $this->client->requisition->getRequisition($requisitionId);
         } catch (\Exception $e) {
-            if (strpos($e->getMessage(), "Invalid Requisition ID") !== false) {
+            if (strpos($e->getMessage(), 'Invalid Requisition ID') !== false) {
                 return false;
             }
 
@@ -181,10 +181,10 @@ class Nordigen
         try {
             $out = new \stdClass();
 
-            $out->data = $this->client->account($account_id)->getAccountDetails()["account"];
+            $out->data = $this->client->account($account_id)->getAccountDetails()['account'];
             $out->metadata = $this->client->account($account_id)->getAccountMetaData();
-            $out->balances = $this->client->account($account_id)->getAccountBalances()["balances"];
-            $out->institution = $this->client->institution->getInstitution($out->metadata["institution_id"]);
+            $out->balances = $this->client->account($account_id)->getAccountBalances()['balances'];
+            $out->institution = $this->client->institution->getInstitution($out->metadata['institution_id']);
 
             $it = new AccountTransformer();
             return $it->transform($out);
@@ -216,8 +216,9 @@ class Nordigen
         try {
             $account = $this->client->account($account_id)->getAccountMetaData();
 
-            if ($account["status"] != "READY") {
-                nlog('nordigen account was not in status ready. accountId: ' . $account_id . ' status: ' . $account["status"]);
+            if ($account['status'] != 'READY') {
+                nlog("Nordigen account '{$account_id}' is not ready (status={$account['status']})");
+
                 return false;
             }
 
@@ -226,7 +227,7 @@ class Nordigen
 
             nlog("Nordigen:: AccountActiveStatus:: {$e->getMessage()} {$e->getCode()}");
 
-            if (strpos($e->getMessage(), "Invalid Account ID") !== false) {
+            if (strpos($e->getMessage(), 'Invalid Account ID') !== false) {
                 return false;
             }
 

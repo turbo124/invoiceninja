@@ -21,8 +21,10 @@ use App\Models\Company;
 use App\Utils\Ninja;
 use Cache;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Nordigen\NordigenPHP\Exceptions\NordigenExceptions\NordigenException;
 
 class NordigenController extends BaseController
@@ -30,11 +32,9 @@ class NordigenController extends BaseController
     /**
      * Handles the initial bank connection flow
      */
-    public function connect(ConnectNordigenBankIntegrationRequest $request)
+    public function connect(ConnectNordigenBankIntegrationRequest $request): View|RedirectResponse
     {
         $data = $request->all();
-
-        /** @var array $context */
         $context = $request->getTokenContent();
 
         if (!$context) {
@@ -42,21 +42,18 @@ class NordigenController extends BaseController
         }
 
         $company = $request->getCompany();
-        $context["redirect"] = $data["redirect"];
-        $context["lang"] = $lang = substr($company->locale(), 0, 2);
+        $context['redirect'] = $data['redirect'];
+        $context['lang'] = $lang = substr($company->locale(), 0, 2);
 
-        if ($context["context"] != "nordigen" || array_key_exists("requisitionId", $context)) {
+        if ($context['context'] != 'nordigen' || array_key_exists('requisitionId', $context)) {
             return $this->failed('token-invalid', $context);
         }
-
-        $company = $request->getCompany();
-        $account = $company->account;
 
         if (!(config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key'))) {
             return $this->failed('account-config-invalid', $context, $company);
         }
 
-        if (!(Ninja::isSelfHost() || (Ninja::isHosted() && $account->isEnterprisePaidClient()))) {
+        if (!(Ninja::isSelfHost() || (Ninja::isHosted() && $company->account->isEnterprisePaidClient()))) {
             return $this->failed('not-available', $context, $company);
         }
 
@@ -64,13 +61,13 @@ class NordigenController extends BaseController
         $institutions = $nordigen->getInstitutions();
 
         // show bank_selection_screen, when institution_id is not present
-        if (!array_key_exists("institution_id", $data)) {
+        if (!array_key_exists('institution_id', $data)) {
             return view('bank.nordigen.handler', [
                 'lang' => $lang,
                 'company' => $company,
                 'account' => $company->account,
                 'institutions' => $institutions,
-                'redirectUrl' => $context["redirect"] . "?action=nordigen_connect&status=user-aborted"
+                'redirectUrl' => $context['redirect'] . '?action=nordigen_connect&status=user-aborted'
             ]);
         }
 
@@ -114,36 +111,35 @@ class NordigenController extends BaseController
                 return $this->failed('token-invalid', $context, $company);
             }
 
-            nlog("Unknown Error from nordigen: " . $e);
+            nlog("Unknown Error from nordigen: {$e}");
             nlog($responseBody);
 
             return $this->failed('unknown', $context, $company);
         }
 
         // save cache
-        $context["requisitionId"] = $requisition["id"];
+        $context['requisitionId'] = $requisition['id'];
         Cache::put($request->token, $context, 3600);
 
-        return response()->redirectTo($requisition["link"]);
+        return response()->redirectTo($requisition['link']);
     }
 
     /**
      * Handles the OAuth redirect and account setup after bank authentication
      */
-    public function confirm(ConfirmNordigenBankIntegrationRequest $request)
+    public function confirm(ConfirmNordigenBankIntegrationRequest $request): View|RedirectResponse
     {
         $data = $request->all();
         $company = $request->getCompany();
-        $account = $company->account;
         $lang = substr($company->locale(), 0, 2);
 
         /** @var array $context */
         $context = $request->getTokenContent();
         if (!array_key_exists('lang', $data) && $context['lang'] != 'en') {
-            return redirect()->route('nordigen.confirm', array_merge(["lang" => $context['lang']], $request->query()));
+            return redirect()->route('nordigen.confirm', array_merge(['lang' => $context['lang']], $request->query()));
         }
 
-        if (!$context || $context["context"] != "nordigen" || !array_key_exists("requisitionId", $context)) {
+        if (!$context || $context['context'] != 'nordigen' || !array_key_exists('requisitionId', $context)) {
             return $this->failed('ref-invalid', $context);
         }
 
@@ -151,28 +147,28 @@ class NordigenController extends BaseController
             return $this->failed('account-config-invalid', $context, $company);
         }
 
-        if (!(Ninja::isSelfHost() || (Ninja::isHosted() && $account->isEnterprisePaidClient()))) {
+        if (!(Ninja::isSelfHost() || (Ninja::isHosted() && $company->account->isEnterprisePaidClient()))) {
             return $this->failed('not-available', $context, $company);
         }
 
         // fetch requisition
         $nordigen = new Nordigen();
-        $requisition = $nordigen->getRequisition($context["requisitionId"]);
+        $requisition = $nordigen->getRequisition($context['requisitionId']);
 
         // check validity of requisition
         if (!$requisition) {
             return $this->failed('requisition-not-found', $context, $company);
         }
-        if ($requisition["status"] != "LN") {
+        if ($requisition['status'] != 'LN') {
             return $this->failed('requisition-invalid-status&status=' . $requisition['status'], $context, $company);
         }
-        if (sizeof($requisition["accounts"]) == 0) {
+        if (sizeof($requisition['accounts']) == 0) {
             return $this->failed('requisition-no-accounts', $context, $company);
         }
 
         // connect new accounts
         $bank_integration_ids = [];
-        foreach ($requisition["accounts"] as $nordigenAccountId) {
+        foreach ($requisition['accounts'] as $nordigenAccountId) {
             $nordigen_account = $nordigen->getAccount($nordigenAccountId);
 
             if (isset($nordigen_account['error'])) {
@@ -213,17 +209,17 @@ class NordigenController extends BaseController
 
         // perform update in background
         $company->account->bank_integrations
-            ->where("integration_type", BankIntegration::INTEGRATION_TYPE_NORDIGEN)
+            ->where('integration_type', BankIntegration::INTEGRATION_TYPE_NORDIGEN)
             ->where('auto_sync', true)
             ->each(function ($bank_integration) {
                 ProcessBankTransactionsNordigen::dispatch($bank_integration);
             });
 
         // prevent rerun of this method with same ref
-        Cache::delete($data["ref"]);
+        Cache::delete($data['ref']);
 
         // Successfull Response => Redirect
-        return response()->redirectTo($context["redirect"] . "?action=nordigen_connect&status=success&bank_integrations=" . implode(',', $bank_integration_ids));
+        return response()->redirectTo($context['redirect'] . '?action=nordigen_connect&status=success&bank_integrations=' . implode(',', $bank_integration_ids));
     }
 
     /**
@@ -300,7 +296,7 @@ class NordigenController extends BaseController
      *       ),
      *     )
      */
-    public function institutions(Request $request)
+    public function institutions(Request $request): JsonResponse
     {
         if (!(config('ninja.nordigen.secret_id') && config('ninja.nordigen.secret_key'))) {
             return response()->json(['message' => 'Not yet authenticated with Nordigen Bank Integration service'], 400);
