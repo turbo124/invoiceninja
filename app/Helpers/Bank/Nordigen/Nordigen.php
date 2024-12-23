@@ -92,14 +92,14 @@ class Nordigen
      *   accepted: ?string,
      * }[] EndUserAgreement list
      */
-    public function firstValidAgreement(string $institutionId, int $txDays): ?array
+    public function firstValidAgreement(string $institutionId, int $accessDays, int $txDays): ?array
     {
         $requiredScopes = ['balances', 'details', 'transactions'];
 
         try {
             return Arr::first(
                 $this->client->endUserAgreement->getEndUserAgreements()['results'],
-                function (array $eua) use ($institutionId, $requiredScopes, $txDays): bool {
+                function (array $eua) use ($institutionId, $requiredScopes, $accessDays, $txDays): bool {
                     $expiresAt = $eua['accepted'] ? (new \DateTimeImmutable($eua['accepted']))->add(
                         new \DateInterval("P{$eua['access_valid_for_days']}D")
                     ) : false;
@@ -107,6 +107,7 @@ class Nordigen
                     return $eua['institution_id'] === $institutionId
                         && $eua['accepted'] === null
                         && $eua['max_historical_days'] >= $txDays
+                        && $eua['access_valid_for_days'] >= $accessDays
                         && !array_diff($requiredScopes, $eua['access_scope'] ?? []);
                 },
                 null
@@ -137,13 +138,15 @@ class Nordigen
      *   accepted: string
      * }|null Agreement details
      */
-    public function createAgreement(array $institution, int $transactionDays): array
+    public function createAgreement(array $institution, int $accessDays, int $transactionDays): array
     {
         $txDays = $transactionDays < 30 ? 30 : $transactionDays;
-        $max = $institution['transaction_total_days'];
+        $maxAccess = $institution['max_access_valid_for_days'];
+        $maxTx = $institution['transaction_total_days'];
 
         return $this->client->endUserAgreement->createEndUserAgreement(
-            maxHistoricalDays: $txDays > $max ? $max : $txDays,
+            accessValidForDays: $accessDays > $maxAccess ? $maxAccess : $accessDays,
+            maxHistoricalDays: $txDays > $maxTx ? $maxTx : $txDays,
             institutionId: $institution['id'],
         );
     }
