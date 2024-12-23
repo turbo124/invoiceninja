@@ -90,12 +90,25 @@ class NordigenController extends BaseController
             $data['tx_days'] = $nordigen->getAgreement($euaId)['max_historical_days'];
         }
 
+        try {
+            $txDays = $data['tx_days'] ?? 0;
+
+            $agreement = $nordigen->firstValidAgreement($institution['id'], $txDays)
+                      ?? $nordigen->createAgreement($institution, $txDays);
+        } catch (\Exception $e) {
+            $debug = "{$e->getMessage()} ({$e->getCode()})";
+
+            nlog("Nordigen: Could not create an agreement with ${institution['name']}: {$debug}");
+
+            return $this->failed('eua-failure', $context, $company);
+        }
+
         // redirect to requisition flow
         try {
             $requisition = $nordigen->createRequisition(
                 config('ninja.app_url') . '/nordigen/confirm',
                 $institution,
-                (int) ($data['tx_days'] ?? 0),
+                $agreement,
                 $request->token,
                 $lang,
             );
