@@ -86,15 +86,17 @@ class NordigenController extends BaseController
             $nordigenAccount = $nordigen->getAccount($integration->nordigen_account_id);
             $euaId = preg_replace($match, '${1}', $nordigenAccount['error']);
 
-            // Fetch the old agreement and maintain its history setting
-            $data['tx_days'] = $nordigen->getAgreement($euaId)['max_historical_days'];
+            // Fetch the old agreement and maintain its access/history settings
+            $agreement = $nordigen->getAgreement($euaId);
+            $data['access_days'] = $agreement['max_access_valid_for_days'];
+            $data['tx_days'] = $agreement['max_historical_days'];
         }
 
         try {
             $txDays = $data['tx_days'] ?? 0;
 
-            $agreement = $nordigen->firstValidAgreement($institution['id'], $txDays)
-                      ?? $nordigen->createAgreement($institution, $txDays);
+            $agreement = $nordigen->firstValidAgreement($institution['id'], $data['access_days'] ?? 0, $txDays)
+                      ?? $nordigen->createAgreement($institution, $data['access_days'] ?? 9999, $txDays);
         } catch (\Exception $e) {
             $debug = "{$e->getMessage()} ({$e->getCode()})";
 
