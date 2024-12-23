@@ -23,6 +23,7 @@ use App\Models\Company;
 use App\Services\Email\Email;
 use App\Models\BankIntegration;
 use App\Services\Email\EmailObject;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Mail\Mailables\Address;
@@ -73,21 +74,90 @@ class Nordigen
      *   accepted: string
      * } Agreement details
      */
-    public function getAgreement(string $euaId): array {
-        $eua = $this->client->endUserAgreement->getEndUserAgreement($euaId);
+    public function getAgreement(string $euaId): array
+    {
+        return $this->client->endUserAgreement->getEndUserAgreement($euaId);
+    }
 
-        return $eua;
+    /**
+     * Get a list of end user agreements
+     *
+     * @return array{
+     *   id: string,
+     *   created: string,
+     *   institution_id: string,
+     *   max_historical_days: int,
+     *   access_valid_for_days: int,
+     *   access_scope: string[],
+     *   accepted: ?string,
+     * }[] EndUserAgreement list
+     */
+    public function firstValidAgreement(string $institutionId, int $txDays): ?array
+    {
+        $requiredScopes = ['balances', 'details', 'transactions'];
+
+        try {
+            return Arr::first(
+                $this->client->endUserAgreement->getEndUserAgreements()['results'],
+                function (array $eua) use ($institutionId, $requiredScopes, $txDays): bool {
+                    $expiresAt = $eua['accepted'] ? (new \DateTimeImmutable($eua['accepted']))->add(
+                        new \DateInterval("P{$eua['access_valid_for_days']}D")
+                    ) : false;
+
+                    return $eua['institution_id'] === $institutionId
+                        && $eua['accepted'] === null
+                        && $eua['max_historical_days'] >= $txDays
+                        && !array_diff($requiredScopes, $eua['access_scope'] ?? []);
+                },
+                null
+            );
+        } catch (\Exception $e) {
+            $debug = "{$e->getMessage()} ({$e->getCode()})";
+
+            nlog("Nordigen: Unable to fetch End User Agreements for institution '{$institutionId}': {$debug}");
+
+            return null;
+        }
+    }
+
+    /**
+     * Create a new End User Agreement with the given parameters
+     *
+     * @param array{id: string, transaction_total_days: int} $institution
+     *
+     * @throws \Nordigen\NordigenPHP\Exceptions\NordigenExceptions\NordigenException
+     *
+     * @return array{
+     *   id: string,
+     *   created: string,
+     *   institution_id: string,
+     *   max_historical_days: int,
+     *   access_valid_for_days: int,
+     *   access_scope: string[],
+     *   accepted: string
+     * }|null Agreement details
+     */
+    public function createAgreement(array $institution, int $transactionDays): array
+    {
+        $txDays = $transactionDays < 30 ? 30 : $transactionDays;
+        $max = $institution['transaction_total_days'];
+
+        return $this->client->endUserAgreement->createEndUserAgreement(
+            maxHistoricalDays: $txDays > $max ? $max : $txDays,
+            institutionId: $institution['id'],
+        );
     }
 
     /**
      * Create a new Bank Requisition
      *
-     * @param array{id: string} $institution
+     * @param array{id: string} $institution,
+     * @param array{id: string, transaction_total_days: int} $agreement
      */
     public function createRequisition(
         string $redirect,
         array $institution,
-        int $transactionDays,
+        array $agreement,
         string $reference,
         string $userLanguage,
     ): array {
@@ -95,71 +165,13 @@ class Nordigen
             throw new \Exception('invalid institutionId while in test-mode');
         }
 
-        $txDays = $transactionDays < 30 ? 30 : $transactionDays;
-        $max = $institution['transaction_total_days'];
-
-        $eua = $this->client->endUserAgreement->createEndUserAgreement(
-            maxHistoricalDays: $txDays > $max ? $max : $txDays,
-            institutionId: $institution['id'],
+        return $this->client->requisition->createRequisition(
+            $redirect,
+            $institution['id'],
+            $agreement['id'] ?? null,
+            $reference,
+            $userLanguage
         );
-
-        return $this->client->requisition->createRequisition($redirect, $institution['id'], $eua['id'], $reference, $userLanguage);
-    }
-
-    private function getExtendedEndUserAggreementId(string $institutionId): string|null
-    {
-
-        $endUserAggreements = null;
-        $endUserAgreement = null;
-
-        // try to fetch endUserAgreements
-        try {
-            $endUserAggreements = $this->client->endUserAgreement->getEndUserAgreements();
-        } catch (\Exception $e) { // not able to accept it
-            nlog("Nordigen: Was not able to fetch endUserAgreements. We continue with defaults to setup bank_integration. {$institutionId} {$e->getMessage()} {$e->getCode()}");
-
-            return null;
-        }
-
-        // try to find an existing valid endUserAgreement
-        foreach ($endUserAggreements["results"] as $row) {
-            $endUserAgreement = $row;
-
-            // Validate Institution
-            if ($endUserAgreement["institution_id"] != $institutionId)
-                continue;
-
-            // Validate Access Scopes
-            $requiredScopes = ["balances", "details", "transactions"];
-            if (isset($endUserAgreement['access_scope']) && array_diff($requiredScopes, $endUserAgreement['access_scope']))
-                continue;
-
-            // try to accept the endUserAgreement when not already accepted
-            if (empty($endUserAgreement["accepted"]))
-                try {
-                    $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
-                } catch (\Exception $e) { // not able to accept it
-                    nlog("Nordigen: Was not able to confirm an existing outstanding endUserAgreement for this institution. We now try to find another or will create and confirm a new one. {$institutionId} {$endUserAgreement["id"]} {$e->getMessage()} {$e->getCode()}");
-                    $endUserAgreement = null;
-
-                    continue;
-                }
-
-            break;
-        }
-
-        // try to create and accept an endUserAgreement
-        if (!$endUserAgreement)
-            try {
-                $endUserAgreement = $this->client->endUserAgreement->createEndUserAgreement($institutionId, ['details', 'balances', 'transactions'], 90, 180);
-                $this->client->endUserAgreement->acceptEndUserAgreement($endUserAgreement["id"], request()->userAgent(), request()->ip());
-            } catch (\Exception $e) { // not able to create this for this institution
-                nlog("Nordigen: Was not able to create and confirm a new endUserAgreement for this institution. We continue with defaults to setup bank_integration. {$institutionId} {$e->getMessage()} {$e->getCode()}");
-
-                return null;
-            }
-
-        return $endUserAgreement["id"];
     }
 
     public function getRequisition(string $requisitionId)
