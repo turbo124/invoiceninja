@@ -159,6 +159,10 @@
                 heading.innerHTML = "{{ ctrans('texts.nordigen_handler_error_heading_institution_invalid', [], $lang ?? 'en') }}";
                 contents.innerHTML = "{{ ctrans('texts.nordigen_handler_error_contents_institution_invalid', [], $lang ?? 'en') }}";
                 break;
+            case "eua-failure":
+                heading.innerHTML = "{{ ctrans('texts.nordigen_handler_error_heading_eua_failure', [], $lang ?? 'en') }}";
+                contents.innerHTML = "{{ ctrans('texts.nordigen_handler_error_contents_eua_failure', [], $lang ?? 'en') }} " + failedReason;
+                break;
             // Confirm Screen Errors
             case "ref-invalid":
                 heading.innerHTML = "{{ ctrans('texts.nordigen_handler_error_heading_ref_invalid', [], $lang ?? 'en') }}";
