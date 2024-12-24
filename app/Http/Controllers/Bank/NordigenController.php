@@ -61,12 +61,13 @@ class NordigenController extends BaseController
         $institutions = $nordigen->getInstitutions();
 
         // show bank_selection_screen, when institution_id is not present
-        if (!array_key_exists('institution_id', $data)) {
+        if (!isset($data['institution_id'], $data['tx_days'])) {
             return view('bank.nordigen.handler', [
                 'lang' => $lang,
                 'company' => $company,
                 'account' => $company->account,
                 'institutions' => $institutions,
+                'institutionId' => $data['institution_id'] ?? null,
                 'redirectUrl' => $context['redirect'] . '?action=nordigen_connect&status=user-aborted'
             ]);
         }
@@ -74,23 +75,6 @@ class NordigenController extends BaseController
         $institution = array_values(array_filter($institutions, function ($institution) use ($data) {
             return $institution['id'] == $data['institution_id'];
         }))[0];
-
-        // Renewals have an Institution ID, but bypass the history selection screen
-        // and thus lack the history setting, so we can find the Agreement ID here.
-        if (!isset($data['tx_days'])) {
-            // Query the integration so we get the correct Account ID
-            $integration = $this->findIntegrationBy('institution', $institution, $company);
-
-            // Extract the EUA ID from the expired account error
-            $match = '/End User Agreement \(EUA\) ([0-9a-f-]+) has expired/';
-            $nordigenAccount = $nordigen->getAccount($integration->nordigen_account_id);
-            $euaId = preg_replace($match, '${1}', $nordigenAccount['error']);
-
-            // Fetch the old agreement and maintain its access/history settings
-            $agreement = $nordigen->getAgreement($euaId);
-            $data['access_days'] = $agreement['max_access_valid_for_days'];
-            $data['tx_days'] = $agreement['max_historical_days'];
-        }
 
         try {
             $txDays = $data['tx_days'] ?? 0;
@@ -272,7 +256,7 @@ class NordigenController extends BaseController
         Company $company,
     ): BankIntegration {
         return BankIntegration::withTrashed()
-            ->where("nordigen_{$key}_id", $accountOrInstitution['id'])
+            ->where($key == 'id' ? 'id' : "nordigen_{$key}_id", $accountOrInstitution['id'])
             ->where('company_id', $company->id)
             ->where('is_deleted', 0)
             ->firstOrFail();
