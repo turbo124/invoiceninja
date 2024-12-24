@@ -48,14 +48,66 @@
             buttonColor: '#3A53EE',
             buttonTextColor: '#fff'
         }
+    }, createSelectionUI = (donor, institution, skippedSelect = false) => {
+        const clone = donor.cloneNode(true),
+            container = document.querySelector('.institution-container'),
+            max_history = parseInt(institution.transaction_total_days),
+            url = new URL(window.location.href);
+
+        container.innerHTML = '';
+        _changeHeading('Select your transaction history');
+
+        clone.classList.replace('ob-list-institution', 'ob-history-option');
+        clone.querySelector('.ob-span-text').innerText = `${max_history} days`;
+        url.searchParams.set('institution_id', institutionId);
+
+        // When we come from the renew button we need to replace the country flag
+        if (skippedSelect) {
+            const logo = document.createElement('img');
+
+            logo.setAttribute('src', institution.logo)
+            logo.setAttribute('class', 'ob-institution-logo');
+
+            clone.querySelector('span.fi').replaceWith(logo)
+        }
+
+        for (let i = 30, next = 30; i <= max_history; i += next) {
+            // If we're close to max, just use the real value
+            if (max_history - i < 15) {
+                continue;
+            }
+
+            const option = clone.cloneNode(true);
+
+            url.searchParams.set('tx_days', i == 360 ? 365 : i);
+
+            option.querySelector('.ob-span-text').innerText = `${i == 360 ? 365 : i} days`;
+            option.querySelector('a').href = url.href;
+            container.append(option);
+
+            // 1, 2, 3, 4, 6, 9, 12, 14, 18, 24 months--as of 24/12/24, no bank exceeds 730 days of history
+            next = i >= 500 ? 180 : i >= 400 ? 120 : i >= 360 ? 60 : i >= 180 ? 90 : i >= 120 ? 60 : 30;
+        }
+
+        url.searchParams.set('tx_days', max_history);
+        clone.querySelector('a').href = url.href;
+        container.append(clone);
     };
 
     const failedReason = "{{ $failed_reason ?? '' }}".trim(),
         institutions = @json($institutions ?? []);
 
+    let institutionId = "{{ $institutionId ?? '' }}";
+
     new institutionSelector(institutions, 'institution-modal-content', config);
 
-    if (!failedReason) {
+    if (null !== institutionId && !failedReason) {
+        createSelectionUI(
+            document.querySelector('.ob-institution'),
+            institutions.find(i => i.id == institutionId),
+            true
+        );
+    } else if (!failedReason) {
         const observer = new MutationObserver((event) => {
             const institutionButtons = document.querySelectorAll('.ob-list-institution > a');
 
@@ -63,41 +115,9 @@
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
 
-                    const clone = button.parentElement.cloneNode(true),
-                        container = document.querySelector('.institution-container'),
-                        institutionId = button.getAttribute('data-institution'),
-                        institution = institutions.find(i => i.id == institutionId),
-                        max_history = parseInt(institution.transaction_total_days),
-                        url = new URL(window.location.href);
-
-                    container.innerHTML = '';
-                    _changeHeading('Select your transaction history');
-
-                    clone.classList.replace('ob-list-institution', 'ob-history-option');
-                    clone.querySelector('span').innerText = `${max_history} days`;
-                    url.searchParams.set('institution_id', institutionId);
-
-                    for (let i = 30, next = 30; i <= max_history; i += next) {
-                        // If we're close to max, just use the real value
-                        if (max_history - i < 15) {
-                            continue;
-                        }
-
-                        const option = clone.cloneNode(true);
-
-                        url.searchParams.set('tx_days', i == 360 ? 365 : i);
-
-                        option.querySelector('span').innerText = `${i == 360 ? 365 : i} days`;
-                        option.querySelector('a').href = url.href;
-                        container.append(option);
-
-                        // 1, 2, 3, 4, 6, 9, 12, 14, 18, 24 months--as of 20/12/24, no bank exceeds 730 days of history
-                        next = i >= 500 ? 180 : i >= 400 ? 120 : i >= 360 ? 60 : i >= 180 ? 90 : i >= 120 ? 60 : 30;
-                    }
-
-                    url.searchParams.set('tx_days', max_history);
-                    clone.querySelector('a').href = url.href;
-                    container.append(clone);
+                    createSelectionUI(button.parentElement, institutions.find(
+                        i => i.id == button.getAttribute('data-institution')
+                    ));
                 });
             });
         });
