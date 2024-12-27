@@ -987,14 +987,14 @@ class Peppol extends AbstractService
             $pi = new PartyIdentification();
             $vatID = new ID();
             $vatID->schemeID = $this->resolveScheme();
-            $vatID->value = $this->override_vat_number ?? $this->company->settings->vat_number; //todo if we are cross border - switch to the supplier local vat number
+            $vatID->value = $this->override_vat_number ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number); //todo if we are cross border - switch to the supplier local vat number
 
             $pi->ID = $vatID;
             $party->PartyIdentification[] = $pi;
             $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
 
             $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
-            $companyID->value = $this->override_vat_number ?? $this->company->settings->vat_number;
+            $companyID->value = $this->override_vat_number ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number);
             $pts->CompanyID = $companyID;
 
             $ts = new TaxScheme();
@@ -1005,7 +1005,7 @@ class Peppol extends AbstractService
 
             //@todo if we have an exact GLN/routing number we should update this, otherwise Storecove will proxy and update on transit
             $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\EndpointID();
-            $id->value = $this->company->settings->vat_number;
+            $id->value = preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number);
             $id->schemeID = $this->resolveScheme();
 
             $party->EndpointID = $id;
@@ -1067,7 +1067,7 @@ class Peppol extends AbstractService
 
             $vatID = new ID();
             $vatID->schemeID = $this->resolveScheme(true);
-            $vatID->value = $this->invoice->client->vat_number;
+            $vatID->value = preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->vat_number);
             $pi->ID = $vatID;
 
             $party->PartyIdentification[] = $pi;
@@ -1075,7 +1075,7 @@ class Peppol extends AbstractService
             $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
 
             $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
-            $companyID->value = $this->invoice->client->vat_number;
+            $companyID->value = preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->vat_number);
             $pts->CompanyID = $companyID;
 
             $ts = new TaxScheme();
@@ -1095,8 +1095,8 @@ class Peppol extends AbstractService
 
         $id = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\EndpointID();
         $id->value = $this->invoice->client->routing_id 
-        ?? $this->invoice->client->vat_number 
-        ?? $this->invoice->client->id_number
+        ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->vat_number) 
+        ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->id_number)
         ?? 'fallback1234';
         
         $id->schemeID = $this->resolveScheme(true);
@@ -1513,8 +1513,8 @@ class Peppol extends AbstractService
     private function resolveScheme(bool $is_client = false): string
     {
 
-        $vat_number = $is_client ? $this->invoice->client->vat_number : $this->company->settings->vat_number;
-        $tax_number = $is_client ? $this->invoice->client->id_number : $this->company->settings->id_number;
+        $vat_number = $is_client ? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->vat_number) : preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number);
+        $tax_number = $is_client ? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->id_number) : preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->id_number);
         $country_code = $is_client ? $this->invoice->client->country->iso_3166_2 : $this->company->country()->iso_3166_2;
 
         return '0037';
