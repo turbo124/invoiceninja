@@ -40,17 +40,18 @@ class BulkProjectRequest extends Request
             'action' => 'required|string',
             // 'ids' => 'required|array',
             'ids' => ['required', 'array', function($attribute, $value, $fail) {
-            $projects = \App\Models\Project::withTrashed()->whereIn('id', $this->transformKeys($value))->company()->get();
+                $projects = \App\Models\Project::withTrashed()->whereIn('id', $this->transformKeys($value))->company()->get();
 
-            if($projects->isEmpty()) {
-                return;
-            }
+                if($projects->isEmpty()) {
+                    return;
+                }
 
-            $clientId = $projects->first()->client_id;
-            
-            if($projects->contains('client_id', '!=', $clientId)) {
-                $fail('All selected projects must belong to the same client.');
-            }
+                $clientId = $projects->first()->client_id;
+                
+                if($this->action == 'invoice' && $projects->contains('client_id', '!=', $clientId)) {
+                    $fail('All selected projects must belong to the same client.');
+                }
+
         }],
             'template' => 'sometimes|string',
             'template_id' => 'sometimes|string',
