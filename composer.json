@@ -69,6 +69,7 @@
         "invoiceninja/ubl_invoice": "^2",
         "josemmo/facturae-php": "^1.7",
         "laracasts/presenter": "^0.2.1",
+        "laravel/octane": "^2.6",
         "laravel/scout": "^10.11",
         "laravel/slack-notification-channel": "^3",
         "laravel/socialite": "^5",

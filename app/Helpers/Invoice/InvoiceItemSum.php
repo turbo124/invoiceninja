@@ -337,10 +337,11 @@ class InvoiceItemSum
 
     private function getPeppolSurchargeTaxes(): self
     {
-        if (!$this->client->getSetting('e_invoice_type') == 'PEPPOL') {
+
+        if (!($this->client->getSetting('e_invoice_type') == 'PEPPOL')) {
             return $this;
         }
-
+        
         collect($this->invoice->line_items)
             ->flatMap(function ($item) {
                 return collect([1, 2, 3])
