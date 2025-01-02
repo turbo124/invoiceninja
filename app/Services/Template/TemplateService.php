@@ -39,6 +39,10 @@ use App\Utils\HostedPDF\NinjaPdf;
 use App\Utils\Traits\Pdf\PdfMaker;
 use Twig\Extra\Intl\IntlExtension;
 use League\CommonMark\CommonMarkConverter;
+use Twig\Extra\Markdown\MarkdownExtension;
+use Twig\Extra\Markdown\DefaultMarkdown;
+use Twig\Extra\Markdown\MarkdownRuntime;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TemplateService
 {
@@ -102,6 +106,17 @@ class TemplateService
         $this->twig->addExtension($string_extension);
         $this->twig->addExtension(new IntlExtension());
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
+        $this->twig->addExtension(new MarkdownExtension());
+
+        
+        $this->twig->addRuntimeLoader(new class () implements RuntimeLoaderInterface {
+            public function load($class)
+            {
+                if (MarkdownRuntime::class === $class) {
+                    return new MarkdownRuntime(new DefaultMarkdown());
+                }
+            }
+        });
 
         $function = new \Twig\TwigFunction('img', \Closure::fromCallable(function (string $image_src, string $image_style = '') {
             $html = '<img src="' . $image_src . '" style="' . $image_style . '"></img>';
@@ -126,7 +141,7 @@ class TemplateService
         $this->twig->addFilter($filter);
 
         $allowedTags = ['if', 'for', 'set', 'filter'];
-        $allowedFilters = ['split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags'];
+        $allowedFilters = ['split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags','markdown_to_html'];
         $allowedFunctions = ['range', 'cycle', 'constant', 'date','img','t'];
         $allowedProperties = ['type_id'];
         // $allowedMethods = ['img','t'];
