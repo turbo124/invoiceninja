@@ -203,7 +203,7 @@ class Helpers
                 ),
                 ':MONTHYEAR' => \sprintf(
                     '%s %s',
-                    Carbon::createFromDate($currentDateTime->month)->translatedFormat('F'),
+                    Carbon::createFromDate($currentDateTime->year, $currentDateTime->month)->translatedFormat('F'),
                     $currentDateTime->year,
                 ),
                 ':MONTH' => Carbon::createFromDate($currentDateTime->year, $currentDateTime->month)->translatedFormat('F'),
