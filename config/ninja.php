@@ -132,8 +132,8 @@ return [
     ],
     'quotas' => [
         'free' => [
-            'daily_emails' => 50,
-            'clients' => 20,
+            'daily_emails' => 20,
+            'clients' => 5,
             'max_companies' => 1,
         ],
         'pro' => [

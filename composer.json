@@ -69,6 +69,7 @@
         "invoiceninja/ubl_invoice": "^2",
         "josemmo/facturae-php": "^1.7",
         "laracasts/presenter": "^0.2.1",
+        "laravel/octane": "^2.6",
         "laravel/scout": "^10.11",
         "laravel/slack-notification-channel": "^3",
         "laravel/socialite": "^5",
@@ -102,15 +103,17 @@
         "stripe/stripe-php": "^12",
         "symfony/brevo-mailer": "^7.1",
         "symfony/http-client": "^7.0.3",
+        "symfony/mailer": "7.1.6",
         "symfony/mailgun-mailer": "^7.1",
         "symfony/postmark-mailer": "^7.1",
         "turbo124/beacon": "^2",
+        "twig/extra-bundle": "^3.18",
         "twig/intl-extra": "^3.7",
+        "twig/markdown-extra": "^3.18",
         "twig/twig": "^3.14",
         "twilio/sdk": "^6.40",
         "wikimedia/composer-merge-plugin": "^2.1",
-        "wildbit/postmark-php": "^4.0",
-        "symfony/mailer":"7.1.6"
+        "wildbit/postmark-php": "^4.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
