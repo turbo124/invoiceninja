@@ -37,19 +37,30 @@ class ProjectRepository extends BaseRepository
                     ->whereNull('invoice_id')
                     ->where('is_deleted', 0)
                     ->cursor()
-                    ->each(function ($task) use (&$lines) {
+                    ->each(function ($task, $key) use (&$lines) {
 
-                        $item = new InvoiceItem();
-                        $item->quantity = $task->getQuantity();
-                        $item->cost = $task->getRate();
-                        $item->product_key = '';
-                        $item->notes = $task->description();
-                        $item->task_id = $task->hashed_id;
-                        $item->tax_id = (string) Product::PRODUCT_TYPE_SERVICE;
-                        $item->type_id = '2';
+                        if (!$task->isRunning())
+                        { 
+                            if ($key == 0 && $task->company->invoice_task_project) {
+                                $body = '<div class="project-header">'.$task->project->name.'</div>' .$task->project?->public_notes ?? '';
+                                $body .= '<div class="task-time-details">'.$task->description().'</div>';
+                            }
+                            else {
+                                $body = '<div class="task-time-details">'.$task->description().'</div>';
+                            }
 
-                        $lines[] = $item;
+                            $item = new InvoiceItem();
+                            $item->quantity = $task->getQuantity();
+                            $item->cost = $task->getRate();
+                            $item->product_key = '';
+                            $item->notes = $body;
+                            $item->task_id = $task->hashed_id;
+                            $item->tax_id = (string) Product::PRODUCT_TYPE_SERVICE;
+                            $item->type_id = '2';
 
+                            $lines[] = $item;
+                        }
+                        
                     });
 
             $project->expenses()
