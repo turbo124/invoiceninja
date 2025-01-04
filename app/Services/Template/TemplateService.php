@@ -39,6 +39,10 @@ use App\Utils\HostedPDF\NinjaPdf;
 use App\Utils\Traits\Pdf\PdfMaker;
 use Twig\Extra\Intl\IntlExtension;
 use League\CommonMark\CommonMarkConverter;
+use Twig\Extra\Markdown\MarkdownExtension;
+use Twig\Extra\Markdown\DefaultMarkdown;
+use Twig\Extra\Markdown\MarkdownRuntime;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class TemplateService
 {
@@ -102,6 +106,17 @@ class TemplateService
         $this->twig->addExtension($string_extension);
         $this->twig->addExtension(new IntlExtension());
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
+        $this->twig->addExtension(new MarkdownExtension());
+
+        
+        $this->twig->addRuntimeLoader(new class () implements RuntimeLoaderInterface {
+            public function load($class)
+            {
+                if (MarkdownRuntime::class === $class) {
+                    return new MarkdownRuntime(new DefaultMarkdown());
+                }
+            }
+        });
 
         $function = new \Twig\TwigFunction('img', \Closure::fromCallable(function (string $image_src, string $image_style = '') {
             $html = '<img src="' . $image_src . '" style="' . $image_style . '"></img>';
@@ -126,7 +141,7 @@ class TemplateService
         $this->twig->addFilter($filter);
 
         $allowedTags = ['if', 'for', 'set', 'filter'];
-        $allowedFilters = ['replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags'];
+        $allowedFilters = ['split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags','markdown_to_html'];
         $allowedFunctions = ['range', 'cycle', 'constant', 'date','img','t'];
         $allowedProperties = ['type_id'];
         // $allowedMethods = ['img','t'];
@@ -391,7 +406,133 @@ class TemplateService
      */
     public function save(): self
     {
+        $this->cleanHtml();
+        
         $this->compiled_html = str_replace('%24', '$', $this->document->saveHTML());
+
+        return $this;
+    }
+
+    private function cleanHtml(): self
+    {
+        if (!$this->document || !$this->document->documentElement) {
+            return $this;
+        }
+
+        $dangerous_elements = [
+            'iframe', 'form', 'object', 'embed', 
+            'applet', 'audio', 'video',
+            'frame', 'frameset', 'base', 'svg'
+        ];
+
+        $dangerous_attributes = [
+            'onabort', 'onblur', 'onchange', 'onclick', 'ondblclick', 
+            'onerror', 'onfocus', 'onkeydown', 'onkeypress', 'onkeyup', 
+            'onload', 'onmousedown', 'onmousemove', 'onmouseout', 
+            'onmouseover', 'onmouseup', 'onreset', 'onresize', 
+            'onselect', 'onsubmit', 'onunload'
+        ];
+
+        // Function to recursively check nodes
+        $removeNodes = function ($node) use (&$removeNodes, $dangerous_elements, $dangerous_attributes) {
+            if (!$node) {
+                return;
+            }
+
+            // Store children in array first to avoid modification during iteration
+            $children = [];
+            if ($node->hasChildNodes()) {
+                foreach ($node->childNodes as $child) {
+                    $children[] = $child;
+                }
+            }
+
+            // Process each child
+            foreach ($children as $child) {
+                $removeNodes($child);
+            }
+
+            // Only process element nodes
+            if ($node instanceof \DOMElement) {
+                // Remove dangerous elements
+                if (in_array(strtolower($node->tagName), $dangerous_elements)) {
+                    if ($node->parentNode) {
+                        $node->parentNode->removeChild($node);
+                    }
+                    return;
+                }
+
+                // Remove dangerous attributes
+                $attributes_to_remove = [];
+                foreach ($node->attributes as $attr) {
+                    $attr_name = strtolower($attr->name);
+                    $attr_value = strtolower($attr->value);
+
+                    // Remove event handlers
+                    if (in_array($attr_name, $dangerous_attributes) || strpos($attr_name, 'on') === 0) {
+                        $attributes_to_remove[] = $attr->name;
+                        continue;
+                    }
+
+                    // Remove dangerous URLs/protocols
+                    if (in_array($attr_name, ['data', 'href', 'meta', 'link'])) {
+                        if (preg_match('/(javascript|data|file|ftp|jar|dict|gopher|ldap|smb|php|alert|prompt|confirm):|\/\/\/\/+|127\.0\.0\.1|localhost/i', $attr_value)) {
+                            $attributes_to_remove[] = $attr->name;
+                            continue;
+                        }
+                    }else if ($attr_name === 'src') {
+                        // For src attributes, only block dangerous protocols but allow data:image
+                        if (preg_match('/(javascript|file|ftp|jar|dict|gopher|ldap|smb|php):|\/\/\/\/+|127\.0\.0\.1|localhost/i', $attr_value)) {
+                            $attributes_to_remove[] = $attr->name;
+                            continue;
+                        }
+                        // Additional check for data: URLs - only allow image types
+                        if (strpos($attr_value, 'data:') === 0 && !preg_match('/^data:image\//i', $attr_value)) {
+                            $attributes_to_remove[] = $attr->name;
+                            continue;
+                        }
+                        
+                        // Check for localhost references
+                        if (preg_match('/localhost|127\.|0\.0\.0\.0|::1|0:0:0:0:0:0:0:1/i', $attr_value)) {
+                            $attributes_to_remove[] = $attr->name;
+                            continue;
+                        }
+
+                    }elseif ($attr_name === 'style') {
+                        
+                        if (preg_match('/(expression|javascript|behavior|vbscript):|url\s*\(|import|@import|eval\s*\(|-moz-binding|behavior|expression/i', $attr_value)) {
+                            $attributes_to_remove[] = $attr->name;
+                            continue;
+                        }
+
+                    }
+
+                    // Remove expressions
+                    if (preg_match('/expression|javascript:|vbscript:|livescript:/i', $attr_value)) {
+                        $attributes_to_remove[] = $attr->name;
+                        continue;
+                    }
+                }
+
+                // Remove the collected dangerous attributes
+                foreach ($attributes_to_remove as $attr) {
+                    $node->removeAttribute($attr);
+                }
+            }
+        };
+
+        try {
+            $removeNodes($this->document->documentElement);
+        } catch (\Exception $e) {
+            info('Error cleaning HTML: ' . $e->getMessage());
+            
+            // Clear the document to prevent unsanitized content
+            $this->document = new \DOMDocument();
+
+            // Throw sanitized exception to alert calling code
+            throw new \RuntimeException('HTML sanitization failed');
+
+        }
 
         return $this;
     }

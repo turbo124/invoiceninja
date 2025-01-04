@@ -91,23 +91,23 @@ class UpdateCompanyRequest extends Request
         $rules['inbound_mailbox_whitelist'] = ['sometimes', 'string', 'nullable', 'regex:/^[\w\-\.\+]+@([\w-]+\.)+[\w-]{2,4}(,[\w\-\.\+]+@([\w-]+\.)+[\w-]{2,4})*$/'];
         $rules['inbound_mailbox_blacklist'] = ['sometimes', 'string', 'nullable', 'regex:/^[\w\-\.\+]+@([\w-]+\.)+[\w-]{2,4}(,[\w\-\.\+]+@([\w-]+\.)+[\w-]{2,4})*$/'];
 
-        $rules['settings.vat_number'] = [
-                'nullable',
-                'string',
-                'bail',
-                'sometimes',
-                Rule::requiredIf(function () use ($user) {
-                    return $this->input('settings.e_invoice_type') === 'PEPPOL' && $user->company()->settings->classification != 'individual';
-                }),
-                function ($attribute, $value, $fail) {
-                    $country_code = $this->getCountryCode();
-                    if ($country_code && isset(AddTaxIdentifierRequest::$vat_regex_patterns[$country_code]) && $this->input('settings.e_invoice_type') === 'PEPPOL') {
-                        if (!preg_match(AddTaxIdentifierRequest::$vat_regex_patterns[$country_code], $value)) {
-                            $fail(ctrans('texts.invalid_vat_number'));
-                        }
-                    }
-                },
-            ];
+        // $rules['settings.vat_number'] = [
+        //         'nullable',
+        //         'string',
+        //         'bail',
+        //         'sometimes',
+        //         Rule::requiredIf(function () use ($user) {
+        //             return $this->input('settings.e_invoice_type') === 'PEPPOL' && $user->company()->settings->classification != 'individual';
+        //         }),
+        //         function ($attribute, $value, $fail) {
+        //             $country_code = $this->getCountryCode();
+        //             if ($country_code && isset(AddTaxIdentifierRequest::$vat_regex_patterns[$country_code]) && $this->input('settings.e_invoice_type') === 'PEPPOL') {
+        //                 if (!preg_match(AddTaxIdentifierRequest::$vat_regex_patterns[$country_code], $value)) {
+        //                     $fail(ctrans('texts.invalid_vat_number'));
+        //                 }
+        //             }
+        //         },
+        //     ];
 
         return $rules;
     }

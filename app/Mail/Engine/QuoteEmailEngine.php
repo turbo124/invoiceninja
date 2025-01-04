@@ -58,6 +58,8 @@ class QuoteEmailEngine extends BaseEmailEngine
 
         if (is_array($this->template_data) && array_key_exists('body', $this->template_data) && strlen($this->template_data['body']) > 0) {
             $body_template = $this->template_data['body'];
+        }elseif($this->reminder_template == 'reminder1'){
+            $body_template = $this->client->getSetting('email_quote_template_reminder1');
         } else {
             $body_template = $this->client->getSetting('email_template_'.$this->reminder_template);
         }
@@ -79,6 +81,8 @@ class QuoteEmailEngine extends BaseEmailEngine
 
         if (is_array($this->template_data) && array_key_exists('subject', $this->template_data) && strlen($this->template_data['subject']) > 0) {
             $subject_template = $this->template_data['subject'];
+        } elseif($this->reminder_template == 'reminder1'){
+            $subject_template = $this->client->getSetting('email_quote_subject_reminder1');
         } else {
             $subject_template = $this->client->getSetting('email_subject_'.$this->reminder_template);
         }

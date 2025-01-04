@@ -224,9 +224,6 @@ class InvoiceItemSum
 
         $this->gross_sub_total += $this->getGrossLineTotal();
 
-        // $this->item->line_total = round($this->item->line_total, $this->currency->precision);
-        // $this->item->gross_line_total = round($this->item->gross_line_total, $this->currency->precision);
-
         $this->line_items[] = $this->item;
 
         return $this;
@@ -242,11 +239,11 @@ class InvoiceItemSum
     private function setDiscount()
     {
         if ($this->invoice->is_amount_discount) {
-            $this->setLineTotal(round($this->getLineTotal() - $this->formatValue($this->item->discount, $this->currency->precision),2));
+            $this->setLineTotal($this->getLineTotal() - $this->formatValue($this->item->discount, $this->currency->precision));
         } else {
             $discount = ($this->item->line_total * ($this->item->discount / 100));
 
-            $this->setLineTotal(round($this->formatValue(($this->getLineTotal() - $discount), $this->currency->precision),2));
+            $this->setLineTotal($this->formatValue(($this->getLineTotal() - $discount), $this->currency->precision));
         }
 
         $this->item->is_amount_discount = $this->invoice->is_amount_discount;
@@ -340,10 +337,11 @@ class InvoiceItemSum
 
     private function getPeppolSurchargeTaxes(): self
     {
-        if (!$this->client->getSetting('e_invoice_type') == 'PEPPOL') {
+
+        if (!($this->client->getSetting('e_invoice_type') == 'PEPPOL')) {
             return $this;
         }
-
+        
         collect($this->invoice->line_items)
             ->flatMap(function ($item) {
                 return collect([1, 2, 3])
@@ -411,8 +409,8 @@ class InvoiceItemSum
     }
 
     public function setLineTotal($total)
-    {
-        $this->item->line_total = (float) $total;
+    {   //Here we go! Epsilon in PHP, who would have thunk it....
+        $this->item->line_total = round(((float) $total + 0.000000000000004),2);
 
         return $this;
     }
@@ -488,8 +486,6 @@ class InvoiceItemSum
                 $amount = $this->item->line_total;
             }
 
-            // $amount = round($amount,2);
-
             $item_tax_rate1_total = $this->calcAmountLineTax($this->item->tax_rate1, $amount);
 
             $item_tax += $item_tax_rate1_total;
@@ -523,7 +519,7 @@ class InvoiceItemSum
 
         }
 
-
+        $this->getPeppolSurchargeTaxes();
 
         return $this;
     }

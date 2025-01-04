@@ -1080,7 +1080,7 @@ $lang = array(
     'invoice_embed_documents' => 'تضمين المستندات',
     'invoice_embed_documents_help' => 'قم بإدراج الصور المرفقة في الفاتورة.',
     'document_email_attachment' => 'إرفاق المستندات',
-    'ubl_email_attachment' => 'إرفاق UBL/الفاتورة الإلكترونية',
+    'ubl_email_attachment' => 'إرفاق UBL',
     'download_documents' => 'تنزيل الملفات (:حجم)',
     'documents_from_expenses' => 'من المصروفات:',
     'dropzone_default_message' => 'قم بإسقاط الملفات أو انقر للتحميل',
@@ -5435,7 +5435,7 @@ $lang = array(
     'connected' => 'متصل',
     'email_count_quotes' => 'البريد الإلكتروني :count اقتباسات',
     'activity_146' => 'تم تسليم الفاتورة الإلكترونية :invoice لـ :client بنجاح! :notes',
-    'activity_147' => 'فشل تسليم الفاتورة الإلكترونية :invoice لـ :client . :notes',
+    'activity_147' => 'E-Invoice :invoice for :client failed delivery :notes',
     'peppol_routing_problem' => 'مشكلة في التوجيه. لم يتم العثور على مستلم/وجهة.',
     'peppol_sending_failed' => 'مشكلة فنية في التسليم. لا يمكن إعادة المحاولة',
     'peppol_cleared_for_sending' => 'تمت الموافقة عليها من قبل مصلحة الضرائب وإرسالها إلى المستلم',
@@ -5458,6 +5458,15 @@ $lang = array(
     'download_ready' => 'الآن أصبح التنزيل الخاص بك جاهزًا! [ :message ]',
     'notification_quote_reminder1_sent_subject' => 'تم إرسال التذكير 1 للعرض :invoice إلى :client',
     'custom_reminder_sent' => 'تم إرسال تذكير مخصص إلى :client',
+    'use_system_fonts' => 'Use System Fonts',
+    'use_system_fonts_help' => 'Override the standard fonts with those from the web browser',
+    'active_tasks' => 'Active Tasks',
+    'enable_public_notifications_1' => 'Hello! You can now receive real-time notifications from Invoice Ninja!',
+    'enable_public_notifications_2' => 'This means you will be connected to the official Invoice Ninja servers, so we\'d like to ask for your preference.',
+    'enable_public_notifications_3' => 'Please note, you\'ll only see this modal once. If you\'d like to change your settings, you can do so in settings menu.',
+    'enable_notifications' => 'Enable Notifications',
+    'enable_public_notifications' => 'Enable Public Notifications',
+    'navigate' => 'Navigate',
 );
 
 return $lang;

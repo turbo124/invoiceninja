@@ -306,7 +306,6 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::resource('projects', ProjectController::class); // name = (projects. index / create / show / update / destroy / edit
     Route::post('projects/bulk', [ProjectController::class, 'bulk'])->name('projects.bulk');
     Route::put('projects/{project}/upload', [ProjectController::class, 'upload'])->name('projects.upload');
-    Route::post('projects/{project}/invoice', [ProjectController::class, 'invoice'])->name('projects.invoice');
     
     Route::resource('purchase_orders', PurchaseOrderController::class);
     Route::post('purchase_orders/bulk', [PurchaseOrderController::class, 'bulk'])->name('purchase_orders.bulk');

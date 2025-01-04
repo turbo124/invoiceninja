@@ -386,6 +386,9 @@ class Storecove
     {
         $uri = "legal_entities/{$legal_entity_id}/peppol_identifiers";
 
+        $identifier = str_ireplace('BE', '', $identifier);
+        $identifier = preg_replace("/[^a-zA-Z0-9]/", "", $identifier);
+        
         $data = [
             "identifier" => $identifier,
             "scheme" => $scheme,
@@ -400,6 +403,8 @@ class Storecove
             return $data;
         }
        
+        $this->deleteIdentifier($legal_entity_id);
+
         return $r;
     }
 
