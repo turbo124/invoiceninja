@@ -30,10 +30,60 @@ trait PdfMaker
     {
         $pdf = new Snappdf();
 
-        if (config('ninja.snappdf_chromium_arguments')) {
+        $chrome_flags = [
+          '--headless',
+            '--no-sandbox',
+            '--disable-gpu',
+            '--no-margins',
+            '--hide-scrollbars',
+            '--no-first-run',
+            '--no-default-browser-check',
+
+            // PDF-specific settings
+            '--print-to-pdf-no-header',
+            '--no-pdf-header-footer',
+
+            // Security settings
+            '--disable-web-security=false',
+            '--block-insecure-private-network-requests',
+            '--block-port=22,25,465,587',
+            '--disable-usb',
+            '--disable-webrtc',
+            '--block-new-web-contents',
+            '--deny-permission-prompts',
+            '--ignore-certificate-errors',
+
+            // Performance & resource settings
+            '--disable-dev-shm-usage',
+            '--disable-software-rasterizer',
+            '--run-all-compositor-stages-before-draw',
+            '--disable-renderer-backgrounding',
+            '--disable-background-timer-throttling',
+            '--disable-background-networking',
+            '--disable-domain-reliability',
+            '--disable-ipc-flooding-protection',
+
+            // Feature disabling
+            '--disable-translate',
+            '--disable-extensions',
+            '--disable-sync',
+            '--disable-default-apps',
+            '--disable-plugins',
+            '--disable-notifications',
+            '--disable-device-discovery-notifications',
+            '--disable-reading-from-canvas',
+            '--safebrowsing-disable-auto-update',
+            '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
+
+            // Debug/Output
+            '--dump-dom',
+        ];
+
+        // if (config('ninja.snappdf_chromium_arguments')) {
             $pdf->clearChromiumArguments();
-            $pdf->addChromiumArguments(config('ninja.snappdf_chromium_arguments'));
-        }
+            // $pdf->addChromiumArguments(config('ninja.snappdf_chromium_arguments'));
+            $pdf->addChromiumArguments(implode(' ', $chrome_flags));
+        // }
 
         if (config('ninja.snappdf_chromium_path')) {
             $pdf->setChromiumPath(config('ninja.snappdf_chromium_path'));
