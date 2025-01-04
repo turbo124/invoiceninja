@@ -85,6 +85,7 @@ class PdfBuilder
     public function getCompiledHTML($final = false)
     {
         $this->cleanHtml();
+
         $html = $this->document->saveHTML();
 
         return str_replace('%24', '$', $html);
@@ -99,7 +100,7 @@ class PdfBuilder
         $dangerous_elements = [
             'iframe', 'form', 'object', 'embed', 
             'applet', 'audio', 'video',
-            'frame', 'frameset', 'base','svg'
+            'frame', 'frameset', 'base', 'svg'
         ];
 
         $dangerous_attributes = [
