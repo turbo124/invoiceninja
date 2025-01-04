@@ -95,16 +95,33 @@ class Design extends BaseDesign
     public function html(): ?string
     {
         if ($this->design == 'custom.html') {
-            return $this->composeFromPartials(
+            $design = $this->composeFromPartials(
                 $this->options['custom_partials']
             );
+            
+            // Remove NULL bytes
+            $design = str_replace("\0", '', $design);
+            // Remove UTF-7 BOM
+            $design = preg_replace('/^\\+ADw-/', '', $design);
+
+            return $design;
+
         }
 
         $path = $this->options['custom_path'] ?? config('ninja.designs.base_path');
 
-        return file_get_contents(
+        $design = file_get_contents(
             $path . $this->design
         );
+
+        
+        // Remove NULL bytes
+        $design = str_replace("\0", '', $design);
+        // Remove UTF-7 BOM
+        $design = preg_replace('/^\\+ADw-/', '', $design);
+
+        return $design;
+
     }
 
     public function elements(array $context, string $type = 'product'): array
