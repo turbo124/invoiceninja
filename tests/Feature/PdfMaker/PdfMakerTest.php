@@ -115,10 +115,6 @@ class PdfMakerTest extends TestCase
             ->design($design)
             ->build();
 
-nlog("1".$maker->getCompiledHTML());
-nlog("2 NEXT");
-nlog("2".$maker->getSection('header'));
-
         $this->assertStringContainsString('Invoice Ninja', $maker->getCompiledHTML());
         $this->assertStringContainsString('Invoice Ninja', $maker->getSection('header'));
     }

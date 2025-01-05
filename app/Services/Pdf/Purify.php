@@ -356,7 +356,7 @@ class Purify
                         $is_allowed = false;
 
                         // Debug log
-                        info("Checking URL attribute {$attr_name} with value: {$value}");
+                        // nlog("Checking URL attribute {$attr_name} with value: {$value}");
 
                         foreach ($allowed_values as $pattern) {
                             // Fix the pattern conversion for URL matching
@@ -372,20 +372,20 @@ class Purify
                             }
 
                             // Debug log
-                            info("Checking against pattern: {$pattern} with regex: {$regex}");
+                            // nlog("Checking against pattern: {$pattern} with regex: {$regex}");
 
                             if (preg_match('/' . $regex . '/i', $value)) {
                                 $is_allowed = true;
-                                info("Match found! URL is allowed");
+                                // nlog("Match found! URL is allowed");
                                 break;
                             }
                         }
 
                         if ($is_allowed) {
                             $node->setAttribute($name, $value);
-                            info("Attribute set successfully");
+                            // nlog("Attribute set successfully");
                         } else {
-                            info("URL was not allowed");
+                            // nlog("URL was not allowed");
                         }
                         continue;
                     }
