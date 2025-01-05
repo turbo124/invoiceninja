@@ -138,7 +138,7 @@ trait PdfMakerUtilities
 
     public function updateVariables(array $variables)
     {
-        $html = strtr($this->getCompiledHTML(), $variables['labels']);
+        $html = strtr(str_replace('%24', '$', $this->document->saveHTML()), $variables['labels']);
 
         $html = strtr($html, $variables['values']);
 

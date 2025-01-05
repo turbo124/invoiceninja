@@ -31,8 +31,8 @@ trait PdfMaker
         $pdf = new Snappdf();
 
         $chrome_flags = [
-          '--headless',
-            '--no-sandbox',
+            '--headless',
+            '--sandbox',
             '--disable-gpu',
             '--no-margins',
             '--hide-scrollbars',

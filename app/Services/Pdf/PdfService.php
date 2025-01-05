@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -120,7 +121,7 @@ class PdfService
     public function getHtml(): string
     {
 
-        $html = $this->builder->getCompiledHTML();
+        $html = \App\Services\Pdf\Purify::purify($this->builder->document);
 
         if (config('ninja.log_pdf_html')) {
             nlog($html);
