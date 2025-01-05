@@ -132,9 +132,9 @@ class PdfMaker
      */
     public function getCompiledHTML($final = false)
     {
-        $html = \App\Services\Pdf\Purify::clean($this->document->saveHTML());
+        
+        return \App\Services\Pdf\Purify::clean($this->document->saveHTML());
      
-        return str_replace('%24', '$', $html);
     }
 
 }

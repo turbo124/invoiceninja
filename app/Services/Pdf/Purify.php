@@ -68,8 +68,8 @@ class Purify
         'headers' => ['*'],
 
         // Links & Media
-        'href' => ['http://*', 'https://*', 'data:image/*', '${*}'],
-        'src' => ['http://*', 'https://*', 'data:image/*', '${*}'],
+        'href' => ['http://*', 'https://*', 'data:image/*', '${*}', '$*.*'],
+        'src' => ['http://*', 'https://*', 'data:image/*', '${*}', '$*.*'],
         'alt' => ['*'],
         'target' => ['_blank', '_self'],
         'rel' => ['nofollow', 'noopener', 'noreferrer'],
@@ -262,6 +262,10 @@ class Purify
 
     public static function clean(string $html): string
     {
+        $html = str_replace('%24', '$', $html);
+
+        nlog($html);
+
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
 
@@ -361,10 +365,13 @@ class Purify
                         foreach ($allowed_values as $pattern) {
                             // Fix the pattern conversion for URL matching
                             if ($pattern === 'http://*') {
+                                nlog("http://* regex");
                                 $regex = '^http\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$';
                             } elseif ($pattern === 'https://*') {
+                                nlog("https://* regex");
                                 $regex = '^https\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$';
                             } elseif ($pattern === 'data:image/*') {
+                                nlog("data:image/* regex");
                                 $regex = '^data\:image\/[a-zA-Z0-9\+]+;base64,.*$';
                             } else {
                                 $regex = preg_quote($pattern, '/');
@@ -408,7 +415,12 @@ class Purify
 
             $cleanNodes($document->documentElement);
 
-            return $document->saveHTML();
+            $html = str_replace('%24', '$', $document->saveHTML());
+
+            nlog("eeenndd");
+            nlog($html);
+
+            return $html;
 
         } catch (\Exception $e) {
 
