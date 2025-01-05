@@ -221,7 +221,7 @@ class PdfService
             $pdfBuilder = new ZugferdDocumentPdfBuilder($e_rechnung, $pdf);
             $pdfBuilder->generateDocument();
 
-            return $pdfBuilder->downloadString(basename($this->config->entity->getFileName()));
+            return $pdfBuilder->downloadString();
 
         } catch (\Exception $e) {
             nlog("E_Invoice Merge failed - " . $e->getMessage());

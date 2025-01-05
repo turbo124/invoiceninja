@@ -163,10 +163,10 @@ class UpdateCompanyRequest extends Request
     }
 
 
-    private function getCountryCode()
-    {
-        return auth()->user()->company()->country()->iso_3166_2;
-    }
+    // private function getCountryCode()
+    // {
+    //     return auth()->user()->company()->country()->iso_3166_2;
+    // }
 
     /**
      * For the hosted platform, we restrict the feature settings.

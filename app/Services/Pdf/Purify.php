@@ -320,7 +320,8 @@ class Purify
 
                 // First, remove ALL attributes from the node
                 while ($node->attributes->length > 0) {
-                    $node->removeAttribute($node->attributes->item(0)->name);
+                    $attr = $node->attributes->item(0);
+                    $node->removeAttribute($attr->nodeName);
                 }
 
                 // Then add back only the allowed attributes

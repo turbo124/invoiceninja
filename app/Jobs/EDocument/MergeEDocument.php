@@ -49,7 +49,7 @@ class MergeEDocument implements ShouldQueue
                 case "XInvoice-Basic":
                     $xml = (new CreateEDocument($this->document, true))->handle();
                     
-                    return(new ZugferdDocumentPdfBuilder($xml, $this->pdf_file))->generateDocument()->downloadString("Invoice.pdf");
+                    return(new ZugferdDocumentPdfBuilder($xml, $this->pdf_file))->generateDocument()->downloadString();
                 default:
                     return $this->pdf_file;
 

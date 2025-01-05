@@ -42,7 +42,7 @@ class ProjectRepository extends BaseRepository
                         if (!$task->isRunning())
                         { 
                             if ($key == 0 && $task->company->invoice_task_project) {
-                                $body = '<div class="project-header">'.$task->project->name.'</div>' .$task->project?->public_notes ?? '';
+                                $body = '<div class="project-header">'.$task->project->name.'</div>' .$task->project?->public_notes ?? ''; //@phpstan-ignore-line
                                 $body .= '<div class="task-time-details">'.$task->description().'</div>';
                             }
                             else {
