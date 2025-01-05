@@ -22,7 +22,8 @@ trait PdfMakerUtilities
         $document = new DOMDocument();
 
         $document->validateOnParse = true;
-        @$document->loadHTML(mb_convert_encoding($this->design->html(), 'HTML-ENTITIES', 'UTF-8'));
+        // @$document->loadHTML(mb_convert_encoding($this->design->html(), 'HTML-ENTITIES', 'UTF-8'));
+        @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($this->design->html(), ENT_QUOTES, 'UTF-8')));
 
         $this->document = $document;
         $this->xpath = new DOMXPath($document);
@@ -33,9 +34,9 @@ trait PdfMakerUtilities
         $element = $this->document->getElementById($selector);
 
         if ($section) {
-            return $element->getAttribute($section);
+           return $element->getAttribute($section);
         }
-
+        
         return $element->nodeValue;
     }
 
@@ -138,7 +139,7 @@ trait PdfMakerUtilities
 
     public function updateVariables(array $variables)
     {
-        $html = strtr(str_replace('%24', '$', $this->document->saveHTML()), $variables['labels']);
+        $html = strtr($this->getCompiledHTML(), $variables['labels']);
 
         $html = strtr($html, $variables['values']);
 

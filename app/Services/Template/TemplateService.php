@@ -406,10 +406,8 @@ class TemplateService
      */
     public function save(): self
     {
-        nlog("Template Service");
-        $html = \App\Services\Pdf\Purify::purify($this->document);
 
-        $this->compiled_html = str_replace('%24', '$', $html);
+        $this->compiled_html = str_replace('%24', '$', \App\Services\Pdf\Purify::clean($this->document->saveHTML()));
 
         return $this;
     }

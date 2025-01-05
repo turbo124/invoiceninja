@@ -121,7 +121,7 @@ class PdfService
     public function getHtml(): string
     {
 
-        $html = \App\Services\Pdf\Purify::purify($this->builder->document);
+        $html = str_replace('%24', '$', \App\Services\Pdf\Purify::clean($this->builder->document->saveHTML()));
 
         if (config('ninja.log_pdf_html')) {
             nlog($html);

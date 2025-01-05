@@ -85,7 +85,14 @@ class Purify
         // Template specific
         'hidden' => ['*'],
         'zoom' => ['*'],
-        'size' => ['*']
+        'size' => ['*'],
+
+        // Meta tag attributes
+        'charset' => ['*'],
+        'name' => ['*'],
+        'content' => ['*'],
+        'http-equiv' => ['*'],
+        'viewport' => ['*'],
     ];
 
     private static array $dangerous_css_patterns = [
@@ -142,53 +149,66 @@ class Purify
         'childElementCount',
         'style',
         'hidden',
-        'display'
+        'display',
+         'innerHTML',  // Add innerHTML to allowed properties
+    'innerText'   // Add innerText since it's used in the script
     ];
 
-    private static function isAllowedScript(string $script): bool
+        private static function isAllowedScript(string $script): bool 
     {
-        // Allow both entry points with comments and whitespace
-        if (!preg_match('/^\s*(?:\/\/[^\n]*\n\s*)*(?:document\.(?:addEventListener\s*\(\s*[\'"]DOMContentLoaded[\'"]\s*,|querySelectorAll\s*\())/', $script)) {
-            return false;
+        // Allow the specific encoded-html script
+        $encodedHtmlScript = "document.addEventListener(\"DOMContentLoaded\",function(){document.querySelectorAll(`[data-state=\"encoded-html\"]`).forEach(e=>e.innerHTML=e.innerText)},!1);";
+        if (trim($script) === $encodedHtmlScript) {
+            return true;
         }
 
-        $tokens = token_get_all('<?php ' . $script);
+        // Check for dangerous patterns
+        $dangerous_patterns = [
+            // JavaScript global objects and methods
+            '/(window|global|globalThis|eval|Function|setTimeout|setInterval)/',
+            // Network requests
+            '/(fetch|XMLHttpRequest|WebSocket|Ajax)/',
+            // DOM manipulation beyond allowed methods
+            '/(createElement|appendChild|insertBefore|write|prepend|append)/',
+            // Dangerous properties
+            '/(constructor|prototype|__proto__)/',
+            // Encoding/decoding
+            '/(btoa|atob|encodeURI|decodeURI)/',
+            // File operations
+            '/(FileReader|Blob|Buffer)/',
+            // Script injection
+            '/(new\s+Function|eval\s*\(|setTimeout\s*\(|setInterval\s*\()/',
+        ];
 
-        foreach ($tokens as $token) {
-            if (is_array($token)) {
-                $tokenText = $token[1];
+        foreach ($dangerous_patterns as $pattern) {
+            if (preg_match($pattern, $script)) {
+                return false;
+            }
+        }
 
-                // Block dangerous methods
-
-                if (preg_match('/\b(window|global|globalThis|this|self|top|parent|frames|eval|Function|setTimeout|setInterval|fetch|XMLHttpRequest|WebSocket|Ajax|Promise|async|await|createElement|appendChild|insertBefore|write|prepend|append|insertAfter|replaceWith|innerHTML|outerHTML|insertAdjacentHTML|document\.body|document\.head|document\.domain|document\.write|document\.writeln|constructor|prototype|__proto__|Image|Script|Object|btoa|atob|encodeURI|decodeURI|FileReader|Blob|Buffer)\b/', $tokenText)) {
+        // Check for allowed property access
+        $property_pattern = '/\.([\w]+)\s*=/';
+        if (preg_match_all($property_pattern, $script, $matches)) {
+            foreach ($matches[1] as $property) {
+                if (!in_array($property, self::$allowed_js_properties)) {
                     return false;
                 }
+            }
+        }
 
-                // Allow specific property assignments
-                if (preg_match('/\.(hidden|style|childElementCount)\s*=/', $tokenText)) {
-                    continue;
-                }
-
-                // Allow specific method calls
-                if (preg_match('/\b([a-zA-Z]+(?:\.[a-zA-Z]+)*)\s*\(/', $tokenText, $matches)) {
-                    $method = $matches[1];
-                    if (!in_array($method, [
-                        'document.addEventListener',
-                        'document.querySelectorAll',
-                        'document.getElementById',
-                        'forEach',
-                        'style.setProperty',
-                        'console.log'
-                    ])) {
-                        return false;
-                    }
+        // Check for allowed method calls
+        $method_pattern = '/\b([\w\.]+)\s*\(/';
+        if (preg_match_all($method_pattern, $script, $matches)) {
+            foreach ($matches[1] as $method) {
+                if (!in_array($method, self::$allowed_js_methods)) {
+                    return false;
                 }
             }
         }
 
         return true;
     }
-    
+
     /**
      * Filter CSS to remove potentially dangerous styles
      */
@@ -240,14 +260,13 @@ class Purify
         return implode('; ', $safe_declarations);
     }
 
-    public static function purify(\DOMDocument $document): string
+    public static function clean(string $html): string
     {
-        if (!$document->documentElement) {
-            return '';
-        }
+        $document = new \DOMDocument();
+        @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
 
         // Function to recursively check nodes
-        $cleanNodes = function ($node) use (&$cleanNodes, &$allowed_elements, &$allowed_attributes) {
+        $cleanNodes = function ($node) use (&$cleanNodes) {
 
             $allowed_elements = self::$allowed_elements;
             $allowed_attributes = self::$allowed_attributes;
@@ -386,6 +405,7 @@ class Purify
         };
 
         try {
+
             $cleanNodes($document->documentElement);
 
             return $document->saveHTML();
@@ -393,7 +413,7 @@ class Purify
         } catch (\Exception $e) {
 
             nlog('Error cleaning HTML: ' . $e->getMessage());
-
+            
             throw new \RuntimeException('HTML sanitization failed');
         }
 

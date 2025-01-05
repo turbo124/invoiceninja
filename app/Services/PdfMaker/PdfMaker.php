@@ -29,6 +29,8 @@ class PdfMaker
 
     private $options;
 
+    public $xpath;
+
     /** @var CommonMarkConverter */
     protected $commonmark;
 
@@ -130,7 +132,7 @@ class PdfMaker
      */
     public function getCompiledHTML($final = false)
     {
-        $html = \App\Services\Pdf\Purify::purify($this->document);
+        $html = \App\Services\Pdf\Purify::clean($this->document->saveHTML());
      
         return str_replace('%24', '$', $html);
     }
