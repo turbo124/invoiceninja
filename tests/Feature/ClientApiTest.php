@@ -822,6 +822,8 @@ class ClientApiTest extends TestCase
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/client_statement', $data);
 
+        echo (print_r($response->getContent(), true));
+        
         $response->assertStatus(200);
 
         $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
