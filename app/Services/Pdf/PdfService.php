@@ -104,7 +104,6 @@ class PdfService
 
         } catch (\Exception $e) {
             nlog($e->getMessage());
-            echo print_r($e->getMessage(), true);
             throw new \Exception($e->getMessage(), $e->getCode());
         }
 
