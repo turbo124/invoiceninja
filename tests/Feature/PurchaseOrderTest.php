@@ -115,9 +115,6 @@ class PurchaseOrderTest extends TestCase
             'X-API-TOKEN' => $this->token,
         ])->postJson("/api/v1/purchase_orders/bulk", $data);
 
-
-        echo $response->getContent();
-
         $response->assertStatus(200);
 
 
@@ -131,9 +128,6 @@ class PurchaseOrderTest extends TestCase
             'X-API-TOKEN' => $this->token,
         ])->postJson("/api/v1/purchase_orders/bulk", $data);
         
-        
-        echo(print_r($response->getContent(), true));
-
         $response->assertStatus(200);
 
         $data = [

@@ -41,6 +41,7 @@ jobs:
       NINJA_LICENSE: ${{ secrets.ninja_license }}
       TRAVIS: true
       MAIL_MAILER: log
+      PDF_GENERATOR: hosted_ninja
 
     services:
       mariadb:
