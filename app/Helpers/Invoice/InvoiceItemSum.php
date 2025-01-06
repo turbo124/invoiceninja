@@ -275,6 +275,13 @@ class InvoiceItemSum
         $this->item->tax_name3 = $this->rule->tax_name3;
         $this->item->tax_rate3 = round($this->rule->tax_rate3, $precision);
 
+        $this->invoice->tax_name1 = '';
+        $this->invoice->tax_rate1 = 0;
+        $this->invoice->tax_name2 = '';
+        $this->invoice->tax_rate2 = 0;
+        $this->invoice->tax_name3 = '';
+        $this->invoice->tax_rate3 = 0;
+
         return $this;
     }
 
