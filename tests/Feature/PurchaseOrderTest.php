@@ -113,8 +113,12 @@ class PurchaseOrderTest extends TestCase
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->post("/api/v1/purchase_orders/bulk", $data)
-        ->assertStatus(200);
+        ])->postJson("/api/v1/purchase_orders/bulk", $data);
+
+
+        echo $response->getContent();
+
+        $response->assertStatus(200);
 
 
         $data = [
