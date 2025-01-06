@@ -33,7 +33,11 @@ class Purify
         'img', 'a',
 
         // Template specific
-        'ninja'
+        'ninja',
+
+        // SVG Elements
+        'svg', 'path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 
+        'polygon', 'g', 'text', 'tspan', 'defs', 'use', 'title',
     ];
 
     private static array $allowed_attributes = [
@@ -49,6 +53,24 @@ class Purify
         'data-ref' => ['*'],
         'data-element' => ['*'],
         'data-state' => ['*'],
+
+        //SVG
+         'd' => ['*'],
+        'viewBox' => ['*'],
+        'xmlns' => ['http://www.w3.org/2000/svg'],
+        'fill' => ['*'],
+        'stroke' => ['*'],
+        'stroke-width' => ['*'],
+        'cx' => ['*'],
+        'cy' => ['*'],
+        'r' => ['*'],
+        'x' => ['*'],
+        'y' => ['*'],
+        'transform' => ['*'],
+        'points' => ['*'],
+        'preserveAspectRatio' => ['*'],
+        'version' => ['*'],
+        'xlink:href' => ['#*'], // Only allow internal references
 
         // Layout & Presentation
         'align' => ['left', 'center', 'right', 'justify'],
@@ -164,6 +186,11 @@ class Purify
 
         // Check for dangerous patterns
         $dangerous_patterns = [
+            '/<svg[^>]*>[^<]*<script/i',
+            '/<svg[^>]*>[^<]*<handler\b/i',
+            '/<svg[^>]*>[^<]*<animate/i',
+            '/<svg[^>]*>[^<]*<set\b/i',
+            '/<svg[^>]*>[^<]*<foreignObject/i',
             // JavaScript global objects and methods
             '/(window|global|globalThis|eval|Function|setTimeout|setInterval)/',
             // Network requests
