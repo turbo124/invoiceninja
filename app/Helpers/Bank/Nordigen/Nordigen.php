@@ -100,10 +100,6 @@ class Nordigen
             return Arr::first(
                 $this->client->endUserAgreement->getEndUserAgreements()['results'],
                 function (array $eua) use ($institutionId, $requiredScopes, $accessDays, $txDays): bool {
-                    $expiresAt = $eua['accepted'] ? (new \DateTimeImmutable($eua['accepted']))->add(
-                        new \DateInterval("P{$eua['access_valid_for_days']}D")
-                    ) : false;
-
                     return $eua['institution_id'] === $institutionId
                         && $eua['accepted'] === null
                         && $eua['max_historical_days'] >= $txDays
