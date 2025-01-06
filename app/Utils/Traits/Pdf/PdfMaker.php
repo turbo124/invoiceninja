@@ -31,8 +31,8 @@ trait PdfMaker
         $pdf = new Snappdf();
 
         $chrome_flags = [
-          '--headless',
-            '--no-sandbox',
+            '--headless',
+            '--sandbox',
             '--disable-gpu',
             '--no-margins',
             '--hide-scrollbars',
@@ -90,6 +90,8 @@ trait PdfMaker
         }
 
         $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
+        
+        // nlog($html);
 
         $generated = $pdf
                         ->setHtml($html)

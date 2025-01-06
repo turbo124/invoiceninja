@@ -103,20 +103,30 @@ class GenerateDeliveryNote
         ];
 
         $maker = new PdfMakerService($state);
-
+nlog("1");
         $maker
             ->design($template)
             ->build();
 
+            
+nlog("2");
+
         if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
             $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
         } else {
+       
+nlog("3");
+
             $pdf = $this->makePdf(null, null, $maker->getCompiledHTML());
         }
+
+nlog("4");
 
         if (config('ninja.log_pdf_html')) {
             info($maker->getCompiledHTML());
         }
+
+nlog("5");
 
         $maker = null;
         $state = null;

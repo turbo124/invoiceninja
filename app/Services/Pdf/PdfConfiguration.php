@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -393,10 +394,11 @@ class PdfConfiguration
         /* 08-01-2022 allow increased precision for unit price*/
         $v = rtrim(sprintf('%f', $value), '0');
         $parts = explode('.', $v);
-        
+
         /** 2024-12-09 improve resolution of unit cost precision */
-        if (strlen($parts[1] ?? '') > 2) 
+        if (strlen($parts[1] ?? '') > 2) {
             $precision = strlen($parts[1]);
+        }
 
         /* 08-02-2023 special if block to render $0.5 to $0.50*/
         // if ($v < 1 && strlen($v) == 3) {
