@@ -21,10 +21,6 @@ jobs:
           ref: v5-develop
           fetch-depth: 1
 
-      - name: Copy .env file
-        run: |
-          cp .env.example .env
-
       - name: Install composer dependencies
         run: |
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
