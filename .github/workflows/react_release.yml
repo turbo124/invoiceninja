@@ -29,16 +29,7 @@ jobs:
         run: |
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
           composer install --no-dev
-      
-      - name: Prepare Laravel Application
-        run: |
-          cp .env.example .env
-          php artisan key:generate --force
-          php artisan optimize
-          php artisan storage:link --force
-          sudo php artisan cache:clear
-          sudo find ./vendor/bin/ -type f -exec chmod +x {} \;
-          sudo find ./ -type d -exec chmod 755 {} \;
+
       - name: Set current date to variable
         id: set_date
         run: echo "current_date=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
