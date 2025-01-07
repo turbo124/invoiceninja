@@ -53,10 +53,10 @@ jobs:
 
       - name: Cleanup Builds
         run: |          
-          sudo rm -rf node_modules
-          sudo rm -rf .git
-          sudo rm .env
-          sudo rm -rf ui
+          rm -rf node_modules
+          rm -rf .git
+          rm .env
+          rm -rf ui
           # Set permissions: directories 755, files 644
           chmod -R a=r,u+w,a+X .
           
