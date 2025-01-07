@@ -52,8 +52,7 @@ jobs:
           npm run production
 
       - name: Cleanup Builds
-        run: |
-          sudo rm -rf bootstrap/cache/*
+        run: |          
           sudo rm -rf node_modules
           sudo rm -rf .git
           sudo rm .env
