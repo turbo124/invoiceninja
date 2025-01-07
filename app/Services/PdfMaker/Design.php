@@ -212,7 +212,7 @@ class Design extends BaseDesign
             'footer-elements' => [
                 'id' => 'footer',
                 'elements' => [
-                    $this->sharedFooterElements(),
+                    // $this->sharedFooterElements(),
                 ],
             ],
         ];
@@ -361,7 +361,7 @@ class Design extends BaseDesign
             return [
                 ['element' => 'tr', 'properties' => ['data-ref' => 'statement-label'], 'elements' => [
                     ['element' => 'th', 'properties' => [], 'content' => ""],
-                    ['element' => 'th', 'properties' => [], 'content' => "<h2>".ctrans('texts.statement')."</h2>"],
+                    ['element' => 'th', 'properties' => [], 'content' => '<h2>'.ctrans('texts.statement').'</h2>'],
                 ]],
                 ['element' => 'tr', 'properties' => [], 'elements' => [
                     ['element' => 'th', 'properties' => [], 'content' => ctrans('texts.statement_date')],

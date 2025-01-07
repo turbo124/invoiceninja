@@ -121,6 +121,53 @@ class PdfMaker
             $this->updateVariables($this->data['variables']);
         }
 
+
+        $elements = [
+                    'product-table', 'task-table', 'delivery-note-table',
+                    'statement-invoice-table', 'statement-payment-table', 'statement-aging-table-totals',
+                    'statement-invoice-table-totals', 'statement-payment-table-totals', 'statement-aging-table',
+                    'client-details', 'vendor-details', 'swiss-qr', 'shipping-details', 'statement-credit-table', 'statement-credit-table-totals',
+                ];
+
+        foreach ($elements as $element) {
+
+            $el = $this->document->getElementById($element);
+
+            if ($el && $el->childElementCount === 0) {
+                $el->setAttribute('style', 'display: none !important;');
+            }
+
+        }
+
+
+        $xpath = new \DOMXPath($this->document);
+        $elements = $xpath->query('//*[@data-state="encoded-html"]');
+
+        nlog("count = > ".count($elements));
+
+        foreach ($elements as $element) {
+            $decoded = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+            $decoded = str_replace(['<br>', '<BR>'], '<br/>', $decoded);
+
+            // Create a temporary document to parse the HTML
+            $temp = new \DOMDocument();
+            @$temp->loadHTML('<div>' . $decoded . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+            // Get the content from the temporary document
+            $content = $temp->getElementsByTagName('div')->item(0);
+
+            if ($content) {
+                // Import and replace
+                $imported = $this->document->importNode($content, true);
+                $element->parentNode->replaceChild($imported, $element);
+            }
+
+            nlog($decoded);
+        }
+
+
+
+
         return $this;
     }
 

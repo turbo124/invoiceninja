@@ -6,7 +6,7 @@ class Purify
 {
     private static array $allowed_elements = [
         // Document structure
-        'html', 'head', 'body', 'meta', 'title', 'style', 'script',
+        'html', 'head', 'body', 'meta', 'title', 'style',
 
         // Root element
         'root',
@@ -176,13 +176,19 @@ class Purify
     'innerText'   // Add innerText since it's used in the script
     ];
 
-        private static function isAllowedScript(string $script): bool 
+    private static function isAllowedScript(string $script): bool 
     {
         // Allow the specific encoded-html script
+                    
         $encodedHtmlScript = "document.addEventListener(\"DOMContentLoaded\",function(){document.querySelectorAll(`[data-state=\"encoded-html\"]`).forEach(e=>e.innerHTML=e.innerText)},!1);";
-        if (trim($script) === $encodedHtmlScript) {
+
+        // Add your new script here
+        $tableVisibilityScript = "document.addEventListener('DOMContentLoaded',()=>{let tables=['product-table','task-table','delivery-note-table','statement-invoice-table','statement-payment-table','statement-aging-table-totals','statement-invoice-table-totals','statement-payment-table-totals','statement-aging-table','client-details','vendor-details','swiss-qr','shipping-details','statement-credit-table','statement-credit-table-totals'];tables.forEach(tableIdentifier=>{console.log(document.getElementById(tableIdentifier));document.getElementById(tableIdentifier)?.childElementCount===0?document.getElementById(tableIdentifier).style.setProperty('display','none','important'):'';});});";
+
+        if (trim($script) === $encodedHtmlScript || trim($script) === $tableVisibilityScript) {
             return true;
         }
+
 
         // Check for dangerous patterns
         $dangerous_patterns = [
@@ -288,10 +294,14 @@ class Purify
     }
 
     public static function clean(string $html): string
-    {
+    { 
+        if(config('ninja.disable_purify_html')){
+            return str_replace('%24', '$', $html);
+        }
+
         $html = str_replace('%24', '$', $html);
 
-        nlog($html);
+        return $html;
 
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
@@ -329,15 +339,15 @@ class Purify
                     return;
                 }
 
-                if (strtolower($node->tagName) === 'script') {
-                    if (!self::isAllowedScript($node->textContent)) {
-                        if ($node->parentNode) {
-                            $node->parentNode->removeChild($node);
-                        }
-                        return;
-                    }
-                    // If script is allowed, continue with normal processing
-                }
+                // if (strtolower($node->tagName) === 'script') {
+                //     if (!self::isAllowedScript($node->textContent)) {
+                //         if ($node->parentNode) {
+                //             $node->parentNode->removeChild($node);
+                //         }
+                //         return;
+                //     }
+                //     // If script is allowed, continue with normal processing
+                // }
 
                 // Store current attributes before removing them
                 $current_attributes = [];
@@ -393,13 +403,13 @@ class Purify
                         foreach ($allowed_values as $pattern) {
                             // Fix the pattern conversion for URL matching
                             if ($pattern === 'http://*') {
-                                nlog("http://* regex");
+                                // nlog("http://* regex");
                                 $regex = '^http\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$';
                             } elseif ($pattern === 'https://*') {
-                                nlog("https://* regex");
+                                // nlog("https://* regex");
                                 $regex = '^https\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$';
                             } elseif ($pattern === 'data:image/*') {
-                                nlog("data:image/* regex");
+                                // nlog("data:image/* regex");
                                 $regex = '^data\:image\/[a-zA-Z0-9\+]+;base64,.*$';
                             } else {
                                 $regex = preg_quote($pattern, '/');

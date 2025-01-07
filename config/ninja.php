@@ -261,4 +261,5 @@ return [
     'pdf_page_numbering_y_alignment' => env('PDF_PAGE_NUMBER_Y', -6),
     'hosted_einvoice_secret' => env('HOSTED_EINVOICE_SECRET', null),
     'e_invoice_quota_warning' => env('E_INVOICE_QUOTA_WARNING', 15),
+    'disable_purify_html' => env('DISABLE_PURIFY_HTML', false),
 ];
