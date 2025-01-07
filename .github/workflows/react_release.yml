@@ -57,6 +57,8 @@ jobs:
           sudo rm -rf .git
           sudo rm .env
           sudo rm -rf ui
+          # Set permissions: directories 755, files 644
+          chmod -R a=r,u+w,a+X .
           
       - name: Build project
         run: |
