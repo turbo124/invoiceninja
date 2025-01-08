@@ -830,7 +830,7 @@ class PdfBuilder
                 $last_visible = array_key_last($visible_elements);
 
                 // Add class to first visible cell
-                if (!isset($element['elements'][$first_visible]['properties']['class'])) {
+                if (!isset($element['elements'][$first_visible]['properties']['class'])) { //@phpstan-ignore-line
                     $element['elements'][$first_visible]['properties']['class'] = 'left-radius';
                 } else {
                     $element['elements'][$first_visible]['properties']['class'] .= ' left-radius';
@@ -1089,7 +1089,7 @@ class PdfBuilder
             $last_visible = array_key_last($visible_elements);
 
             // Add class to first visible element
-            if (!isset($elements[$first_visible]['properties']['class'])) {
+            if (!isset($elements[$first_visible]['properties']['class'])) {//@phpstan-ignore-line
                 $elements[$first_visible]['properties']['class'] = 'left-radius';
             } else {
                 $elements[$first_visible]['properties']['class'] .= 'left-radius';
