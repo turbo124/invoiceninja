@@ -96,7 +96,8 @@ class PdfBuilder
             $el = $this->document->getElementById($element);
 
             if ($el && $el->childElementCount === 0) {
-                $el->setAttribute('style', 'display: none !important;');
+                $el->parentNode->removeChild($el); // This removes the element completely
+                // $el->setAttribute('style', 'display: none !important;');
             }
 
         }

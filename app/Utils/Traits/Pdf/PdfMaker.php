@@ -75,6 +75,10 @@ trait PdfMaker
             '--safebrowsing-disable-auto-update',
             '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
 
+            '--virtual-time-budget=2000',
+            '--font-render-hinting=medium',
+            '--enable-font-antialiasing',
+            
             // Debug/Output
             '--dump-dom',
         ];
