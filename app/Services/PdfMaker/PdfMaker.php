@@ -180,8 +180,10 @@ class PdfMaker
     public function getCompiledHTML($final = false)
     {
         
-        return \App\Services\Pdf\Purify::clean($this->document->saveHTML());
-     
+        $html = \App\Services\Pdf\Purify::clean($this->document->saveHTML());
+
+        return $html;
+
     }
 
 }

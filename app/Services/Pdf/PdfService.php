@@ -126,9 +126,6 @@ class PdfService
         if (config('ninja.log_pdf_html')) {
             nlog($html);
         }
-
-        $this->execution_time = microtime(true) - $this->start_time;
-
         return $html;
     }
 

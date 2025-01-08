@@ -172,75 +172,9 @@ class Purify
         'style',
         'hidden',
         'display',
-         'innerHTML',  // Add innerHTML to allowed properties
-    'innerText'   // Add innerText since it's used in the script
+        'innerHTML',  // Add innerHTML to allowed properties
+        'innerText'   // Add innerText since it's used in the script
     ];
-
-    private static function isAllowedScript(string $script): bool 
-    {
-        // Allow the specific encoded-html script
-                    
-        $encodedHtmlScript = "document.addEventListener(\"DOMContentLoaded\",function(){document.querySelectorAll(`[data-state=\"encoded-html\"]`).forEach(e=>e.innerHTML=e.innerText)},!1);";
-
-        // Add your new script here
-        $tableVisibilityScript = "document.addEventListener('DOMContentLoaded',()=>{let tables=['product-table','task-table','delivery-note-table','statement-invoice-table','statement-payment-table','statement-aging-table-totals','statement-invoice-table-totals','statement-payment-table-totals','statement-aging-table','client-details','vendor-details','swiss-qr','shipping-details','statement-credit-table','statement-credit-table-totals'];tables.forEach(tableIdentifier=>{console.log(document.getElementById(tableIdentifier));document.getElementById(tableIdentifier)?.childElementCount===0?document.getElementById(tableIdentifier).style.setProperty('display','none','important'):'';});});";
-
-        if (trim($script) === $encodedHtmlScript || trim($script) === $tableVisibilityScript) {
-            return true;
-        }
-
-
-        // Check for dangerous patterns
-        $dangerous_patterns = [
-            '/<svg[^>]*>[^<]*<script/i',
-            '/<svg[^>]*>[^<]*<handler\b/i',
-            '/<svg[^>]*>[^<]*<animate/i',
-            '/<svg[^>]*>[^<]*<set\b/i',
-            '/<svg[^>]*>[^<]*<foreignObject/i',
-            // JavaScript global objects and methods
-            '/(window|global|globalThis|eval|Function|setTimeout|setInterval)/',
-            // Network requests
-            '/(fetch|XMLHttpRequest|WebSocket|Ajax)/',
-            // DOM manipulation beyond allowed methods
-            '/(createElement|appendChild|insertBefore|write|prepend|append)/',
-            // Dangerous properties
-            '/(constructor|prototype|__proto__)/',
-            // Encoding/decoding
-            '/(btoa|atob|encodeURI|decodeURI)/',
-            // File operations
-            '/(FileReader|Blob|Buffer)/',
-            // Script injection
-            '/(new\s+Function|eval\s*\(|setTimeout\s*\(|setInterval\s*\()/',
-        ];
-
-        foreach ($dangerous_patterns as $pattern) {
-            if (preg_match($pattern, $script)) {
-                return false;
-            }
-        }
-
-        // Check for allowed property access
-        $property_pattern = '/\.([\w]+)\s*=/';
-        if (preg_match_all($property_pattern, $script, $matches)) {
-            foreach ($matches[1] as $property) {
-                if (!in_array($property, self::$allowed_js_properties)) {
-                    return false;
-                }
-            }
-        }
-
-        // Check for allowed method calls
-        $method_pattern = '/\b([\w\.]+)\s*\(/';
-        if (preg_match_all($method_pattern, $script, $matches)) {
-            foreach ($matches[1] as $method) {
-                if (!in_array($method, self::$allowed_js_methods)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
 
     /**
      * Filter CSS to remove potentially dangerous styles
@@ -301,8 +235,6 @@ class Purify
 
         $html = str_replace('%24', '$', $html);
 
-        return $html;
-
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
 
@@ -338,16 +270,6 @@ class Purify
                     }
                     return;
                 }
-
-                // if (strtolower($node->tagName) === 'script') {
-                //     if (!self::isAllowedScript($node->textContent)) {
-                //         if ($node->parentNode) {
-                //             $node->parentNode->removeChild($node);
-                //         }
-                //         return;
-                //     }
-                //     // If script is allowed, continue with normal processing
-                // }
 
                 // Store current attributes before removing them
                 $current_attributes = [];
@@ -416,21 +338,15 @@ class Purify
                                 $regex = str_replace('\*', '.*', $regex);
                             }
 
-                            // Debug log
-                            // nlog("Checking against pattern: {$pattern} with regex: {$regex}");
-
                             if (preg_match('/' . $regex . '/i', $value)) {
                                 $is_allowed = true;
-                                // nlog("Match found! URL is allowed");
                                 break;
                             }
                         }
 
                         if ($is_allowed) {
                             $node->setAttribute($name, $value);
-                            // nlog("Attribute set successfully");
                         } else {
-                            // nlog("URL was not allowed");
                         }
                         continue;
                     }
@@ -454,9 +370,6 @@ class Purify
             $cleanNodes($document->documentElement);
 
             $html = str_replace('%24', '$', $document->saveHTML());
-
-            nlog("eeenndd");
-            nlog($html);
 
             return $html;
 
