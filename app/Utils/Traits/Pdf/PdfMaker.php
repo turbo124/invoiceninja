@@ -75,6 +75,10 @@ trait PdfMaker
             '--safebrowsing-disable-auto-update',
             '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
 
+            '--virtual-time-budget=2000',
+            '--font-render-hinting=medium',
+            '--enable-font-antialiasing',
+            
             // Debug/Output
             '--dump-dom',
         ];
@@ -101,7 +105,7 @@ trait PdfMaker
             $pdf->setChromiumPath(config('ninja.snappdf_chromium_path'));
         }
 
-        $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
+        // $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
         
         // nlog($html);
 
