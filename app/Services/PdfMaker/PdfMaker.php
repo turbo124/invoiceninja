@@ -59,7 +59,7 @@ class PdfMaker
 
     public function build()
     {
-        
+
         if (isset($this->data['template']) && isset($this->data['variables'])) {
             $this->getEmptyElements($this->data['template'], $this->data['variables']);
         }
@@ -146,23 +146,18 @@ class PdfMaker
         nlog("count = > ".count($elements));
 
         foreach ($elements as $element) {
-            $decoded = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
-            $decoded = str_replace(['<br>', '<BR>'], '<br/>', $decoded);
+            $clone = $element->cloneNode(true);
 
-            // Create a temporary document to parse the HTML
-            $temp = new \DOMDocument();
-            @$temp->loadHTML('<div>' . $decoded . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            // Filter allowed tags?
+            $clone->textContent = htmlspecialchars_decode($clone->textContent, ENT_QUOTES | ENT_HTML5);
+            $clone->textContent = str_replace(['<br>', '<BR>'], '<br/>', $clone->textContent);
 
-            // Get the content from the temporary document
-            $content = $temp->getElementsByTagName('div')->item(0);
-
-            if ($content) {
-                // Import and replace
-                $imported = $this->document->importNode($content, true);
+            if ($clone) {
+                $imported = $this->document->importNode($clone, true);
                 $element->parentNode->replaceChild($imported, $element);
             }
 
-            nlog($decoded);
+            nlog($clone->textContent);
         }
 
 
@@ -179,7 +174,7 @@ class PdfMaker
      */
     public function getCompiledHTML($final = false)
     {
-        
+
         $html = \App\Services\Pdf\Purify::clean($this->document->saveHTML());
 
         return $html;
