@@ -44,7 +44,7 @@
         "aws/aws-sdk-php": "^3.319",
         "babenkoivan/elastic-scout-driver": "^4.0",
         "bacon/bacon-qr-code": "^2.0",
-        "beganovich/snappdf": "^5.0",
+        "beganovich/snappdf": "dev-master",
         "braintree/braintree_php": "^6.0",
         "btcpayserver/btcpayserver-greenfield-php": "^2.6",
         "checkout/checkout-sdk-php": "^3.0",
@@ -53,7 +53,7 @@
         "fakerphp/faker": "^1.14",
         "getbrevo/brevo-php": "^1.0",
         "gocardless/gocardless-pro": "^4.12",
-        "google/apiclient": "^2.7",
+        "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.2",
         "halaxa/json-machine": "^0.7.0",
         "hashids/hashids": "^4.0",
@@ -218,6 +218,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/beganovich/php-ansible"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/turbo124/snappdf"
         }
     ],
     "minimum-stability": "dev",
