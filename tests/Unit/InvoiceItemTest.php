@@ -775,7 +775,7 @@ class InvoiceItemTest extends TestCase
 
         $invoice = $invoice->calc()->getInvoice();
 
-        3$item = $invoice->line_items[0];
+        $item = $invoice->line_items[0];
 
         $this->assertEquals(100, $invoice->amount);
         $this->assertEquals(13.04, $invoice->total_taxes);
