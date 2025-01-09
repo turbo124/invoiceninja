@@ -99,7 +99,6 @@ trait CompanySettingsSaver
             CompanyTaxRate::dispatch($entity);
         }
 
-
         $entity->save();
     }
 
@@ -207,14 +206,6 @@ trait CompanySettingsSaver
                 if (in_array($key, $this->string_ids)) {
                     $value = 'string';
                 }
-
-                // if ($key == 'gmail_sending_user_id') {
-                //     $value = 'string';
-                // }
-
-                // if ($key == 'besr_id') {
-                //     $value = 'string';
-                // }
 
                 if (! property_exists($settings, $key)) {
                     continue;
