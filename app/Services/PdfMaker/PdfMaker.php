@@ -142,40 +142,33 @@ class PdfMaker
         $xpath = new \DOMXPath($this->document);
         $elements = $xpath->query('//*[@data-state="encoded-html"]');
 
-        // nlog("count = > ".count($elements));
-
         foreach ($elements as $element) {
-                          
-            $decoded = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
-            $decoded = str_replace(['<br>', '<BR>'], '<br/>', $decoded);
 
-            // Create a temporary document to parse the HTML
+
+            // Decode the HTML content
+            $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+            $html = str_ireplace(['<br>'], '<br/>', $html);
+
+            // Create a temporary document to properly parse the HTML
             $temp = new \DOMDocument();
-            @$temp->loadHTML('<div>' . $decoded . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-            // Get the content from the temporary document
-            $content = $temp->getElementsByTagName('div')->item(0);
+            // Add UTF-8 wrapper and div container
+            $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
 
-            if ($content) {
-                // Import and replace
-                $imported = $this->document->importNode($content, true);
-                $element->parentNode->replaceChild($imported, $element);
+            // Load the HTML, suppressing any parsing warnings
+            @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+            // Import the div's contents
+            $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
+
+            // Clear existing content of the element
+            while ($element->firstChild) {
+                $element->removeChild($element->firstChild);
             }
 
-            // nlog($decoded);
+            // Append the new content to the element
+            $element->appendChild($imported);
 
-            // $clone = $element->cloneNode(true);
-
-            // // Filter allowed tags?
-            // $clone->textContent = htmlspecialchars_decode($clone->textContent, ENT_QUOTES | ENT_HTML5);
-            // $clone->textContent = str_replace(['<br>', '<BR>'], '<br/>', $clone->textContent);
-
-            // if ($clone) {
-            //     $imported = $this->document->importNode($clone, true);
-            //     $element->parentNode->replaceChild($imported, $element);
-            // }
-
-            // nlog($clone->textContent);
         }
 
 
