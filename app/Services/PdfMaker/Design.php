@@ -821,9 +821,7 @@ class Design extends BaseDesign
 
         $this->processTaxColumns($column_type);
 
-        $items = $this->transformLineItems($this->entity->line_items, $type);
-
-        $column_visibility = $this->getColumnVisibility($items, $type);
+        $column_visibility = $this->getColumnVisibility($this->entity->line_items, $type);
 
         foreach ($this->context['pdf_variables'][$table_type] as $column) {
             if (array_key_exists($column, $aliases)) {
@@ -1055,13 +1053,12 @@ class Design extends BaseDesign
 
         // Filter items by type_id
         $filtered_items = collect($items)->filter(function ($item) use ($type_id) {
-            return (!isset($item['type_id']) || $item['type_id'] == $type_id) ||
-                ($type_id == '1' && ($item['type_id'] == '4' || $item['type_id'] == '5' || $item['type_id'] == '6'));
+            return (!isset($item->type_id) || $item->type_id == $type_id) ||
+                ($type_id == '1' && ($item->type_id == '4' || $item->type_id == '5' || $item->type_id == '6'));
         });
 
         // Transform the items first
-        $transformed_items = $this->transformLineItems(
-            $filtered_items->toArray(),
+        $transformed_items = $this->transformLineItems($filtered_items,
             $type_id === '1' ? '$product' : '$task'
         );
 

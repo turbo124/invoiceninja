@@ -278,7 +278,7 @@ trait MakesInvoiceValues
                 }
             }
 
-            if (is_array($item) || ($table_type == '$task' && $item->type_id != 2)) {
+            if (($table_type == '$task' && $item->type_id != 2)) {
                 continue;
             }
 

@@ -146,18 +146,38 @@ class PdfMaker
         nlog("count = > ".count($elements));
 
         foreach ($elements as $element) {
-            $clone = $element->cloneNode(true);
+                    
+                    
+            $decoded = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+            $decoded = str_replace(['<br>', '<BR>'], '<br/>', $decoded);
 
-            // Filter allowed tags?
-            $clone->textContent = htmlspecialchars_decode($clone->textContent, ENT_QUOTES | ENT_HTML5);
-            $clone->textContent = str_replace(['<br>', '<BR>'], '<br/>', $clone->textContent);
+            // Create a temporary document to parse the HTML
+            $temp = new \DOMDocument();
+            @$temp->loadHTML('<div>' . $decoded . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-            if ($clone) {
-                $imported = $this->document->importNode($clone, true);
+            // Get the content from the temporary document
+            $content = $temp->getElementsByTagName('div')->item(0);
+
+            if ($content) {
+                // Import and replace
+                $imported = $this->document->importNode($content, true);
                 $element->parentNode->replaceChild($imported, $element);
             }
 
-            nlog($clone->textContent);
+            nlog($decoded);
+
+            // $clone = $element->cloneNode(true);
+
+            // // Filter allowed tags?
+            // $clone->textContent = htmlspecialchars_decode($clone->textContent, ENT_QUOTES | ENT_HTML5);
+            // $clone->textContent = str_replace(['<br>', '<BR>'], '<br/>', $clone->textContent);
+
+            // if ($clone) {
+            //     $imported = $this->document->importNode($clone, true);
+            //     $element->parentNode->replaceChild($imported, $element);
+            // }
+
+            // nlog($clone->textContent);
         }
 
 
