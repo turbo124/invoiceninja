@@ -1011,7 +1011,7 @@ class Design extends BaseDesign
                 }
             } else {
 
-                $column_visibility = $this->getColumnVisibility($items, $_type);
+                $column_visibility = $this->getColumnVisibility($this->entity->line_items, $_type);
 
                 foreach ($this->context['pdf_variables'][$table_type] as $key => $cell) {
                     // We want to keep aliases like these:
