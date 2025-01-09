@@ -764,16 +764,18 @@ class InvoiceItemTest extends TestCase
         $line_item = new InvoiceItem();
         $line_item->quantity = 1;
         $line_item->cost = 100;
+        $line_item->tax_name1 = 'Tax1';
         $line_item->tax_rate1 = 0;
+        $line_item->tax_name2 = 'Tax2';
         $line_item->tax_rate2 = 15;
         $line_items[] = $line_item;
 
         $invoice->line_items = $line_items;
         $invoice->save();
 
-        $item = $invoice->line_items[0];
-
         $invoice = $invoice->calc()->getInvoice();
+
+        $item = $invoice->line_items[0];
 
         $this->assertEquals(100, $invoice->amount);
         $this->assertEquals(13.04, $invoice->total_taxes);
