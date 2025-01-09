@@ -128,6 +128,7 @@ class EInvoiceController extends BaseController
      */
     public function quota(ShowQuotaRequest $request): JsonResponse
     {
+        nlog(["quota" => $request->all()]);
         /**
         * @var \App\Models\Company
         */
