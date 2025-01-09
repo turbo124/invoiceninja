@@ -66,7 +66,6 @@ jobs:
           tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf /home/runner/work/invoiceninja/invoiceninja.tar *
           cd ../
           tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf invoiceninja.tar.gz invoiceninja/
-          mv ./invoiceninja.tar.gz ./invoiceninja/
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
