@@ -821,24 +821,74 @@ class Design extends BaseDesign
 
         $this->processTaxColumns($column_type);
 
+        $items = $this->transformLineItems($this->entity->line_items, $type);
+
+        $column_visibility = $this->getColumnVisibility($items, $type);
 
         foreach ($this->context['pdf_variables'][$table_type] as $column) {
             if (array_key_exists($column, $aliases)) {
-                $elements[] = ['element' => 'th', 'content' => $aliases[$column] . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($aliases[$column], 1) . '-th', 'hidden' => $this->settings_object->getSetting('hide_empty_columns_on_pdf')]];
+                $elements[] = ['element' => 'th', 'content' => $aliases[$column] . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($aliases[$column], 1) . '-th', 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$product.discount' && !$this->company->enable_product_discount) {
                 $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'style' => 'display: none;']];
             } elseif ($column == '$product.tax_rate1') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax1-th", 'hidden' => $this->settings_object->getSetting('hide_empty_columns_on_pdf')]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax1-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$product.tax_rate2') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax2-th", 'hidden' => $this->settings_object->getSetting('hide_empty_columns_on_pdf')]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax2-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$product.tax_rate3') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax3-th", 'hidden' => $this->settings_object->getSetting('hide_empty_columns_on_pdf')]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax3-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } else {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'hidden' => $this->settings_object->getSetting('hide_empty_columns_on_pdf')]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             }
         }
 
+                
+        $visible_elements = array_filter($elements, function ($element) {
+            return $element['properties']['visi'] ?? true;
+        });
+
+        if (!empty($visible_elements)) {
+            $first_visible = array_key_first($visible_elements);
+            $last_visible = array_key_last($visible_elements);
+
+            // Add class to first visible element
+            if (!isset($elements[$first_visible]['properties']['class'])) {//@phpstan-ignore-line
+                $elements[$first_visible]['properties']['class'] = 'left-radius';
+            } else {
+                $elements[$first_visible]['properties']['class'] .= 'left-radius';
+            }
+
+            // Add class to last visible element
+            if (!isset($elements[$last_visible]['properties']['class'])) {
+                $elements[$last_visible]['properties']['class'] = 'right-radius';
+            } else {
+                $elements[$last_visible]['properties']['class'] .= 'right-radius';
+            }
+        }
+
+        $elements = array_map(function ($element) {
+            if (isset($element['properties']['visi'])) {
+                if ($element['properties']['visi'] === false) {
+                    $element['properties']['style'] = 'display: none;';
+                }
+                unset($element['properties']['visi']);
+            }
+            return $element;
+        }, $elements);
+
         return $elements;
+    }
+
+    private function visibilityCheck(array $column_visibility, string $column): bool
+    {
+        if(!$this->settings_object->getSetting('hide_empty_columns_on_pdf')){
+            return true;
+        }
+
+        if(array_key_exists($column, $column_visibility)){
+            return $column_visibility[$column] ? false: true;
+        }
+
+        return true;
     }
 
     /**
@@ -883,6 +933,45 @@ class Design extends BaseDesign
                     }
                 }
 
+            $visible_elements = array_filter($element['elements'], function ($el) {
+                if (isset($el['properties']['visi']) && $el['properties']['visi']) {
+                    return true;
+                }
+                return false;
+            });
+
+            if (!empty($visible_elements)) {
+                $first_visible = array_key_first($visible_elements);
+                $last_visible = array_key_last($visible_elements);
+
+                // Add class to first visible cell
+                if (!isset($element['elements'][$first_visible]['properties']['class'])) { //@phpstan-ignore-line
+                    $element['elements'][$first_visible]['properties']['class'] = 'left-radius';
+                } else {
+                    $element['elements'][$first_visible]['properties']['class'] .= ' left-radius';
+                }
+
+                // Add class to last visible cell
+                if (!isset($element['elements'][$last_visible]['properties']['class'])) {
+                    $element['elements'][$last_visible]['properties']['class'] = 'right-radius';
+                } else {
+                    $element['elements'][$last_visible]['properties']['class'] .= ' right-radius';
+                }
+            }
+
+
+            // Then, filter the elements array
+            $element['elements'] = array_map(function ($el) {
+                if (isset($el['properties']['visi'])) {
+                    if ($el['properties']['visi'] === false) {
+                        $el['properties']['style'] = 'display: none;';
+                    }
+                    unset($el['properties']['visi']);
+                }
+                return $el;
+            }, $element['elements']);
+
+
                 $elements[] = $element;
             }
 
@@ -923,27 +1012,30 @@ class Design extends BaseDesign
                     }
                 }
             } else {
+
+                $column_visibility = $this->getColumnVisibility($items, $_type);
+
                 foreach ($this->context['pdf_variables'][$table_type] as $key => $cell) {
                     // We want to keep aliases like these:
                     // $task.cost => $task.rate
                     // $task.quantity => $task.hours
 
                     if ($cell == '$task.rate') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.cost'], 'properties' => ['data-ref' => 'task_table-task.cost-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.cost'], 'properties' => ['data-ref' => 'task_table-task.cost-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.discount' && !$this->company->enable_product_discount) {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$product.discount'], 'properties' => ['data-ref' => 'product_table-product.discount-td', 'style' => 'display: none;']];
                     } elseif ($cell == '$task.hours') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.quantity'], 'properties' => ['data-ref' => 'task_table-task.hours-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.quantity'], 'properties' => ['data-ref' => 'task_table-task.hours-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.tax_rate1') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax1-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax1-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.tax_rate2') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax2-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax2-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.tax_rate3') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax3-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax3-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.unit_cost' || $cell == '$task.rate') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['style' => 'white-space: nowrap;', 'data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['style' => 'white-space: nowrap;', 'data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } else {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     }
                 }
             }
@@ -954,6 +1046,47 @@ class Design extends BaseDesign
         $document = null;
 
         return $elements;
+    }
+
+    private function getColumnVisibility(array $items, string $type_id): array
+    {
+        // Convert type_id to numeric
+        $type_id = $type_id === 'product' ? '1' : '2';
+
+        // Filter items by type_id
+        $filtered_items = collect($items)->filter(function ($item) use ($type_id) {
+            return (!isset($item['type_id']) || $item['type_id'] == $type_id) ||
+                ($type_id == '1' && ($item['type_id'] == '4' || $item['type_id'] == '5' || $item['type_id'] == '6'));
+        });
+
+        // Transform the items first
+        $transformed_items = $this->transformLineItems(
+            $filtered_items->toArray(),
+            $type_id === '1' ? '$product' : '$task'
+        );
+
+        $columns = [];
+
+        // Initialize all columns as empty
+        if (!empty($transformed_items)) {
+            $firstRow = reset($transformed_items);
+            foreach (array_keys($firstRow) as $column) {
+                $columns[$column] = true;
+            }
+        }
+
+        // Check each column for non-empty values
+        foreach ($transformed_items as $row) {
+            foreach ($row as $key => $value) {
+                if (!empty($value)) {
+                    $columns[$key] = false;
+                }
+            }
+        }
+
+        return $columns;
+
+
     }
 
     public function tableTotals(): array
