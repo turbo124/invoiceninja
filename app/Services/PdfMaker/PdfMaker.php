@@ -139,15 +139,13 @@ class PdfMaker
 
         }
 
-
         $xpath = new \DOMXPath($this->document);
         $elements = $xpath->query('//*[@data-state="encoded-html"]');
 
-        nlog("count = > ".count($elements));
+        // nlog("count = > ".count($elements));
 
         foreach ($elements as $element) {
-                    
-                    
+                          
             $decoded = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
             $decoded = str_replace(['<br>', '<BR>'], '<br/>', $decoded);
 
@@ -164,7 +162,7 @@ class PdfMaker
                 $element->parentNode->replaceChild($imported, $element);
             }
 
-            nlog($decoded);
+            // nlog($decoded);
 
             // $clone = $element->cloneNode(true);
 
