@@ -55,8 +55,8 @@ jobs:
         run: |
           rm -rf node_modules
           rm -rf .git
-          rm .env
-          rm -rf ui
+          rm .env || true
+          rm -rf ui || true
           # Set permissions: directories 755, files 644
           chmod -R a=r,u+w,a+X .
 
