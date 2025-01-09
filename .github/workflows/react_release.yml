@@ -55,15 +55,15 @@ jobs:
         run: |
           rm -rf node_modules
           rm -rf .git
-          rm .env
-          rm -rf ui
+          rm .env || true
+          rm -rf ui || true
           # Set permissions: directories 755, files 644
           chmod -R a=r,u+w,a+X .
 
       - name: Build project
         run: |
           shopt -s dotglob
-          tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf /home/runner/work/invoiceninja/invoiceninja.tar.gz *
+          tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf /home/runner/work/invoiceninja/invoiceninja.tar *
           cd ../
           tar --exclude='public/storage' --exclude='invoiceninja.tar' --exclude='invoiceninja.zip' -zcvf invoiceninja.tar.gz invoiceninja/
           mv ./invoiceninja.tar.gz ./invoiceninja/

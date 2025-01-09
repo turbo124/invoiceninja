@@ -33,6 +33,9 @@ class PdfBuilder
     private float $payment_amount_total = 0;
 
     private float $unapplied_total = 0;
+
+    private array $empty_elements = [];
+
     /**
      * an array of sections to be injected into the template
      *
@@ -72,11 +75,71 @@ class PdfBuilder
             ->getEmptyElements()
             ->updateElementProperties()
             ->parseTwigElements()
-            ->updateVariables();
+            ->updateVariables()
+            ->removeEmptyElements();
 
         return $this;
     }
 
+    private function removeEmptyElements(): self
+    { 
+        
+        $elements =[
+            'product-table', 'task-table', 'delivery-note-table',
+            'statement-invoice-table', 'statement-payment-table', 'statement-aging-table-totals',
+            'statement-invoice-table-totals', 'statement-payment-table-totals', 'statement-aging-table',
+            'client-details', 'vendor-details', 'swiss-qr', 'shipping-details', 'statement-credit-table', 'statement-credit-table-totals',
+        ];
+
+        foreach ($elements as $element) {
+                    
+            $el = $this->document->getElementById($element);
+
+            if ($el && $el->childElementCount === 0) {
+                $el->parentNode->removeChild($el); // This removes the element completely
+                // $el->setAttribute('style', 'display: none !important;');
+            }
+
+        }
+        
+        $xpath = new \DOMXPath($this->document);
+        $elements = $xpath->query('//*[@data-state="encoded-html"]');
+
+        foreach ($elements as $element) {
+
+                
+
+            // Decode the HTML content
+            $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+            $html = str_ireplace(['<br>'], '<br/>', $html);
+
+            // Create a temporary document to properly parse the HTML
+            $temp = new \DOMDocument();
+
+            // Add UTF-8 wrapper and div container
+            $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
+
+            // Load the HTML, suppressing any parsing warnings
+            @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+            // Import the div's contents
+            $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
+
+            // Clear existing content of the element
+            while ($element->firstChild) {
+                $element->removeChild($element->firstChild);
+            }
+
+            // Append the new content to the element
+            $element->appendChild($imported);
+
+
+
+        }
+
+
+        return $this;
+    }
     /**
     * Final method to get compiled HTML.
     *
@@ -610,7 +673,7 @@ class PdfBuilder
             'footer-elements' => [
                 'id' => 'footer',
                 'elements' => [
-                    $this->sharedFooterElements(),
+                    // $this->sharedFooterElements(),
                 ],
             ],
         ]);
@@ -733,44 +796,85 @@ class PdfBuilder
             } else {
                 $_type = Str::startsWith($type, '$') ? ltrim($type, '$') : $type;
 
+                $column_visibility = $this->getColumnVisibility($this->service->config->entity->line_items, $_type);
+                
                 foreach ($this->service->config->pdf_variables[$table_type] as $key => $cell) {
                     // We want to keep aliases like these:
                     // $task.cost => $task.rate
                     // $task.quantity => $task.hours
 
                     if ($cell == '$task.rate') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.cost'], 'properties' => ['data-ref' => 'task_table-task.cost-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.cost'], 'properties' => ['data-ref' => 'task_table-task.cost-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.discount' && !$this->service->company->enable_product_discount) {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$product.discount'], 'properties' => ['data-ref' => 'product_table-product.discount-td', 'style' => 'display: none;']];
                     } elseif ($cell == '$task.hours') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.quantity'], 'properties' => ['data-ref' => 'task_table-task.hours-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row['$task.quantity'], 'properties' => ['data-ref' => 'task_table-task.hours-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.tax_rate1') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax1-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax1-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.tax_rate2') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax2-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax2-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.tax_rate3') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax3-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'product_table-product.tax3-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$task.discount' && !$this->service->company->enable_product_discount) {
                         $element['elements'][] = ['element' => 'td', 'content' => $row['$task.discount'], 'properties' => ['data-ref' => 'task_table-task.discount-td', 'style' => 'display: none;']];
                     } elseif ($cell == '$task.tax_rate1') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax1-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax1-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$task.tax_rate2') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax2-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax2-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$task.tax_rate3') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax3-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => 'task_table-task.tax3-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     } elseif ($cell == '$product.unit_cost' || $cell == '$task.rate') {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['style' => 'white-space: nowrap;', 'data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['style' => 'white-space: nowrap;', 'data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td', 'style' => $this->visibilityCheck($column_visibility, $cell)]];
                     } else {
-                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td']];
+                        $element['elements'][] = ['element' => 'td', 'content' => $row[$cell], 'properties' => ['data-ref' => "{$_type}_table-" . substr($cell, 1) . '-td', 'visi' => $this->visibilityCheck($column_visibility, $cell)]];
                     }
                 }
             }
+                                    
+            $visible_elements = array_filter($element['elements'], function ($el) {
+                if (isset($el['properties']['visi']) && $el['properties']['visi']) {
+                    return true;
+                }
+                return false;
+            });
+
+            if (!empty($visible_elements)) {
+                $first_visible = array_key_first($visible_elements);
+                $last_visible = array_key_last($visible_elements);
+
+                // Add class to first visible cell
+                if (!isset($element['elements'][$first_visible]['properties']['class'])) { //@phpstan-ignore-line
+                    $element['elements'][$first_visible]['properties']['class'] = 'left-radius';
+                } else {
+                    $element['elements'][$first_visible]['properties']['class'] .= ' left-radius';
+                }
+
+                // Add class to last visible cell
+                if (!isset($element['elements'][$last_visible]['properties']['class'])) {
+                    $element['elements'][$last_visible]['properties']['class'] = 'right-radius';
+                } else {
+                    $element['elements'][$last_visible]['properties']['class'] .= ' right-radius';
+                }
+            }
+            
+
+            // Then, filter the elements array
+            $element['elements'] = array_map(function ($el) {
+                if (isset($el['properties']['visi'])) {
+                    if ($el['properties']['visi'] === false) {
+                        $el['properties']['style'] = 'display: none;';
+                    }
+                    unset($el['properties']['visi']);
+                }
+                return $el;
+            }, $element['elements']);
+
 
             $elements[] = $element;
         }
 
         $document = null;
-
+                
         return $elements;
     }
 
@@ -889,6 +993,49 @@ class PdfBuilder
         return $data;
     }
 
+
+    private function getColumnVisibility(array $items, string $type_id): array
+    {
+                
+        // Convert type_id to numeric
+        $type_id = $type_id === 'product' ? '1' : '2';
+
+        // Filter items by type_id
+        $filtered_items = collect($items)->filter(function ($item) use ($type_id) {
+            return $item->type_id == $type_id ||
+                ($type_id == '1' && ($item->type_id == '4' || $item->type_id == '5' || $item->type_id == '6'));
+        });
+
+        // Transform the items first
+        $transformed_items = $this->transformLineItems(
+            $filtered_items->toArray(),
+            $type_id === '1' ? '$product' : '$task'
+        );
+
+        $columns = [];
+
+        // Initialize all columns as empty
+        if (!empty($transformed_items)) {
+            $firstRow = reset($transformed_items);
+            foreach (array_keys($firstRow) as $column) {
+                $columns[$column] = true;
+            }
+        }
+
+        // Check each column for non-empty values
+        foreach ($transformed_items as $row) {
+            foreach ($row as $key => $value) {
+                if (!empty($value)) {
+                    $columns[$key] = false;
+                }
+            }
+        }
+
+        return $columns;
+
+
+    }
+
     /**
     * Generate the structure of table headers. (<thead/>)
     *
@@ -919,31 +1066,80 @@ class PdfBuilder
 
         $this->processTaxColumns($column_type);
 
+        $column_visibility = $this->getColumnVisibility($this->service->config->entity->line_items, $type);
+    
         foreach ($this->service->config->pdf_variables[$table_type] as $column) {
+            
             if (array_key_exists($column, $aliases)) {
-                $elements[] = ['element' => 'th', 'content' => $aliases[$column] . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($aliases[$column], 1) . '-th', 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $aliases[$column] . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($aliases[$column], 1) . '-th', 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$product.discount' && !$this->service->company->enable_product_discount) {
                 $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'style' => 'display: none;']];
             } elseif ($column == '$product.tax_rate1') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax1-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax1-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$product.tax_rate2') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax2-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax2-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$product.tax_rate3') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax3-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-product.tax3-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$task.discount' && !$this->service->company->enable_product_discount) {
                 $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'style' => 'display: none;']];
             } elseif ($column == '$task.tax_rate1') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-task.tax1-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => '$task.tax_name1_label', 'properties' => ['data-ref' => "{$type}_table-task.tax1-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$task.tax_rate2') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-task.tax2-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => '$task.tax_name1_label', 'properties' => ['data-ref' => "{$type}_table-task.tax2-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } elseif ($column == '$task.tax_rate3') {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-task.tax3-th", 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => '$task.tax_name1_label', 'properties' => ['data-ref' => "{$type}_table-task.tax3-th", 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             } else {
-                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'hidden' => $this->service->config->settings->hide_empty_columns_on_pdf]];
+                $elements[] = ['element' => 'th', 'content' => $column . '_label', 'properties' => ['data-ref' => "{$type}_table-" . substr($column, 1) . '-th', 'visi' => $this->visibilityCheck($column_visibility, $column)]];
             }
         }
+        
+        $visible_elements = array_filter($elements, function ($element) {
+            return $element['properties']['visi'] ?? true;
+        });
+
+        if (!empty($visible_elements)) {
+            $first_visible = array_key_first($visible_elements);
+            $last_visible = array_key_last($visible_elements);
+
+            // Add class to first visible element
+            if (!isset($elements[$first_visible]['properties']['class'])) {//@phpstan-ignore-line
+                $elements[$first_visible]['properties']['class'] = 'left-radius';
+            } else {
+                $elements[$first_visible]['properties']['class'] .= 'left-radius';
+            }
+
+            // Add class to last visible element
+            if (!isset($elements[$last_visible]['properties']['class'])) {
+                $elements[$last_visible]['properties']['class'] = 'right-radius';
+            } else {
+                $elements[$last_visible]['properties']['class'] .= 'right-radius';
+            }
+        }
+                
+        $elements = array_map(function ($element) {
+            if (isset($element['properties']['visi'])) {
+                if ($element['properties']['visi'] === false) {
+                    $element['properties']['style'] = 'display: none;';
+                }
+                unset($element['properties']['visi']);
+            }
+            return $element;
+        }, $elements);
 
         return $elements;
+    }
+
+    private function visibilityCheck(array $column_visibility, string $column): bool
+    {
+        if(!$this->service->config->settings->hide_empty_columns_on_pdf){
+            return true;
+        }
+
+        if(array_key_exists($column, $column_visibility)){
+            return $column_visibility[$column] ? false: true;
+        }
+
+        return true;
     }
 
     /**
@@ -1371,7 +1567,9 @@ class PdfBuilder
         }
 
         return [
-            ['element' => 'thead', 'elements' => $this->buildTableHeader('product')],
+            ['element' => 'thead', 'properties' => [], 'elements' => [
+            ['element' => 'tr', 'elements' => $this->buildTableHeader('product')],
+            ]],
             ['element' => 'tbody', 'elements' => $this->buildTableBody('$product')],
         ];
     }
@@ -1392,7 +1590,9 @@ class PdfBuilder
         }
 
         return [
-            ['element' => 'thead', 'elements' => $this->buildTableHeader('task')],
+            ['element' => 'thead', 'properties' => [], 'elements' => [
+                ['element' => 'tr', 'elements' => $this->buildTableHeader('task')],
+            ]],
             ['element' => 'tbody', 'elements' => $this->buildTableBody('$task')],
         ];
     }
@@ -1411,7 +1611,7 @@ class PdfBuilder
         return [
             ['element' => 'tr', 'properties' => ['data-ref' => 'statement-label'], 'elements' => [
                 ['element' => 'th', 'properties' => [], 'content' => ""],
-                ['element' => 'th', 'properties' => [], 'content' => "<h2>".ctrans('texts.statement')."</h2>"],
+                ['element' => 'th', 'properties' => [], 'content' => '<h2>'.ctrans('texts.statement').'</h2>'],
             ]],
             ['element' => 'tr', 'properties' => [], 'elements' => [
                 ['element' => 'th', 'properties' => [], 'content' => ctrans('texts.statement_date')],

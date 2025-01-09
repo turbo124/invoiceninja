@@ -32,7 +32,7 @@ trait PdfMaker
 
         $chrome_flags = [
             '--headless',
-            '--sandbox',
+            '--no-sandbox',
             '--disable-gpu',
             '--no-margins',
             '--hide-scrollbars',
@@ -75,9 +75,25 @@ trait PdfMaker
             '--safebrowsing-disable-auto-update',
             '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
 
+            '--virtual-time-budget=2000',
+            '--font-render-hinting=medium',
+            '--enable-font-antialiasing',
+            
             // Debug/Output
             '--dump-dom',
         ];
+
+
+        if(config('ninja.is_docker')){
+
+            
+            if (($key = array_search('--sandbox', $chrome_flags)) !== false) {
+                unset($chrome_flags[$key]);
+            }
+
+            $chrome_flags[] = '--no-sandbox';
+
+        }
 
         // if (config('ninja.snappdf_chromium_arguments')) {
             $pdf->clearChromiumArguments();
@@ -92,7 +108,6 @@ trait PdfMaker
         $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
         
         // nlog($html);
-
         $generated = $pdf
                         ->setHtml($html)
                         ->generate();

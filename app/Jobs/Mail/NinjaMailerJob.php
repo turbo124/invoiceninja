@@ -97,7 +97,7 @@ class NinjaMailerJob implements ShouldQueue
                 $reply_to_name = $this->nmo->settings->reply_to_email;
             }
 
-            $this->nmo->mailable->replyTo($this->nmo->settings->reply_to_email, $reply_to_name);
+        $this->nmo->mailable->replyTo($this->nmo->settings->reply_to_email, $reply_to_name);
         } elseif (isset($this->nmo->invitation->user)) {
             $this->nmo->mailable->replyTo($this->nmo->invitation->user->email, $this->nmo->invitation->user->present()->name());
         } else {

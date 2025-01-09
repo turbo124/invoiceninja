@@ -130,9 +130,11 @@ class License extends StaticModel
             return;
         }
 
-        $this->entities = array_filter($this->entities, function ($existingEntity) use ($entity) {
+        $entities = array_filter($this->entities, function ($existingEntity) use ($entity) {
             return $existingEntity->legal_entity_id !== $entity->legal_entity_id;
         });
+
+        $this->entities = $entities;
 
         $this->save();
 

@@ -272,6 +272,8 @@ class InvoiceItemSumInclusive
 
         $this->item->tax_amount = $this->formatValue($item_tax, $this->currency->precision);
 
+        $this->item->net_cost = round(($amount - $this->item->tax_amount)/$this->item->quantity, $this->currency->precision);
+
         $this->setTotalTaxes($this->formatValue($item_tax, $this->currency->precision));
 
         return $this;
@@ -367,13 +369,11 @@ class InvoiceItemSumInclusive
     {
         $this->setGroupedTaxes(collect([]));
 
-
         foreach ($this->line_items as $this->item) {
             if ($this->sub_total == 0) {
                 $amount = $this->item->line_total;
             } else {
                 $amount = $this->item->line_total - ($this->invoice->discount * ($this->item->line_total / $this->sub_total));
-                // $amount = $this->item->line_total - ($this->item->line_total * ($this->invoice->discount / $this->sub_total));
             }
 
             $item_tax = 0;
@@ -406,6 +406,9 @@ class InvoiceItemSumInclusive
             $this->item->gross_line_total = $this->getLineTotal();
 
             $this->item->tax_amount = $item_tax;
+
+            $this->item->net_cost = round($amount * (100 / (100 + ($this->item->tax_rate1+$this->item->tax_rate2+$this->item->tax_rate3))) / $this->item->quantity, $this->currency->precision+1);
+            $this->item->net_cost = round($this->item->net_cost, $this->currency->precision);
 
         }
 

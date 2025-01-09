@@ -59,7 +59,7 @@ class PdfMaker
 
     public function build()
     {
-        
+
         if (isset($this->data['template']) && isset($this->data['variables'])) {
             $this->getEmptyElements($this->data['template'], $this->data['variables']);
         }
@@ -121,6 +121,59 @@ class PdfMaker
             $this->updateVariables($this->data['variables']);
         }
 
+
+        $elements = [
+                    'product-table', 'task-table', 'delivery-note-table',
+                    'statement-invoice-table', 'statement-payment-table', 'statement-aging-table-totals',
+                    'statement-invoice-table-totals', 'statement-payment-table-totals', 'statement-aging-table',
+                    'client-details', 'vendor-details', 'swiss-qr', 'shipping-details', 'statement-credit-table', 'statement-credit-table-totals',
+                ];
+
+        foreach ($elements as $element) {
+
+            $el = $this->document->getElementById($element);
+
+            if ($el && $el->childElementCount === 0) {
+                $el->setAttribute('style', 'display: none !important;');
+            }
+
+        }
+
+        $xpath = new \DOMXPath($this->document);
+        $elements = $xpath->query('//*[@data-state="encoded-html"]');
+
+        foreach ($elements as $element) {
+
+
+            // Decode the HTML content
+            $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+            $html = str_ireplace(['<br>'], '<br/>', $html);
+
+            // Create a temporary document to properly parse the HTML
+            $temp = new \DOMDocument();
+
+            // Add UTF-8 wrapper and div container
+            $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
+
+            // Load the HTML, suppressing any parsing warnings
+            @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+            // Import the div's contents
+            $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
+
+            // Clear existing content of the element
+            while ($element->firstChild) {
+                $element->removeChild($element->firstChild);
+            }
+
+            // Append the new content to the element
+            $element->appendChild($imported);
+
+        }
+
+
+
+
         return $this;
     }
 
@@ -132,9 +185,11 @@ class PdfMaker
      */
     public function getCompiledHTML($final = false)
     {
-        
-        return \App\Services\Pdf\Purify::clean($this->document->saveHTML());
-     
+
+        $html = \App\Services\Pdf\Purify::clean($this->document->saveHTML());
+
+        return $html;
+
     }
 
 }

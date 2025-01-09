@@ -67,7 +67,6 @@
 
     .header-wrapper .header-right-side-wrapper {
         display: grid;
-        /* grid-template-columns: 1fr 1fr; */
         gap: 10px;
         border-left: 1px solid #303030;
         padding-left: 1rem;
@@ -142,6 +141,16 @@
         display: none;
     }
 
+    td.left-radius {
+        text-align:left !important;
+        padding-left: 1rem !important;
+    }
+
+    th.left-radius {
+        text-align:left !important;
+        padding-left: 0.5rem !important;
+    }
+
     [data-ref="table"] {
         margin-top: 1rem;
         margin-bottom: 5px;
@@ -169,25 +178,22 @@
         border-left: 1px solid;
     }
 
-    [data-ref="table"] > thead > tr > th:last-child {
-        text-align: right;
-        padding-right: 1rem;
-    }
-
     [data-ref="table"] > thead > tr > th:nth-last-child(2) {
         text-align: right;
         padding-right: 1rem;
     }
 
     [data-ref="table"] > tbody > tr > td {
-        padding: 1rem;
+        padding-left: 1rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
         border-left: 1px solid;
     }
 
-    [data-ref="table"] > tbody > tr td:last-child {
+    .right-radius {
         text-align: right;
     }
-
+    
     #table-totals {
         margin-top: 1rem;
         display: grid;
@@ -249,7 +255,67 @@
         margin-bottom: 0;
     }
 
-    [data-ref="product_table-product.unit_cost-td"] { text-align: right; }
+    [data-ref='product_table-product.description-td'] {
+        min-width:100px;
+        overflow-wrap: break-word; 
+    }
+    
+    [data-ref='task_table-task.description-th'] {
+        overflow-wrap: break-word;
+        min-width: 100px !important;
+    }
+
+    [data-ref="product_table-product.unit_cost-td"],
+    [data-ref="product_table-product.unit_cost-th"]{ 
+        text-align: center; 
+        width: 10%;
+         padding-left:0 !important;
+        padding-right:0 !important;
+    }
+
+    [data-ref="product_table-product.quantity-th"],
+    [data-ref="product_table-product.quantity-td"]{
+        width: 10%;
+        text-align: center; 
+        padding-left:0 !important;
+        padding-right:0 !important;
+    }
+
+    [data-ref="product_table-product.tax1-th"],
+    [data-ref="product_table-product.tax1-td"] {
+        text-align: center;
+        width: 6%;
+        padding-left:0 !important;
+        padding-right:0 !important;
+    }
+
+    [data-ref="product_table-product.line_total-th"],
+    [data-ref="product_table-product.line_total-td"] {
+        text-align: right;
+        width: 13%;
+    }
+
+    [data-ref='task_table-task.hours-th'],
+    [data-ref='task_table-task.hours-td'] {
+        text-align: center;
+        padding-left:0 !important;
+        padding-right:0 !important;
+        width: 6%;
+     }
+
+     [data-ref='task_table-task.cost-th'],
+    [data-ref='task_table-task.cost-td'] {
+        text-align: center;
+        padding-left:0 !important;
+        padding-right:0 !important;
+        width: 8%;
+     }
+
+     [data-ref="task_table-task.line_total-th"],
+    [data-ref="task_table-task.line_total-td"] {
+        text-align: right;
+        width: 13%;
+    }
 
     [data-ref="totals_table-outstanding"] { color: var(--primary-color); }
 
@@ -278,12 +344,8 @@
         bottom: 0;
     }
 
-    [data-element='product_table-product.description-td'], td {
-        min-width:100%;
-        max-width: 300px;
-        overflow-wrap: break-word; 
-    }
-    
+   
+
     .stamp {
       transform: rotate(12deg);
         color: #555;
@@ -329,6 +391,10 @@
     .pqrcode {
         
     }
+    #qr-bill{
+        width:100%;
+    }
+
     /** Useful snippets, uncomment to enable. **/
 
     /** Hide company logo **/
@@ -454,24 +520,6 @@ $entity_images
 <div class="repeating-footerx" id="footer">
    <p data-ref="total_table-footer">$entity_footer</p>
 
-        <script>
-            // Clear up space a bit, if [product-table, tasks-table, delivery-note-table] isn't present.
-            document.addEventListener('DOMContentLoaded', () => {
-                let tables = [
-                    'product-table', 'task-table', 'delivery-note-table',
-                    'statement-invoice-table', 'statement-payment-table', 'statement-aging-table-totals',
-                    'statement-invoice-table-totals', 'statement-payment-table-totals', 'statement-aging-table',
-                    'client-details', 'vendor-details', 'swiss-qr', 'shipping-details', 'statement-credit-table', 'statement-credit-table-totals',
-                ];
-
-                tables.forEach((tableIdentifier) => {
-                    console.log(document.getElementById(tableIdentifier));
-
-                    document.getElementById(tableIdentifier)?.childElementCount === 0
-                        ? document.getElementById(tableIdentifier).style.setProperty('display', 'none', 'important')
-                        : '';
-                });
-            });
-        </script>
+       
 </div>
 
