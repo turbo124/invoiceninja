@@ -63,7 +63,7 @@ jobs:
       - name: Build project
         run: |
           shopt -s dotglob
-          tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf /home/runner/work/invoiceninja/invoiceninja.tar.gz *
+          tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf /home/runner/work/invoiceninja/invoiceninja.tar *
           cd ../
           tar --exclude='public/storage' --exclude='invoiceninja.zip' -zcvf invoiceninja.tar.gz invoiceninja/
           mv ./invoiceninja.tar.gz ./invoiceninja/
