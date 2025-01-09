@@ -32,7 +32,7 @@ trait PdfMaker
 
         $chrome_flags = [
             '--headless',
-            '--sandbox',
+            '--no-sandbox',
             '--disable-gpu',
             '--no-margins',
             '--hide-scrollbars',

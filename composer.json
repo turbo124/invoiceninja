@@ -44,7 +44,7 @@
         "aws/aws-sdk-php": "^3.319",
         "babenkoivan/elastic-scout-driver": "^4.0",
         "bacon/bacon-qr-code": "^2.0",
-        "beganovich/snappdf": "^5.0",
+        "beganovich/snappdf": "dev-master",
         "braintree/braintree_php": "^6.0",
         "btcpayserver/btcpayserver-greenfield-php": "^2.6",
         "checkout/checkout-sdk-php": "^3.0",
@@ -218,6 +218,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/beganovich/php-ansible"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/turbo124/snappdf"
         }
     ],
     "minimum-stability": "dev",
