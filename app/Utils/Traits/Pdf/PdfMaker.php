@@ -83,18 +83,6 @@ trait PdfMaker
             '--dump-dom',
         ];
 
-
-        if(config('ninja.is_docker')){
-
-            
-            if (($key = array_search('--sandbox', $chrome_flags)) !== false) {
-                unset($chrome_flags[$key]);
-            }
-
-            $chrome_flags[] = '--no-sandbox';
-
-        }
-
         // if (config('ninja.snappdf_chromium_arguments')) {
             $pdf->clearChromiumArguments();
             // $pdf->addChromiumArguments(config('ninja.snappdf_chromium_arguments'));

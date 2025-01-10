@@ -143,7 +143,13 @@ class Purify
             // IE-specific expressions
             '/progid\s*:/',
             '/setExpression\s*\(/',
-            '/AlphaImageLoader\s*\(/'
+            '/AlphaImageLoader\s*\(/',
+            '/chrome-extension\s*:/',
+            '/file\s*:/',
+            '/ftp\s*:/',
+            '/gopher\s*:/',
+            '/ws\s*:/',
+            '/wss\s*:/',
         ];
 
     private static array $dangerous_css_properties = [
@@ -234,6 +240,9 @@ class Purify
         }
 
         $html = str_replace('%24', '$', $html);
+
+        libxml_use_internal_errors(true);
+        libxml_disable_entity_loader(true); // Prevent XXE
 
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
