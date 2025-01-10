@@ -163,25 +163,6 @@ class Purify
         'backdrop-filter',
     ];
 
-    private static array $allowed_js_methods = [
-        'document.addEventListener',
-        'document.getElementById',
-        'document.querySelector',
-        'document.querySelectorAll',
-        'forEach',
-        'style.setProperty',
-        'console.log'
-    ];
-
-    private static array $allowed_js_properties = [
-        'childElementCount',
-        'style',
-        'hidden',
-        'display',
-        'innerHTML',  // Add innerHTML to allowed properties
-        'innerText'   // Add innerText since it's used in the script
-    ];
-
     /**
      * Filter CSS to remove potentially dangerous styles
      */
@@ -242,7 +223,7 @@ class Purify
         $html = str_replace('%24', '$', $html);
 
         libxml_use_internal_errors(true);
-        libxml_disable_entity_loader(true); // Prevent XXE
+        libxml_disable_entity_loader(true);
 
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
