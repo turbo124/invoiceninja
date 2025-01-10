@@ -12,6 +12,7 @@
 
 namespace App\Services\EDocument\Standards;
 
+use DateTime;
 use App\Models\Quote;
 use App\Models\Client;
 use App\Models\Credit;
@@ -21,8 +22,8 @@ use App\Models\Product;
 use App\DataMapper\InvoiceItem;
 use App\Services\AbstractService;
 use App\Helpers\Invoice\InvoiceSum;
-use DateTime;
 use horstoeko\zugferd\ZugferdProfiles;
+use App\Helpers\Invoice\InvoiceSumInclusive;
 use horstoeko\zugferd\ZugferdDocumentBuilder;
 use horstoeko\zugferd\codelists\ZugferdDocumentType;
 use horstoeko\zugferd\codelists\ZugferdDutyTaxFeeCategories;
@@ -35,7 +36,7 @@ class ZugferdEDocument extends AbstractService
 
     private Client $client;
 
-    private InvoiceSum | InvoiceInclusiveSum $calc;
+    private InvoiceSum | InvoiceSumInclusive $calc;
     /**
      * __construct
      *
@@ -108,14 +109,43 @@ class ZugferdEDocument extends AbstractService
             return $this;
         }
 
+        // Get document level discount
+        $document_discount = $this->calc->getTotalDiscount();
+        $total_taxable = $this->getTaxable();
+
+        // Process each tax rate group
         foreach ($this->calc->getTaxMap() as $item) {
             $tax_type = $this->getTaxType($item["tax_id"]);
+            
+            // Calculate proportional discount for this tax group
+            $tax_group_total = $item["base_amount"];
+            $proportional_discount = 0;
+            
+            if ($document_discount > 0 && $total_taxable > 0) {
+                $proportional_discount = round(($tax_group_total / $total_taxable) * $document_discount, 2);
+            }
 
+            // Adjusted taxable amount for this tax group
+            $adjusted_taxable = $tax_group_total - $proportional_discount;
+
+            // Add document level allowance (discount) if present
+            if ($proportional_discount > 0) {
+                $this->xdocument->addDocumentAllowanceCharge(
+                    $proportional_discount,
+                    false, // isCharge = false means it's a discount
+                    $tax_type,
+                    "VAT",
+                    $item["tax_rate"]
+                );
+            }
+
+            // Add tax information
             $this->xdocument->addDocumentTax(
                 $tax_type,
                 "VAT",
+                $adjusted_taxable, // Taxable amount after discount
+                // ($item["tax_rate"] / 100) * $adjusted_taxable, // Tax amount
                 $item["total"],
-                ($item["tax_rate"] / 100) * $item["total"],
                 $item["tax_rate"],
                 $tax_type == ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
                     ? ctrans('texts.intracommunity_tax_info')
@@ -161,17 +191,22 @@ class ZugferdEDocument extends AbstractService
     private function setDocumentSummation(): self
     {
         $document_discount = $this->calc->getTotalDiscount();
+        $total_tax = $this->calc->getTotalTaxes();
+        $subtotal = $this->calc->getTotal() - $total_tax;
 
+        // Calculate amounts after discount
+        $taxable_amount = $this->getTaxable();
+        
         $this->xdocument->setDocumentSummation(
-            $this->document->amount,
-            $this->document->balance,
-            $this->calc->getSubTotal(),
-            $this->calc->getTotalSurcharges(),
-            $document_discount,
-            $this->calc->getSubTotal() - $document_discount,
-            $this->calc->getItemTotalTaxes(),
-            0.0,
-            $this->document->amount - $this->document->balance
+            $this->document->amount,                    // Total amount with VAT
+            $this->document->balance,                   // Amount due
+            $subtotal,                                  // Sum before tax
+            $this->calc->getTotalSurcharges(),         // Total charges
+            $document_discount,                         // Total allowances
+            $taxable_amount,                           // Tax basis total (net)
+            $total_tax,                                // Total tax amount
+            0.0,                                       // Total prepaid amount
+            $this->document->amount - $this->document->balance  // Amount already paid
         );
 
         return $this;
