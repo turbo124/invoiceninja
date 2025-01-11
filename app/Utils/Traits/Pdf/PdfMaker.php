@@ -93,7 +93,7 @@ trait PdfMaker
             $pdf->setChromiumPath(config('ninja.snappdf_chromium_path'));
         }
 
-        // $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
+        $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
         
         // nlog($html);
         $generated = $pdf
