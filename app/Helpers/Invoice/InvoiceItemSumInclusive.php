@@ -108,7 +108,7 @@ class InvoiceItemSumInclusive
     private $sub_total;
 
     private $tax_collection;
-
+7
     private bool $calc_tax = false;
 
     private Client | Vendor $client;
@@ -272,7 +272,11 @@ class InvoiceItemSumInclusive
 
         $this->item->tax_amount = $this->formatValue($item_tax, $this->currency->precision);
 
-        $this->item->net_cost = round(($amount - $this->item->tax_amount)/$this->item->quantity, $this->currency->precision);
+        try{
+            $this->item->net_cost = round(($amount - $this->item->tax_amount)/$this->item->quantity, $this->currency->precision);
+        } catch (\DivisionByZeroError $e) {
+            $this->item->net_cost = $this->item->cost;
+        }
 
         $this->setTotalTaxes($this->formatValue($item_tax, $this->currency->precision));
 
@@ -407,8 +411,12 @@ class InvoiceItemSumInclusive
 
             $this->item->tax_amount = $item_tax;
 
-            $this->item->net_cost = round($amount * (100 / (100 + ($this->item->tax_rate1+$this->item->tax_rate2+$this->item->tax_rate3))) / $this->item->quantity, $this->currency->precision+1);
-            $this->item->net_cost = round($this->item->net_cost, $this->currency->precision);
+            try{
+                $this->item->net_cost = round($amount * (100 / (100 + ($this->item->tax_rate1+$this->item->tax_rate2+$this->item->tax_rate3))) / $this->item->quantity, $this->currency->precision+1);
+                $this->item->net_cost = round($this->item->net_cost, $this->currency->precision);
+            } catch (\DivisionByZeroError $e) {
+                $this->item->net_cost = $this->item->cost;
+            }
 
         }
 
