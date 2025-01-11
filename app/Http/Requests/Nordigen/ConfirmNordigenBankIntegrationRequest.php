@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -20,36 +21,27 @@ class ConfirmNordigenBankIntegrationRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
             'ref' => 'required|string', // nordigen redirects only with the ref-property
             'lang' => 'string',
         ];
     }
-
-    /**
-     * @return array{
-     *   user_id: int,
-     *   company_key: string,
-     *   context: string,
-     *   is_react: bool,
-     *   institution_id: string,
-     *   lang: string,
-     *   redirect: string,
-     *   requisitionId: string
-     * }
-     */
-    public function getTokenContent(): array
+    public function getTokenContent()
     {
         $input = $this->all();
 
@@ -58,12 +50,10 @@ class ConfirmNordigenBankIntegrationRequest extends Request
         return $data;
     }
 
-    public function getCompany(): Company
+    public function getCompany()
     {
-        $key = $this->getTokenContent()['company_key'];
+        MultiDB::findAndSetDbByCompanyKey($this->getTokenContent()['company_key']);
 
-        MultiDB::findAndSetDbByCompanyKey($key);
-
-        return Company::where('company_key', $key)->firstOrFail();
+        return Company::where('company_key', $this->getTokenContent()['company_key'])->firstOrFail();
     }
 }
