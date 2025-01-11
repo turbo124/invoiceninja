@@ -125,6 +125,11 @@ class StorecoveRouter
             default => $code = "B",
         };
 
+        //DE we can route via Steurnummer? double check with storecove @blocked
+        if ($country == "DE" && $classification == 'individual') {
+            return 'DE:STNR';
+        }
+
         //France determine routing scheme
         if ($this->invoice && $country == 'FR') {
 
