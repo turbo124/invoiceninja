@@ -1103,12 +1103,13 @@ class Design extends BaseDesign
             : ['values' => ['$entity.public_notes' => $this->entity->public_notes, '$entity.terms' => $this->entity->terms, '$entity_footer' => $this->entity->footer], 'labels' => []];
 
         $variables = $this->context['pdf_variables']['total_columns'];
+        $show_terms_label = $this->entityVariableCheck('$entity.terms') ? 'display: none;' : '';
 
         $elements = [
             ['element' => 'div', 'properties' => ['style' => 'display: flex; flex-direction: column;'], 'elements' => [
                 ['element' => 'p', 'content' => strtr(str_replace(["labels","values"], ["",""], $_variables['values']['$entity.public_notes']), $_variables), 'properties' => ['data-ref' => 'total_table-public_notes', 'style' => 'text-align: left;']],
                 ['element' => 'p', 'content' => '', 'properties' => ['style' => 'text-align: left; display: flex; flex-direction: column; page-break-inside: auto;'], 'elements' => [
-                    ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['hidden' => $this->entityVariableCheck('$entity.terms'), 'data-ref' => 'total_table-terms-label', 'style' => 'font-weight: bold; text-align: left; margin-top: 1rem;']],
+                    ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['data-ref' => 'total_table-terms-label', 'style' => "font-weight: bold; text-align: left; margin-top: 1rem; {$show_terms_label}"]],
                     ['element' => 'span', 'content' => strtr(str_replace("labels", "", $_variables['values']['$entity.terms']), $_variables['labels']), 'properties' => ['data-ref' => 'total_table-terms', 'style' => 'text-align: left;']],
                 ]],
                 ['element' => 'img', 'properties' => ['style' => 'max-width: 50%; height: auto;', 'src' => '$contact.signature', 'id' => 'contact-signature']],

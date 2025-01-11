@@ -143,7 +143,13 @@ class Purify
             // IE-specific expressions
             '/progid\s*:/',
             '/setExpression\s*\(/',
-            '/AlphaImageLoader\s*\(/'
+            '/AlphaImageLoader\s*\(/',
+            '/chrome-extension\s*:/',
+            '/file\s*:/',
+            '/ftp\s*:/',
+            '/gopher\s*:/',
+            '/ws\s*:/',
+            '/wss\s*:/',
         ];
 
     private static array $dangerous_css_properties = [
@@ -155,25 +161,6 @@ class Purify
         'mask',
         'filter',
         'backdrop-filter',
-    ];
-
-    private static array $allowed_js_methods = [
-        'document.addEventListener',
-        'document.getElementById',
-        'document.querySelector',
-        'document.querySelectorAll',
-        'forEach',
-        'style.setProperty',
-        'console.log'
-    ];
-
-    private static array $allowed_js_properties = [
-        'childElementCount',
-        'style',
-        'hidden',
-        'display',
-        'innerHTML',  // Add innerHTML to allowed properties
-        'innerText'   // Add innerText since it's used in the script
     ];
 
     /**
@@ -234,6 +221,9 @@ class Purify
         }
 
         $html = str_replace('%24', '$', $html);
+
+        libxml_use_internal_errors(true);
+        libxml_disable_entity_loader(true);
 
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));
