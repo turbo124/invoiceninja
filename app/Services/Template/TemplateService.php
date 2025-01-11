@@ -392,7 +392,13 @@ class TemplateService
             }
         }
 
-        @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+                
+        $html = htmlspecialchars_decode($html, ENT_QUOTES | ENT_HTML5);
+        $html = str_ireplace(['<br>'], '<br/>', $html);
+
+        @$this->document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        // @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         $this->save();
 

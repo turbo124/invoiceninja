@@ -139,37 +139,37 @@ class PdfMaker
 
         }
 
-        $xpath = new \DOMXPath($this->document);
-        $elements = $xpath->query('//*[@data-state="encoded-html"]');
+        // $xpath = new \DOMXPath($this->document);
+        // $elements = $xpath->query('//*[@data-state="encoded-html"]');
 
-        foreach ($elements as $element) {
+        // foreach ($elements as $element) {
 
 
-            // Decode the HTML content
-            $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
-            $html = str_ireplace(['<br>'], '<br/>', $html);
+        //     // Decode the HTML content
+        //     $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+        //     $html = str_ireplace(['<br>'], '<br/>', $html);
 
-            // Create a temporary document to properly parse the HTML
-            $temp = new \DOMDocument();
+        //     // Create a temporary document to properly parse the HTML
+        //     $temp = new \DOMDocument();
 
-            // Add UTF-8 wrapper and div container
-            $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
+        //     // Add UTF-8 wrapper and div container
+        //     $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
 
-            // Load the HTML, suppressing any parsing warnings
-            @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        //     // Load the HTML, suppressing any parsing warnings
+        //     @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-            // Import the div's contents
-            $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
+        //     // Import the div's contents
+        //     $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
 
-            // Clear existing content of the element
-            while ($element->firstChild) {
-                $element->removeChild($element->firstChild);
-            }
+        //     // Clear existing content of the element
+        //     while ($element->firstChild) {
+        //         $element->removeChild($element->firstChild);
+        //     }
 
-            // Append the new content to the element
-            $element->appendChild($imported);
+        //     // Append the new content to the element
+        //     $element->appendChild($imported);
 
-        }
+        // }
 
 
 
