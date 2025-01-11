@@ -220,8 +220,8 @@ class PdfService
 
             return $pdfBuilder->downloadString();
 
-        } catch (\Exception $e) {
-            nlog("E_Invoice Merge failed - " . $e->getMessage());
+        } catch (\Throwable $th) {
+            nlog("E_Invoice Merge failed - " . $th->getMessage());
         }
 
         return $pdf;
