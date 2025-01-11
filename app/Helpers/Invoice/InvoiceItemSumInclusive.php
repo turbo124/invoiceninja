@@ -108,7 +108,7 @@ class InvoiceItemSumInclusive
     private $sub_total;
 
     private $tax_collection;
-7
+
     private bool $calc_tax = false;
 
     private Client | Vendor $client;
