@@ -3891,16 +3891,16 @@
         },
         {
             "name": "horstoeko/zugferd",
-            "version": "v1.0.102",
+            "version": "v1.0.103",
             "source": {
                 "type": "git",
                 "url": "https://github.com/horstoeko/zugferd.git",
-                "reference": "c43788ad1713393247a2d73bbded8308f1eea031"
+                "reference": "9b02e3e1ce2574a73125c513692521d713886157"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/c43788ad1713393247a2d73bbded8308f1eea031",
-                "reference": "c43788ad1713393247a2d73bbded8308f1eea031",
+                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/9b02e3e1ce2574a73125c513692521d713886157",
+                "reference": "9b02e3e1ce2574a73125c513692521d713886157",
                 "shasum": ""
             },
             "require": {
@@ -3959,9 +3959,9 @@
             ],
             "support": {
                 "issues": "https://github.com/horstoeko/zugferd/issues",
-                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.102"
+                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.103"
             },
-            "time": "2025-01-03T10:49:47+00:00"
+            "time": "2025-01-11T14:55:05+00:00"
         },
         {
             "name": "horstoeko/zugferdvisualizer",
