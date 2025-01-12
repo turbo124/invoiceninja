@@ -368,6 +368,10 @@ class Purify
             nlog('Error cleaning HTML: ' . $e->getMessage());
             
             throw new \RuntimeException('HTML sanitization failed');
+        }finally {
+            // Restore original setting
+            libxml_disable_entity_loader(false);
+            libxml_clear_errors();
         }
 
     }
