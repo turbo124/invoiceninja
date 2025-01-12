@@ -56,7 +56,7 @@ class Preloader
 
         $count = self::$count;
 
-        echo "[Preloader] Preloaded {$count} classes" . PHP_EOL;
+        // echo "[Preloader] Preloaded {$count} classes" . PHP_EOL;
     }
 
     private function loadPath(string $path): void
