@@ -956,6 +956,19 @@ class Design extends BaseDesign
                 }
             }
 
+                // Then, filter the elements array
+                $element['elements'] = array_map(function ($el) {
+                    if (isset($el['properties']['visi'])) {
+                        if ($el['properties']['visi'] === false) {
+                            $el['properties']['style'] = 'display: none;';
+                        }
+                        unset($el['properties']['visi']);
+                    }
+                    return $el;
+                }, $element['elements']);
+
+                $elements[] = $element;
+
             }
 
             return $elements;
@@ -1067,7 +1080,7 @@ class Design extends BaseDesign
             $filtered_items->toArray(),
             $type_id === '1' ? '$product' : '$task'
         );
-nlog($transformed_items);
+        
         $columns = [];
 
         // Initialize all columns as empty
