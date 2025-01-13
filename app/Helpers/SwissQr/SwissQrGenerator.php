@@ -172,6 +172,7 @@ class SwissQrGenerator
                 ->setPrintable(false)
                 ->getPaymentPart();
 
+                // return $html;
             return htmlspecialchars($html);
         } catch (\Exception $e) {
 

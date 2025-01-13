@@ -691,7 +691,7 @@ class Email implements ShouldQueue
     private function checkValidSendingUser($user)
     {
         /* Always ensure the user is set on the correct account */
-        if ($user->account_id != $this->company->account_id) {
+        if (!$user || ($user->account_id != $this->company->account_id)) {
             $this->email_object->settings->email_sending_method = 'default';
 
             return $this->setMailDriver();

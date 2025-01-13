@@ -866,7 +866,6 @@ class PdfBuilder
                     $element['elements'][$last_visible]['properties']['class'] .= ' right-radius';
                 }
             }
-            
 
             // Then, filter the elements array
             $element['elements'] = array_map(function ($el) {
