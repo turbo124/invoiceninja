@@ -172,7 +172,7 @@ class SwissQrGenerator
                 ->setPrintable(false)
                 ->getPaymentPart();
 
-            return $html;
+            return htmlspecialchars($html);
         } catch (\Exception $e) {
 
             // if (is_iterable($qrBill->getViolations())) {
