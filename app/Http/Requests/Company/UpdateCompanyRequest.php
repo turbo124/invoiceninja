@@ -195,7 +195,10 @@ class UpdateCompanyRequest extends Request
 
         if (Ninja::isHosted()) {
             foreach ($this->protected_input as $protected_var) {
-                $settings[$protected_var] = str_replace("script", "", $settings[$protected_var]);
+
+                if(isset($settings[$protected_var])) {
+                    $settings[$protected_var] = str_replace("script", "", $settings[$protected_var]);
+                }
             }
         }
 
