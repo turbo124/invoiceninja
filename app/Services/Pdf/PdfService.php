@@ -90,7 +90,10 @@ class PdfService
     public function getPdf()
     {
         try {
-            $pdf = $this->resolvePdfEngine($this->getHtml());
+
+            $html = $this->getHtml();
+            // nlog($html);
+            $pdf = $this->resolvePdfEngine($html);
 
             $numbered_pdf = $this->pageNumbering($pdf, $this->company);
 

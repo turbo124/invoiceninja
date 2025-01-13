@@ -143,13 +143,15 @@ trait PdfMakerUtilities
 
         $html = strtr($html, $variables['values']);
 
-        // @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        //old block
+        @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
-        $html = htmlspecialchars_decode($html, ENT_QUOTES | ENT_HTML5);
-        $html = str_ireplace(['<br>'], '<br/>', $html);
+        //new block
+        // $html = htmlspecialchars_decode($html, ENT_QUOTES | ENT_HTML5);
+        // $html = str_ireplace(['<br>'], '<br/>', $html);
+        // @$this->document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-        @$this->document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
+        //continues
         $this->document->saveHTML();
     }
 

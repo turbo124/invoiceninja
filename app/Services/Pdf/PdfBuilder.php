@@ -83,6 +83,7 @@ class PdfBuilder
 
     private function removeEmptyElements(): self
     { 
+        
         $elements =[
             'product-table', 'task-table', 'delivery-note-table',
             'statement-invoice-table', 'statement-payment-table', 'statement-aging-table-totals',
@@ -96,45 +97,59 @@ class PdfBuilder
 
             if ($el && $el->childElementCount === 0) {
                 $el->parentNode->removeChild($el); // This removes the element completely
-                // $el->setAttribute('style', 'display: none !important;');
             }
 
         }
-        
-        // $xpath = new \DOMXPath($this->document);
-        // $elements = $xpath->query('//*[@data-state="encoded-html"]');
+                
+            
+        $xpath = new \DOMXPath($this->document);
+        $elements = $xpath->query('//*[@data-state="encoded-html"]');
 
-        // foreach ($elements as $element) {
+        foreach ($elements as $element) {
 
-        //     // Decode the HTML content
-        //     $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
-        //     $html = str_ireplace(['<br>'], '<br/>', $html);
+            // Decode the HTML content
+            $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
+            $html = str_ireplace(['<br>','<?xml encoding="UTF-8">'], ['<br/>',''], $html);
 
-        //     // Create a temporary document to properly parse the HTML
-        //     $temp = new \DOMDocument();
+            // Create a temporary document to properly parse the HTML
+            $temp = new \DOMDocument();
 
-        //     // Add UTF-8 wrapper and div container
-        //     $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
+            // Add UTF-8 wrapper and div container
+            $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
 
-        //     // Load the HTML, suppressing any parsing warnings
-        //     @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            // Load the HTML, suppressing any parsing warnings
+            @$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-        //     // Import the div's contents
-        //     $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
+            // Import the div's contents
+            $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
 
-        //     // Clear existing content of the element
-        //     while ($element->firstChild) {
-        //         $element->removeChild($element->firstChild);
-        //     }
+            // Clear existing content - more efficient
+            $element->textContent = '';
+            // Get the first div's content
+            $divContent = $temp->getElementsByTagName('div')->item(0);
 
-        //     // Append the new content to the element
-        //     $element->appendChild($imported);
+            if ($divContent) {
+                // Import all nodes from the temporary div
+                foreach ($divContent->childNodes as $child) {
+                    $imported = $this->document->importNode($child, true);
+                    $element->appendChild($imported);
+                }
+            } else {
+                // Fallback - import the entire content if no div found
+                $imported = $this->document->importNode($temp->documentElement, true);
+                $element->appendChild($imported);
 
-        // }
+            }
+
+
+        }
+
 
 
         return $this;
     }
+
+
     /**
     * Final method to get compiled HTML.
     *
@@ -1131,7 +1146,7 @@ class PdfBuilder
         }
 
         if(array_key_exists($column, $column_visibility)){
-            return $column_visibility[$column] ? false: true;
+            return !$column_visibility[$column];
         }
 
         return true;
@@ -1386,9 +1401,11 @@ class PdfBuilder
 
         $elements = [
             ['element' => 'div', 'properties' => ['style' => 'display: flex; flex-direction: column;'], 'elements' => [
-                ['element' => 'p', 'content' => strtr(str_replace(["labels", "values"], ["",""], $_variables['values']['$entity.public_notes']), $_variables), 'properties' => ['data-ref' => 'total_table-public_notes', 'style' => 'text-align: left;']],
-                ['element' => 'p', 'content' => '', 'properties' => ['style' => 'text-align: left; display: flex; flex-direction: column; page-break-inside: auto;'], 'elements' => [
-                    ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['data-ref' => 'total_table-terms-label', 'style' => "font-weight: bold; text-align: left; margin-top: 1rem; {$show_terms_label}"]],
+                ['element' => 'div', 'properties' => ['data-ref' => 'total_table-public_notes', 'style' => 'text-align: left;'], 'elements' => [
+                    ['element' => 'span', 'content' => strtr(str_replace(["labels", "values"], ["",""], $_variables['values']['$entity.public_notes']), $_variables)]
+                ]],
+                ['element' => 'div', 'content' => '', 'properties' => ['style' => 'text-align: left; display: flex; flex-direction: column; page-break-inside: auto;'], 'elements' => [
+                    ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['data-ref' => 'total_table-terms-label', 'style' => "text-align: left; margin-top: 1rem; {$show_terms_label}"]],
                     ['element' => 'span', 'content' => strtr(str_replace("labels", "", $_variables['values']['$entity.terms']), $_variables['labels']), 'properties' => ['data-ref' => 'total_table-terms', 'style' => 'text-align: left;']],
                 ]],
                 ['element' => 'img', 'properties' => ['style' => 'max-width: 50%; height: auto;', 'src' => '$contact.signature', 'id' => 'contact-signature']],
@@ -1494,6 +1511,7 @@ class PdfBuilder
             ['element' => 'span', 'content' => '',],
             ['element' => 'span', 'content' => ''],
         ]];
+
 
         return $elements;
     }
@@ -2037,11 +2055,15 @@ class PdfBuilder
         $html = strtr($this->getCompiledHTML(), $this->service->html_variables['labels']);
         $html = strtr($html, $this->service->html_variables['values']);
         
-        $html = htmlspecialchars_decode($html, ENT_QUOTES | ENT_HTML5);
-        $html = str_ireplace(['<br>'], '<br/>', $html);
+        //old block
+        @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
-        @$this->document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        //new block
+        // $html = htmlspecialchars_decode($html, ENT_QUOTES | ENT_HTML5);
+        // $html = str_ireplace(['<br>','<?xml encoding="UTF-8">'], ['<br/>',''], $html);
+        // @$this->document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
+        //continues
         $this->document->saveHTML();
 
         return $this;
