@@ -42,6 +42,10 @@ class PeppolApiTest extends TestCase
 
     public function testGeneratingToken()
     {
+        if (! class_exists(\Modules\Admin\Http\Controllers\EInvoiceTokenController::class)) {
+            $this->markTestSkipped('Admin module not installed');
+        }
+
         config(['ninja.environment' => 'selfhost']);
 
         /**
@@ -68,6 +72,10 @@ class PeppolApiTest extends TestCase
 
     public function testHealthCheck()
     {
+        if (! class_exists(\Modules\Admin\Http\Controllers\EInvoiceTokenController::class)) {
+            $this->markTestSkipped('Admin module not installed');
+        }
+
         config(['ninja.environment' => 'selfhost']);
 
         $this
