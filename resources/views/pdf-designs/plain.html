@@ -238,18 +238,23 @@
         bottom: 0;
     }
 
-    [data-ref='product_table-product.description-td']{
+    [data-ref='product_table-product.description-td'],
+    [data-ref='task_table-task.description-th']{
         min-width: 100px !important;
         overflow-wrap: break-word;
     }
 
     
     [data-ref='product_table-product.item-th'],
-    [data-ref='product_table-product.unit_cost-th']{
+    [data-ref='product_table-product.unit_cost-th'],
+    [data-ref='task_table-task.service-th'],
+    [data-ref='task_table-task.cost-th']{
         width: 12%;
     }
 
     [data-ref='product_table-product.quantity-th'],
+    [data-ref='task_table-task.hours-th'],
+    [data-ref='task_table-task.quantity-th'],
     [data-ref='product_table-product.product1-th'],
     [data-ref='product_table-product.product2-th'],
     [data-ref='product_table-product.product3-th'],
@@ -269,16 +274,7 @@
         text-align: right;
     }
 
-    [data-ref='task_table-task.description-th'] {
-        overflow-wrap: break-word;
-        min-width: 100px !important;
-    }
-
-
-    [data-ref='task_table-task.hours-th'],
     [data-ref='task_table-task.discount-th'],
-    [data-ref='task_table-task.service-th'],
-    [data-ref='task_table-task.quantity-th'],
     [data-ref='task_table-task.task1-th'],
     [data-ref='task_table-task.task2-th'],
     [data-ref='task_table-task.task3-th'],
@@ -287,9 +283,6 @@
     }
 
     
-    [data-ref='task_table-task.cost-th']{
-        width: 12%;
-    }
     
     [data-ref='task_table-task.tax1-th'] {
         width: 10%;
