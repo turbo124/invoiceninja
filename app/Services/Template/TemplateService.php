@@ -68,7 +68,7 @@ class TemplateService
 
     private ?Vendor $vendor = null;
 
-    private Invoice | Quote | Credit | PurchaseOrder | RecurringInvoice | Task | Project $entity;
+    private Invoice | Quote | Credit | PurchaseOrder | RecurringInvoice | Task | Project | Payment $entity;
 
     private Payment $payment;
 
@@ -1575,23 +1575,14 @@ class TemplateService
 
         foreach ($children as $child) {
             $contains_html = false;
+            $child['content'] = $child['content'] ?? '';
 
-            //06-11-2023 for some reason this parses content as HTML
-            // if ($child['element'] !== 'script') {
-            //     if ($this->company->markdown_enabled && array_key_exists('content', $child)) {
-            //         $child['content'] = str_replace('<br>', "\r", $child['content']);
-            //         $child['content'] = $this->commonmark->convert($child['content'] ?? '');
-            //     }
-            // }
-
-            if (isset($child['content'])) {
-                if (isset($child['is_empty']) && $child['is_empty'] === true) {
-                    continue;
-                }
-
-                $contains_html = preg_match('#(?<=<)\w+(?=[^<]*?>)#', $child['content'], $m) != 0;
+            if (isset($child['is_empty']) && $child['is_empty'] === true) {
+                continue;
             }
 
+            $contains_html = str_contains($child['content'], '<') && str_contains($child['content'], '>');
+        
             if ($contains_html) {
                 // If the element contains the HTML, we gonna display it as is. Backend is going to
                 // encode it for us, preventing any errors on the processing stage.
@@ -1605,7 +1596,7 @@ class TemplateService
             } else {
                 // .. in case string doesn't contain any HTML, we'll just return
                 // raw $content.
-                $_child = $this->document->createElement($child['element'], isset($child['content']) ? $child['content'] : '');
+                $_child = $this->document->createElement($child['element'], $child['content']);
             }
 
             $element->appendChild($_child);

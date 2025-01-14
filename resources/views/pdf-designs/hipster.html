@@ -242,7 +242,7 @@
 
     #table-totals > * > :last-child {
         text-align: right;
-        padding-right: 1rem;
+        padding-right: 0rem;
     }
 
     #footer {
@@ -255,7 +255,14 @@
         margin-bottom: 0;
     }
 
-    [data-ref='product_table-product.description-td'] {
+    [data-ref='task_table-task.service-th'],
+    [data-ref='product_table-product.item-th'] {
+        padding-left:1rem !important;
+        width:14%;
+    } 
+
+    [data-ref='product_table-product.description-td'],
+    [data-ref="task_table-task.description-td"] {
         min-width:100px;
         overflow-wrap: break-word; 
     }
@@ -266,17 +273,21 @@
     }
 
     [data-ref="product_table-product.unit_cost-td"],
-    [data-ref="product_table-product.unit_cost-th"]{ 
-        text-align: center; 
+    [data-ref="product_table-product.unit_cost-th"],
+    [data-ref='task_table-task.cost-th'],
+    [data-ref='task_table-task.cost-td']{ 
+        text-align: center !important; 
         width: 10%;
-         padding-left:0 !important;
+        padding-left:0 !important;
         padding-right:0 !important;
     }
 
     [data-ref="product_table-product.quantity-th"],
-    [data-ref="product_table-product.quantity-td"]{
+    [data-ref="product_table-product.quantity-td"],
+    [data-ref='task_table-task.hours-th'],
+    [data-ref='task_table-task.hours-td'] {
         width: 10%;
-        text-align: center; 
+        text-align: center !important; 
         padding-left:0 !important;
         padding-right:0 !important;
     }
@@ -295,21 +306,8 @@
         width: 13%;
     }
 
-    [data-ref='task_table-task.hours-th'],
-    [data-ref='task_table-task.hours-td'] {
-        text-align: center;
-        padding-left:0 !important;
-        padding-right:0 !important;
-        width: 6%;
-     }
-
-     [data-ref='task_table-task.cost-th'],
-    [data-ref='task_table-task.cost-td'] {
-        text-align: center;
-        padding-left:0 !important;
-        padding-right:0 !important;
-        width: 8%;
-     }
+   
+     
 
      [data-ref="task_table-task.line_total-th"],
     [data-ref="task_table-task.line_total-td"] {
@@ -317,7 +315,16 @@
         width: 13%;
     }
 
-    [data-ref="totals_table-outstanding"] { color: var(--primary-color); }
+    [data-ref="totals_table-outstanding-label"] { 
+        font-weight:bold;
+        font-size:120%;
+    }
+
+    [data-ref="totals_table-outstanding"] { 
+        color: var(--primary-color); 
+        font-weight:bold;
+        font-size:120%;
+    }
 
     [data-ref="statement-totals"] {
         margin-top: 1rem;
@@ -343,8 +350,6 @@
         position: fixed;
         bottom: 0;
     }
-
-   
 
     .stamp {
       transform: rotate(12deg);
@@ -487,18 +492,18 @@
                         >
                   </div>
                </div>
-               <table id="product-table" cellspacing="0" data-ref="table"></table>
-               <table id="task-table" cellspacing="0" data-ref="table"></table>
-               <table id="delivery-note-table" cellspacing="0" data-ref="table"></table>
-               <table id="statement-invoice-table" cellspacing="0" data-ref="table"></table>
-               <div id="statement-invoice-table-totals" data-ref="statement-totals"></div>
-               <table id="statement-payment-table" cellspacing="0" data-ref="table"></table>
-               <div id="statement-payment-table-totals" data-ref="statement-totals"></div>
-                            <table id="statement-credit-table" cellspacing="0" data-ref="table"></table>
-                            <div id="statement-credit-table-totals" data-ref="statement-totals"></div>
-               <table id="statement-aging-table" cellspacing="0" data-ref="table"></table>
-               <div id="statement-aging-table-totals" data-ref="statement-totals"></div>
-               <div id="table-totals" cellspacing="0">$status_logo</div>
+                <table id="product-table" cellspacing="0" data-ref="table"></table>
+                <table id="task-table" cellspacing="0" data-ref="table"></table>
+                <table id="delivery-note-table" cellspacing="0" data-ref="table"></table>
+                <table id="statement-invoice-table" cellspacing="0" data-ref="table"></table>
+                <div id="statement-invoice-table-totals" data-ref="statement-totals"></div>
+                <table id="statement-payment-table" cellspacing="0" data-ref="table"></table>
+                <div id="statement-payment-table-totals" data-ref="statement-totals"></div>
+                <table id="statement-credit-table" cellspacing="0" data-ref="table"></table>
+                <div id="statement-credit-table-totals" data-ref="statement-totals"></div>
+                <table id="statement-aging-table" cellspacing="0" data-ref="table"></table>
+                <div id="statement-aging-table-totals" data-ref="statement-totals"></div>
+                <div id="table-totals" cellspacing="0">$status_logo</div>
             </div>
          </td>
       </tr>

@@ -58,7 +58,10 @@
 
     #header, #header-spacer {
         height: 160px;
-        padding: 2rem;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
         margin-bottom: 1rem;
     }
     .company-logo {
@@ -129,7 +132,7 @@
         min-width: 100%;
         table-layout: fixed;
         overflow-wrap: break-word;
-        margin-top: 0rem;
+        margin-top: 0.5rem;
         margin-bottom: 0px;
     }
 
@@ -181,8 +184,8 @@
         display: grid;
         grid-template-columns: 2fr 1fr;
         padding-top: .5rem;
-        padding-left: 3rem;
-        padding-right: 3rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
         gap: 80px;
     }
 
@@ -248,7 +251,7 @@
 
     #footer, #footer-spacer {
         height: 160px;
-        padding: 1rem 3rem;
+        padding: 1rem 1rem;
         margin-top: 1rem;
     }
 
@@ -257,8 +260,8 @@
     }
 
     [data-ref="footer_content"]{
-        padding-right: 2rem;
-        margin-right: 2rem;
+        padding-right: 1rem;
+        margin-right: 1rem;
     }
 
     table {
@@ -309,7 +312,10 @@
         width: 10%;
     }
 
-    [data-ref='product_table-product.unit_cost-th'],
+    [data-ref='product_table-product.unit_cost-th']{
+        width: 10%;
+    }
+
     [data-ref='product_table-product.quantity-th'],
     [data-ref='product_table-product.product1-th'],
     [data-ref='product_table-product.product2-th'],
@@ -323,9 +329,12 @@
     }
 
     [data-ref='product_table-product.line_total-th'],
-    [data-ref='product_table-product.line_total-td'] {
-        width: 8%;
-        text-align: right;
+    [data-ref='product_table-product.line_total-td'],
+    [data-ref='task_table-task.line_total-th'],
+    [data-ref='task_table-task.line_total-td'] {
+        width: 10%;
+        text-align: right !important;
+        padding-right: 1rem !important;
     }
 
     [data-ref='task_table-task.description-th'] {
@@ -352,11 +361,6 @@
         width: 6%;
     }
 
-    [data-ref='task_table-task.line_total-th'],
-    [data-ref='task_table-task.line_total-td'] {
-        width: 8%;
-        text-align: right !important;
-    }
 
     .left-radius {
         padding-left: 1rem;

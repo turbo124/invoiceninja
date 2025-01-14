@@ -94,7 +94,8 @@ trait PdfMaker
         }
 
         $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost', '<?xml encoding="UTF-8">'], '', $html);
-        
+
+        // nlog($html);
         $generated = $pdf
                         ->setHtml($html)
                         ->generate();

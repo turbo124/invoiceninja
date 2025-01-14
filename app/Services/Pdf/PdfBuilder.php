@@ -352,7 +352,7 @@ class PdfBuilder
         $outstanding = $this->service->options['invoices']->sum('balance');
 
         return [
-            ['element' => 'p', 'content' => '$outstanding_label: ' . $this->service->config->formatMoney($outstanding)],
+            ['element' => 'div', 'content' => '$outstanding_label: ' . $this->service->config->formatMoney($outstanding)],
         ];
     }
 
@@ -402,7 +402,7 @@ class PdfBuilder
         $outstanding = $this->service->options['credits']->sum('balance');
 
         return [
-            ['element' => 'p', 'content' => '$credit.balance_label: ' . $this->service->config->formatMoney($outstanding)],
+            ['element' => 'div', 'content' => '$credit.balance_label: ' . $this->service->config->formatMoney($outstanding)],
         ];
     }
 
@@ -474,7 +474,7 @@ class PdfBuilder
                 }
             }
         }
-
+        
         return [
             ['element' => 'thead', 'elements' => $this->buildTableHeader('statement_payment')],
             ['element' => 'tbody', 'elements' => $tbody],
@@ -500,9 +500,9 @@ class PdfBuilder
         $payment = $this->service->options['payments']->first();
 
         return [
-            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.amount_paid'), $this->service->config->formatMoney($this->payment_amount_total))],
-            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
-            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.amount_paid'), $this->service->config->formatMoney($this->payment_amount_total))],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
         ];
     }
 
@@ -520,9 +520,9 @@ class PdfBuilder
         $payment = $this->service->options['unapplied']->first();
 
         return [
-            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_balance'), $this->service->config->formatMoney($this->unapplied_total))],
-            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
-            ['element' => 'p', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_balance'), $this->service->config->formatMoney($this->unapplied_total))],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
         ];
 
     }
@@ -866,7 +866,6 @@ class PdfBuilder
                     $element['elements'][$last_visible]['properties']['class'] .= ' right-radius';
                 }
             }
-            
 
             // Then, filter the elements array
             $element['elements'] = array_map(function ($el) {
@@ -1405,7 +1404,7 @@ class PdfBuilder
                     ['element' => 'span', 'content' => strtr(str_replace(["labels", "values"], ["",""], $_variables['values']['$entity.public_notes']), $_variables)]
                 ]],
                 ['element' => 'div', 'content' => '', 'properties' => ['style' => 'text-align: left; display: flex; flex-direction: column; page-break-inside: auto;'], 'elements' => [
-                    ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['data-ref' => 'total_table-terms-label', 'style' => "text-align: left; margin-top: 1rem; {$show_terms_label}"]],
+                    ['element' => 'span', 'content' => '$entity.terms_label: ', 'properties' => ['data-ref' => 'total_table-terms-label', 'style' => "font-weight:bold; text-align: left; margin-top: 1rem; {$show_terms_label}"]],
                     ['element' => 'span', 'content' => strtr(str_replace("labels", "", $_variables['values']['$entity.terms']), $_variables['labels']), 'properties' => ['data-ref' => 'total_table-terms', 'style' => 'text-align: left;']],
                 ]],
                 ['element' => 'img', 'properties' => ['style' => 'max-width: 50%; height: auto;', 'src' => '$contact.signature', 'id' => 'contact-signature']],
@@ -1761,20 +1760,20 @@ class PdfBuilder
         }
 
         $elements = [
-                ['element' => 'p', 'content' => ctrans('texts.delivery_note'), 'properties' => ['data-ref' => 'delivery_note-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
-                ['element' => 'p', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
-                ['element' => 'p', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
-                ['element' => 'p', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
-                ['element' => 'p', 'show_empty' => false, 'elements' => [
+                ['element' => 'div', 'content' => ctrans('texts.delivery_note'), 'properties' => ['data-ref' => 'delivery_note-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
+                ['element' => 'div', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
+                ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
+                ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
+                ['element' => 'div', 'show_empty' => false, 'elements' => [
                     ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['ref' => 'delivery_note-client.shipping_city']],
                     ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
                     ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
                 ]],
-                ['element' => 'p', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
+                ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
             ];
 
         if (!is_null($this->service->config->contact)) {
-            $elements[] = ['element' => 'p', 'content' => $this->service->config->contact->email, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-contact.email']];
+            $elements[] = ['element' => 'div', 'content' => $this->service->config->contact->email, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-contact.email']];
         }
 
         return $elements;
@@ -1796,7 +1795,7 @@ class PdfBuilder
         $variables = $this->service->config->pdf_variables['client_details'];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'client_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'div', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'client_details-' . substr($variable, 1)]];
         }
 
         return $elements;
@@ -1811,16 +1810,16 @@ class PdfBuilder
         }
 
         $elements = [
-            ['element' => 'p', 'content' => ctrans('texts.shipping_address'), 'properties' => ['data-ref' => 'shipping_address-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
-            // ['element' => 'p', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.name']],
-            ['element' => 'p', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address1']],
-            ['element' => 'p', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address2']],
-            ['element' => 'p', 'show_empty' => false, 'elements' => [
+            ['element' => 'div', 'content' => ctrans('texts.shipping_address'), 'properties' => ['data-ref' => 'shipping_address-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
+            // ['element' => 'div', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.name']],
+            ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address1']],
+            ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address2']],
+            ['element' => 'div', 'show_empty' => false, 'elements' => [
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['ref' => 'shipping_address-client.shipping_city']],
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'shipping_address-client.shipping_state']],
                 ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'shipping_address-client.shipping_postal_code']],
             ]],
-            ['element' => 'p', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
+            ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
         ];
 
         return $elements;
@@ -1899,7 +1898,7 @@ class PdfBuilder
         $elements = [];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'div', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_details-' . substr($variable, 1)]];
         }
 
         return $elements;
@@ -1919,7 +1918,7 @@ class PdfBuilder
         $elements = [];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_address-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'div', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_address-' . substr($variable, 1)]];
         }
 
         return $elements;
@@ -1939,7 +1938,7 @@ class PdfBuilder
         $variables = $this->service->config->pdf_variables['vendor_details'];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'vendor_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'div', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'vendor_details-' . substr($variable, 1)]];
         }
 
         return $elements;
@@ -1997,22 +1996,48 @@ class PdfBuilder
     public function createElementContent($element, $children): self
     {
         foreach ($children as $child) {
+                        
             $contains_html = false;
+            $contains_markdown = false;
+            $child['content'] = $child['content'] ?? '';
 
-            if ($child['element'] !== 'script') {
-                if ($this->service->company->markdown_enabled && array_key_exists('content', $child)) {
-                    $child['content'] = str_replace('<br>', "\r", ($child['content'] ?? ''));
-                    $child['content'] = $this->commonmark->convert($child['content'] ?? ''); //@phpstan-ignore-line
-                }
-            }
+            $lines = explode("\n", $child['content']);
+            $contains_markdown = false;
 
-            if (isset($child['content'])) {
-                if (isset($child['is_empty']) && $child['is_empty'] === true) {
+            foreach ($lines as $line) {
+                $trimmed = ltrim($line);
+                if (empty($trimmed)) {
                     continue;
                 }
 
-                $contains_html = preg_match('#(?<=<)\w+(?=[^<]*?>)#', $child['content'], $m) != 0;
+                $first_char = substr($trimmed, 0, 1);
+
+                if (
+                    $first_char === '#' ||    // Headers
+                    $first_char === '>' ||    // Blockquotes
+                    $first_char === '-' ||    // Lists
+                    $first_char === '*' ||    // Lists/Bold
+                    $first_char === '_' ||    // Italic
+                    $first_char === '`' ||    // Code
+                    $first_char === '[' ||    // Links
+                    str_contains($trimmed, '**') // Bold (special case)
+                ) {
+                    $contains_markdown = true;
+                    break;
+                }
             }
+
+            if ($this->service->company->markdown_enabled && $contains_markdown && $child['element'] !== 'script') {
+                $child['content'] = str_ireplace('<br>', "\r", $child['content']);
+                $child['content'] = $this->commonmark->convert($child['content']); //@phpstan-ignore-line
+            }
+
+            if (isset($child['is_empty']) && $child['is_empty'] === true) {
+                continue;
+            }
+
+            $contains_html = str_contains($child['content'], '<') && str_contains($child['content'], '>');
+
 
             if ($contains_html) {
 
@@ -2030,7 +2055,7 @@ class PdfBuilder
                 // .. in case string doesn't contain any HTML, we'll just return
                 // raw $content
 
-                $_child = $this->document->createElement($child['element'], isset($child['content']) ? htmlspecialchars($child['content']) : '');
+                $_child = $this->document->createElement($child['element'], htmlspecialchars($child['content']));
             }
 
             $element->appendChild($_child);
