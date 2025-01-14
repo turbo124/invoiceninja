@@ -1996,22 +1996,48 @@ class PdfBuilder
     public function createElementContent($element, $children): self
     {
         foreach ($children as $child) {
+                        
             $contains_html = false;
+            $contains_markdown = false;
+            $child['content'] = $child['content'] ?? '';
 
-            if ($child['element'] !== 'script') {
-                if ($this->service->company->markdown_enabled && array_key_exists('content', $child)) {
-                    $child['content'] = str_replace('<br>', "\r", ($child['content'] ?? ''));
-                    $child['content'] = $this->commonmark->convert($child['content'] ?? ''); //@phpstan-ignore-line
-                }
-            }
+            $lines = explode("\n", $child['content']);
+            $contains_markdown = false;
 
-            if (isset($child['content'])) {
-                if (isset($child['is_empty']) && $child['is_empty'] === true) {
+            foreach ($lines as $line) {
+                $trimmed = ltrim($line);
+                if (empty($trimmed)) {
                     continue;
                 }
 
-                $contains_html = preg_match('#(?<=<)\w+(?=[^<]*?>)#', $child['content'], $m) != 0;
+                $first_char = substr($trimmed, 0, 1);
+
+                if (
+                    $first_char === '#' ||    // Headers
+                    $first_char === '>' ||    // Blockquotes
+                    $first_char === '-' ||    // Lists
+                    $first_char === '*' ||    // Lists/Bold
+                    $first_char === '_' ||    // Italic
+                    $first_char === '`' ||    // Code
+                    $first_char === '[' ||    // Links
+                    str_contains($trimmed, '**') // Bold (special case)
+                ) {
+                    $contains_markdown = true;
+                    break;
+                }
             }
+
+            if ($this->service->company->markdown_enabled && $contains_markdown && $child['element'] !== 'script') {
+                $child['content'] = str_ireplace('<br>', "\r", $child['content']);
+                $child['content'] = $this->commonmark->convert($child['content']); //@phpstan-ignore-line
+            }
+
+            if (isset($child['is_empty']) && $child['is_empty'] === true) {
+                continue;
+            }
+
+            $contains_html = str_contains($child['content'], '<') && str_contains($child['content'], '>');
+
 
             if ($contains_html) {
 
@@ -2029,7 +2055,7 @@ class PdfBuilder
                 // .. in case string doesn't contain any HTML, we'll just return
                 // raw $content
 
-                $_child = $this->document->createElement($child['element'], isset($child['content']) ? htmlspecialchars($child['content']) : '');
+                $_child = $this->document->createElement($child['element'], htmlspecialchars($child['content']));
             }
 
             $element->appendChild($_child);
