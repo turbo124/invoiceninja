@@ -33,7 +33,7 @@ class AddGatewayFee extends AbstractService
             return $this->invoice;
         }
 
-        return $gateway_fee > 0 $this->processGatewayFee($gateway_fee) : $this->processGatewayDiscount($gateway_fee);
+        return $gateway_fee > 0 ? $this->processGatewayFee($gateway_fee) : $this->processGatewayDiscount($gateway_fee);
 
     }
 
