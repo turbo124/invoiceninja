@@ -59,7 +59,7 @@ class ClientPresenter extends EntityPresenter
     {
         $primary_contact = $this->entity->primary_contact->first();
 
-        if ($primary_contact && strlen($primary_contact->email) > 1) {
+        if ($primary_contact && filter_var($primary_contact->email, FILTER_VALIDATE_EMAIL)) {
             return $primary_contact->email;
         }
 
