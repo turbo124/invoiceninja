@@ -28,7 +28,7 @@ class EntityEmailedNotification implements ShouldQueue
 {
     use UserNotifies;
 
-    public $delay = 10;
+    public $delay = 1;
 
     private $entity_string;
 
@@ -77,8 +77,6 @@ class EntityEmailedNotification implements ShouldQueue
             /* If one of the methods is email then we fire the EntitySentMailer */
             if (($key = array_search('mail', $methods)) !== false) {
                 unset($methods[$key]);
-
-                    nlog((new EntitySentObject($event->invitation, $this->entity_string, $event->template, $company_user->portalType())));
 
                 $nmo = new NinjaMailerObject();
                 $nmo->mailable = new NinjaMailer((new EntitySentObject($event->invitation, $this->entity_string, $event->template, $company_user->portalType()))->build());
