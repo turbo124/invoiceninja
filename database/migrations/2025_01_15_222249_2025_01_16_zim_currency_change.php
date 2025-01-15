@@ -14,7 +14,7 @@ return new class extends Migration
         
         \Illuminate\Support\Facades\Artisan::call('ninja:design-update');
 
-        $currency = Currency::where('code', 'ZWL')->first();
+        $currency = \App\Models\Currency::where('code', 'ZWL')->first();
 
         if($currency){
             $currency->update(['name' => 'Zimbabwe Gold']);
