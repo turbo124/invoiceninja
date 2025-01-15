@@ -30,7 +30,6 @@ use App\Transformers\CreditTransformer;
 use App\Events\General\EntityWasEmailed;
 use App\Transformers\InvoiceTransformer;
 use App\Http\Requests\Email\SendEmailRequest;
-use App\Jobs\PurchaseOrder\PurchaseOrderEmail;
 use App\Transformers\PurchaseOrderTransformer;
 use App\Transformers\RecurringInvoiceTransformer;
 

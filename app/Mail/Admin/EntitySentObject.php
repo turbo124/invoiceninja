@@ -95,7 +95,7 @@ class EntitySentObject
                         'vendor' => $this->contact->vendor->present()->name(),
                         'purchase_order' => $this->entity->number,
                     ]
-                );
+                    ),
             ];
 
             $mail_obj->markdown = 'email.admin.generic';

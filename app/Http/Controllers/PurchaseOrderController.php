@@ -25,7 +25,6 @@ use App\Http\Requests\PurchaseOrder\StorePurchaseOrderRequest;
 use App\Http\Requests\PurchaseOrder\UpdatePurchaseOrderRequest;
 use App\Http\Requests\PurchaseOrder\UploadPurchaseOrderRequest;
 use App\Jobs\Entity\CreateRawPdf;
-use App\Jobs\PurchaseOrder\PurchaseOrderEmail;
 use App\Jobs\PurchaseOrder\ZipPurchaseOrders;
 use App\Models\Account;
 use App\Models\Client;
@@ -672,8 +671,7 @@ class PurchaseOrderController extends BaseController
             case 'email':
             case 'send_email':
                 //check query parameter for email_type and set the template else use calculateTemplate
-                // PurchaseOrderEmail::dispatch($purchase_order, $purchase_order->company);
-
+                
                 $purchase_order->service()->sendEmail();
                 
                 if (! $bulk) {
