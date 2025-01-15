@@ -11,7 +11,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DataMapper\InvoiceSync;
 use App\Utils\Ninja;
 use App\Models\Quote;
 use App\Models\Credit;
@@ -19,6 +18,7 @@ use App\Models\Invoice;
 use App\Models\Webhook;
 use App\Models\PurchaseOrder;
 use App\Services\Email\Email;
+use App\DataMapper\InvoiceSync;
 use App\Utils\Traits\MakesHash;
 use App\Models\RecurringInvoice;
 use App\Services\Email\EmailObject;
@@ -27,6 +27,7 @@ use App\Transformers\QuoteTransformer;
 use Illuminate\Mail\Mailables\Address;
 use App\Events\Credit\CreditWasEmailed;
 use App\Transformers\CreditTransformer;
+use App\Events\General\EntityWasEmailed;
 use App\Transformers\InvoiceTransformer;
 use App\Http\Requests\Email\SendEmailRequest;
 use App\Jobs\PurchaseOrder\PurchaseOrderEmail;
@@ -80,7 +81,7 @@ class EmailController extends BaseController
 
         }
 
-        $entity_obj->invitations->each(function ($invitation) use ($entity_obj, $mo) {
+        $entity_obj->invitations->each(function ($invitation) use ($entity_obj, $mo, $template) {
             if (! $invitation->contact->trashed() && $invitation->contact->email) {
                 $entity_obj->service()->markSent()->save();
 
@@ -89,6 +90,8 @@ class EmailController extends BaseController
                 $mo->vendor_id = $invitation->contact->vendor_id ?? null;
 
                 Email::dispatch($mo, $invitation->company);
+                $entity_obj->entityEmailEvent($invitation, $template, $template);
+
             }
         });
 
@@ -102,7 +105,7 @@ class EmailController extends BaseController
             $this->entity_transformer = InvoiceTransformer::class;
 
             if ($entity_obj->invitations->count() >= 1) {
-                $entity_obj->entityEmailEvent($entity_obj->invitations->first(), $template, $template);
+                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'invoice'));
                 $entity_obj->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
             }
         }
@@ -112,7 +115,7 @@ class EmailController extends BaseController
             $this->entity_transformer = QuoteTransformer::class;
 
             if ($entity_obj->invitations->count() >= 1) {
-                $entity_obj->entityEmailEvent($entity_obj->invitations->first(), $template);
+                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'invoice'));
                 $entity_obj->sendEvent(Webhook::EVENT_SENT_QUOTE, "client");
             }
         }
@@ -122,7 +125,7 @@ class EmailController extends BaseController
             $this->entity_transformer = CreditTransformer::class;
 
             if ($entity_obj->invitations->count() >= 1) {
-                event(new CreditWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'credit'));
+                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'invoice'));
                 $entity_obj->sendEvent(Webhook::EVENT_SENT_CREDIT, "client");
             }
         }

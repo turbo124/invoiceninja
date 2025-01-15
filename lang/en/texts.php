@@ -5487,6 +5487,8 @@ $lang = array(
     'enable_public_notifications_help' => 'Enable real-time notifications from Invoice Ninja.',
     'navigate' => 'Navigate',
     'calculate_taxes_warning' => 'This action will enable line item taxes and disable total taxes. Any open invoices may be recalculated with the new settings!',
+    'activity_149' => ':user emailed credit :credit for :client to :contact',
+
 );
 
 return $lang;

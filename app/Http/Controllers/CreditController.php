@@ -32,6 +32,7 @@ use App\Events\Credit\CreditWasCreated;
 use App\Events\Credit\CreditWasUpdated;
 use App\Transformers\CreditTransformer;
 use Illuminate\Support\Facades\Storage;
+use App\Events\General\EntityWasEmailed;
 use App\Services\Template\TemplateAction;
 use App\Http\Requests\Credit\BulkCreditRequest;
 use App\Http\Requests\Credit\EditCreditRequest;
@@ -640,9 +641,27 @@ class CreditController extends BaseController
             case 'email':
             case 'send_email':
 
+                $credit->service()->markSent()->save();
+
                 $credit->invitations->load('contact.client.country', 'credit.client.country', 'credit.company')->each(function ($invitation) use ($credit) {
-                    EmailEntity::dispatch($invitation->withoutRelations(), $credit->company->db, 'credit');
+                                           
+                    $mo = new \App\Services\Email\EmailObject();
+                    $mo->entity_id = $credit->id;
+                    $mo->entity_class = \App\Models\Credit::class;
+                    $mo->invitation_id = $invitation->id;
+                    $mo->client_id = $invitation->contact->client_id ?? null;
+                    $mo->vendor_id = $invitation->contact->vendor_id ?? null;
+                    $mo->settings = $invitation->contact->client->getMergedSettings();
+                    $mo->email_template_body = 'email_template_credit';
+                    $mo->email_template_subject = 'email_subject_credit';
+
+                    \App\Services\Email\Email::dispatch($mo, $invitation->company);
+
+                    $credit->entityEmailEvent($invitation, 'credit', 'credit');
+
                 });
+
+                event(new EntityWasEmailed($credit->invitations->first(), $credit->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'credit'));
 
                 if (! $bulk) {
                     return response()->json(['message' => 'email sent'], 200);
