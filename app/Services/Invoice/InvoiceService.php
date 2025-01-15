@@ -127,7 +127,7 @@ class InvoiceService
     public function addGatewayFee(CompanyGateway $company_gateway, $gateway_type_id, float $amount, string $payment_hash_string)
     {
         $this->removeUnpaidGatewayFees();
-        
+
         $this->invoice = (new AddGatewayFee($company_gateway, $gateway_type_id, $this->invoice, $amount, $payment_hash_string))->run();
 
         return $this;
@@ -218,9 +218,9 @@ class InvoiceService
         return $this->getEInvoice($contact);
     }
 
-    public function sendEmail($contact = null)
+    public function sendEmail($contact = null, $email_type = 'invoice')
     {
-        $send_email = new SendEmail($this->invoice, null, $contact);
+        $send_email = new SendEmail($this->invoice, $email_type, $contact);
 
         return $send_email->run();
     }

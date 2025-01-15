@@ -539,7 +539,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         QuoteWasEmailed::class => [
             QuoteEmailActivity::class,
-            QuoteEmailedNotification::class,
         ],
         QuoteWasViewed::class => [
             QuoteViewedActivity::class,

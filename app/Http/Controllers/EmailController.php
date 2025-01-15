@@ -115,7 +115,7 @@ class EmailController extends BaseController
             $this->entity_transformer = QuoteTransformer::class;
 
             if ($entity_obj->invitations->count() >= 1) {
-                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'invoice'));
+                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'quote'));
                 $entity_obj->sendEvent(Webhook::EVENT_SENT_QUOTE, "client");
             }
         }
@@ -125,7 +125,7 @@ class EmailController extends BaseController
             $this->entity_transformer = CreditTransformer::class;
 
             if ($entity_obj->invitations->count() >= 1) {
-                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'invoice'));
+                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'credit'));
                 $entity_obj->sendEvent(Webhook::EVENT_SENT_CREDIT, "client");
             }
         }
@@ -138,6 +138,13 @@ class EmailController extends BaseController
         if ($entity_obj instanceof PurchaseOrder) {
             $this->entity_type = PurchaseOrder::class;
             $this->entity_transformer = PurchaseOrderTransformer::class;
+
+            
+            if ($entity_obj->invitations->count() >= 1) {
+                event(new EntityWasEmailed($entity_obj->invitations->first(), $entity_obj->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'purchase_order'));
+                $entity_obj->sendEvent(Webhook::EVENT_SENT_PURCHASE_ORDER, "client");
+            }
+
         }
 
         return $this->itemResponse($entity_obj->fresh());

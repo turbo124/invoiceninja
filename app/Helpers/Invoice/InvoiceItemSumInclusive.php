@@ -110,6 +110,8 @@ class InvoiceItemSumInclusive
     private $tax_collection;
 
     private bool $calc_tax = false;
+    
+    private $total_discount;
 
     private Client | Vendor $client;
 
@@ -118,7 +120,8 @@ class InvoiceItemSumInclusive
     public function __construct(RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice)
     {
         $this->tax_collection = collect([]);
-
+        $this->total_discount = 0;
+        
         $this->invoice = $invoice;
         $this->client = $invoice->client ?? $invoice->vendor;
 

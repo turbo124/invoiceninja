@@ -670,18 +670,12 @@ class PurchaseOrderController extends BaseController
                 break;
 
             case 'email':
-                //check query parameter for email_type and set the template else use calculateTemplate
-                PurchaseOrderEmail::dispatch($purchase_order, $purchase_order->company);
-
-                if (! $bulk) {
-                    return response()->json(['message' => 'email sent'], 200);
-                }
-                break;
-
             case 'send_email':
                 //check query parameter for email_type and set the template else use calculateTemplate
-                PurchaseOrderEmail::dispatch($purchase_order, $purchase_order->company);
+                // PurchaseOrderEmail::dispatch($purchase_order, $purchase_order->company);
 
+                $purchase_order->service()->sendEmail();
+                
                 if (! $bulk) {
                     return response()->json(['message' => 'email sent'], 200);
                 }
