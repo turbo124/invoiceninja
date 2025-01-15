@@ -5488,7 +5488,8 @@ $lang = array(
     'navigate' => 'Navigate',
     'calculate_taxes_warning' => 'This action will enable line item taxes and disable total taxes. Any open invoices may be recalculated with the new settings!',
     'activity_149' => ':user emailed credit :credit for :client to :contact',
-
+    'email_history_empty' => 'No email history found, this feature only available when sending with Postmark/Mailgun.',
+    'e_invoicing' => 'E-Invoicing',
 );
 
 return $lang;
