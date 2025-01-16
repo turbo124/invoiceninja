@@ -1097,8 +1097,8 @@ $lang = array(
     'quote_documents' => 'Angebots-Dateien',
     'invoice_documents' => 'Rechnungs-Dateien',
     'expense_documents' => 'Ausgaben-Dateien',
-    'invoice_embed_documents' => 'Dokumente einbetten',
-    'invoice_embed_documents_help' => 'Angehängte Bilder in Rechnung einfügen.',
+    'invoice_embed_documents' => 'Embed Images/Documents',
+    'invoice_embed_documents_help' => 'Include attached images/pdfs in the invoice.',
     'document_email_attachment' => 'Dokumente anhängen',
     'ubl_email_attachment' => 'UBL anhängen',
     'download_documents' => 'Dokumente herunterladen (:size)',
@@ -5491,6 +5491,12 @@ Leistungsempfängers',
     'enable_public_notifications_help' => 'Aktivieren Sie Echtzeitbenachrichtigungen von Invoice Ninja.',
     'navigate' => 'Navigiere',
     'calculate_taxes_warning' => 'Mit dieser Aktion werden Einzelpostensteuern aktiviert und Gesamtsteuern deaktiviert. Eventuell offene Rechnungen können mit den neuen Einstellungen neu berechnet werden!',
+    'activity_149' => ':user emailed credit :credit for :client to :contact',
+    'email_history_empty' => 'No email history found, this feature only available when sending with Postmark/Mailgun.',
+    'e_invoicing' => 'E-Invoicing',
+    'einvoice_token_not_found' => 'E-invoicing token not found. Please go to Settings > E-invoice and regenerate token.',
+    'regenerate' => 'Regenerate',
+
 );
 
 return $lang;

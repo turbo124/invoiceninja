@@ -1093,8 +1093,8 @@ $lang = array(
     'quote_documents' => 'Justificatifs de soumission',
     'invoice_documents' => 'Justificatifs de facturation',
     'expense_documents' => 'Justificatifs de dépense',
-    'invoice_embed_documents' => 'Documents intégrés',
-    'invoice_embed_documents_help' => 'Inclure les images jointes dans la facture.',
+    'invoice_embed_documents' => 'Activer Images/Documents',
+    'invoice_embed_documents_help' => 'Inclure pièce jointes images/pdf dans la facture.',
     'document_email_attachment' => 'Joindre un document',
     'ubl_email_attachment' => 'Joindre un UBL',
     'download_documents' => 'Télécharger les documents (:size)',
@@ -5485,6 +5485,12 @@ Développe automatiquement la section des notes dans le tableau de produits pour
     'enable_public_notifications_help' => 'Activer les notifications en temps réel de Invoice Ninja.',
     'navigate' => 'Naviguer',
     'calculate_taxes_warning' => 'Cette action activera les taxes par ligne et désactivera les taxes totales. Toutes les factures ouvertes peuvent être recalculées avec les nouveaux paramètres !',
+    'activity_149' => ':user a envoyé par courriel le crédit :credit pour :client à :contact',
+    'email_history_empty' => 'Aucun historique de courriel trouvé. Cette fonctionnalité est uniquement disponible lors de l\'envoi avec Postmark/Mailgun.',
+    'e_invoicing' => 'Facture électronique',
+    'einvoice_token_not_found' => 'Le jeton de facturation électronique est introuvable. Veuillez vous rendre dans Réglages > Facturation électronique et régénérer le jeton.',
+    'regenerate' => 'Régénérer',
+
 );
 
 return $lang;
