@@ -66,7 +66,7 @@ class InvoiceRepository extends BaseRepository
     {
         
         $invoice = \DB::transaction(function () use ($invoice) {
-           return \App\Models\Invoice::lockForUpdate()->find($invoice->id);
+           return \App\Models\Invoice::withTrashed()->lockForUpdate()->find($invoice->id);
         });
 
         if (!$invoice || $invoice->is_deleted) {
