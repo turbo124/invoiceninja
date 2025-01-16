@@ -244,7 +244,6 @@ class Purify
         $html = str_replace('%24', '$', $html);
         libxml_use_internal_errors(true);
         libxml_disable_entity_loader(true);
-// nlog("pre purify => {$html}");
 
         $document = new \DOMDocument();
         @$document->loadHTML(htmlspecialchars_decode(htmlspecialchars($html, ENT_QUOTES, 'UTF-8')));

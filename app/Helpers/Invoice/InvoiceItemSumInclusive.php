@@ -110,6 +110,8 @@ class InvoiceItemSumInclusive
     private $tax_collection;
 
     private bool $calc_tax = false;
+    
+    private $total_discount;
 
     private Client | Vendor $client;
 
@@ -118,7 +120,8 @@ class InvoiceItemSumInclusive
     public function __construct(RecurringInvoice | Invoice | Quote | Credit | PurchaseOrder | RecurringQuote $invoice)
     {
         $this->tax_collection = collect([]);
-
+        $this->total_discount = 0;
+        
         $this->invoice = $invoice;
         $this->client = $invoice->client ?? $invoice->vendor;
 
@@ -175,8 +178,10 @@ class InvoiceItemSumInclusive
     {
         if ($this->invoice->is_amount_discount) {
             $this->setLineTotal($this->getLineTotal() - $this->formatValue($this->item->discount, $this->currency->precision));
+            $this->total_discount += $this->item->discount;
         } else {
             $this->setLineTotal($this->getLineTotal() - $this->formatValue(($this->item->line_total * ($this->item->discount / 100)), $this->currency->precision));
+            $this->total_discount += ($this->item->line_total * ($this->item->discount / 100));
         }
 
         $this->item->is_amount_discount = $this->invoice->is_amount_discount;
@@ -292,6 +297,11 @@ class InvoiceItemSumInclusive
         $group_tax = ['key' => $key, 'total' => $tax_total, 'tax_name' => $tax_name.' '.Number::formatValueNoTrailingZeroes(floatval($tax_rate), $this->client).'%', 'tax_id' => $tax_id, 'base_amount' => $amount];
 
         $this->tax_collection->push(collect($group_tax));
+    }
+
+    public function getTotalDiscount()
+    {
+        return $this->total_discount;
     }
 
     public function getTotalTaxes()

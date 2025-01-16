@@ -346,7 +346,7 @@ class TemplateService
 
             $template = htmlspecialchars($template, ENT_XML1, 'UTF-8');
 
-            $f->appendXML(html_entity_decode($template));
+            $f->appendXML(str_ireplace("<br>", "<br/>", html_entity_decode($template)));
 
             $replacements[] = $f;
 

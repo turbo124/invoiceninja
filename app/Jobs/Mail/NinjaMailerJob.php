@@ -535,7 +535,7 @@ class NinjaMailerJob implements ShouldQueue
         if ($sending_user == "0") {
             $user = $this->company->owner();
         } else {
-            $user = User::find($this->decodePrimaryKey($sending_user));
+            $user = User::withTrashed()->find($this->decodePrimaryKey($sending_user));
         }
 
         return $user;
