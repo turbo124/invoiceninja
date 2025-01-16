@@ -147,19 +147,13 @@ class Preloader
         __DIR__ . '/vendor/laravel/octane/src/Testing',
     ])
     ->ignore(
-        ->ignore(
         \Illuminate\Filesystem\Cache::class,
         \Illuminate\Http\UploadedFile::class,
-        \Illuminate\Log\LogManager::class,       
+        \Illuminate\Log\LogManager::class,
         \Illuminate\Support\Carbon::class,
         \Illuminate\Console\View\Components\Choice::class,
         \Laravel\Octane\Tables\OpenSwooleTable::class,
-        \Laravel\Octane\Tables\SwooleTable::class,        
-        \Laravel\Octane\WorkerExceptionInspector::class,
-    )
-        \Illuminate\Console\View\Components\Choice::class,
-        \Laravel\Octane\Tables\OpenSwooleTable::class,
-        \Laravel\Octane\Tables\SwooleTable::class,        
+        \Laravel\Octane\Tables\SwooleTable::class,
         \Laravel\Octane\WorkerExceptionInspector::class,
     )
     ->load();

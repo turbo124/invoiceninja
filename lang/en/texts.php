@@ -5490,6 +5490,9 @@ $lang = array(
     'activity_149' => ':user emailed credit :credit for :client to :contact',
     'email_history_empty' => 'No email history found, this feature only available when sending with Postmark/Mailgun.',
     'e_invoicing' => 'E-Invoicing',
+    'einvoice_token_not_found' => 'E-invoicing token not found. Please go to Settings > E-invoice and regenerate token.',
+    'regenerate' => 'Regenerate',
+
 );
 
 return $lang;
