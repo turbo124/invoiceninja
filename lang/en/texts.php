@@ -5492,7 +5492,7 @@ $lang = array(
     'e_invoicing' => 'E-Invoicing',
     'einvoice_token_not_found' => 'E-invoicing token not found. Please go to Settings > E-invoice and regenerate token.',
     'regenerate' => 'Regenerate',
-
+    'subscription_unavailable' => 'This item is no longer available',
 );
 
 return $lang;
