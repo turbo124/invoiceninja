@@ -240,8 +240,10 @@ class HtmlEngine
             if (strlen($this->company->getSetting('qr_iban')) > 5) {
                 try {
                     $data['$swiss_qr'] = ['value' => (new SwissQrGenerator($this->entity, $this->company))->run(), 'label' => ''];
+                    $data['$swiss_qr_raw'] = ['value' => html_entity_decode($data['$swiss_qr']['value']), 'label' => '']; 
                 } catch (\Exception $e) {
                     $data['$swiss_qr'] = ['value' => '', 'label' => ''];
+                    $data['$swiss_qr_raw'] = ['value' => '', 'label' => ''];
                 }
             }
         }
