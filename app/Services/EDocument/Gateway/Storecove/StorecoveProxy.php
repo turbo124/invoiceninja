@@ -64,6 +64,12 @@ class StorecoveProxy
         ];
 
         if (Ninja::isHosted()) {
+
+            //check if the user is already on the network.
+            if($already_registered = $this->storecove->checkNetworkStatus($data)){
+                return $already_registered;
+            }
+
             $response = $this->storecove->setupLegalEntity($data);
 
             if (is_array($response)) {
