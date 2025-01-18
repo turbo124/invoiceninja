@@ -5493,6 +5493,7 @@ $lang = array(
     'einvoice_token_not_found' => 'E-invoicing token not found. Please go to Settings > E-invoice and regenerate token.',
     'regenerate' => 'Regenerate',
     'subscription_unavailable' => 'This item is no longer available',
+    'currency_samoan_tala' => 'Samoan Tala',
 );
 
 return $lang;
