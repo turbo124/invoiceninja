@@ -1096,8 +1096,8 @@ $lang = array(
     'quote_documents' => 'Tài liệu trích dẫn',
     'invoice_documents' => 'Tài liệu hóa đơn',
     'expense_documents' => 'Tài liệu chi phí',
-    'invoice_embed_documents' => 'Embed Images/Documents',
-    'invoice_embed_documents_help' => 'Include attached images/pdfs in the invoice.',
+    'invoice_embed_documents' => 'Nhúng hình ảnh/tài liệu',
+    'invoice_embed_documents_help' => 'Bao gồm hình ảnh/pdf đính kèm trong Hóa đơn .',
     'document_email_attachment' => 'Đính kèm tài liệu',
     'ubl_email_attachment' => 'Đính kèm UBL',
     'download_documents' => 'Tải xuống Tài liệu ( :size )',
@@ -5487,12 +5487,10 @@ $lang = array(
     'enable_public_notifications_help' => 'Bật thông báo thời gian thực từ Invoice Ninja.',
     'navigate' => 'Điều hướng',
     'calculate_taxes_warning' => 'Hành động này sẽ kích hoạt thuế mục hàng và vô hiệu hóa thuế Tổng cộng . Mọi Hóa đơn đang mở có thể được tính toán lại bằng Cài đặt mới !',
-    'activity_149' => ':user emailed credit :credit for :client to :contact',
-    'email_history_empty' => 'No email history found, this feature only available when sending with Postmark/Mailgun.',
-    'e_invoicing' => 'E-Invoicing',
-    'einvoice_token_not_found' => 'Không tìm thấy mã thông báo lập hóa đơn . Vui lòng đến Cài đặt &gt; E- Hóa đơn và tạo lại token.',
-    'regenerate' => 'Tái tạo',
-
+    'activity_149' => ':user đã gửi email ghi rõ :credit cho :client đến :contact',
+    'email_history_empty' => 'Không tìm thấy lịch sử email , tính năng này chỉ khả dụng khi gửi bằng Postmark/Mailgun.',
+    'e_invoicing' => 'E- lập hóa đơn',
+    'einvoice_token_not_found' => 'Không tìm thấy mã thông báo lập hóa đơn . email contact@invoiceninja.com để biết thêm thông tin.',
 );
 
 return $lang;

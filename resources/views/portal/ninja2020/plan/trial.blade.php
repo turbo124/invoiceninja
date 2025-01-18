@@ -1827,8 +1827,8 @@ var elements = stripe.elements({
 
 var cardElement = elements.create('card', {
     value: {
-        postalCode: document.querySelector('input[name=postal_code]').content,
-        name: document.querySelector('input[name=first_name]').content + ' ' + document.querySelector('input[name=last_name]').content,
+        postalCode: document.querySelector('input[name=postal_code]').value,
+        name: document.querySelector('input[name=first_name]').value + ' ' + document.querySelector('input[name=last_name]').value,
     }
 });
 
@@ -1882,14 +1882,14 @@ var country_value = e.options[e.selectedIndex].value;
         stripe.handleCardSetup(this.client_secret, cardElement, {
                 payment_method_data: {
                       billing_details: {
-                        name: document.querySelector('input[name=first_name]').content + ' ' + document.querySelector('input[name=first_name]').content,
+                        name: document.querySelector('input[name=first_name]').value + ' ' + document.querySelector('input[name=last_name]').value,
                         email: '{{ $client->present()->email() }}',
                         address: {
-                          line1: document.querySelector('input[name=address1]').content,
-                          line2: document.querySelector('input[name=address2]').content,
-                          city: document.querySelector('input[name=city]').content,
-                          postal_code: document.querySelector('input[name=postal_code]').content,
-                          state: document.querySelector('input[name=state]').content,
+                          line1: document.querySelector('input[name=address1]').value,
+                          line2: document.querySelector('input[name=address2]').value,
+                          city: document.querySelector('input[name=city]').value,
+                          postal_code: document.querySelector('input[name=postal_code]').value,
+                          state: document.querySelector('input[name=state]').value,
                         }        
                 },
               }
