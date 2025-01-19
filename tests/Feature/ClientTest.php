@@ -148,7 +148,7 @@ class ClientTest extends TestCase
                 'city' => 'NoRoses',
                 'contacts' => [
                     '0' => [
-                        'email' => 'craig@.za',
+                        'email' => 'craig@gmail.za',
                         'first_name' => 'Leon',
                         'last_name' => 'Labagne'
                     ],
