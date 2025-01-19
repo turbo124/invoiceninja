@@ -143,15 +143,14 @@ class ClientTest extends TestCase
     {
         $data = [
             
-                'address1' => '105 Corlett Drive',
+                'address1' => '105 Drive',
                 'address2' => '122',
-                'city' => 'Melrose',
+                'city' => 'NoRoses',
                 'contacts' => [
                     '0' => [
-                        'email' => 'craig@defined.co.za',
+                        'email' => 'craig@.za',
                         'first_name' => 'Leon',
-                        'id' => 'O5xe7W8e7r',
-                        'last_name' => 'Labuschagne'
+                        'last_name' => 'Labagne'
                     ],
                     'is_primary' => true,
                     'send_email' => false
@@ -162,7 +161,7 @@ class ClientTest extends TestCase
                 'postal_code' => '2196',
                 'private_notes' => 'DMARC Client | Tenant ID: 45 | Team Name: Targas',
                 'state' => 'Gauteng',
-                'vat_number' => 'VAT: 1321321321'
+                'vat_number' => 'VAT: 33'
             
         ];
 
