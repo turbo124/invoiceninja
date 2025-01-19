@@ -132,7 +132,7 @@ class Nordigen
      *   access_valid_for_days: int,
      *   access_scope: string[],
      *   accepted: string
-     * }|null Agreement details
+     * } Agreement details
      */
     public function createAgreement(array $institution, int $accessDays, int $transactionDays): array
     {
