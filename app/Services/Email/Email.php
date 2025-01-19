@@ -301,6 +301,23 @@ class Email implements ShouldQueue
                 $this->company->save();
             }
 
+            if (stripos($e->getMessage(), 'code 406') !== false) {
+
+                $address_object = reset($this->email_object->to);
+
+                $email = $address_object->address ?? '';
+
+                $message = "Recipient {$email} has been suppressed and cannot receive emails from you.";
+
+                $this->fail();
+                $this->logMailError($message, $this->company->clients()->first());
+                $this->cleanUpMailers();
+
+                $this->entityEmailFailed($message);
+
+                return;
+            }
+
             $this->fail();
             $this->cleanUpMailers();
             $this->logMailError($e->getMessage(), $this->company->clients()->first());
@@ -353,22 +370,7 @@ class Email implements ShouldQueue
 
             }
 
-            if (stripos($e->getMessage(), 'code 406') !== false) {
-
-                $address_object = reset($this->email_object->to);
-
-                $email = $address_object->address ?? '';
-
-                $message = "Recipient {$email} has been suppressed and cannot receive emails from you.";
-
-                $this->fail();
-                $this->logMailError($message, $this->company->clients()->first());
-                $this->cleanUpMailers();
-
-                $this->entityEmailFailed($message);
-
-                return;
-            }
+           
 
             /**
              * Post mark buries the proper message in a guzzle response
@@ -621,7 +623,7 @@ class Email implements ShouldQueue
         $company = $this->company;
 
         $smtp_host = $company->smtp_host ?? '';
-        $smtp_port = $company->smtp_port ?? 0;
+        $smtp_port = (int)$company->smtp_port ?? 0; //@phpstan-ignore-line
         $smtp_username = $company->smtp_username ?? '';
         $smtp_password = $company->smtp_password ?? '';
         $smtp_encryption = $company->smtp_encryption ?? 'tls';
@@ -691,7 +693,7 @@ class Email implements ShouldQueue
     private function checkValidSendingUser($user)
     {
         /* Always ensure the user is set on the correct account */
-        if ($user->account_id != $this->company->account_id) {
+        if (!$user || ($user->account_id != $this->company->account_id)) {
             $this->email_object->settings->email_sending_method = 'default';
 
             return $this->setMailDriver();

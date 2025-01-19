@@ -59,7 +59,7 @@ class PdfMaker
 
     public function build()
     {
-
+        
         if (isset($this->data['template']) && isset($this->data['variables'])) {
             $this->getEmptyElements($this->data['template'], $this->data['variables']);
         }
@@ -75,7 +75,7 @@ class PdfMaker
 
             $ts = new TemplateService();
 
-            if (isset($this->options['client'])) {
+            if (isset($this->options['client']) && !empty($this->options['client'])) {
                 $client = $this->options['client'];
                 try {
                     $ts->setCompany($client->company);
@@ -85,7 +85,7 @@ class PdfMaker
                 }
             }
 
-            if (isset($this->options['vendor'])) {
+            if (isset($this->options['vendor']) && !empty($this->options['vendor'])) {
                 $vendor = $this->options['vendor'];
                 try {
                     $ts->setCompany($vendor->company);
@@ -147,7 +147,7 @@ class PdfMaker
 
             // Decode the HTML content
             $html = htmlspecialchars_decode($element->textContent, ENT_QUOTES | ENT_HTML5);
-            $html = str_ireplace(['<br>'], '<br/>', $html);
+            $html = str_ireplace(['<br>','<?xml encoding="UTF-8">'], ['<br/>',''], $html);
 
             // Create a temporary document to properly parse the HTML
             $temp = new \DOMDocument();
@@ -161,18 +161,26 @@ class PdfMaker
             // Import the div's contents
             $imported = $this->document->importNode($temp->getElementsByTagName('div')->item(0), true);
 
-            // Clear existing content of the element
-            while ($element->firstChild) {
-                $element->removeChild($element->firstChild);
+            // Clear existing content - more efficient
+            $element->textContent = '';
+            // Get the first div's content
+            $divContent = $temp->getElementsByTagName('div')->item(0);
+
+            if ($divContent) {
+                // Import all nodes from the temporary div
+                foreach ($divContent->childNodes as $child) {
+                    $imported = $this->document->importNode($child, true);
+                    $element->appendChild($imported);
+                }
+            } else {
+                // Fallback - import the entire content if no div found
+                $imported = $this->document->importNode($temp->documentElement, true);
+                $element->appendChild($imported);
+
             }
 
-            // Append the new content to the element
-            $element->appendChild($imported);
 
         }
-
-
-
 
         return $this;
     }

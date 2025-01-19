@@ -120,7 +120,7 @@ class Nordigen
     /**
      * Create a new End User Agreement with the given parameters
      *
-     * @param array{id: string, transaction_total_days: int, max_access_valid_for_days: int} $institution
+     * @param array{id: string, transaction_total_days: int} $institution
      *
      * @throws \Nordigen\NordigenPHP\Exceptions\NordigenExceptions\NordigenException
      *
@@ -132,9 +132,9 @@ class Nordigen
      *   access_valid_for_days: int,
      *   access_scope: string[],
      *   accepted: string
-     * }|null Agreement details
+     * } Agreement details
      */
-    public function createAgreement(array $institution, int $accessDays, int $transactionDays): ?array
+    public function createAgreement(array $institution, int $accessDays, int $transactionDays): array
     {
         $txDays = $transactionDays < 30 ? 30 : $transactionDays;
         $maxAccess = $institution['max_access_valid_for_days'];
@@ -151,7 +151,7 @@ class Nordigen
      * Create a new Bank Requisition
      *
      * @param array{id: string} $institution,
-     * @param array{id: ?string, transaction_total_days: int} $agreement
+     * @param array{id: string, transaction_total_days: int} $agreement
      */
     public function createRequisition(
         string $redirect,

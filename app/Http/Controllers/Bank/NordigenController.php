@@ -77,7 +77,7 @@ class NordigenController extends BaseController
         }))[0];
 
         try {
-            $txDays = $data['tx_days'] ?? 0;
+            $txDays = $data['tx_days'] ?? 0; //@phpstan-ignore-line
 
             $agreement = $nordigen->firstValidAgreement($institution['id'], $data['access_days'] ?? 0, $txDays)
                       ?? $nordigen->createAgreement($institution, $data['access_days'] ?? 9999, $txDays);
@@ -173,6 +173,8 @@ class NordigenController extends BaseController
             if (isset($nordigen_account['error'])) {
                 continue;
             }
+            
+            $bank_integration = false;
 
             try {
                 $bank_integration = $this->findIntegrationBy('account', $nordigen_account, $company);
@@ -194,6 +196,10 @@ class NordigenController extends BaseController
                 $bank_integration->nickname = $nordigen_account['nickname'];
                 $bank_integration->currency = $nordigen_account['account_currency'];
             } finally {
+
+                if(!$bank_integration)
+                    continue;
+
                 $bank_integration->auto_sync = true;
                 $bank_integration->disabled_upstream = false;
                 $bank_integration->balance = $nordigen_account['current_balance'];
@@ -224,8 +230,6 @@ class NordigenController extends BaseController
     /**
      * Handles failure scenarios for Nordigen bank integrations
      *
-     * @param array{lang: string, redirect?: string}|null $context
-     * @param array{account: array}|null $company
      */
     private function failed(string $reason, array $context, $company = null): View
     {
@@ -305,4 +309,5 @@ class NordigenController extends BaseController
 
         return response()->json($nordigen->getInstitutions());
     }
+
 }

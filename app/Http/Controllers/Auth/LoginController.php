@@ -335,6 +335,10 @@ class LoginController extends BaseController
             $name[1] = request()->has('last_name') ? request()->input('last_name') : $name[1];
         }
 
+        if($provider == 'apple' && !$user->email){
+            return response()->json(['message' => 'This signup method is not supported as no email was provided'], 403);
+        }
+
         $new_account = [
             'first_name' => $name[0],
             'last_name' => $name[1],

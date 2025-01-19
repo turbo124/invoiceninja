@@ -1096,8 +1096,8 @@ $lang = array(
     'quote_documents' => 'Quote Documents',
     'invoice_documents' => 'Invoice Documents',
     'expense_documents' => 'Expense Documents',
-    'invoice_embed_documents' => 'Embed Documents',
-    'invoice_embed_documents_help' => 'Include attached images in the invoice.',
+    'invoice_embed_documents' => 'Embed Images/Documents',
+    'invoice_embed_documents_help' => 'Include attached images/pdfs in the invoice.',
     'document_email_attachment' => 'Attach Documents',
     'ubl_email_attachment' => 'Attach UBL',
     'download_documents' => 'Download Documents (:size)',
@@ -5487,6 +5487,13 @@ $lang = array(
     'enable_public_notifications_help' => 'Enable real-time notifications from Invoice Ninja.',
     'navigate' => 'Navigate',
     'calculate_taxes_warning' => 'This action will enable line item taxes and disable total taxes. Any open invoices may be recalculated with the new settings!',
+    'activity_149' => ':user emailed credit :credit for :client to :contact',
+    'email_history_empty' => 'No email history found, this feature only available when sending with Postmark/Mailgun.',
+    'e_invoicing' => 'E-Invoicing',
+    'einvoice_token_not_found' => 'E-invoicing token not found. Please go to Settings > E-invoice and regenerate token.',
+    'regenerate' => 'Regenerate',
+    'subscription_unavailable' => 'This item is no longer available',
+    'currency_samoan_tala' => 'Samoan Tala',
 );
 
 return $lang;

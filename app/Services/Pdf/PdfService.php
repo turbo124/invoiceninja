@@ -90,7 +90,10 @@ class PdfService
     public function getPdf()
     {
         try {
-            $pdf = $this->resolvePdfEngine($this->getHtml());
+
+            $html = $this->getHtml();
+            // nlog($html);
+            $pdf = $this->resolvePdfEngine($html);
 
             $numbered_pdf = $this->pageNumbering($pdf, $this->company);
 
@@ -220,8 +223,8 @@ class PdfService
 
             return $pdfBuilder->downloadString();
 
-        } catch (\Exception $e) {
-            nlog("E_Invoice Merge failed - " . $e->getMessage());
+        } catch (\Throwable $th) {
+            nlog("E_Invoice Merge failed - " . $th->getMessage());
         }
 
         return $pdf;

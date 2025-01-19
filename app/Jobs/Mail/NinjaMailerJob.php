@@ -165,6 +165,23 @@ class NinjaMailerJob implements ShouldQueue
                 $this->company->save();
             }
 
+            if (stripos($e->getMessage(), 'code 406') !== false) {
+
+                $email = $this->nmo->to_user->email ?? '';
+
+                $message = "Recipient {$email} has been suppressed and cannot receive emails from you.";
+
+                $this->fail();
+                $this->cleanUpMailers();
+                $this->logMailError($message, $this->company->clients()->first());
+
+                if ($this->nmo->entity) {
+                    $this->entityEmailFailed($message);
+                }
+
+                return;
+            }
+
             $this->fail();
             $this->cleanUpMailers();
             $this->logMailError($e->getMessage(), $this->company->clients()->first());
@@ -223,25 +240,6 @@ class NinjaMailerJob implements ShouldQueue
                 return $this->setMailDriver();
 
             }
-
-            if (stripos($e->getMessage(), 'code 406') !== false) {
-
-                $email = $this->nmo->to_user->email ?? '';
-
-                $message = "Recipient {$email} has been suppressed and cannot receive emails from you.";
-
-                $this->fail();
-                $this->logMailError($message, $this->company->clients()->first());
-
-                if ($this->nmo->entity) {
-                    $this->entityEmailFailed($message);
-                }
-
-                $this->cleanUpMailers();
-
-                return;
-            }
-
 
             /**
              * Post mark buries the proper message in a guzzle response
@@ -417,7 +415,7 @@ class NinjaMailerJob implements ShouldQueue
         $company = $this->company;
 
         $smtp_host = $company->smtp_host ?? '';
-        $smtp_port = $company->smtp_port ?? 0;
+        $smtp_port = (int)$company->smtp_port ?? 0; //@phpstan-ignore-line
         $smtp_username = $company->smtp_username ?? '';
         $smtp_password = $company->smtp_password ?? '';
         $smtp_encryption = $company->smtp_encryption ?? 'tls';
@@ -515,7 +513,7 @@ class NinjaMailerJob implements ShouldQueue
     private function checkValidSendingUser($user)
     {
         /* Always ensure the user is set on the correct account */
-        if ($user->account_id != $this->company->account_id) {
+        if (!$user ||($user->account_id != $this->company->account_id)) {
             $this->nmo->settings->email_sending_method = 'default';
             return $this->setMailDriver();
         }
@@ -535,7 +533,7 @@ class NinjaMailerJob implements ShouldQueue
         if ($sending_user == "0") {
             $user = $this->company->owner();
         } else {
-            $user = User::find($this->decodePrimaryKey($sending_user));
+            $user = User::withTrashed()->find($this->decodePrimaryKey($sending_user));
         }
 
         return $user;

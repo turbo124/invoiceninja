@@ -68,7 +68,7 @@ class TemplateService
 
     private ?Vendor $vendor = null;
 
-    private Invoice | Quote | Credit | PurchaseOrder | RecurringInvoice | Task | Project $entity;
+    private Invoice | Quote | Credit | PurchaseOrder | RecurringInvoice | Task | Project | Payment $entity;
 
     private Payment $payment;
 
@@ -346,7 +346,7 @@ class TemplateService
 
             $template = htmlspecialchars($template, ENT_XML1, 'UTF-8');
 
-            $f->appendXML(html_entity_decode($template));
+            $f->appendXML(str_ireplace("<br>", "<br/>", html_entity_decode($template)));
 
             $replacements[] = $f;
 
@@ -392,7 +392,13 @@ class TemplateService
             }
         }
 
-        @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+                
+        $html = htmlspecialchars_decode($html, ENT_QUOTES | ENT_HTML5);
+        $html = str_ireplace(['<br>'], '<br/>', $html);
+
+        @$this->document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        // @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         $this->save();
 
@@ -1569,23 +1575,14 @@ class TemplateService
 
         foreach ($children as $child) {
             $contains_html = false;
+            $child['content'] = $child['content'] ?? '';
 
-            //06-11-2023 for some reason this parses content as HTML
-            // if ($child['element'] !== 'script') {
-            //     if ($this->company->markdown_enabled && array_key_exists('content', $child)) {
-            //         $child['content'] = str_replace('<br>', "\r", $child['content']);
-            //         $child['content'] = $this->commonmark->convert($child['content'] ?? '');
-            //     }
-            // }
-
-            if (isset($child['content'])) {
-                if (isset($child['is_empty']) && $child['is_empty'] === true) {
-                    continue;
-                }
-
-                $contains_html = preg_match('#(?<=<)\w+(?=[^<]*?>)#', $child['content'], $m) != 0;
+            if (isset($child['is_empty']) && $child['is_empty'] === true) {
+                continue;
             }
 
+            $contains_html = str_contains($child['content'], '<') && str_contains($child['content'], '>');
+        
             if ($contains_html) {
                 // If the element contains the HTML, we gonna display it as is. Backend is going to
                 // encode it for us, preventing any errors on the processing stage.
@@ -1599,7 +1596,7 @@ class TemplateService
             } else {
                 // .. in case string doesn't contain any HTML, we'll just return
                 // raw $content.
-                $_child = $this->document->createElement($child['element'], isset($child['content']) ? $child['content'] : '');
+                $_child = $this->document->createElement($child['element'], $child['content']);
             }
 
             $element->appendChild($_child);

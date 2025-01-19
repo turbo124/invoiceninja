@@ -59,7 +59,7 @@
 
         clone.classList.replace('ob-list-institution', 'ob-history-option');
         clone.querySelector('.ob-span-text').innerText = `${max_history} days`;
-        url.searchParams.set('institution_id', institutionId);
+        url.searchParams.set('institution_id', institution.id);
 
         // When we come from the renew button we need to replace the country flag
         if (skippedSelect) {
@@ -101,7 +101,7 @@
 
     new institutionSelector(institutions, 'institution-modal-content', config);
 
-    if (null !== institutionId && !failedReason) {
+    if ('' !== institutionId && !failedReason) {
         createSelectionUI(
             document.querySelector('.ob-institution'),
             institutions.find(i => i.id == institutionId),
@@ -140,6 +140,7 @@
         let restartFlow = false; // return, restart, refresh
         heading.innerHTML = "{{ ctrans('texts.nordigen_handler_error_heading_unknown', [], $lang ?? 'en') }}";
         contents.innerHTML = "{{ ctrans('texts.nordigen_handler_error_contents_unknown', [], $lang ?? 'en') }} " + failedReason;
+
         switch (failedReason) {
             // Connect Screen Errors
             case "token-invalid":
