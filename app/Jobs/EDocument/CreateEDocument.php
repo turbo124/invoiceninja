@@ -28,6 +28,7 @@ use App\Services\EDocument\Standards\FatturaPA;
 use App\Services\EDocument\Standards\RoEInvoice;
 use App\Services\EDocument\Standards\OrderXDocument;
 use App\Services\EDocument\Standards\FacturaEInvoice;
+use App\Services\EDocument\Standards\ZugferdEDocument;
 use App\Services\EDocument\Standards\ZugferdEDokument;
 
 class CreateEDocument implements ShouldQueue
@@ -85,7 +86,10 @@ class CreateEDocument implements ShouldQueue
                 case "XInvoice-Extended":
                 case "XInvoice-BasicWL":
                 case "XInvoice-Basic":
-                    $zugferd = (new ZugferdEDokument($this->document))->run();
+
+// $zugferd = (new ZugferdEDokument($this->document))->run();
+
+$zugferd = (new ZugferdEDocument($this->document))->run();
 
                     return $this->returnObject ? $zugferd->xdocument : $zugferd->getXml();
                 case "Facturae_3.2":

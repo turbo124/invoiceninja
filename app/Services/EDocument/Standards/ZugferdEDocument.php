@@ -110,47 +110,40 @@ class ZugferdEDocument extends AbstractService
         }
 
         // Get document level discount
-        $document_discount = $this->calc->getTotalDiscount();
-        $total_taxable = $this->getTaxable();
-
+        // $document_discount = $this->calc->getTotalDiscount();
+        // $total_taxable = $this->getTaxable();
+        $net_subtotal = $this->calc->getNetSubTotal();
+        
         // Process each tax rate group
         foreach ($this->calc->getTaxMap() as $item) {
             $tax_type = $this->getTaxType($item["tax_id"]);
-            
-            // Calculate proportional discount for this tax group
-            $tax_group_total = $item["base_amount"];
-            $proportional_discount = 0;
-            
-            if ($document_discount > 0 && $total_taxable > 0) {
-                $proportional_discount = round(($tax_group_total / $total_taxable) * $document_discount, 2);
-            }
-
-            // Adjusted taxable amount for this tax group
-            $adjusted_taxable = $tax_group_total - $proportional_discount;
-
-            // Add document level allowance (discount) if present
-            if ($proportional_discount > 0) {
-                $this->xdocument->addDocumentAllowanceCharge(
-                    $proportional_discount,
-                    false, // isCharge = false means it's a discount
-                    $tax_type,
-                    "VAT",
-                    $item["tax_rate"]
-                );
-            }
-
             // Add tax information
             $this->xdocument->addDocumentTax(
                 $tax_type,
                 "VAT",
-                $adjusted_taxable, // Taxable amount after discount
-                // ($item["tax_rate"] / 100) * $adjusted_taxable, // Tax amount
+                $item["base_amount"], // Taxable amount after discount
                 $item["total"],
                 $item["tax_rate"],
                 $tax_type == ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
                     ? ctrans('texts.intracommunity_tax_info')
                     : ''
             );
+                
+            if ($this->calc->getTotalDiscount() > 0) {
+
+                $ratio = $item["base_amount"] / $net_subtotal;
+
+                $this->xdocument->addDocumentAllowanceCharge(
+                    round($this->calc->getTotalDiscount() * $ratio, 2),
+                    false,
+                    $tax_type,
+                    "VAT",
+                    $item["tax_rate"]
+                );
+            }
+
+        
+        
         }
 
         return $this;
@@ -197,10 +190,22 @@ class ZugferdEDocument extends AbstractService
         // Calculate amounts after discount
         $taxable_amount = $this->getTaxable();
         
+        nlog([
+             $this->document->amount,                    // Total amount with VAT
+            $this->document->balance,                   // Amount due
+            $this->calc->getSubTotal(),                                  // Sum before tax
+            $this->calc->getTotalSurcharges(),         // Total charges
+            $document_discount,                         // Total allowances
+            $taxable_amount,                           // Tax basis total (net)
+            $total_tax,                                // Total tax amount
+            0.0,                                       // Total prepaid amount
+            $this->document->amount - $this->document->balance, 
+        ]);
+        
         $this->xdocument->setDocumentSummation(
             $this->document->amount,                    // Total amount with VAT
             $this->document->balance,                   // Amount due
-            $subtotal,                                  // Sum before tax
+            $this->calc->getSubTotal(),                                  // Sum before tax
             $this->calc->getTotalSurcharges(),         // Total charges
             $document_discount,                         // Total allowances
             $taxable_amount,                           // Tax basis total (net)
@@ -211,65 +216,66 @@ class ZugferdEDocument extends AbstractService
 
         return $this;
     }
-private function setLineItems(): self
-{
-    foreach ($this->document->line_items as $index => $item) {
-        /** @var InvoiceItem $item **/
         
-        // 1. Start new position and set basic details
-        $this->xdocument->addNewPosition($index)
-            ->setDocumentPositionProductDetails(
-                strlen($item->product_key ?? '') >= 1 ? $item->product_key : "no product name defined", 
-                $item->notes
-            )
-            ->setDocumentPositionQuantity(
-                $item->quantity, 
-                $item->type_id == 2 ? "HUR" : "H87"
-            )
-            ->setDocumentPositionNetPrice(
-                $this->document->uses_inclusive_tax ? $item->net_cost : $item->cost
-            );
+    private function setLineItems(): self
+    {
+        foreach ($this->document->line_items as $index => $item) {
+            /** @var InvoiceItem $item **/
             
-        // 2. ALWAYS add tax information (even if zero)
-        if(strlen($item->tax_name1) > 1) {
-            $this->xdocument->addDocumentPositionTax(
-                $this->getTaxType($item->tax_id ?? '2'), 
-                'VAT', 
-                $item->tax_rate1
-            );
-        } else {
-            // Add zero tax if no tax is specified
-            $this->xdocument->addDocumentPositionTax(
-                ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX,
-                'VAT',
-                0
-            );
+            // 1. Start new position and set basic details
+            $this->xdocument->addNewPosition($index)
+                ->setDocumentPositionProductDetails(
+                    strlen($item->product_key ?? '') >= 1 ? $item->product_key : "no product name defined", 
+                    $item->notes
+                )
+                ->setDocumentPositionQuantity(
+                    $item->quantity, 
+                    $item->type_id == 2 ? "HUR" : "H87"
+                )
+                ->setDocumentPositionNetPrice(
+                    $this->document->uses_inclusive_taxes ? $item->net_cost : $item->cost
+                );
+                
+            // 2. ALWAYS add tax information (even if zero)
+            if(strlen($item->tax_name1) > 1) {
+                $this->xdocument->addDocumentPositionTax(
+                    $this->getTaxType($item->tax_id ?? '2'), 
+                    'VAT', 
+                    $item->tax_rate1
+                );
+            } else {
+                // Add zero tax if no tax is specified
+                $this->xdocument->addDocumentPositionTax(
+                    ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX,
+                    'VAT',
+                    0
+                );
+            }
+
+            // 3. Add allowances/charges (discounts) if any
+            if($item->discount > 0) {
+                $line_discount = $this->calculateTotalItemDiscountAmount($item);
+                $this->xdocument->addDocumentPositionGrossPriceAllowanceCharge(
+                    abs($line_discount), 
+                    false
+                );
+            }
+
+            // 4. Finally add monetary summation
+            $this->xdocument->setDocumentPositionLineSummation($item->line_total);
         }
 
-        // 3. Add allowances/charges (discounts) if any
-        if($item->discount > 0) {
-            $line_discount = $this->calculateTotalItemDiscountAmount($item);
-            $this->xdocument->addDocumentPositionGrossPriceAllowanceCharge(
-                abs($line_discount), 
-                false
-            );
+        return $this;
+    }
+
+    private function calculateTotalItemDiscountAmount($item): float
+    {
+        if ($item->is_amount_discount) {
+            return $item->discount;
         }
 
-        // 4. Finally add monetary summation
-        $this->xdocument->setDocumentPositionLineSummation($item->line_total);
+        return ($item->cost * $item->quantity) * ($item->discount / 100);
     }
-
-    return $this;
-}
-
-private function calculateTotalItemDiscountAmount($item): float
-{
-    if ($item->is_amount_discount) {
-        return $item->discount;
-    }
-
-    return ($item->cost * $item->quantity) * ($item->discount / 100);
-}
 
 
     private function setClientTaxRegistration(): self
