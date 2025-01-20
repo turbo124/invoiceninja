@@ -216,10 +216,10 @@ class ZugferdEDocument extends AbstractService
         $taxable_amount = $this->document->amount - $total_tax;
         $base_taxable_amount = $this->calc->getTaxMap()->sum('base_amount');
 
-        // $subtotal = $this->document->uses_inclusive_taxes ? ($this->calc->getSubTotal() - $total_tax) : ($this->calc->getSubTotal());
+        $subtotal = $this->document->uses_inclusive_taxes ? ($this->calc->getTotal() - $total_tax - $this->calc->getTotalNetSurcharges() + $this->calc->getTotalDiscount()) : ($this->calc->getSubTotal());
 
         
-        $subtotal = $this->document->uses_inclusive_taxes ? ($taxable_amount - $this->calc->getTotalNetSurcharges()) : ($this->calc->getSubTotal());
+        // $subtotal = $this->document->uses_inclusive_taxes ? ($taxable_amount - $this->calc->getTotalNetSurcharges()) : ($this->calc->getSubTotal());
 
         nlog($this->calc->getTotalTaxes());
         nlog($this->calc->getSubTotal());
