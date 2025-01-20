@@ -52,10 +52,8 @@ class ZugferdEDocument extends AbstractService
     public function run(): self
     {
 
-        /** @var \App\Models\Company $company */
         $this->company = $this->document->company;
 
-        /** @var \App\Models\Client $client */
         $this->client = $this->document->client;
 
         $profile = $this->client->getSetting('e_invoice_type');
@@ -86,12 +84,39 @@ class ZugferdEDocument extends AbstractService
             ->setPaymentMeans()         // 2. Then payment means
             ->setPaymentTerms()         // 3. Then payment terms
             ->setLineItems()            // 4. Then line items
+            ->setCustomSurcharges()     // 4a. Surcharges
             ->setDocumentSummation();   // 5. Finally document summation
 
         return $this;
 
     }
 
+    private function setCustomSurcharges(): self
+    {
+        $item = $this->calc->getTaxMap()->first();
+
+        if($this->document->custom_surcharge1 > 0){
+            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge1 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge1;
+            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $this->getTaxType($item["tax_id"] ?? '2'), "VAT", $item["tax_rate"]);
+        }
+
+        if($this->document->custom_surcharge2 > 0){
+            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge2 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge2;
+            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $this->getTaxType($item["tax_id"] ?? '2'), "VAT", $item["tax_rate"]);
+        }
+
+        if($this->document->custom_surcharge3 > 0){
+            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge3 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge3;
+            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $this->getTaxType($item["tax_id"] ?? '2'), "VAT", $item["tax_rate"]);
+        }
+
+        if($this->document->custom_surcharge4 > 0){
+            $surcharge = $this->document->uses_inclusive_taxes ?  ($this->document->custom_surcharge4 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge4;
+            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $this->getTaxType($item["tax_id"] ?? '2'), "VAT", $item["tax_rate"]);
+        }
+
+        return $this;
+    }
 
     private function setDocumentTaxes(): self
     {
@@ -109,19 +134,23 @@ class ZugferdEDocument extends AbstractService
             return $this;
         }
 
-        // Get document level discount
-        // $document_discount = $this->calc->getTotalDiscount();
-        // $total_taxable = $this->getTaxable();
-        $net_subtotal = $this->calc->getNetSubTotal();
-        
+        $tax_map = $this->calc->getTaxMap();
+        $net_subtotal = $tax_map->sum('base_amount');
+
+        $total_tax = $this->calc->getTotalTaxes();
+        $taxable_amount = $this->document->amount - $total_tax;
+
+        //taxable amount and net subtotal should be the same
+        $adjustment = round($taxable_amount-$net_subtotal,2);
+
         // Process each tax rate group
-        foreach ($this->calc->getTaxMap() as $item) {
+        foreach ($tax_map as $item) {
             $tax_type = $this->getTaxType($item["tax_id"]);
             // Add tax information
             $this->xdocument->addDocumentTax(
                 $tax_type,
                 "VAT",
-                $item["base_amount"], // Taxable amount after discount
+                $item["base_amount"]+$adjustment, // Taxable amount after discount
                 $item["total"],
                 $item["tax_rate"],
                 $tax_type == ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES
@@ -142,8 +171,7 @@ class ZugferdEDocument extends AbstractService
                 );
             }
 
-        
-        
+            $adjustment = 0;
         }
 
         return $this;
@@ -184,33 +212,50 @@ class ZugferdEDocument extends AbstractService
     private function setDocumentSummation(): self
     {
         $document_discount = $this->calc->getTotalDiscount();
-        $total_tax = $this->calc->getTotalTaxes();
-        $subtotal = $this->calc->getTotal() - $total_tax;
+        $total_tax = round($this->calc->getTotalTaxes(),2);
+        $taxable_amount = $this->document->amount - $total_tax;
+        $base_taxable_amount = $this->calc->getTaxMap()->sum('base_amount');
+
+        // $subtotal = $this->document->uses_inclusive_taxes ? ($this->calc->getSubTotal() - $total_tax) : ($this->calc->getSubTotal());
+
+        
+        $subtotal = $this->document->uses_inclusive_taxes ? ($taxable_amount - $this->calc->getTotalNetSurcharges()) : ($this->calc->getSubTotal());
+
+        nlog($this->calc->getTotalTaxes());
+        nlog($this->calc->getSubTotal());
+        nlog($this->calc->getTotalSurcharges());
+
+        nlog($this->calc->getSubTotal() - $this->calc->getTotalSurcharges() - $this->calc->getTotalTaxes());
+        nlog($this->document->total_taxes);
+
+// $subtotal = $this->document->uses_inclusive_taxes ? ($this->calc->getNetSubTotal() - $total_tax) : ($this->calc->getSubTotal());
 
         // Calculate amounts after discount
-        $taxable_amount = $this->getTaxable();
+
         
         nlog([
              $this->document->amount,                    // Total amount with VAT
             $this->document->balance,                   // Amount due
-            $this->calc->getSubTotal(),                                  // Sum before tax
+            $subtotal,                                  // Sum before tax
             $this->calc->getTotalSurcharges(),         // Total charges
             $document_discount,                         // Total allowances
             $taxable_amount,                           // Tax basis total (net)
             $total_tax,                                // Total tax amount
-            0.0,                                       // Total prepaid amount
+            0,
+            // round($this->document->amount - ($base_taxable_amount+$total_tax),2),                                       // Total prepaid amount
             $this->document->amount - $this->document->balance, 
         ]);
         
         $this->xdocument->setDocumentSummation(
             $this->document->amount,                    // Total amount with VAT
             $this->document->balance,                   // Amount due
-            $this->calc->getSubTotal(),                                  // Sum before tax
-            $this->calc->getTotalSurcharges(),         // Total charges
+            $subtotal,                                  // Sum before tax
+            $this->document->uses_inclusive_taxes ? $this->calc->getTotalNetSurcharges() : $this->calc->getTotalSurcharges(),         // Total charges
             $document_discount,                         // Total allowances
             $taxable_amount,                           // Tax basis total (net)
-            $total_tax,                                // Total tax amount
-            0.0,                                       // Total prepaid amount
+            round($total_tax,2),                       // Total tax amount
+            0,            
+            // round($this->document->amount - ($base_taxable_amount+$total_tax),2),                                       // Total rounding amount
             $this->document->amount - $this->document->balance  // Amount already paid
         );
 
@@ -252,6 +297,8 @@ class ZugferdEDocument extends AbstractService
                 );
             }
 
+            $line_discount = 0;
+
             // 3. Add allowances/charges (discounts) if any
             if($item->discount > 0) {
                 $line_discount = $this->calculateTotalItemDiscountAmount($item);
@@ -260,9 +307,8 @@ class ZugferdEDocument extends AbstractService
                     false
                 );
             }
-
             // 4. Finally add monetary summation
-            $this->xdocument->setDocumentPositionLineSummation($item->line_total);
+            $this->xdocument->setDocumentPositionLineSummation($this->document->uses_inclusive_taxes ? ($item->line_total-$item->tax_amount) : $item->line_total);
         }
 
         return $this;
@@ -277,20 +323,6 @@ class ZugferdEDocument extends AbstractService
         return ($item->cost * $item->quantity) * ($item->discount / 100);
     }
 
-
-    private function setClientTaxRegistration(): self
-    {
-        if (empty($this->client->vat_number)) {
-
-            return $this;
-
-        }
-
-        $this->xdocument->addDocumentBuyerTaxRegistration("VA", $this->client->vat_number);
-
-        return $this;
-
-    }
 
     private function setCompanyTaxRegistration(): array
     {
@@ -343,7 +375,7 @@ class ZugferdEDocument extends AbstractService
     private function setDeliveryAddress(): self
     {
 
-        if (isset($client->shipping_address1) && $client->shipping_country) {
+        if (isset($this->client->shipping_address1) && $this->client->shipping_country) {
             $this->xdocument->setDocumentShipToAddress(
                 $this->client->shipping_address1,
                 $this->client->shipping_address2,
@@ -491,52 +523,4 @@ class ZugferdEDocument extends AbstractService
         return $tax_type;
     }
 
-    private function getTaxable(): float
-    {
-        $total = 0;
-
-        foreach ($this->document->line_items as $item) {
-            $line_total = $item->quantity * $item->cost;
-
-            if ($item->discount != 0) {
-                if ($this->document->is_amount_discount) {
-                    $line_total -= $item->discount;
-                } else {
-                    $line_total -= $line_total * $item->discount / 100;
-                }
-            }
-
-            $total += $line_total;
-        }
-
-        $total = round($total, 2);
-
-        if ($this->document->discount > 0) {
-            if ($this->document->is_amount_discount) {
-                $total -= $this->document->discount;
-            } else {
-                $total *= (100 - $this->document->discount) / 100;
-
-            }
-        }
-
-        //** Surcharges are taxable regardless, if control is needed over taxable components, add it as a line item! */
-        if ($this->document->custom_surcharge1 > 0) {
-            $total += $this->document->custom_surcharge1;
-        }
-
-        if ($this->document->custom_surcharge2 > 0) {
-            $total += $this->document->custom_surcharge2;
-        }
-
-        if ($this->document->custom_surcharge3 > 0) {
-            $total += $this->document->custom_surcharge3;
-        }
-
-        if ($this->document->custom_surcharge4 > 0) {
-            $total += $this->document->custom_surcharge4;
-        }
-
-        return round($total, 2);
-    }
 }
