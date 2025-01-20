@@ -18,7 +18,7 @@ class Purify
 
         // Text Elements
         'span', 'strong', 'em', 'b', 'i', 'u', 'small',
-        'sub', 'sup', 'del', 'ins',
+        'sub', 'sup', 'del', 'ins', 
 
         // Line Breaks
         'br', 'hr',
