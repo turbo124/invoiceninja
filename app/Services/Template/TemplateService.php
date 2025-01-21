@@ -37,6 +37,7 @@ use App\Utils\PaymentHtmlEngine;
 use App\Utils\Traits\MakesDates;
 use App\Utils\HostedPDF\NinjaPdf;
 use App\Utils\Traits\Pdf\PdfMaker;
+use Illuminate\Support\Facades\App;
 use Twig\Extra\Intl\IntlExtension;
 use League\CommonMark\CommonMarkConverter;
 use Twig\Extra\Markdown\MarkdownExtension;
@@ -89,7 +90,6 @@ class TemplateService
      */
     private function init(): self
     {
-
         $this->commonmark = new CommonMarkConverter([
             'allow_unsafe_links' => false,
         ]);
@@ -141,7 +141,7 @@ class TemplateService
         $this->twig->addFilter($filter);
 
         $allowedTags = ['if', 'for', 'set', 'filter'];
-        $allowedFilters = ['format_spellout_number', 'split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags','markdown_to_html'];
+        $allowedFilters = ['format_spellout_number','split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags','markdown_to_html'];
         $allowedFunctions = ['range', 'cycle', 'constant', 'date','img','t'];
         $allowedProperties = ['type_id'];
         // $allowedMethods = ['img','t'];

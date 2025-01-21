@@ -93,7 +93,7 @@ class SendEDocument implements ShouldQueue
             'account_key' => $model->company->account->key,
             'e_invoicing_token' => $model->company->account->e_invoicing_token,
         ];
-
+nlog($payload);
         //Self Hosted Sending Code Path
         if (Ninja::isSelfHost() && ($model instanceof Invoice) && $model->company->peppolSendingEnabled()) {
 
