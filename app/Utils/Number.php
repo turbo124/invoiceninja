@@ -320,7 +320,7 @@ class Number
         }
 
         // 2025-01-21 - force cast to float so that we do not hit exception in number_format
-        $v = (float)rtrim(sprintf('%f', $value), '0');
+        $v = rtrim(sprintf('%f', $value), '0');
         $parts = explode('.', $v);
 
         //04-04-2023 if currency = JPY override precision to 0
@@ -328,7 +328,7 @@ class Number
             $precision = 0;
         }
 
-        $value = number_format($v, $precision, $decimal, $thousand);//@phpstan-ignore-line
+        $value = number_format((float)$v, $precision, $decimal, $thousand);//@phpstan-ignore-line
         $symbol = $currency->symbol;
 
         if ($entity->getSetting('show_currency_code') === true && $currency->code == 'CHF') {

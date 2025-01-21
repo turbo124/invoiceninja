@@ -104,6 +104,8 @@ class InvitationController extends Controller
 
         if (request()->has('client_hash') && request()->input('client_hash') == $invitation->contact->client->client_hash) {
             request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
             auth()->guard('contact')->loginUsingId($client_contact->id, true);
         } elseif ((bool) $invitation->contact->client->getSetting('enable_client_portal_password') !== false) {
             //if no contact password has been set - allow user to set password - then continue to view entity
@@ -123,6 +125,7 @@ class InvitationController extends Controller
 
         } else {
             request()->session()->invalidate();
+            request()->session()->regenerateToken();
             auth()->guard('contact')->loginUsingId($client_contact->id, true);
         }
 
@@ -263,6 +266,7 @@ class InvitationController extends Controller
         }
 
         request()->session()->invalidate();
+        request()->session()->regenerateToken();
         auth()->guard('contact')->loginUsingId($contact->id, true);
 
         return redirect()->route('client.payments.show', $payment->hashed_id);
@@ -281,6 +285,7 @@ class InvitationController extends Controller
         }
 
         request()->session()->invalidate();
+        request()->session()->regenerateToken();
         auth()->guard('contact')->loginUsingId($invitation->contact->id, true);
 
         $invoice = $invitation->invoice->service()->removeUnpaidGatewayFees()->save();
