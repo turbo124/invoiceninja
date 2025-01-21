@@ -319,25 +319,9 @@ class Number
             $swapSymbol = $country->swap_currency_symbol;
         }
 
-        /* 08-01-2022 allow increased precision for unit price*/
-        $v = rtrim(sprintf('%f', $value), '0');
+        // 2025-01-21 - force cast to float so that we do not hit exception in number_format
+        $v = (float)rtrim(sprintf('%f', $value), '0');
         $parts = explode('.', $v);
-
-        /* 2024-12-09 improved decimal resolution        
-        if (strlen($parts[1] ?? '') > 2) {
-            $precision = strlen($parts[1]);
-        }
-
-        /* 08-02-2023 special if block to render $0.5 to $0.50*/
-        // if ($v < 1 && strlen($v) == 3) {
-        //     $precision = 2;
-        // } elseif ($v < 1) {
-        //     $precision = strlen($v) - strrpos($v, '.') - 1;
-        // }
-
-        // if (is_array($parts) && $parts[0] != 0) {
-        //     $precision = 2;
-        // }
 
         //04-04-2023 if currency = JPY override precision to 0
         if ($currency->code == 'JPY') {
