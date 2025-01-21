@@ -262,4 +262,5 @@ return [
     'hosted_einvoice_secret' => env('HOSTED_EINVOICE_SECRET', null),
     'e_invoice_quota_warning' => env('E_INVOICE_QUOTA_WARNING', 15),
     'disable_purify_html' => env('DISABLE_PURIFY_HTML', false),
+    'zugferd_version_two' => env('ZUGFERD_VERSION_TWO', false),
 ];
