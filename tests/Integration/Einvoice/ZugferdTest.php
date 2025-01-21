@@ -281,8 +281,8 @@ class ZugferdTest extends TestCase
 
             if (count($validator->getErrors()) > 0) {
             
-                nlog($invoice->toArray());
-                nlog($xml);
+                // nlog($invoice->toArray());
+                // nlog($xml);
                 nlog($validator->getErrors());
             }
 
