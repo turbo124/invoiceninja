@@ -63,7 +63,7 @@ class AdjustEmailQuota implements ShouldQueue
     public function adjust()
     {
         Account::query()->cursor()->each(function ($account) {
-            nlog("resetting email quota for {$account->key}");
+            // nlog("resetting email quota for {$account->key}");
 
             $email_count = Cache::get("email_quota".$account->key);
 

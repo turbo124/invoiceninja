@@ -61,6 +61,7 @@ class MailSentListener
                     return;
                 }
 
+                $invitation->sent_date = now();
                 $invitation->message_id = str_replace(["<",">"], "", $message_id);
                 $invitation->save();
             }
