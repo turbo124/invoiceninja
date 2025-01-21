@@ -75,7 +75,6 @@ trait PdfMaker
             '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
 
             '--wait-for-network-idle',
-            '--virtual-time-budget=5000',
             '--font-render-hinting=medium',
             '--enable-font-antialiasing',
         ];
