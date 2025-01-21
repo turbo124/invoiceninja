@@ -216,6 +216,13 @@ class InvoiceSumInclusive
         return $this->total_custom_values;
     }
 
+    public function getTotalNetSurcharges()
+    {
+        $map = $this->invoice_items->getCustomSurchargeNetMap();
+
+        return $map->sum('custom_surcharge1') + $map->sum('custom_surcharge2') + $map->sum('custom_surcharge3') + $map->sum('custom_surcharge4');
+    }
+
     public function getRecurringInvoice()
     {
         $this->invoice->amount = $this->formatValue($this->getTotal(), $this->precision);
@@ -365,7 +372,7 @@ class InvoiceSumInclusive
         }
 
         $this->tax_map = collect();
-
+        
         $keys = $this->invoice_items->getGroupedTaxes()->pluck('key')->unique();
 
         $values = $this->invoice_items->getGroupedTaxes();

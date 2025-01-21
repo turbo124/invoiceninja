@@ -987,14 +987,14 @@ class Peppol extends AbstractService
             $pi = new PartyIdentification();
             $vatID = new ID();
             $vatID->schemeID = $this->resolveScheme();
-            $vatID->value = $this->override_vat_number ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number); //todo if we are cross border - switch to the supplier local vat number
+            $vatID->value = $this->override_vat_number ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->company->settings->vat_number); //todo if we are cross border - switch to the supplier local vat number
 
             $pi->ID = $vatID;
             $party->PartyIdentification[] = $pi;
             $pts = new \InvoiceNinja\EInvoice\Models\Peppol\PartyTaxSchemeType\PartyTaxScheme();
 
             $companyID = new \InvoiceNinja\EInvoice\Models\Peppol\IdentifierType\CompanyID();
-            $companyID->value = $this->override_vat_number ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number);
+            $companyID->value = $this->override_vat_number ?? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->company->settings->vat_number);
             $pts->CompanyID = $companyID;
 
             $ts = new TaxScheme();
@@ -1513,9 +1513,9 @@ class Peppol extends AbstractService
     private function resolveScheme(bool $is_client = false): string
     {
 
-        $vat_number = $is_client ? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->vat_number) : preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->vat_number);
-        $tax_number = $is_client ? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->id_number) : preg_replace("/[^a-zA-Z0-9]/", "", $this->company->settings->id_number);
-        $country_code = $is_client ? $this->invoice->client->country->iso_3166_2 : $this->company->country()->iso_3166_2;
+        $vat_number = $is_client ? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->vat_number ?? '') : preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->company->settings->vat_number ?? '');
+        $tax_number = $is_client ? preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->client->id_number ?? ''): preg_replace("/[^a-zA-Z0-9]/", "", $this->invoice->company->settings->id_number ?? '');
+        $country_code = $is_client ? $this->invoice->client->country->iso_3166_2 : $this->invoice->company->country()->iso_3166_2;
 
         return '0037';
     }

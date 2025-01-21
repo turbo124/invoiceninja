@@ -110,6 +110,18 @@ class XsltDocumentValidator
         return $this;
     }
 
+    public function setXsd(string $xsd): self
+    {
+        $this->ubl_xsd = $xsd;
+
+        return $this;
+    }
+
+    public function getXsd(): string
+    {
+        return $this->ubl_xsd;
+    }
+
     public function setStyleSheets(array $stylesheets): self
     {
         $this->stylesheets = $stylesheets;

@@ -1836,6 +1836,10 @@ cardElement.mount('#card-element');
 
 const form = document.getElementById('card-form');
 
+form.addEventListener('submit', (event) => {
+    event.preventDefault(); // Prevent default form submission
+});
+
 var e = document.getElementById("country");
 var country_value = e.options[e.selectedIndex].value;
 
