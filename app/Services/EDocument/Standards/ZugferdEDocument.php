@@ -462,7 +462,7 @@ class ZugferdEDocument extends AbstractService
         };
     }
 
-    private function getDocumentDate(): ?DateTime
+    private function getDocumentDate(): DateTime
     {
         return date_create($this->document->date ?? now()->format('Y-m-d'));
     }

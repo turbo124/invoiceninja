@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -120,7 +121,7 @@ class Nordigen
     /**
      * Create a new End User Agreement with the given parameters
      *
-     * @param array{id: string, transaction_total_days: int} $institution
+     * @param array{id: string, transaction_total_days: int, max_access_valid_for_days: int} $institution
      *
      * @throws \Nordigen\NordigenPHP\Exceptions\NordigenExceptions\NordigenException
      *
@@ -150,8 +151,8 @@ class Nordigen
     /**
      * Create a new Bank Requisition
      *
-     * @param array{id: string} $institution,
-     * @param array{id: string, transaction_total_days: int} $agreement
+     * @param array{id: ?string} $institution,
+     * @param array{id: ?string, transaction_total_days: int} $agreement
      */
     public function createRequisition(
         string $redirect,
