@@ -55,7 +55,6 @@ trait PdfMaker
 
             // Performance & resource settings
             '--disable-dev-shm-usage',
-            '--disable-software-rasterizer',
             '--run-all-compositor-stages-before-draw',
             '--disable-renderer-backgrounding',
             '--disable-background-timer-throttling',
@@ -75,18 +74,16 @@ trait PdfMaker
             '--safebrowsing-disable-auto-update',
             '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
 
-            '--virtual-time-budget=2000',
+            '--wait-for-network-idle',
+            '--virtual-time-budget=5000',
             '--font-render-hinting=medium',
             '--enable-font-antialiasing',
-            
-            // Debug/Output
-            '--dump-dom',
         ];
 
         // if (config('ninja.snappdf_chromium_arguments')) {
             // $pdf->clearChromiumArguments();
             // $pdf->addChromiumArguments(config('ninja.snappdf_chromium_arguments'));
-            // $pdf->addChromiumArguments(implode(' ', $chrome_flags));
+            $pdf->addChromiumArguments(implode(' ', $chrome_flags));
         // }
 
         if (config('ninja.snappdf_chromium_path')) {
