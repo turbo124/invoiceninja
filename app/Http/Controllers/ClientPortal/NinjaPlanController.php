@@ -55,6 +55,7 @@ class NinjaPlanController extends Controller
             nlog('Ninja Plan Controller - Found and set Client Contact');
 
             request()->session()->invalidate();
+            request()->session()->regenerateToken();
             Auth::guard('contact')->loginUsingId($client_contact->id, true);
 
             return $this->plan();
