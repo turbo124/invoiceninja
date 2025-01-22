@@ -844,7 +844,7 @@ class HtmlEngine
         }
 
         if (isset($this->entity->company->tax_data->regions->EU->has_sales_above_threshold) && !$this->entity->company->tax_data->regions->EU->has_sales_above_threshold) {
-            $tax_label .= ctrans('text.small_company_info') ."<br>";
+            $tax_label .= ctrans('texts.small_company_info') ."<br>";
         }
 
         return $tax_label;
