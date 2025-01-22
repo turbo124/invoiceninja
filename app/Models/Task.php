@@ -281,6 +281,10 @@ class Task extends BaseModel
 
     public function getRate(): float
     {
+        if(is_numeric($this->rate) && $this->rate > 0) {
+            return $this->rate;
+        }
+
         if ($this->project && $this->project->task_rate > 0) {
             return $this->project->task_rate;
         }
