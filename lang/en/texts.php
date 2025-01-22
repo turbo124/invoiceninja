@@ -5494,6 +5494,7 @@ $lang = array(
     'regenerate' => 'Regenerate',
     'subscription_unavailable' => 'This item is no longer available',
     'currency_samoan_tala' => 'Samoan Tala',
+    'confirm_duplicate_gateway' => 'Are you sure you want to create another connection?',
 );
 
 return $lang;
