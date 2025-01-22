@@ -52,6 +52,9 @@ class Kernel extends ConsoleKernel
         /* Check for the latest version of Invoice Ninja */
         $schedule->job(new VersionCheck())->daily();
 
+        /* Clear the batch job failed table daily */
+        $schedule->command('queue:prune-batches')->daily()->name('queue-prune-batched')->onOneServer();
+
         /* Returns the number of jobs in the queue */
         $schedule->job(new QueueSize())->everyFiveMinutes()->withoutOverlapping()->name('queue-size-job')->onOneServer();
 
