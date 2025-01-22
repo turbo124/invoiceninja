@@ -17,11 +17,20 @@ return new class extends Migration
         \App\Models\CompanyGateway::withTrashed()->where('gateway_key','b9886f9257f0c6ee7c302f1c74475f6c')
         ->cursor()
         ->each(function ($cg){
-
             $cg->setConfigField('verifyBankAccount',false);
-            $cg->save();
-
         });
+
+        $gateway = \App\Models\Gateway::where('key','b9886f9257f0c6ee7c302f1c74475f6c')->first();
+                
+        $fields = json_decode($gateway->fields);
+        $fields->verifyBankAccount = false;
+        $gateway->fields = json_encode($fields);
+
+        $gateway->save();
+
+        \Illuminate\Support\Facades\Cache::forget('gateways');
+
+
     }
 
     /**
