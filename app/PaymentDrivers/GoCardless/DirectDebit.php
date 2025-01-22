@@ -64,7 +64,7 @@ class DirectDebit implements MethodInterface, LivewireMethodInterface
             "params" => [
                 "mandate_request" => [
                 "currency" => auth()->guard('contact')->user()->client->currency()->code,
-                "verify" => "when_available"
+                "verify" => "recommended" //when_available
                 ]
             ]
         ]);
