@@ -100,7 +100,7 @@ class PreviewController extends BaseController
             'Content-Disposition' => 'inline',
             'Content-Type' => 'application/pdf',
             'Cache-Control:' => 'no-cache',
-            'Server-Timing' => microtime(true) - $start
+            'Server-Timing' => (string)(microtime(true) - $start)
         ]);
 
     }

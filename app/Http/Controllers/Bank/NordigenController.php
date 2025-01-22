@@ -165,6 +165,7 @@ class NordigenController extends BaseController
             return $this->failed('requisition-no-accounts', $context, $company);
         }
 
+
         // connect new accounts
         $bank_integration_ids = [];
         foreach ($requisition['accounts'] as $nordigenAccountId) {
@@ -212,10 +213,6 @@ class NordigenController extends BaseController
                 }
             }
         }
-
-
-        if(!$bank_integration)
-            continue;
 
         // perform update in background
         $company->account->bank_integrations

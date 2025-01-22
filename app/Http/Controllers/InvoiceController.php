@@ -544,13 +544,44 @@ class InvoiceController extends BaseController
         }
 
         if ($action == 'bulk_print' && $user->can('view', $invoices->first())) {
-            $paths = $invoices->map(function ($invoice) {
-                return (new \App\Jobs\Entity\CreateRawPdf($invoice->invitations->first()))->handle();
-            });
+            $start = microtime(true);
+            
+            // 2025-01-22 Legacy implementation of bulk print
+            // $paths = $invoices->map(function ($invoice) {
+            //     return (new \App\Jobs\Entity\CreateRawPdf($invoice->invitations->first()))->handle();
+            // });
 
-            return response()->streamDownload(function () use ($paths) {
-                echo $merge = (new PdfMerge($paths->toArray()))->run();
-            }, 'print.pdf', ['Content-Type' => 'application/pdf']);
+            // return response()->streamDownload(function () use ($paths) {
+            //     echo $merge = (new PdfMerge($paths->toArray()))->run();
+            // }, 'print.pdf', ['Content-Type' => 'application/pdf']);
+
+            $batch_id = (new \App\Jobs\Invoice\PrintInvoiceBatch($invoices->pluck('id')->toArray(), $user->company()->db))->handle();
+            $batch = \Illuminate\Support\Facades\Bus::findBatch($batch_id);
+            $batch_key = $batch->name;          
+
+            $finished = false;
+
+            do{
+                usleep(500000);
+                $batch = \Illuminate\Support\Facades\Bus::findBatch($batch_id);
+                $finished = $batch->finished();
+            }while(!$finished);
+            
+            $paths = $invoices->map(function ($invoice) use($batch_key){
+                return \Illuminate\Support\Facades\Cache::pull("{$batch_key}-{$invoice->id}");
+            })->filter(function ($value) {
+                return !is_null($value);
+            })->toArray();
+
+            $mergedPdf = (new PdfMerge($paths))->run();
+
+            return response()->streamDownload(function () use ($mergedPdf) {
+                echo $mergedPdf;
+            }, 'print.pdf', [
+                'Content-Type' => 'application/pdf',
+                'Cache-Control:' => 'no-cache',
+                'Server-Timing' => (string)(microtime(true) - $start)
+            ]);
         }
 
         if ($action == 'template' && $user->can('view', $invoices->first())) {
@@ -591,13 +622,6 @@ class InvoiceController extends BaseController
             })->each(function ($invoice) use ($user, $request) {
                 $invoice->service()->sendEmail(email_type: $request->input('email_type', $invoice->calculateTemplate('invoice')));
             });
-
-            // if ($user->can('edit', $invoice)) {
-
-                // $template = $request->input('email_type', $invoice->calculateTemplate('invoice'));
-
-                // BulkInvoiceJob::dispatch($invoices->pluck('id')->toArray(), $user->company()->db, $template);
-        //   }
 
             return $this->listResponse(Invoice::withTrashed()->whereIn('id', $this->transformKeys($ids))->company());
 

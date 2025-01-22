@@ -73,6 +73,10 @@ return [
 
     ],
 
+    'batching' => [
+        'database' => env('DB_BATCH', 'mysql'),
+        'table' => 'job_batches',
+    ],
     /*
     |--------------------------------------------------------------------------
     | Failed Queue Jobs
