@@ -22,14 +22,16 @@ return new class extends Migration
 
         $gateway = \App\Models\Gateway::where('key','b9886f9257f0c6ee7c302f1c74475f6c')->first();
                 
-        $fields = json_decode($gateway->fields);
-        $fields->verifyBankAccount = false;
-        $gateway->fields = json_encode($fields);
+        if($gateway)
+        {
+            $fields = json_decode($gateway->fields);
+            $fields->verifyBankAccount = false;
+            $gateway->fields = json_encode($fields);
 
-        $gateway->save();
+            $gateway->save();
 
-        \Illuminate\Support\Facades\Cache::forget('gateways');
-
+            \Illuminate\Support\Facades\Cache::forget('gateways');
+        }
 
     }
 
