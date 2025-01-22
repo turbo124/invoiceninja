@@ -60,7 +60,6 @@ class EInvoicePeppolController extends BaseController
             ->setCompany($company)
             ->setup($request->validated());
 
-            nlog("returnign");
             nlog($response);
 
         if (data_get($response, 'status') === 'error') {

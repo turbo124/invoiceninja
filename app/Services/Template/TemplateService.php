@@ -634,14 +634,18 @@ class TemplateService
         return collect($items)->map(function ($item) use ($client_or_vendor) {
 
             $item->cost_raw = $item->cost ?? 0;
+            
             $item->discount_raw = $item->discount ?? 0;
             $item->line_total_raw = $item->line_total ?? 0;
             $item->gross_line_total_raw = $item->gross_line_total ?? 0;
             $item->tax_amount_raw = $item->tax_amount ?? 0;
             $item->product_cost_raw = $item->product_cost ?? 0;
 
-            $item->cost = Number::formatMoney($item->cost_raw, $client_or_vendor);
+            $item->net_cost_raw = $item->net_cost ?? 0;
+            $item->net_cost = Number::formatMoney($item->net_cost_raw, $client_or_vendor);
 
+            $item->cost = Number::formatMoney($item->cost_raw, $client_or_vendor);
+            
             if ($item->is_amount_discount) {
                 $item->discount = Number::formatMoney($item->discount_raw, $client_or_vendor);
             }
