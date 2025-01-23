@@ -745,7 +745,9 @@ class RecurringInvoice extends BaseModel
 
             default:
 
-            $date = Carbon::parse($date);
+                // 2025-01-23 - Reverting this back, this is tightly linked to recurring invoice generation and
+                // the timezone offset of the client AND when it was generated.
+                $date = Carbon::parse($date);
                 // $date = now()->addSeconds($this->client->timezone_offset());
                 //$date = Carbon::parse($date)->addSeconds($this->client->timezone_offset());
                 return $this->setDayOfMonth($date, $this->due_date_days);
