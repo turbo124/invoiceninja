@@ -182,7 +182,7 @@ class Rule extends BaseRule implements RuleInterface
     {
 
         $this->tax_rate1 = 0;
-        $this->tax_name1 = "{$this->tax_data->geoState} Zero Rated Tax";
+        $this->tax_name1 = "Zero Rated Tax";
 
         return $this;
 

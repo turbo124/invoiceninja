@@ -537,12 +537,9 @@ trait GeneratesCounter
 
         if ($reset_counter_frequency == 0) {
             if ($client->getSetting('reset_counter_date')) {
-                // $settings = $client->company->settings;
                 $settings->reset_counter_date = "";
                 $settings_entity->settings = $settings;
                 $settings_entity->saveQuietly();
-                // $client->company->settings = $settings;
-                // $client->company->save();
             }
 
             return;
