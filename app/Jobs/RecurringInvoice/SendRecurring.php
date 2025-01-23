@@ -62,7 +62,9 @@ class SendRecurring implements ShouldQueue
         // Generate Standard Invoice
         $invoice = RecurringInvoiceToInvoiceFactory::create($this->recurring_invoice, $this->recurring_invoice->client);
 
-        $date = date('Y-m-d'); //@todo this will always pull UTC date.
+        
+        $date = now()->addSeconds($this->recurring_invoice->client->timezone_offset())->format('Y-m-d');
+        // $date = date('Y-m-d'); //@todo this will always pull UTC date.
         $invoice->date = $date;
 
         nlog("Recurring Invoice Date Set on Invoice = {$invoice->date} - ". now()->format('Y-m-d'));

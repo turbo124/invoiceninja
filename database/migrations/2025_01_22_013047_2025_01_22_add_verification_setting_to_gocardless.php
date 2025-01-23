@@ -44,6 +44,8 @@ return new class extends Migration
             \Illuminate\Support\Facades\Cache::forget('gateways');
         }
 
+        \Illuminate\Support\Facades\Artisan::call('ninja:design-update');
+
     }
 
     /**
