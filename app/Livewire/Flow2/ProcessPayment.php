@@ -63,8 +63,10 @@ class ProcessPayment extends Component
             $gateway_fee = data_get($responder_data, 'payload.total.fee_total', false);
             $amount = data_get($responder_data, 'payload.total.amount_with_fee', 0);
 
-            $this->setContext('amount', $amount);
-            $this->setContext('gateway_fee', $gateway_fee);
+            $this->bulkSetContext([
+                'amount' => $amount,
+                'gateway_fee' => $gateway_fee,
+            ]);
 
             $this->dispatch('payment-view-rendered');
         }
