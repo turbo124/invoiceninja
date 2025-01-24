@@ -534,14 +534,15 @@ trait GeneratesCounter
         $reset_counter_frequency = (int) $client->getSetting('reset_counter_frequency_id');
         $settings_entity = $client->getSettingEntity('reset_counter_frequency_id');
         $settings = $settings_entity->settings;
-
+        
         if ($reset_counter_frequency == 0) {
+            
             if ($client->getSetting('reset_counter_date')) {
                 $settings->reset_counter_date = "";
                 $settings_entity->settings = $settings;
                 $settings_entity->saveQuietly();
             }
-
+            
             return;
         }
 
