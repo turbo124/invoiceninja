@@ -59,9 +59,11 @@ class InvitationController extends Controller
 
         if (request()->has('vendor_hash') && request()->input('vendor_hash') == $invitation->contact->vendor->vendor_hash) {
             request()->session()->invalidate();
+            request()->session()->regenerateToken();
             auth()->guard('vendor')->loginUsingId($vendor_contact->id, true);
         } else {
             request()->session()->invalidate();
+            request()->session()->regenerateToken();
             auth()->guard('vendor')->loginUsingId($vendor_contact->id, true);
         }
 

@@ -61,6 +61,8 @@ class RecurringDatesTest extends TestCase
 
         $this->travelTo(\Carbon\Carbon::create(2024, 12, 1, 17, 0, 0));
 
+        $this->assertEquals('2024-12-01', now()->format('Y-m-d'));
+        
         $recurring_invoice = RecurringInvoiceFactory::create($company->id, $this->user->id);
         $recurring_invoice->line_items = $this->buildLineItems();
         $recurring_invoice->client_id = $client->id;

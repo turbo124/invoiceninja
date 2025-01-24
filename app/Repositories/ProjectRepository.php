@@ -45,10 +45,13 @@ class ProjectRepository extends BaseRepository
                                 $body = '<div class="project-header">'.$task->project->name.'</div>' .$task->project?->public_notes ?? ''; //@phpstan-ignore-line
                                 $body .= '<div class="task-time-details">'.$task->description().'</div>';
                             }
-                            else {
+                            elseif($task->company->invoice_task_timelog) {
                                 $body = '<div class="task-time-details">'.$task->description().'</div>';
                             }
-
+                            else {
+                                $body = '';
+                            }
+                            
                             $item = new InvoiceItem();
                             $item->quantity = $task->getQuantity();
                             $item->cost = $task->getRate();

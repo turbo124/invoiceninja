@@ -36,6 +36,7 @@ class VendorContactLoginController extends Controller
         Auth::guard('vendor')->logout();
 
         request()->session()->invalidate();
+        request()->session()->regenerateToken();
 
         return redirect('/vendors');
     }

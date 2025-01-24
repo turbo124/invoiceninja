@@ -26,7 +26,18 @@ trait ChartQueries
         $user_filter = $this->is_admin ? '' : 'AND expenses.user_id = '.$this->user->id;
 
         return DB::select("
-            SELECT sum(expenses.amount) as amount,
+            SELECT 
+            SUM(CASE 
+                WHEN expenses.uses_inclusive_taxes = 0 THEN 
+                    expenses.amount + 
+                    (COALESCE(expenses.tax_amount1, 0) + COALESCE(expenses.tax_amount2, 0) + COALESCE(expenses.tax_amount3, 0)) +
+                    (
+                        (expenses.amount * COALESCE(expenses.tax_rate1, 0)/100) +
+                        (expenses.amount * COALESCE(expenses.tax_rate2, 0)/100) +
+                        (expenses.amount * COALESCE(expenses.tax_rate3, 0)/100)
+                    )
+                ELSE expenses.amount 
+            END) as amount,
             IFNULL(expenses.currency_id, :company_currency) as currency_id
             FROM expenses
             WHERE expenses.is_deleted = 0
@@ -45,8 +56,30 @@ trait ChartQueries
             SELECT 
             SUM(
                 CASE 
-                    WHEN expenses.currency_id = :company_currency THEN amount
-                    ELSE expenses.amount * COALESCE(NULLIF(expenses.exchange_rate, 0), 1)
+                    WHEN expenses.currency_id = :company_currency THEN 
+                        CASE 
+                            WHEN expenses.uses_inclusive_taxes = 0 THEN 
+                             expenses.amount + 
+                                (COALESCE(expenses.tax_amount1, 0) + COALESCE(expenses.tax_amount2, 0) + COALESCE(expenses.tax_amount3, 0)) +
+                                (
+                                    (expenses.amount * COALESCE(expenses.tax_rate1, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate2, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate3, 0)/100)
+                                )   
+                            ELSE expenses.amount 
+                        END
+                    ELSE 
+                        (CASE 
+                            WHEN expenses.uses_inclusive_taxes = 0 THEN 
+                                expenses.amount + 
+                                (COALESCE(expenses.tax_amount1, 0) + COALESCE(expenses.tax_amount2, 0) + COALESCE(expenses.tax_amount3, 0)) +
+                                (
+                                    (expenses.amount * COALESCE(expenses.tax_rate1, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate2, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate3, 0)/100)
+                                )   
+                            ELSE expenses.amount 
+                        END) * COALESCE(NULLIF(expenses.exchange_rate, 0), 1)
                 END
             ) AS amount
             FROM expenses
@@ -66,8 +99,30 @@ trait ChartQueries
             SELECT
             SUM(
                 CASE 
-                    WHEN expenses.currency_id = :company_currency THEN amount
-                    ELSE expenses.amount * COALESCE(NULLIF(expenses.exchange_rate, 0), 1)
+                    WHEN expenses.currency_id = :company_currency THEN 
+                        CASE 
+                            WHEN expenses.uses_inclusive_taxes = 0 THEN 
+                                expenses.amount + 
+                                (COALESCE(expenses.tax_amount1, 0) + COALESCE(expenses.tax_amount2, 0) + COALESCE(expenses.tax_amount3, 0)) +
+                                (
+                                    (expenses.amount * COALESCE(expenses.tax_rate1, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate2, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate3, 0)/100)
+                                )   
+                            ELSE expenses.amount 
+                        END
+                    ELSE 
+                        (CASE 
+                            WHEN expenses.uses_inclusive_taxes = 0 THEN 
+                                expenses.amount + 
+                                (COALESCE(expenses.tax_amount1, 0) + COALESCE(expenses.tax_amount2, 0) + COALESCE(expenses.tax_amount3, 0)) +
+                                (
+                                    (expenses.amount * COALESCE(expenses.tax_rate1, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate2, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate3, 0)/100)
+                                )   
+                            ELSE expenses.amount 
+                        END) * COALESCE(NULLIF(expenses.exchange_rate, 0), 1)
                 END
             ) AS total,
             expenses.date
@@ -93,7 +148,19 @@ trait ChartQueries
 
         return DB::select("
                     SELECT
-                    sum(expenses.amount) as total,
+                    SUM(
+                        CASE 
+                            WHEN expenses.uses_inclusive_taxes = 0 THEN 
+                                expenses.amount + 
+                                (COALESCE(expenses.tax_amount1, 0) + COALESCE(expenses.tax_amount2, 0) + COALESCE(expenses.tax_amount3, 0)) +
+                                (
+                                    (expenses.amount * COALESCE(expenses.tax_rate1, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate2, 0)/100) +
+                                    (expenses.amount * COALESCE(expenses.tax_rate3, 0)/100)
+                                )   
+                            ELSE expenses.amount 
+                        END
+                    ) as total,
                     expenses.date
                     FROM expenses
                     WHERE (expenses.date BETWEEN :start_date AND :end_date)

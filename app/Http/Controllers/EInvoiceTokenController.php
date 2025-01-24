@@ -41,6 +41,7 @@ class EInvoiceTokenController extends BaseController
 
             return response()->noContent();
         }
+        
 
         return response()->noContent(status: 422);
     }

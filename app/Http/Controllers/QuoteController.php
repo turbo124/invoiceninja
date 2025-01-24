@@ -560,15 +560,48 @@ class QuoteController extends BaseController
         }
 
         if ($action == 'bulk_print' && $user->can('view', $quotes->first())) {
-            $paths = $quotes->map(function ($quote) {
-                return (new \App\Jobs\Entity\CreateRawPdf($quote->invitations->first()))->handle();
-            });
+            // $paths = $quotes->map(function ($quote) {
+            //     return (new \App\Jobs\Entity\CreateRawPdf($quote->invitations->first()))->handle();
+            // });
 
-            $merge = (new PdfMerge($paths->toArray()))->run();
+            // $merge = (new PdfMerge($paths->toArray()))->run();
 
-            return response()->streamDownload(function () use ($merge) {
-                echo($merge);
-            }, 'print.pdf', ['Content-Type' => 'application/pdf']);
+            // return response()->streamDownload(function () use ($merge) {
+            //     echo($merge);
+            // }, 'print.pdf', ['Content-Type' => 'application/pdf']);
+
+
+            $start = microtime(true);
+
+            $batch_id = (new \App\Jobs\Invoice\PrintEntityBatch(Quote::class, $quotes->pluck('id')->toArray(), $user->company()->db))->handle();
+            $batch = \Illuminate\Support\Facades\Bus::findBatch($batch_id);
+            $batch_key = $batch->name;
+
+            $finished = false;
+
+            do {
+                usleep(500000);
+                $batch = \Illuminate\Support\Facades\Bus::findBatch($batch_id);
+                $finished = $batch->finished();
+            } while (!$finished);
+
+            $paths = $quotes->map(function ($quote) use ($batch_key) {
+                return \Illuminate\Support\Facades\Cache::pull("{$batch_key}-{$quote->id}");
+            })->filter(function ($value) {
+                return !is_null($value);
+            })->toArray();
+
+            $mergedPdf = (new PdfMerge($paths))->run();
+
+            return response()->streamDownload(function () use ($mergedPdf) {
+                echo $mergedPdf;
+            }, 'print.pdf', [
+                'Content-Type' => 'application/pdf',
+                'Cache-Control:' => 'no-cache',
+                'Server-Timing' => (string)(microtime(true) - $start)
+            ]);
+
+
         }
 
 

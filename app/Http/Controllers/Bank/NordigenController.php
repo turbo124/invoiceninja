@@ -165,6 +165,7 @@ class NordigenController extends BaseController
             return $this->failed('requisition-no-accounts', $context, $company);
         }
 
+
         // connect new accounts
         $bank_integration_ids = [];
         foreach ($requisition['accounts'] as $nordigenAccountId) {
@@ -197,18 +198,19 @@ class NordigenController extends BaseController
                 $bank_integration->currency = $nordigen_account['account_currency'];
             } finally {
 
-                if(!$bank_integration)
-                    continue;
+                if($bank_integration)
+                { 
 
-                $bank_integration->auto_sync = true;
-                $bank_integration->disabled_upstream = false;
-                $bank_integration->balance = $nordigen_account['current_balance'];
-                $bank_integration->bank_account_status = $nordigen_account['account_status'];
-                $bank_integration->from_date = now()->subDays($nordigen_account['provider_history']);
+                    $bank_integration->auto_sync = true;
+                    $bank_integration->disabled_upstream = false;
+                    $bank_integration->balance = $nordigen_account['current_balance'];
+                    $bank_integration->bank_account_status = $nordigen_account['account_status'];
+                    $bank_integration->from_date = now()->subDays($nordigen_account['provider_history']);
 
-                $bank_integration->save();
+                    $bank_integration->save();
 
-                array_push($bank_integration_ids, $bank_integration->id);
+                    array_push($bank_integration_ids, $bank_integration->id);
+                }
             }
         }
 
