@@ -117,7 +117,8 @@ class MailWebhookSync implements ShouldQueue
 
     private function runIterator($query)
     {
-        $query->whereBetween('created_at' , [now()->subHours(12), now->subHour()])
+        $query->whereBetween('created_at' , [now()->subHours(12), now()->subHour()])
+        ->orderBy('id','desc')
         ->each(function ($invite) {
 
             $postmark = new \Postmark\PostmarkClient(config('services.postmark.token'));
