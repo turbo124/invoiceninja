@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e1c578d3a0516f1438d8703fefa5cc8",
+    "content-hash": "2db1d9b7140ed367436ba6e01ebf11d7",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -4431,6 +4431,73 @@
                 }
             ],
             "time": "2022-05-21T17:30:32+00:00"
+        },
+        {
+            "name": "invoiceninja/admin-api",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:invoiceninja/admin-api.git",
+                "reference": "4e43197bded44adb59d0749e1c7e8dc9acfb4c83"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/invoiceninja/admin-api/zipball/4e43197bded44adb59d0749e1c7e8dc9acfb4c83",
+                "reference": "4e43197bded44adb59d0749e1c7e8dc9acfb4c83",
+                "shasum": ""
+            },
+            "require": {
+                "asm/php-ansible": "dev-main",
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "ext-json": "*",
+                "ext-libxml": "*",
+                "ext-simplexml": "*",
+                "illuminate/database": "^11.0",
+                "illuminate/support": "^11.0",
+                "imdhemy/laravel-purchases": "^1.7",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "InvoiceNinja\\AdminApi\\Providers\\AdminApiServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "InvoiceNinja\\AdminApi\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "InvoiceNinja\\AdminApi\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "Elastic"
+            ],
+            "authors": [
+                {
+                    "name": "David Bomba",
+                    "email": "turbo124@gmail.com"
+                }
+            ],
+            "description": "API endpoints for the admin interface",
+            "support": {
+                "source": "https://github.com/invoiceninja/admin-api/tree/main",
+                "issues": "https://github.com/invoiceninja/admin-api/issues"
+            },
+            "time": "2024-12-06T01:48:38+00:00"
         },
         {
             "name": "invoiceninja/einvoice",
@@ -21209,6 +21276,7 @@
         "asm/php-ansible": 20,
         "beganovich/snappdf": 20,
         "horstoeko/orderx": 20,
+        "invoiceninja/admin-api": 20,
         "invoiceninja/einvoice": 20,
         "socialiteproviders/apple": 20
     },
