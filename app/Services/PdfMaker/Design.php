@@ -1044,6 +1044,33 @@ class Design extends BaseDesign
                 }
             }
 
+            
+            $visible_elements = array_filter($element['elements'], function ($el) {
+                if (isset($el['properties']['visi']) && $el['properties']['visi']) {
+                    return true;
+                }
+                return false;
+            });
+
+            if (!empty($visible_elements)) {
+                $first_visible = array_key_first($visible_elements);
+                $last_visible = array_key_last($visible_elements);
+
+                // Add class to first visible cell
+                if (!isset($element['elements'][$first_visible]['properties']['class'])) { //@phpstan-ignore-line
+                    $element['elements'][$first_visible]['properties']['class'] = 'left-radius';
+                } else {
+                    $element['elements'][$first_visible]['properties']['class'] .= ' left-radius';
+                }
+
+                // Add class to last visible cell
+                if (!isset($element['elements'][$last_visible]['properties']['class'])) {
+                    $element['elements'][$last_visible]['properties']['class'] = 'right-radius';
+                } else {
+                    $element['elements'][$last_visible]['properties']['class'] .= ' right-radius';
+                }
+            }
+
             // Then, filter the elements array
             $element['elements'] = array_map(function ($el) {
                 if (isset($el['properties']['visi'])) {
@@ -1055,68 +1082,8 @@ class Design extends BaseDesign
                 return $el;
             }, $element['elements']);
 
+            $elements[] = $element;
 
-
-$visible_elements = array_filter($element['elements'], function ($el) {
-    if (isset($el['properties']['visi']) && $el['properties']['visi']) {
-        return true;
-    }
-    return false;
-});
-
-if (!empty($visible_elements)) {
-    $first_visible = array_key_first($visible_elements);
-    $last_visible = array_key_last($visible_elements);
-
-    // Add class to first visible cell
-    if (!isset($element['elements'][$first_visible]['properties']['class'])) { //@phpstan-ignore-line
-        $element['elements'][$first_visible]['properties']['class'] = 'left-radius';
-    } else {
-        $element['elements'][$first_visible]['properties']['class'] .= ' left-radius';
-    }
-
-    // Add class to last visible cell
-    if (!isset($element['elements'][$last_visible]['properties']['class'])) {
-        $element['elements'][$last_visible]['properties']['class'] = 'right-radius';
-    } else {
-        $element['elements'][$last_visible]['properties']['class'] .= ' right-radius';
-    }
-}
-
-// Then, filter the elements array
-$element['elements'] = array_map(function ($el) {
-    if (isset($el['properties']['visi'])) {
-        if ($el['properties']['visi'] === false) {
-            $el['properties']['style'] = 'display: none;';
-        }
-        unset($el['properties']['visi']);
-    }
-    return $el;
-}, $element['elements']);
-
-$elements[] = $element;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // $elements[] = $element;
 
         }
 
