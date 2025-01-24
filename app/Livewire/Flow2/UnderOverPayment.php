@@ -32,20 +32,23 @@ class UnderOverPayment extends Component
 
     public function mount()
     {
-        $contact = $this->getContext()['contact'] ?? auth()->guard('contact')->user();
+        
+        $_context = $this->getContext();
 
-        $this->invoice_amount = array_sum(array_column($this->getContext()['payable_invoices'], 'amount'));
+        $contact = $_context['contact'] ?? auth()->guard('contact')->user();
+
+        $this->invoice_amount = array_sum(array_column($_context['payable_invoices'], 'amount'));
         $this->currency = $contact->client->currency();
-        $this->payableInvoices = $this->getContext()['payable_invoices'];
+        $this->payableInvoices = $_context['payable_invoices'];
     }
 
     public function checkValue(array $payableInvoices)
     {
         $this->errors = '';
+        $_context = $this->getContext();
+        $settings = $_context['settings'];
 
-        $settings = $this->getContext()['settings'];
-
-        $contact = $this->getContext()['contact'] ?? auth()->guard('contact')->user();
+        $contact = $_context['contact'] ?? auth()->guard('contact')->user();
 
         foreach ($payableInvoices as $key => $invoice) {
             $payableInvoices[$key]['amount'] = Number::parseFloat($invoice['formatted_amount']);
