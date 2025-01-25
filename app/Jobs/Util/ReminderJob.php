@@ -143,33 +143,33 @@ class ReminderJob implements ShouldQueue
             }
 
             if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3', 'reminder_endless', 'endless_reminder']) &&
-        $invoice->client->getSetting($enabled_reminder) &&
-        $invoice->client->getSetting('send_reminders') &&
-        (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
+            $invoice->client->getSetting($enabled_reminder) &&
+            $invoice->client->getSetting('send_reminders') &&
+            (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
 
-                $event_fired = false;
+                    $event_fired = false;
 
-                $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template, &$event_fired) {
-                    if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
-                        EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
-                        nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
-                        $invoice->entityEmailEvent($invitation, $reminder_template);
-                        $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
-                        
-                        if (!$event_fired) {
-                            event(new \App\Events\General\EntityWasEmailed($invitation, $invoice->company, \App\Utils\Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
-                            $event_fired = true;
+                    $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template, &$event_fired) {
+                        if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
+                            EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
+                            nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
+                            $invoice->entityEmailEvent($invitation, $reminder_template);
+                            $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
+                            
+                            if (!$event_fired) {
+                                event(new \App\Events\General\EntityWasEmailed($invitation, $invoice->company, \App\Utils\Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                                $event_fired = true;
+                            }
+                            
+                            usleep(200000);
                         }
-                        
-                        usleep(200000);
-                    }
-                });
+                    });
+                }
+                $invoice->service()->setReminder()->save();
+            } else {
+                $invoice->next_send_date = null;
+                $invoice->save();
             }
-            $invoice->service()->setReminder()->save();
-        } else {
-            $invoice->next_send_date = null;
-            $invoice->save();
-        }
     }
 
     private function addFeeToNewInvoice(Invoice $over_due_invoice, string $reminder_template, array $fees)
