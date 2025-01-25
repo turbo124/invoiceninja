@@ -140,8 +140,14 @@ class TemplateService
         }));
         $this->twig->addFilter($filter);
 
+        $filter = new \Twig\TwigFilter('json_decode', \Closure::fromCallable(function (?string $json_string) {
+            return json_decode($json_string ?? '', true, 512);
+        }));
+        $this->twig->addFilter($filter);
+
+
         $allowedTags = ['if', 'for', 'set', 'filter'];
-        $allowedFilters = ['date_modify','trim','round','format_spellout_number','split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags','markdown_to_html'];
+        $allowedFilters = ['format_date','json_decode','date_modify','trim','round','format_spellout_number','split','replace', 'escape', 'e', 'upper', 'lower', 'capitalize', 'filter', 'length', 'merge','format_currency', 'format_number','format_percent_number','map', 'join', 'first', 'date', 'sum', 'number_format','nl2br','striptags','markdown_to_html'];
         $allowedFunctions = ['range', 'cycle', 'constant', 'date','img','t'];
         $allowedProperties = ['type_id'];
         // $allowedMethods = ['img','t'];

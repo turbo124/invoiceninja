@@ -154,6 +154,8 @@ class SendRecurring implements ShouldQueue
     {
         //Admin notification for recurring invoice sent.
         if ($invoice->invitations->count() >= 1) {
+            
+            event(new \App\Events\General\EntityWasEmailed($invoice->invitations->first(), $invoice->company, \App\Utils\Ninja::eventVars(auth()->user() ? auth()->user()->id : null), 'invoice'));
             $invoice->entityEmailEvent($invoice->invitations->first(), 'invoice', 'email_template_invoice');
         }
 

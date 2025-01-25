@@ -146,13 +146,22 @@ class ReminderJob implements ShouldQueue
         $invoice->client->getSetting($enabled_reminder) &&
         $invoice->client->getSetting('send_reminders') &&
         (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
-                $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
+
+                $event_fired = false;
+
+                $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template, &$event_fired) {
                     if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email) {
                         EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                         nrlog("Firing reminder email for invoice {$invoice->number} - {$reminder_template}");
                         $invoice->entityEmailEvent($invitation, $reminder_template);
                         $invoice->sendEvent(Webhook::EVENT_REMIND_INVOICE, "client");
-                        usleep(300000);
+                        
+                        if (!$event_fired) {
+                            event(new \App\Events\General\EntityWasEmailed($invitation, $invoice->company, \App\Utils\Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+                            $event_fired = true;
+                        }
+                        
+                        usleep(200000);
                     }
                 });
             }
