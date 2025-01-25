@@ -62,6 +62,76 @@ class PaymentTest extends TestCase
         );
     }
 
+    public function testDeleteInvoiceDeletePaymentRaceCondition()
+    {
+
+        $client = \App\Models\Client::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+        ]);
+
+        $invoice = \App\Models\Invoice::factory()->create([
+            'client_id' => $client->id,
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'tax_rate1' => 0,
+            'tax_rate2' => 0,
+            'tax_rate3' => 0,
+            'tax_name1' => '',
+            'tax_name2' => '',
+            'tax_name3' => '',
+            'discount' => 0,
+        ]);
+
+        $item = new \App\DataMapper\InvoiceItem();
+        $item->cost = 100;
+        $item->quantity = 1;
+        $item->product_key = 'product1';
+
+        $invoice->line_items = [$item];
+        $invoice->calc()->getInvoice();
+        $invoice->service()->markSent()->save();
+
+        $this->assertEquals(100, $invoice->amount);
+        $this->assertEquals(100, $invoice->balance);
+
+        $data = [
+            'client_id' => $client->hashed_id,
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson("/api/v1/invoices/{$invoice->hashed_id}?amount_paid=100&include=payments", $data);
+
+        $response->assertStatus(200);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->deleteJson("/api/v1/invoices/{$invoice->hashed_id}");
+
+        $response->assertStatus(200);
+
+        $invoice = $invoice->fresh();
+
+        $invoice->load('payments');
+
+        $this->assertEquals(true, $invoice->is_deleted);
+
+        $dead_payment = $invoice->payments->first();
+        
+        $this->assertEquals(true, $dead_payment->is_deleted);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->deleteJson("/api/v1/payments/{$dead_payment->hashed_id}");
+
+        $response->assertStatus(401);
+
+    }
+
     public function testNullExchangeRateHandling()
     {
             
