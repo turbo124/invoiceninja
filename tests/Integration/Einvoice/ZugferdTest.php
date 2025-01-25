@@ -9,7 +9,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-namespace Tests\Integration\Einvoice\Storecove;
+namespace Tests\Integration\Einvoice;
 
 use Tests\TestCase;
 use App\Models\Client;
