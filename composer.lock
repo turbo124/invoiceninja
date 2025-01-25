@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e1c578d3a0516f1438d8703fefa5cc8",
+    "content-hash": "2db1d9b7140ed367436ba6e01ebf11d7",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -4433,6 +4433,73 @@
             "time": "2022-05-21T17:30:32+00:00"
         },
         {
+            "name": "invoiceninja/admin-api",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:invoiceninja/admin-api.git",
+                "reference": "2fdd14b91f384393a40eade40c58523422dd624f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/invoiceninja/admin-api/zipball/2fdd14b91f384393a40eade40c58523422dd624f",
+                "reference": "2fdd14b91f384393a40eade40c58523422dd624f",
+                "shasum": ""
+            },
+            "require": {
+                "asm/php-ansible": "dev-main",
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "ext-json": "*",
+                "ext-libxml": "*",
+                "ext-simplexml": "*",
+                "illuminate/database": "^11.0",
+                "illuminate/support": "^11.0",
+                "imdhemy/laravel-purchases": "^1.7",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "InvoiceNinja\\AdminApi\\Providers\\AdminApiServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "InvoiceNinja\\AdminApi\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "InvoiceNinja\\AdminApi\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "Elastic"
+            ],
+            "authors": [
+                {
+                    "name": "David Bomba",
+                    "email": "turbo124@gmail.com"
+                }
+            ],
+            "description": "API endpoints for the admin interface",
+            "support": {
+                "source": "https://github.com/invoiceninja/admin-api/tree/main",
+                "issues": "https://github.com/invoiceninja/admin-api/issues"
+            },
+            "time": "2025-01-24T09:44:31+00:00"
+        },
+        {
             "name": "invoiceninja/einvoice",
             "version": "dev-main",
             "source": {
@@ -5079,16 +5146,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.39.1",
+            "version": "v11.40.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "3d693dd36e78121bcd51fc02eda4bc137d2a17f2"
+                "reference": "599a28196d284fee158cc10086fd56ac625ad7a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/3d693dd36e78121bcd51fc02eda4bc137d2a17f2",
-                "reference": "3d693dd36e78121bcd51fc02eda4bc137d2a17f2",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/599a28196d284fee158cc10086fd56ac625ad7a3",
+                "reference": "599a28196d284fee158cc10086fd56ac625ad7a3",
                 "shasum": ""
             },
             "require": {
@@ -5114,7 +5181,7 @@
                 "league/flysystem-local": "^3.25.1",
                 "league/uri": "^7.5.1",
                 "monolog/monolog": "^3.0",
-                "nesbot/carbon": "^2.72.2|^3.4",
+                "nesbot/carbon": "^2.72.6|^3.8.4",
                 "nunomaduro/termwind": "^2.0",
                 "php": "^8.2",
                 "psr/container": "^1.1.1|^2.0.1",
@@ -5189,6 +5256,7 @@
                 "fakerphp/faker": "^1.24",
                 "guzzlehttp/promises": "^2.0.3",
                 "guzzlehttp/psr7": "^2.4",
+                "laravel/pint": "^1.18",
                 "league/flysystem-aws-s3-v3": "^3.25.1",
                 "league/flysystem-ftp": "^3.25.1",
                 "league/flysystem-path-prefixing": "^3.25.1",
@@ -5289,7 +5357,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-01-22T17:01:46+00:00"
+            "time": "2025-01-24T16:17:42+00:00"
         },
         {
             "name": "laravel/octane",
@@ -7320,16 +7388,16 @@
         },
         {
             "name": "mollie/mollie-api-php",
-            "version": "v2.76.0",
+            "version": "v2.76.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mollie/mollie-api-php.git",
-                "reference": "b6e9848e4893d1d306fba54da3ac6f4a31a40368"
+                "reference": "2a90a9224e6dcc25569e572edfe57ba75455e435"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/b6e9848e4893d1d306fba54da3ac6f4a31a40368",
-                "reference": "b6e9848e4893d1d306fba54da3ac6f4a31a40368",
+                "url": "https://api.github.com/repos/mollie/mollie-api-php/zipball/2a90a9224e6dcc25569e572edfe57ba75455e435",
+                "reference": "2a90a9224e6dcc25569e572edfe57ba75455e435",
                 "shasum": ""
             },
             "require": {
@@ -7406,9 +7474,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mollie/mollie-api-php/issues",
-                "source": "https://github.com/mollie/mollie-api-php/tree/v2.76.0"
+                "source": "https://github.com/mollie/mollie-api-php/tree/v2.76.1"
             },
-            "time": "2024-12-18T12:26:03+00:00"
+            "time": "2025-01-24T14:59:44+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -21209,6 +21277,7 @@
         "asm/php-ansible": 20,
         "beganovich/snappdf": 20,
         "horstoeko/orderx": 20,
+        "invoiceninja/admin-api": 20,
         "invoiceninja/einvoice": 20,
         "socialiteproviders/apple": 20
     },

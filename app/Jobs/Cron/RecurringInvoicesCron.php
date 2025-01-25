@@ -59,7 +59,10 @@ class RecurringInvoicesCron
                                                                    ->where('deleted_at', null);
                                                         })
                                                         ->whereHas('company', function ($query) {
-                                                            $query->where('is_disabled', 0);
+                                                            $query->where('is_disabled', 0)
+                                                                  ->whereHas('account', function ($q){
+                                                                        $q->where('is_flagged', false);
+                                                                  });
                                                         })
                                                         ->with('company')
                                                         ->cursor();
@@ -98,7 +101,10 @@ class RecurringInvoicesCron
                                                                    ->where('deleted_at', null);
                                                         })
                                                         ->whereHas('company', function ($query) {
-                                                            $query->where('is_disabled', 0);
+                                                            $query->where('is_disabled', 0)
+                                                                  ->whereHas('account', function ($q){
+                                                                        $q->where('is_flagged', false);
+                                                                  });
                                                         })
                                                         ->with('company')
                                                         ->cursor();

@@ -131,11 +131,15 @@ class InvoicePay extends Component
     #[On('payment-method-selected')]
     public function paymentMethodSelected($company_gateway_id, $gateway_type_id, $amount)
     {
-        $this->setContext('company_gateway_id', $company_gateway_id);
-        $this->setContext('gateway_type_id', $gateway_type_id);
-        $this->setContext('amount', $amount);
-        $this->setContext('pre_payment', false);
-        $this->setContext('is_recurring', false);
+
+        $this->bulkSetContext([
+            'company_gateway_id' => $company_gateway_id,
+            'gateway_type_id' => $gateway_type_id,
+            'amount' => $amount,
+            'pre_payment' => false,
+            'is_recurring' => false,
+        ]);
+
 
         $this->payment_method_accepted = true;
 
@@ -236,10 +240,14 @@ class InvoicePay extends Component
 
         $client = $invite->contact->client;
         $settings = $client->getMergedSettings();
-        $this->setContext('contact', $invite->contact); // $this->context['contact'] = $invite->contact;
-        $this->setContext('settings', $settings); // $this->context['settings'] = $settings;
-        $this->setContext('db', $this->db); // $this->context['db'] = $this->db;
-        $this->setContext('invitation_id', $this->invitation_id);
+
+        $this->bulkSetContext([
+            'contact' => $invite->contact,
+            'settings' => $settings,
+            'db' => $this->db,
+            'invitation_id' => $this->invitation_id,
+        ]);
+
 
         $invoices = Invoice::withTrashed()
                                     ->whereIn('id', $this->transformKeys($this->invoices))
@@ -262,11 +270,6 @@ class InvoicePay extends Component
         $this->under_over_payment = $settings->client_portal_allow_over_payment || $settings->client_portal_allow_under_payment;
         $this->required_fields = false;
 
-        $this->setContext('variables', $this->variables); // $this->context['variables'] = $this->variables;
-        $this->setContext('invoices', $invoices); // $this->context['invoices'] = $invoices;
-        $this->setContext('settings', $settings); // $this->context['settings'] = $settings;
-        // $this->setContext('invitation', $invite->withoutRelations()); // $this->context['invitation'] = $invite;
-
         $payable_invoices = $invoices->map(function ($i) {
             /** @var \App\Models\Invoice $i */
             return [
@@ -281,8 +284,14 @@ class InvoicePay extends Component
             ];
         })->toArray();
 
-        $this->setContext('amount', array_sum(array_column($payable_invoices, 'amount')));
-        $this->setContext('payable_invoices', $payable_invoices);
+        $this->bulkSetContext([
+            'variables' => $this->variables,
+            'invoices' => $invoices,
+            'settings' => $settings,
+            'amount' => array_sum(array_column($payable_invoices, 'amount')),
+            'payable_invoices' => $payable_invoices,
+        ]);
+        
     }
 
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View

@@ -52,6 +52,20 @@ trait WithSecureContext
         return $clone;
     }
 
+    public function bulkSetContext(array $data): array
+    {
+
+        $clone = $this->getContext();
+        $clone = array_merge($clone, $data);
+
+        \Illuminate\Support\Facades\Cache::put(session()->getId(), $clone, now()->addHour());
+
+        $this->dispatch(self::CONTEXT_UPDATE);
+
+        return $clone;
+        
+    }
+
     public function resetContext(): void
     {
         \Illuminate\Support\Facades\Cache::forget(session()->getId());

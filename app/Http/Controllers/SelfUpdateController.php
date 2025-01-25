@@ -126,7 +126,7 @@ class SelfUpdateController extends BaseController
         Artisan::call('migrate', ['--force' => true]);
         Artisan::call('config:clear');
         Artisan::call('cache:clear');
-        Artisan::call('ninja:design');
+        Artisan::call('ninja:design-update');
 
         // $this->runModelChecks();
 

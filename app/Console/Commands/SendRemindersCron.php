@@ -89,6 +89,9 @@ class SendRemindersCron extends Command
 
                              if ($invoice->invitations->count() > 0) {
                                 //  event(new InvoiceWasEmailed($invoice->invitations->first(), $invoice->company, Ninja::eventVars(), $reminder_template));
+                                
+event(new \App\Events\General\EntityWasEmailed($invoice->invitations->first(), $invoice->company, Ninja::eventVars(auth()->user() ? auth()->user()->id : null), $reminder_template));
+
                                  $invoice->entityEmailEvent($invoice->invitations->first(), $reminder_template);
                              }
                          }
