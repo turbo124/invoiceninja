@@ -276,6 +276,15 @@ class RotessaPaymentDriver extends BaseDriver
         return $r;
     }
 
+    public function tokenBilling(\App\Models\ClientGatewayToken $cgt, \App\Models\PaymentHash $payment_hash)
+    {
+                
+        $this->setPaymentMethod($cgt->gateway_type_id);
+        
+        return $this->payment_method->tokenBilling($cgt, $payment_hash);
+
+    }
+
     private function getUrl(): string
     {
         return $this->company_gateway->getConfigField('testMode') ? 'https://sandbox-api.rotessa.com/v1/' : 'https://api.rotessa.com/v1/';

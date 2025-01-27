@@ -106,13 +106,7 @@ trait PdfMakerUtilities
                 $first_char = substr($trimmed, 0, 1);
 
                 if (
-                    $first_char === '#' ||    // Headers
-                    $first_char === '>' ||    // Blockquotes
-                    $first_char === '-' ||    // Lists
-                    $first_char === '*' ||    // Lists/Bold
-                    $first_char === '_' ||    // Italic
-                    $first_char === '`' ||    // Code
-                    $first_char === '[' ||    // Links
+                    in_array($first_char, ['#', '>', '-', '+', '*', '_', '`', '[']) ||    // Markdown characters
                     str_contains($trimmed, '**') // Bold (special case)
                 ) {
                     $contains_markdown = true;

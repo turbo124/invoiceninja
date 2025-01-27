@@ -69,7 +69,7 @@ class TemplateService
 
     private ?Vendor $vendor = null;
 
-    private Invoice | Quote | Credit | PurchaseOrder | RecurringInvoice | Task | Project | Payment $entity;
+    private Invoice | Quote | Credit | PurchaseOrder | RecurringInvoice | Task | Project | Payment | Client $entity;
 
     private Payment $payment;
 
@@ -108,7 +108,6 @@ class TemplateService
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
         $this->twig->addExtension(new MarkdownExtension());
 
-        
         $this->twig->addRuntimeLoader(new class () implements RuntimeLoaderInterface {
             public function load($class)
             {
