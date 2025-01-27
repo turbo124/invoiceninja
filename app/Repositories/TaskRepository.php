@@ -241,7 +241,7 @@ class TaskRepository extends BaseRepository
     {
         //do no allow an task to be restarted if it has been invoiced
         if ($task->invoice_id) {
-            return;
+            return $task;
         }
 
         if (strlen($task->time_log) < 5) {
