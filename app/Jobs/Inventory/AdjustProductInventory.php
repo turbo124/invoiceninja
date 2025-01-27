@@ -69,7 +69,6 @@ class AdjustProductInventory implements ShouldQueue
 
             if ($p) {
                 $p->in_stock_quantity += $i->quantity;
-
                 $p->saveQuietly();
             }
         });

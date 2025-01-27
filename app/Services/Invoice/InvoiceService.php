@@ -243,7 +243,7 @@ class InvoiceService
 
     public function markDeleted()
     {
-        $this->removeUnpaidGatewayFees();
+        // $this->removeUnpaidGatewayFees();
 
         $this->invoice = (new MarkInvoiceDeleted($this->invoice))->run();
 
