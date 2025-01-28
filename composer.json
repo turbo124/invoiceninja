@@ -37,7 +37,7 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
-        "afosto/yaac": "^1.4",
+        "afosto/yaac": "^1.5",
         "asm/php-ansible": "dev-main",
         "authorizenet/authorizenet": "^2.0",
         "awobaz/compoships": "^2.1",

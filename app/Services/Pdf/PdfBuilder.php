@@ -1993,34 +1993,44 @@ class PdfBuilder
         return $element;
     }
 
+    private function isMarkdown(string $content): bool
+    {
+        $content = str_ireplace('<br>', "\n", $content);
+        
+        $markdownPatterns = [
+            '/^\s*#{1,6}\s/m',  // Headers
+            '/^\s*[-+*]\s/m',   // Lists
+            '/\[.*?\]\(.*?\)/', // Links
+            '/!\[.*?\]\(.*?\)/', // Images
+            '/\*\*.*?\*\*/',   // Bold
+            '/\*.*?\*/',       // Italic
+            '/__.*?__/',       // Bold
+            '/_.*?_/',         // Italic
+            '/`.*?`/',         // Inline code
+            '/^\s*>/m',        // Blockquotes
+            '/^\s*```/m',      // Code blocks
+        ];
+
+        // Check if any pattern matches the text
+        foreach ($markdownPatterns as $pattern) {
+            if (preg_match($pattern, $content)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
     public function createElementContent($element, $children): self
     {
         foreach ($children as $child) {
                         
             $contains_html = false;
-            $contains_markdown = false;
+
             $child['content'] = $child['content'] ?? '';
 
-            $lines = explode("\n", $child['content']);
-            $contains_markdown = false;
-
-            foreach ($lines as $line) {
-                $trimmed = ltrim($line);
-                if (empty($trimmed)) {
-                    continue;
-                }
-
-                $first_char = substr($trimmed, 0, 1);
-
-                if (in_array($first_char, ['#', '>', '-', '+', '*', '_', '`', '[']) ||    // Markdown characters
-                    str_contains($trimmed, '**') // Bold (special case)
-                ) {
-                    $contains_markdown = true;
-                    break;
-                }
-            }
-
-            if ($this->service->company->markdown_enabled && $contains_markdown && $child['element'] !== 'script') {
+            if ($this->service->company->markdown_enabled && $this->isMarkdown($child['content']) && $child['element'] !== 'script') {
                 $child['content'] = str_ireplace('<br>', "\r", $child['content']);
                 $child['content'] = $this->commonmark->convert($child['content']); //@phpstan-ignore-line
             }

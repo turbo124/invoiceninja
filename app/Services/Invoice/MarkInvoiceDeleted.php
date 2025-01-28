@@ -64,10 +64,16 @@ class MarkInvoiceDeleted extends AbstractService
     private function adjustPaidToDateAndBalance()
     {
 
+        $ba = $this->balance_adjustment * -1;
+        $aa = $this->adjustment_amount * -1;    
+        $cb = $this->invoice->client->balance;
+
+        nlog("APB => {$this->invoice->number} - BA={$ba} - AA={$aa} - CB={$cb}");
+        
         $this->invoice
              ->client
              ->service()
-             ->updateBalanceAndPaidToDate($this->balance_adjustment * -1, $this->adjustment_amount * -1)
+             ->updateBalanceAndPaidToDate($ba, $aa)
              ->save();
 
         return $this;
@@ -131,6 +137,18 @@ class MarkInvoiceDeleted extends AbstractService
         $this->total_payments = $this->invoice->payments->sum('amount') - $this->invoice->payments->sum('refunded');
 
         $this->balance_adjustment = $this->invoice->balance;
+
+            $pre_count = count((array)$this->invoice->line_items);
+
+            $items = collect((array)$this->invoice->line_items)
+                        ->filter(function ($item) {
+                            return $item->type_id != '3';
+                        })->toArray();
+
+            if(count($items) < $pre_count) {
+                $this->invoice->line_items = array_values($items);
+                $this->invoice = $this->invoice->calc()->getInvoice();
+            }
 
         return $this;
     }

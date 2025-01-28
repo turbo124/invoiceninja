@@ -62,7 +62,6 @@ class ClientLedgerBalanceUpdate implements ShouldQueue
                                                     ->where('client_id', $company_ledger->client_id)
                                                     ->where('company_id', $company_ledger->company_id)
                                                     ->whereNotNull('balance')
-                                                    // ->where('balance', '!=', 0)
                                                     ->orderBy('id', 'DESC')
                                                     ->first();
 
