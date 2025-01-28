@@ -981,6 +981,8 @@ class Design extends BaseDesign
             $table_type = "product_quote_columns";
         }
 
+        $column_visibility = $this->getColumnVisibility($this->entity->line_items, $_type);
+
         foreach ($items as $row) {
             $element = ['element' => 'tr', 'elements' => []];
 
@@ -1008,9 +1010,7 @@ class Design extends BaseDesign
                     }
                 }
             } else {
-
-                $column_visibility = $this->getColumnVisibility($this->entity->line_items, $_type);
-
+                
                 foreach ($this->context['pdf_variables'][$table_type] as $key => $cell) {
                     // We want to keep aliases like these:
                     // $task.cost => $task.rate
