@@ -87,18 +87,17 @@ class PreviewPurchaseOrderController extends BaseController
      */
     public function show(ShowPreviewRequest $request)
     {
-        if (request()->has('entity') &&
-            request()->has('entity_id') &&
-            ! empty(request()->input('entity')) &&
-            ! empty(request()->input('entity_id')) &&
-            request()->has('body')) {
-            $design_object = json_decode(json_encode(request()->input('design')));
+        if ($request->input('entity', false) &&
+            $request->input('entity_id', false) != '-1' &&
+            $request->has('body')) {
 
-            if (! is_object($design_object)) {
+            $design_object = json_decode(json_encode($request->input('design')), true);
+
+            if (! is_array($design_object)) {
                 return response()->json(['message' => ctrans('texts.invalid_design_object')], 400);
             }
 
-            $entity_obj = PurchaseOrder::query()->whereId($this->decodePrimaryKey(request()->input('entity_id')))->company()->first();
+            $entity_obj = PurchaseOrder::query()->whereId($this->decodePrimaryKey($request->input('entity_id')))->company()->first();
 
             if (! $entity_obj) {
                 return $this->blankEntity();
@@ -109,95 +108,36 @@ class PreviewPurchaseOrderController extends BaseController
             App::setLocale($entity_obj->company->locale());
             $t->replace(Ninja::transformTranslations($entity_obj->company->settings));
 
+            $invitation = $entity_obj->invitations()->first();
+
+            $ps = new PdfService($invitation, 'product', [
+                'client' => $entity_obj->client ?? false,
+                'vendor' => $entity_obj->vendor ?? false,
+                $request->input('entity')."s" => [$entity_obj],
+            ]);
+
+            $ps->boot()
+            ->designer
+            ->buildFromPartials($request->design['design']);
+
+            $ps->builder
+            ->build();
+
+            if ($request->query('html') == 'true') {
+                return $ps->getHtml();
+            }
+
+            $pdf = $ps->getPdf();
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf;
+            }, 'preview.pdf', [
+                'Content-Disposition' => 'inline',
+                'Content-Type' => 'application/pdf',
+                'Cache-Control:' => 'no-cache',
+            ]);
 
 
-$invitation = $entity_obj->invitations()->first();
-
-$ps = new PdfService($invitation, 'product', [
-    'client' => $entity_obj->client ?? false,
-    'vendor' => $entity_obj->vendor ?? false,
-    $request->input('entity')."s" => [$entity_obj],
-]);
-
-$ps->boot()
-->designer
-->buildFromPartials($request->design['design']);
-
-$ps->builder
-->build();
-
-if ($request->query('html') == 'true') {
-    return $ps->getHtml();
-}
-
-$pdf = $ps->getPdf();
-
-return response()->streamDownload(function () use ($pdf) {
-    echo $pdf;
-}, 'preview.pdf', [
-    'Content-Disposition' => 'inline',
-    'Content-Type' => 'application/pdf',
-    'Cache-Control:' => 'no-cache',
-]);
-
-
-            // $html = new VendorHtmlEngine($entity_obj->invitations()->first());
-
-            // $design_namespace = 'App\Services\PdfMaker\Designs\\'.request()->design['name'];
-
-            // $design_class = new $design_namespace();
-
-            // $state = [
-            //     'template' => $design_class->elements([
-            //         'client' => null,
-            //         'vendor' => $entity_obj->vendor,
-            //         'entity' => $entity_obj,
-            //         'pdf_variables' => (array) $entity_obj->company->settings->pdf_variables,
-            //         'variables' => $html->generateLabelsAndValues(),
-            //     ]),
-            //     'variables' => $html->generateLabelsAndValues(),
-            //     'process_markdown' => $entity_obj->company->markdown_enabled,
-            //     'options' => [
-            //         'vendor' => $entity_obj->vendor ?? [],
-            //         request()->input('entity')."s" => [$entity_obj],
-            //     ]
-            // ];
-
-            // $design = new Design(request()->design['name']);
-            // $maker = new PdfMaker($state);
-
-            // $maker
-            //     ->design($design)
-            //     ->build();
-
-            // if (request()->query('html') == 'true') {
-            //     return $maker->getCompiledHTML();
-            // }
-
-            // //if phantom js...... inject here..
-            // if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
-            //     return (new Phantom())->convertHtmlToPdf($maker->getCompiledHTML(true));
-            // }
-
-            // /** @var \App\Models\User $user */
-            // $user = auth()->user();
-
-            // if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
-            //     $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
-
-            //     $numbered_pdf = $this->pageNumbering($pdf, $user->company());
-
-            //     if ($numbered_pdf) {
-            //         $pdf = $numbered_pdf;
-            //     }
-
-            //     return $pdf;
-            // }
-
-            // //else
-            // $file_path = (new PreviewPdf($maker->getCompiledHTML(true), $user->company()))->handle();
-
-            // return response()->download($file_path, basename($file_path), ['Cache-Control:' => 'no-cache'])->deleteFileAfterSend(true);
         }
 
         return $this->blankEntity();
@@ -270,40 +210,40 @@ return response()->streamDownload(function () use ($pdf) {
             return $this->mockEntity();
         }
 
-       
-$design_object = json_decode(json_encode(request()->input('design')), true);
+            
+        $design_object = json_decode(json_encode(request()->input('design')), true);
 
-if (! is_array($design_object)) {
-    return response()->json(['message' => 'Invalid custom design object'], 400);
-}
+        if (! is_array($design_object)) {
+            return response()->json(['message' => 'Invalid custom design object'], 400);
+        }
 
-$ps = new PdfService($invitation, 'product', [
-    'client' => $invitation->client ?? false,
-    'vendor' => $invitation->vendor ?? false,
-    "{$entity_string}s" => [$invitation->{$entity_string}],
-]);
+        $ps = new PdfService($invitation, 'product', [
+            'client' => $invitation->client ?? false,
+            'vendor' => $invitation->vendor ?? false,
+            "{$entity_string}s" => [$invitation->{$entity_string}],
+        ]);
 
-$ps->boot()
-->designer
-->buildFromPartials($design_object['design']);
+        $ps->boot()
+        ->designer
+        ->buildFromPartials($design_object['design']);
 
-$ps->builder
-->build();
+        $ps->builder
+        ->build();
 
 
-if (request()->query('html') == 'true') {
-    return $ps->getHtml();
-}
+        if (request()->query('html') == 'true') {
+            return $ps->getHtml();
+        }
 
-$pdf = $ps->getPdf();
+        $pdf = $ps->getPdf();
 
-return response()->streamDownload(function () use ($pdf) {
-    echo $pdf;
-}, 'preview.pdf', [
-    'Content-Disposition' => 'inline',
-    'Content-Type' => 'application/pdf',
-    'Cache-Control:' => 'no-cache',
-]);
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf;
+        }, 'preview.pdf', [
+            'Content-Disposition' => 'inline',
+            'Content-Type' => 'application/pdf',
+            'Cache-Control:' => 'no-cache',
+        ]);
 
     }
 

@@ -11,12 +11,13 @@
 
 namespace App\Http\Requests\Preview;
 
-use App\Http\Requests\Request;
-use App\Models\PurchaseOrder;
-use App\Models\PurchaseOrderInvitation;
 use App\Models\Vendor;
-use App\Utils\Traits\CleanLineItems;
+use App\Models\PurchaseOrder;
+use App\Http\Requests\Request;
 use App\Utils\Traits\MakesHash;
+use Illuminate\Validation\Rule;
+use App\Utils\Traits\CleanLineItems;
+use App\Models\PurchaseOrderInvitation;
 
 class PreviewPurchaseOrderRequest extends Request
 {
@@ -40,9 +41,14 @@ class PreviewPurchaseOrderRequest extends Request
 
     public function rules()
     {
+        
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         $rules = [];
 
         $rules['number'] = ['nullable'];
+        $rules['vendor_id'] = ['required', Rule::exists(Vendor::class, 'id')->where('is_deleted', 0)->where('company_id', $user->company()->id)];
 
         return $rules;
     }
