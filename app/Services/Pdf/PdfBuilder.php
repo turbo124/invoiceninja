@@ -296,6 +296,10 @@ class PdfBuilder
         $this->genericSectionBuilder();
 
         $this->mergeSections([
+            'client-details' => [
+                'id' => 'client-details',
+                'elements' => $this->clientDetails(),
+            ],
             'statement-invoice-table' => [
                 'id' => 'statement-invoice-table',
                 'elements' => $this->statementInvoiceTable(),
@@ -320,8 +324,8 @@ class PdfBuilder
                 'id' => 'statement-payment-table-totals',
                 'elements' => $this->statementPaymentTableTotals(),
             ],
-            'statement-credits-table' => [
-                'id' => 'statement-credits-table',
+            'statement-credit-table' => [
+                'id' => 'statement-credit-table',
                 'elements' => $this->statementCreditTable(),
             ],
             'statement-credit-table-totals' => [
@@ -385,7 +389,7 @@ class PdfBuilder
         }
 
         return [
-            ['element' => 'thead', 'elements' => $this->buildTableHeader('statement_invoice')],
+            ['element' => 'thead', 'elements' => $this->buildTableHeader('statement_credit')],
             ['element' => 'tbody', 'elements' => $tbody],
         ];
 
@@ -400,6 +404,10 @@ class PdfBuilder
     public function statementCreditTableTotals(): array
     {
         $outstanding = $this->service->options['credits']->sum('balance');
+       
+        if (\array_key_exists('show_credits_table', $this->service->options) && $this->service->options['show_credits_table'] === false) {
+            return [];
+        }
 
         return [
             ['element' => 'div', 'content' => '$credit.balance_label: ' . $this->service->config->formatMoney($outstanding)],
@@ -501,8 +509,8 @@ class PdfBuilder
 
         return [
             ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.amount_paid'), $this->service->config->formatMoney($this->payment_amount_total))],
-            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
-            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
+            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_type'), $payment->translatedType())],
+            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
         ];
     }
 
@@ -520,9 +528,9 @@ class PdfBuilder
         $payment = $this->service->options['unapplied']->first();
 
         return [
-            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_balance'), $this->service->config->formatMoney($this->unapplied_total))],
-            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_method'), $payment->translatedType())],
-            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
+            ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_balance_on_file'), $this->service->config->formatMoney($this->unapplied_total))],
+            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_type'), $payment->translatedType())],
+            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
         ];
 
     }
@@ -545,6 +553,8 @@ class PdfBuilder
         }
 
         $tbody = [];
+        
+        $this->unapplied_total = 0;
 
         //24-03-2022 show payments per invoice
         foreach ($this->service->options['unapplied'] as $unapplied_payment) {

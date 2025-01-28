@@ -26,9 +26,6 @@ use App\Utils\VendorHtmlEngine;
 use App\Models\RecurringInvoice;
 use App\Services\Pdf\PdfService;
 use App\Utils\Traits\MakesInvoiceHtml;
-use App\Services\PdfMaker\Design as PdfDesignModel;
-use App\Services\PdfMaker\Design as PdfMakerDesign;
-use App\Services\PdfMaker\PdfMaker as PdfMakerService;
 
 /**
  * Class for activity repository.
