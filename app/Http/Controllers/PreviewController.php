@@ -147,11 +147,8 @@ class PreviewController extends BaseController
 
         
         if ($request->input('design.is_template')) {
-            nlog("I Template");
             return $this->template();
         }
-
-        nlog("pre");
 
         if ($request->input('entity', false) &&
             $request->input('entity_id', false) != '-1') {
@@ -160,17 +157,17 @@ class PreviewController extends BaseController
                 return app(\App\Http\Controllers\PreviewPurchaseOrderController::class)->show($request);
             }
 
-            $design_object = json_decode(json_encode(request()->input('design')));
+            $design_object = json_decode(json_encode($request->input('design')));
 
             if (! is_object($design_object)) {
                 return response()->json(['message' => ctrans('texts.invalid_design_object')], 400);
             }
 
-            $entity = Str::camel(request()->input('entity'));
+            $entity = Str::camel($request->input('entity'));
 
             $class = "App\Models\\$entity";
 
-            $entity_obj = $class::whereId($this->decodePrimaryKey(request()->input('entity_id')))->company()->first();
+            $entity_obj = $class::whereId($this->decodePrimaryKey($request->input('entity_id')))->company()->first();
 
             if (! $entity_obj) {
                 return $this->blankEntity();
