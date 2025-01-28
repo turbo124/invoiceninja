@@ -42,18 +42,20 @@ class PdfMock
 
     private string $entity_string = 'invoice';
 
+    private PdfService $pdf_service;
+
     public function __construct(public array $request, public Company $company)
     {
     }
 
-    public function getPdf(): mixed
+    public function setPdfService(): self
     {
         //need to resolve the pdf type here, ie product / purchase order
         $document_type = $this->request['entity_type'] == 'purchase_order' ? 'purchase_order' : 'product';
 
-        $pdf_service = new PdfService($this->mock->invitation, $document_type);
+        $this->pdf_service = new PdfService($this->mock->invitation, $document_type);
 
-        $pdf_config = (new PdfConfiguration($pdf_service));
+        $pdf_config = (new PdfConfiguration($this->pdf_service));
         $pdf_config->entity = $this->mock;
         $pdf_config->entity_string = $this->request['entity_type'];
         $this->entity_string = $this->request['entity_type'];
@@ -76,29 +78,44 @@ class PdfMock
             $pdf_config->design = Design::withTrashed()->find($this->decodePrimaryKey($pdf_config->entity_design_id));
         }
 
-        $pdf_service->config = $pdf_config;
+        $this->pdf_service->config = $pdf_config;
 
         if (isset($this->request['design'])) {
-            $pdf_designer = (new PdfDesigner($pdf_service))->buildFromPartials($this->request['design']);
+            $pdf_designer = (new PdfDesigner($this->pdf_service))->buildFromPartials($this->request['design']);
         } else {
-            $pdf_designer = (new PdfDesigner($pdf_service))->build();
+            $pdf_designer = (new PdfDesigner($this->pdf_service))->build();
         }
 
-        $pdf_service->designer = $pdf_designer;
+        $this->pdf_service->designer = $pdf_designer;
 
-        $pdf_service->html_variables = $document_type == 'purchase_order' ? $this->getVendorStubVariables() : $this->getStubVariables();
+        $this->pdf_service->html_variables = $document_type == 'purchase_order' ? $this->getVendorStubVariables() : $this->getStubVariables();
 
-        $pdf_builder = (new PdfBuilder($pdf_service))->build();
-        $pdf_service->builder = $pdf_builder;
+        $pdf_builder = (new PdfBuilder($this->pdf_service))->build();
+        $this->pdf_service->builder = $pdf_builder;
 
-        $html = $pdf_service->getHtml();
+        return $this;
+    }
 
-        return $pdf_service->resolvePdfEngine($html);
+    public function getPdf(): mixed
+    {
+
+        $html = $this->pdf_service->getHtml();
+
+        return $this->pdf_service->resolvePdfEngine($html);
+
+    }
+
+    public function getHtml(): string
+    {
+        return $this->pdf_service->getHtml();
+
     }
 
     public function build(): self
     {
         $this->mock = $this->initEntity();
+        
+        $this->setPdfService();
 
         return $this;
     }

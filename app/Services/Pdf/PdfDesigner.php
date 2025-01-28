@@ -59,6 +59,8 @@ class PdfDesigner
 
         $this->template = $this->composeFromPartials($partials);
 
+        nlog("template is");
+        nlog($this->template);
         return $this;
 
     }
