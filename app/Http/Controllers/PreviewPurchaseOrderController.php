@@ -109,63 +109,95 @@ class PreviewPurchaseOrderController extends BaseController
             App::setLocale($entity_obj->company->locale());
             $t->replace(Ninja::transformTranslations($entity_obj->company->settings));
 
-            $html = new VendorHtmlEngine($entity_obj->invitations()->first());
 
-            $design_namespace = 'App\Services\PdfMaker\Designs\\'.request()->design['name'];
 
-            $design_class = new $design_namespace();
+$invitation = $entity_obj->invitations()->first();
 
-            $state = [
-                'template' => $design_class->elements([
-                    'client' => null,
-                    'vendor' => $entity_obj->vendor,
-                    'entity' => $entity_obj,
-                    'pdf_variables' => (array) $entity_obj->company->settings->pdf_variables,
-                    'variables' => $html->generateLabelsAndValues(),
-                ]),
-                'variables' => $html->generateLabelsAndValues(),
-                'process_markdown' => $entity_obj->company->markdown_enabled,
-                'options' => [
-                    'vendor' => $entity_obj->vendor ?? [],
-                    request()->input('entity')."s" => [$entity_obj],
-                ]
-            ];
+$ps = new PdfService($invitation, 'product', [
+    'client' => $entity_obj->client ?? false,
+    'vendor' => $entity_obj->vendor ?? false,
+    $request->input('entity')."s" => [$entity_obj],
+]);
 
-            $design = new Design(request()->design['name']);
-            $maker = new PdfMaker($state);
+$ps->boot()
+->designer
+->buildFromPartials($request->design['design']);
 
-            $maker
-                ->design($design)
-                ->build();
+$ps->builder
+->build();
 
-            if (request()->query('html') == 'true') {
-                return $maker->getCompiledHTML();
-            }
+if ($request->query('html') == 'true') {
+    return $ps->getHtml();
+}
 
-            //if phantom js...... inject here..
-            if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
-                return (new Phantom())->convertHtmlToPdf($maker->getCompiledHTML(true));
-            }
+$pdf = $ps->getPdf();
 
-            /** @var \App\Models\User $user */
-            $user = auth()->user();
+return response()->streamDownload(function () use ($pdf) {
+    echo $pdf;
+}, 'preview.pdf', [
+    'Content-Disposition' => 'inline',
+    'Content-Type' => 'application/pdf',
+    'Cache-Control:' => 'no-cache',
+]);
 
-            if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
-                $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
 
-                $numbered_pdf = $this->pageNumbering($pdf, $user->company());
+            // $html = new VendorHtmlEngine($entity_obj->invitations()->first());
 
-                if ($numbered_pdf) {
-                    $pdf = $numbered_pdf;
-                }
+            // $design_namespace = 'App\Services\PdfMaker\Designs\\'.request()->design['name'];
 
-                return $pdf;
-            }
+            // $design_class = new $design_namespace();
 
-            //else
-            $file_path = (new PreviewPdf($maker->getCompiledHTML(true), $user->company()))->handle();
+            // $state = [
+            //     'template' => $design_class->elements([
+            //         'client' => null,
+            //         'vendor' => $entity_obj->vendor,
+            //         'entity' => $entity_obj,
+            //         'pdf_variables' => (array) $entity_obj->company->settings->pdf_variables,
+            //         'variables' => $html->generateLabelsAndValues(),
+            //     ]),
+            //     'variables' => $html->generateLabelsAndValues(),
+            //     'process_markdown' => $entity_obj->company->markdown_enabled,
+            //     'options' => [
+            //         'vendor' => $entity_obj->vendor ?? [],
+            //         request()->input('entity')."s" => [$entity_obj],
+            //     ]
+            // ];
 
-            return response()->download($file_path, basename($file_path), ['Cache-Control:' => 'no-cache'])->deleteFileAfterSend(true);
+            // $design = new Design(request()->design['name']);
+            // $maker = new PdfMaker($state);
+
+            // $maker
+            //     ->design($design)
+            //     ->build();
+
+            // if (request()->query('html') == 'true') {
+            //     return $maker->getCompiledHTML();
+            // }
+
+            // //if phantom js...... inject here..
+            // if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
+            //     return (new Phantom())->convertHtmlToPdf($maker->getCompiledHTML(true));
+            // }
+
+            // /** @var \App\Models\User $user */
+            // $user = auth()->user();
+
+            // if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
+            //     $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
+
+            //     $numbered_pdf = $this->pageNumbering($pdf, $user->company());
+
+            //     if ($numbered_pdf) {
+            //         $pdf = $numbered_pdf;
+            //     }
+
+            //     return $pdf;
+            // }
+
+            // //else
+            // $file_path = (new PreviewPdf($maker->getCompiledHTML(true), $user->company()))->handle();
+
+            // return response()->download($file_path, basename($file_path), ['Cache-Control:' => 'no-cache'])->deleteFileAfterSend(true);
         }
 
         return $this->blankEntity();
@@ -238,177 +270,70 @@ class PreviewPurchaseOrderController extends BaseController
             return $this->mockEntity();
         }
 
-        $design_object = json_decode(json_encode(request()->input('design')));
+       
+$design_object = json_decode(json_encode(request()->input('design')), true);
 
-        if (! is_object($design_object)) {
-            return response()->json(['message' => 'Invalid custom design object'], 400);
-        }
+if (! is_array($design_object)) {
+    return response()->json(['message' => 'Invalid custom design object'], 400);
+}
 
-        $html = new VendorHtmlEngine($invitation);
+$ps = new PdfService($invitation, 'product', [
+    'client' => $invitation->client ?? false,
+    'vendor' => $invitation->vendor ?? false,
+    "{$entity_string}s" => [$invitation->{$entity_string}],
+]);
 
-        $design = new Design(Design::CUSTOM, ['custom_partials' => request()->design['design']]);
+$ps->boot()
+->designer
+->buildFromPartials($design_object['design']);
 
-        $state = [
-            'template' => $design->elements([
-                'client' => null,
-                'vendor' => $invitation->purchase_order->vendor,
-                'entity' => $invitation->purchase_order,
-                'pdf_variables' => (array) $invitation->company->settings->pdf_variables,
-                'products' => request()->design['design']['product'],
-            ]),
-            'variables' => $html->generateLabelsAndValues(),
-            'process_markdown' => $invitation->company->markdown_enabled,
-            'options' => [
-                'vendor' => $invitation->purchase_order->vendor,
-                'purchase_orders' => [$invitation->purchase_order],
-            ],
-        ];
+$ps->builder
+->build();
 
 
-        $maker = new PdfMaker($state);
+if (request()->query('html') == 'true') {
+    return $ps->getHtml();
+}
 
-        $maker
-            ->design($design)
-            ->build();
+$pdf = $ps->getPdf();
 
-        if (request()->query('html') == 'true') {
-            return $maker->getCompiledHTML();
-        }
+return response()->streamDownload(function () use ($pdf) {
+    echo $pdf;
+}, 'preview.pdf', [
+    'Content-Disposition' => 'inline',
+    'Content-Type' => 'application/pdf',
+    'Cache-Control:' => 'no-cache',
+]);
 
-        if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
-            return (new Phantom())->convertHtmlToPdf($maker->getCompiledHTML(true));
-        }
-
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-
-        if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
-            $pdf =  (new NinjaPdf())->build($maker->getCompiledHTML(true));
-
-            $numbered_pdf = $this->pageNumbering($pdf, $user->company());
-
-            if ($numbered_pdf) {
-                $pdf = $numbered_pdf;
-            }
-
-            return $pdf;
-        }
-
-        $file_path = (new PreviewPdf($maker->getCompiledHTML(true), $user->company()))->handle();
-
-        $response = Response::make($file_path, 200);
-        $response->header('Content-Type', 'application/pdf');
-
-        return $response;
     }
 
     private function mockEntity()
     {
-        /** @var \App\Models\User $user */
+        
+        nlog("mockEntity");
+                
+        $start = microtime(true);
         $user = auth()->user();
 
-        DB::connection($user->company()->db)->beginTransaction();
+        /** @var \App\Models\Company $company */
+        $company = $user->company();
 
-        /** @var \App\Models\Vendor $vendor */
-        $vendor = Vendor::factory()->create([
-                'user_id' => $user->id,
-                'company_id' => $user->company()->id,
-            ]);
+        $request = request()->input('design');
+        $request['entity_type'] = request()->input('entity', 'invoice');
 
-        /** @var \App\Models\VendorContact $contact */
-        $contact = VendorContact::factory()->create([
-                'user_id' => $user->id,
-                'company_id' => $user->company()->id,
-                'vendor_id' => $vendor->id,
-                'is_primary' => 1,
-                'send_email' => true,
-            ]);
-
-        /** @var \App\Models\PurchaseOrder $purchase_order */
-        $purchase_order = PurchaseOrder::factory()->create([
-                    'user_id' => $user->id,
-                    'company_id' => $user->company()->id,
-                    'vendor_id' => $vendor->id,
-                    'terms' => 'Sample Terms',
-                    'footer' => 'Sample Footer',
-                    'public_notes' => 'Sample Public Notes',
-                ]);
-
-        /** @var \App\Models\PurchaseOrderInvitation $invitation */
-        $invitation = PurchaseOrderInvitation::factory()->create([
-                    'user_id' => $user->id,
-                    'company_id' => $user->company()->id,
-                    'purchase_order_id' => $purchase_order->id,
-                    'vendor_contact_id' => $contact->id,
-        ]);
-
-        $purchase_order->setRelation('invitations', $invitation);
-        $purchase_order->setRelation('vendor', $vendor);
-        $purchase_order->setRelation('company', $user->company());
-        $purchase_order->load('vendor.company');
-
-        $design_object = json_decode(json_encode(request()->input('design')));
-
-        if (! is_object($design_object)) {
-            return response()->json(['message' => 'Invalid custom design object'], 400);
-        }
-
-        $html = new VendorHtmlEngine($purchase_order->invitations()->first());
-
-        $design = new Design(Design::CUSTOM, ['custom_partials' => request()->design['design']]);
-
-        $state = [
-            'template' => $design->elements([
-                'client' => null,
-                'vendor' => $purchase_order->vendor,
-                'entity' => $purchase_order,
-                'pdf_variables' => (array) $purchase_order->company->settings->pdf_variables,
-                'products' => request()->design['design']['product'],
-            ]),
-            'variables' => $html->generateLabelsAndValues(),
-            'process_markdown' => $purchase_order->company->markdown_enabled,
-             'options' => [
-                'vendor' => $invitation->purchase_order->vendor,
-                'purchase_orders' => [$invitation->purchase_order],
-            ],
-        ];
-
-        $maker = new PdfMaker($state);
-
-        $maker
-            ->design($design)
-            ->build();
-
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-
-        DB::connection($user->company()->db)->rollBack();
+        $pdf = (new PdfMock($request, $company))->build();
 
         if (request()->query('html') == 'true') {
-            return $maker->getCompiledHTML();
+            return $pdf->getHtml();
         }
 
-        if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
-            return (new Phantom())->convertHtmlToPdf($maker->getCompiledHTML(true));
-        }
+        $pdf = $pdf->getPdf();
 
-        if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
-            $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
-
-            $numbered_pdf = $this->pageNumbering($pdf, $user->company());
-
-            if ($numbered_pdf) {
-                $pdf = $numbered_pdf;
-            }
-
-            return $pdf;
-        }
-
-        $file_path = (new PreviewPdf($maker->getCompiledHTML(true), $user->company()))->handle();
-
-        $response = Response::make($file_path, 200);
+        $response = Response::make($pdf, 200);
         $response->header('Content-Type', 'application/pdf');
+        $response->header('Server-Timing', (string) (microtime(true) - $start));
 
         return $response;
+
     }
 }
