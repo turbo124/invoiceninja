@@ -145,14 +145,16 @@ class PreviewController extends BaseController
     public function show(ShowPreviewRequest $request)
     {
 
+        
         if ($request->input('design.is_template')) {
+            nlog("I Template");
             return $this->template();
         }
 
-        if (request()->has('entity') &&
-            request()->has('entity_id') &&
-            ! empty(request()->input('entity')) &&
-            ! empty(request()->input('entity_id'))) {
+        nlog("pre");
+
+        if ($request->input('entity', false) &&
+            $request->input('entity_id', false) != '-1') {
 
             if ($request->input('entity') == 'purchase_order') {
                 return app(\App\Http\Controllers\PreviewPurchaseOrderController::class)->show($request);
@@ -180,64 +182,18 @@ class PreviewController extends BaseController
             $t = app('translator');
             App::setLocale($entity_obj->client->preferredLocale());
             $t->replace(Ninja::transformTranslations($entity_obj->client->getMergedSettings()));
+            $invitation = $entity_obj->invitations()->first();
 
-            if ($entity_obj->client) {
-                $html = new HtmlEngine($entity_obj->invitations()->first());
-            } else {
-                $html = new VendorHtmlEngine($entity_obj->invitations()->first());
-            }
+            $ps = new PdfService($invitation, 'product', [
+                'client' => $entity_obj->client ?? false,
+                'vendor' => $entity_obj->vendor ?? false,
+                $request->input('entity')."s" => [$entity_obj],
+            ]);
 
-            $design = new Design(Design::CUSTOM, ['custom_partials' => request()->design['design']]);
-
-            $state = [
-                'template' => $design->elements([
-                    'client' => $entity_obj->client,
-                    'entity' => $entity_obj,
-                    'pdf_variables' => (array) $entity_obj->company->settings->pdf_variables,
-                    'products' => request()->design['design']['product'],
-                ]),
-                'variables' => $html->generateLabelsAndValues(),
-                'process_markdown' => $entity_obj->client->company->markdown_enabled,
-                'options' => [
-                    'client' => $entity_obj->client ?? [],
-                    'vendor' => $entity_obj->vendor ?? [],
-                    request()->input('entity_type', 'invoice')."s" => [$entity_obj],
-                ]
-            ];
-
-            $maker = new PdfMaker($state);
-
-            $maker
-                ->design($design)
-                ->build();
-
-            if (request()->query('html') == 'true') {
-                
-                return $maker->getCompiledHTML();
-            }
-
-            //if phantom js...... inject here..
-            if (config('ninja.phantomjs_pdf_generation') || config('ninja.pdf_generator') == 'phantom') {
-                return (new Phantom())->convertHtmlToPdf($maker->getCompiledHTML(true));
-            }
-
-            /** @var \App\Models\User $user */
-            $user = auth()->user();
-            $company = $user->company();
-
-            if (config('ninja.invoiceninja_hosted_pdf_generation') || config('ninja.pdf_generator') == 'hosted_ninja') {
-
-                $pdf = (new NinjaPdf())->build($maker->getCompiledHTML(true));
-                $numbered_pdf = $this->pageNumbering($pdf, $company);
-                if ($numbered_pdf) {
-                    $pdf = $numbered_pdf;
-                }
-
-                return $pdf;
-
-            }
-
-            $pdf = (new PreviewPdf($maker->getCompiledHTML(true), $company))->handle();
+            $pdf = $ps->boot()
+            ->designer
+            ->buildFromPartials($request->design['design'])        
+            ->getPdf();
 
             return response()->streamDownload(function () use ($pdf) {
                 echo $pdf;
