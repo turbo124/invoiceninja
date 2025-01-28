@@ -80,7 +80,7 @@ class PdfMock
 
         $this->pdf_service->config = $pdf_config;
 
-        if (isset($this->request['design'])) {
+        if (isset($this->request['design']) && is_array($this->request['design'])) {
             $pdf_designer = (new PdfDesigner($this->pdf_service))->buildFromPartials($this->request['design']);
         } else {
             $pdf_designer = (new PdfDesigner($this->pdf_service))->build();

@@ -21,6 +21,7 @@ use App\Jobs\Util\PreviewPdf;
 use App\Models\ClientContact;
 use App\Services\Pdf\PdfMock;
 use App\Utils\Traits\MakesHash;
+use App\Utils\VendorHtmlEngine;
 use App\Services\Pdf\PdfService;
 use App\Utils\PhantomJS\Phantom;
 use App\Models\InvoiceInvitation;
@@ -32,6 +33,7 @@ use Illuminate\Support\Facades\App;
 use App\Utils\Traits\GeneratesCounter;
 use App\Utils\Traits\MakesInvoiceHtml;
 use Turbo124\Beacon\Facades\LightLogs;
+use App\Models\PurchaseOrderInvitation;
 use App\Utils\Traits\Pdf\PageNumbering;
 use Illuminate\Support\Facades\Response;
 use App\DataMapper\Analytics\LivePreview;
@@ -39,7 +41,6 @@ use App\Services\Template\TemplateService;
 use App\Http\Requests\Preview\ShowPreviewRequest;
 use App\Http\Requests\Preview\DesignPreviewRequest;
 use App\Http\Requests\Preview\PreviewInvoiceRequest;
-use App\Utils\VendorHtmlEngine;
 
 class PreviewController extends BaseController
 {
@@ -153,10 +154,6 @@ class PreviewController extends BaseController
         if ($request->input('entity', false) &&
             $request->input('entity_id', false) != '-1') {
 
-            if ($request->input('entity') == 'purchase_order') {
-                return app(\App\Http\Controllers\PreviewPurchaseOrderController::class)->show($request);
-            }
-
             $design_object = json_decode(json_encode($request->input('design')));
 
             if (! is_object($design_object)) {
@@ -173,12 +170,21 @@ class PreviewController extends BaseController
                 return $this->blankEntity();
             }
 
-            $entity_obj->load('client');
+            if($entity_obj->client){
+                $entity_obj->load('client');
+                $locale = $entity_obj->client->preferredLocale();
+                $settings = $entity_obj->client->getMergedSettings();
+            }
+            else {
+                $entity_obj->load('vendor');
+                $locale = $entity_obj->vendor->preferredLocale();
+                $settings = $entity_obj->vendor->getMergedSettings();
+            }
 
             App::forgetInstance('translator');
             $t = app('translator');
-            App::setLocale($entity_obj->client->preferredLocale());
-            $t->replace(Ninja::transformTranslations($entity_obj->client->getMergedSettings()));
+            App::setLocale($locale);
+            $t->replace(Ninja::transformTranslations($settings));
             $invitation = $entity_obj->invitations()->first();
 
             $ps = new PdfService($invitation, 'product', [
@@ -187,9 +193,12 @@ class PreviewController extends BaseController
                 $request->input('entity')."s" => [$entity_obj],
             ]);
 
-            $pdf = $ps->boot()
+            $ps->boot()
             ->designer
             ->buildFromPartials($request->design['design']);
+
+            $ps->builder
+            ->build();
             
             if ($request->query('html') == 'true') {
                 return $ps->getHtml();
@@ -286,8 +295,6 @@ class PreviewController extends BaseController
     private function blankEntity()
     {
 
-        nlog("blankEntity");
-
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
@@ -298,8 +305,16 @@ class PreviewController extends BaseController
         $t = app('translator');
         $t->replace(Ninja::transformTranslations($company->settings));
 
-        /** @var \App\Models\InvoiceInvitation $invitation */
-        $invitation = InvoiceInvitation::where('company_id', $company->id)->orderBy('id', 'desc')->first();
+        $entity_string = 'invoice';
+
+        if(request()->input('entity') == 'purchase_order') {
+            $invitation = PurchaseOrderInvitation::where('company_id', $company->id)->orderBy('id', 'desc')->first();
+            $entity_string = 'purchase_order';
+        }
+        else{
+            /** @var \App\Models\InvoiceInvitation $invitation */
+            $invitation = InvoiceInvitation::where('company_id', $company->id)->orderBy('id', 'desc')->first();
+        }
 
         /* If we don't have a valid invitation in the system - create a mock using transactions */
         if (! $invitation) {
@@ -314,12 +329,15 @@ class PreviewController extends BaseController
 
         $ps = new PdfService($invitation, 'product', [
             'client' => $invitation->client ?? false,
-            'invoices' => [$invitation->invoice],
+            'vendor' => $invitation->vendor ?? false,
+            "{$entity_string}s" => [$invitation->{$entity_string}],
         ]);
 
         $ps->boot()
         ->designer
-        ->buildFromPartials($design_object['design'])
+        ->buildFromPartials($design_object['design']);
+
+        $ps->builder
         ->build();
 
 

@@ -319,6 +319,11 @@ class Vendor extends BaseModel
         return $this->language ? $this->language->locale : $this->company->locale();
     }
 
+    public function preferredLocale(): string
+    {
+        return $this->locale();
+    }
+
     public function language(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Language::class);
