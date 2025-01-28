@@ -143,7 +143,6 @@ class PdfService
 
         $this->config = (new PdfConfiguration($this))->init();
 
-
         $this->html_variables = $this->config->client ?
                                     (new HtmlEngine($this->invitation))->generateLabelsAndValues() :
                                     (new VendorHtmlEngine($this->invitation))->generateLabelsAndValues();

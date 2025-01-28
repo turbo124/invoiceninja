@@ -37,8 +37,6 @@ use Illuminate\Support\Facades\Response;
 use App\DataMapper\Analytics\LivePreview;
 use App\Repositories\PurchaseOrderRepository;
 use App\Http\Requests\Preview\ShowPreviewRequest;
-use App\Services\PdfMaker\Design as PdfDesignModel;
-use App\Services\PdfMaker\Design as PdfMakerDesign;
 use App\Http\Requests\Preview\PreviewPurchaseOrderRequest;
 
 class PreviewPurchaseOrderController extends BaseController
