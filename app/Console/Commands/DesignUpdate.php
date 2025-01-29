@@ -69,9 +69,9 @@ class DesignUpdate extends Command
 
     private function handleOnDb()
     {
-        foreach (Design::whereIsCustom(false)->get() as $design) {
-            $invoice_design = new \App\Services\PdfMaker\Design(strtolower($design->name));
-            $invoice_design->document();
+        foreach (Design::where('is_custom', false)->get() as $design) {
+            
+            $invoice_design = new \App\Services\Pdf\DesignExtractor($design->name);
 
             $design_object = new stdClass();
             $design_object->includes = $invoice_design->getSectionHTML('style');

@@ -15,6 +15,7 @@ namespace App\Services\PdfMaker;
 use DOMDocument;
 use DOMXPath;
 
+/** @deprecated */
 trait PdfMakerUtilities
 {
     private function initializeDomDocument()

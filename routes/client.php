@@ -15,7 +15,6 @@ use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RecurringInvoiceController;
 use App\Models\Account;
 use App\Utils\Ninja;
-use App\Utils\PhantomJS\Phantom;
 use Illuminate\Support\Facades\Route;
 
 Route::get('client', [ContactLoginController::class, 'showLoginForm'])->name('client.catchall')->middleware(['domain_db', 'contact_account','locale', 'throttle:portal']); //catch all
@@ -145,24 +144,6 @@ Route::group(['middleware' => ['invite_db'], 'prefix' => 'client', 'as' => 'clie
 
     Route::get('unsubscribe/{entity}/{invitation_key}', [App\Http\Controllers\ClientPortal\InvitationController::class, 'unsubscribe'])->name('unsubscribe');
 });
-
-// Route::get('route/{hash}', function ($hash) {
-
-//     $route = '/';
-
-//     try {
-//         $route = decrypt($hash); 
-//     }
-//     catch (\Exception $e) { 
-//         abort(404);
-//     }
-
-//     return redirect($route);
-
-// })->middleware('throttle:404');
-
-Route::get('phantom/{entity}/{invitation_key}', [Phantom::class, 'displayInvitation'])->middleware(['invite_db', 'phantom_secret'])->name('phantom_view');
-Route::get('blade/', [Phantom::class, 'blade'])->name('blade');
 
 Route::get('.env', function () {
 })->middleware('throttle:honeypot');
