@@ -144,6 +144,7 @@ return [
         'environment' => env('GOCARDLESS_ENVIRONMENT', 'production'),
         'redirect_uri' => env('GOCARDLESS_REDIRECT_URI', 'https://invoicing.co/gocardless/oauth/connect/confirm'),
         'testing_company' => env('GOCARDLESS_TESTING_COMPANY', null),
+        'webhook_secret' => env('GOCARDLESS_WEBHOOK_SECRET', null),
     ],
     'quickbooks' => [
         'client_id' => env('QUICKBOOKS_CLIENT_ID', false),
