@@ -1757,6 +1757,7 @@ class PdfBuilder
                 ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
             ];
 
+
         if (!is_null($this->service->config->contact)) {
             $elements[] = ['element' => 'div', 'content' => $this->service->config->contact->email, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-contact.email']];
         }
@@ -1796,15 +1797,14 @@ class PdfBuilder
 
         $elements = [
             ['element' => 'div', 'content' => ctrans('texts.shipping_address'), 'properties' => ['data-ref' => 'shipping_address-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
-            // ['element' => 'div', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.name']],
             ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address1']],
             ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address2']],
             ['element' => 'div', 'show_empty' => false, 'elements' => [
-                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['ref' => 'shipping_address-client.shipping_city']],
-                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'shipping_address-client.shipping_state']],
-                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'shipping_address-client.shipping_postal_code']],
+                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_city']],
+                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_state']],
+                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_postal_code']],
             ]],
-            ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
+            ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_country']],
         ];
 
         return $elements;
