@@ -12,26 +12,27 @@
 
 namespace App\Services\Client;
 
-use App\Factory\InvoiceFactory;
-use App\Factory\InvoiceInvitationFactory;
-use App\Factory\InvoiceItemFactory;
+use App\Utils\Number;
 use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Design;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Utils\HostedPDF\NinjaPdf;
 use App\Utils\HtmlEngine;
-use App\Utils\Number;
+use Illuminate\Support\Carbon;
+use App\Factory\InvoiceFactory;
+use App\Utils\Traits\MakesHash;
 use App\Utils\PhantomJS\Phantom;
 use App\Utils\Traits\MakesDates;
-use App\Utils\Traits\MakesHash;
+use App\Utils\HostedPDF\NinjaPdf;
+use App\Utils\Traits\Pdf\PdfMaker;
+use App\Factory\InvoiceItemFactory;
+use App\Factory\InvoiceInvitationFactory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 
 class Statement
 {
-    use PdfMakerTrait;
+    use PdfMaker;
     use MakesHash;
     use MakesDates;
 
