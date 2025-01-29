@@ -251,18 +251,34 @@ class FacturaEInvoice extends AbstractService
 
     private function setPayments(): self
     {
-        $this->invoice->payments()->each(function ($payment) {
 
-            $payment_data = [
-                "dueDate" => \Carbon\Carbon::parse($payment->date)->format('Y-m-d'),
-                "amount"  => $payment->pivot->amount,
-            ];
+        if (isset($this->invoice->company->e_invoice->Invoice->PaymentMeans) && ($pm = $this->invoice->company->e_invoice->Invoice->PaymentMeans[0] ?? false)) {
 
-            $data = array_merge($this->resolvePaymentMethod($payment), $payment_data);
+            switch ($pm->PaymentMeansCode->value ?? false) {
+                case '30':
+                case '58':
+                    $iban = $pm->PayeeFinancialAccount->ID->value;
+                    $name = $pm->PayeeFinancialAccount->Name ?? '';
+                    $bic = $pm->PayeeFinancialAccount->FinancialInstitutionBranch->FinancialInstitution->ID->value ?? '';
+                    $typecode = $pm->PaymentMeansCode->value;
+                    
 
-            $this->fac->addPayment(new FacturaePayment($data));
+                    $this->fac->addPayment(new FacturaePayment([
+                                        "method"  => FacturaePayment::TYPE_TRANSFER,
+                                        "dueDate" => $this->invoice->date,
+                                        "iban"    => $iban,
+                                        "bic"     => $bic
+                                    ]));
 
-        });
+
+                    return $this;
+
+                default:
+                    # code...
+                    break;
+            }
+
+        }
 
         return $this;
     }
