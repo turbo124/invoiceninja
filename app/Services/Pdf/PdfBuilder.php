@@ -1770,6 +1770,11 @@ class PdfBuilder
             return $elements;
         }
 
+
+        $this->service->html_variables['values']['$show_shipping_address_block'] = 'none';
+        $this->service->html_variables['values']['$show_shipping_address'] = 'none';
+        $this->service->html_variables['values']['$show_shipping_address_visibility'] = 'hidden';
+
         $elements = [
                 ['element' => 'div', 'content' => ctrans('texts.delivery_note'), 'properties' => ['data-ref' => 'delivery_note-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
                 ['element' => 'div', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
@@ -1816,7 +1821,7 @@ class PdfBuilder
     {
         $elements = [];
 
-        if (!$this->service->config->client) {
+        if (!$this->service->config->client || $this->service->document_type == PdfService::DELIVERY_NOTE) {
             return $elements;
         }
 

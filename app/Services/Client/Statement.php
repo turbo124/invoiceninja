@@ -20,15 +20,12 @@ use App\Models\Credit;
 use App\Models\Design;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Services\PdfMaker\Design as PdfMakerDesign;
-use App\Services\PdfMaker\PdfMaker;
 use App\Utils\HostedPDF\NinjaPdf;
 use App\Utils\HtmlEngine;
 use App\Utils\Number;
 use App\Utils\PhantomJS\Phantom;
 use App\Utils\Traits\MakesDates;
 use App\Utils\Traits\MakesHash;
-use App\Utils\Traits\Pdf\PdfMaker as PdfMakerTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
