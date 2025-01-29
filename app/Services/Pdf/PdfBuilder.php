@@ -300,6 +300,19 @@ class PdfBuilder
                 'id' => 'client-details',
                 'elements' => $this->clientDetails(),
             ],
+            'vendor-details' => [ //this block pads the grid for client / vendor / entity details
+                'id' => 'vendor-details',
+                'elements' => [
+                    ['element' => 'tr', 'properties' => ['data-ref' => 'statement-labelx'], 'elements' => [
+                        ['element' => 'th', 'properties' => [], 'content' => ""],
+                        ['element' => 'th', 'properties' => [], 'content' => '<h2></h2>'],
+                    ]],
+                ],
+            ],
+            'entity-details' => [
+                'id' => 'entity-details',
+                'elements' => $this->statementDetails(),
+            ],
             'statement-invoice-table' => [
                 'id' => 'statement-invoice-table',
                 'elements' => $this->statementInvoiceTable(),
@@ -509,8 +522,6 @@ class PdfBuilder
 
         return [
             ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.amount_paid'), $this->service->config->formatMoney($this->payment_amount_total))],
-            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_type'), $payment->translatedType())],
-            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
         ];
     }
 
@@ -529,8 +540,6 @@ class PdfBuilder
 
         return [
             ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_balance_on_file'), $this->service->config->formatMoney($this->unapplied_total))],
-            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_type'), $payment->translatedType())],
-            // ['element' => 'div', 'content' => \sprintf('%s: %s', ctrans('texts.payment_date'), $this->translateDate($payment->date, $this->service->config->date_format, $this->service->config->locale) ?: '&nbsp;')],
         ];
 
     }
@@ -556,7 +565,6 @@ class PdfBuilder
         
         $this->unapplied_total = 0;
 
-        //24-03-2022 show payments per invoice
         foreach ($this->service->options['unapplied'] as $unapplied_payment) {
             if ($unapplied_payment->is_deleted) {
                 continue;
@@ -659,16 +667,6 @@ class PdfBuilder
             ],
         ]);
 
-        // if($this->service->config->entity->client)
-        // {
-        //     $this->service->config->client = $this->service->config->entity->client;
-        //     nlog("inside");
-        //     $this->getClientDetails();
-        //     $this->service->config->client = null;
-        // }
-
-        // nlog($this->sections);
-
         return $this;
     }
 
@@ -692,9 +690,7 @@ class PdfBuilder
             ],
             'footer-elements' => [
                 'id' => 'footer',
-                'elements' => [
-                    // $this->sharedFooterElements(),
-                ],
+                'elements' => [],
             ],
         ]);
 
@@ -711,12 +707,14 @@ class PdfBuilder
     {
         $tbody = [];
 
+        $date_format = $this->service->config->client->date_format();
+
         foreach ($this->service->options['invoices'] as $invoice) {
             $element = ['element' => 'tr', 'elements' => []];
 
             $element['elements'][] = ['element' => 'td', 'content' => $invoice->number];
-            $element['elements'][] = ['element' => 'td', 'content' => $this->translateDate($invoice->date, $this->service->config->client->date_format(), $this->service->config->locale) ?: ' '];
-            $element['elements'][] = ['element' => 'td', 'content' => $this->translateDate($invoice->due_date, $this->service->config->client->date_format(), $this->service->config->locale) ?: ' '];
+            $element['elements'][] = ['element' => 'td', 'content' => $this->translateDate($invoice->date, $date_format, $this->service->config->locale) ?: ' '];
+            $element['elements'][] = ['element' => 'td', 'content' => $this->translateDate($invoice->due_date, $date_format, $this->service->config->locale) ?: ' '];
             $element['elements'][] = ['element' => 'td', 'content' => $this->service->config->formatMoney($invoice->amount) ?: ' '];
             $element['elements'][] = ['element' => 'td', 'content' => $this->service->config->formatMoney($invoice->balance) ?: ' '];
 
@@ -780,9 +778,14 @@ class PdfBuilder
             return $elements;
         }
 
+
+
+        //2025-01-28 Regular Table Body
         $_type = Str::startsWith($type, '$') ? ltrim($type, '$') : $type;
+        
         $table_type = "{$_type}_columns";
 
+        //Handle custom quote columns
         if ($_type == 'product' && $this->service->config->entity instanceof Quote && !$this->service->config->settings?->sync_invoice_quote_columns) {
             $table_type = "product_quote_columns";
         }
@@ -793,12 +796,9 @@ class PdfBuilder
 
         foreach ($items as $row) {
             $element = ['element' => 'tr', 'elements' => []];
-
-            if (
-                array_key_exists($type, $this->service->options) &&
-                !empty($this->service->options[$type]) &&
-                !is_null($this->service->options[$type])
-            ) {
+            //checks if we have custom columns in the options array with key $product/$task - looks like unused functionality
+             if (isset($this->service->options[$type]) && !empty($this->service->options[$type])) {
+                
                 $document = new DOMDocument();
                 $document->loadHTML($this->service->options[$type], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
@@ -922,17 +922,20 @@ class PdfBuilder
             }
 
             if ($table_type == '$task' && $item->type_id != 2) {
-                // if ($item->type_id != 4 && $item->type_id != 5) {
                 continue;
-                // }
             }
 
             $helpers = new Helpers();
             $_table_type = ltrim($table_type, '$'); // From $product -> product.
 
-            $data[$key][$table_type.'.product_key'] = is_null(optional($item)->product_key) ? $item->item : $item->product_key;
-            $data[$key][$table_type.'.item'] = is_null(optional($item)->item) ? $item->product_key : $item->item;
-            $data[$key][$table_type.'.service'] = is_null(optional($item)->service) ? $item->product_key : $item->service;
+            //2025-01-28 not sure how we ever got ->item and ->service....
+            $data[$key][$table_type.'.product_key'] = $item->product_key ?? $item->item;
+            $data[$key][$table_type.'.item'] = $item->item ?? $item->product_key;
+            $data[$key][$table_type.'.service'] = $item->service ?? $item->product_key;
+
+            // $data[$key][$table_type.'.product_key'] = is_null(optional($item)->product_key) ? $item->item : $item->product_key;
+            // $data[$key][$table_type.'.item'] = is_null(optional($item)->item) ? $item->product_key : $item->item;
+            // $data[$key][$table_type.'.service'] = is_null(optional($item)->service) ? $item->product_key : $item->service;
 
             $currentDateTime = null;
             if (isset($this->service->config->entity->next_send_date)) {
@@ -940,7 +943,7 @@ class PdfBuilder
             }
 
             $data[$key][$table_type.'.notes'] = Helpers::processReservedKeywords($item->notes, $this->service->config->currency_entity, $currentDateTime);
-            $data[$key][$table_type.'.description'] = Helpers::processReservedKeywords($item->notes, $this->service->config->currency_entity, $currentDateTime);
+            $data[$key][$table_type.'.description'] = &$data[$key][$table_type.'.notes'];
 
             $data[$key][$table_type.".{$_table_type}1"] = strlen($item->custom_value1) >= 1 ? $helpers->formatCustomFieldValue($this->service->company->custom_fields, "{$_table_type}1", $item->custom_value1, $this->service->config->currency_entity) : '';
             $data[$key][$table_type.".{$_table_type}2"] = strlen($item->custom_value2) >= 1 ? $helpers->formatCustomFieldValue($this->service->company->custom_fields, "{$_table_type}2", $item->custom_value2, $this->service->config->currency_entity) : '';
@@ -987,9 +990,6 @@ class PdfBuilder
                 $data[$key][$table_type.'.discount'] = '';
             }
 
-            // Previously we used to check for tax_rate value,
-            // but that's no longer necessary.
-
             if (isset($item->tax_rate1)) {
                 $data[$key][$table_type.'.tax_rate1'] = $this->service->config->formatValueNoTrailingZeroes(floatval($item->tax_rate1)).'%';
                 $data[$key][$table_type.'.tax1'] = &$data[$key][$table_type.'.tax_rate1'];
@@ -1007,8 +1007,6 @@ class PdfBuilder
 
             $data[$key]['task_id'] = property_exists($item, 'task_id') ? $item->task_id : '';
         }
-
-        //nlog(microtime(true) - $start);
 
         return $data;
     }
@@ -1052,7 +1050,6 @@ class PdfBuilder
         }
 
         return $columns;
-
 
     }
 
@@ -1229,36 +1226,6 @@ class PdfBuilder
     }
 
     /**
-     * Generates the javascript block for
-     * hiding elements which need to be hidden
-     *
-     * @return array
-     *
-     */
-    public function sharedFooterElements(): array
-    {
-        // We want to show headers for statements, no exceptions.
-        $statements = "
-            document.querySelectorAll('#statement-invoice-table > thead > tr > th, #statement-payment-table > thead > tr > th, #statement-aging-table > thead > tr > th').forEach(t => {
-                t.hidden = false;
-            });
-        ";
-
-        $javascript = 'document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll("#product-table > tbody > tr > td, #task-table > tbody > tr > td, #delivery-note-table > tbody > tr > td").forEach(t=>{if(""!==t.innerText){let e=t.getAttribute("data-ref").slice(0,-3);document.querySelector(`th[data-ref="${e}-th"]`).removeAttribute("hidden")}}),document.querySelectorAll("#product-table > tbody > tr > td, #task-table > tbody > tr > td, #delivery-note-table > tbody > tr > td").forEach(t=>{let e=t.getAttribute("data-ref").slice(0,-3);(e=document.querySelector(`th[data-ref="${e}-th"]`)).hasAttribute("hidden")&&""==t.innerText&&t.setAttribute("hidden","true")})},!1);';
-
-        // Previously we've been decoding the HTML on the backend and XML parsing isn't good options because it requires,
-        // strict & valid HTML to even output/decode. Decoding is now done on the frontend with this piece of Javascript.
-
-        $html_decode = 'document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(`[data-state="encoded-html"]`).forEach(e=>e.innerHTML=e.innerText)},!1);';
-
-        return ['element' => 'div', 'elements' => [
-            ['element' => 'script', 'content' => $statements],
-            ['element' => 'script', 'content' => $javascript],
-            ['element' => 'script', 'content' => $html_decode],
-        ]];
-    }
-
-    /**
      * Generates the totals table for
      * the product type entities
      *
@@ -1391,6 +1358,8 @@ class PdfBuilder
             return true;
         }
 
+        nlog("{$_variable} - {$this->service->config->entity->{$_variable}}");
+        
         return false;
     }
 
@@ -1709,11 +1678,6 @@ class PdfBuilder
     {
         $variables = $this->service->config->pdf_variables['invoice_details'];
 
-        // $_v = $this->service->html_variables;
-
-        // $_v['labels']['$invoice.date_label'] = ctrans('text.date');
-        // $this->service->html_variables = $_v;
-
         $variables = array_filter($variables, function ($m) {
             return !in_array($m, ['$invoice.balance_due', '$invoice.total']);
         });
@@ -1770,13 +1734,22 @@ class PdfBuilder
             return $elements;
         }
 
-
         $this->service->html_variables['values']['$show_shipping_address_block'] = 'none';
         $this->service->html_variables['values']['$show_shipping_address'] = 'none';
         $this->service->html_variables['values']['$show_shipping_address_visibility'] = 'hidden';
-
+        $this->service->html_variables['labels']['$entity_issued_to_label'] = '';
+        $this->service->html_variables['labels']['$entity_number_label'] = ctrans('texts.delivery_note');
+        $this->service->html_variables['values']['$entity'] = ctrans('texts.delivery_note');
+        $this->service->html_variables['labels']['$entity_label'] = ctrans('texts.delivery_note');
+        $this->service->html_variables['labels']['$invoice.number_label'] = ctrans('texts.delivery_note');
+        $this->service->html_variables['labels']['$payment_due_label'] = '';
+        $this->service->html_variables['values']['$payment_due'] = '';
+        $this->service->html_variables['labels']['$amount_due_label'] = '';
+        $this->service->html_variables['values']['$balance_due'] = '';
+        $this->service->html_variables['values']['$amount_due'] = '';
+        $this->service->html_variables['labels']['$amount_due_label'] = '';
+        
         $elements = [
-                ['element' => 'div', 'content' => ctrans('texts.delivery_note'), 'properties' => ['data-ref' => 'delivery_note-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
                 ['element' => 'div', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
                 ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
                 ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
@@ -2008,7 +1981,15 @@ class PdfBuilder
 
         return $element;
     }
-
+    
+    /**
+     * isMarkdown
+     *
+     * Checks if the given content is most likely markdown
+     * 
+     * @param  string $content
+     * @return bool
+     */
     private function isMarkdown(string $content): bool
     {
         $content = str_ireplace('<br>', "\n", $content);
@@ -2040,30 +2021,26 @@ class PdfBuilder
 
     public function createElementContent($element, $children): self
     {
-        foreach ($children as $child) {
-                        
+        foreach ($children as $child) {                      
+            if (isset($child['is_empty']) && $child['is_empty'] === true) {
+                continue;
+            }
+  
             $contains_html = false;
 
             $child['content'] = $child['content'] ?? '';
 
-            if ($this->service->company->markdown_enabled && $this->isMarkdown($child['content']) && $child['element'] !== 'script') {
+            if ($this->service->company->markdown_enabled && $this->isMarkdown($child['content'])) {
                 $child['content'] = str_ireplace('<br>', "\r", $child['content']);
                 $child['content'] = $this->commonmark->convert($child['content']); //@phpstan-ignore-line
             }
 
-            if (isset($child['is_empty']) && $child['is_empty'] === true) {
-                continue;
-            }
-
             $contains_html = str_contains($child['content'], '<') && str_contains($child['content'], '>');
-
 
             if ($contains_html) {
 
-                // If the element contains the HTML, we gonna display it as is. Backend is going to
-                // encode it for us, preventing any errors on the processing stage.
-                // Later, we decode this using Javascript so it looks like it's normal HTML being injected.
-                // To get all elements that need frontend decoding, we use 'data-state' property.
+                // Encode any HTML elements now so that DOMDocument doesn't throw any errors,
+                // Later we can decode specific elements.
 
                 $_child = $this->document->createElement($child['element'], '');
                 $_child->setAttribute('data-state', 'encoded-html');
@@ -2071,9 +2048,6 @@ class PdfBuilder
 
 
             } else {
-                // .. in case string doesn't contain any HTML, we'll just return
-                // raw $content
-
                 $_child = $this->document->createElement($child['element'], htmlspecialchars($child['content']));
             }
 
@@ -2092,14 +2066,18 @@ class PdfBuilder
 
         return $this;
     }
-
+    
+    /**
+     * updateVariables
+     *
+     * @return void
+     */
     public function updateVariables()
     {
 
         $html = strtr($this->getCompiledHTML(), $this->service->html_variables['labels']);
         $html = strtr($html, $this->service->html_variables['values']);
         
-        //old block
         @$this->document->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         //new block
@@ -2134,7 +2112,7 @@ class PdfBuilder
     {
         foreach ($this->sections as $element) {
             if (isset($element['elements'])) {
-                $this->getEmptyChildrens($element['elements'], $this->service->html_variables);
+                $this->getEmptyChildrens($element['elements']);
             }
         }
 

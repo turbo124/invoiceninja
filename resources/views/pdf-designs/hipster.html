@@ -129,6 +129,10 @@
         text-transform: uppercase;
     }
 
+    .entity-property-label:not(:empty)::after {
+        content: ":";
+    }
+
     .entity-details-wrapper
     [data-element='entity-details-wrapper-invoice-number-label'],
     .entity-details-wrapper
@@ -473,20 +477,20 @@
                <div class="entity-details-wrapper">
                   <div>
                      <span class="entity-property-label" data-element="entity-details-wrapper-invoice-number-label">
-                     $entity_number_label:
+                     $entity_number_label
                      </span>
                      <span class="entity-property-value">$entity_number</span>
                   </div>
                   <div>
-                     <span class="entity-property-label">$date_label:</span>
+                     <span class="entity-property-label">$date_label</span>
                      <span class="entity-property-value">$date</span>
                   </div>
                   <div>
-                     <span class="entity-property-label">$payment_due_label:</span>
+                     <span class="entity-property-label">$payment_due_label</span>
                      <span class="entity-property-value">$payment_due</span>
                   </div>
                   <div>
-                     <span class="entity-property-label">$amount_due_label:</span>
+                     <span class="entity-property-label">$amount_due_label</span>
                      <span
                         class="entity-property-value"
                         data-element="entity-details-wrapper-amount-due"

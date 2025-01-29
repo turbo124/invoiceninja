@@ -73,6 +73,10 @@
         font-weight: bold;
     }
 
+    .entity-issued-to:not(:empty)::after {
+        content: ":";
+    }
+
     .client-and-entity-wrapper {
         display: flex;
         justify-content: space-between;
@@ -404,7 +408,7 @@
                   <div id="company-address"></div>
                </div>
                <div class="client-and-entity-wrapper">
-                <div id="client-details"><p class="entity-issued-to">$entity_issued_to_label:</p></div>
+                <div id="client-details"><p class="entity-issued-to">$entity_issued_to_label</p></div>
                 <div id="vendor-details"></div>
                 <div id="shipping-details"></div>
                   <div class="entity-details-wrapper">

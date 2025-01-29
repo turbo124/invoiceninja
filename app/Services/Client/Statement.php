@@ -88,14 +88,14 @@ class Statement
             }
 
 
-            $variables['values']['$show_paid_stamp'] = 'none'; //do not show paid stamp on statement
+            $variables['values']['$show_paid_stamp'] = 'none'; 
 
             $options = [
-                'client' => $this->entity->client,
-                'entity' => $this->entity,
-                'pdf_variables' => (array) $this->entity->company->settings->pdf_variables,
-                '$product' => $this->getDesign()->design->product,
-                'variables' => $variables,
+                // 'client' => $this->entity->client,
+                // 'entity' => $this->entity,
+                // 'pdf_variables' => (array) $this->entity->company->settings->pdf_variables,
+                // '$product' => $this->getDesign()->design->product,
+                // 'variables' => $variables,
                 'invoices' => $this->getInvoices()->cursor(),
                 'payments' => $this->getPayments()->cursor(),
                 'credits' => $this->getCredits()->cursor(),
@@ -107,7 +107,7 @@ class Statement
             $pdf = $ps->boot();
             
             $ps->config->pdf_variables = (array) $this->entity->company->settings->pdf_variables;
-            $ps->config->html_variables = $variables;
+            $ps->html_variables = $variables;
             $ps->config->design = $this->getDesign();
 
             $ps->designer->buildFromPartials((array)$ps->config->design->design);

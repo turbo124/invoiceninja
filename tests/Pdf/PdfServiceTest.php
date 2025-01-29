@@ -32,6 +32,72 @@ class PdfServiceTest extends TestCase
         $this->makeTestData();
     }
 
+    public function testMultiDesignGeneration()
+    {
+
+        if (config('ninja.testvars.travis')) {
+            $this->markTestSkipped();
+        }
+
+        \App\Models\Design::where('is_custom',false)->cursor()->each(function ($design){
+
+
+            $this->invoice->design_id = $design->id;
+            $this->invoice->save();
+            $this->invoice = $this->invoice->fresh();
+
+            $invitation = $this->invoice->invitations->first();
+
+            $service = (new PdfService($invitation))->boot();
+            $pdf = $service->getPdf();
+
+            $this->assertNotNull($pdf);
+
+            \Illuminate\Support\Facades\Storage::put('/pdf/' . $design->name.'.pdf', $pdf);
+            
+        });
+    
+
+        \App\Models\Design::where('is_custom', false)->cursor()->each(function ($design) {
+
+
+            $this->invoice->design_id = $design->id;
+            $this->invoice->save();
+            $this->invoice = $this->invoice->fresh();
+
+            $invitation = $this->invoice->invitations->first();
+
+            $service = (new PdfService($invitation, 'delivery_note'))->boot();
+            $pdf = $service->getPdf();
+
+            $this->assertNotNull($pdf);
+
+            \Illuminate\Support\Facades\Storage::put('/pdf/dn_' . $design->name.'.pdf', $pdf);
+
+        });
+
+    }
+
+    public function testStatementPdfGeneration()
+    {
+
+        $pdf = $this->client->service()->statement([
+            'client_id' => $this->client->hashed_id,
+            'start_date' => '2000-01-01',
+            'end_date' => '2023-01-01',
+            'show_aging_table' => true,
+            'show_payments_table' => true,
+            'status' => 'all'    
+        ]);
+    
+
+        $this->assertNotNull($pdf);
+
+        \Illuminate\Support\Facades\Storage::put('/pdf/statement.pdf', $pdf);
+
+
+    }
+
     public function testPdfGeneration()
     {
 
