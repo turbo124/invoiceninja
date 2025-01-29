@@ -1350,15 +1350,11 @@ class PdfBuilder
             $_variable = $aliases[$variable];
         }
 
-        if (is_null($this->service->config->entity->{$_variable})) {
+        if (is_null($this->service->config->entity->{$_variable}) || empty($this->service->config->entity->{$_variable})) {
             return true;
         }
 
-        if (empty($this->service->config->entity->{$_variable})) {
-            return true;
-        }
-
-        nlog("{$_variable} - {$this->service->config->entity->{$_variable}}");
+        // nlog("{$_variable} - {$this->service->config->entity->{$_variable}}");
         
         return false;
     }
