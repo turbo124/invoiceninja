@@ -72,9 +72,10 @@
       }
 
       #entity-details {
+        margin-top: 1rem;
         text-align: left;
         color: #fff4e9 !important;
-        line-height: 1.6;
+        line-height: 1.6 !important;
       }
 
       #entity-details > tr,
@@ -106,9 +107,13 @@
       #shipping-details {
           display: $show_shipping_address;
           flex-direction: column;
-          margin-left: 10px;
-          margin-right: 10px;
+          padding-left: 10px;
+          padding-right: 2rem;
           float:right;
+      }
+
+      #shipping-details > * {
+        margin-bottom: 0.5rem;
       }
 
       #client-details > * {
@@ -117,6 +122,11 @@
 
       .table-wrapper {
         margin: 0rem 2rem;
+      }
+
+      [data-ref="delivery_note-client.city_state_postal"] p{
+        display: inline-block;
+        white-space: nowrap;
       }
 
       [data-ref="table"] {
@@ -203,7 +213,6 @@
     #company-address {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
     }
 
       #company-address > *,
@@ -424,8 +433,12 @@
       /** To find out selectors on your own: https://invoiceninja.github.io/docs/custom-fields/#snippets **/
 </style>
 <div id="header">
-    <h1 class="company-name">$company.name</h1>
-    <table id="entity-details" cellspacing="0" cellpadding="0" dir="$dir"></table>
+    <div id="company-name-wrapper">
+      <h1 class="company-name">$company.name</h1>
+    </div>
+    <div id="entity-details-wrapper">
+      <table id="entity-details" cellspacing="0" cellpadding="0" dir="$dir"></table>
+    </div>
 </div>
 <div id="body">
     <table id="spacer-table" cellspacing="0">

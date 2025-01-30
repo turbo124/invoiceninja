@@ -1750,11 +1750,7 @@ class PdfBuilder
                 ['element' => 'div', 'content' => $this->service->config->client->name, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.name']],
                 ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
                 ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
-                ['element' => 'div', 'show_empty' => false, 'elements' => [
-                    ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['ref' => 'delivery_note-client.shipping_city']],
-                    ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
-                    ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
-                ]],
+                ['element' => 'div', 'content' => "{$this->service->config->client->shipping_city} {$this->service->config->client->shipping_state} {$this->service->config->client->shipping_postal_code}", 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.city_state_postal']],
                 ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false],
             ];
 
@@ -1800,11 +1796,7 @@ class PdfBuilder
             ['element' => 'div', 'content' => ctrans('texts.shipping_address'), 'properties' => ['data-ref' => 'shipping_address-label', 'style' => 'font-weight: bold; text-transform: uppercase']],
             ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address1']],
             ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address2']],
-            ['element' => 'div', 'show_empty' => false, 'elements' => [
-                ['element' => 'p', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_city']],
-                ['element' => 'p', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_state']],
-                ['element' => 'p', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_postal_code']],
-            ]],
+            ['element' => 'div', 'content' => "{$this->service->config->client->shipping_city} {$this->service->config->client->shipping_state} {$this->service->config->client->shipping_postal_code}", 'properties' => ['data-ref' => 'shipping_address-client.city_state_postal']],
             ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_country']],
         ];
 
@@ -1884,7 +1876,7 @@ class PdfBuilder
         $elements = [];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'div', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'company_details-' . substr($variable, 1)]];
         }
 
         return $elements;
@@ -2107,30 +2099,41 @@ class PdfBuilder
 
     public function getEmptyElements(): self
     {
-        foreach ($this->sections as $element) {
+        foreach ($this->sections as $key => $element) {
             if (isset($element['elements'])) {
-                $this->getEmptyChildrens($element['elements']);
+                $this->sections[$key] = $this->getEmptyChildren($element);
             }
         }
 
         return $this;
     }
 
-    public function getEmptyChildrens(array $children)
+    public function getEmptyChildren(array $element): array
     {
-        foreach ($children as $key => $child) {
-            if (isset($child['content']) && isset($child['show_empty']) && $child['show_empty'] === false) {
-                $value = strtr($child['content'], $this->service->html_variables['values']);
-                if ($value === '' || $value === '&nbsp;' || $value === ' ') {
-                    $child['is_empty'] = true;
-                }
+        foreach ($element['elements'] as $key => &$child) {
+            if ($this->isChildEmpty($child)) {
+                $child['is_empty'] = true;
             }
 
             if (isset($child['elements'])) {
-                $this->getEmptyChildrens($child['elements']);
+                $child = $this->getEmptyChildren($child);
             }
         }
 
-        return $this;
+        return $element;
+    }
+
+    private function isChildEmpty(array $child): bool
+    {
+        if (!isset($child['content']) && isset($child['show_empty']) && $child['show_empty'] === false) {
+            return true;
+        }
+
+        if (isset($child['content']) && isset($child['show_empty']) && $child['show_empty'] === false) {
+            $value = strtr($child['content'], $this->service->html_variables['values']);
+            return empty($value) || $value === '&nbsp;' || $value === ' ';
+        }
+
+        return false;
     }
 }

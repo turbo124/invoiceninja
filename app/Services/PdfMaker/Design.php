@@ -328,9 +328,9 @@ class Design extends BaseDesign
                 ['element' => 'div', 'content' => $this->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address1']],
                 ['element' => 'div', 'content' => $this->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'delivery_note-client.shipping_address2']],
                 ['element' => 'div', 'show_empty' => false, 'elements' => [
-                    ['element' => 'span', 'content' => "{$this->client->shipping_city} ", 'properties' => ['ref' => 'delivery_note-client.shipping_city']],
-                    ['element' => 'span', 'content' => "{$this->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
-                    ['element' => 'span', 'content' => "{$this->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
+                    ['element' => 'p', 'content' => "{$this->client->shipping_city} ", 'properties' => ['ref' => 'delivery_note-client.shipping_city']],
+                    ['element' => 'p', 'content' => "{$this->client->shipping_state} ", 'properties' => ['ref' => 'delivery_note-client.shipping_state']],
+                    ['element' => 'p', 'content' => "{$this->client->shipping_postal_code} ", 'properties' => ['ref' => 'delivery_note-client.shipping_postal_code']],
                 ]],
                 ['element' => 'div', 'content' => optional($this->client->shipping_country)->name, 'show_empty' => false],
             ];
@@ -345,7 +345,7 @@ class Design extends BaseDesign
         $variables = $this->context['pdf_variables']['client_details'];
 
         foreach ($variables as $variable) {
-            $elements[] = ['element' => 'div', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'client_details-' . substr($variable, 1)]];
+            $elements[] = ['element' => 'p', 'content' => $variable, 'show_empty' => false, 'properties' => ['data-ref' => 'client_details-' . substr($variable, 1)]];
         }
 
         return $elements;
@@ -406,7 +406,6 @@ class Design extends BaseDesign
             $_variable = explode('.', $variable)[1];
             $_customs = ['custom1', 'custom2', 'custom3', 'custom4'];
 
-            /* 2/7/2022 don't show custom values if they are empty */
             $var = str_replace("custom", "custom_value", $_variable);
 
             if (in_array($_variable, $_customs) && !empty($this->entity->{$var})) {
