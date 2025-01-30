@@ -71,7 +71,7 @@
         border-left: 1px solid #303030;
         padding-left: 1rem;
 
-        grid-template-columns: 1fr auto auto;
+        grid-template-columns: auto auto auto;
         grid-template-areas: "a b c";
         grid-auto-columns: minmax(0, 1fr);
         grid-auto-flow: column;
@@ -86,10 +86,15 @@
     }
 
     .header-wrapper .header-right-side-wrapper #shipping-details {
-        display: $show_shipping_address;
+        display: $show_shipping_address_block;
         flex-direction: column;
         margin-top: 0.8rem;
         grid-area: b;
+    }
+
+    .header-wrapper .header-right-side-wrapper-left-shipping {
+        padding-left: 1rem;
+        border-left: 1px solid #303030;
     }
 
     .header-wrapper .header-right-side-wrapper-right {
@@ -111,6 +116,8 @@
 
     .company-logo {
         max-width: $company_logo_size;
+        float:right;
+        object-fit: contain;
     }
 
     .entity-label {
@@ -466,7 +473,7 @@
                         <div id="client-details"></div>
                         <div id="vendor-details"></div>
                      </div>
-                    <div class="header-right-side-wrapper-left">
+                    <div class="header-right-side-wrapper-left-shipping">
                         <p class="shipping-text-label">$shipping_label:</p>
                         <div id="shipping-details"></div>
                     </div>

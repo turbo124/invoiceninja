@@ -1730,6 +1730,7 @@ class PdfBuilder
             return $elements;
         }
 
+        $this->service->html_variables['values']['$show_paid_stamp'] = 'none';
         $this->service->html_variables['values']['$show_shipping_address_block'] = 'none';
         $this->service->html_variables['values']['$show_shipping_address'] = 'none';
         $this->service->html_variables['values']['$show_shipping_address_visibility'] = 'hidden';
