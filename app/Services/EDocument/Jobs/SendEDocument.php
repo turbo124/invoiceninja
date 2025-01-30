@@ -216,9 +216,9 @@ nlog($payload);
 
         if($activity_id == Activity::EINVOICE_DELIVERY_SUCCESS){
 
-            $std = new \stdClass();
-            $std->guid = str_replace('"', '', $notes);
-            $model->backup = $std;
+            $backup = ($model->backup && is_object($model->backup)) ? $model->backup : new \stdClass();
+            $backup->guid = str_replace('"', '', $notes);
+            $model->backup = $backup;
             $model->saveQuietly();
 
         }

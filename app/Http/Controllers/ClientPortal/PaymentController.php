@@ -65,6 +65,18 @@ class PaymentController extends Controller
         $data = false;
         $gateway = false;
 
+        $invoice = $payment->invoices->filter(function ($invoice) {
+            return isset($invoice->backup->redirect);
+        })->first();
+
+        if ($invoice) {
+            $backup = $invoice->backup;
+            $url = $backup->redirect;
+            unset($backup->redirect);
+            $invoice->saveQuietly();
+            return redirect($url);
+        }
+
         if ($payment->gateway_type_id == GatewayType::DIRECT_DEBIT && $payment->type_id == PaymentType::DIRECT_DEBIT) {
             if (method_exists($payment->company_gateway->driver($payment->client), 'getPaymentIntent')) {
                 $stripe = $payment->company_gateway->driver($payment->client);
