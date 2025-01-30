@@ -97,12 +97,13 @@ class PdfServiceTest extends TestCase
         \App\Models\Design::where('is_custom', false)->cursor()->each(function ($design) use ($max_settings) {
 
 
-            $this->invoice->design_id = $design->id;
-            $this->invoice->save();
+            $this->invoice->design_id = $design->id; 
+            $this->invoice->client->settings->pdf_variables = $max_settings;
+            $this->invoice->push();
             $this->invoice = $this->invoice->fresh();
 
             $invitation = $this->invoice->invitations->first();
-            $invitation = $invitation->fresh();
+            $invitation->setRelation('company', $this->company);
 
             $service = (new PdfService($invitation))->boot();
             $pdf = $service->getPdf();
@@ -132,7 +133,8 @@ class PdfServiceTest extends TestCase
 
 
             $this->invoice->design_id = $design->id;
-            $this->invoice->save();
+            $this->invoice->client->settings = $min_settings;
+            $this->invoice->push();
             $this->invoice = $this->invoice->fresh();
 
             $invitation = $this->invoice->invitations->first();
