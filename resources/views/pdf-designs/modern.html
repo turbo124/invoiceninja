@@ -85,7 +85,7 @@
       .logo-client-wrapper {
         margin-left: 2rem;
         display: grid;
-        grid-template-columns: 1fr auto auto;
+        grid-template-columns: 2fr auto auto ;
         margin-top: 1rem;
         margin-bottom: 1rem;
       }
@@ -98,7 +98,8 @@
         display: flex;
         flex-direction: column;
         margin-left: 10px;
-        margin-right: 10px;
+        margin-right: 2rem;
+        float:right;
 
       }
 
@@ -107,6 +108,7 @@
           flex-direction: column;
           margin-left: 10px;
           margin-right: 10px;
+          float:right;
       }
 
       #client-details > * {
@@ -439,9 +441,9 @@
             <td>
                 <div class="logo-client-wrapper">
                     <img class="company-logo" src="$company.logo" alt="$company.name logo"/>
+                    <div id="shipping-details"></div>
                     <div id="client-details"></div>
                     <div id="vendor-details"></div>
-                    <div id="shipping-details"></div>
                 </div>
                 <div class="table-wrapper">
                     <table id="product-table" cellspacing="0" data-ref="table"></table>

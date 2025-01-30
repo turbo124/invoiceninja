@@ -82,6 +82,75 @@ class PdfServiceTest extends TestCase
 
     }
 
+    public function testMaxInvoiceFields()
+    {
+        $max_settings = json_decode($this->max_pdf_variables);
+
+        $settings = $this->company->settings;
+        $settings->pdf_variables = $max_settings;
+
+        $this->company->settings = $settings;
+        $this->company->save();
+
+        $this->invoice->company->settings->pdf_variables = $max_settings;
+
+        \App\Models\Design::where('is_custom', false)->cursor()->each(function ($design) use ($max_settings) {
+
+
+            $this->invoice->design_id = $design->id;
+            $this->invoice->save();
+            $this->invoice = $this->invoice->fresh();
+
+            $invitation = $this->invoice->invitations->first();
+            $invitation = $invitation->fresh();
+
+            $service = (new PdfService($invitation))->boot();
+            $pdf = $service->getPdf();
+
+            $this->assertNotNull($pdf);
+
+            \Illuminate\Support\Facades\Storage::put('/pdf/max_fields_' . $design->name.'.pdf', $pdf);
+
+        });
+
+
+    }
+
+    public function testMinInvoiceFields()
+    {
+        $min_settings = json_decode($this->min_pdf_variables);
+
+        $settings = $this->company->settings;
+        $settings->pdf_variables = $min_settings;
+
+        $this->company->settings = $settings;
+        $this->company->save();
+
+        $this->invoice->company->settings->pdf_variables = $min_settings;
+
+        \App\Models\Design::where('is_custom', false)->cursor()->each(function ($design) use ($min_settings) {
+
+
+            $this->invoice->design_id = $design->id;
+            $this->invoice->save();
+            $this->invoice = $this->invoice->fresh();
+
+            $invitation = $this->invoice->invitations->first();
+            $invitation = $invitation->fresh();
+
+            $service = (new PdfService($invitation))->boot();
+            $pdf = $service->getPdf();
+
+            $this->assertNotNull($pdf);
+
+            \Illuminate\Support\Facades\Storage::put('/pdf/min_fields_' . $design->name.'.pdf', $pdf);
+
+        });
+
+
+    }
+
+
     public function testStatementPdfGeneration()
     {
 

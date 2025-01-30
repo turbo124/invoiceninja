@@ -1801,9 +1801,9 @@ class PdfBuilder
             ['element' => 'div', 'content' => $this->service->config->client->shipping_address1, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address1']],
             ['element' => 'div', 'content' => $this->service->config->client->shipping_address2, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_address2']],
             ['element' => 'div', 'show_empty' => false, 'elements' => [
-                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_city']],
-                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_state']],
-                ['element' => 'span', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_postal_code']],
+                ['element' => 'p', 'content' => "{$this->service->config->client->shipping_city} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_city']],
+                ['element' => 'p', 'content' => "{$this->service->config->client->shipping_state} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_state']],
+                ['element' => 'p', 'content' => "{$this->service->config->client->shipping_postal_code} ", 'properties' => ['data-ref' => 'shipping_address-client.shipping_postal_code']],
             ]],
             ['element' => 'div', 'content' => optional($this->service->config->client->shipping_country)->name, 'show_empty' => false, 'properties' => ['data-ref' => 'shipping_address-client.shipping_country']],
         ];
