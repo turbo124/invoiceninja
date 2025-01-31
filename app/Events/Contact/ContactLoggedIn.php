@@ -11,11 +11,12 @@
 
 namespace App\Events\Contact;
 
+use App\Models\Company;
 use App\Models\ClientContact;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
 
 /**
  * Class UserLoggedIn.
@@ -26,12 +27,6 @@ class ContactLoggedIn
     use InteractsWithSockets;
     use SerializesModels;
 
-    public $client_contact;
-
-    public $company;
-
-    public $event_vars;
-
     /**
      * Create a new event instance.
      *
@@ -39,7 +34,7 @@ class ContactLoggedIn
      * @param $company
      * @param $event_vars
      */
-    public function __construct(ClientContact $client_contact, $company, $event_vars)
+    public function __construct(public ClientContact $client_contact, public Company $company, public array $event_vars)
     {
         $this->client_contact = $client_contact;
         $this->company = $company;
