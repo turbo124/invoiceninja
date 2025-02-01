@@ -279,17 +279,14 @@
         width:14%;
     } 
 
+    [data-ref='task_table-task.description-th'],
+    [data-ref='product_table-product.description-th'],
     [data-ref='product_table-product.description-td'],
     [data-ref="task_table-task.description-td"] {
-        min-width:100px;
+        min-width:100px !important;;
         overflow-wrap: break-word; 
     }
     
-    [data-ref='task_table-task.description-th'] {
-        overflow-wrap: break-word;
-        min-width: 100px !important;
-    }
-
     [data-ref="product_table-product.unit_cost-td"],
     [data-ref="product_table-product.unit_cost-th"],
     [data-ref='task_table-task.cost-th'],
@@ -310,11 +307,19 @@
         padding-right:0 !important;
     }
 
+    [data-ref="task_table-task.discount-th"],
+    [data-ref="task_table-task.discount-td"],
+    [data-ref="product_table-product.discount-th"],
+    [data-ref="product_table-product.discount-td"] {
+        text-align: left !important;
+        width: 9%;
+    }
+
     [data-ref="task_table-task.tax1-th"],
     [data-ref="task_table-task.tax1-td"],
     [data-ref="product_table-product.tax1-th"],
     [data-ref="product_table-product.tax1-td"] {
-        text-align: center;
+        text-align: center !important;
         width: 9%;
         padding-left:0 !important;
         padding-right:0 !important;
