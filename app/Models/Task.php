@@ -380,16 +380,16 @@ class Task extends BaseModel
 
                 if ($this->company->invoice_task_datelog) {
                     $date_time[] = Carbon::createFromTimestamp((int)$log[0])
-                        // ->setTimeZone($this->company->timezone()->name)
+                        ->setTimeZone($this->company->timezone()->name)
                         ->format($parent_entity->date_format());
                 }
 
                 if ($this->company->invoice_task_timelog) {
                     $date_time[] = Carbon::createFromTimestamp((int)$log[0])
-                        // ->setTimeZone($this->company->timezone()->name)
+                        ->setTimeZone($this->company->timezone()->name)
                         ->format($time_format) . " - " .
                         Carbon::createFromTimestamp((int)$log[1])
-                        // ->setTimeZone($this->company->timezone()->name)
+                        ->setTimeZone($this->company->timezone()->name)
                         ->format($time_format);
                 }
 
