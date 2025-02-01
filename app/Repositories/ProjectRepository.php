@@ -49,7 +49,7 @@ class ProjectRepository extends BaseRepository
                                 $body = '<div class="task-time-details">'.$task->description().'</div>';
                             }
                             else {
-                                $body = '';
+                                $body = $task->description ?? '';
                             }
                             
                             $item = new InvoiceItem();

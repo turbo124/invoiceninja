@@ -29,7 +29,7 @@ class GoCardlessOAuthWebhookController extends Controller
     public function __invoke(WebhookRequest $request)
     {
         foreach ($request->events as $event) {
-            nlog($event['action']);
+            nlog("GoCardless OAuth Webhook: " . $event['action']);
 
             $e = Arr::dot($event);
 

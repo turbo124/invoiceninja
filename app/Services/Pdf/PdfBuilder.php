@@ -729,6 +729,7 @@ class PdfBuilder
      */
     public function buildTableBody(string $type): array
     {
+        
         $elements = [];
 
         $items = $this->transformLineItems($this->service->config->entity->line_items, $type);
@@ -776,6 +777,9 @@ class PdfBuilder
             $table_type = "product_quote_columns";
         }
 
+        $_type = Str::startsWith($type, '$') ? ltrim($type, '$') : $type;
+
+        $column_visibility = $this->getColumnVisibility($this->service->config->entity->line_items, $_type);
 
         foreach ($items as $row) {
             $element = ['element' => 'tr', 'elements' => []];
@@ -804,9 +808,6 @@ class PdfBuilder
                     }
                 }
             } else {
-                $_type = Str::startsWith($type, '$') ? ltrim($type, '$') : $type;
-
-                $column_visibility = $this->getColumnVisibility($this->service->config->entity->line_items, $_type);
                 
                 foreach ($this->service->config->pdf_variables[$table_type] as $key => $cell) {
                     // We want to keep aliases like these:

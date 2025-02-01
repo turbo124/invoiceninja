@@ -295,11 +295,13 @@ class InvitationController extends Controller
 
             if (!session()->get('is_silent')) {
                 event(new InvitationWasViewed($invitation->invoice, $invitation, $invitation->invoice->company, Ninja::eventVars()));
-            }
-
-            if (!session()->get('is_silent')) {
                 $this->fireEntityViewedEvent($invitation, $invoice);
             }
+
+        }
+
+        if (!session()->get('is_silent')) {
+            event(new ContactLoggedIn($invitation->contact, $invitation->contact->company, Ninja::eventVars()));
         }
 
         if ($invoice->partial > 0) {
