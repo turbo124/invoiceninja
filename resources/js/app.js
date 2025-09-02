@@ -26,4 +26,3 @@ document.querySelectorAll('.disposable-alert').forEach((element) => {
 });
 
 import '../../node_modules/@docuninja/builder2.0/dist/builder.iife';
-// import '../../node_modules/@docuninja/builder2.0/dist/builder2.0.standalone.css';
