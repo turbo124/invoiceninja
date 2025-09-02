@@ -123,6 +123,14 @@ class InvoicePay extends Component
 
     }
 
+    #[On('docuninja-signature-captured')]
+    public function docuNinjaSignatureCaptured()
+    {
+        $this->signature_accepted = true;
+
+        // @todo: Rest of events...
+    }
+
     #[On('payable-amount')]
     public function payableAmount($payable_amount)
     {
