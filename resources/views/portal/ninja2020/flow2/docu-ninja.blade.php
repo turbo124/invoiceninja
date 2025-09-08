@@ -27,10 +27,11 @@
     const doc = '{{ $document }}';
     const invitation = '{{ $invitation }}';
     const sig = '{{ $sig }}';
+    const company = '{{ $company_key }}';
     
     const mount = document.getElementById("sign");
     
-    new DocuNinjaSign({ token, document: doc, invitation, sig, endpoint: 'https://docuninja.romulus.com.au' }).mount(mount);
+    new DocuNinjaSign({ token, document: doc, invitation, sig, endpoint: 'https://docuninja.romulus.com.au', company }).mount(mount);
 
     window.addEventListener('builder:sign.submit.success', function () {
         Livewire.dispatch('docuninja-signature-captured');
