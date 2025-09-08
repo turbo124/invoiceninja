@@ -33,6 +33,7 @@ class DocuNinja extends Component
     private ?string $document_id = null;
     private ?string $document_invitation_id = null;
     private ?string $sig = null;
+    private ?string $company_key = null;
 
     public function mount()
     {
@@ -81,6 +82,7 @@ class DocuNinja extends Component
         $this->document_invitation_id = $signable['document_invitation_id'];
         $this->sig = $signable['sig'];
 
+        $this->company_key = $invitation->invoice->company_id;
     }
 
     public function placeholder()
@@ -95,14 +97,13 @@ class DocuNinja extends Component
     
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\View\View
     {
-
         return render('flow2.docu-ninja', [
             'token' => '',
             'document' => $this->document_id,
             'invitation' => $this->document_invitation_id,
             'sig' => $this->sig,
+            'company_key' => $this->company_key,
         ]);
-
     }
 
     /**
