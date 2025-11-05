@@ -95,6 +95,7 @@ class InvoicePay extends Component
     public $required_fields = false;
 
     public $docu_ninja_active = false;
+    
     public $docu_ninja_ready = false;
 
     #[On('update.context')]

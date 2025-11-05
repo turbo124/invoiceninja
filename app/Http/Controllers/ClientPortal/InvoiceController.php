@@ -73,6 +73,10 @@ class InvoiceController extends Controller
 
         $variables = ($invitation && auth()->guard('contact')->user()->client->getSetting('show_accept_invoice_terms')) ? (new HtmlEngine($invitation))->generateLabelsAndValues() : false;
 
+        $docuninja_active = $invoice->company->enable_modules ?? false;
+        $signature_required = $invoice->client->getSetting('require_invoice_signature');
+        $docuninja_signed = $invoice->sync?->dn_completed ?? false;
+
         $data = [
             'invoice' => $invoice->service()->removeUnpaidGatewayFees()->save(),
             'invitation' => $invitation ?: $invoice->invitations->first(),
@@ -81,6 +85,7 @@ class InvoiceController extends Controller
             'variables' => $variables,
             'invoices' => [$invoice->hashed_id],
             'db' => $invoice->company->db,
+            'set_docuninja' => $docuninja_active && !$docuninja_signed && $signature_required,
         ];
 
         if ($request->query('mode') === 'fullscreen') {

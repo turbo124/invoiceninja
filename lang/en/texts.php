@@ -1903,7 +1903,6 @@ $lang = array(
     'sign_here_ux_tip' => 'Use the mouse or your touchpad to trace your signature.',
     'authorization' => 'Authorization',
     'signed' => 'Signed',
-
     'vendor_name' => 'Vendor',
     'entity_state' => 'State',
     'client_created_at' => 'Date Created',
@@ -5672,8 +5671,7 @@ $lang = array(
     'document_archived' => 'Document Archived',
     'document_restored' => 'Document Restored',
     'document_deleted' => 'Document Deleted',
-    
-
+    'sign_now' => 'Sign Now',
 );
 
 return $lang;

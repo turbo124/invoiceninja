@@ -63,11 +63,14 @@
                                 <input type="hidden" name="invoices[]" value="{{ $invoice->hashed_id }}">
                                 <input type="hidden" name="action" value="payment">
 
-                                @if($settings->client_portal_allow_under_payment || $settings->client_portal_allow_over_payment)
+                                @if($set_docuninja)
+                                    @livewire('sign.sign-now', ['invitation_ids' => [$invitation->id], 'entity_type' => 'invoice', 'db' => $invoice->company->db])
+                                @elseif($settings->client_portal_allow_under_payment || $settings->client_portal_allow_over_payment)
                                     <button class="button button-primary bg-primary">{{ ctrans('texts.pay_now') }}</button>
                                 @else
                                     @livewire('pay-now-dropdown', ['total' => $invoice->getPayableAmount(), 'company_id' => $company->id, 'db' => $company->db])
                                 @endif
+                                
                             </div>
                         </div>
                     </div>
@@ -113,6 +116,7 @@
             @if($key)
                 window.history.pushState({}, "", "{{ url("client/invoice/{$key}") }}");
             @endif
+
 
         });
 

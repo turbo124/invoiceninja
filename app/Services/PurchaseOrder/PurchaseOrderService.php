@@ -162,6 +162,16 @@ class PurchaseOrderService
         return $send_email->run();
     }
 
+    public function getDocuNinjaSignable(?\App\Models\PurchaseOrderInvitation $invite = null)
+    {
+
+        if (class_exists(\InvoiceNinja\AdminApi\Services\DocuNinja\DocuNinja::class))
+        {
+            $invite = $invite ?: $this->purchase_order->invitations->first();
+            return (new \InvoiceNinja\AdminApi\Services\DocuNinja\DocuNinja())->signable->get($invite);
+        }
+        
+    }
 
     /**
      * Saves the purchase order.
