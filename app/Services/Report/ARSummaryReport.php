@@ -25,6 +25,7 @@ use App\Utils\Traits\MakesDates;
 use Illuminate\Support\Facades\App;
 use App\Services\Template\TemplateService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class ARSummaryReport extends BaseExport
 {
@@ -47,6 +48,13 @@ class ARSummaryReport extends BaseExport
      * Set to false to rollback to legacy implementation.
      */
     private bool $useOptimizedQuery = true;
+    
+    /**
+     * Chunk size for whereIn queries to avoid SQL limits.
+     * MySQL has max_allowed_packet and whereIn performance degrades with large arrays.
+     * Set to 1000 to safely handle 100,000+ clients without hitting SQL limits.
+     */
+    private int $chunkSize = 1000;
 
     public array $report_keys = [
         'client_name',
@@ -141,21 +149,26 @@ class ARSummaryReport extends BaseExport
 
         $query = $this->filterByUserPermissions($query);
 
-        $clients = $query->orderBy('balance', 'desc')->get();
-        
-        if ($clients->isEmpty()) {
-            return;
-        }
-
-        $clientIds = $clients->pluck('id')->toArray();
-
-        // Fetch all aging data in a single optimized query
-        $agingData = $this->getAgingDataOptimized($clientIds);
-
-        // Build rows from cached data
-        foreach ($clients as $client) {
-            $this->csv->insertOne($this->buildRowOptimized($client, $agingData));
-        }
+        // Process clients in chunks to avoid whereIn() SQL limits
+        // For 100,000 clients, this creates 100 chunks with 1 query each
+        $query->orderBy('balance', 'desc')
+            ->chunk($this->chunkSize, function ($clientChunk) {
+                $clientIds = $clientChunk->pluck('id')->toArray();
+                
+                if (empty($clientIds)) {
+                    return true; // Continue to next chunk
+                }
+                
+                // Fetch aging data for this chunk (1 query per chunk)
+                $agingData = $this->getAgingDataOptimized($clientIds);
+                
+                // Build rows from cached data
+                foreach ($clientChunk as $client) {
+                    $this->csv->insertOne($this->buildRowOptimized($client, $agingData));
+                }
+                
+                return true; // Continue to next chunk
+            });
     }
 
     public function getPdf()
@@ -186,9 +199,16 @@ class ARSummaryReport extends BaseExport
     /**
      * Fetch all aging data for multiple clients in a single query.
      * Uses CASE statements to calculate all aging buckets in one pass.
+     * 
+     * @param array $clientIds Array of client IDs (should be ≤ 1000 from chunking)
+     * @return Collection Aging data keyed by client_id
      */
-    private function getAgingDataOptimized(array $clientIds): \Illuminate\Support\Collection
+    private function getAgingDataOptimized(array $clientIds): Collection
     {
+        if (empty($clientIds)) {
+            return collect([]);
+        }
+        
         $now = now()->startOfDay();
         $nowStr = $now->toDateString();
         $date_30 = $now->copy()->subDays(30)->toDateString();
@@ -256,7 +276,7 @@ class ARSummaryReport extends BaseExport
     /**
      * Build row using pre-fetched aging data (optimized).
      */
-    private function buildRowOptimized(Client $client, \Illuminate\Support\Collection $agingData): array
+    private function buildRowOptimized(Client $client, Collection $agingData): array
     {
         $data = $agingData->get($client->id);
 
