@@ -5674,6 +5674,8 @@ $lang = array(
     'document_deleted' => 'Document Deleted',
     'sign_now' => 'Sign Now',
     'signed_document' => 'Signed Document',
+    'or_import_from' => 'or import from',
+    'google_drive' => 'Google Drive',
 );
 
 return $lang;
