@@ -5674,6 +5674,16 @@ $lang = array(
     'document_deleted' => 'Document Deleted',
     'sign_now' => 'Sign Now',
     'signed_document' => 'Signed Document',
+    'element' => 'Element',
+    'tips_and_notes' => 'Tips & notes',
+    'default_checkbox_label' => 'Checkbox has default label, considering changing it.',
+    'empty_checkbox_label' => 'Checkbox has no label, we recommend adding one.',
+    'select_needs_two_options' => 'Select dropdown has less than two options.',
+    'default_select_label' => 'Select dropdown has default label, consider changing it.',
+    'radio_needs_two_options' => 'Radio group has less than two options.',
+    'default_radio_group_label' => 'Radio group has default label, consider changing it.',
+    'multiselect_needs_two_options' => 'Multi-select has less than two options.',
+    'default_multiselect_label' => 'Multi-select has default label, consider changing it.',
 );
 
 return $lang;
