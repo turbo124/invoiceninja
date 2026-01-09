@@ -5674,6 +5674,12 @@ $lang = array(
     'document_deleted' => 'Document Deleted',
     'sign_now' => 'Sign Now',
     'signed_document' => 'Signed Document',
+    'tour_document_upload' => 'To start signing documents, you can upload them here. Simply drag and drop your files into this area.',
+    'tour_signatory_selector' => 'This is signatory selector. Use it to manage your document signatories. Select a signatory to continue.',
+    'tour_continue_select_signatory' => 'Continue and select a signatory',
+    'tour_toolbox_description' => 'On the right you can see the toolbox. There you can find various fields and elements to add to your document for signatories to interact with. We have already picked signature. Click to continue.',
+    'tour_document_canvas' => 'This is your document canvas. You can draw and place fields for your signatories here.',
+    'tour_save_document' => 'Finally, click here to save your document.',
 );
 
 return $lang;
