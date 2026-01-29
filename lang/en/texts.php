@@ -5674,6 +5674,8 @@ $lang = array(
     'document_deleted' => 'Document Deleted',
     'sign_now' => 'Sign Now',
     'signed_document' => 'Signed Document',
+    'create_signature' => 'Create Signature',
+    'signature_name' => 'Signature Name',
 );
 
 return $lang;
