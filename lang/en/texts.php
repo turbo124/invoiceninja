@@ -5677,6 +5677,7 @@ $lang = array(
     'create_signature' => 'Create Signature',
     'signature_name' => 'Signature Name',
     'close_tab' => 'Close Tab',
+    'sign' => 'Sign',
 );
 
 return $lang;
