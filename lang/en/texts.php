@@ -5676,6 +5676,9 @@ $lang = array(
     'signed_document' => 'Signed Document',
     'or_import_from' => 'or import from',
     'google_drive' => 'Google Drive',
+    'successfully_signed_document' => 'You have successfully signed the document.',
+    'download_signed_document' => 'You’ll receive an email once the document is finalized—immediately for self-signed, or after all parties have signed.',
+
 );
 
 return $lang;
