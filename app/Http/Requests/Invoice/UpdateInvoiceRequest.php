@@ -106,6 +106,8 @@ class UpdateInvoiceRequest extends Request
             },
         ];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

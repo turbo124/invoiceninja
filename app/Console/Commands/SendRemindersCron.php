@@ -82,7 +82,7 @@ class SendRemindersCron extends Command
                          $invoice = $this->calcLateFee($invoice, $reminder_template);
 
                          //check if this reminder needs to be emailed
-                         if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3']) && $invoice->client->getSetting('enable_' . $reminder_template)) {
+                         if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3']) && $invoice->getSetting('enable_' . $reminder_template)) {
                              $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
                                  EmailEntity::dispatch($invitation->withoutRelations(), $invitation->company->db, $reminder_template);
                                  nlog("Firing reminder email for invoice {$invoice->number}");
@@ -111,20 +111,20 @@ class SendRemindersCron extends Command
 
         switch ($template) {
             case 'reminder1':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_amount1');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_percent1');
+                $late_fee_amount = $invoice->getSetting('late_fee_amount1');
+                $late_fee_percent = $invoice->getSetting('late_fee_percent1');
                 break;
             case 'reminder2':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_amount2');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_percent2');
+                $late_fee_amount = $invoice->getSetting('late_fee_amount2');
+                $late_fee_percent = $invoice->getSetting('late_fee_percent2');
                 break;
             case 'reminder3':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_amount3');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_percent3');
+                $late_fee_amount = $invoice->getSetting('late_fee_amount3');
+                $late_fee_percent = $invoice->getSetting('late_fee_percent3');
                 break;
             case 'endless_reminder':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_endless_amount');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_endless_percent');
+                $late_fee_amount = $invoice->getSetting('late_fee_endless_amount');
+                $late_fee_percent = $invoice->getSetting('late_fee_endless_percent');
                 break;
             default:
                 $late_fee_amount = 0;
@@ -148,7 +148,7 @@ class SendRemindersCron extends Command
     {
         App::forgetInstance('translator');
         $t = app('translator');
-        $t->replace(Ninja::transformTranslations($invoice->client->getMergedSettings()));
+        $t->replace(Ninja::transformTranslations($invoice->getMergedSettings()));
         App::setLocale($invoice->client->locale());
 
         $temp_invoice_balance = $invoice->balance;

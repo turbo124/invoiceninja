@@ -75,7 +75,7 @@ class SendRecurring implements ShouldQueue
         $invoice->recurring_id = $this->recurring_invoice->id;
         $invoice->saveQuietly();
 
-        if ($invoice->client->getSetting('auto_email_invoice')) {
+        if ($this->recurring_invoice->getSetting('auto_email_invoice')) {
             $invoice = $invoice->service()
                                ->markSent()
                                ->applyNumber()
@@ -116,26 +116,26 @@ class SendRecurring implements ShouldQueue
         event(new InvoiceWasCreated($invoice, $invoice->company, Ninja::eventVars()));
 
         //auto bill, BUT NOT DRAFTS!!
-        if ($invoice->auto_bill_enabled && $invoice->client->getSetting('auto_bill_date') == 'on_send_date' && $invoice->client->getSetting('auto_email_invoice')) {
+        if ($invoice->auto_bill_enabled && $this->recurring_invoice->getSetting('auto_bill_date') == 'on_send_date' && $this->recurring_invoice->getSetting('auto_email_invoice')) {
             nlog("attempting to autobill {$invoice->number}");
             AutoBill::dispatch($invoice->id, $this->db, true)->delay(rand(1, 2));
 
             //04-08-2023 edge case to support where online payment notifications are not enabled
-            if (!$invoice->client->getSetting('client_online_payment_notification')) {
+            if (!$invoice->getSetting('client_online_payment_notification')) {
                 $this->sendRecurringEmails($invoice);
                 $invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
             }
-        } elseif ($invoice->auto_bill_enabled && $invoice->client->getSetting('auto_bill_date') == 'on_due_date' && $invoice->client->getSetting('auto_email_invoice') && ($invoice->due_date && Carbon::parse($invoice->due_date)->startOfDay()->lte(now()->startOfDay()))) {
+        } elseif ($invoice->auto_bill_enabled && $this->recurring_invoice->getSetting('auto_bill_date') == 'on_due_date' && $this->recurring_invoice->getSetting('auto_email_invoice') && ($invoice->due_date && Carbon::parse($invoice->due_date)->startOfDay()->lte(now()->startOfDay()))) {
             nlog("attempting to autobill {$invoice->number}");
             AutoBill::dispatch($invoice->id, $this->db, true)->delay(rand(1, 2));
 
             //04-08-2023 edge case to support where online payment notifications are not enabled
-            if (!$invoice->client->getSetting('client_online_payment_notification')) {
+            if (!$invoice->getSetting('client_online_payment_notification')) {
                 $this->sendRecurringEmails($invoice);
                 $invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
             }
 
-        } elseif ($invoice->client->getSetting('auto_email_invoice')) {
+        } elseif ($this->recurring_invoice->getSetting('auto_email_invoice')) {
             $this->sendRecurringEmails($invoice);
             $invoice->sendEvent(Webhook::EVENT_SENT_INVOICE, "client");
         }
@@ -159,7 +159,7 @@ class SendRecurring implements ShouldQueue
         }
 
         $invoice->invitations->each(function ($invitation) use ($invoice) {
-            if ($invitation->contact && ! $invitation->contact->trashed() && strlen($invitation->contact->email) >= 1 && $invoice->client->getSetting('auto_email_invoice') && !$invitation->contact->is_locked) {
+            if ($invitation->contact && ! $invitation->contact->trashed() && strlen($invitation->contact->email) >= 1 && $this->recurring_invoice->getSetting('auto_email_invoice') && !$invitation->contact->is_locked) {
                 try {
                     EmailEntity::dispatch($invitation->withoutRelations(), $invoice->company->db, 'invoice')->delay(rand(1, 2));
                 } catch (\Exception $e) {

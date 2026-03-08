@@ -25,6 +25,7 @@ use App\Utils\Helpers;
 use App\Utils\Ninja;
 use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\SavesDocuments;
+use App\DataMapper\EntitySettings;
 
 class BaseRepository
 {
@@ -182,6 +183,16 @@ class BaseRepository
             unset($tmp_data['client_contacts']);
         }
 
+        /* Extract entity-level settings before fill (stored in backup, not a direct column) */
+        $entity_settings = null;
+        if (isset($tmp_data['settings'])) {
+            $entity_settings = EntitySettings::filterEntitySettings($tmp_data['settings']);
+            if (count((array) $entity_settings) === 0) {
+                $entity_settings = null;
+            }
+            unset($tmp_data['settings']);
+        }
+
         $model->fill($tmp_data);
 
         $model->custom_surcharge_tax1 = $client->getSetting('e_invoice_type') == 'PEPPOL' ? true : $client->company->custom_surcharge_taxes1;
@@ -199,6 +210,13 @@ class BaseRepository
                     return $item;
                 });
             }
+        }
+
+        /* Apply entity-level settings to the backup column */
+        if (array_key_exists('settings', $data)) {
+            $backup = $model->backup ?? new \App\DataMapper\InvoiceBackup();
+            $backup->settings = $entity_settings ? (object) $entity_settings : null;
+            $model->backup = $backup;
         }
 
         $model->saveQuietly();

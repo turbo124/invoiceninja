@@ -72,6 +72,8 @@ class UpdateRecurringInvoiceRequest extends Request
         $rules['location_id'] = ['nullable', 'sometimes','bail', Rule::exists('locations', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->recurring_invoice->client_id)];
         $rules['vendor_id'] = ['nullable', 'sometimes','bail', Rule::exists('vendors', 'id')->where('company_id', $user->company()->id)];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

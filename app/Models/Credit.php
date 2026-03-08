@@ -22,6 +22,8 @@ use App\Utils\Traits\MakesHash;
 use App\Helpers\Invoice\InvoiceSum;
 use Illuminate\Support\Facades\App;
 use App\Utils\Traits\MakesReminders;
+use App\Utils\Traits\EntitySettingsResolver;
+use App\Utils\Traits\EntitySettingsSaver;
 use App\Services\Credit\CreditService;
 use App\Services\Ledger\LedgerService;
 use App\Events\Credit\CreditWasEmailed;
@@ -152,6 +154,8 @@ class Credit extends BaseModel
     use MakesInvoiceValues;
     use MakesReminders;
     use Searchable;
+    use EntitySettingsResolver;
+    use EntitySettingsSaver;
 
     /**
      * Get the index name for the model.
@@ -213,7 +217,6 @@ class Credit extends BaseModel
         'is_amount_discount' => 'bool',
         'e_invoice' => 'object',
         'sync' => InvoiceSync::class,
-
     ];
 
     protected $touches = [];

@@ -90,6 +90,8 @@ class StoreInvoiceRequest extends Request
 
         // $rules['modified_invoice_id'] = ['bail', 'sometimes', 'nullable', new CanGenerateModificationInvoice()];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

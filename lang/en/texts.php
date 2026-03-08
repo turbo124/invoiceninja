@@ -4270,6 +4270,7 @@ $lang = array(
     'no_payment_types_enabled' => 'No payment types enabled',
     'wait_for_data' => 'Please wait for the data to finish loading',
     'net_total' => 'Net Total',
+    'net_cost' => 'Net Cost',
     'has_taxes' => 'Has Taxes',
     'import_customers' => 'Import Customers',
     'imported_customers' => 'Successfully started importing customers',

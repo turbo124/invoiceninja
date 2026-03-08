@@ -25,7 +25,7 @@ class UpdateReminder extends AbstractService
     public function run()
     {
         if (! $this->settings) {
-            $this->settings = $this->quote->client->getMergedSettings();
+            $this->settings = $this->quote->getMergedSettings();
         }
 
         if (!$this->quote->canRemind()) {

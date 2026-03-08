@@ -150,6 +150,7 @@ class CreditTransformer extends EntityTransformer
             'location_id' => $this->encodePrimaryKey($credit->location_id),
             'backup' => $credit->backup,
             'sync' => $credit->sync,
+            'settings' => $credit->backup?->settings,
         ];
     }
 }

@@ -44,6 +44,7 @@ class InvoiceBackup implements Castable
         public ?string $redirect = null,
         public float $adjustable_amount = 0,
         public ?string $notes = null,
+        public ?\stdClass $settings = null,
     ) {}
 
     /**
@@ -68,6 +69,7 @@ class InvoiceBackup implements Castable
             redirect: $data['redirect'] ?? null,
             adjustable_amount: $data['adjustable_amount'] ?? 0,
             notes: $data['notes'] ?? null,
+            settings: isset($data['settings']) ? (object) $data['settings'] : null,
         );
     }
 

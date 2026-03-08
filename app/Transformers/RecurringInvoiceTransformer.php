@@ -148,6 +148,7 @@ class RecurringInvoiceTransformer extends EntityTransformer
             'subscription_id' => (string) $this->encodePrimaryKey($invoice->subscription_id),
             'e_invoice' => $invoice->e_invoice ?: new \stdClass(),
             'location_id' => $this->encodePrimaryKey($invoice->location_id),
+            'settings' => $invoice->backup?->settings,
         ];
 
         if (request()->has('show_dates') && request()->query('show_dates') == 'true') {

@@ -84,6 +84,8 @@ class UpdateCreditRequest extends Request
 
         $rules['e_invoice'] = ['sometimes', 'nullable', new ValidCreditScheme()];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

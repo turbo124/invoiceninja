@@ -12,6 +12,7 @@
 
 namespace App\Models;
 
+use App\DataMapper\InvoiceBackup;
 use App\Utils\Number;
 use Elastic\ScoutDriverPlus\Searchable;
 use Illuminate\Support\Carbon;
@@ -22,6 +23,8 @@ use Laracasts\Presenter\PresentableTrait;
 use App\Helpers\Invoice\InvoiceSumInclusive;
 use App\Services\Recurring\RecurringService;
 use App\Utils\Traits\Recurring\HasRecurrence;
+use App\Utils\Traits\EntitySettingsResolver;
+use App\Utils\Traits\EntitySettingsSaver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Presenters\RecurringInvoicePresenter;
 
@@ -139,7 +142,8 @@ class RecurringInvoice extends BaseModel
     use HasRecurrence;
     use PresentableTrait;
     use Searchable;
-
+    use EntitySettingsResolver;
+    use EntitySettingsSaver;
 
     protected $presenter = RecurringInvoicePresenter::class;
 
@@ -237,9 +241,8 @@ class RecurringInvoice extends BaseModel
     ];
 
     protected $casts = [
-        'settings' => 'object',
         'line_items' => 'object',
-        'backup' => 'object',
+        'backup' => InvoiceBackup::class,
         'updated_at' => 'timestamp',
         'created_at' => 'timestamp',
         'deleted_at' => 'timestamp',

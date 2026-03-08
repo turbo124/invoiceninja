@@ -19,6 +19,8 @@ use App\DataMapper\InvoiceSync;
 use App\Helpers\Invoice\InvoiceSum;
 use Illuminate\Support\Facades\App;
 use App\Utils\Traits\MakesReminders;
+use App\Utils\Traits\EntitySettingsResolver;
+use App\Utils\Traits\EntitySettingsSaver;
 use App\Utils\Traits\NumberFormatter;
 use App\Services\Ledger\LedgerService;
 use App\Services\Invoice\InvoiceService;
@@ -159,6 +161,8 @@ class Invoice extends BaseModel
     use MakesReminders;
     use ActionsInvoice;
     use Searchable;
+    use EntitySettingsResolver;
+    use EntitySettingsSaver;
 
     protected $presenter = EntityPresenter::class;
 
@@ -229,7 +233,6 @@ class Invoice extends BaseModel
         'custom_surcharge_tax4' => 'bool',
         'e_invoice' => 'object',
         'sync' => InvoiceSync::class,
-
     ];
 
     protected $with = [];

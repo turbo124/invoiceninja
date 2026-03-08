@@ -12,6 +12,7 @@
 
 namespace App\Repositories;
 
+use App\DataMapper\EntitySettings;
 use App\Factory\PurchaseOrderInvitationFactory;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderInvitation;
@@ -26,7 +27,25 @@ class PurchaseOrderRepository extends BaseRepository
 
     public function save(array $data, PurchaseOrder $purchase_order): ?PurchaseOrder
     {
+        /* Extract entity-level settings before fill (stored in backup, not a direct column) */
+        $has_settings = array_key_exists('settings', $data);
+        $entity_settings = null;
+        if ($has_settings) {
+            $entity_settings = EntitySettings::filterEntitySettings($data['settings']);
+            if (count((array) $entity_settings) === 0) {
+                $entity_settings = null;
+            }
+            unset($data['settings']);
+        }
+
         $purchase_order->fill($data);
+
+        /* Apply entity-level settings to the backup column */
+        if ($has_settings) {
+            $backup = $purchase_order->backup ?? new \App\DataMapper\InvoiceBackup();
+            $backup->settings = $entity_settings ? (object) $entity_settings : null;
+            $purchase_order->backup = $backup;
+        }
 
         $purchase_order->save();
         $dn_enabled = $purchase_order->company->docuninjaActive();

@@ -1044,6 +1044,8 @@ class PdfBuilder
 
                 $data[$key][$table_type . '.unit_cost'] = $this->service->config->formatMoneyNoRounding($item->cost);
 
+                $data[$key][$table_type . '.net_cost'] = $this->service->config->formatMoneyNoRounding($item->net_cost ?? 0);
+
                 $data[$key][$table_type . '.cost'] = $this->service->config->formatMoney($item->cost);
 
                 $data[$key][$table_type . '.line_total'] = $this->service->config->formatMoneyNoRounding($item->line_total);
@@ -1051,6 +1053,8 @@ class PdfBuilder
                 $data[$key][$table_type . '.quantity'] = '';
 
                 $data[$key][$table_type . '.unit_cost'] = '';
+
+                $data[$key][$table_type . '.net_cost'] = '';
 
                 $data[$key][$table_type . '.cost'] = '';
 

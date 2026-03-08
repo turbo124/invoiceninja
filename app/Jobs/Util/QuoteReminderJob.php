@@ -115,7 +115,7 @@ class QuoteReminderJob implements ShouldQueue
     {
         App::forgetInstance('translator');
         $t = app('translator');
-        $t->replace(Ninja::transformTranslations($quote->client->getMergedSettings()));
+        $t->replace(Ninja::transformTranslations($quote->getMergedSettings()));
         App::setLocale($quote->client->locale());
 
         if ($quote->canRemind()) {
@@ -132,8 +132,8 @@ class QuoteReminderJob implements ShouldQueue
             $enabled_reminder = 'enable_quote_' . $reminder_template;
 
             if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3', 'reminder_endless', 'endless_reminder'])
-        && $quote->client->getSetting($enabled_reminder)
-        && $quote->client->getSetting('send_reminders')
+        && $quote->getSetting($enabled_reminder)
+        && $quote->getSetting('send_reminders')
         && (Ninja::isSelfHost() || $quote->company->account->isPaidHostedClient())) {
                 $quote->invitations->each(function ($invitation) use ($quote, $reminder_template) {
                     if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email && !$invitation->contact->is_locked) {

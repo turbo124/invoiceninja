@@ -83,6 +83,8 @@ class StoreQuoteRequest extends Request
 
         $rules['location_id'] = ['nullable', 'sometimes','bail',Rule::exists('locations', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->client_id)];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

@@ -154,6 +154,7 @@ class PurchaseOrderTransformer extends EntityTransformer
             'e_invoice' => $purchase_order->e_invoice ?: new \stdClass(),
             'location_id' => $this->encodePrimaryKey($purchase_order->location_id),
             'sync' => $purchase_order->sync,
+            'settings' => $purchase_order->backup?->settings,
         ];
     }
 }

@@ -72,11 +72,11 @@ class AutoBillInvoice extends AbstractService
         }
 
         //if the credits cover the payments, we stop here, build the payment with credits and exit early
-        if ($this->client->getSetting('use_credits_payment') != 'off') {
+        if ($this->invoice->getSetting('use_credits_payment') != 'off') {
             $this->applyCreditPayment();
         }
 
-        if ($this->client->getSetting('use_unapplied_payment') != 'off') {
+        if ($this->invoice->getSetting('use_unapplied_payment') != 'off') {
             $this->applyUnappliedPayment();
         }
 
@@ -444,7 +444,7 @@ class AutoBillInvoice extends AbstractService
      */
     public function getGateway($amount)
     {
-        $company_gateway_ids = $this->client->getSetting('company_gateway_ids');
+        $company_gateway_ids = $this->invoice->getSetting('company_gateway_ids');
 
         $transformed_ids = false;
 

@@ -676,7 +676,8 @@ class HtmlEngine
         $data['$product.gross_line_total'] = ['value' => '', 'label' => ctrans('texts.gross_line_total')];
         $data['$product.tax_amount'] = ['value' => '', 'label' => ctrans('texts.tax')];
         $data['$product.description'] = ['value' => '', 'label' => ctrans('texts.description')];
-        $data['$product.unit_cost'] = ['value' => '', 'label' => ctrans('texts.unit_cost')];
+        
+        $data['$product.net_cost'] = ['value' => '', 'label' => ctrans('texts.net_cost')];
         $data['$product.product1'] = ['value' => '', 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'product1')];
         $data['$product.product2'] = ['value' => '', 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'product2')];
         $data['$product.product3'] = ['value' => '', 'label' => $this->helpers->makeCustomField($this->company->custom_fields, 'product3')];

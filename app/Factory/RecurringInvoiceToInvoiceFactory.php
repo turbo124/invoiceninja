@@ -71,6 +71,13 @@ class RecurringInvoiceToInvoiceFactory
         $invoice->vendor_id = $recurring_invoice->vendor_id;
         $invoice->location_id = $recurring_invoice->location_id;
 
+        /* Copy entity-level settings from recurring invoice backup to new invoice backup */
+        if ($recurring_invoice->backup?->settings) {
+            $backup = $invoice->backup ?? new \App\DataMapper\InvoiceBackup();
+            $backup->settings = $recurring_invoice->backup->settings;
+            $invoice->backup = $backup;
+        }
+
         return $invoice;
     }
 

@@ -112,7 +112,7 @@ class ReminderJob implements ShouldQueue
     {
         App::forgetInstance('translator');
         $t = app('translator');
-        $t->replace(Ninja::transformTranslations($invoice->client->getMergedSettings()));
+        $t->replace(Ninja::transformTranslations($invoice->getMergedSettings()));
         App::setLocale($invoice->client->locale());
 
         if ($invoice->isPayable()) {
@@ -142,8 +142,8 @@ class ReminderJob implements ShouldQueue
             }
 
             if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3', 'reminder_endless', 'endless_reminder'])
-            && $invoice->client->getSetting($enabled_reminder)
-            && $invoice->client->getSetting('send_reminders')
+            && $invoice->getSetting($enabled_reminder)
+            && $invoice->getSetting('send_reminders')
             && (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
 
                 $event_fired = false;
@@ -228,8 +228,8 @@ class ReminderJob implements ShouldQueue
         }
 
         if (in_array($reminder_template, ['reminder1', 'reminder2', 'reminder3', 'reminder_endless', 'endless_reminder'])
-                && $invoice->client->getSetting($enabled_reminder)
-                && $invoice->client->getSetting('send_reminders')
+                && $over_due_invoice->getSetting($enabled_reminder)
+                && $over_due_invoice->getSetting('send_reminders')
                 && (Ninja::isSelfHost() || $invoice->company->account->isPaidHostedClient())) {
             $invoice->invitations->each(function ($invitation) use ($invoice, $reminder_template) {
                 if ($invitation->contact && !$invitation->contact->trashed() && $invitation->contact->email && !$invitation->contact->is_locked) {
@@ -260,20 +260,20 @@ class ReminderJob implements ShouldQueue
 
         switch ($template) {
             case 'reminder1':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_amount1');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_percent1');
+                $late_fee_amount = $invoice->getSetting('late_fee_amount1');
+                $late_fee_percent = $invoice->getSetting('late_fee_percent1');
                 break;
             case 'reminder2':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_amount2');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_percent2');
+                $late_fee_amount = $invoice->getSetting('late_fee_amount2');
+                $late_fee_percent = $invoice->getSetting('late_fee_percent2');
                 break;
             case 'reminder3':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_amount3');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_percent3');
+                $late_fee_amount = $invoice->getSetting('late_fee_amount3');
+                $late_fee_percent = $invoice->getSetting('late_fee_percent3');
                 break;
             case 'endless_reminder':
-                $late_fee_amount = $invoice->client->getSetting('late_fee_endless_amount');
-                $late_fee_percent = $invoice->client->getSetting('late_fee_endless_percent');
+                $late_fee_amount = $invoice->getSetting('late_fee_endless_amount');
+                $late_fee_percent = $invoice->getSetting('late_fee_endless_percent');
                 break;
             default:
                 $late_fee_amount = 0;

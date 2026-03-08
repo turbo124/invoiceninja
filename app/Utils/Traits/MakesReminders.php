@@ -30,7 +30,7 @@ trait MakesReminders
     {
         /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this **/
         $offset = $this->client->timezone_offset();
-        $entity_send_time = $this->client->getSetting('entity_send_time');
+        $entity_send_time = $this->getSetting('entity_send_time');
 
         switch ($schedule_reminder) {
             case 'after_invoice_date':
@@ -96,30 +96,29 @@ trait MakesReminders
     {
 
         /** @var \App\Models\Invoice | \App\Models\Quote | \App\Models\RecurringInvoice  | \App\Models\Credit $this **/
-        $client = $this->client;
 
         if ($entity_string != 'invoice') {
             return $entity_string;
         }
 
         if ($this->inReminderWindow(
-            $client->getSetting('schedule_reminder1'),
-            $client->getSetting('num_days_reminder1')
+            $this->getSetting('schedule_reminder1'),
+            $this->getSetting('num_days_reminder1')
         ) && ! $this->reminder1_sent) {
             return 'reminder1';
         } elseif ($this->inReminderWindow(
-            $client->getSetting('schedule_reminder2'),
-            $client->getSetting('num_days_reminder2')
+            $this->getSetting('schedule_reminder2'),
+            $this->getSetting('num_days_reminder2')
         ) && ! $this->reminder2_sent) {
             return 'reminder2';
         } elseif ($this->inReminderWindow(
-            $client->getSetting('schedule_reminder3'),
-            $client->getSetting('num_days_reminder3')
+            $this->getSetting('schedule_reminder3'),
+            $this->getSetting('num_days_reminder3')
         ) && ! $this->reminder3_sent) {
             return 'reminder3';
         } elseif ($this->checkEndlessReminder(
             $this->reminder_last_sent,
-            $client->getSetting('endless_reminder_frequency_id')
+            $this->getSetting('endless_reminder_frequency_id')
         )) {
             return 'endless_reminder';
         } else {

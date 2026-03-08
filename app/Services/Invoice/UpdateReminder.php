@@ -26,7 +26,7 @@ class UpdateReminder extends AbstractService
     public function run()
     {
         if (! $this->settings) {
-            $this->settings = $this->invoice->client->getMergedSettings();
+            $this->settings = $this->invoice->getMergedSettings();
         }
 
         if (! $this->invoice->isPayable() || $this->invoice->status_id == Invoice::STATUS_DRAFT) {

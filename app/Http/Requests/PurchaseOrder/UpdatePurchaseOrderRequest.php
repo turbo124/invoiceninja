@@ -74,6 +74,8 @@ class UpdatePurchaseOrderRequest extends Request
 
         $rules['location_id'] = ['nullable', 'sometimes','bail', Rule::exists('locations', 'id')->where('company_id', $user->company()->id)->where('vendor_id', $this->purchase_order->vendor_id)];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

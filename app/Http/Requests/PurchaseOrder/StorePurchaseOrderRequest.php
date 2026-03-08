@@ -73,6 +73,8 @@ class StorePurchaseOrderRequest extends Request
         $rules['custom_surcharge4'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
         $rules['location_id'] = ['nullable', 'sometimes', 'bail', Rule::exists('locations', 'id')->where('company_id', $user->company()->id)->where('vendor_id', $this->vendor_id)];
 
+        $rules['settings'] = 'sometimes|nullable';
+
         return $rules;
     }
 

@@ -12,6 +12,7 @@
 
 namespace App\Models;
 
+use App\DataMapper\InvoiceBackup;
 use App\DataMapper\QuoteSync;
 use App\Utils\Ninja;
 use App\Utils\Number;
@@ -22,6 +23,8 @@ use App\Helpers\Invoice\InvoiceSum;
 use Illuminate\Support\Facades\App;
 use App\Services\Quote\QuoteService;
 use App\Utils\Traits\MakesReminders;
+use App\Utils\Traits\EntitySettingsResolver;
+use App\Utils\Traits\EntitySettingsSaver;
 use App\Events\Quote\QuoteWasEmailed;
 use App\Utils\Traits\MakesInvoiceValues;
 use App\Models\Presenters\QuotePresenter;
@@ -136,6 +139,8 @@ class Quote extends BaseModel
     use PresentableTrait;
     use MakesInvoiceValues;
     use Searchable;
+    use EntitySettingsResolver;
+    use EntitySettingsSaver;
 
     /**
      * Get the index name for the model.
@@ -196,7 +201,7 @@ class Quote extends BaseModel
         'due_date' => 'date:Y-m-d',
         'partial_due_date' => 'date:Y-m-d',
         'line_items' => 'object',
-        'backup' => 'object',
+        'backup' => InvoiceBackup::class,
         'updated_at' => 'timestamp',
         'created_at' => 'timestamp',
         'deleted_at' => 'timestamp',
@@ -204,7 +209,6 @@ class Quote extends BaseModel
         'is_amount_discount' => 'bool',
         'e_invoice' => 'object',
         'sync' => QuoteSync::class,
-
     ];
 
     public const STATUS_DRAFT = 1;
@@ -466,15 +470,13 @@ class Quote extends BaseModel
     public function calculateTemplate(string $entity_string): string
     {
 
-        $client = $this->client;
-
         if ($entity_string != 'quote') {
             return $entity_string;
         }
 
         if ($this->inReminderWindow(
-            $client->getSetting('quote_schedule_reminder1'),
-            $client->getSetting('quote_num_days_reminder1')
+            $this->getSetting('quote_schedule_reminder1'),
+            $this->getSetting('quote_num_days_reminder1')
         ) && ! $this->reminder1_sent) {
             return 'reminder1';
             // } elseif ($this->inReminderWindow(

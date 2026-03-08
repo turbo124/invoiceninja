@@ -15,12 +15,15 @@ namespace App\Models;
 use App\Utils\Ninja;
 use App\Utils\Number;
 use Illuminate\Support\Carbon;
+use App\DataMapper\InvoiceBackup;
 use App\DataMapper\PurchaseOrderSync;
 use App\Helpers\Invoice\InvoiceSum;
 use Illuminate\Support\Facades\App;
 use Elastic\ScoutDriverPlus\Searchable;
 use App\Helpers\Invoice\InvoiceSumInclusive;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Utils\Traits\EntitySettingsResolver;
+use App\Utils\Traits\EntitySettingsSaver;
 use App\Services\PurchaseOrder\PurchaseOrderService;
 use App\Events\PurchaseOrder\PurchaseOrderWasEmailed;
 
@@ -136,6 +139,8 @@ class PurchaseOrder extends BaseModel
     use Filterable;
     use SoftDeletes;
     use Searchable;
+    use EntitySettingsResolver;
+    use EntitySettingsSaver;
 
     /**
      * Get the index name for the model.
@@ -212,7 +217,7 @@ class PurchaseOrder extends BaseModel
 
     protected $casts = [
         'line_items' => 'object',
-        'backup' => 'object',
+        'backup' => InvoiceBackup::class,
         'updated_at' => 'timestamp',
         'created_at' => 'timestamp',
         'deleted_at' => 'timestamp',
