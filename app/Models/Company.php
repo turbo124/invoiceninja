@@ -544,6 +544,11 @@ class Company extends BaseModel
         return $this->hasMany(Webhook::class);
     }
 
+    public function workflows(): HasMany
+    {
+        return $this->hasMany(Workflow::class);
+    }
+
     /**
      * @return HasMany
      */

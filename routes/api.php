@@ -35,6 +35,8 @@ use App\Http\Controllers\StaticController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TwilioController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\WorkflowController;
+use App\Http\Controllers\WorkflowRunController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ExpenseController;
@@ -454,6 +456,20 @@ Route::group(['middleware' => ['throttle:api', 'token_auth', 'valid_json','local
     Route::resource('webhooks', WebhookController::class);
     Route::post('webhooks/bulk', [WebhookController::class, 'bulk'])->name('webhooks.bulk');
     Route::post('webhooks/{webhook}/retry', [WebhookController::class, 'retry'])->name('webhooks.retry');
+
+    Route::resource('workflows', WorkflowController::class);
+    Route::post('workflows/bulk', [WorkflowController::class, 'bulk'])->name('workflows.bulk');
+    Route::get('workflows/templates', [WorkflowController::class, 'templates'])->name('workflows.templates');
+    Route::post('workflows/from_template', [WorkflowController::class, 'createFromTemplate'])->name('workflows.from_template');
+    Route::get('workflows/metadata/triggers', [WorkflowController::class, 'triggers'])->name('workflows.metadata.triggers');
+    Route::get('workflows/metadata/actions', [WorkflowController::class, 'actions'])->name('workflows.metadata.actions');
+    Route::get('workflows/metadata/fields', [WorkflowController::class, 'fields'])->name('workflows.metadata.fields');
+
+    Route::get('workflow_runs', [WorkflowRunController::class, 'index'])->name('workflow_runs.index');
+    Route::get('workflow_runs/{workflow_run}', [WorkflowRunController::class, 'show'])->name('workflow_runs.show');
+    Route::post('workflow_runs/{workflow_run}/cancel', [WorkflowRunController::class, 'cancel'])->name('workflow_runs.cancel');
+    Route::post('workflow_runs/{workflow_run}/advance', [WorkflowRunController::class, 'advance'])->name('workflow_runs.advance');
+    Route::post('workflow_runs/{workflow_run}/retry', [WorkflowRunController::class, 'retry'])->name('workflow_runs.retry');
 
     /*Subscription and Webhook routes */
     // Route::post('hooks', [SubscriptionController::class, 'subscribe'])->name('hooks.subscribe');

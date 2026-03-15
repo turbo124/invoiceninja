@@ -13,7 +13,6 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\FilePermissionsFailure;
-use App\Models\Company;
 use App\Utils\Ninja;
 use App\Utils\Traits\AppSetup;
 use App\Utils\Traits\ClientGroupSettingsSaver;

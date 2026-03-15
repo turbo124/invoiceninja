@@ -367,6 +367,7 @@ class EventServiceProvider extends ServiceProvider
             PaymentCreatedActivity::class,
             PaymentNotification::class,
             PaymentBalanceActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         PaymentWasDeleted::class => [
             PaymentDeletedActivity::class,
@@ -394,6 +395,7 @@ class EventServiceProvider extends ServiceProvider
         // Clients
         ClientWasCreated::class => [
             CreatedClientActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         ClientWasArchived::class => [
             ArchivedClientActivity::class,
@@ -493,9 +495,11 @@ class EventServiceProvider extends ServiceProvider
         InvoiceWasCreated::class => [
             CreateInvoiceActivity::class,
             InvoiceCreatedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         InvoiceWasPaid::class => [
             InvoicePaidActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         InvoiceWasViewed::class => [
             InvoiceViewedActivity::class,
@@ -573,10 +577,12 @@ class EventServiceProvider extends ServiceProvider
             QuoteApprovedActivity::class,
             QuoteApprovedWebhook::class,
             QuoteApprovedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         QuoteWasCreated::class => [
             CreatedQuoteActivity::class,
             QuoteCreatedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         QuoteWasRejected::class => [
             QuoteRejectedActivity::class,

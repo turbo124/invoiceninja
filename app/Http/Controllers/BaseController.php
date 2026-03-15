@@ -156,6 +156,7 @@ class BaseController extends Controller
         'company.bank_transaction_rules',
         'company.task_schedulers',
         'company.locations',
+        'company.workflows',
     ];
 
     /**
