@@ -8,9 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('workflows', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('user_id');
+            $table->increments('id');
+            $table->unsignedInteger('company_id');
+            $table->unsignedInteger('user_id');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('trigger_entity', 50);
@@ -31,12 +31,12 @@ return new class extends Migration {
         });
 
         Schema::create('workflow_runs', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('workflow_id');
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('user_id');
+            $table->increments('id');
+            $table->unsignedInteger('workflow_id');
+            $table->unsignedInteger('company_id');
+            $table->unsignedInteger('user_id');
             $table->string('entity_type', 100);
-            $table->unsignedBigInteger('entity_id');
+            $table->unsignedInteger('entity_id');
             $table->string('current_step_id', 50)->nullable();
             $table->string('status', 20)->default('active');
             $table->string('waiting_for', 100)->nullable();
