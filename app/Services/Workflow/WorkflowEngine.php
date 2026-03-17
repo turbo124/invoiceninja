@@ -18,18 +18,13 @@ use App\Models\BaseModel;
 use App\Models\Company;
 use App\Models\Workflow;
 use App\Models\WorkflowRun;
-use App\Services\Workflow\Actions\ApplyCreditAction;
-use App\Services\Workflow\Actions\ApplyPaymentAction;
+use App\Services\Workflow\Actions;
 use App\Services\Workflow\Actions\AssignUserAction;
-use App\Services\Workflow\Actions\CloneAction;
 use App\Services\Workflow\Actions\ConvertAction;
 use App\Services\Workflow\Actions\CreateTaskAction;
-use App\Services\Workflow\Actions\EntityOperationAction;
-use App\Services\Workflow\Actions\LifecycleOperationAction;
 use App\Services\Workflow\Actions\NotifyUserAction;
 use App\Services\Workflow\Actions\SendEmailAction;
 use App\Services\Workflow\Actions\SendWebhookAction;
-use App\Services\Workflow\Actions\UpdateFieldAction;
 use App\Services\Workflow\Actions\WorkflowActionInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -40,18 +35,20 @@ class WorkflowEngine
      * Map of action type keys to handler classes.
      */
     private static array $actionHandlers = [
-        'entity_operation' => EntityOperationAction::class,
-        'lifecycle_operation' => LifecycleOperationAction::class,
         'send_email' => SendEmailAction::class,
-        'convert' => ConvertAction::class,
-        'assign_user' => AssignUserAction::class,
-        'update_field' => UpdateFieldAction::class,
-        'create_task' => CreateTaskAction::class,
         'notify_user' => NotifyUserAction::class,
         'send_webhook' => SendWebhookAction::class,
-        'clone_to' => CloneAction::class,
-        'apply_payment' => ApplyPaymentAction::class,
-        'apply_credit' => ApplyCreditAction::class,
+        'create_task' => CreateTaskAction::class,
+        'assign_user' => AssignUserAction::class,
+        'convert' => ConvertAction::class,
+        'mark_sent' => Actions\MarkSentAction::class,
+        'auto_bill' => Actions\AutoBillAction::class,
+        'approve' => Actions\ApproveAction::class,
+        'increase_price' => Actions\IncreasePriceAction::class,
+        'update_price' => Actions\UpdatePriceAction::class,
+        'add_to_inventory' => Actions\AddToInventoryAction::class,
+        'expense_from_po' => Actions\ExpenseFromPoAction::class,
+        'archive' => Actions\ArchiveAction::class,
     ];
 
     /**

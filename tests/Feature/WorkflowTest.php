@@ -175,13 +175,13 @@ class WorkflowTest extends TestCase
         $data = $response->json()['data'];
 
         $types = array_column($data, 'type');
-        $this->assertContains('entity_operation', $types);
-        $this->assertContains('lifecycle_operation', $types);
         $this->assertContains('send_email', $types);
         $this->assertContains('create_task', $types);
-        $this->assertNotContains('apply_payment', $types);
-        $this->assertNotContains('clone_to', $types);
-        $this->assertNotContains('update_field', $types);
+        $this->assertContains('mark_sent', $types);
+        $this->assertContains('auto_bill', $types);
+        $this->assertContains('archive', $types);
+        $this->assertNotContains('entity_operation', $types);
+        $this->assertNotContains('lifecycle_operation', $types);
     }
 
     public function testMetadataOperationsEndpoint()
@@ -274,8 +274,7 @@ class WorkflowTest extends TestCase
                     'id' => 'mark_sent',
                     'name' => 'Mark Sent',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'mark_sent'],
+                    'action' => 'mark_sent',
                     'on_guard_fail' => 'skip',
                     'on_error' => 'stop',
                 ],
@@ -305,8 +304,7 @@ class WorkflowTest extends TestCase
                     'id' => 'mark_sent',
                     'name' => 'Mark Sent',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'mark_sent'],
+                    'action' => 'mark_sent',
                     'on_guard_fail' => 'skip', // Should skip, not fail
                 ],
                 ['id' => 'end', 'name' => 'End', 'type' => 'end'],
@@ -338,8 +336,7 @@ class WorkflowTest extends TestCase
                     'id' => 'mark_sent',
                     'name' => 'Mark Sent',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'mark_sent'],
+                    'action' => 'mark_sent',
                     'on_guard_fail' => 'stop', // Should stop the run
                 ],
                 ['id' => 'end', 'name' => 'End', 'type' => 'end'],
@@ -365,8 +362,7 @@ class WorkflowTest extends TestCase
                     'id' => 'mark_sent',
                     'name' => 'Mark Sent',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'mark_sent'],
+                    'action' => 'mark_sent',
                     'on_guard_fail' => 'already_sent_handler',
                 ],
                 ['id' => 'end', 'name' => 'End', 'type' => 'end'],
@@ -621,8 +617,7 @@ class WorkflowTest extends TestCase
                     'id' => 'bad_step',
                     'name' => 'Bad Step',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'nonexistent_op'],
+                    'action' => 'nonexistent_action',
                     'on_error' => 'stop',
                 ],
                 ['id' => 'end', 'name' => 'End', 'type' => 'end'],
@@ -888,8 +883,7 @@ class WorkflowTest extends TestCase
                     'id' => 'mark_sent',
                     'name' => 'Mark Sent',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'mark_sent'],
+                    'action' => 'mark_sent',
                     'on_guard_fail' => 'skip',
                 ],
                 [
@@ -999,8 +993,7 @@ class WorkflowTest extends TestCase
                     'id' => 'mark_sent',
                     'name' => 'Mark Sent',
                     'type' => 'action',
-                    'action' => 'entity_operation',
-                    'params' => ['entity_ref' => '$trigger', 'operation' => 'mark_sent'],
+                    'action' => 'mark_sent',
                 ],
                 ['id' => 'end', 'name' => 'End', 'type' => 'end'],
             ],
