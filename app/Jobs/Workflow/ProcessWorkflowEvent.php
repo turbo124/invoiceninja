@@ -20,6 +20,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 
 class ProcessWorkflowEvent implements ShouldQueue
@@ -29,9 +30,9 @@ class ProcessWorkflowEvent implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public int $tries = 1;
+    public int $tries = 2;
 
-    public int $maxExceptions = 1;
+    public int $maxExceptions = 2;
 
     public function __construct(
         private string $entityType,
@@ -51,5 +52,10 @@ class ProcessWorkflowEvent implements ShouldQueue
             nlog("Workflow event processing failed: {$e->getMessage()}");
             nlog($e->getTraceAsString());
         }
+    }
+
+    public function middleware(): array
+    {
+        return [(new WithoutOverlapping("workflow_event_{$this->entityType}_{$this->entity->id}_{$this->event}"))->dontRelease()];
     }
 }

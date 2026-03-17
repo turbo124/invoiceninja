@@ -383,6 +383,7 @@ class EventServiceProvider extends ServiceProvider
         PaymentWasRefunded::class => [
             PaymentRefundedActivity::class,
             PaymentBalanceActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         PaymentWasVoided::class => [
             PaymentVoidedActivity::class,
@@ -402,6 +403,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         ClientWasUpdated::class => [
             ClientUpdatedActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         ClientWasDeleted::class => [
             DeleteClientActivity::class,
@@ -429,6 +431,7 @@ class EventServiceProvider extends ServiceProvider
         CreditWasCreated::class => [
             CreatedCreditActivity::class,
             CreditCreatedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         CreditWasDeleted::class => [
             DeleteCreditActivity::class,
@@ -441,6 +444,7 @@ class EventServiceProvider extends ServiceProvider
         CreditWasEmailed::class => [
             CreditEmailActivity::class,
             // CreditEmailedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         CreditWasMarkedSent::class => [
         ],
@@ -467,9 +471,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         ExpenseWasCreated::class => [
             CreatedExpenseActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         ExpenseWasUpdated::class => [
             ExpenseUpdatedActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         ExpenseWasArchived::class => [
             ExpenseArchivedActivity::class,
@@ -503,10 +509,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         InvoiceWasViewed::class => [
             InvoiceViewedActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         InvoiceWasEmailed::class => [
             InvoiceEmailActivity::class,
             // InvoiceEmailedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         InvoiceWasEmailedAndFailed::class => [
             InvoiceEmailFailedActivity::class,
@@ -527,9 +535,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         InvoiceWasReversed::class => [
             InvoiceReversedActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         InvoiceWasCancelled::class => [
             InvoiceCancelledActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         InvitationWasViewed::class => [
             InvitationViewedListener::class,
@@ -548,6 +558,7 @@ class EventServiceProvider extends ServiceProvider
         PurchaseOrderWasCreated::class => [
             CreatePurchaseOrderActivity::class,
             PurchaseOrderCreatedListener::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         PurchaseOrderWasDeleted::class => [
             PurchaseOrderDeletedActivity::class,
@@ -555,6 +566,7 @@ class EventServiceProvider extends ServiceProvider
         PurchaseOrderWasEmailed::class => [
             PurchaseOrderEmailActivity::class,
             // PurchaseOrderEmailedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         PurchaseOrderWasRestored::class => [
             PurchaseOrderRestoredActivity::class,
@@ -587,12 +599,14 @@ class EventServiceProvider extends ServiceProvider
         QuoteWasRejected::class => [
             QuoteRejectedActivity::class,
             QuoteRejectedNotification::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         QuoteWasUpdated::class => [
             QuoteUpdatedActivity::class,
         ],
         QuoteWasEmailed::class => [
             QuoteEmailActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         QuoteWasViewed::class => [
             QuoteViewedActivity::class,
@@ -660,9 +674,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         TaskWasCreated::class => [
             CreatedTaskActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         TaskWasUpdated::class => [
             TaskUpdatedActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         TaskWasArchived::class => [
             TaskArchivedActivity::class,
@@ -693,6 +709,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         VendorWasCreated::class => [
             CreatedVendorActivity::class,
+            \App\Listeners\Workflow\AdvanceWorkflows::class,
         ],
         VendorWasArchived::class => [
             VendorArchivedActivity::class,
@@ -716,6 +733,20 @@ class EventServiceProvider extends ServiceProvider
             // ... Manager won't register drivers that are not added to this listener.
             \SocialiteProviders\Apple\AppleExtendSocialite::class . '@handle',
             \SocialiteProviders\Microsoft\MicrosoftExtendSocialite::class . '@handle',
+        ],
+
+        // Workflow events
+        \App\Events\Workflow\WorkflowRunFailed::class => [
+            \App\Listeners\Workflow\NotifyWorkflowFailure::class,
+        ],
+        \App\Events\Workflow\WorkflowWasArchived::class => [
+            \App\Listeners\Workflow\WorkflowArchivedActivity::class,
+        ],
+        \App\Events\Workflow\WorkflowWasDeleted::class => [
+            \App\Listeners\Workflow\WorkflowDeletedActivity::class,
+        ],
+        \App\Events\Workflow\WorkflowWasRestored::class => [
+            \App\Listeners\Workflow\WorkflowRestoredActivity::class,
         ],
 
     ];

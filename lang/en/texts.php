@@ -238,7 +238,7 @@ $lang = array(
     'deleted_vendors' => 'Successfully deleted :count vendors',
     'confirmation_subject' => 'Account Confirmation',
     'confirmation_header' => 'Account Confirmation',
-    'confirmation_message' => 'Please access the link below to confirm your account.',
+    'confirmation_message' => 'Please verify your email address by clicking the button below.',
     'invoice_subject' => 'New invoice :number from :account',
     'invoice_message' => 'To view your invoice for :amount, click the link below.',
     'payment_subject' => 'Payment Received',
@@ -5915,6 +5915,9 @@ $lang = array(
     'payment_type_Stripe Bank Transfer' => 'Stripe Bank Transfer',
     'activity_164' => 'QuickBooks sync failed. :notes',
     'activity_166' => 'User :notes was purged by :user',
+    'activity_170' => ':user archived workflow :workflow',
+    'activity_171' => ':user deleted workflow :workflow',
+    'activity_172' => ':user restored workflow :workflow',
     'purged_user' => 'Successfully purged user',
     'quickbooks_connect_description' => 'Connect your QuickBooks account to Invoice Ninja to automatically sync your transactions and invoices.',
     'sync_direction_description' => 'These settings determine how Invoice Ninja will sync with QuickBooks.',
@@ -5940,6 +5943,10 @@ $lang = array(
     'login_with_passkey' => 'Login with a Passkey',
     'manage_passkeys' => 'Manage Passkeys',
     'last_used' => 'Last used',
-);
+    'wait_delay' => 'Wait Delay',
+    'wait_event' => 'Wait Event',
+    'condition' => 'Condition',
+    'conditional' => 'Conditional',
+);  
 
 return $lang;

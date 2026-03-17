@@ -314,6 +314,12 @@ class Activity extends StaticModel
 
     public const PURGE_USER = 166;
 
+    public const ARCHIVE_WORKFLOW = 170;
+
+    public const DELETE_WORKFLOW = 171;
+
+    public const RESTORE_WORKFLOW = 172;
+
     protected $casts = [
         'is_system' => 'boolean',
         'updated_at' => 'timestamp',

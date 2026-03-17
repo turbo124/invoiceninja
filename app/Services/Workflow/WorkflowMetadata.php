@@ -19,66 +19,99 @@ class WorkflowMetadata
         return [
             [
                 'entity' => 'invoice',
-                'label' => 'Invoice',
+                'label' => 'invoice',
                 'events' => [
-                    ['event' => 'created', 'label' => 'Created'],
-                    ['event' => 'sent', 'label' => 'Sent / Emailed'],
-                    ['event' => 'paid', 'label' => 'Paid'],
-                    ['event' => 'viewed', 'label' => 'Viewed by Client'],
-                    ['event' => 'cancelled', 'label' => 'Cancelled'],
-                    ['event' => 'reversed', 'label' => 'Reversed'],
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'sent', 'label' => 'sent'],
+                    ['event' => 'paid', 'label' => 'paid'],
+                    ['event' => 'viewed', 'label' => 'viewed'],
+                    ['event' => 'cancelled', 'label' => 'cancelled'],
+                    ['event' => 'reversed', 'label' => 'reversed'],
+                    ['event' => 'overdue', 'label' => 'overdue'],
                 ],
             ],
             [
                 'entity' => 'quote',
-                'label' => 'Quote',
+                'label' => 'quote',
                 'events' => [
-                    ['event' => 'created', 'label' => 'Created'],
-                    ['event' => 'sent', 'label' => 'Sent / Emailed'],
-                    ['event' => 'approved', 'label' => 'Approved by Client'],
-                    ['event' => 'rejected', 'label' => 'Rejected by Client'],
-                    ['event' => 'converted', 'label' => 'Converted to Invoice'],
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'sent', 'label' => 'sent'],
+                    ['event' => 'approved', 'label' => 'approved'],
+                    ['event' => 'rejected', 'label' => 'rejected'],
+                    ['event' => 'converted', 'label' => 'converted'],
                 ],
             ],
             [
                 'entity' => 'client',
-                'label' => 'Client',
+                'label' => 'client',
                 'events' => [
-                    ['event' => 'created', 'label' => 'Created'],
-                    ['event' => 'updated', 'label' => 'Updated'],
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'updated', 'label' => 'updated_at'],
                 ],
             ],
             [
                 'entity' => 'payment',
-                'label' => 'Payment',
+                'label' => 'payment',
                 'events' => [
-                    ['event' => 'completed', 'label' => 'Completed'],
-                    ['event' => 'failed', 'label' => 'Failed'],
-                    ['event' => 'refunded', 'label' => 'Refunded'],
+                    ['event' => 'completed', 'label' => 'completed'],
+                    ['event' => 'failed', 'label' => 'failed'],
+                    ['event' => 'refunded', 'label' => 'refunded'],
                 ],
             ],
             [
                 'entity' => 'task',
-                'label' => 'Task',
+                'label' => 'task',
                 'events' => [
-                    ['event' => 'created', 'label' => 'Created'],
-                    ['event' => 'updated', 'label' => 'Updated'],
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'updated', 'label' => 'updated_at'],
                 ],
             ],
             [
                 'entity' => 'project',
-                'label' => 'Project',
+                'label' => 'project',
                 'events' => [
-                    ['event' => 'created', 'label' => 'Created'],
-                    ['event' => 'updated', 'label' => 'Updated'],
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'updated', 'label' => 'updated_at'],
                 ],
             ],
             [
                 'entity' => 'expense',
-                'label' => 'Expense',
+                'label' => 'expense',
                 'events' => [
-                    ['event' => 'created', 'label' => 'Created'],
-                    ['event' => 'updated', 'label' => 'Updated'],
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'updated', 'label' => 'updated_at'],
+                ],
+            ],
+            [
+                'entity' => 'credit',
+                'label' => 'credit',
+                'events' => [
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'sent', 'label' => 'sent'],
+                ],
+            ],
+            [
+                'entity' => 'recurring_invoice',
+                'label' => 'recurring_invoice',
+                'events' => [
+                    ['event' => 'started', 'label' => 'active'],
+                    ['event' => 'paused', 'label' => 'paused'],
+                    ['event' => 'sent', 'label' => 'created'],
+                ],
+            ],
+            [
+                'entity' => 'purchase_order',
+                'label' => 'purchase_order',
+                'events' => [
+                    ['event' => 'created', 'label' => 'created'],
+                    ['event' => 'sent', 'label' => 'sent'],
+                ],
+            ],
+            [
+                'entity' => 'vendor',
+                'label' => 'vendor',
+                'events' => [
+                    ['event' => 'created', 'label' => 'created'],
                 ],
             ],
         ];
@@ -89,106 +122,198 @@ class WorkflowMetadata
         return [
             [
                 'type' => 'send_email',
-                'label' => 'Send Email',
+                'label' => 'send_email',
                 'icon' => 'email',
                 'category' => 'communication',
+                'entities' => ['invoice', 'quote', 'credit', 'purchase_order', 'recurring_invoice'],
                 'params_schema' => [
-                    'entity_ref' => ['type' => 'entity_reference', 'label' => 'Entity to Email', 'required' => true],
-                    'template' => ['type' => 'select', 'label' => 'Email Template', 'required' => true, 'options' => ['invoice', 'quote', 'credit', 'purchase_order', 'payment', 'reminder1', 'reminder2', 'reminder3', 'statement']],
-                ],
-            ],
-            [
-                'type' => 'convert',
-                'label' => 'Convert Entity',
-                'icon' => 'transform',
-                'category' => 'entity',
-                'params_schema' => [
-                    'from' => ['type' => 'select', 'label' => 'Source', 'options' => ['quote']],
-                    'to' => ['type' => 'select', 'label' => 'Target', 'options' => ['invoice', 'project']],
-                ],
-            ],
-            [
-                'type' => 'assign_user',
-                'label' => 'Assign User',
-                'icon' => 'person_add',
-                'category' => 'entity',
-                'params_schema' => [
-                    'entity_ref' => ['type' => 'entity_reference', 'label' => 'Entity', 'required' => true],
-                    'strategy' => ['type' => 'select', 'label' => 'Strategy', 'options' => ['specific', 'round_robin']],
-                    'user_id' => ['type' => 'user_select', 'label' => 'Assign To', 'required' => false],
-                ],
-            ],
-            [
-                'type' => 'update_field',
-                'label' => 'Update Field',
-                'icon' => 'edit',
-                'category' => 'entity',
-                'params_schema' => [
-                    'entity_ref' => ['type' => 'entity_reference', 'label' => 'Entity', 'required' => true],
-                    'field' => ['type' => 'field_select', 'label' => 'Field', 'required' => true],
-                    'value' => ['type' => 'dynamic', 'label' => 'New Value', 'required' => true],
-                ],
-            ],
-            [
-                'type' => 'create_task',
-                'label' => 'Create Task',
-                'icon' => 'add_task',
-                'category' => 'creation',
-                'params_schema' => [
-                    'description' => ['type' => 'string', 'label' => 'Description', 'required' => true, 'supports_variables' => true],
-                    'project_ref' => ['type' => 'entity_reference', 'label' => 'Project (optional)', 'required' => false],
-                    'assigned_user_id' => ['type' => 'user_select', 'label' => 'Assign To', 'required' => false],
-                    'due_date_offset' => ['type' => 'number', 'label' => 'Due in (days)', 'required' => false],
+                    'to' => ['type' => 'select', 'label' => 'user', 'options' => ['assigned_user', 'creator', 'specific_user', 'all_admins']],
+                    'template' => ['type' => 'select', 'label' => 'template', 'required' => true, 'options' => ['invoice', 'quote', 'credit', 'purchase_order', 'reminder1', 'reminder2', 'reminder3', 'custom1','custom2','custom3', 'reminder_endless', 'custom']],
                 ],
             ],
             [
                 'type' => 'notify_user',
-                'label' => 'Notify Team Member',
+                'label' => 'notifications',
                 'icon' => 'notifications',
                 'category' => 'communication',
+                'entities' => ['invoice', 'quote', 'credit', 'client', 'payment', 'task', 'project', 'expense', 'recurring_invoice', 'purchase_order', 'vendor'],
                 'params_schema' => [
-                    'to' => ['type' => 'select', 'label' => 'Notify', 'options' => ['assigned_user', 'creator', 'specific_user', 'all_admins']],
-                    'user_id' => ['type' => 'user_select', 'label' => 'Specific User', 'required' => false],
-                    'message' => ['type' => 'textarea', 'label' => 'Message', 'required' => true, 'supports_variables' => true],
+                    'to' => ['type' => 'select', 'label' => 'user', 'options' => ['assigned_user', 'creator', 'specific_user', 'all_admins']],
+                    'user_id' => ['type' => 'user_select', 'label' => 'user', 'required' => false],
+                    'subject' => ['type' => 'string', 'label' => 'subject', 'required' => true, 'supports_variables' => true],
+                    'body' => ['type' => 'textarea', 'label' => 'message', 'required' => true, 'supports_variables' => true],
                 ],
             ],
             [
                 'type' => 'send_webhook',
-                'label' => 'Send Webhook',
+                'label' => 'webhook',
                 'icon' => 'webhook',
-                'category' => 'integration',
+                'category' => 'communication',
+                'entities' => ['invoice', 'quote', 'credit', 'client', 'payment', 'task', 'project', 'expense', 'recurring_invoice', 'purchase_order', 'vendor'],
                 'params_schema' => [
-                    'url' => ['type' => 'url', 'label' => 'Webhook URL', 'required' => true],
-                    'method' => ['type' => 'select', 'label' => 'HTTP Method', 'options' => ['POST', 'PUT', 'GET']],
+                    'url' => ['type' => 'url', 'label' => 'webhook_url', 'required' => true],
+                    'method' => ['type' => 'select', 'label' => 'method', 'options' => ['POST', 'PUT', 'GET']],
+                    'headers' => ['type' => 'key_value', 'label' => 'headers', 'required' => false],
+                ],
+            ],
+            [
+                'type' => 'create_task',
+                'label' => 'create_task',
+                'icon' => 'add_task',
+                'category' => 'automation',
+                'entities' => ['invoice', 'quote', 'credit', 'client', 'payment', 'task', 'project', 'expense', 'recurring_invoice', 'purchase_order', 'vendor'],
+                'params_schema' => [
+                    'description' => ['type' => 'string', 'label' => 'description', 'required' => true, 'supports_variables' => true],
+                    'assigned_user_id' => ['type' => 'user_select', 'label' => 'assigned_user', 'required' => false],
+                ],
+            ],
+            [
+                'type' => 'assign_user',
+                'label' => 'assigned_user',
+                'icon' => 'person_add',
+                'category' => 'automation',
+                'entities' => ['invoice', 'quote', 'client', 'task', 'project'],
+                'params_schema' => [
+                    'user_id' => ['type' => 'user_select', 'label' => 'assigned_to', 'required' => false],
+                ],
+            ],
+            [
+                'type' => 'convert',
+                'label' => 'convert',
+                'icon' => 'transform',
+                'category' => 'automation',
+                'entities' => ['quote'],
+                'params_schema' => [
+                    'from' => ['type' => 'select', 'label' => 'source', 'options' => ['quote']],
+                    'to' => ['type' => 'select', 'label' => 'convert_to', 'options' => ['invoice', 'project']],
+                ],
+            ],
+            [
+                'type' => 'entity_operation',
+                'label' => 'action',
+                'icon' => 'play_arrow',
+                'category' => 'automation',
+                'entities' => ['invoice', 'quote', 'recurring_invoice', 'purchase_order'],
+                'params_schema' => [
+                    'entity_ref' => ['type' => 'entity_reference', 'label' => 'invoice', 'required' => true],
+                    'operation' => ['type' => 'operation_select', 'label' => 'action', 'required' => true],
+                    'args' => ['type' => 'dynamic', 'label' => 'value', 'required' => false],
+                ],
+            ],
+            [
+                'type' => 'lifecycle_operation',
+                'label' => 'archive',
+                'icon' => 'archive',
+                'category' => 'automation',
+                'entities' => ['invoice', 'quote', 'credit', 'expense'],
+                'params_schema' => [
+                    'entity_ref' => ['type' => 'entity_reference', 'label' => 'invoice', 'required' => true],
+                    'operation' => ['type' => 'select', 'label' => 'action', 'required' => true, 'options' => ['archive']],
                 ],
             ],
         ];
+    }
+
+    /**
+     * Get actions filtered to those available for a specific trigger entity.
+     */
+    public static function actionsForEntity(string $entity): array
+    {
+        return array_values(array_filter(self::actions(), function ($action) use ($entity) {
+            return in_array($entity, $action['entities']);
+        }));
     }
 
     public static function fields(): array
     {
         return [
             'invoice' => [
-                ['field' => 'amount', 'label' => 'Amount', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'balance', 'label' => 'Balance', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'status_id', 'label' => 'Status', 'type' => 'status', 'operators' => ['=', '!='], 'options' => [['value' => 1, 'label' => 'Draft'], ['value' => 2, 'label' => 'Sent'], ['value' => 3, 'label' => 'Partial'], ['value' => 4, 'label' => 'Paid']]],
-                ['field' => 'days_overdue', 'label' => 'Days Overdue', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'balance', 'label' => 'balance', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => ['=', '!='], 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'partial'], ['value' => 4, 'label' => 'paid']]],
+                ['field' => 'days_overdue', 'label' => 'overdue', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
             ],
             'quote' => [
-                ['field' => 'amount', 'label' => 'Amount', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'status_id', 'label' => 'Status', 'type' => 'status', 'operators' => ['=', '!='], 'options' => [['value' => 1, 'label' => 'Draft'], ['value' => 2, 'label' => 'Sent'], ['value' => 3, 'label' => 'Approved'], ['value' => 5, 'label' => 'Rejected']]],
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => ['=', '!='], 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'approved'], ['value' => 5, 'label' => 'rejected']]],
             ],
             'client' => [
-                ['field' => 'balance', 'label' => 'Outstanding Balance', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'paid_to_date', 'label' => 'Paid to Date', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'balance', 'label' => 'outstanding', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'paid_to_date', 'label' => 'paid_to_date', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
             ],
             'task' => [
-                ['field' => 'status_id', 'label' => 'Status', 'type' => 'relation', 'operators' => ['=', '!=']],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'relation', 'operators' => ['=', '!=']],
             ],
             'project' => [
-                ['field' => 'budgeted_hours', 'label' => 'Budgeted Hours', 'type' => 'number', 'operators' => ['=', '>', '<']],
-                ['field' => 'current_hours', 'label' => 'Current Hours', 'type' => 'number', 'operators' => ['=', '>', '>=']],
-                ['field' => 'budget_utilization_pct', 'label' => 'Budget Used %', 'type' => 'number', 'operators' => ['>', '>=', '<', '<=']],
+                ['field' => 'budgeted_hours', 'label' => 'budgeted_hours', 'type' => 'number', 'operators' => ['=', '>', '<']],
+                ['field' => 'current_hours', 'label' => 'hours', 'type' => 'number', 'operators' => ['=', '>', '>=']],
+                ['field' => 'budget_utilization_pct', 'label' => 'budgeted_hours', 'type' => 'number', 'operators' => ['>', '>=', '<', '<=']],
+            ],
+        ];
+    }
+
+    /**
+     * Condition group configuration for trigger_conditions.
+     *
+     * Groups are OR'd together. Within each group, "match" controls
+     * whether conditions are AND'd (all) or OR'd (any).
+     */
+    public static function conditionGroupMeta(): array
+    {
+        return [
+            'group_logic' => 'or',
+            'group_match_options' => [
+                ['value' => 'all', 'label' => 'all_conditions'],
+                ['value' => 'any', 'label' => 'any_condition'],
+            ],
+        ];
+    }
+
+    /**
+     * Date fields available per entity for wait_delay steps.
+     * The UI uses this to populate the date field picker.
+     *
+     * offset_operators: the direction options the UI shows alongside the days input.
+     *   - "before" → negative offset_days in engine
+     *   - "on"     → offset_days = 0 in engine
+     *   - "after"  → positive offset_days in engine
+     */
+    public static function dateFields(): array
+    {
+        return [
+            'offset_operators' => [
+                ['value' => 'before', 'label' => 'before'],
+                ['value' => 'on', 'label' => 'on'],
+                ['value' => 'after', 'label' => 'after'],
+            ],
+            'entity_fields' => [
+                'invoice' => [
+                    ['field' => 'date', 'label' => 'invoice_date'],
+                    ['field' => 'due_date', 'label' => 'due_date'],
+                ],
+                'quote' => [
+                    ['field' => 'date', 'label' => 'quote_date'],
+                    ['field' => 'due_date', 'label' => 'valid_until'],
+                ],
+                'credit' => [
+                    ['field' => 'date', 'label' => 'credit_date'],
+                    ['field' => 'due_date', 'label' => 'due_date'],
+                ],
+                'purchase_order' => [
+                    ['field' => 'date', 'label' => 'date'],
+                    ['field' => 'due_date', 'label' => 'due_date'],
+                ],
+                'expense' => [
+                    ['field' => 'date', 'label' => 'expense_date'],
+                    ['field' => 'payment_date', 'label' => 'payment_date'],
+                ],
+                'task' => [
+                    ['field' => 'calculated_start_date', 'label' => 'start_date'],
+                ],
+                'recurring_invoice' => [
+                    ['field' => 'next_send_date', 'label' => 'next_send_date'],
+                    ['field' => 'due_date_days', 'label' => 'due_date'],
+                ],
             ],
         ];
     }
@@ -198,30 +323,48 @@ class WorkflowMetadata
         return [
             [
                 'key' => 'overdue_collection',
-                'name' => 'Overdue Collection',
-                'description' => 'Automated reminder sequence for overdue invoices',
-                'category' => 'billing',
+                'name' => 'overdue',
+                'description' => 'overdue',
+                'category' => 'category',
                 'trigger_entity' => 'invoice',
                 'trigger_event' => 'sent',
-                'steps_count' => 7,
+                'steps_count' => 11,
             ],
             [
                 'key' => 'quote_followup',
-                'name' => 'Quote Follow-up',
-                'description' => 'Automated follow-up when quotes are not responded to',
-                'category' => 'sales',
+                'name' => 'quote',
+                'description' => 'quote',
+                'category' => 'category',
                 'trigger_entity' => 'quote',
                 'trigger_event' => 'sent',
                 'steps_count' => 5,
             ],
             [
                 'key' => 'client_onboarding',
-                'name' => 'Client Onboarding',
-                'description' => 'Welcome email and task creation for new clients',
-                'category' => 'onboarding',
+                'name' => 'new_client',
+                'description' => 'new_client',
+                'category' => 'category',
                 'trigger_entity' => 'client',
                 'trigger_event' => 'created',
                 'steps_count' => 4,
+            ],
+            [
+                'key' => 'auto_bill_overdue',
+                'name' => 'auto_bill',
+                'description' => 'auto_bill',
+                'category' => 'category',
+                'trigger_entity' => 'invoice',
+                'trigger_event' => 'sent',
+                'steps_count' => 5,
+            ],
+            [
+                'key' => 'purchase_order_to_expense',
+                'name' => 'purchase_order',
+                'description' => 'purchase_order',
+                'category' => 'category',
+                'trigger_entity' => 'purchase_order',
+                'trigger_event' => 'sent',
+                'steps_count' => 5,
             ],
         ];
     }
@@ -230,24 +373,28 @@ class WorkflowMetadata
     {
         return match ($key) {
             'overdue_collection' => [
-                'name' => 'Overdue Collection',
-                'description' => 'Automated reminder sequence for overdue invoices',
+                'name' => 'overdue',
+                'description' => 'overdue',
                 'trigger_entity' => 'invoice',
                 'trigger_event' => 'sent',
                 'trigger_conditions' => [],
                 'steps' => [
-                    ['id' => 'wait_overdue', 'name' => 'Wait until overdue', 'type' => 'wait_delay', 'delay_days' => 7, 'position' => ['x' => 250, 'y' => 100]],
+                    ['id' => 'wait_overdue', 'name' => 'Wait 7 days after due date', 'type' => 'wait_delay', 'date_field' => '$trigger.due_date', 'offset_days' => 7, 'position' => ['x' => 250, 'y' => 100]],
+                    ['id' => 'check_1', 'name' => 'Still unpaid?', 'type' => 'branch', 'conditions' => [['label' => 'Has balance', 'if' => ['field' => '$trigger.balance', 'operator' => '>', 'value' => 0], 'goto' => 'reminder_1']], 'default_next' => 'end_paid', 'position' => ['x' => 250, 'y' => 150]],
                     ['id' => 'reminder_1', 'name' => 'Send Reminder 1', 'type' => 'action', 'action' => 'send_email', 'params' => ['entity_ref' => '$trigger', 'template' => 'reminder1'], 'position' => ['x' => 250, 'y' => 200]],
-                    ['id' => 'wait_2', 'name' => 'Wait 14 days', 'type' => 'wait_delay', 'delay_days' => 14, 'position' => ['x' => 250, 'y' => 300]],
+                    ['id' => 'wait_2', 'name' => 'Wait 14 days after due date', 'type' => 'wait_delay', 'date_field' => '$trigger.due_date', 'offset_days' => 14, 'position' => ['x' => 250, 'y' => 300]],
+                    ['id' => 'check_2', 'name' => 'Still unpaid?', 'type' => 'branch', 'conditions' => [['label' => 'Has balance', 'if' => ['field' => '$trigger.balance', 'operator' => '>', 'value' => 0], 'goto' => 'reminder_2']], 'default_next' => 'end_paid', 'position' => ['x' => 250, 'y' => 350]],
                     ['id' => 'reminder_2', 'name' => 'Send Reminder 2', 'type' => 'action', 'action' => 'send_email', 'params' => ['entity_ref' => '$trigger', 'template' => 'reminder2'], 'position' => ['x' => 250, 'y' => 400]],
-                    ['id' => 'wait_3', 'name' => 'Wait 30 days', 'type' => 'wait_delay', 'delay_days' => 30, 'position' => ['x' => 250, 'y' => 500]],
+                    ['id' => 'wait_3', 'name' => 'Wait 30 days after due date', 'type' => 'wait_delay', 'date_field' => '$trigger.due_date', 'offset_days' => 30, 'position' => ['x' => 250, 'y' => 500]],
+                    ['id' => 'check_3', 'name' => 'Still unpaid?', 'type' => 'branch', 'conditions' => [['label' => 'Has balance', 'if' => ['field' => '$trigger.balance', 'operator' => '>', 'value' => 0], 'goto' => 'notify_admin']], 'default_next' => 'end_paid', 'position' => ['x' => 250, 'y' => 550]],
                     ['id' => 'notify_admin', 'name' => 'Notify Account Manager', 'type' => 'action', 'action' => 'notify_user', 'params' => ['to' => 'assigned_user', 'message' => 'Invoice {{invoice.number}} for {{client.name}} is 51+ days overdue'], 'position' => ['x' => 250, 'y' => 600]],
                     ['id' => 'end', 'name' => 'End', 'type' => 'end', 'end_status' => 'completed', 'position' => ['x' => 250, 'y' => 700]],
+                    ['id' => 'end_paid', 'name' => 'Paid - no action needed', 'type' => 'end', 'end_status' => 'completed', 'position' => ['x' => 450, 'y' => 400]],
                 ],
             ],
             'quote_followup' => [
-                'name' => 'Quote Follow-up',
-                'description' => 'Automated follow-up when quotes are not responded to',
+                'name' => 'quote',
+                'description' => 'quote',
                 'trigger_entity' => 'quote',
                 'trigger_event' => 'sent',
                 'trigger_conditions' => [],
@@ -260,8 +407,8 @@ class WorkflowMetadata
                 ],
             ],
             'client_onboarding' => [
-                'name' => 'Client Onboarding',
-                'description' => 'Welcome sequence for new clients',
+                'name' => 'new_client',
+                'description' => 'new_client',
                 'trigger_entity' => 'client',
                 'trigger_event' => 'created',
                 'trigger_conditions' => [],
@@ -270,6 +417,35 @@ class WorkflowMetadata
                     ['id' => 'assign', 'name' => 'Assign account manager', 'type' => 'action', 'action' => 'assign_user', 'params' => ['entity_ref' => '$trigger', 'strategy' => 'round_robin'], 'position' => ['x' => 250, 'y' => 200]],
                     ['id' => 'notify', 'name' => 'Notify team', 'type' => 'action', 'action' => 'notify_user', 'params' => ['to' => 'all_admins', 'message' => 'New client {{client.name}} has been onboarded and assigned'], 'position' => ['x' => 250, 'y' => 300]],
                     ['id' => 'end', 'name' => 'Complete', 'type' => 'end', 'end_status' => 'completed', 'position' => ['x' => 250, 'y' => 400]],
+                ],
+            ],
+            'auto_bill_overdue' => [
+                'name' => 'auto_bill',
+                'description' => 'auto_bill',
+                'trigger_entity' => 'invoice',
+                'trigger_event' => 'sent',
+                'trigger_conditions' => [],
+                'steps' => [
+                    ['id' => 'wait_overdue', 'name' => 'Wait 7 days after due date', 'type' => 'wait_delay', 'date_field' => '$trigger.due_date', 'offset_days' => 7, 'position' => ['x' => 250, 'y' => 100]],
+                    ['id' => 'check_balance', 'name' => 'Check balance', 'type' => 'branch', 'conditions' => [['label' => 'Has balance', 'if' => ['field' => '$trigger.balance', 'operator' => '>', 'value' => 0], 'goto' => 'auto_bill']], 'default_next' => 'end_paid', 'position' => ['x' => 250, 'y' => 200]],
+                    ['id' => 'auto_bill', 'name' => 'Auto Bill', 'type' => 'action', 'action' => 'entity_operation', 'params' => ['entity_ref' => '$trigger', 'operation' => 'auto_bill'], 'on_guard_fail' => 'skip', 'on_error' => 'notify_error', 'max_retries' => 2, 'next' => 'end_billed', 'position' => ['x' => 250, 'y' => 300]],
+                    ['id' => 'notify_error', 'name' => 'Notify billing error', 'type' => 'action', 'action' => 'notify_user', 'params' => ['to' => 'assigned_user', 'message' => 'Auto-billing failed for {{invoice.number}}. Please process manually.'], 'next' => 'end_failed', 'position' => ['x' => 450, 'y' => 300]],
+                    ['id' => 'end_paid', 'name' => 'Already paid', 'type' => 'end', 'end_status' => 'completed', 'position' => ['x' => 450, 'y' => 200]],
+                    ['id' => 'end_billed', 'name' => 'Billed', 'type' => 'end', 'end_status' => 'completed', 'position' => ['x' => 250, 'y' => 400]],
+                    ['id' => 'end_failed', 'name' => 'Failed', 'type' => 'end', 'end_status' => 'billing_failed', 'position' => ['x' => 450, 'y' => 400]],
+                ],
+            ],
+            'purchase_order_to_expense' => [
+                'name' => 'purchase_order',
+                'description' => 'purchase_order',
+                'trigger_entity' => 'purchase_order',
+                'trigger_event' => 'sent',
+                'trigger_conditions' => [],
+                'steps' => [
+                    ['id' => 'add_inventory', 'name' => 'Add to Inventory', 'type' => 'action', 'action' => 'entity_operation', 'params' => ['entity_ref' => '$trigger', 'operation' => 'add_to_inventory'], 'on_guard_fail' => 'skip', 'position' => ['x' => 250, 'y' => 100]],
+                    ['id' => 'create_expense', 'name' => 'Create Expense', 'type' => 'action', 'action' => 'entity_operation', 'params' => ['entity_ref' => '$trigger', 'operation' => 'expense'], 'output_key' => 'expense', 'position' => ['x' => 250, 'y' => 200]],
+                    ['id' => 'notify', 'name' => 'Notify assigned user', 'type' => 'action', 'action' => 'notify_user', 'params' => ['to' => 'assigned_user', 'message' => 'Expense created from PO for {{purchase_order.number}}'], 'position' => ['x' => 250, 'y' => 300]],
+                    ['id' => 'end', 'name' => 'End', 'type' => 'end', 'end_status' => 'completed', 'position' => ['x' => 250, 'y' => 400]],
                 ],
             ],
             default => null,

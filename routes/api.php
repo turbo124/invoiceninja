@@ -464,6 +464,8 @@ Route::group(['middleware' => ['throttle:api', 'token_auth', 'valid_json','local
     Route::get('workflows/metadata/triggers', [WorkflowController::class, 'triggers'])->name('workflows.metadata.triggers');
     Route::get('workflows/metadata/actions', [WorkflowController::class, 'actions'])->name('workflows.metadata.actions');
     Route::get('workflows/metadata/fields', [WorkflowController::class, 'fields'])->name('workflows.metadata.fields');
+    Route::get('workflows/metadata/date_fields', [WorkflowController::class, 'dateFields'])->name('workflows.metadata.date_fields');
+    Route::get('workflows/metadata/operations', [WorkflowController::class, 'operations'])->name('workflows.metadata.operations');
 
     Route::get('workflow_runs', [WorkflowRunController::class, 'index'])->name('workflow_runs.index');
     Route::get('workflow_runs/{workflow_run}', [WorkflowRunController::class, 'show'])->name('workflow_runs.show');

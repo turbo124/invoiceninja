@@ -395,6 +395,11 @@ class PurchaseOrder extends BaseModel
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function workflow_runs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(WorkflowRun::class, 'workflowable');
+    }
+
     /**
      * Access the invoice calculator object.
      *

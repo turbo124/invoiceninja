@@ -21,7 +21,6 @@ CREATE TABLE workflows (
     trigger_event    VARCHAR(50) NOT NULL,
     trigger_conditions TEXT NULL,           -- JSON array of condition objects
     steps            TEXT NOT NULL,          -- JSON array of step definitions
-    is_active        TINYINT(1) DEFAULT 1,
     is_deleted       TINYINT(1) DEFAULT 0,
     is_template      TINYINT(1) DEFAULT 0,
     runs_count       INT UNSIGNED DEFAULT 0,
@@ -30,7 +29,7 @@ CREATE TABLE workflows (
     updated_at       TIMESTAMP(6) NULL,
     deleted_at       TIMESTAMP(6) NULL,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
-    INDEX idx_workflows_trigger (company_id, trigger_entity, trigger_event, is_active),
+    INDEX idx_workflows_trigger (company_id, trigger_entity, trigger_event, deleted_at),
     INDEX idx_workflows_deleted (company_id, deleted_at)
 );
 ```
@@ -43,7 +42,7 @@ CREATE TABLE workflow_runs (
     workflow_id      INT UNSIGNED NOT NULL,
     company_id       INT UNSIGNED NOT NULL,
     user_id          INT UNSIGNED NOT NULL,
-    entity_type      VARCHAR(100) NOT NULL,  -- FQCN of trigger entity
+    entity_type      VARCHAR(191) NOT NULL,  -- FQCN of trigger entity
     entity_id        INT UNSIGNED NOT NULL,
     current_step_id  VARCHAR(50) NULL,
     status           VARCHAR(20) DEFAULT 'active',
@@ -72,8 +71,8 @@ CREATE TABLE workflow_runs (
 
 ### Workflow
 
-- **Fillable:** name, description, trigger_entity, trigger_event, trigger_conditions, steps, is_active, is_template
-- **Casts:** trigger_conditions => array, steps => array, is_active => boolean, is_deleted => boolean, is_template => boolean, last_run_at => datetime, created_at => timestamp, updated_at => timestamp, deleted_at => timestamp
+- **Fillable:** name, description, trigger_entity, trigger_event, trigger_conditions, steps, is_template
+- **Casts:** trigger_conditions => array, steps => array, is_deleted => boolean, is_template => boolean, last_run_at => datetime, created_at => timestamp, updated_at => timestamp, deleted_at => timestamp
 - **Relationships:** company (belongsTo), user (belongsTo), runs (hasMany WorkflowRun), activeRuns (hasMany, filtered)
 - **Helper methods:**
   - `findStep(string $stepId): ?array` — locate step by ID in steps array
@@ -109,7 +108,6 @@ CREATE TABLE workflow_runs (
     "trigger_event": "string",
     "trigger_conditions": [],
     "steps": [],
-    "is_active": true,
     "is_deleted": false,
     "is_template": false,
     "runs_count": 0,
@@ -155,7 +153,7 @@ POST   /api/v1/workflows                    — Create workflow
 GET    /api/v1/workflows/{id}               — Show workflow
 PUT    /api/v1/workflows/{id}               — Update workflow
 DELETE /api/v1/workflows/{id}               — Delete workflow
-POST   /api/v1/workflows/bulk               — Bulk: activate, deactivate, archive, restore, delete
+POST   /api/v1/workflows/bulk               — Bulk: archive, restore, delete, cancel_runs
 ```
 
 ### Templates
@@ -214,6 +212,11 @@ interface WorkflowStep {
 
     // Wait for event steps
     event?: string;                     // Event pattern: "entity.event" or pipe-separated "a|b"
+    satisfied_when?: {                  // Pre-check: if entity already matches, skip wait
+        field: string;                  // Field reference: "$entity.field_name"
+        operator: string;              // =, !=, >, >=, <, <=, contains, starts_with, is_empty
+        value: any;
+    };
     timeout_days?: number;              // Max wait duration
     on_timeout?: string;                // Step ID to jump to on timeout
 
@@ -794,7 +797,7 @@ These remain as dedicated handler classes with their own parameter schemas:
 2. AdvanceWorkflows listener catches event
 3. ProcessWorkflowEvent job dispatched (queued, 2-second delay)
 4. WorkflowEngine::onEvent() called
-5. Finds matching workflows by company_id + trigger_entity + trigger_event + is_active
+5. Finds matching workflows by company_id + trigger_entity + trigger_event (archived/soft-deleted workflows are excluded automatically)
 6. Evaluates trigger_conditions (matchAll or matchAny)
 7. Starts new WorkflowRun for each matching workflow
 8. Also checks for waiting runs that match this event and resumes them
@@ -1115,15 +1118,53 @@ Entity references use `$` prefix in step params: `$trigger`, `$quote`, `$new_inv
 {
     "type": "wait_for_event",
     "event": "quote.approved|quote.rejected",
+    "satisfied_when": {"field": "$quote.status_id", "operator": "in", "value": [4, 6]},
     "timeout_days": 3,
     "on_timeout": "followup_step"
 }
 ```
 
+- **Pre-check:** On entering a `wait_for_event` step, the engine evaluates `satisfied_when` (if present) against the current entity state. If the condition is already true (e.g., the quote was approved before the run reached this step), the wait is skipped and the run advances immediately. This handles out-of-order events without requiring event journaling.
 - Sets `status = waiting`, `waiting_for = "quote.approved|quote.rejected"`
 - When any matching event fires, `WorkflowEngine::onEvent()` finds waiting runs via the `idx_runs_waiting` index
 - Event matching verifies the entity is in the run's context (same entity, not a different quote)
 - If `timeout_days` elapses without a match → cron advances to `on_timeout` step or marks `STATUS_TIMED_OUT`
+
+#### satisfied_when check (enterWait)
+
+```php
+private function enterWait(WorkflowRun $run, array $step, Company $company): void
+{
+    // Pre-check: if the entity already satisfies the wait condition, skip it
+    if (!empty($step['satisfied_when'])) {
+        $fieldValue = ContextResolver::resolveField(
+            $step['satisfied_when']['field'],
+            $run->context ?? [],
+            $run
+        );
+
+        if ($this->evaluateCondition($fieldValue, $step['satisfied_when']['operator'], $step['satisfied_when']['value'])) {
+            $run->logStep($step, 'skipped', ['reason' => 'satisfied_when already met']);
+            $this->moveToNextStep($run, $step);
+            return;
+        }
+    }
+
+    // Normal wait entry — park the run
+    $waitData = [
+        'status' => WorkflowRun::STATUS_WAITING,
+        'waiting_for' => $step['event'],
+        'waiting_since' => now(),
+    ];
+
+    if (!empty($step['timeout_days'])) {
+        $waitData['wait_until'] = now()->addDays($step['timeout_days']);
+    }
+
+    $run->update($waitData);
+    $run->logStep($step, 'waiting');
+}
+```
 
 ### 9.2 Wait Delay
 
@@ -1250,7 +1291,7 @@ These Laravel events are mapped in `AdvanceWorkflows` listener and dispatch `Pro
 
 When a workflow action fires a domain event (e.g., `markSent()` fires `InvoiceWasEmailed`), that event can trigger other workflows, creating cascades. The `events` flag in the registry controls whether `->save()` or `->saveQuietly()` is used. For operations where cascading is intentional (status transitions), `events: true`. For internal housekeeping (fill_defaults, apply_number), `events: false`.
 
-**Safety:** The 50-step execution limit in `advanceRun()` prevents infinite loops within a single run. Cross-run cascades are bounded by the 2-second dispatch delay and the fact that `ProcessWorkflowEvent` has `$tries = 1`.
+**Safety:** The 50-step execution limit in `advanceRun()` prevents infinite loops within a single run. Cross-run cascades are bounded by the 2-second dispatch delay and the fact that `ProcessWorkflowEvent` has `$tries = 2`.
 
 ---
 
@@ -1503,14 +1544,14 @@ database/
 | Concern | Mechanism |
 |---------|-----------|
 | Infinite loops within a run | 50-step limit in `advanceRun()` |
-| Cross-run cascading | 2-second dispatch delay, `$tries = 1` on ProcessWorkflowEvent |
+| Cross-run cascading | 2-second dispatch delay, `$tries = 2` on ProcessWorkflowEvent |
 | Silent no-ops | Post-condition assertions detect when service methods don't change state |
 | Transient failures | Automatic retry with exponential backoff (5m, 15m, 45m) up to `max_retries` |
 | Permanent failures | Run terminates, error logged, admin notified |
 | Stale wait states | Cron processes `wait_until` every 15 minutes |
 | Entity deleted during run | `withTrashed()` on entity resolution; guard/assertion catches invalid state |
 | Concurrent runs on same entity | No mutex — multiple workflows can act on the same entity. Each run is independent. |
-| Job failure | `ProcessWorkflowEvent` has `$tries = 1`, `$maxExceptions = 1` — fails silently with nlog |
+| Job failure | `ProcessWorkflowEvent` has `$tries = 2`, `$maxExceptions = 2` — fails silently with nlog after retries exhausted |
 
 ---
 

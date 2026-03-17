@@ -381,6 +381,11 @@ class Invoice extends BaseModel
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function workflow_runs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(WorkflowRun::class, 'workflowable');
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */

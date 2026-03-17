@@ -28,11 +28,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $trigger_event
  * @property array|null $trigger_conditions
  * @property array $steps
- * @property bool $is_active
  * @property bool $is_deleted
  * @property bool $is_template
- * @property int $runs_count
- * @property \Carbon\Carbon|null $last_run_at
  * @property int|null $created_at
  * @property int|null $updated_at
  * @property int|null $deleted_at
@@ -53,17 +50,14 @@ class Workflow extends BaseModel
         'trigger_event',
         'trigger_conditions',
         'steps',
-        'is_active',
         'is_template',
     ];
 
     protected $casts = [
         'trigger_conditions' => 'array',
         'steps' => 'array',
-        'is_active' => 'boolean',
         'is_deleted' => 'boolean',
         'is_template' => 'boolean',
-        'last_run_at' => 'datetime',
         'created_at' => 'timestamp',
         'updated_at' => 'timestamp',
         'deleted_at' => 'timestamp',

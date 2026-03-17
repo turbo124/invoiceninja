@@ -19,8 +19,6 @@ use App\Repositories\TaskRepository;
 use App\Services\Workflow\ContextResolver;
 use App\Services\Workflow\TemplateVariableResolver;
 use App\Utils\Traits\MakesHash;
-use Carbon\Carbon;
-
 class CreateTaskAction implements WorkflowActionInterface
 {
     use MakesHash;
@@ -54,16 +52,6 @@ class CreateTaskAction implements WorkflowActionInterface
             if ($firstStatus) {
                 $task->status_id = $firstStatus->id;
             }
-        }
-
-        // Optional: due date offset
-        if (isset($params['due_date_offset']) && is_numeric($params['due_date_offset'])) {
-            $task->due_date = Carbon::now()->addDays((int) $params['due_date_offset'])->format('Y-m-d');
-        }
-
-        // Optional: priority
-        if (isset($params['priority_id'])) {
-            $task->priority_id = (int) $params['priority_id'];
         }
 
         $taskRepo = new TaskRepository();

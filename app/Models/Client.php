@@ -611,6 +611,11 @@ class Client extends BaseModel implements HasLocalePreference
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function workflow_runs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(WorkflowRun::class, 'workflowable');
+    }
+
     public function group_settings(): BelongsTo
     {
         return $this->belongsTo(GroupSetting::class);

@@ -13,6 +13,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * App\Models\WorkflowRun
@@ -21,13 +22,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $workflow_id
  * @property int $company_id
  * @property int $user_id
- * @property string $entity_type
- * @property int $entity_id
+ * @property string $workflowable_type
+ * @property int $workflowable_id
  * @property string|null $current_step_id
  * @property string $status
  * @property string|null $waiting_for
  * @property \Carbon\Carbon|null $waiting_since
  * @property \Carbon\Carbon|null $wait_until
+ * @property array|null $workflow_steps
  * @property array|null $context
  * @property array|null $step_history
  * @property string|null $error_message
@@ -37,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Workflow $workflow
  * @property-read \App\Models\Company $company
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\BaseModel $workflowable
  * @mixin \Eloquent
  */
 class WorkflowRun extends BaseModel
@@ -51,16 +54,14 @@ class WorkflowRun extends BaseModel
     public const STATUS_TIMED_OUT = 'timed_out';
 
     protected $fillable = [
-        'workflow_id',
-        'company_id',
-        'user_id',
-        'entity_type',
-        'entity_id',
+        'workflowable_type',
+        'workflowable_id',
         'current_step_id',
         'status',
         'waiting_for',
         'waiting_since',
         'wait_until',
+        'workflow_steps',
         'context',
         'step_history',
         'error_message',
@@ -68,6 +69,7 @@ class WorkflowRun extends BaseModel
     ];
 
     protected $casts = [
+        'workflow_steps' => 'array',
         'context' => 'array',
         'step_history' => 'array',
         'waiting_since' => 'datetime',
@@ -80,6 +82,11 @@ class WorkflowRun extends BaseModel
     public function getEntityType()
     {
         return self::class;
+    }
+
+    public function workflowable(): MorphTo
+    {
+        return $this->morphTo()->withTrashed();
     }
 
     public function workflow(): BelongsTo
@@ -98,15 +105,52 @@ class WorkflowRun extends BaseModel
     }
 
     /**
-     * Get the entity this run is associated with.
+     * Find a step by ID from the snapshotted workflow steps.
      */
-    public function entity(): ?BaseModel
+    public function findStep(string $stepId): ?array
     {
-        if (! class_exists($this->entity_type)) {
+        foreach ($this->workflow_steps ?? [] as $step) {
+            if ($step['id'] === $stepId) {
+                return $step;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the first step from the snapshotted workflow steps.
+     */
+    public function firstStep(): ?array
+    {
+        return ($this->workflow_steps ?? [])[0] ?? null;
+    }
+
+    /**
+     * Get the next step after the given step ID from the snapshot.
+     */
+    public function nextStep(string $currentStepId): ?array
+    {
+        $currentStep = $this->findStep($currentStepId);
+
+        if (! $currentStep) {
             return null;
         }
 
-        return $this->entity_type::withTrashed()->find($this->entity_id);
+        // Explicit next reference
+        if (! empty($currentStep['next'])) {
+            return $this->findStep($currentStep['next']);
+        }
+
+        // Sequential: find index and return next
+        $steps = $this->workflow_steps ?? [];
+        foreach ($steps as $index => $step) {
+            if ($step['id'] === $currentStepId && isset($steps[$index + 1])) {
+                return $steps[$index + 1];
+            }
+        }
+
+        return null;
     }
 
     /**

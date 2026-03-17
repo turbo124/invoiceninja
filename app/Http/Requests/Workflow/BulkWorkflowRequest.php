@@ -14,7 +14,7 @@ class BulkWorkflowRequest extends Request
     public function rules()
     {
         return [
-            'action' => 'required|string|in:archive,restore,delete,activate,deactivate',
+            'action' => 'required|string|in:archive,restore,delete,cancel_runs,clone',
             'ids' => 'required|bail|array',
         ];
     }

@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Utils\Traits\UserSessionAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Class BaseModel
@@ -84,6 +85,11 @@ class BaseModel extends Model
     use MakesDates;
 
     public int $max_attachment_size = 3000000;
+
+    public function workflowRuns(): MorphMany
+    {
+        return $this->morphMany(WorkflowRun::class, 'workflowable');
+    }
 
     protected $appends = [
         'hashed_id',

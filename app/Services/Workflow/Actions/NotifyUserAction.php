@@ -57,7 +57,7 @@ class NotifyUserAction implements WorkflowActionInterface
 
     private function getAssignedUser(array $context, WorkflowRun $run)
     {
-        $entity = $run->entity();
+        $entity = $run->workflowable;
 
         if ($entity && isset($entity->assigned_user_id) && $entity->assigned_user_id) {
             return collect([User::find($entity->assigned_user_id)]);

@@ -444,6 +444,11 @@ class RecurringInvoice extends BaseModel
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function workflow_runs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(WorkflowRun::class, 'workflowable');
+    }
+
     public function getStatusAttribute()
     {
         if ($this->status_id == self::STATUS_ACTIVE && Carbon::parse($this->next_send_date)->isFuture()) {

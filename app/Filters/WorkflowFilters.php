@@ -26,11 +26,11 @@ class WorkflowFilters extends QueryFilters
         }
 
         if ($value === 'active') {
-            return $this->builder->where('is_active', true);
+            return $this->builder->whereNull('deleted_at');
         }
 
-        if ($value === 'inactive') {
-            return $this->builder->where('is_active', false);
+        if ($value === 'archived') {
+            return $this->builder->whereNotNull('deleted_at');
         }
 
         return $this->builder;

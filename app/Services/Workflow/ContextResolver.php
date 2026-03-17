@@ -17,9 +17,13 @@ use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\Project;
+use App\Models\PurchaseOrder;
 use App\Models\Quote;
+use App\Models\RecurringInvoice;
 use App\Models\Task;
+use App\Models\Vendor;
 use App\Models\WorkflowRun;
 
 class ContextResolver
@@ -35,6 +39,10 @@ class ContextResolver
         'project' => Project::class,
         'task' => Task::class,
         'expense' => Expense::class,
+        'payment' => Payment::class,
+        'recurring_invoice' => RecurringInvoice::class,
+        'purchase_order' => PurchaseOrder::class,
+        'vendor' => Vendor::class,
     ];
 
     /**
@@ -45,7 +53,7 @@ class ContextResolver
         $ref = ltrim($ref, '$');
 
         if ($ref === 'trigger') {
-            return $run->entity();
+            return $run->workflowable;
         }
 
         return self::resolveEntityByKey($ref, $context, $run);
@@ -114,7 +122,9 @@ class ContextResolver
             return 0;
         }
 
-        return max(0, (int) now()->diffInDays($entity->due_date, false) * -1);
+        $tz = self::entityTimezone($entity);
+
+        return max(0, (int) \Illuminate\Support\Carbon::now($tz)->diffInDays($entity->due_date, false) * -1);
     }
 
     private static function budgetUtilization(BaseModel $entity): float
@@ -132,6 +142,20 @@ class ContextResolver
             return 0;
         }
 
-        return max(0, (int) now()->diffInDays($entity->due_date, false));
+        $tz = self::entityTimezone($entity);
+
+        return max(0, (int) \Illuminate\Support\Carbon::now($tz)->diffInDays($entity->due_date, false));
+    }
+
+    private static function entityTimezone(BaseModel $entity): string
+    {
+        if (isset($entity->company_id) && $entity->company) {
+            $tz = $entity->company->timezone();
+            if ($tz) {
+                return $tz->name;
+            }
+        }
+
+        return 'UTC';
     }
 }

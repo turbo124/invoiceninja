@@ -172,6 +172,11 @@ class Project extends BaseModel
         return $this->morphMany(Document::class, 'documentable');
     }
 
+    public function workflow_runs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(WorkflowRun::class, 'workflowable');
+    }
+
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();

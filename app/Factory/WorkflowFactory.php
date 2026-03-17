@@ -15,10 +15,8 @@ class WorkflowFactory
         $workflow->steps = [];
         $workflow->trigger_entity = '';
         $workflow->trigger_event = '';
-        $workflow->is_active = true;
         $workflow->is_deleted = false;
         $workflow->is_template = false;
-        $workflow->runs_count = 0;
 
         return $workflow;
     }

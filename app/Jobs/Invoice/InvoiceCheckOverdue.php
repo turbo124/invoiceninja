@@ -12,6 +12,9 @@
 
 namespace App\Jobs\Invoice;
 
+use App\Models\Workflow;
+use App\Services\Workflow\WorkflowEngine;
+
 use App\Utils\Ninja;
 use App\Utils\Number;
 use App\Models\Company;
@@ -115,7 +118,7 @@ class InvoiceCheckOverdue implements ShouldQueue
         // Yesterday's date in the company's timezone (Y-m-d format)
         $yesterday = $now_in_company_tz->copy()->subDay()->format('Y-m-d');
 
-        $overdue_invoices = Invoice::query()
+        $invoices = Invoice::query()
             ->where('company_id', $company->id)
             ->whereIn('status_id', [Invoice::STATUS_SENT, Invoice::STATUS_PARTIAL])
             ->where('is_deleted', false)
@@ -144,8 +147,25 @@ class InvoiceCheckOverdue implements ShouldQueue
                       ->where('due_date', $yesterday);
                 });
             })
-            ->cursor()
-            ->map(function ($invoice) {
+            ->get();
+
+        // Process overdue workflows directly — avoids event storm for large invoice volumes
+        $hasOverdueWorkflows = Workflow::where('company_id', $company->id)
+            ->where('trigger_entity', 'invoice')
+            ->where('trigger_event', 'overdue')
+            ->where('is_deleted', false)
+            ->where('is_template', false)
+            ->exists();
+
+        if ($hasOverdueWorkflows) {
+            $engine = new WorkflowEngine();
+
+            $invoices->each(function (Invoice $invoice) use ($engine, $company) {
+                $engine->onEvent('invoice', 'overdue', $invoice, $company);
+            });
+        }
+
+        $overdue_invoices = $invoices->map(function ($invoice) {
 
                 return [
                     'id' => $invoice->id,
