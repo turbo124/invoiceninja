@@ -187,8 +187,10 @@ class WorkflowController extends BaseController
 
     public function fields()
     {
+        $company = auth()->user()->company();
+
         return response()->json([
-            'data' => WorkflowMetadata::fields(),
+            'data' => WorkflowMetadata::fields($company),
             'condition_groups' => WorkflowMetadata::conditionGroupMeta(),
         ]);
     }

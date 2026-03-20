@@ -12,8 +12,28 @@
 
 namespace App\Services\Workflow;
 
+use App\Models\Company;
+
 class WorkflowMetadata
 {
+    private const NUMBER_OPERATORS = ['=', '!=', '>', '>=', '<', '<='];
+    private const STRING_OPERATORS = ['=', '!=', 'contains', 'starts_with', 'is_empty'];
+    private const STATUS_OPERATORS = ['=', '!='];
+
+    private const CUSTOM_FIELD_ENTITY_MAP = [
+        'invoice' => 'invoice',
+        'quote' => 'invoice',
+        'credit' => 'invoice',
+        'recurring_invoice' => 'invoice',
+        'client' => 'client',
+        'payment' => 'payment',
+        'task' => 'task',
+        'project' => 'project',
+        'expense' => 'expense',
+        'vendor' => 'vendor',
+        'purchase_order' => 'purchase_order',
+    ];
+
     public static function triggers(): array
     {
         return [
@@ -267,31 +287,172 @@ class WorkflowMetadata
         }));
     }
 
-    public static function fields(): array
+    public static function fields(?Company $company = null): array
     {
-        return [
+        $fields = [
             'invoice' => [
-                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'balance', 'label' => 'balance', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => ['=', '!='], 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'partial'], ['value' => 4, 'label' => 'paid']]],
-                ['field' => 'days_overdue', 'label' => 'overdue', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'balance', 'label' => 'balance', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'paid_to_date', 'label' => 'paid_to_date', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => self::STATUS_OPERATORS, 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'partial'], ['value' => 4, 'label' => 'paid']]],
+                ['field' => 'date', 'label' => 'date', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'due_date', 'label' => 'due_date', 'type' => 'date', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'discount', 'label' => 'discount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'po_number', 'label' => 'po_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'public_notes', 'label' => 'public_notes', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'terms', 'label' => 'terms', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'footer', 'label' => 'footer', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'custom_value1', 'label' => 'custom_value1', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'custom_value2', 'label' => 'custom_value2', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'custom_value3', 'label' => 'custom_value3', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'custom_value4', 'label' => 'custom_value4', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
             ],
             'quote' => [
-                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => ['=', '!='], 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'approved'], ['value' => 5, 'label' => 'rejected']]],
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => self::STATUS_OPERATORS, 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'approved'], ['value' => 5, 'label' => 'rejected']]],
+                ['field' => 'due_date', 'label' => 'valid_until', 'type' => 'date', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'po_number', 'label' => 'po_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'public_notes', 'label' => 'public_notes', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'discount', 'label' => 'discount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
             ],
             'client' => [
-                ['field' => 'balance', 'label' => 'outstanding', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
-                ['field' => 'paid_to_date', 'label' => 'paid_to_date', 'type' => 'number', 'operators' => ['=', '>', '>=', '<', '<=']],
+                ['field' => 'balance', 'label' => 'outstanding', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'paid_to_date', 'label' => 'paid_to_date', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'name', 'label' => 'name', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'id_number', 'label' => 'id_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'vat_number', 'label' => 'vat_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'country_id', 'label' => 'country', 'type' => 'number', 'operators' => self::STATUS_OPERATORS],
+                ['field' => 'credit_balance', 'label' => 'credit_balance', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'payment_balance', 'label' => 'payment_balance', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+            ],
+            'payment' => [
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => self::STATUS_OPERATORS, 'options' => [['value' => 1, 'label' => 'pending'], ['value' => 2, 'label' => 'cancelled'], ['value' => 3, 'label' => 'failed'], ['value' => 4, 'label' => 'completed'], ['value' => 5, 'label' => 'partially_refunded'], ['value' => 6, 'label' => 'refunded']]],
+                ['field' => 'transaction_reference', 'label' => 'transaction_reference', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+            ],
+            'expense' => [
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'public_notes', 'label' => 'public_notes', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'category_id', 'label' => 'category', 'type' => 'relation', 'operators' => self::STATUS_OPERATORS],
+                ['field' => 'tax_amount1', 'label' => 'tax_amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+            ],
+            'credit' => [
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'balance', 'label' => 'balance', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => self::STATUS_OPERATORS, 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'partial'], ['value' => 4, 'label' => 'applied']]],
+                ['field' => 'po_number', 'label' => 'po_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+            ],
+            'recurring_invoice' => [
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => self::STATUS_OPERATORS, 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'active'], ['value' => 3, 'label' => 'paused'], ['value' => 4, 'label' => 'completed']]],
+                ['field' => 'frequency_id', 'label' => 'frequency', 'type' => 'number', 'operators' => self::STATUS_OPERATORS],
+                ['field' => 'remaining_cycles', 'label' => 'remaining_cycles', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+            ],
+            'purchase_order' => [
+                ['field' => 'amount', 'label' => 'amount', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'balance', 'label' => 'balance', 'type' => 'number', 'operators' => self::NUMBER_OPERATORS],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'status', 'operators' => self::STATUS_OPERATORS, 'options' => [['value' => 1, 'label' => 'draft'], ['value' => 2, 'label' => 'sent'], ['value' => 3, 'label' => 'accepted'], ['value' => 4, 'label' => 'received'], ['value' => 5, 'label' => 'cancelled']]],
+                ['field' => 'public_notes', 'label' => 'public_notes', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+            ],
+            'vendor' => [
+                ['field' => 'name', 'label' => 'name', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'id_number', 'label' => 'id_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
+                ['field' => 'vat_number', 'label' => 'vat_number', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
             ],
             'task' => [
-                ['field' => 'status_id', 'label' => 'status', 'type' => 'relation', 'operators' => ['=', '!=']],
+                ['field' => 'status_id', 'label' => 'status', 'type' => 'relation', 'operators' => self::STATUS_OPERATORS],
+                ['field' => 'description', 'label' => 'description', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
             ],
             'project' => [
                 ['field' => 'budgeted_hours', 'label' => 'budgeted_hours', 'type' => 'number', 'operators' => ['=', '>', '<']],
                 ['field' => 'current_hours', 'label' => 'hours', 'type' => 'number', 'operators' => ['=', '>', '>=']],
                 ['field' => 'budget_utilization_pct', 'label' => 'budgeted_hours', 'type' => 'number', 'operators' => ['>', '>=', '<', '<=']],
+                ['field' => 'name', 'label' => 'name', 'type' => 'string', 'operators' => self::STRING_OPERATORS],
             ],
+        ];
+
+        if ($company) {
+            self::appendCustomFields($fields, $company);
+        }
+
+        return $fields;
+    }
+
+    private static function appendCustomFields(array &$fields, Company $company): void
+    {
+        $customFields = $company->custom_fields;
+
+        if (! $customFields) {
+            return;
+        }
+
+        foreach (self::CUSTOM_FIELD_ENTITY_MAP as $entity => $cfPrefix) {
+            if (! isset($fields[$entity])) {
+                continue;
+            }
+
+            for ($i = 1; $i <= 4; $i++) {
+                $cfKey = "{$cfPrefix}{$i}";
+
+                if (! property_exists($customFields, $cfKey)) {
+                    continue;
+                }
+
+                $cfDef = $customFields->{$cfKey};
+
+                if (empty($cfDef)) {
+                    continue;
+                }
+
+                $fields[$entity][] = self::resolveCustomField($cfDef, $i);
+            }
+        }
+    }
+
+    private static function resolveCustomField(string $definition, int $index): array
+    {
+        $parts = explode('|', $definition, 2);
+        $label = $parts[0] ?: "custom_value{$index}";
+        $typeDef = $parts[1] ?? 'single_line_text';
+
+        if ($typeDef === 'switch') {
+            return [
+                'field' => "custom_value{$index}",
+                'label' => $label,
+                'type' => 'select',
+                'operators' => self::STATUS_OPERATORS,
+                'options' => [['value' => 'yes', 'label' => 'yes'], ['value' => 'no', 'label' => 'no']],
+            ];
+        }
+
+        if ($typeDef === 'date') {
+            return [
+                'field' => "custom_value{$index}",
+                'label' => $label,
+                'type' => 'date',
+                'operators' => self::NUMBER_OPERATORS,
+            ];
+        }
+
+        // Comma-separated options = dropdown select
+        if ($typeDef !== 'single_line_text' && str_contains($typeDef, ',')) {
+            $options = array_map(fn ($opt) => ['value' => trim($opt), 'label' => trim($opt)], explode(',', $typeDef));
+
+            return [
+                'field' => "custom_value{$index}",
+                'label' => $label,
+                'type' => 'select',
+                'operators' => ['=', '!=', 'in'],
+                'options' => $options,
+            ];
+        }
+
+        // single_line_text — could be string or number, so provide both operator sets
+        return [
+            'field' => "custom_value{$index}",
+            'label' => $label,
+            'type' => 'string',
+            'operators' => array_values(array_unique(array_merge(self::STRING_OPERATORS, self::NUMBER_OPERATORS))),
         ];
     }
 
