@@ -147,7 +147,7 @@ class WorkflowMetadata
                 'category' => 'communication',
                 'entities' => ['invoice', 'quote', 'credit', 'purchase_order', 'recurring_invoice'],
                 'params_schema' => [
-                    'to' => ['type' => 'select', 'label' => 'user', 'options' => ['assigned_user', 'creator', 'specific_user', 'all_admins']],
+                    'to' => ['type' => 'select', 'label' => 'user', 'options' => ['contact', 'assigned_user', 'creator', 'specific_user', 'all_admins']],
                     'template' => ['type' => 'select', 'label' => 'template', 'required' => true, 'options' => ['invoice', 'quote', 'credit', 'purchase_order', 'reminder1', 'reminder2', 'reminder3', 'custom1','custom2','custom3', 'reminder_endless', 'custom']],
                 ],
             ],
