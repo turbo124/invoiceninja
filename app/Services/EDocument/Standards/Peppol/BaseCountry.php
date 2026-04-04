@@ -70,6 +70,15 @@ class BaseCountry implements CountryHandler
     }
 
     /**
+     * Resolve the client identifier value used for routing.
+     * Return null to use the default resolution logic in Mutator.
+     */
+    public function resolveClientIdentifier(mixed $invoice, string $routingCode): ?string
+    {
+        return null;
+    }
+
+    /**
      * Build a Storecove routing structure from an array of identifiers.
      */
     protected function buildRouting(array $identifiers): array

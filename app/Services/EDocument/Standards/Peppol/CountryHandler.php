@@ -72,4 +72,21 @@ interface CountryHandler
      * Return null to use default resolution logic.
      */
     public function resolveTaxSchemeOverride(?string $classification, ?object $invoice = null): ?string;
+
+    /**
+     * Resolve the client identifier value used for routing.
+     *
+     * Different countries use different client fields for routing:
+     * - Most use vat_number
+     * - FR uses id_number (SIREN/SIRET)
+     * - IT uses routing_id (codice destinatario) for CUUO
+     * - DE uses routing_id for government (Leitweg-ID)
+     *
+     * Return null to use the default resolution logic in Mutator.
+     *
+     * @param mixed $invoice The Invoice/Credit model
+     * @param string $routingCode The resolved routing scheme (e.g. FR:SIRET, DE:LWID)
+     * @return string|null The identifier value, or null for default logic
+     */
+    public function resolveClientIdentifier(mixed $invoice, string $routingCode): ?string;
 }

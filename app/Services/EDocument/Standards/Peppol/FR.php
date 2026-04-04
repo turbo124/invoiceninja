@@ -66,6 +66,14 @@ class FR extends BaseCountry
         return null;
     }
 
+    /**
+     * FR always uses id_number (SIREN/SIRET) for routing, not vat_number.
+     */
+    public function resolveClientIdentifier(mixed $invoice, string $routingCode): ?string
+    {
+        return $invoice->client->id_number;
+    }
+
     public function senderMutations(
         mixed $p_invoice,
         mixed $invoice,
@@ -73,9 +81,7 @@ class FR extends BaseCountry
         array $storecove_meta
     ): array {
 
-        // When sending invoices to the French government (Chorus Pro):
-        // All invoices have to be routed to SIRET 0009:11000201100044.
-        // There is no test environment for sending to public entities.
+        // B2G: Route to Chorus Pro via SIRET 0009:11000201100044
         if ($invoice->client->classification == 'government') {
             $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
                 ["scheme" => 'FR:SIRET', "id" => '11000201100044'],
@@ -84,17 +90,68 @@ class FR extends BaseCountry
             // The SIRET / 0009 identifier of the final recipient is to be included
             // in the invoice.accountingCustomerParty.publicIdentifiers array.
             $mutator_util->setCustomerAssignedAccountId(true);
+
+            return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
         }
 
-        if (strlen($invoice->client->id_number ?? '') == 9) {
-            // SIREN
+        // B2C: Email routing fallback for individuals
+        if ($invoice->client->classification == 'individual') {
+            $email = $invoice->client->present()->email();
+
+            if (strlen($email) > 2) {
+                $storecove_meta = $this->setEmailRouting($storecove_meta, $email);
+            }
+
+            return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
+        }
+
+        // B2B: Route via SIRENE (9-digit) or SIRET (14-digit)
+        $id_number = $invoice->client->id_number ?? '';
+
+        if (strlen($id_number) == 9) {
             $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
-                ["scheme" => 'FR:SIRET', "id" => "{$invoice->client->id_number}"],
+                ["scheme" => 'FR:SIRENE', "id" => $id_number],
             ]));
         } else {
-            // SIRET
             $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
-                ["scheme" => 'FR:SIRET', "id" => "{$invoice->client->id_number}"],
+                ["scheme" => 'FR:SIRET', "id" => $id_number],
+            ]));
+        }
+
+        return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
+    }
+
+    /**
+     * Receiver mutations for when the client is in France but the sender is not.
+     */
+    public function receiverMutations(
+        mixed $p_invoice,
+        mixed $invoice,
+        MutatorUtil $mutator_util,
+        array $storecove_meta
+    ): array {
+
+        // Non-FR sender to FR government receiver: route to Chorus Pro
+        if ($invoice->client->classification == 'government') {
+            $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
+                ["scheme" => 'FR:SIRET', "id" => '11000201100044'],
+            ]));
+
+            $mutator_util->setCustomerAssignedAccountId(true);
+
+            return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
+        }
+
+        // Non-FR sender to FR B2B receiver: set SIRENE/SIRET routing
+        $id_number = $invoice->client->id_number ?? '';
+
+        if (strlen($id_number) == 9) {
+            $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
+                ["scheme" => 'FR:SIRENE', "id" => $id_number],
+            ]));
+        } elseif (strlen($id_number) >= 14) {
+            $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
+                ["scheme" => 'FR:SIRET', "id" => $id_number],
             ]));
         }
 

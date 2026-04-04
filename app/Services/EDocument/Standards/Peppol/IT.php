@@ -17,6 +17,18 @@ use App\Services\EDocument\Gateway\Storecove\StorecoveRouter;
 
 class IT extends BaseCountry
 {
+    /**
+     * IT:CUUO uses routing_id (codice destinatario), IT:CF uses vat_number.
+     */
+    public function resolveClientIdentifier(mixed $invoice, string $routingCode): ?string
+    {
+        if (str_contains($routingCode, ':CUUO') && strlen($invoice->client->routing_id ?? '') > 1) {
+            return $invoice->client->routing_id;
+        }
+
+        return null;
+    }
+
     public function getRoutingRules(): ?array
     {
         return [
@@ -88,12 +100,26 @@ class IT extends BaseCountry
 
         // non-IT Sender, IT Receiver, B2C
         // Provide the receiver IT:CF and an optional email.
-        if (in_array($invoice->client->classification, ['individual']) && $invoice->company->country()->iso_3166_2 != 'IT') {
+        if ($invoice->client->classification == 'individual') {
+            $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
+                ["scheme" => 'IT:CF', "id" => $invoice->client->vat_number],
+            ]));
+
+            $email = $invoice->client->present()->email();
+
+            if (strlen($email) > 2) {
+                $storecove_meta = $this->setEmailRouting($storecove_meta, $email);
+            }
+
             return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
         }
 
         // non-IT Sender, IT Receiver, B2B/B2G
-        // Provide the receiver IT:VAT and the receiver IT:CUUO (codice destinatario)
+        // Provide the receiver IT:IVA and the receiver IT:CUUO (codice destinatario)
+        $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
+            ["scheme" => 'IT:IVA', "id" => $invoice->client->vat_number],
+            ["scheme" => 'IT:CUUO', "id" => $invoice->client->routing_id],
+        ]));
 
         return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
     }

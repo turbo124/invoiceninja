@@ -24,6 +24,7 @@ class CountryFactory
     private static array $handlers = [
         'AT' => AT::class,
         'AU' => AU::class,
+        'BE' => BE::class,
         'CH' => CH::class,
         'DE' => DE::class,
         'DK' => DK::class,

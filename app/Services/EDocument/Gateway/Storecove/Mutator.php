@@ -245,26 +245,21 @@ class Mutator implements MutatorInterface
         }
 
         $code = $this->getClientRoutingCode();
+        $countryCode = $this->invoice->client->country->iso_3166_2;
 
-        $identifier = false;
+        // Delegate identifier resolution to country handler first
+        $handler = CountryFactory::make($countryCode);
+        $identifier = $handler->resolveClientIdentifier($this->invoice, $code);
 
-        // Non-VAT routing schemes (DK:DIGST, SE:ORGNR, FI:OVT, EE:CC, NO:ORG, LT:LEC, etc.)
-        // use id_number (org/registry number), not vat_number.
-        // IT:CUUO uses routing_id (SDI code).
-        $is_vat_scheme = str_contains($code, ':VAT') || str_contains($code, ':IVA') || str_contains($code, ':CF');
+        // Fallback: generic resolution based on routing scheme type
+        if (!$identifier) {
+            $is_vat_scheme = str_contains($code, ':VAT') || str_contains($code, ':IVA') || str_contains($code, ':CF');
 
-        if ($this->invoice->client->country->iso_3166_2 == 'FR') {
-            $identifier = $this->invoice->client->id_number;
-        } elseif (str_contains($code, ':CUUO') && strlen($this->invoice->client->routing_id ?? '') > 1) {
-            $identifier = $this->invoice->client->routing_id;
-        } elseif (!$is_vat_scheme && strlen($this->invoice->client->id_number ?? '') > 1) {
-            $identifier = $this->invoice->client->id_number;
-        } else {
-            $identifier = $this->invoice->client->vat_number;
-        }
-
-        if ($this->invoice->client->country->iso_3166_2 == 'DE' && $this->invoice->client->classification == 'government') {
-            $identifier = $this->invoice->client->routing_id;
+            if (!$is_vat_scheme && strlen($this->invoice->client->id_number ?? '') > 1) {
+                $identifier = $this->invoice->client->id_number;
+            } else {
+                $identifier = $this->invoice->client->vat_number;
+            }
         }
 
         if (!$identifier) {

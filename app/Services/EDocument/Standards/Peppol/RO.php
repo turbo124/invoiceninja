@@ -195,4 +195,39 @@ class RO extends BaseCountry
 
         return $client_sector_code;
     }
+
+    /**
+     * Receiver mutations for when the client is in Romania but the sender is not.
+     */
+    public function receiverMutations(
+        mixed $p_invoice,
+        mixed $invoice,
+        MutatorUtil $mutator_util,
+        array $storecove_meta
+    ): array {
+
+        // Enable RO-ANAF network for delivery to Romanian receivers
+        $storecove_meta = $this->mergeMeta($storecove_meta, ["networks" => [
+            [
+                "application" => "ro-anaf",
+                "settings" => [
+                    "enabled" => true,
+                ],
+            ],
+        ]]);
+
+        // Route via RO:VAT
+        $storecove_meta = $this->mergeMeta($storecove_meta, $this->buildRouting([
+            ["scheme" => 'RO:VAT', "id" => $invoice->client->vat_number],
+        ]));
+
+        // Resolve state and sector codes for the receiver
+        $resolved_state = $this->getStateCode($invoice->client->state, $invoice);
+        $resolved_city = $this->getSectorCode($invoice->client->city, $invoice);
+
+        $p_invoice->AccountingCustomerParty->Party->PostalAddress->CountrySubentity = $resolved_state;
+        $p_invoice->AccountingCustomerParty->Party->PostalAddress->CityName = $resolved_city;
+
+        return ['p_invoice' => $p_invoice, 'storecove_meta' => $storecove_meta];
+    }
 }
