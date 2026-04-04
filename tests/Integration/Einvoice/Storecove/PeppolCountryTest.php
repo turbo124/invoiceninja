@@ -1203,4 +1203,979 @@ class PeppolCountryTest extends TestCase
             $this->assertTrue($anafFound, 'Cross-border to RO should enable ro-anaf network');
         }
     }
+
+    // ══════════════════════════════════════════════════════════════
+    //  UNIT TESTS: Handler Method Overrides
+    // ══════════════════════════════════════════════════════════════
+
+    public function testFR_ResolveClientIdentifier(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('FR');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->id_number = '12345678901234';
+
+        $this->assertEquals('12345678901234', $handler->resolveClientIdentifier($invoice, 'FR:SIRET'));
+        $this->assertEquals('12345678901234', $handler->resolveClientIdentifier($invoice, 'FR:SIRENE'));
+
+        $invoice->client->id_number = '123456789';
+        $this->assertEquals('123456789', $handler->resolveClientIdentifier($invoice, 'FR:SIRENE'));
+    }
+
+    public function testFR_ResolveRoutingOverride(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('FR');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->id_number = '123456789';
+
+        $this->assertEquals('FR:SIRENE', $handler->resolveRoutingOverride('business', $invoice));
+
+        $invoice->client->id_number = '12345678901234';
+        $this->assertEquals('FR:SIRET', $handler->resolveRoutingOverride('business', $invoice));
+        $this->assertEquals('0009:11000201100044', $handler->resolveRoutingOverride('government', $invoice));
+        $this->assertNull($handler->resolveRoutingOverride('individual', $invoice));
+    }
+
+    public function testFR_ResolveTaxSchemeOverride(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('FR');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+
+        $this->assertEquals('0009:11000201100044', $handler->resolveTaxSchemeOverride('government', $invoice));
+        $this->assertNull($handler->resolveTaxSchemeOverride('business', $invoice));
+        $this->assertNull($handler->resolveTaxSchemeOverride('individual', $invoice));
+    }
+
+    public function testDE_ResolveClientIdentifier(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('DE');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->classification = 'government';
+        $invoice->client->routing_id = '10101010-STO-10';
+
+        $this->assertEquals('10101010-STO-10', $handler->resolveClientIdentifier($invoice, 'DE:LWID'));
+
+        $invoice->client->classification = 'business';
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'DE:VAT'));
+    }
+
+    public function testDE_ResolveRoutingOverride(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('DE');
+
+        $this->assertEquals('DE:STNR', $handler->resolveRoutingOverride('individual'));
+        $this->assertNull($handler->resolveRoutingOverride('business'));
+        $this->assertNull($handler->resolveRoutingOverride('government'));
+    }
+
+    public function testDE_ResolveTaxSchemeOverride(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('DE');
+
+        $this->assertEquals('DE:STNR', $handler->resolveTaxSchemeOverride('individual'));
+        $this->assertNull($handler->resolveTaxSchemeOverride('business'));
+        $this->assertNull($handler->resolveTaxSchemeOverride('government'));
+    }
+
+    public function testIT_ResolveClientIdentifier(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('IT');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->routing_id = 'SCSCSCS';
+        $invoice->client->vat_number = 'IT12345678901';
+
+        $this->assertEquals('SCSCSCS', $handler->resolveClientIdentifier($invoice, 'IT:CUUO'));
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'IT:IVA'));
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'IT:CF'));
+    }
+
+    public function testSG_ResolveClientIdentifier(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('SG');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->id_number = '201234567K';
+
+        $this->assertEquals('201234567K', $handler->resolveClientIdentifier($invoice, 'SG:UEN'));
+
+        $invoice->client->id_number = '';
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'SG:UEN'));
+    }
+
+    public function testMY_ResolveClientIdentifier(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('MY');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->id_number = 'C12345678';
+
+        $this->assertEquals('C12345678', $handler->resolveClientIdentifier($invoice, 'MY:EIF'));
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'MY:TIN'));
+
+        $invoice->client->id_number = '';
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'MY:EIF'));
+    }
+
+    public function testBE_ResolveClientIdentifier(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('BE');
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->id_number = '0202239951';
+        $invoice->client->vat_number = 'BE0202239951';
+
+        $this->assertEquals('0202239951', $handler->resolveClientIdentifier($invoice, 'BE:EN'));
+        $this->assertNull($handler->resolveClientIdentifier($invoice, 'BE:VAT'));
+    }
+
+    public function testBaseCountry_DefaultOverrides(): void
+    {
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('XX');
+
+        $this->assertNull($handler->resolveClientIdentifier(new \stdClass(), 'XX:VAT'));
+        $this->assertNull($handler->resolveRoutingOverride('business'));
+        $this->assertNull($handler->resolveTaxSchemeOverride('business'));
+        $this->assertNull($handler->getRoutingRules());
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  UNIT TESTS: RO State/Sector Code Resolution
+    // ══════════════════════════════════════════════════════════════
+
+    public function testRO_StateCodeResolution(): void
+    {
+        $handler = new \App\Services\EDocument\Standards\Peppol\RO();
+
+        // Direct code
+        $this->assertEquals('RO-B', $handler->getStateCode('RO-B'));
+        $this->assertEquals('RO-CJ', $handler->getStateCode('RO-CJ'));
+
+        // Name lookup
+        $this->assertEquals('RO-B', $handler->getStateCode('Bucharest'));
+        $this->assertEquals('RO-CJ', $handler->getStateCode('Cluj'));
+
+        // Fallback to RO-B
+        $this->assertEquals('RO-B', $handler->getStateCode('Unknown'));
+        $this->assertEquals('RO-B', $handler->getStateCode(''));
+    }
+
+    public function testRO_SectorCodeResolution(): void
+    {
+        $handler = new \App\Services\EDocument\Standards\Peppol\RO();
+
+        $invoice = new \stdClass();
+        $invoice->client = new \stdClass();
+        $invoice->client->state = 'RO-B';
+        $invoice->client->city = 'SECTOR1';
+
+        // Bucharest: should return sector code
+        $this->assertEquals('SECTOR1', $handler->getSectorCode('SECTOR1', $invoice));
+
+        // Non-Bucharest: should return the city as-is
+        $invoice->client->state = 'RO-CJ';
+        $invoice->client->city = 'Cluj-Napoca';
+        $this->assertEquals('Cluj-Napoca', $handler->getSectorCode('Cluj-Napoca', $invoice));
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  B2G DOMESTIC TESTS (Government routing)
+    // ══════════════════════════════════════════════════════════════
+
+    public function testAU_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'AU', 'client_country' => 'AU',
+            'client_classification' => 'government',
+        ]);
+        $this->runAndValidate($data['invoice'], 'AU => AU (government)');
+    }
+
+    public function testBE_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'BE', 'client_country' => 'BE',
+            'client_classification' => 'government',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'BE => BE (government)');
+
+        if (isset($result['meta']['routing'])) {
+            $beRoute = $this->findRoutingScheme($result['meta'], 'BE:EN');
+            $this->assertNotNull($beRoute, 'BE government should route via BE:EN');
+        }
+    }
+
+    public function testCH_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'CH', 'client_country' => 'CH',
+            'client_classification' => 'government',
+        ]);
+        $this->runAndValidate($data['invoice'], 'CH => CH (government)');
+    }
+
+    public function testDK_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DK', 'client_country' => 'DK',
+            'client_classification' => 'government',
+        ]);
+        $this->runAndValidate($data['invoice'], 'DK => DK (government)');
+    }
+
+    public function testFI_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FI', 'client_country' => 'FI',
+            'client_classification' => 'government',
+        ]);
+        $this->runAndValidate($data['invoice'], 'FI => FI (government)');
+    }
+
+    public function testNL_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'NL', 'client_country' => 'NL',
+            'client_classification' => 'government',
+            'client_id_number' => '00000001001234567890',
+        ]);
+        $this->runAndValidate($data['invoice'], 'NL => NL (government)');
+    }
+
+    public function testNZ_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'NZ', 'client_country' => 'NZ',
+            'client_classification' => 'government',
+        ]);
+        $this->runAndValidate($data['invoice'], 'NZ => NZ (government)');
+    }
+
+    public function testPL_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'PL', 'client_country' => 'PL',
+            'client_classification' => 'government',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'PL => PL (government)');
+
+        if (isset($result['meta']['networks'])) {
+            $ksefFound = false;
+            foreach ($result['meta']['networks'] as $network) {
+                if (($network['application'] ?? '') === 'pl-ksef') {
+                    $ksefFound = true;
+                }
+            }
+            $this->assertTrue($ksefFound, 'PL B2G should enable pl-ksef network');
+        }
+    }
+
+    public function testRO_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'RO', 'client_country' => 'RO',
+            'client_classification' => 'government',
+            'client_state' => 'RO-B',
+            'client_city' => 'SECTOR1',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'RO => RO (government)');
+
+        if (isset($result['meta']['networks'])) {
+            $anafFound = false;
+            foreach ($result['meta']['networks'] as $network) {
+                if (($network['application'] ?? '') === 'ro-anaf') {
+                    $anafFound = true;
+                }
+            }
+            $this->assertTrue($anafFound, 'RO B2G should enable ro-anaf network');
+        }
+    }
+
+    public function testSE_Domestic_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'SE', 'client_country' => 'SE',
+            'client_classification' => 'government',
+        ]);
+        $this->runAndValidate($data['invoice'], 'SE => SE (government)');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  B2C DOMESTIC TESTS (Individual/Consumer routing)
+    // ══════════════════════════════════════════════════════════════
+
+    public function testAT_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'AT', 'client_country' => 'AT',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'AT => AT (B2C)');
+    }
+
+    public function testAU_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'AU', 'client_country' => 'AU',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'AU => AU (B2C)');
+    }
+
+    public function testBE_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'BE', 'client_country' => 'BE',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'BE => BE (B2C)');
+    }
+
+    public function testCH_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'CH', 'client_country' => 'CH',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'CH => CH (B2C)');
+    }
+
+    public function testDK_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DK', 'client_country' => 'DK',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'DK => DK (B2C)');
+    }
+
+    public function testES_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'ES', 'client_country' => 'ES',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'ES => ES (B2C)');
+    }
+
+    public function testFI_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FI', 'client_country' => 'FI',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'FI => FI (B2C)');
+    }
+
+    public function testMY_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'MY', 'client_country' => 'MY',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'MY => MY (B2C)');
+
+        if (isset($result['meta']['routing']['emails'])) {
+            $this->assertNotEmpty($result['meta']['routing']['emails'], 'MY B2C should have email routing');
+        }
+    }
+
+    public function testNL_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'NL', 'client_country' => 'NL',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'NL => NL (B2C)');
+    }
+
+    public function testNZ_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'NZ', 'client_country' => 'NZ',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'NZ => NZ (B2C)');
+    }
+
+    public function testPL_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'PL', 'client_country' => 'PL',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'PL => PL (B2C)');
+    }
+
+    public function testRO_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'RO', 'client_country' => 'RO',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+            'client_state' => 'RO-B',
+            'client_city' => 'SECTOR1',
+        ]);
+        $this->runAndValidate($data['invoice'], 'RO => RO (B2C)');
+    }
+
+    public function testSE_Domestic_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'SE', 'client_country' => 'SE',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'INDIVIDUAL123',
+        ]);
+        $this->runAndValidate($data['invoice'], 'SE => SE (B2C)');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  RECEIVER MUTATION CROSS-BORDER TESTS
+    // ══════════════════════════════════════════════════════════════
+
+    // ── FR receiver mutations ──
+
+    public function testES_to_FR_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'ES', 'client_country' => 'FR',
+            'client_classification' => 'government',
+            'client_id_number' => '12345678901234',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'ES => FR (B2G)');
+
+        if (isset($result['meta']['routing'])) {
+            $siretRoute = $this->findRoutingScheme($result['meta'], 'FR:SIRET');
+            $this->assertNotNull($siretRoute, 'Cross-border to FR government should route via Chorus Pro');
+        }
+    }
+
+    public function testDE_to_FR_B2C(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'FR',
+            'client_classification' => 'individual',
+            'client_vat' => '',
+            'client_id_number' => 'FRINDIVIDUAL',
+        ]);
+        $this->runAndValidate($data['invoice'], 'DE => FR (B2C)');
+    }
+
+    public function testIT_to_FR_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'FR',
+            'client_classification' => 'government',
+            'client_id_number' => '12345678901234',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'IT => FR (B2G)');
+
+        if (isset($result['meta']['routing'])) {
+            $siretRoute = $this->findRoutingScheme($result['meta'], 'FR:SIRET');
+            $this->assertNotNull($siretRoute, 'IT to FR government should route via Chorus Pro');
+        }
+    }
+
+    // ── DE receiver mutations ──
+
+    public function testFR_to_DE_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'DE',
+            'client_classification' => 'government',
+            'client_routing_id' => '991-12345-67',
+            'client_vat' => '',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'FR => DE (B2G)');
+
+        if (isset($result['meta']['routing'])) {
+            $lwidRoute = $this->findRoutingScheme($result['meta'], 'DE:LWID');
+            $this->assertNotNull($lwidRoute, 'Cross-border to DE government should route via DE:LWID');
+        }
+    }
+
+    public function testIT_to_DE_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'DE',
+            'client_classification' => 'government',
+            'client_routing_id' => '991-12345-67',
+            'client_vat' => '',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'IT => DE (B2G)');
+
+        if (isset($result['meta']['routing'])) {
+            $lwidRoute = $this->findRoutingScheme($result['meta'], 'DE:LWID');
+            $this->assertNotNull($lwidRoute, 'IT to DE government should route via DE:LWID');
+        }
+    }
+
+    // ── SG receiver mutations ──
+
+    public function testDE_to_SG_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'SG',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'DE => SG (B2B)');
+
+        if (isset($result['meta']['routing'])) {
+            $uenRoute = $this->findRoutingScheme($result['meta'], 'SG:UEN');
+            $this->assertNotNull($uenRoute, 'Cross-border to SG B2B should route via SG:UEN');
+        }
+    }
+
+    public function testDE_to_SG_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'SG',
+            'client_classification' => 'government',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'DE => SG (B2G)');
+
+        if (isset($result['meta']['routing'])) {
+            $uenRoute = $this->findRoutingScheme($result['meta'], 'SG:UEN');
+            $this->assertNotNull($uenRoute, 'Cross-border to SG B2G should route via SG:UEN');
+        }
+    }
+
+    public function testFR_to_SG_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'SG',
+        ]);
+        $this->runAndValidate($data['invoice'], 'FR => SG (B2B)');
+    }
+
+    // ── ES receiver mutations ──
+
+    public function testDE_to_ES_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'ES',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'DE => ES (B2B)');
+    }
+
+    public function testDE_to_ES_Government(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'ES',
+            'client_classification' => 'government',
+            'client_routing_id' => 'L01234567;REC001;PAG001',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'DE => ES (B2G)');
+
+        if (isset($result['meta']['routing'])) {
+            $faceRoute = $this->findRoutingScheme($result['meta'], 'ES:FACE');
+            $this->assertNotNull($faceRoute, 'Cross-border to ES government should route via ES:FACE');
+        }
+    }
+
+    public function testFR_to_ES_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'ES',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'FR => ES (B2B)');
+    }
+
+    // ── IT receiver mutations ──
+
+    public function testFR_to_IT_B2B_ReceiverMutations(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'IT',
+            'has_valid_vat' => true,
+            'client_routing_id' => 'SCSCSCS',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'FR => IT (B2B receiver)');
+
+        if (isset($result['meta']['routing'])) {
+            $this->assertNotNull($this->findRoutingScheme($result['meta'], 'IT:IVA'), 'FR to IT B2B should include IT:IVA');
+            $this->assertNotNull($this->findRoutingScheme($result['meta'], 'IT:CUUO'), 'FR to IT B2B should include IT:CUUO');
+        }
+    }
+
+    public function testES_to_IT_B2B(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'ES', 'client_country' => 'IT',
+            'has_valid_vat' => true,
+            'client_routing_id' => 'SCSCSCS',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'ES => IT (B2B)');
+
+        if (isset($result['meta']['routing'])) {
+            $this->assertNotNull($this->findRoutingScheme($result['meta'], 'IT:IVA'), 'ES to IT should include IT:IVA');
+        }
+    }
+
+    public function testAU_to_IT_B2B(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'AU', 'client_country' => 'IT',
+            'client_routing_id' => 'SCSCSCS',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'AU => IT (B2B)');
+
+        if (isset($result['meta']['routing'])) {
+            $this->assertNotNull($this->findRoutingScheme($result['meta'], 'IT:IVA'), 'Non-EU to IT should include IT:IVA');
+            $this->assertNotNull($this->findRoutingScheme($result['meta'], 'IT:CUUO'), 'Non-EU to IT should include IT:CUUO');
+        }
+    }
+
+    // ── BE receiver mutations ──
+
+    public function testFR_to_BE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'BE',
+            'has_valid_vat' => true,
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'FR => BE (B2B)');
+
+        if (isset($result['meta']['routing'])) {
+            $beRoute = $this->findRoutingScheme($result['meta'], 'BE:EN');
+            $this->assertNotNull($beRoute, 'FR to BE should route via BE:EN');
+        }
+    }
+
+    public function testIT_to_BE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'BE',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'IT => BE (B2B)');
+    }
+
+    // ── PL receiver mutations ──
+
+    public function testDE_to_PL_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'PL',
+            'has_valid_vat' => true,
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'DE => PL (B2B)');
+
+        if (isset($result['meta']['routing'])) {
+            $plRoute = $this->findRoutingScheme($result['meta'], 'PL:VAT');
+            $this->assertNotNull($plRoute, 'Cross-border to PL should route via PL:VAT');
+        }
+    }
+
+    public function testFR_to_PL_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'PL',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'FR => PL (B2B)');
+    }
+
+    // ── MY receiver mutations ──
+
+    public function testDE_to_MY_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'MY',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'DE => MY (B2B)');
+
+        if (isset($result['meta']['routing'])) {
+            $myRoute = $this->findRoutingScheme($result['meta'], 'MY:EIF');
+            $this->assertNotNull($myRoute, 'Cross-border to MY should route via MY:EIF');
+        }
+    }
+
+    public function testAU_to_MY_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'AU', 'client_country' => 'MY',
+        ]);
+        $this->runAndValidate($data['invoice'], 'AU => MY (B2B)');
+    }
+
+    // ── RO receiver mutations ──
+
+    public function testFR_to_RO_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'FR', 'client_country' => 'RO',
+            'has_valid_vat' => true,
+            'client_state' => 'RO-CJ',
+            'client_city' => 'Cluj-Napoca',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'FR => RO (B2B)');
+
+        if (isset($result['meta']['networks'])) {
+            $anafFound = false;
+            foreach ($result['meta']['networks'] as $network) {
+                if (($network['application'] ?? '') === 'ro-anaf') {
+                    $anafFound = true;
+                }
+            }
+            $this->assertTrue($anafFound, 'FR to RO should enable ro-anaf network');
+        }
+    }
+
+    public function testIT_to_RO_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'RO',
+            'has_valid_vat' => true,
+            'client_state' => 'RO-B',
+            'client_city' => 'SECTOR1',
+        ]);
+        $this->runAndValidate($data['invoice'], 'IT => RO (B2B)');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  ADDITIONAL CROSS-BORDER SENDER TESTS
+    // ══════════════════════════════════════════════════════════════
+
+    public function testCH_to_DE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'CH', 'client_country' => 'DE',
+        ]);
+        $this->runAndValidate($data['invoice'], 'CH => DE (B2B)');
+    }
+
+    public function testNZ_to_AU_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'NZ', 'client_country' => 'AU',
+        ]);
+        $this->runAndValidate($data['invoice'], 'NZ => AU (B2B)');
+    }
+
+    public function testSG_to_AU_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'SG', 'client_country' => 'AU',
+        ]);
+        $this->runAndValidate($data['invoice'], 'SG => AU (B2B)');
+    }
+
+    public function testSG_to_DE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'SG', 'client_country' => 'DE',
+        ]);
+        $this->runAndValidate($data['invoice'], 'SG => DE (B2B)');
+    }
+
+    public function testRO_to_IT_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'RO', 'client_country' => 'IT',
+            'has_valid_vat' => true,
+            'company_state' => 'RO-B',
+            'company_city' => 'SECTOR1',
+            'client_routing_id' => 'SCSCSCS',
+        ]);
+        $this->runAndValidate($data['invoice'], 'RO => IT (B2B)');
+    }
+
+    public function testBE_to_FR_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'BE', 'client_country' => 'FR',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'BE => FR (B2B)');
+    }
+
+    public function testBE_to_DE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'BE', 'client_country' => 'DE',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'BE => DE (B2B)');
+    }
+
+    public function testES_to_DE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'ES', 'client_country' => 'DE',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'ES => DE (B2B)');
+    }
+
+    public function testDK_to_DE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DK', 'client_country' => 'DE',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'DK => DE (B2B)');
+    }
+
+    public function testDE_to_SE_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'SE',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'DE => SE (B2B)');
+    }
+
+    public function testDE_to_FI_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'FI',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'DE => FI (B2B)');
+    }
+
+    public function testDE_to_DK_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DE', 'client_country' => 'DK',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'DE => DK (B2B)');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  SPECIAL SCENARIO TESTS
+    // ══════════════════════════════════════════════════════════════
+
+    // ── DK: PaymentMeans code remapping (30 → 58) ──
+
+    public function testDK_PaymentMeansRemapping(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'DK', 'client_country' => 'DK',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'DK PaymentMeans remap');
+
+        // DK should remap PaymentMeansCode 30 to 58 (SEPA)
+        if (isset($result['peppol']->PaymentMeans)) {
+            foreach ($result['peppol']->PaymentMeans as $pm) {
+                if (isset($pm->PaymentMeansCode)) {
+                    $this->assertNotEquals('30', $pm->PaymentMeansCode->value, 'DK should remap code 30 to 58');
+                }
+            }
+        }
+    }
+
+    // ── ES: PaymentMeans required for B2B ──
+
+    public function testES_B2B_PaymentMeans(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'ES', 'client_country' => 'ES',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'ES B2B PaymentMeans');
+
+        $this->assertNotNull($result['peppol']->PaymentMeans, 'ES B2B should set PaymentMeans');
+    }
+
+    // ── ES: FACe routing ID parsing variations ──
+
+    public function testES_FACe_SingleCode(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'ES', 'client_country' => 'ES',
+            'client_classification' => 'government',
+            'client_routing_id' => 'L01234567',
+        ]);
+        $result = $this->runAndValidate($data['invoice'], 'ES FACe single code');
+
+        if (isset($result['meta']['routing'])) {
+            $faceRoute = $this->findRoutingScheme($result['meta'], 'ES:FACE');
+            $this->assertNotNull($faceRoute, 'ES FACe with single code should still route');
+        }
+    }
+
+    // ── IT: Foreign receiver routing (IT sender, non-IT receiver) ──
+
+    public function testIT_to_DE_B2B(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'DE',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'IT => DE (foreign receiver)');
+    }
+
+    public function testIT_to_NL_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'NL',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'IT => NL (foreign receiver)');
+    }
+
+    public function testIT_to_ES_Business(): void
+    {
+        $data = $this->buildScenario([
+            'company_country' => 'IT', 'client_country' => 'ES',
+            'has_valid_vat' => true,
+        ]);
+        $this->runAndValidate($data['invoice'], 'IT => ES (foreign receiver)');
+    }
+
+    // ── CountryFactory: Handler registration ──
+
+    public function testCountryFactory_AllHandlersRegistered(): void
+    {
+        $expectedCountries = ['AT', 'AU', 'BE', 'CH', 'DE', 'DK', 'ES', 'FI', 'FR', 'IT', 'MY', 'NL', 'NZ', 'PL', 'RO', 'SE', 'SG'];
+
+        foreach ($expectedCountries as $code) {
+            $this->assertTrue(
+                \App\Services\EDocument\Standards\Peppol\CountryFactory::has($code),
+                "CountryFactory should have handler for {$code}"
+            );
+        }
+
+        // Unsupported country should return BaseCountry
+        $handler = \App\Services\EDocument\Standards\Peppol\CountryFactory::make('XX');
+        $this->assertInstanceOf(\App\Services\EDocument\Standards\Peppol\BaseCountry::class, $handler);
+    }
 }
