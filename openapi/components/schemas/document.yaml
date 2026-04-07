@@ -9,6 +9,7 @@
           description: 'The user hashed id'
           type: string
           example: ''
+          readOnly: true
         assigned_user_id:
           description: 'The assigned user hashed id'
           type: string
@@ -18,54 +19,87 @@
           type: string
           example: ''
         vendor_id:
-          description: 'The vendor associated with this documents'
+          description: 'The vendor associated with this document'
           type: string
           example: ''
         name:
           description: 'The document name'
           type: string
-          example: Beauty
+          example: 'contract.pdf'
         url:
           description: 'The document url'
           type: string
-          example: Beauty
+          example: 'https://invoicing.co/api/v1/documents/AS3df3A/download'
+          readOnly: true
         preview:
           description: 'The document preview url'
           type: string
-          example: Beauty
+          example: 'https://invoicing.co/api/v1/documents/AS3df3A/download?inline=true'
+          readOnly: true
         type:
-          description: 'The document type'
+          description: 'The document file type (extension)'
           type: string
-          example: Beauty
+          example: 'pdf'
+          readOnly: true
         disk:
-          description: 'The document disk'
+          description: 'The storage disk for the document'
           type: string
-          example: Beauty
+          example: 'public'
+          readOnly: true
         hash:
-          description: 'The document hashed'
+          description: 'The file hash'
           type: string
-          example: Beauty
+          example: 'a1b2c3d4e5f6'
+          readOnly: true
+        size:
+          description: 'The file size in bytes'
+          type: integer
+          example: 204800
+          readOnly: true
+        width:
+          description: 'The image width in pixels (0 for non-image documents)'
+          type: integer
+          example: 0
+          readOnly: true
+        height:
+          description: 'The image height in pixels (0 for non-image documents)'
+          type: integer
+          example: 0
+          readOnly: true
         is_deleted:
           description: 'Flag to determine if the document is deleted'
           type: boolean
-          example: true
+          example: false
+          readOnly: true
         is_default:
           description: 'Flag to determine if the document is a default doc'
           type: boolean
+          example: false
+        is_public:
+          description: 'Flag to determine if the document is publicly accessible via client portal'
+          type: boolean
           example: true
+        link:
+          description: 'A link to the parent entity in the client portal'
+          type: string
+          example: ''
+          readOnly: true
         created_at:
           description: Timestamp
           type: number
           format: integer
           example: 134341234234
+          readOnly: true
         updated_at:
           description: Timestamp
           type: number
           format: integer
           example: 134341234234
-        deleted_at:
+          readOnly: true
+        archived_at:
           description: Timestamp
           type: number
           format: integer
           example: 134341234234
+          readOnly: true
       type: object
