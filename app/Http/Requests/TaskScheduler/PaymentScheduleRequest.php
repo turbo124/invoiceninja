@@ -13,8 +13,8 @@
 namespace App\Http\Requests\TaskScheduler;
 
 use App\Utils\BcMath;
+use App\Models\Invoice;
 use App\Http\Requests\Request;
-use App\Models\RecurringQuote;
 use Illuminate\Support\Carbon;
 use App\Models\RecurringInvoice;
 
@@ -27,7 +27,10 @@ class PaymentScheduleRequest extends Request
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('edit', $this->invoice);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        return $user->can('edit', $this->invoice);
     }
 
     public function rules()
@@ -56,6 +59,7 @@ class PaymentScheduleRequest extends Request
         $input['name'] = "Payment Schedule for Invoice #{$this->invoice->number}";
         $input['is_paused'] = false;
         $input['parameters']['auto_bill'] = (bool) isset($input['parameters']['auto_bill']) ? $input['parameters']['auto_bill'] : false;
+        $input['parameters']['schedule_basis'] = $this->scheduleBasis();
 
         if (isset($input['parameters']['schedule']) && is_array($input['parameters']['schedule']) && count($input['parameters']['schedule']) > 0) {
             $input['parameters']['schedule'] = $input['parameters']['schedule'];
@@ -74,10 +78,11 @@ class PaymentScheduleRequest extends Request
             });
 
             $first_map = $schedule_map->first();
+            $basis = $this->scheduleBasis();
 
-            if ($first_map['is_amount'] && !BcMath::equal($schedule_map->sum('amount'), $this->invoice->amount)) {
+            if ($first_map['is_amount'] && !BcMath::equal($schedule_map->sum('amount'), $basis)) {
                 $validator = \Validator::make([], []);
-                $validator->errors()->add('schedule', 'The total amount of the schedule does not match the invoice amount.');
+                $validator->errors()->add('schedule', 'The total amount of the schedule does not match the outstanding invoice balance.');
                 throw new \Illuminate\Validation\ValidationException($validator);
             } elseif (!$first_map['is_amount'] && !BcMath::equal($schedule_map->sum('amount'), 100)) {
                 $validator = \Validator::make([], []);
@@ -105,14 +110,14 @@ class PaymentScheduleRequest extends Request
     private function generateSchedule(int $frequency_id, int $remaining_cycles, Carbon $due_date)
     {
 
-
-        $amount = round($this->invoice->amount / $remaining_cycles, 2);
+        $basis = $this->scheduleBasis();
+        $amount = round($basis / $remaining_cycles, 2);
 
         $delta = round($amount * $remaining_cycles, 2);
         $adjustment = 0;
 
-        if (!BcMath::equal($delta, $this->invoice->amount)) {
-            $adjustment = round(floatval($this->invoice->amount) - floatval($delta), 2); //adjustment to make the total amount equal to the invoice amount
+        if (!BcMath::equal($delta, $basis)) {
+            $adjustment = round(floatval($basis) - floatval($delta), 2); //adjustment to make the total amount equal to the schedule basis
         }
 
         $schedule = [];
@@ -131,6 +136,11 @@ class PaymentScheduleRequest extends Request
         }
 
         return $schedule;
+    }
+
+    private function scheduleBasis(): float
+    {
+        return (float) ($this->invoice->status_id == Invoice::STATUS_DRAFT ? $this->invoice->amount : $this->invoice->balance);
     }
 
     private function generateScheduleByFrequency(int $frequency_id, Carbon $date)

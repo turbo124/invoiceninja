@@ -145,12 +145,18 @@ class StoreSchedulerRequest extends Request
 
         $schedule = collect($this->parameters['schedule']);
         $is_amount = (bool) ($schedule->first()['is_amount'] ?? false);
+        $basis = $this->paymentScheduleBasis($invoice);
 
-        if ($is_amount && !BcMath::equal($schedule->sum('amount'), $invoice->amount)) {
-            $validator->errors()->add('schedule', 'The total amount of the schedule does not match the invoice amount.');
+        if ($is_amount && !BcMath::equal($schedule->sum('amount'), $basis)) {
+            $validator->errors()->add('schedule', 'The total amount of the schedule does not match the outstanding invoice balance.');
         } elseif (!$is_amount && !BcMath::equal($schedule->sum('amount'), 100)) {
             $validator->errors()->add('schedule', 'The total percentage amount of the schedule does not match 100%.');
         }
+    }
+
+    private function paymentScheduleBasis(Invoice $invoice): float
+    {
+        return (float) ($invoice->status_id == Invoice::STATUS_DRAFT ? $invoice->amount : $invoice->balance);
     }
 
     public function prepareForValidation()
@@ -192,6 +198,7 @@ class StoreSchedulerRequest extends Request
         if ($input['template'] == 'payment_schedule' && isset($input['parameters']['invoice_id'])) {
             $i = Invoice::withTrashed()->find($this->decodePrimaryKey($input['parameters']['invoice_id']));
             $input['name'] = ctrans('texts.payment_schedule') . " " . ctrans('texts.invoice_number_short') . " " . $i->number;
+            $input['parameters']['schedule_basis'] = $this->paymentScheduleBasis($i);
         } elseif ($input['template'] == 'invoice_outstanding_tasks') {
             $input['name'] = ctrans('texts.invoice_outstanding_tasks');
         }

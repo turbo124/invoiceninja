@@ -909,9 +909,10 @@ class Invoice extends BaseModel
         $formatted_string = "<div id=\"payment-schedule\">";
 
         $formatted_string .= "<p><span class=\"payment-schedule-title\"><b>" . ctrans('texts.payment_schedule') . "</b></span></p>";
+        $basis = (float) ($schedule->parameters['schedule_basis'] ?? $this->amount);
 
         foreach ($schedule->parameters['schedule'] as $key => $item) {
-            $amount = $item['is_amount'] ? $item['amount'] : round($this->amount * ($item['amount'] / 100), 2);
+            $amount = $item['is_amount'] ? $item['amount'] : round($basis * ($item['amount'] / 100), 2);
             $amount = \App\Utils\Number::formatMoney($amount, $this->client);
 
             $schedule_text = ctrans('texts.payment_schedule_table', ['key' => $key + 1, 'date' => $this->formatDate($item['date'], $this->client->date_format()), 'amount' => $amount]);
@@ -946,7 +947,8 @@ class Invoice extends BaseModel
             }
         }
 
-        $amount = $schedule_array[$index]['is_amount'] ? \App\Utils\Number::formatMoney($schedule_array[$index]['amount'], $this->client) : \App\Utils\Number::formatMoney(($schedule_array[$index]['amount'] / 100) * $this->amount, $this->client);
+        $basis = (float) ($schedule->parameters['schedule_basis'] ?? $this->amount);
+        $amount = $schedule_array[$index]['is_amount'] ? \App\Utils\Number::formatMoney($schedule_array[$index]['amount'], $this->client) : \App\Utils\Number::formatMoney(($schedule_array[$index]['amount'] / 100) * $basis, $this->client);
 
         return ctrans('texts.payment_schedule_interval', ['index' => $index + 1, 'total' => count($schedule_array), 'amount' => $amount]);
     }

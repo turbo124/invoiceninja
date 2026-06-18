@@ -69,9 +69,10 @@ class PaymentSchedule
             return;
         }
 
-        $amount = $first['is_amount'] ? $first['amount'] : round(($first['amount'] / 100) * $invoice->amount, 2);
+        $basis = $this->scheduleBasis($invoice);
+        $amount = $first['is_amount'] ? $first['amount'] : round(($first['amount'] / 100) * $basis, 2);
 
-        $amount = min($amount, $invoice->amount);
+        $amount = min($amount, $basis);
 
         // A draft invoice has not had its balance populated yet (balance == 0), so only clamp
         // to balance once it reflects a real outstanding amount - otherwise the partial is
@@ -134,9 +135,10 @@ class PaymentSchedule
             $invoice->partial_due_date = null;
             $invoice->due_date = now()->subSeconds($offset)->format('Y-m-d');
         } else {
-            $amount = $next_schedule['is_amount'] ? $next_schedule['amount'] : round(($next_schedule['amount'] / 100) * $invoice->amount, 2);
+            $basis = $this->scheduleBasis($invoice);
+            $amount = $next_schedule['is_amount'] ? $next_schedule['amount'] : round(($next_schedule['amount'] / 100) * $basis, 2);
 
-            $amount = min($amount, $invoice->amount);
+            $amount = min($amount, $basis);
 
             if ($amount > $invoice->balance) {
                 $amount = $invoice->balance;
@@ -170,5 +172,10 @@ class PaymentSchedule
         } else {
             $this->scheduler->forceDelete();
         }
+    }
+
+    private function scheduleBasis(Invoice $invoice): float
+    {
+        return (float) ($this->scheduler->parameters['schedule_basis'] ?? $invoice->amount);
     }
 }

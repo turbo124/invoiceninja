@@ -839,6 +839,96 @@ class SchedulerTest extends TestCase
         $this->assertEquals($date->addMonthNoOverflow()->format($this->company->date_format()), $arr['data']['schedule'][2]['date']);
     }
 
+    public function testPaymentScheduleRequestWithFrequencyUsesBalanceForPartiallyPaidInvoice()
+    {
+        $invoice = Invoice::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'date' => now()->format('Y-m-d'),
+            'due_date' => now()->addDays(30)->format('Y-m-d'),
+            'amount' => 300.00,
+            'balance' => 200.00,
+            'paid_to_date' => 100.00,
+            'status_id' => Invoice::STATUS_PARTIAL,
+        ]);
+
+        $data = [
+            'frequency_id' => 5,
+            'remaining_cycles' => 2,
+            'auto_bill' => false,
+            'next_run' => now()->addDays(30)->format('Y-m-d'),
+        ];
+
+        $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/invoices/'.$invoice->hashed_id.'/payment_schedule?show_schedule=true', $data)
+            ->assertStatus(200);
+
+        $scheduler = Scheduler::where('company_id', $invoice->company_id)
+            ->where('template', 'payment_schedule')
+            ->where('parameters->invoice_id', $invoice->hashed_id)
+            ->first();
+
+        $this->assertNotNull($scheduler);
+        $this->assertEquals(200, $scheduler->parameters['schedule_basis']);
+        $this->assertEquals(100, $scheduler->parameters['schedule'][0]['amount']);
+        $this->assertEquals(100, $scheduler->parameters['schedule'][1]['amount']);
+        $this->assertEquals(100, $invoice->fresh()->partial);
+    }
+
+    public function testPaymentScheduleRequestManualAmountsUseBalanceForPartiallyPaidInvoice()
+    {
+        $invoice = Invoice::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'date' => now()->format('Y-m-d'),
+            'due_date' => now()->addDays(30)->format('Y-m-d'),
+            'amount' => 300.00,
+            'balance' => 200.00,
+            'paid_to_date' => 100.00,
+            'status_id' => Invoice::STATUS_PARTIAL,
+        ]);
+
+        $valid_data = [
+            'schedule' => [
+                ['id' => 1, 'date' => now()->format('Y-m-d'), 'amount' => 100, 'is_amount' => true],
+                ['id' => 2, 'date' => now()->addDays(30)->format('Y-m-d'), 'amount' => 100, 'is_amount' => true],
+            ],
+            'auto_bill' => false,
+            'next_run' => now()->format('Y-m-d'),
+        ];
+
+        $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/invoices/'.$invoice->hashed_id.'/payment_schedule', $valid_data)
+            ->assertStatus(200);
+
+        $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->deleteJson('/api/v1/invoices/'.$invoice->hashed_id.'/payment_schedule')
+            ->assertStatus(200);
+
+        $invalid_data = [
+            'schedule' => [
+                ['id' => 1, 'date' => now()->format('Y-m-d'), 'amount' => 150, 'is_amount' => true],
+                ['id' => 2, 'date' => now()->addDays(30)->format('Y-m-d'), 'amount' => 150, 'is_amount' => true],
+            ],
+            'auto_bill' => false,
+            'next_run' => now()->format('Y-m-d'),
+        ];
+
+        $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/invoices/'.$invoice->hashed_id.'/payment_schedule', $invalid_data)
+            ->assertStatus(422);
+    }
+
     public function testPaymentScheduleSeededViaTaskSchedulerEndpoint()
     {
         $invoice = Invoice::factory()->create([
@@ -923,6 +1013,49 @@ class SchedulerTest extends TestCase
 
         // 40 + 60 != invoice amount of 300.
         $response->assertStatus(422);
+    }
+
+    public function testPaymentScheduleViaTaskSchedulerUsesBalanceForPartiallyPaidInvoice()
+    {
+        $invoice = Invoice::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'client_id' => $this->client->id,
+            'date' => now()->format('Y-m-d'),
+            'due_date' => now()->addDays(30)->format('Y-m-d'),
+            'partial' => 0,
+            'partial_due_date' => null,
+            'amount' => 300.00,
+            'balance' => 200.00,
+            'paid_to_date' => 100.00,
+            'status_id' => Invoice::STATUS_PARTIAL,
+        ]);
+
+        $data = [
+            'name' => 'A test payment schedule scheduler',
+            'frequency_id' => 0,
+            'next_run' => now()->format('Y-m-d'),
+            'template' => 'payment_schedule',
+            'parameters' => [
+                'invoice_id' => $invoice->hashed_id,
+                'auto_bill' => false,
+                'schedule' => [
+                    ['id' => 1, 'date' => now()->format('Y-m-d'), 'amount' => 100, 'is_amount' => true],
+                    ['id' => 2, 'date' => now()->addDays(30)->format('Y-m-d'), 'amount' => 100, 'is_amount' => true],
+                ],
+            ],
+        ];
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/task_schedulers', $data);
+
+        $response->assertStatus(200);
+
+        $scheduler = Scheduler::find($this->decodePrimaryKey($response->json()['data']['id']));
+        $this->assertEquals(200, $scheduler->parameters['schedule_basis']);
+        $this->assertEquals(100, $invoice->fresh()->partial);
     }
 
     public function testPaymentScheduleSeedsFirstInstalmentOnCreation()
