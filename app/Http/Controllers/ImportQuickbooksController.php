@@ -17,6 +17,7 @@ use App\Libraries\MultiDB;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\Quickbooks\AuthQuickbooksRequest;
 use App\Services\Quickbooks\QuickbooksService;
+use App\Services\Quickbooks\Connection\QuickbooksConnection;
 
 class ImportQuickbooksController extends BaseController
 {
@@ -36,11 +37,11 @@ class ImportQuickbooksController extends BaseController
 
         $company = $request->getCompany();
 
-        $qb = new QuickbooksService($company);
+        $connection = new QuickbooksConnection($company);
 
-        $authorizationUrl = $qb->sdk()->getAuthorizationUrl();
+        $authorizationUrl = $connection->authorizationUrl();
 
-        $state = $qb->sdk()->getState();
+        $state = $connection->state();
 
         Cache::put($state, $token, 190);
 
@@ -68,10 +69,10 @@ class ImportQuickbooksController extends BaseController
             return redirect(config('ninja.react_url') . '?error=no_existing_connection');
         }
 
-        $qb = new QuickbooksService($company);
+        $connection = new QuickbooksConnection($company);
 
-        $authorizationUrl = $qb->sdk()->getAuthorizationUrl();
-        $state = $qb->sdk()->getState();
+        $authorizationUrl = $connection->authorizationUrl();
+        $state = $connection->state();
 
         // Store token AND expected realmID for validation on return
         Cache::put($state, [
@@ -114,21 +115,18 @@ class ImportQuickbooksController extends BaseController
             ));
         }
 
-        $qb = new QuickbooksService($company);
+        $connection = new QuickbooksConnection($company);
 
         nlog($realm);
 
-        $access_token_object = $qb->sdk()->accessTokenFromCode($request->query('code'), $realm);
+        $access_token_object = $connection->exchangeCodeForToken($request->query('code'), $realm);
 
         nlog($access_token_object);
 
-        // saveOAuthToken resets requires_reconnect = false
-        $qb->sdk()->saveOAuthToken($access_token_object);
-
-        // Refresh the service to initialize SDK with the new access token
-        $qb->refresh();
+        $connection->saveOAuthToken($access_token_object);
 
         // Sync the company information from Quickbooks to Invoice Ninja
+        $qb = new QuickbooksService($company->fresh() ?? $company);
         $qb->companySync();
 
         $redirect_url = $is_reconnect

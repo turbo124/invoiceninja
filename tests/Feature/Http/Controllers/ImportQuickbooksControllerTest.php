@@ -47,7 +47,7 @@ class ImportQuickbooksControllerTest extends TestCase
     public function testAuthorize(): void
     {
 
-        $this->mock->shouldReceive('getState')->andReturn($this->state);
+        $this->mock->shouldReceive('state')->andReturn($this->state);
         $this->mock->shouldReceive('getAuthorizationCodeURL')->andReturn('https://example.com');
         $this->mock->shouldReceive("getOAuth2LoginHelper")->andReturn($this->mock);
 

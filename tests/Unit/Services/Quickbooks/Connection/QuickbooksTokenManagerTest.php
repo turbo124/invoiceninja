@@ -1,34 +1,22 @@
 <?php
 
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2026. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
+namespace Tests\Unit\Services\Quickbooks\Connection;
 
-namespace Tests\Unit\Services\Quickbooks;
-
-use Mockery;
-use Tests\TestCase;
-use Tests\MockAccountData;
 use App\DataMapper\QuickbooksSettings;
 use App\Services\Quickbooks\Connection\QuickbooksReconnectNotifier;
 use App\Services\Quickbooks\Connection\QuickbooksSettingsRepository;
 use App\Services\Quickbooks\Connection\QuickbooksTokenManager;
-use App\Services\Quickbooks\SdkWrapper;
 use Illuminate\Contracts\Cache\Lock;
-use Illuminate\Support\Facades\Cache;
-use QuickBooksOnline\API\DataService\DataService;
-use QuickBooksOnline\API\Exception\ServiceException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use QuickBooksOnline\API\Core\OAuth\OAuth2\OAuth2LoginHelper;
+use Illuminate\Support\Facades\Cache;
+use Mockery;
 use QuickBooksOnline\API\Core\OAuth\OAuth2\OAuth2AccessToken;
+use QuickBooksOnline\API\Core\OAuth\OAuth2\OAuth2LoginHelper;
+use QuickBooksOnline\API\DataService\DataService;
+use Tests\MockAccountData;
+use Tests\TestCase;
 
-class SdkWrapperTokenRefreshTest extends TestCase
+class QuickbooksTokenManagerTest extends TestCase
 {
     use DatabaseTransactions;
     use MockAccountData;
@@ -42,7 +30,6 @@ class SdkWrapperTokenRefreshTest extends TestCase
         config(['services.quickbooks.client_secret' => 'test-client-secret']);
 
         Cache::flush();
-
         $this->makeTestData();
     }
 
@@ -53,11 +40,10 @@ class SdkWrapperTokenRefreshTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_refresh_token_lock_key_is_scoped_by_company_id_and_database(): void
+    public function test_refresh_if_needed_uses_company_and_database_scoped_lock(): void
     {
         $this->company->db = 'db-ninja-02';
         $this->company->save();
-
         $this->configureQuickbooks(accessTokenExpiresAt: time() + 3600);
 
         $lock = Mockery::mock(Lock::class);
@@ -71,20 +57,13 @@ class SdkWrapperTokenRefreshTest extends TestCase
             ->with("quickbooks-token-refresh:{$this->company->id}:db-ninja-02", 30)
             ->andReturn($lock);
 
-        $sdk = Mockery::mock(DataService::class)->makePartial();
-        $manager = new QuickbooksTokenManager(
-            $this->company,
-            $sdk,
-            new QuickbooksSettingsRepository($this->company),
-            Mockery::mock(QuickbooksReconnectNotifier::class)->shouldIgnoreMissing()
-        );
-
+        $manager = $this->manager(Mockery::mock(DataService::class)->makePartial());
         $manager->refreshIfNeeded();
 
         $this->addToAssertionCount(1);
     }
 
-    public function test_query_refreshes_nearly_expired_token_before_calling_quickbooks(): void
+    public function test_refresh_if_needed_refreshes_nearly_expired_access_token_and_persists_it(): void
     {
         $this->configureQuickbooks(accessTokenExpiresAt: time() + 60);
 
@@ -96,95 +75,81 @@ class SdkWrapperTokenRefreshTest extends TestCase
             ->andReturn($newToken);
 
         $sdk = Mockery::mock(DataService::class)->makePartial();
-        $sdk->shouldReceive('getOAuth2LoginHelper')
-            ->once()
-            ->andReturn($loginHelper);
+        $sdk->shouldReceive('getOAuth2LoginHelper')->once()->andReturn($loginHelper);
         $sdk->shouldReceive('updateOAuth2Token')
             ->once()
             ->with(Mockery::on(fn (OAuth2AccessToken $token): bool => $token->getAccessToken() === 'new-access-token'
                 && $token->getRefreshToken() === 'new-refresh-token'
                 && $token->getRealmID() === 'test-realm'))
             ->andReturnSelf();
-        $sdk->shouldReceive('Query')
-            ->once()
-            ->with('SELECT * FROM Customer')
-            ->andReturn([(object) ['Id' => '1']]);
 
-        $wrapper = new SdkWrapper($sdk, $this->company);
-
-        $records = $wrapper->query('SELECT * FROM Customer');
-
-        $this->assertCount(1, $records);
+        $this->manager($sdk)->refreshIfNeeded();
 
         $quickbooks = $this->company->fresh()->quickbooks;
+
         $this->assertSame('new-access-token', $quickbooks->accessTokenKey);
         $this->assertSame('new-refresh-token', $quickbooks->refresh_token);
         $this->assertSame('test-realm', $quickbooks->realmID);
-        $this->assertSame('https://sandbox-quickbooks.api.intuit.com', $quickbooks->baseURL);
     }
 
-    public function test_query_refreshes_token_and_retries_once_after_401(): void
+    public function test_expired_refresh_token_marks_reconnect_required(): void
     {
-        $this->configureQuickbooks(accessTokenExpiresAt: time() + 3600);
+        $this->configureQuickbooks(
+            accessTokenExpiresAt: time() - 60,
+            refreshTokenExpiresAt: time() - 1
+        );
 
-        $newToken = $this->makeToken('retry-access-token', 'retry-refresh-token');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Quickbooks refresh token expired');
+
+        try {
+            $this->manager(Mockery::mock(DataService::class)->makePartial())->refreshIfNeeded(true);
+        } finally {
+            $this->assertTrue($this->company->fresh()->quickbooks->requires_reconnect);
+        }
+    }
+
+    public function test_invalid_grant_marks_reconnect_required(): void
+    {
+        $this->configureQuickbooks(accessTokenExpiresAt: time() - 60);
+
         $loginHelper = Mockery::mock(OAuth2LoginHelper::class);
         $loginHelper->shouldReceive('refreshAccessTokenWithRefreshToken')
             ->once()
             ->with('test-refresh-token')
-            ->andReturn($newToken);
+            ->andThrow(new \RuntimeException('invalid_grant'));
 
         $sdk = Mockery::mock(DataService::class)->makePartial();
-        $sdk->shouldReceive('Query')
-            ->once()
-            ->with('SELECT * FROM Invoice')
-            ->andThrow(new ServiceException('Request is not made successful. Response Code:[401]', 401));
-        $sdk->shouldReceive('getOAuth2LoginHelper')
-            ->once()
-            ->andReturn($loginHelper);
-        $sdk->shouldReceive('updateOAuth2Token')
-            ->once()
-            ->with(Mockery::on(fn (OAuth2AccessToken $token): bool => $token->getAccessToken() === 'retry-access-token'))
-            ->andReturnSelf();
-        $sdk->shouldReceive('Query')
-            ->once()
-            ->with('SELECT * FROM Invoice')
-            ->andReturn([(object) ['Id' => '10']]);
+        $sdk->shouldReceive('getOAuth2LoginHelper')->once()->andReturn($loginHelper);
 
-        $wrapper = new SdkWrapper($sdk, $this->company);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('invalid_grant');
 
-        $records = $wrapper->query('SELECT * FROM Invoice');
-
-        $this->assertCount(1, $records);
-        $this->assertSame('retry-access-token', $this->company->fresh()->quickbooks->accessTokenKey);
+        try {
+            $this->manager($sdk)->refreshIfNeeded(true);
+        } finally {
+            $this->assertTrue($this->company->fresh()->quickbooks->requires_reconnect);
+        }
     }
 
-    public function test_fetch_records_page_uses_start_position_and_page_size(): void
+    private function manager(DataService $sdk): QuickbooksTokenManager
     {
-        $this->configureQuickbooks(accessTokenExpiresAt: time() + 3600);
-
-        $sdk = Mockery::mock(DataService::class)->makePartial();
-        $sdk->shouldReceive('Query')
-            ->once()
-            ->with('select * from Customer', 1001, 1000)
-            ->andReturn((object) ['Id' => '42']);
-
-        $wrapper = new SdkWrapper($sdk, $this->company);
-
-        $records = $wrapper->fetchRecordsPage('Customer', 1001, 5000);
-
-        $this->assertCount(1, $records);
-        $this->assertSame('42', $records[0]->Id);
+        return new QuickbooksTokenManager(
+            $this->company,
+            $sdk,
+            new QuickbooksSettingsRepository($this->company),
+            Mockery::mock(QuickbooksReconnectNotifier::class)->shouldIgnoreMissing()
+        );
     }
 
-    private function configureQuickbooks(int $accessTokenExpiresAt): void
+    private function configureQuickbooks(int $accessTokenExpiresAt, ?int $refreshTokenExpiresAt = null): void
     {
         $this->company->quickbooks = new QuickbooksSettings([
             'accessTokenKey' => 'test-access-token',
             'refresh_token' => 'test-refresh-token',
             'realmID' => 'test-realm',
             'accessTokenExpiresAt' => $accessTokenExpiresAt,
-            'refreshTokenExpiresAt' => time() + 86400,
+            'refreshTokenExpiresAt' => $refreshTokenExpiresAt ?? time() + 86400,
             'baseURL' => 'https://sandbox-quickbooks.api.intuit.com',
             'companyName' => 'Test Company',
             'settings' => [],
@@ -202,8 +167,9 @@ class SdkWrapperTokenRefreshTest extends TestCase
             3600,
             8726400
         );
-        $token->setAccessTokenExpiresAt(time() + 3600);
-        $token->setRefreshTokenExpiresAt(time() + 8726400);
+
+        $token->setAccessTokenExpiresAt(now()->addHour()->timestamp);
+        $token->setRefreshTokenExpiresAt(now()->addDays(100)->timestamp);
         $token->setRealmID('test-realm');
         $token->setBaseURL('https://sandbox-quickbooks.api.intuit.com');
 

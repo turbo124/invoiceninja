@@ -34,7 +34,7 @@ class QuickbooksServiceTest extends TestCase
 
     /**
      * Build a Company with quickbooks settings so QuickbooksService::init() can run.
-     * Uses future expiry so checkToken() does not try to refresh when SDK is configured.
+     * Uses future expiry so connection setup does not try to refresh when SDK is configured.
      */
     private function companyWithQuickbooks(): Company
     {

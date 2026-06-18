@@ -12,69 +12,41 @@
 
 namespace App\Services\Quickbooks;
 
-use App\DataMapper\QuickbooksSettings;
-use Carbon\Carbon;
 use App\Models\Company;
-use Illuminate\Support\Facades\Cache;
+use App\Services\Quickbooks\Connection\QuickbooksReconnectNotifier;
+use App\Services\Quickbooks\Connection\QuickbooksSettingsRepository;
+use App\Services\Quickbooks\Connection\QuickbooksTokenManager;
 use QuickBooksOnline\API\DataService\DataService;
-use QuickBooksOnline\API\Exception\ServiceException;
-use QuickBooksOnline\API\Core\OAuth\OAuth2\OAuth2AccessToken;
 
 class SdkWrapper
 {
     public const MAXRESULTS = 1000;
 
-    private const ACCESS_TOKEN_REFRESH_LEEWAY_SECONDS = 300;
-
-    private const TOKEN_REFRESH_LOCK_SECONDS = 30;
-
-    private const TOKEN_REFRESH_LOCK_WAIT_SECONDS = 10;
-
     private const RATE_LIMIT_MAX_WAIT_SECONDS = 90;
 
     private $entities = ['Customer','Invoice', 'Item', 'SalesReceipt', 'Vendor', 'Purchase', 'Payment'];
 
-    private ?OAuth2AccessToken $token = null;
-
     private ?QuickbooksRateLimiter $rate_limiter = null;
 
-    public function __construct(public DataService $sdk, private Company $company)
-    {
+    public function __construct(
+        public DataService $sdk,
+        private Company $company,
+        private ?QuickbooksTokenManager $token_manager = null
+    ) {
         $this->init();
     }
 
     private function init(): self
     {
-        // Only set access token if quickbooks settings exist and have valid token data
-        // During reconnection flow, we may not have valid tokens yet
-        if ($this->company->quickbooks
-            && $this->company->quickbooks->accessTokenKey
-            && !$this->company->quickbooks->requires_reconnect) {
-            $this->setNinjaAccessToken($this->company->quickbooks);
-        }
+        $this->token_manager ??= new QuickbooksTokenManager(
+            $this->company,
+            $this->sdk,
+            new QuickbooksSettingsRepository($this->company),
+            new QuickbooksReconnectNotifier()
+        );
 
         return $this;
 
-    }
-
-    public function getAuthorizationUrl(): string
-    {
-        return $this->sdk->getOAuth2LoginHelper()->getAuthorizationCodeURL();
-    }
-
-    public function getState(): string
-    {
-        return $this->sdk->getOAuth2LoginHelper()->getState();
-    }
-
-    public function getRefreshToken(): string
-    {
-        return $this->accessToken()->getRefreshToken();
-    }
-
-    public function revokeAccessToken()
-    {
-        return $this->sdk->getOAuth2LoginHelper()->revokeToken($this->accessToken()->getAccessToken());
     }
 
     public function company()
@@ -85,156 +57,6 @@ class SdkWrapper
     public function getPreferences()
     {
         return $this->execute(fn () => $this->sdk->getCompanyPreferences());
-    }
-    /*
-    accessTokenKey
-    tokenType
-    refresh_token
-    accessTokenExpiresAt
-    refreshTokenExpiresAt
-    accessTokenValidationPeriod
-    refreshTokenValidationPeriod
-    clientID
-    clientSecret
-    realmID
-    baseURL
-    */
-    public function accessTokenFromCode(string $code, string $realm): OAuth2AccessToken
-    {
-        $token = $this->sdk->getOAuth2LoginHelper()->exchangeAuthorizationCodeForToken($code, $realm);
-
-        $this->setAccessToken($token);
-
-        return $this->accessToken();
-    }
-
-    /**
-     * Set Stored NinjaAccessToken
-     *
-     * @param  QuickbooksSettings $token_object
-     * @return self
-     */
-    public function setNinjaAccessToken(QuickbooksSettings $token_object): self
-    {
-        $token = new OAuth2AccessToken(
-            config('services.quickbooks.client_id'),
-            config('services.quickbooks.client_secret'),
-            $token_object->accessTokenKey,
-            $token_object->refresh_token,
-            3600,
-            8726400
-        );
-
-        $token->setAccessTokenExpiresAt($token_object->accessTokenExpiresAt); //@phpstan-ignore-line
-        $token->setRefreshTokenExpiresAt($token_object->refreshTokenExpiresAt); //@phpstan-ignore-line
-        $token->setAccessTokenValidationPeriodInSeconds(3600);
-        $token->setRefreshTokenValidationPeriodInSeconds(8726400);
-
-        $this->setAccessToken($token);
-        $this->preserveConnectionContext($token, $token_object);
-
-        if ($token_object->accessTokenExpiresAt != 0 && $token_object->accessTokenExpiresAt < time()) {
-            $this->refreshTokenLocked(true);
-        }
-
-        return $this;
-    }
-
-
-    public function refreshToken(string $refresh_token): self
-    {
-        $new_token = $this->sdk->getOAuth2LoginHelper()->refreshAccessTokenWithRefreshToken($refresh_token);
-
-        if ($this->company->quickbooks) {
-            $this->preserveConnectionContext($new_token, $this->company->quickbooks);
-        }
-
-        $this->setAccessToken($new_token);
-        $this->sdk->updateOAuth2Token($this->accessToken());
-        $this->saveOAuthToken($this->accessToken());
-
-        return $this;
-    }
-
-    public function refreshTokenLocked(bool $force = false): self
-    {
-        if (! $this->company->quickbooks || $this->company->quickbooks->requires_reconnect) {
-            return $this;
-        }
-
-        Cache::lock(
-            "quickbooks-token-refresh:{$this->company->id}:{$this->company->db}",
-            self::TOKEN_REFRESH_LOCK_SECONDS
-        )->block(self::TOKEN_REFRESH_LOCK_WAIT_SECONDS, function () use ($force): void {
-            $fresh_company = $this->company->fresh();
-
-            if ($fresh_company) {
-                $this->company = $fresh_company;
-            }
-
-            if (! $this->company->quickbooks || $this->company->quickbooks->requires_reconnect) {
-                return;
-            }
-
-            if (! $force && ! $this->tokenNeedsRefresh()) {
-                $this->setNinjaAccessToken($this->company->quickbooks);
-                $this->sdk->updateOAuth2Token($this->accessToken());
-
-                return;
-            }
-
-            if ($this->refreshTokenExpired()) {
-                $this->markRequiresReconnect();
-
-                throw new \RuntimeException('Quickbooks refresh token expired');
-            }
-
-            try {
-                $this->refreshToken($this->company->quickbooks->refresh_token);
-            } catch (\Throwable $e) {
-                if ($this->isRefreshTokenFailure($e)) {
-                    $this->markRequiresReconnect();
-                }
-
-                throw $e;
-            }
-        });
-
-        return $this;
-    }
-
-    /**
-     * SetsAccessToken
-     *
-     * @param  OAuth2AccessToken $token
-     * @return self
-     */
-    public function setAccessToken(OAuth2AccessToken $token): self
-    {
-        $this->token = $token;
-
-        return $this;
-    }
-
-    public function accessToken(): OAuth2AccessToken
-    {
-        return $this->token;
-    }
-
-    public function saveOAuthToken(OAuth2AccessToken $token): void
-    {
-        $obj = $this->company->quickbooks ?? new QuickbooksSettings();
-        $obj->accessTokenKey = $token->getAccessToken();
-        $obj->refresh_token = $token->getRefreshToken();
-        $obj->accessTokenExpiresAt = Carbon::createFromFormat('Y/m/d H:i:s', $token->getAccessTokenExpiresAt())->timestamp; //@phpstan-ignore-line - QB phpdoc wrong types!!
-        $obj->refreshTokenExpiresAt = Carbon::createFromFormat('Y/m/d H:i:s', $token->getRefreshTokenExpiresAt())->timestamp; //@phpstan-ignore-line - QB phpdoc wrong types!!
-        $obj->requires_reconnect = false;
-
-        $obj->realmID = $token->getRealmID() ?: $obj->realmID;
-        $obj->baseURL = $token->getBaseURL() ?: $obj->baseURL;
-
-        $this->company->quickbooks = $obj;
-        $this->company->save();
     }
 
 
@@ -394,7 +216,9 @@ class SdkWrapper
 
     private function execute(callable $callback): mixed
     {
-        $this->ensureTokenFresh();
+        if ($this->token_manager->tokenNeedsRefresh()) {
+            $this->token_manager->refreshIfNeeded();
+        }
 
         $limiter = $this->rateLimiter();
         $request_token = null;
@@ -422,11 +246,11 @@ class SdkWrapper
                 throw $e;
             }
 
-            if (! $this->isAuthenticationFailure($e)) {
+            if (! $this->token_manager->isAuthenticationFailure($e)) {
                 throw $e;
             }
 
-            $this->refreshTokenLocked(true);
+            $this->token_manager->refreshIfNeeded(true);
 
             return $callback();
         } finally {
@@ -436,80 +260,4 @@ class SdkWrapper
         }
     }
 
-    private function ensureTokenFresh(): void
-    {
-        if ($this->tokenNeedsRefresh()) {
-            $this->refreshTokenLocked();
-        }
-    }
-
-    private function tokenNeedsRefresh(int $leewaySeconds = self::ACCESS_TOKEN_REFRESH_LEEWAY_SECONDS): bool
-    {
-        if (! $this->company->quickbooks || $this->company->quickbooks->requires_reconnect) {
-            return false;
-        }
-
-        if ($this->company->quickbooks->accessTokenExpiresAt === 0) {
-            return false;
-        }
-
-        return $this->company->quickbooks->accessTokenExpiresAt <= time() + $leewaySeconds;
-    }
-
-    private function refreshTokenExpired(): bool
-    {
-        if (! $this->company->quickbooks) {
-            return true;
-        }
-
-        return $this->company->quickbooks->refreshTokenExpiresAt > 0
-            && $this->company->quickbooks->refreshTokenExpiresAt < time();
-    }
-
-    private function markRequiresReconnect(): void
-    {
-        if (! $this->company->quickbooks) {
-            return;
-        }
-
-        $quickbooks = $this->company->quickbooks;
-        $quickbooks->requires_reconnect = true;
-        $this->company->quickbooks = $quickbooks;
-        $this->company->save();
-    }
-
-    private function preserveConnectionContext(OAuth2AccessToken $token, QuickbooksSettings $settings): void
-    {
-        if ($token->getRealmID() === '' && $settings->realmID !== '') {
-            $token->setRealmID($settings->realmID);
-        }
-
-        if ($token->getBaseURL() === '' && $settings->baseURL !== '') {
-            $token->setBaseURL($settings->baseURL);
-        }
-    }
-
-    private function isAuthenticationFailure(\Throwable $e): bool
-    {
-        if ($e instanceof ServiceException && (int) $e->getCode() === 401) {
-            return true;
-        }
-
-        $message = strtolower($e->getMessage());
-
-        return str_contains($message, '401')
-            || str_contains($message, 'unauthorized')
-            || str_contains($message, 'authenticationfailed')
-            || str_contains($message, 'invalid_token')
-            || str_contains($message, 'token expired');
-    }
-
-    private function isRefreshTokenFailure(\Throwable $e): bool
-    {
-        $message = strtolower($e->getMessage());
-
-        return str_contains($message, 'invalid_grant')
-            || str_contains($message, 'refresh token')
-            || str_contains($message, 'refresh_token');
-    }
 }

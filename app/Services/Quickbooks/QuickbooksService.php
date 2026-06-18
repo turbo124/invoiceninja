@@ -17,26 +17,21 @@ use App\Models\TaxRate;
 use App\DataMapper\QuickbooksSync;
 use App\Services\Quickbooks\Models\QbQuote;
 use App\Services\Quickbooks\Models\QbClient;
-use QuickBooksOnline\API\Core\CoreConstants;
 use App\Services\Quickbooks\Models\QbExpense;
 use App\Services\Quickbooks\Models\QbInvoice;
 use App\Services\Quickbooks\Models\QbPayment;
 use App\Services\Quickbooks\Models\QbProduct;
 use App\Services\Quickbooks\Models\QbTaxRate;
+use App\Services\Quickbooks\Connection\QuickbooksConnection;
 use QuickBooksOnline\API\DataService\DataService;
 use App\Services\Quickbooks\Jobs\QuickbooksImport;
 use App\Services\Quickbooks\Transformers\TaxRateTransformer;
 use App\Services\Quickbooks\Transformers\IncomeAccountTransformer;
 use App\Services\Quickbooks\Helpers\Helper;
-use App\Helpers\Cache\Atomic;
-use App\Services\Email\AdminEmail;
-use App\Services\Email\EmailObject;
-use App\Utils\Ninja;
-use Illuminate\Mail\Mailables\Address;
 
 class QuickbooksService
 {
-    public DataService $sdk;
+    public ?DataService $sdk = null;
 
     public QbInvoice $invoice;
 
@@ -58,9 +53,7 @@ class QuickbooksService
 
     private ?SdkWrapper $sdk_wrapper = null;
 
-    private bool $testMode = true;
-
-    private bool $try_refresh = true;
+    private QuickbooksConnection $connection;
 
     /** Company IDs currently importing from QB — skip pushing them back. */
     public static array $importing = [];
@@ -88,34 +81,11 @@ class QuickbooksService
     private function init(): self
     {
         $this->sdk_wrapper = null;
+        $this->connection = new QuickbooksConnection($this->company);
+        $this->sdk = $this->connection->dataService();
 
-        if (config('services.quickbooks.client_id')) {
-            $config = [
-                'ClientID' => config('services.quickbooks.client_id'),
-                'ClientSecret' => config('services.quickbooks.client_secret'),
-                'auth_mode' => 'oauth2',
-                'scope' => "com.intuit.quickbooks.accounting",
-                'RedirectURI' => config('services.quickbooks.redirect'),
-                'baseUrl' => config('services.quickbooks.env') === 'sandbox' ? CoreConstants::SANDBOX_DEVELOPMENT : CoreConstants::QBO_BASEURL,
-            ];
-
-            // Don't merge expired tokens when reconnection is required
-            // This allows getAuthorizationUrl() to work correctly
-            $requires_reconnect = $this->company->quickbooks && $this->company->quickbooks->requires_reconnect;
-
-            if (!$requires_reconnect) {
-                $config = array_merge($config, $this->ninjaAccessToken());
-            }
-
-            $this->sdk = DataService::Configure($config);
-
-            $this->sdk->enableLog();
-            $this->sdk->setMinorVersion("75");
-            $this->sdk->throwExceptionOnError(true);
-
-            if (!$requires_reconnect) {
-                $this->checkToken();
-            }
+        if ($fresh_company = $this->company->fresh()) {
+            $this->company = $fresh_company;
         }
 
         $this->invoice = new QbInvoice($this);
@@ -158,129 +128,6 @@ class QuickbooksService
     }
 
     /**
-     * checkToken
-     *
-     * Checks if the Quickbooks token is valid and refreshes it if it is not
-     *
-     * @return self
-     */
-    private function checkToken(): self
-    {
-
-        if (!$this->company->quickbooks || $this->company->quickbooks->accessTokenExpiresAt == 0 || $this->company->quickbooks->accessTokenExpiresAt > time()) {
-            return $this;
-        }
-
-        // Access token is expired, check if we can refresh it
-        if ($this->company->quickbooks->accessTokenExpiresAt < time() && $this->try_refresh) {
-
-            // Check if refresh token is also expired - if so, don't attempt refresh
-            $refresh_token_expired = $this->company->quickbooks->refreshTokenExpiresAt > 0
-               && $this->company->quickbooks->refreshTokenExpiresAt < time();
-
-            if ($refresh_token_expired) {
-                $this->markRequiresReconnect();
-                nlog('Quickbooks tokens expired (both access and refresh) => ' . $this->company->company_key);
-                throw new \Exception('Quickbooks tokens expired (both access and refresh)');
-            }
-
-            // Refresh token is still valid, attempt to refresh
-            try {
-                $this->sdk()->refreshTokenLocked(true);
-            } catch (\Throwable $e) {
-                // Only log and disconnect if the error is not about expired refresh token
-                // If refresh token is expired, we've already checked above, so this is a different error
-                $error_message = $e->getMessage();
-                if (str_contains($error_message, 'invalid_grant') || str_contains($error_message, 'refresh token')) {
-                    // Refresh token is invalid/expired - don't try to disconnect (which would also fail)
-                    nlog('Quickbooks refresh token invalid/expired => ' . $this->company->company_key);
-                    $this->markRequiresReconnect();
-                    throw new \Exception('Quickbooks refresh token invalid/expired');
-                }
-
-                nlog("QB: failure to refresh token: " . $error_message);
-                // Only attempt disconnect if it's not a token expiration issue
-                // Disconnect will try to revoke the token, which will fail if token is expired
-                // So we skip disconnect for token-related errors
-                if (!str_contains($error_message, 'token') && !str_contains($error_message, '401') && !str_contains($error_message, 'AuthenticationFailed')) {
-                    $this->disconnect();
-                }
-                return $this;
-            }
-
-            $this->company = $this->company->fresh();
-            $this->try_refresh = false;
-            $this->init();
-
-            return $this;
-        }
-
-        nlog('Quickbooks token expired and could not be refreshed => ' . $this->company->company_key);
-
-        throw new \Exception('Quickbooks token expired and could not be refreshed');
-
-    }
-    
-    /**
-     * markRequiresReconnect
-     *
-     * Marks the company as requiring reconnection to Quickbooks.
-     *
-     * @return void
-     */
-    private function markRequiresReconnect(): void
-    {
-        if ($this->company->quickbooks) {
-            $this->company->quickbooks->requires_reconnect = true;
-            $this->company->save();
-
-            $this->notifyOwnerTokenExpired();
-        }
-    }
-
-    private function notifyOwnerTokenExpired(): void
-    {
-        $cache_key = "qb_token_expired_notified:{$this->company->company_key}";
-
-        if (!Atomic::set($cache_key, true, 60 * 60 * 24)) {
-            return;
-        }
-
-        try {
-            $mo = new EmailObject();
-            $mo->subject = ctrans('texts.quickbooks_requires_reauth');
-            $mo->body = ctrans('texts.quickbooks_requires_reauth_body');
-            $mo->text_body = ctrans('texts.quickbooks_requires_reauth_body');
-            $mo->company_key = $this->company->company_key;
-            $mo->html_template = 'email.template.admin';
-            $mo->to = [new Address($this->company->owner()->email, $this->company->owner()->present()->name())];
-            $mo->url = Ninja::isHosted() ? config('ninja.react_url') . '/#/settings/integrations/quickbooks' : config('ninja.app_url');
-            $mo->button = ctrans('texts.quickbooks_reconnect');
-            $mo->settings = $this->company->settings;
-            $mo->company = $this->company;
-            $mo->logo = $this->company->present()->logo();
-
-            AdminEmail::dispatch($mo, $this->company);
-        } catch (\Exception $e) {
-            nlog("Failed to send QuickBooks token expired notification: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * ninjaAccessToken
-     *
-     * @return array
-     */
-    private function ninjaAccessToken(): array
-    {
-        return $this->company->quickbooks->accessTokenExpiresAt > 0 ? [
-            'accessTokenKey' => $this->company->quickbooks->accessTokenKey,
-            'refreshTokenKey' => $this->company->quickbooks->refresh_token,
-            'QBORealmID' => $this->company->quickbooks->realmID,
-        ] : [];
-    }
-
-    /**
      * sdk
      *
      * Wrapper class for fluent type accessors
@@ -289,7 +136,11 @@ class QuickbooksService
      */
     public function sdk(): SdkWrapper
     {
-        return $this->sdk_wrapper ??= new SdkWrapper($this->sdk, $this->company);
+        if (! $this->connection->hasDataService() && $this->sdk) {
+            return $this->sdk_wrapper ??= new SdkWrapper($this->sdk, $this->company);
+        }
+
+        return $this->sdk_wrapper ??= $this->connection->sdk();
     }
 
     /**
@@ -688,15 +539,8 @@ class QuickbooksService
      */
     public function disconnect(): self
     {
-
-        try {
-            $this->sdk()->revokeAccessToken();
-        } catch (\Throwable $e) {
-            nlog("QB: failure to revoke token during disconnect:: " . $e->getMessage());
-        }
-
-        $this->company->quickbooks = null;
-        $this->company->save();
+        $this->connection->disconnect();
+        $this->company = $this->company->fresh() ?? $this->company;
 
         return $this;
 
