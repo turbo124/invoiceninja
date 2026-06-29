@@ -243,14 +243,17 @@ class SESWebhook implements ShouldQueue
 
         $this->invitation = $this->discoverInvitation($message_id);
 
+        // Handle different SES notification types
+        $notification_type = $this->request['eventType'] ?? $this->request['Type'] ?? $this->request['notificationType'] ?? '';
+
+        /* Record the delivery projection independently of legacy invitation discovery. */
+        $this->recordInboundDelivery($notification_type);
+
         /** Free accounts do not have email delivery meta data stored. */
         if (!$this->invitation || (Ninja::isHosted() && $this->company->account->isFreeHostedClient())) {
             nlog("SESWebhook: No invitation found for message ID: " . $message_id);
             return;
         }
-
-        // Handle different SES notification types
-        $notification_type = $this->request['eventType'] ?? $this->request['Type'] ?? $this->request['notificationType'] ?? '';
 
         switch ($notification_type) {
             case 'Delivery':
@@ -266,6 +269,27 @@ class SESWebhook implements ShouldQueue
             default:
                 nlog("SESWebhook: Unknown notification type: " . $notification_type);
                 break;
+        }
+    }
+
+    private function recordInboundDelivery(string $notification_type): void
+    {
+        try {
+            $status = match ($notification_type) {
+                'Delivery', 'Received' => 'delivered',
+                'Open', 'Rendering Failure' => 'opened',
+                'Bounce' => 'bounced',
+                'Complaint' => 'complained',
+                default => null,
+            };
+
+            if (! $status) {
+                return;
+            }
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->recordInbound($this->extractMessageId(), $status, $notification_type);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery inbound record error: {$e->getMessage()}");
         }
     }
 

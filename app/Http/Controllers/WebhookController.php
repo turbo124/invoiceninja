@@ -523,7 +523,7 @@ class WebhookController extends BaseController
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        WebhookSingle::dispatchSync($webhook->id, $entity, $user->company()->db, $includes);
+        WebhookSingle::dispatchSync($webhook->id, $entity, $user->company()->db, $includes, (string) \Illuminate\Support\Str::ulid());
 
         return $this->itemResponse($webhook);
     }

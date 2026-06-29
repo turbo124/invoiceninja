@@ -99,6 +99,9 @@ class ProcessPostmarkWebhook implements ShouldQueue
 
         $this->invitation = $this->discoverInvitation($this->request['MessageID']);
 
+        /* Record the delivery projection independently of legacy invitation discovery. */
+        $this->recordInboundDelivery($this->request['RecordType']);
+
         if ($this->company && $this->request['RecordType'] == 'SpamComplaint' && config('ninja.notification.slack')) {
             $this->company->notification(new EmailSpamNotification($this->company))->ninja();
         }
@@ -168,6 +171,27 @@ class ProcessPostmarkWebhook implements ShouldQueue
     //   "Tag": "welcome-email",
     //   "Recipient": "john@example.com"
     // }
+
+    private function recordInboundDelivery(string $record_type): void
+    {
+        try {
+            $status = match ($record_type) {
+                'Delivery' => 'delivered',
+                'Open' => 'opened',
+                'Bounce' => 'bounced',
+                'SpamComplaint' => 'complained',
+                default => null,
+            };
+
+            if (! $status) {
+                return;
+            }
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->recordInbound($this->request['MessageID'], $status, $record_type);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery inbound record error: {$e->getMessage()}");
+        }
+    }
 
     private function processOpen()
     {

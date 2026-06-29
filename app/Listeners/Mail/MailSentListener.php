@@ -48,12 +48,25 @@ class MailSentListener
 
             $message = MessageConverter::toEmail($event->sent->getOriginalMessage()); //@phpstan-ignore-line
 
-            if (!$message->getHeaders()->get('x-invitation')) {
-                return;
-            }
+            // $to = $message->getTo();
+            // nlog(($to[0] ?? null)?->getAddress(). " - ". $message_id);
 
             if ($message->getHeaders()->get('x-message-id')) {
                 $message_id = $message->getHeaders()->get('x-message-id')->getValue();
+            }
+
+            /* Record the sent transition for the unified delivery projection. */
+            if ($message->getHeaders()->get('x-thread')) {
+                try {
+                    app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)
+                        ->recordSent($message->getHeaders()->get('x-thread')->getValue(), $message_id);
+                } catch (\Throwable $e) {
+                    nlog("MessageDelivery sent record error: {$e->getMessage()}");
+                }
+            }
+
+            if (!$message->getHeaders()->get('x-invitation')) {
+                return;
             }
 
             $invitation_key = $message->getHeaders()->get('x-invitation')->getValue();

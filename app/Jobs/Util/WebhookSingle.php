@@ -51,6 +51,8 @@ class WebhookSingle implements ShouldQueue
 
     private Company $company;
 
+    private ?string $thread_id;
+
     /**
      * Create a new job instance.
      *
@@ -58,13 +60,15 @@ class WebhookSingle implements ShouldQueue
      * @param $entity
      * @param $db
      * @param $includes
+     * @param ?string $thread_id delivery-projection addressing key (per subscription)
      */
-    public function __construct($subscription_id, $entity, $db, $includes = '')
+    public function __construct($subscription_id, $entity, $db, $includes = '', ?string $thread_id = null)
     {
         $this->entity = $entity;
         $this->db = $db;
         $this->includes = $includes;
         $this->subscription_id = $subscription_id;
+        $this->thread_id = $thread_id;
     }
 
     public function backoff()
@@ -88,6 +92,8 @@ class WebhookSingle implements ShouldQueue
         }
 
         $this->company = $subscription->company;
+
+        $this->recordQueued($subscription);
 
         $this->entity->refresh();
 
@@ -140,10 +146,14 @@ class WebhookSingle implements ShouldQueue
                 $this->resolveClient(),
                 $this->company
             ))->handle();
+
+            $this->recordDelivery('delivered');
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
             nlog("connection problem");
             nlog($e->getCode());
             nlog($e->getMessage());
+
+            $this->recordDelivery('failed', $e->getMessage());
 
             (new SystemLogger(
                 ['message' => "Error connecting to " . $subscription->target_url, 'body' => $data],
@@ -154,6 +164,8 @@ class WebhookSingle implements ShouldQueue
                 $this->company
             ))->handle();
         } catch (BadResponseException $e) {
+            $this->recordDelivery('failed', "status code " . $e->getResponse()->getStatusCode());
+
             if ($e->getResponse()->getStatusCode() >= 400 && $e->getResponse()->getStatusCode() < 500) {
 
                 /* Some 400's should never be repeated */
@@ -214,6 +226,8 @@ class WebhookSingle implements ShouldQueue
             nlog("Server exception");
             $error = json_decode($e->getResponse()->getBody()->getContents());
 
+            $this->recordDelivery('failed', 'server exception');
+
             (new SystemLogger(
                 ['message' => $error, 'body' => $data],
                 SystemLog::CATEGORY_WEBHOOK,
@@ -226,6 +240,8 @@ class WebhookSingle implements ShouldQueue
             nlog("Client exception");
             $error = json_decode($e->getResponse()->getBody()->getContents());
 
+            $this->recordDelivery('failed', 'client exception');
+
             (new SystemLogger(
                 ['message' => $error, 'body' => $data],
                 SystemLog::CATEGORY_WEBHOOK,
@@ -237,6 +253,8 @@ class WebhookSingle implements ShouldQueue
         } catch (\Exception $e) {
             nlog("Exception handler => " . $e->getMessage());
             nlog($e->getCode());
+
+            $this->recordDelivery('failed', $e->getMessage());
 
             (new SystemLogger(
                 ['message' => $e->getMessage(), 'body' => $data],
@@ -304,6 +322,54 @@ class WebhookSingle implements ShouldQueue
             $value instanceof \Stringable => (string) $value,
             default => null,
         };
+    }
+
+    private function recordQueued($subscription): void
+    {
+        try {
+            if (! $this->thread_id) {
+                return;
+            }
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->recordQueued($this->thread_id, [
+                'company_id' => $this->company->id,
+                'client_id' => $this->resolveClient()?->id,
+                'channel' => 'webhook',
+                'subject_type' => get_class($this->entity),
+                'subject_id' => $this->entity->id,
+                'target_type' => Webhook::class,
+                'target_id' => $subscription->id,
+                'payload_ref' => [
+                    'event_id' => $subscription->event_id,
+                    'subscription_id' => $subscription->id,
+                    'includes' => $this->includes,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery webhook queued record error: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Folds the webhook delivery outcome (delivered|failed) into the projection.
+     * WebhookHandler runs this synchronously via ->handle(), so release()/retry
+     * never actually fires — a failure is therefore terminal (retryable=false),
+     * not deferred.
+     */
+    private function recordDelivery(string $status, ?string $reason = null): void
+    {
+        try {
+            if (! $this->thread_id) {
+                return;
+            }
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->fold(['thread_id' => $this->thread_id], $status, [
+                'reason_detail' => $reason ? substr($reason, 0, 150) : null,
+                'retryable' => false,
+            ]);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery webhook outcome record error: {$e->getMessage()}");
+        }
     }
 
     private function resolveClient()

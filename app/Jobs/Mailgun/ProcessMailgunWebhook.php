@@ -111,6 +111,9 @@ class ProcessMailgunWebhook implements ShouldQueue
 
         $this->request['MessageID'] = $this->message_id;
 
+        /* Record the delivery projection independently of legacy invitation discovery (correlates on provider_message_id). */
+        $this->recordInboundDelivery($this->request['event-data']['event']);
+
         $this->invitation = $this->discoverInvitation($this->message_id);
 
         if (!$this->invitation) {
@@ -133,6 +136,27 @@ class ProcessMailgunWebhook implements ShouldQueue
             default:
                 # code...
                 break;
+        }
+    }
+
+    private function recordInboundDelivery(string $event): void
+    {
+        try {
+            $status = match ($event) {
+                'delivered' => 'delivered',
+                'opened' => 'opened',
+                'failed' => 'bounced',
+                'complained' => 'complained',
+                default => null,
+            };
+
+            if (! $status) {
+                return;
+            }
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->recordInbound($this->message_id, $status, $event);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery inbound record error: {$e->getMessage()}");
         }
     }
 

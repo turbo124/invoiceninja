@@ -13,7 +13,6 @@
 namespace App\Utils;
 
 use App\DataMapper\EmailTemplateDefaults;
-use App\Mail\Engine\PaymentEmailEngine;
 use App\Models\Client;
 use App\Models\ClientContact;
 use App\Models\Invoice;
@@ -203,7 +202,7 @@ class TemplateEngine
         if (in_array($this->entity, ['purchaseOrder', 'purchase_order'])) {
             $this->labels_and_values = (new VendorHtmlEngine($this->entity_obj->invitations->first()))->generateLabelsAndValues();
         } elseif ($this->entity == 'payment') {
-            $this->labels_and_values = (new PaymentEmailEngine($this->entity_obj, $this->entity_obj->client->contacts->first()))->generateLabelsAndValues();
+            $this->labels_and_values = (new PaymentHtmlEngine($this->entity_obj, $this->entity_obj->client->contacts->first()))->generateLabelsAndValues();
         } else {
             $this->labels_and_values = (new HtmlEngine($this->entity_obj->invitations->first()))->generateLabelsAndValues();
         }

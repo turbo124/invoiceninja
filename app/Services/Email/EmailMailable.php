@@ -101,6 +101,12 @@ class EmailMailable extends Mailable
 
         $attachments = collect($this->email_object->attachments)->map(function ($file) {
 
+            // Path-based attachments (e.g. payment invoice documents) carry a
+            // 'path' instead of an inlined base64 'file'.
+            if (! array_key_exists('file', $file) || $file['file'] === null) {
+                return Attachment::fromPath($file['path'])->as($file['name']);
+            }
+
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime  = finfo_buffer($finfo, base64_decode($file['file']));
             $mime = $mime ?: 'application/octet-stream';

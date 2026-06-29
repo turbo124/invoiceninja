@@ -195,7 +195,7 @@ class PaymentHtmlEngine
         $data['$invoices.po_number'] = ['value' => $this->formatInvoiceField('po_number'), 'label' => ctrans('texts.invoices')];
         $data['$date'] = ['value' => '', 'label' => ctrans('texts.date')];
         $data['$method'] = ['value' => '', 'label' => ctrans('texts.method')];
-        $data['$transaction_reference'] = ['value' => '', 'label' => ctrans('texts.transaction_reference')];
+        $data['$transaction_reference'] = ['value' => $this->payment->transaction_reference, 'label' => ctrans('texts.transaction_reference')];
         $data['$public_notes'] = ['value' => $this->client->public_notes, 'label' => ctrans('texts.public_notes')];
         $data['$receipt'] = ['value' => '', 'label' => ctrans('texts.receipt')];
         $data['$amount_paid'] = ['value' => '', 'label' => ctrans('texts.amount_paid')];
@@ -204,6 +204,18 @@ class PaymentHtmlEngine
         $data['$reference'] = ['value' => '', 'label' => ctrans('texts.reference')];
         $data['$total'] = ['value' => '', 'label' => ctrans('texts.total')];
         $data['$history'] = ['value' => '', 'label' => ctrans('texts.history')];
+
+        /* Consolidated from the (now removed) PaymentEmailEngine so this is the single payment variable provider. */
+        $data['$payment.unapplied'] = ['value' => Number::formatMoney(($this->payment->amount - $this->payment->refunded - $this->payment->applied), $this->client) ?: ' ', 'label' => ctrans('texts.refund')];
+        $data['$city'] = ['value' => $this->client->city ?: ' ', 'label' => ctrans('texts.city')];
+        $data['$client.city'] = &$data['$city'];
+        $data['$state'] = ['value' => $this->client->state ?: ' ', 'label' => ctrans('texts.state')];
+        $data['$client.state'] = &$data['$state'];
+        $data['$postal_code'] = ['value' => $this->client->postal_code ?: ' ', 'label' => ctrans('texts.postal_code')];
+        $data['$client.postal_code'] = &$data['$postal_code'];
+        $data['$client.payment_balance'] = ['value' => Number::formatMoney($this->client->payment_balance, $this->client), 'label' => ctrans('texts.payment_balance_on_file')];
+        $data['$invoice_numbers'] = ['value' => $this->formatInvoiceNumbersRaw(), 'label' => ctrans('texts.invoices')];
+        $data['$invoice_references_subject'] = ['value' => $this->formatInvoiceReferencesSubject(), 'label' => ctrans('texts.invoices')];
 
         if ($this->payment->status_id == 4) {
             $data['$status_logo'] = ['value' => '<div class="stamp is-paid"> ' . ctrans('texts.paid') . '</div>', 'label' => ''];
@@ -247,6 +259,30 @@ class PaymentHtmlEngine
         }
 
         return $invoice;
+    }
+
+    private function formatInvoiceNumbersRaw()
+    {
+        return collect($this->payment->invoices->pluck('number')->toArray())->implode(', ');
+    }
+
+    private function formatInvoiceReferencesSubject()
+    {
+        $invoice_list = '';
+
+        foreach ($this->payment->invoices as $invoice) {
+            if (strlen($invoice->po_number ?? '') > 1) {
+                $invoice_list .= ctrans('texts.po_number') . " {$invoice->po_number} <br>";
+            }
+
+            $invoice_list .= ctrans('texts.invoice_number_short') . " {$invoice->number} " . Number::formatMoney($invoice->pivot->amount, $this->client) . ', ';
+        }
+
+        if (strlen($invoice_list) < 4) {
+            $invoice_list = Number::formatMoney($this->payment->amount, $this->client) ?: ' ';
+        }
+
+        return $invoice_list;
     }
 
     private function formatPoNumber()

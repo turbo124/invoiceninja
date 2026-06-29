@@ -16,15 +16,10 @@ use App\Utils\Ninja;
 use App\Models\PurchaseOrder;
 use App\Models\VendorContact;
 use App\Services\Email\Email;
-use App\Jobs\Mail\NinjaMailerJob;
-use App\Mail\VendorTemplateEmail;
 use App\Services\AbstractService;
 use App\Services\Email\EmailObject;
 use Illuminate\Support\Facades\App;
-use App\Jobs\Mail\NinjaMailerObject;
 use App\Events\General\EntityWasEmailed;
-use App\Mail\Engine\PurchaseOrderEmailEngine;
-use App\Events\PurchaseOrder\PurchaseOrderWasEmailed;
 
 class SendEmail extends AbstractService
 {
@@ -58,8 +53,8 @@ class SendEmail extends AbstractService
 
             $mo->entity_class = get_class($invitation->purchase_order);
             $mo->invitation_id = $invitation->id;
-            $mo->client_id = $invitation->vendor->client_id ?? null;
-            $mo->vendor_id = $invitation->vendor->vendor_id ?? null;
+            $mo->vendor_id = $invitation->purchase_order->vendor_id;
+            $mo->vendor_contact_id = $invitation->vendor_contact_id;
 
             Email::dispatch($mo, $invitation->company);
             $this->purchase_order->entityEmailEvent($invitation, $template, $template);

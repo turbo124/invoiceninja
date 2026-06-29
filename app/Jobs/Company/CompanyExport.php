@@ -72,8 +72,11 @@ class CompanyExport implements ShouldQueue
      */
     public function handle()
     {
+        
         MultiDB::setDb($this->company->db);
-
+        
+        nlog("CompanyExport: " . $this->company->id);
+        
         $this->file_name = date('Y-m-d') . '_' . str_replace([" ", "/"], ["_",""], $this->company->present()->name() . '_' . $this->company->company_key . '.json');
 
         $this->writer = new File(sys_get_temp_dir() . '/' . $this->file_name);

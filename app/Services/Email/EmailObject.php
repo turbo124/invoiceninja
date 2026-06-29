@@ -24,6 +24,8 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderInvitation;
 use App\Models\Quote;
 use App\Models\QuoteInvitation;
+use App\Models\RecurringInvoice;
+use App\Models\RecurringInvoiceInvitation;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorContact;
@@ -72,11 +74,11 @@ class EmailObject
 
     public ?int $invitation_id = null;
 
-    public InvoiceInvitation|QuoteInvitation|CreditInvitation|PurchaseOrderInvitation|null $invitation;
+    public InvoiceInvitation|QuoteInvitation|CreditInvitation|PurchaseOrderInvitation|RecurringInvoiceInvitation|null $invitation;
 
     public ?int $entity_id = null;
 
-    public Invoice|Quote|Credit|PurchaseOrder|Payment|null $entity;
+    public Invoice|Quote|Credit|PurchaseOrder|Payment|RecurringInvoice|null $entity;
 
     public ?int $client_id = null;
 
@@ -120,6 +122,20 @@ class EmailObject
     public array $documents = [];
 
     public ?string $template = null; //invoice //quote //reminder1
+
+    public ?string $thread_id = null;
+
+    public ?string $reminder_template = null;
+
+    public ?array $template_data = null;
+
+    /**
+     * When true the subject/body/attachments are already fully rendered
+     * (e.g. by PaymentEmailStrategy) and EmailDefaults must NOT re-assemble them.
+     */
+    public bool $prebuilt = false;
+
+    public bool $is_refund = false;
 
     public array $links = [];
 

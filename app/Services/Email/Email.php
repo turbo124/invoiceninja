@@ -15,28 +15,21 @@ namespace App\Services\Email;
 use Log;
 use App\Models\User;
 use App\Utils\Ninja;
-use App\Models\Client;
-use App\Models\Vendor;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\SystemLog;
-use App\Utils\HtmlEngine;
 use App\Libraries\MultiDB;
-use App\Models\ClientContact;
-use App\Models\VendorContact;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use App\Jobs\Util\SystemLogger;
 use App\Utils\Traits\MakesHash;
-use App\Utils\VendorHtmlEngine;
 use App\Libraries\Google\Google;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Queue\SerializesModels;
 use Postmark\Models\PostmarkException;
 use Turbo124\Beacon\Facades\LightLogs;
-use App\Mail\Engine\PaymentEmailEngine;
 use Illuminate\Queue\InteractsWithQueue;
 use GuzzleHttp\Exception\ClientException;
 use App\DataMapper\Analytics\EmailFailure;
@@ -103,7 +96,11 @@ class Email implements ShouldQueue
     /** The mailable */
     public Mailable $mailable;
 
-    public function __construct(public EmailObject $email_object, public Company $company) {}
+    public function __construct(public EmailObject $email_object, public Company $company)
+    {
+        /* Mint the delivery thread id at dispatch so it serialises and stays stable across retries. */
+        $this->email_object->thread_id ??= (string) \Illuminate\Support\Str::ulid();
+    }
 
     /**
      * The backoff time between retries.
@@ -122,16 +119,20 @@ class Email implements ShouldQueue
     {
         MultiDB::setDb($this->company->db);
 
-        $this->setOverride()
-            ->initModels()
-            ->setDefaults()
-            ->buildMailable();
+        $this->setOverride();
+
+        $this->mintDeliveryThread();
+
+        $this->email_object = (new EmailObjectBuilder())->build($this->email_object, $this->company);
+
+        $this->buildMailable();
 
         /** Ensure quota's on hosted platform are respected. :) */
         $this->setMailDriver();
 
         /** Fail early if pre flight checks fail. */
         if ($this->preFlightChecksFail()) {
+            $this->recordDeliverySuppressed();
             return;
         }
 
@@ -154,76 +155,6 @@ class Email implements ShouldQueue
     }
 
     /**
-     * Initilializes the models
-     *
-     * @return self
-     */
-    public function initModels(): self
-    {
-        $this->email_object->entity_id ? $this->email_object->entity = $this->email_object->entity_class::withTrashed()->with('invitations')->find($this->email_object->entity_id) : $this->email_object->entity = null;
-
-        $this->email_object->invitation_id ? $this->email_object->invitation = $this->email_object->entity->invitations()->where('id', $this->email_object->invitation_id)->first() : $this->email_object->invitation = null;
-
-        $this->email_object->invitation_id ? $this->email_object->contact = $this->email_object->invitation->contact : $this->email_object->contact = null;
-
-        $this->email_object->client_id ? $this->email_object->client = Client::withTrashed()->find($this->email_object->client_id) : $this->email_object->client = null;
-
-        $this->email_object->vendor_id ? $this->email_object->vendor = Vendor::withTrashed()->find($this->email_object->vendor_id) : $this->email_object->vendor = null;
-
-        if (!$this->email_object->contact) {
-            $this->email_object->vendor_contact_id ? $this->email_object->contact = VendorContact::withTrashed()->find($this->email_object->vendor_contact_id) : null;
-
-            $this->email_object->client_contact_id ? $this->email_object->contact = ClientContact::withTrashed()->find($this->email_object->client_contact_id) : null;
-        }
-
-        $this->email_object->user_id ? $this->email_object->user = User::withTrashed()->find($this->email_object->user_id) : $this->email_object->user = $this->company->owner();
-
-        $this->email_object->company_key = $this->company->company_key;
-
-        $this->email_object->company = $this->company;
-
-        $this->email_object->client_id ? $this->email_object->settings = $this->email_object->client->getMergedSettings() : $this->email_object->settings = $this->company->settings;
-
-        $this->email_object->whitelabel = $this->company->account->isPaid() ? true : false;
-
-        $this->email_object->logo = $this->email_object->settings->company_logo;
-
-        $this->email_object->signature = $this->email_object->settings->email_signature;
-
-        $this->email_object->invitation_key = $this->email_object->invitation ? $this->email_object->invitation->key : null;
-
-        $this->resolveVariables();
-
-        return $this;
-    }
-
-    /**
-     * Generates the correct set of variables
-     *
-     * @return self
-     */
-    private function resolveVariables(): self
-    {
-        $_variables = $this->email_object->variables;
-
-        match (class_basename($this->email_object->entity ?? '')) {
-            "Invoice" => $this->email_object->variables = (new HtmlEngine($this->email_object->invitation))->makeValues(),
-            "Quote" => $this->email_object->variables = (new HtmlEngine($this->email_object->invitation))->makeValues(),
-            "Credit" => $this->email_object->variables = (new HtmlEngine($this->email_object->invitation))->makeValues(),
-            "PurchaseOrder" => $this->email_object->variables = (new VendorHtmlEngine($this->email_object->invitation))->makeValues(),
-            "Payment" => $this->email_object->variables = (new PaymentEmailEngine($this->email_object->entity, $this->email_object->contact))->makePaymentVariables(),
-            default => $this->email_object->variables = []
-        };
-
-        /** If we have passed some variable overrides we insert them here */
-        foreach ($_variables as $key => $value) {
-            $this->email_object->variables[$key] = $value;
-        }
-
-        return $this;
-    }
-
-    /**
      * Tear Down
      *
      * @return self
@@ -237,19 +168,6 @@ class Email implements ShouldQueue
         $this->email_object->user = null;
         $this->email_object->contact = null;
         $this->email_object->settings = null;
-
-        return $this;
-    }
-
-    /**
-     * Builds the email defaults,
-     * sets any missing props.
-     *
-     * @return self
-     */
-    public function setDefaults(): self
-    {
-        (new EmailDefaults($this))->run();
 
         return $this;
     }
@@ -362,7 +280,7 @@ class Email implements ShouldQueue
             if ($e->getCode() == '429') {
 
                 $message = "Google rate limiting triggered, we are queueing based on Gmail requirements.";
-                $this->logMailError($message, $this->company->clients()->first());
+                $this->logMailError($message, $this->company->clients()->first(), will_retry: true);
                 sleep(rand(1, 2));
                 $this->release(900);
                 $message = null;
@@ -913,7 +831,7 @@ class Email implements ShouldQueue
      * @param  null | \App\Models\Client $recipient_object
      * @return void
      */
-    private function logMailError($errors, $recipient_object): void
+    private function logMailError($errors, $recipient_object, bool $will_retry = false): void
     {
         (
             new SystemLogger(
@@ -942,6 +860,65 @@ class Email implements ShouldQueue
             }
         } catch (\Throwable $e) {
             nlog("Problem saving email error: {$e->getMessage()}");
+        }
+
+        try {
+            if ($this->email_object->thread_id) {
+                app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)
+                    ->recordFailed(['thread_id' => $this->email_object->thread_id], 'send_failure', substr($errors, 0, 150), $will_retry);
+            }
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery failed record error: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Records the queued state. Idempotent on thread_id (stable across retries,
+     * minted at construct). Defensive: a projection failure must never block a send.
+     */
+    private function mintDeliveryThread(): void
+    {
+        try {
+            /* Channel-symmetric target morph: the invitation the email went to. */
+            $invitation_class = ($this->email_object->invitation_id && $this->email_object->entity_class && class_exists($this->email_object->entity_class . 'Invitation'))
+                ? $this->email_object->entity_class . 'Invitation'
+                : null;
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->recordQueued($this->email_object->thread_id, [
+                'company_id' => $this->company->id,
+                'client_id' => $this->email_object->client_id,
+                'channel' => 'email',
+                'subject_type' => $this->email_object->entity_class,
+                'subject_id' => $this->email_object->entity_id,
+                'target_type' => $invitation_class,
+                'target_id' => $invitation_class ? $this->email_object->invitation_id : null,
+                'payload_ref' => [
+                    'entity_class' => $this->email_object->entity_class,
+                    'entity_id' => $this->email_object->entity_id,
+                    'invitation_id' => $this->email_object->invitation_id,
+                    'template' => $this->email_object->template,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery queued record error: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Folds the delivery to a terminal `suppressed` state when a preflight check
+     * blocks the send, so the projection never leaves a permanently-queued row.
+     */
+    private function recordDeliverySuppressed(): void
+    {
+        try {
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)
+                ->fold(['thread_id' => $this->email_object->thread_id], 'suppressed', [
+                    'reason_code' => 'preflight_blocked',
+                    'reason_detail' => 'Blocked by pre-flight checks (disabled/flagged/quota/invalid recipient/quality).',
+                    'retryable' => false,
+                ]);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery suppressed record error: {$e->getMessage()}");
         }
     }
 

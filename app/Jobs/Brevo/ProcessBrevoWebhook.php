@@ -96,6 +96,9 @@ class ProcessBrevoWebhook implements ShouldQueue
 
         $this->invitation = $this->discoverInvitation($this->request['message-id']);
 
+        /* Record the delivery projection independently of legacy invitation discovery. */
+        $this->recordInboundDelivery($this->request['event']);
+
         if ($this->company && $this->request['event'] == 'spam' && config('ninja.notification.slack')) {
             $this->company->notification(new EmailSpamNotification($this->company))->ninja();
         }
@@ -130,6 +133,27 @@ class ProcessBrevoWebhook implements ShouldQueue
             default:
                 # code...
                 break;
+        }
+    }
+
+    private function recordInboundDelivery(string $event): void
+    {
+        try {
+            $status = match ($event) {
+                'delivered' => 'delivered',
+                'unique_opened', 'opened', 'click' => 'opened',
+                'soft_bounce', 'hard_bounce', 'invalid_email', 'blocked' => 'bounced',
+                'spam' => 'complained',
+                default => null,
+            };
+
+            if (! $status) {
+                return;
+            }
+
+            app(\App\Services\MessageDelivery\MessageDeliveryRecorder::class)->recordInbound($this->request['message-id'], $status, $event);
+        } catch (\Throwable $e) {
+            nlog("MessageDelivery inbound record error: {$e->getMessage()}");
         }
     }
 

@@ -99,11 +99,14 @@ class EmailController extends BaseController
 
                 $entity_obj->service()->markSent()->save();
 
-                $mo->invitation_id = $invitation->id;
-                $mo->client_id = $invitation->contact->client_id ?? null;
-                $mo->vendor_id = $invitation->contact->vendor_id ?? null;
+                /* A fresh descriptor per invitation — a shared instance would collapse
+                   every contact onto one delivery thread_id (one projection row). */
+                $invitation_mo = clone $mo;
+                $invitation_mo->invitation_id = $invitation->id;
+                $invitation_mo->client_id = $invitation->contact->client_id ?? null;
+                $invitation_mo->vendor_id = $invitation->contact->vendor_id ?? null;
 
-                Email::dispatch($mo, $invitation->company);
+                Email::dispatch($invitation_mo, $invitation->company);
 
                 $entity_obj->entityEmailEvent($invitation, $template, $template);
 
