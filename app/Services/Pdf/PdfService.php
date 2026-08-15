@@ -166,8 +166,11 @@ class PdfService
 
     public function getHtml(): string
     {
+        $inline_pdf_images = (bool) config('ninja.pdf_inline_images');
+
         // If JSON design was used, return the pre-generated HTML
         if ($this->json_design_html !== null) {
+            // JsonToSectionsAdapter already inlines logo/image blocks via ImageFetcher.
             $html = \App\Services\Pdf\Purify::clean($this->json_design_html);
 
             if (config('ninja.log_pdf_html')) {
@@ -177,7 +180,7 @@ class PdfService
             return $html;
         }
 
-        $html = \App\Services\Pdf\Purify::clean($this->builder->document->saveHTML());
+        $html = \App\Services\Pdf\Purify::clean($this->builder->document->saveHTML(), false, $inline_pdf_images);
 
         if (config('ninja.log_pdf_html')) {
             nlog($html);
@@ -282,24 +285,6 @@ class PdfService
     private function buildWithJsonDesign(): void
     {
         $designData = $this->config->decodedDesign();
-
-        // Ensure pageSettings exists (use defaults if missing)
-        if (!isset($designData['pageSettings'])) {
-            $designData['pageSettings'] = [
-                'pageSize' => 'a4',
-                'orientation' => 'portrait',
-                'marginTop' => '10mm',
-                'marginRight' => '10mm',
-                'marginBottom' => '10mm',
-                'marginLeft' => '10mm',
-                'fontFamily' => 'Inter, sans-serif',
-                'fontSize' => '12px',
-                'textColor' => '#374151',
-                'lineHeight' => '1.5',
-                'backgroundColor' => '#ffffff',
-            ];
-            nlog("No pageSettings found, using defaults");
-        }
 
         nlog("Attempting to build PDF with JSON Design Service");
         nlog("Design data keys: " . json_encode(array_keys($designData)));

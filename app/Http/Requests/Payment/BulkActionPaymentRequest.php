@@ -26,9 +26,8 @@ class BulkActionPaymentRequest extends Request
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
-
         return [
             'action' => 'required|string',
             'ids' => 'required|array',
@@ -36,6 +35,5 @@ class BulkActionPaymentRequest extends Request
             'template_id' => 'sometimes|string',
             'send_email' => 'sometimes|bool',
         ];
-
     }
 }

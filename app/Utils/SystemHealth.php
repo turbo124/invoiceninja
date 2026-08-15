@@ -362,7 +362,14 @@ class SystemHealth
 
     public static function lastError()
     {
-        $log_file = new SplFileObject(sprintf('%s/laravel.log', base_path('storage/logs')));
+        $log_path = sprintf('%s/laravel.log', base_path('storage/logs'));
+
+        $log_file = new SplFileObject($log_path);
+
+        if (! is_readable($log_path)) {
+            return '';
+        }
+
         $log_file->seek(PHP_INT_MAX);
         $last_line = $log_file->key();
 
@@ -372,7 +379,7 @@ class SystemHealth
 
         foreach ($lines as $line) {
             // Match the main error, ie. [2024-07-10 12:23:07] production.ERROR: ...
-            if (substr($line, 0, 2) === '[2') {
+            if (substr($line, 0, 2) === '.ERROR') {
                 $last_error = $line;
             }
         }

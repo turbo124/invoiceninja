@@ -107,7 +107,7 @@ class CreditController extends BaseController
      */
     public function index(CreditFilters $filters)
     {
-        $credits = Credit::filter($filters);
+        $credits = Credit::filter($filters)->with('tags');
 
         return $this->listResponse($credits);
     }
@@ -931,7 +931,7 @@ class CreditController extends BaseController
         }
 
         if ($request->has('documents')) {
-            $this->saveDocuments($request->file('documents'), $credit, $request->input('is_public', true));
+            $this->saveDocuments($request->file('documents'), $credit, $request->has('is_public') ? $request->boolean('is_public') : null);
         }
 
         return $this->itemResponse($credit->fresh());

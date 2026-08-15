@@ -81,13 +81,14 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->name('invoice-tax-summary')
             ->onOneServer();
+            
         /* Runs France e-reporting payment notifications and due report submissions */
-        $schedule->job(new FranceEReportingCron())
-            ->dailyAt('22:00')
-            ->timezone('Europe/Paris')
-            ->withoutOverlapping()
-            ->name('france-e-reporting-job')
-            ->onOneServer();
+        // $schedule->job(new FranceEReportingCron())
+        //     ->dailyAt('22:00')
+        //     ->timezone('Europe/Paris')
+        //     ->withoutOverlapping()
+        //     ->name('france-e-reporting-job')
+        //     ->onOneServer();
 
         /* Checks Rotessa Transactions */
         $schedule->job(new TransactionReport())->dailyAt('01:48')->withoutOverlapping()->name('rotessa-transaction-report')->onOneServer();
@@ -120,7 +121,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new QuoteCheckExpired())->dailyAt('05:10')->withoutOverlapping()->name('quote-expired-job')->onOneServer();
 
         /* Performs auto billing */
-        $schedule->job(new AutoBillCron())->dailyAt('06:20')->withoutOverlapping()->name('auto-bill-job')->onOneServer();
+        $schedule->job(new AutoBillCron())->dailyAt(config('ninja.auto_bill_time'))->withoutOverlapping()->name('auto-bill-job')->onOneServer();
 
         /* Fires webhooks for overdue Invoice */
         $schedule->job(new InvoiceCheckLateWebhook())->dailyAt('07:00')->withoutOverlapping()->name('invoice-overdue-webhook-job')->onOneServer();

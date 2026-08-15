@@ -43,7 +43,7 @@ class ZipInvoices implements ShouldQueue
     /**
      * @param $invoices
      * @param Company $company
-     * @param $email
+     * @param $user
      * Create a new job instance.
      */
     public function __construct(public mixed $invoices, public Company $company, public User $user) {}
@@ -68,7 +68,7 @@ class ZipInvoices implements ShouldQueue
 
         // create new zip object
         $zipFile = new \PhpZip\ZipFile();
-        $file_name = date('Y-m-d') . '_' . str_replace(' ', '_', trans('texts.invoices')) . '.zip';
+        $file_name = date('Y-m-d-h-i-s') . '_' . str_replace(' ', '_', trans('texts.invoices')) . '.zip';
         $invitation = $this->invoices->first()->invitations->first();
 
         if (!$invitation) {
@@ -111,10 +111,11 @@ class ZipInvoices implements ShouldQueue
 
             UnlinkFile::dispatch(config('filesystems.default'), $path . $file_name)->delay(now()->addHours(1));
 
-            $message = count($this->invoices) . " " . ctrans('texts.invoices');
-            $message = ctrans('texts.download_ready', ['message' => $message]);
-
-            broadcast(new DownloadAvailable($storage_url, $message, $this->user));
+            DownloadAvailable::notify(
+                $this->user,
+                $storage_url,
+                count($this->invoices).' '.ctrans('texts.invoices'),
+            );
 
         } catch (\PhpZip\Exception\ZipException $e) {
             nlog('ZipInvoices:: could not make zip => ' . $e->getMessage());

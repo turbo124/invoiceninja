@@ -96,7 +96,7 @@ class PurchaseOrderController extends BaseController
      */
     public function index(PurchaseOrderFilters $filters)
     {
-        $purchase_orders = PurchaseOrder::filter($filters);
+        $purchase_orders = PurchaseOrder::filter($filters)->with('tags');
 
         return $this->listResponse($purchase_orders);
     }
@@ -802,7 +802,7 @@ class PurchaseOrderController extends BaseController
         }
 
         if ($request->has('documents')) {
-            $this->saveDocuments($request->file('documents'), $purchase_order, $request->input('is_public', true));
+            $this->saveDocuments($request->file('documents'), $purchase_order, $request->has('is_public') ? $request->boolean('is_public') : null);
         }
 
         return $this->itemResponse($purchase_order->fresh());

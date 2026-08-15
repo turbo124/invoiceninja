@@ -13,7 +13,6 @@
 namespace App\Observers;
 
 use App\Jobs\Util\WebhookHandler;
-use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Webhook;
 use App\Services\EDocument\Standards\France\FrancePaymentApplicationRecorder;
@@ -33,6 +32,8 @@ class PaymentObserver
     public function created(Payment $payment)
     {
         $subscriptions = Webhook::where('company_id', $payment->company_id)
+                            ->where('is_deleted', false)
+                            ->whereNull('deleted_at')
                             ->where('event_id', Webhook::EVENT_CREATE_PAYMENT)
                             ->exists();
 
@@ -75,6 +76,8 @@ class PaymentObserver
 
 
         $subscriptions = Webhook::where('company_id', $payment->company_id)
+                                    ->where('is_deleted', false)
+                                    ->whereNull('deleted_at')
                                     ->where('event_id', $event)
                                     ->exists();
 
@@ -93,60 +96,24 @@ class PaymentObserver
             );
         }
 
-        $this->recordFrancePaymentCompletion($payment);
+        // $this->recordFrancePaymentStatusTransition($payment);
     }
-    /**
-     * Capture France payment movement rows when an async payment becomes completed after application.
-     */
-    private function recordFrancePaymentCompletion(Payment $payment): void
-    {
-        try {
-            if ((int) $payment->status_id !== Payment::STATUS_COMPLETED
-                || (int) $payment->getOriginal('status_id') === Payment::STATUS_COMPLETED
-                || $payment->is_deleted) {
-                return;
-            }
 
-            $payment->loadMissing([
-                'company',
-                'client.country',
-                'client.company',
-                'invoices.client.country',
-                'invoices.client.company',
-                'invoices.company',
-            ]);
+    // private function recordFrancePaymentStatusTransition(Payment $payment): void
+    // {
+    //     if (! (bool) $payment->company->getSetting('france_reporting_enabled')) {
+    //         return;
+    //     }
 
-            if (! $payment->client) {
-                return;
-            }
-
-            if (! $payment->client->relationLoaded('company')) {
-                $payment->client->setRelation('company', $payment->company);
-            }
-
-            if (! $payment->client->reportableFrTransaction()) {
-                return;
-            }
-
-            $payment->invoices->each(function (Invoice $invoice) use ($payment): void {
-                $paymentable = $payment->paymentables()
-                    ->withTrashed()
-                    ->where('paymentable_type', 'invoices')
-                    ->where('paymentable_id', $invoice->id)
-                    ->latest('id')
-                    ->first();
-
-                app(FrancePaymentApplicationRecorder::class)->recordMovement(
-                    payment: $payment,
-                    invoice: $invoice,
-                    paymentable: $paymentable,
-                    movementAmount: $paymentable->amount ?? data_get($invoice, 'pivot.amount', 0),
-                );
-            });
-        } catch (\Throwable $exception) {
-            report($exception);
-        }
-    }
+    //     try {
+    //         app(FrancePaymentApplicationRecorder::class)->recordStatusTransition(
+    //             $payment,
+    //             (int) $payment->getOriginal('status_id'),
+    //         );
+    //     } catch (\Throwable $exception) {
+    //         report($exception);
+    //     }
+    // }
 
     /**
      * Handle the payment "deleted" event.
@@ -161,6 +128,8 @@ class PaymentObserver
         }
 
         $subscriptions = Webhook::where('company_id', $payment->company_id)
+                        ->where('is_deleted', false)
+                        ->whereNull('deleted_at')
                         ->where('event_id', Webhook::EVENT_ARCHIVE_PAYMENT)
                         ->exists();
 

@@ -101,7 +101,7 @@ class RecurringExpenseController extends BaseController
      */
     public function index(RecurringExpenseFilters $filters)
     {
-        $recurring_expenses = RecurringExpense::filter($filters);
+        $recurring_expenses = RecurringExpense::filter($filters)->with('tags');
 
         return $this->listResponse($recurring_expenses);
     }
@@ -609,7 +609,7 @@ class RecurringExpenseController extends BaseController
         }
 
         if ($request->has('documents')) {
-            $this->saveDocuments($request->file('documents'), $recurring_expense, $request->input('is_public', true));
+            $this->saveDocuments($request->file('documents'), $recurring_expense, $request->has('is_public') ? $request->boolean('is_public') : null);
         }
 
         return $this->itemResponse($recurring_expense->fresh());

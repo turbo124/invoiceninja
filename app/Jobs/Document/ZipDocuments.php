@@ -12,6 +12,7 @@
 
 namespace App\Jobs\Document;
 
+use App\Events\Socket\DownloadAvailable;
 use App\Jobs\Mail\NinjaMailerJob;
 use App\Jobs\Mail\NinjaMailerObject;
 use App\Jobs\Util\UnlinkFile;
@@ -49,6 +50,8 @@ class ZipDocuments implements ShouldQueue
 
     public $tries = 1;
 
+    public $timeout = 3600;
+
     /**
      * @param array $document_ids
      * @param Company $company
@@ -83,7 +86,7 @@ class ZipDocuments implements ShouldQueue
 
         // create new zip object
         $zipFile = new \PhpZip\ZipFile();
-        $file_name = date('Y-m-d') . '_' . str_replace(' ', '_', trans('texts.documents')) . '.zip';
+        $file_name = date('Y-m-d-h-i-s') . '_' . str_replace(' ', '_', trans('texts.documents')) . '.zip';
         $path = $this->company->file_path();
 
         try {
@@ -94,9 +97,10 @@ class ZipDocuments implements ShouldQueue
             }
 
             Storage::put($path . $file_name, $zipFile->outputAsString());
+            $storage_url = Storage::url($path . $file_name);
 
             $nmo = new NinjaMailerObject();
-            $nmo->mailable = new DownloadDocuments(Storage::url($path . $file_name), $this->company);
+            $nmo->mailable = new DownloadDocuments($storage_url, $this->company);
             $nmo->to_user = $this->user;
             $nmo->settings = $this->settings;
             $nmo->company = $this->company;
@@ -104,8 +108,16 @@ class ZipDocuments implements ShouldQueue
             NinjaMailerJob::dispatch($nmo);
 
             UnlinkFile::dispatch(config('filesystems.default'), $path . $file_name)->delay(now()->addHours(1));
+
+            DownloadAvailable::notify(
+                $this->user,
+                $storage_url,
+                count($this->document_ids).' '.ctrans('texts.documents'),
+            );
         } catch (\PhpZip\Exception\ZipException $e) {
             nlog('could not make zip => ' . $e->getMessage());
+        } catch (\Throwable $e){
+            nlog('ZIPDOCUMENTS:: => ' . $e->getMessage());
         } finally {
             $zipFile->close();
         }

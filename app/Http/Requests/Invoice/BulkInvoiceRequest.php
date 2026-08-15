@@ -19,6 +19,7 @@ use App\Utils\Traits\MakesHash;
 use App\Utils\Traits\Invoice\ActionsInvoice;
 use App\Exceptions\DuplicatePaymentException;
 use App\Helpers\Cache\Atomic;
+use Illuminate\Validation\Validator;
 
 class BulkInvoiceRequest extends Request
 {
@@ -45,19 +46,22 @@ class BulkInvoiceRequest extends Request
         ];
     }
 
-    public function withValidator($validator)
+    public function withValidator(Validator $validator): void
     {
+        if ($validator->errors()->isNotEmpty()) {
+            return;
+        }
+
         /** @var \App\Models\User $user */
         $user = auth()->user();
         $action = $this->input('action');
 
-        $validator->after(function ($validator) use ($user, $action) {
+        $validator->after(function (Validator $validator) use ($user, $action): void {
             Invoice::withTrashed()
                 ->whereIn('id', $this->transformKeys($this->input('ids', [])))
                 ->where('company_id', $user->company()->id)
                 ->cursor()
-                ->each(function ($invoice) use ($validator, $action) {
-
+                ->each(function (Invoice $invoice) use ($validator, $action): void {
                     if ($action ==  'delete' && ! $this->invoiceDeletable($invoice)) {
                         $validator->errors()->add('action', 'This invoice cannot be deleted');
                     } elseif ($action == 'cancel' && ! $this->invoiceCancellable($invoice)) {
