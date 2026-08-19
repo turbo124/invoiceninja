@@ -57,7 +57,7 @@
  *       @OA\Property(property="credit_number_pattern", type="string", example="{$year}-{$counter}", description="Allows customisation of the credit number pattern"),
  *       @OA\Property(property="credit_number_counter", type="integer", example="1", description="The incrementing counter for credits"),
  *       @OA\Property(property="recurring_invoice_number_prefix", type="string", example="R", description="This string is prepended to the recurring invoice number"),
- *       @OA\Property(property="reset_counter_frequency_id", type="integer", example="1", description="CONSTANT which is used to apply the frequency which the counters are reset"),
+ *       @OA\Property(property="reset_counter_frequency_id", type="string", example="1", description="CONSTANT which is used to apply the frequency which the counters are reset"),
  *       @OA\Property(property="reset_counter_date", type="string", example="2019-01-01", description="The explicit date which is used to reset counters"),
  *       @OA\Property(property="counter_padding", type="integer", example="1", description="Pads the counter with leading zeros"),
  *       @OA\Property(property="shared_invoice_quote_counter", type="boolean", example=true, description="Flags whether to share the counter for invoices and quotes"),

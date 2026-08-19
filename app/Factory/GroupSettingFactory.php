@@ -12,22 +12,18 @@
 
 namespace App\Factory;
 
-use App\Models\Client;
 use App\Models\GroupSetting;
 
 class GroupSettingFactory
 {
     public static function create(int $company_id, int $user_id): GroupSetting
     {
-        $settings = new \stdClass();
-        $settings->entity = Client::class;
-
         $gs = new GroupSetting();
         $gs->id = 0;
         $gs->name = '';
         $gs->company_id = $company_id;
         $gs->user_id = $user_id;
-        $gs->settings = $settings;
+        $gs->settings = new \stdClass();
 
         return $gs;
     }

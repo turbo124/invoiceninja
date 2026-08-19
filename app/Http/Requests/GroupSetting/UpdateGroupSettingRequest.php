@@ -13,7 +13,6 @@
 namespace App\Http\Requests\GroupSetting;
 
 use App\DataMapper\CompanySettings;
-use App\DataMapper\Settings\SettingsData;
 use App\Http\Requests\Request;
 use App\Http\ValidationRules\ValidClientGroupSettingsRule;
 
@@ -82,30 +81,26 @@ class UpdateGroupSettingRequest extends Request
      * @param  object $settings
      * @return array $settings
      */
-    private function filterSaveableSettings($settings)
+    private function filterSaveableSettings($settings): array
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $settings_data = new SettingsData();
-        $settings = $settings_data->cast($settings)->toObject();
-
-
-        // Do not allow a user to force pdf variables on the client settings.
-        unset($settings->pdf_variables);
+        $settings = (array) $settings;
+        unset($settings['translations'], $settings['pdf_variables']);
 
         if (! $user->account->isFreeHostedClient()) {
-            return (array) $settings;
+            return $settings;
         }
 
         $saveable_casts = CompanySettings::$free_plan_casts;
 
         foreach ($settings as $key => $value) {
             if (! array_key_exists($key, $saveable_casts)) {
-                unset($settings->{$key});
+                unset($settings[$key]);
             }
         }
 
-        return (array) $settings;
+        return $settings;
     }
 }

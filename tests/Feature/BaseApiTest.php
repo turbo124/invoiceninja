@@ -322,7 +322,7 @@ class BaseApiTest extends TestCase
         $gs = new GroupSetting();
         $gs->name = 'Test';
         $gs->company_id = $client->company_id;
-        $gs->settings = ClientSettings::buildClientSettings($company->settings, $client->settings);
+        $gs->settings = ClientSettings::buildClientSettings($company->settings, clone $client->settings);
 
         $gs_settings = $gs->settings;
         $gs_settings->website = 'http://staging.invoicing.co';

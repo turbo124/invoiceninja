@@ -75,7 +75,8 @@ class ClientRepository extends BaseRepository
 
         $client->fill($data);
 
-        if (array_key_exists('settings', $data)) {
+        if (array_key_exists('settings', $data)
+        && ! $client->hasCast('settings', \App\Casts\ClientGroupSettingsCast::class)) {
             $client->settings = $client->saveSettings($data['settings'], $client);
         }
 

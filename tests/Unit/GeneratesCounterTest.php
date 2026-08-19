@@ -204,7 +204,7 @@ class GeneratesCounterTest extends TestCase
         $gs = new GroupSetting();
         $gs->name = 'Test';
         $gs->company_id = $this->client->company_id;
-        $gs->settings = ClientSettings::buildClientSettings($this->company->settings, $this->client->settings);
+        $gs->settings = ClientSettings::buildClientSettings($this->company->settings, clone $this->client->settings);
         $gs->save();
 
         $this->client->group_settings_id = $gs->id;

@@ -65,7 +65,7 @@ class GroupSetting extends StaticModel
     use Filterable;
 
     protected $casts = [
-        'settings' => 'object',
+        'settings' => \App\Casts\ClientGroupSettingsCast::class,
         'updated_at' => 'timestamp',
         'created_at' => 'timestamp',
         'deleted_at' => 'timestamp',

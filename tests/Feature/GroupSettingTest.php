@@ -147,7 +147,7 @@ class GroupSettingTest extends TestCase
         // nlog(json_encode($settings));
     }
 
-    public function testTaxNameInGroupFilters()
+    public function testBlankTaxNameIsRemovedFromGroupOverrides()
     {
         $settings = new \stdClass();
         $settings->currency_id = '1';
@@ -168,8 +168,8 @@ class GroupSettingTest extends TestCase
 
         $arr = $response->json();
 
-        $this->assertEquals("", (string)null);
-        $this->assertNotNull($arr['data']['settings']['tax_name1']);
+        $this->assertArrayNotHasKey('tax_name1', $arr['data']['settings']);
+        $this->assertSame(0, $arr['data']['settings']['tax_rate1']);
     }
 
 

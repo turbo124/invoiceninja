@@ -333,7 +333,7 @@ class ClientApiTest extends TestCase
         $gs = new GroupSetting();
         $gs->name = 'FilterGroup_' . uniqid();
         $gs->company_id = $this->company->id;
-        $gs->settings = ClientSettings::buildClientSettings($this->company->settings, $this->client->settings);
+        $gs->settings = ClientSettings::buildClientSettings($this->company->settings, clone $this->client->settings);
         $gs->save();
 
         $client = Client::factory()->create([

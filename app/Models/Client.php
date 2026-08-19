@@ -206,7 +206,6 @@ class Client extends BaseModel implements HasLocalePreference
     protected $casts = [
         'is_deleted' => 'boolean',
         'country_id' => 'string',
-        'settings' => 'object',
         'updated_at' => 'timestamp',
         'created_at' => 'timestamp',
         'deleted_at' => 'timestamp',
@@ -214,6 +213,7 @@ class Client extends BaseModel implements HasLocalePreference
         'tax_data' => 'object',
         'e_invoice' => 'object',
         'sync' => ClientSync::class,
+        'settings' => \App\Casts\ClientGroupSettingsCast::class,
     ];
 
     protected $touches = [];
@@ -567,13 +567,15 @@ class Client extends BaseModel implements HasLocalePreference
      */
     public function getMergedSettings(): object
     {
+        $_settings = clone $this->settings;
+
         if ($this->group_settings !== null) {
-            $group_settings = ClientSettings::buildClientSettings($this->group_settings->settings, $this->settings);
+            $group_settings = ClientSettings::buildClientSettings($this->group_settings->settings, $_settings);
 
             return ClientSettings::buildClientSettings($this->company->settings, $group_settings);
         }
 
-        return CompanySettings::setProperties(ClientSettings::buildClientSettings($this->company->settings, $this->settings));
+        return CompanySettings::setProperties(ClientSettings::buildClientSettings($this->company->settings, $_settings));
     }
 
     /**

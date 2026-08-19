@@ -12,7 +12,6 @@
 
 namespace App\Repositories;
 
-use App\Models\Client;
 use App\Models\GroupSetting;
 
 class GroupSettingRepository extends BaseRepository
@@ -38,9 +37,7 @@ class GroupSettingRepository extends BaseRepository
         }
 
         if (! array_key_exists('settings', $data) || count((array) $data['settings']) == 0) {
-            $settings = new \stdClass();
-            $settings->entity = Client::class;
-            $group_setting->settings = $settings;
+            $group_setting->settings = new \stdClass();
         }
 
         $group_setting->save();
