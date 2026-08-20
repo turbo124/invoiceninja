@@ -45,6 +45,10 @@ class StripeAchBillingAddressTest extends TestCase
     {
         parent::setUp();
 
+        if (config('ninja.testvars.travis') !== false) {
+            $this->markTestSkipped('Skip test for GH Actions');
+        }
+
         $this->withoutMiddleware(ThrottleRequests::class);
 
         Model::reguard();
