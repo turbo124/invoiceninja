@@ -1074,7 +1074,7 @@ class Company extends BaseModel
     public function shouldPushToQuickbooks(string $entity): bool
     {
         
-        if (is_null($this->getRawOriginal('quickbooks')) && $this->account->isFreeHostedClient()) {
+        if (is_null($this->getRawOriginal('quickbooks')) || $this->account->isFreeHostedClient()) {
             return false;
         }
 
