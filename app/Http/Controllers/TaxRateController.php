@@ -443,7 +443,7 @@ class TaxRateController extends BaseController
 
                         if ($settings->{$tax_name} == $tax_rate->name) {
                             $settings->{$tax_name} = '';
-                            $settings->{str_replace("name", "rate", $tax_name)} = '';
+                            $settings->{str_replace("name", "rate", $tax_name)} = 0;
                         }
                     }
 
