@@ -214,7 +214,7 @@ class CompanySettingsTest extends TestCase
         $this->assertEquals($arr['data'][0]['company']['settings']['reset_counter_date'], '');
     }
 
-    public function testCompanyWrongValueMatrixPOST()
+    public function testCompanyIntegerValueIsCanonicalizedToAStringPOST()
     {
         $settings = CompanySettings::defaults();
         $settings->reset_counter_date = 1;
@@ -229,7 +229,7 @@ class CompanySettingsTest extends TestCase
         $arr = $response->json();
         $response->assertStatus(200);
 
-        $this->assertEquals($arr['data'][0]['company']['settings']['reset_counter_date'], '');
+        $this->assertEquals($arr['data'][0]['company']['settings']['reset_counter_date'], '1');
     }
 
     public function testCompanyWrong2ValueMatrixPOST()

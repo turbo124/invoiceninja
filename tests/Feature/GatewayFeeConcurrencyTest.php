@@ -33,6 +33,7 @@ use App\Services\Invoice\ReverseGatewayFee;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\MockAccountData;
 use Tests\TestCase;
 
@@ -239,9 +240,8 @@ class GatewayFeeConcurrencyTest extends TestCase
     /**
      * The quoted gross is what the customer is charged. Confirmation must move the invoice
      * by exactly that amount, or the payment and the invoice disagree.
-     *
-     * @dataProvider feeShapes
      */
+    #[DataProvider('feeShapes')]
     public function testConfirmationMovesTheInvoiceByExactlyTheQuotedAmount(float $fee_amount, float $fee_tax_rate, bool $inclusive): void
     {
         $cg = $this->gateway($fee_amount, $fee_tax_rate);

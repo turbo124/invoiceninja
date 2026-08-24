@@ -40,7 +40,9 @@ class BaseSettings
                 return is_scalar($value) ? (string) $value : '';
             case 'bool':
             case 'boolean':
-                return is_scalar($value) ? boolval($value) : false;
+                return is_scalar($value)
+                    ? filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                    : false;
             case 'object':
                 return json_decode($value);
             case 'array':

@@ -31,6 +31,9 @@ class CompanyRepository extends BaseRepository
      */
     public function save(array $data, Company $company): ?Company
     {
+        $hasSettings = array_key_exists('settings', $data);
+        $settings = $hasSettings ? $data['settings'] : null;
+        unset($data['settings']);
 
         if (isset($data['custom_fields']) && is_array($data['custom_fields'])) {
             $data['custom_fields'] = $this->parseCustomFields($data['custom_fields']);
@@ -38,8 +41,8 @@ class CompanyRepository extends BaseRepository
 
         $company->fill($data);
 
-        if (array_key_exists('settings', $data)) {
-            $company->saveSettings($data['settings'], $company);
+        if ($hasSettings) {
+            $company->saveSettings($settings, $company);
         }
 
         if (isset($data['smtp_username'])) {

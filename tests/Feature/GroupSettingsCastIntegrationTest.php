@@ -74,8 +74,8 @@ class GroupSettingsCastIntegrationTest extends TestCase
             'settings' => [
                 'currency_id' => '2',
                 'statement_design_id' => 'design-id',
-                'task_round_up' => false,
-                'send_reminders' => false,
+                'task_round_up' => '0',
+                'send_reminders' => 'false',
                 'tax_name1' => '',
                 'language_id' => null,
             ],

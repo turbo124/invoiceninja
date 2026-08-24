@@ -182,6 +182,29 @@ class CompanySettingsCastTest extends TestCase
         $this->assertSame(12.5, $rehydrated->default_task_rate);
     }
 
+    public function testBooleanStringsUseSemanticBooleanCoercion(): void
+    {
+        $settings = $this->companyWithSettings([
+            'send_reminders' => 'false',
+            'auto_archive_invoice' => '0',
+            'auto_convert_quote' => 'off',
+            'auto_email_invoice' => 'no',
+            'inclusive_taxes' => 'true',
+            'show_currency_code' => '1',
+            'military_time' => 'on',
+            'signature_on_pdf' => 'yes',
+        ])->settings;
+
+        $this->assertFalse($settings->send_reminders);
+        $this->assertFalse($settings->auto_archive_invoice);
+        $this->assertFalse($settings->auto_convert_quote);
+        $this->assertFalse($settings->auto_email_invoice);
+        $this->assertTrue($settings->inclusive_taxes);
+        $this->assertTrue($settings->show_currency_code);
+        $this->assertTrue($settings->military_time);
+        $this->assertTrue($settings->signature_on_pdf);
+    }
+
     public function testModelSerializationUsesACompletePlainSettingsObject(): void
     {
         $company = $this->companyWithSettings([

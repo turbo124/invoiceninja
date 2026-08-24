@@ -90,7 +90,7 @@ class GroupSettingsTest extends TestCase
     public function testClientDefaults()
     {
         $cs = $this->client->company->settings;
-        $cs->timezone_id = null;
+        $cs->timezone_id = '';
 
         $this->client->company->settings = $cs;
 

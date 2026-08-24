@@ -113,7 +113,7 @@ trait SettingsSaver
                 return !is_int($value) || (is_string($value) && method_exists($value, '__toString')) || is_null($value) || is_string($value);
             case 'bool':
             case 'boolean':
-                return is_bool($value) || (int) filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
             case 'object':
                 return is_object($value);
             case 'array':
