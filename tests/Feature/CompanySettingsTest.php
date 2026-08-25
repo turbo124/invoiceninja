@@ -76,11 +76,9 @@ class CompanySettingsTest extends TestCase
 
     public function testNullValuesInSettings()
     {
-        $settings = $this->company->settings;
-
-        $settings->reset_counter_date = null;
-
-        $this->company->saveSettings($settings, $this->company);
+        $this->company->saveSettings([
+            'reset_counter_date' => null,
+        ], $this->company);
 
         $response = false;
 
@@ -117,14 +115,12 @@ class CompanySettingsTest extends TestCase
 
     public function testIntegerEdgeCases()
     {
-        $settings = $this->company->settings;
-
-        $settings->client_number_counter = 'a';
-        $settings->invoice_number_counter = 1000;
-        $settings->quote_number_counter = 1.2;
-        $settings->credit_number_counter = 10.1;
-
-        $this->company->saveSettings($settings, $this->company);
+        $this->company->saveSettings([
+            'client_number_counter' => 'a',
+            'invoice_number_counter' => 1000,
+            'quote_number_counter' => 1.2,
+            'credit_number_counter' => 10.1,
+        ], $this->company);
 
         $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
@@ -143,14 +139,12 @@ class CompanySettingsTest extends TestCase
 
     public function testFloatEdgeCases()
     {
-        $settings = $this->company->settings;
-
-        $settings->default_task_rate = 'a';
-        $settings->tax_rate1 = 10.0;
-        $settings->tax_rate2 = '10.0';
-        $settings->tax_rate3 = '10.5';
-
-        $this->company->saveSettings($settings, $this->company);
+        $this->company->saveSettings([
+            'default_task_rate' => 'a',
+            'tax_rate1' => 10.0,
+            'tax_rate2' => '10.0',
+            'tax_rate3' => '10.5',
+        ], $this->company);
 
         $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),
@@ -169,15 +163,13 @@ class CompanySettingsTest extends TestCase
 
     public function testBoolEdgeCases()
     {
-        $settings = $this->company->settings;
-
-        $settings->require_invoice_signature = true;
-        $settings->require_quote_signature = true;
-        $settings->show_accept_quote_terms = false;
-        $settings->show_accept_invoice_terms = 'TRUE';
-        $settings->enable_client_portal_tasks = 'FALSE';
-
-        $this->company->saveSettings($settings, $this->company);
+        $this->company->saveSettings([
+            'require_invoice_signature' => true,
+            'require_quote_signature' => true,
+            'show_accept_quote_terms' => false,
+            'show_accept_invoice_terms' => 'TRUE',
+            'enable_client_portal_tasks' => 'FALSE',
+        ], $this->company);
 
         $response = $this->withHeaders([
                 'X-API-SECRET' => config('ninja.api_secret'),

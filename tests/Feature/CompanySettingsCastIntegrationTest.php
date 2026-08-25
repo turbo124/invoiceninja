@@ -7,6 +7,7 @@ use App\Jobs\Company\CompanyTaxRate;
 use App\Models\Company;
 use App\Repositories\CompanyRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use stdClass;
 use Tests\MockAccountData;
@@ -98,9 +99,28 @@ class CompanySettingsCastIntegrationTest extends TestCase
         $this->assertSame('preserved', $company->fresh()->settings->custom_value1);
     }
 
+    public function testCompanyRepositorySavesOnlyOnceWhenSettingsArePresent(): void
+    {
+        $company = Company::query()->findOrFail($this->company->id);
+        $savedEvent = 'eloquent.saved: '.Company::class;
+
+        Event::fake([$savedEvent]);
+
+        app(CompanyRepository::class)->save([
+            'settings' => [
+                'currency_id' => 2,
+            ],
+            'smtp_username' => 'single-save@example.com',
+        ], $company);
+
+        Event::assertDispatchedTimes($savedEvent, 1);
+        $this->assertSame('2', $company->fresh()->settings->currency_id);
+        $this->assertSame('single-save@example.com', $company->fresh()->smtp_username);
+    }
+
     public function testBackupSettingsSaverPreservesTheFormerPersistencePath(): void
     {
-        $settings = CompanySettings::defaults();
+        $settings = $this->company->fresh()->settings;
         $settings->currency_id = 2;
         $settings->default_task_rate = 12.5;
 
@@ -110,6 +130,18 @@ class CompanySettingsCastIntegrationTest extends TestCase
 
         $this->assertSame('2', $settings->currency_id);
         $this->assertSame(12.5, $settings->default_task_rate);
+    }
+
+    public function testSaveSettingsRetainsAnAlreadyTypedSettingsInstance(): void
+    {
+        $company = Company::query()->findOrFail($this->company->id);
+        $settings = $company->settings;
+        $settings->currency_id = '2';
+
+        $company->saveSettings($settings, $company);
+
+        $this->assertSame($settings, $company->settings);
+        $this->assertSame('2', $company->fresh()->settings->currency_id);
     }
 
     public function testNullRawCompanyValuesUseTypedDefaultsAndSerializeCompletely(): void
@@ -156,5 +188,26 @@ class CompanySettingsCastIntegrationTest extends TestCase
             static fn (CompanyTaxRate $job): bool => $job->company->settings->postal_code === '90210',
         );
         $this->assertSame('90210', $company->fresh()->settings->postal_code);
+    }
+
+    public function testSaveSettingsDispatchesTaxRefreshWhenTaxCalculationIsEnabled(): void
+    {
+        $company = Company::query()->findOrFail($this->company->id);
+        $company->account->plan = 'enterprise';
+        $company->account->save();
+        $company->calculate_taxes = false;
+        $company->settings = [
+            'country_id' => '840',
+            'postal_code' => '10001',
+        ];
+        $company->save();
+
+        Queue::fake();
+
+        $company->calculate_taxes = true;
+        $company->saveSettings([], $company);
+
+        Queue::assertPushed(CompanyTaxRate::class);
+        $this->assertSame(1, $company->fresh()->calculate_taxes);
     }
 }

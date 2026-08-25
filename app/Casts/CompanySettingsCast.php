@@ -7,12 +7,12 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Eloquent\Model;
 use JsonException;
-use ReflectionNamedType;
-use ReflectionProperty;
 use stdClass;
 
 class CompanySettingsCast implements CastsAttributes, SerializesCastableAttributes
 {
+    public bool $withoutObjectCaching = false;
+
     /**
      * Cast the given value.
      *
@@ -20,7 +20,7 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): CompanySettings
     {
-        return $this->hydrate($this->payload($value));
+        return $this->normalize($value);
     }
 
     /**
@@ -30,11 +30,10 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): string
     {
-        $settings = $this->hydrate($this->payload($value));
+        $this->withoutObjectCaching = ! $value instanceof CompanySettings;
+        $settings = $this->normalize($value);
 
-        $this->synchronizeCachedObject($value, $settings);
-
-        return json_encode(get_object_vars($settings), JSON_THROW_ON_ERROR);
+        return json_encode($this->storagePayload($settings), JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -44,7 +43,16 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
      */
     public function serialize(Model $model, string $key, mixed $value, array $attributes): stdClass
     {
-        return (object) get_object_vars($this->hydrate($this->payload($value)));
+        return (object) $this->storagePayload($this->normalize($value));
+    }
+
+    public function normalize(mixed $value): CompanySettings
+    {
+        if ($value instanceof CompanySettings) {
+            return $value;
+        }
+
+        return $this->hydrate($this->payload($value));
     }
 
     /**
@@ -53,8 +61,9 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
     private function hydrate(array $payload): CompanySettings
     {
         $settings = new CompanySettings();
+        $defaults = CompanySettings::defaults();
 
-        foreach (get_object_vars(CompanySettings::defaults()) as $property => $default) {
+        foreach (get_object_vars($defaults) as $property => $default) {
             $value = array_key_exists($property, $payload) && $payload[$property] !== null
                 ? $payload[$property]
                 : $default;
@@ -65,14 +74,8 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
                 continue;
             }
 
-            $type = $this->settingType($property);
-
-            if ($type === null) {
-                continue;
-            }
-
             $settings->{$property} = $this->castValue(
-                $type,
+                $property,
                 $value,
                 $default,
             );
@@ -81,8 +84,14 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
         return $settings;
     }
 
-    private function castValue(string $type, mixed $value, mixed $default): mixed
+    private function castValue(string $property, mixed $value, mixed $default): mixed
     {
+        if (in_array($property, CompanySettings::NUMERIC_STRING_CASTS, true)) {
+            return $this->numericString($value, (string) $default);
+        }
+
+        $type = gettype($default);
+
         if ($type !== 'object') {
             return CompanySettings::castAttribute($type, $value);
         }
@@ -110,20 +119,27 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
         return is_object($default) ? $default : new stdClass();
     }
 
-    private function settingType(string $property): ?string
+    private function numericString(mixed $value, string $default): string
     {
-        if (! property_exists(CompanySettings::class, $property)) {
-            return null;
+        if ($value === '') {
+            return '';
         }
 
-        $property = new ReflectionProperty(CompanySettings::class, $property);
-        $type = $property->getType();
-
-        if (! $property->isPublic() || $property->isStatic() || ! $type instanceof ReflectionNamedType) {
-            return null;
+        if (is_int($value) && $value >= 0) {
+            return (string) $value;
         }
 
-        return $type->getName();
+        if (is_float($value) && is_finite($value) && $value >= 0 && floor($value) === $value) {
+            return number_format($value, 0, '.', '');
+        }
+
+        if (! is_string($value) || ! ctype_digit($value)) {
+            return $default;
+        }
+
+        $value = ltrim($value, '0');
+
+        return $value === '' ? '0' : $value;
     }
 
     private function translations(mixed $value): stdClass
@@ -153,21 +169,20 @@ class CompanySettingsCast implements CastsAttributes, SerializesCastableAttribut
         return $translations;
     }
 
-    private function synchronizeCachedObject(mixed $value, CompanySettings $settings): void
+    /**
+     * @return array<string, mixed>
+     */
+    private function storagePayload(CompanySettings $settings): array
     {
-        if (! $value instanceof CompanySettings) {
-            return;
+        $payload = [];
+
+        foreach (array_keys(CompanySettings::$casts) as $property) {
+            $payload[$property] = $settings->{$property};
         }
 
-        foreach (array_keys(get_object_vars($value)) as $property) {
-            if (! property_exists(CompanySettings::class, $property)) {
-                unset($value->{$property});
-            }
-        }
+        $payload['translations'] = $settings->translations;
 
-        foreach (get_object_vars($settings) as $property => $setting) {
-            $value->{$property} = $setting;
-        }
+        return $payload;
     }
 
     /**

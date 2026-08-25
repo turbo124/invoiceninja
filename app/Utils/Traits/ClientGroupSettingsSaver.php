@@ -40,8 +40,8 @@ trait ClientGroupSettingsSaver
             return;
         }
 
-        $settings = (object) $settings;
-        $entity_settings = (object) $this->settings;
+        $settings = $this->settingsObject($settings);
+        $entity_settings = $this->settingsObject($this->settings);
 
         //unset protected properties.
         foreach (CompanySettings::$protected_fields as $field) {
@@ -59,7 +59,7 @@ trait ClientGroupSettingsSaver
          * we unset it from the settings object
          */
         foreach ($settings as $key => $value) {
-            if (! isset($settings->{$key}) || empty($settings->{$key})  || !property_exists($company_settings_stub, $key) || (! is_object($settings->{$key}) && strlen($settings->{$key}) == 0)) {
+            if ($this->isDiscardedSettingValue($value) || ! property_exists($company_settings_stub, $key)) {
                 unset($settings->{$key});
             }
         }
@@ -85,7 +85,7 @@ trait ClientGroupSettingsSaver
      */
     public function validateSettings($settings)
     {
-        $settings = (object) $settings;
+        $settings = $this->settingsObject($settings);
         $casts = CompanySettings::$casts;
 
         ksort($casts);
@@ -102,7 +102,7 @@ trait ClientGroupSettingsSaver
 
         //18-07-2022 removed || empty($settings->{$key}) from this check to allow "0" values to persist
         foreach ($settings as $key => $value) {
-            if (! isset($settings->{$key}) || (! is_object($settings->{$key}) && strlen($settings->{$key}) == 0)) {
+            if ($this->isDiscardedSettingValue($value)) {
                 unset($settings->{$key});
             }
         }
@@ -139,7 +139,7 @@ trait ClientGroupSettingsSaver
             }
 
             /* Handles unset settings or blank strings */
-            if (! property_exists($settings, $key) || is_null($settings->{$key}) || ! isset($settings->{$key}) || $settings->{$key} == '') {
+            if (! property_exists($settings, $key)) {
                 continue;
             }
 
@@ -165,7 +165,7 @@ trait ClientGroupSettingsSaver
      */
     private function checkSettingType($settings): stdClass
     {
-        $settings = (object) $settings;
+        $settings = $this->settingsObject($settings);
         $casts = CompanySettings::$casts;
 
         foreach ($casts as $key => $value) {
@@ -198,7 +198,7 @@ trait ClientGroupSettingsSaver
             }
 
             /* Handles unset settings or blank strings */
-            if (! property_exists($settings, $key) || is_null($settings->{$key}) || ! isset($settings->{$key}) || $settings->{$key} == '') {
+            if (! property_exists($settings, $key)) {
                 continue;
             }
 
@@ -250,5 +250,23 @@ trait ClientGroupSettingsSaver
             default:
                 return false;
         }
+    }
+
+    private function isDiscardedSettingValue(mixed $value): bool
+    {
+        return $value === null || $value === '';
+    }
+
+    private function settingsObject(mixed $settings): stdClass
+    {
+        if (is_array($settings)) {
+            return (object) $settings;
+        }
+
+        if ($settings instanceof stdClass) {
+            return $settings;
+        }
+
+        return (object) get_object_vars($settings);
     }
 }

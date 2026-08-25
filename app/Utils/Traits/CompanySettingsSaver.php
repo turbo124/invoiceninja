@@ -12,10 +12,12 @@
 
 namespace App\Utils\Traits;
 
+use App\Casts\CompanySettingsCast;
 use App\DataMapper\CompanySettings;
 use App\Jobs\Company\CompanyTaxRate;
 use App\Models\Company;
 use stdClass;
+use Stringable;
 
 /**
  * Class CompanySettingsSaver.
@@ -42,21 +44,27 @@ trait CompanySettingsSaver
      */
     public function saveSettings(mixed $settings, Company $entity): void
     {
-        $settings = $this->settingsPayload($settings);
-
-        if ($settings === []) {
-            return;
-        }
+        $settingsCast = new CompanySettingsCast();
+        $companySettings = $settingsCast->normalize($entity->settings);
+        $settingsPayload = $this->settingsPayload($settings);
 
         foreach (CompanySettings::$protected_fields as $field) {
-            unset($settings[$field]);
+            unset($settingsPayload[$field]);
         }
 
-        $originalSettings = $this->settingsPayload($entity->getOriginal('settings'));
-        $entity->settings = array_replace($originalSettings, $settings);
-        $companySettings = $entity->settings;
+        if ($settings instanceof CompanySettings && CompanySettings::$protected_fields === []) {
+            $companySettings = $settings;
+        } elseif ($settingsPayload !== []) {
+            $companySettings = $settingsCast->normalize(array_replace(
+                get_object_vars($companySettings),
+                $settingsPayload,
+            ));
+        }
+
+        $originalSettings = $this->settingsPayload($entity->getRawOriginal('settings'));
         $refreshTaxRates = $this->shouldRefreshTaxRates($entity, $originalSettings, $companySettings);
 
+        $entity->settings = $companySettings;
         $entity->save();
 
         if ($refreshTaxRates) {
@@ -73,8 +81,10 @@ trait CompanySettingsSaver
             return;
         }
 
+        $settings = (object) get_object_vars((object) $settings);
+
         foreach (CompanySettings::$protected_fields as $field) {
-            unset($settings[$field]);
+            unset($settings->{$field});
         }
 
         $settings = $this->backupCheckSettingType($settings);
@@ -156,18 +166,21 @@ trait CompanySettingsSaver
 
                 continue;
             }
-            /*Separate loop if it is a _id field which is an integer cast as a string*/ elseif (substr($key, -3) == '_id' || substr($key, -14) == 'number_counter') {
+            /* Separate loop for integers stored as strings and number counters. */ elseif (in_array($key, CompanySettings::NUMERIC_STRING_CASTS, true) || str_ends_with($key, 'number_counter')) {
                 $value = 'integer';
-
-                if (in_array($key, $this->string_ids)) {
-                    // if ($key == 'besr_id') {
-                    $value = 'string';
-                }
 
                 if (! property_exists($settings, $key)) {
                     continue;
                 } elseif (! $this->checkAttribute($value, $settings->{$key})) {
                     return [$key, $value, $settings->{$key}];
+                }
+
+                continue;
+            } elseif (str_ends_with($key, '_id')) {
+                if (! property_exists($settings, $key)) {
+                    continue;
+                } elseif (! $this->checkAttribute('string', $settings->{$key})) {
+                    return [$key, 'string', $settings->{$key}];
                 }
 
                 continue;
@@ -200,13 +213,16 @@ trait CompanySettingsSaver
         switch ($key) {
             case 'int':
             case 'integer':
-                return ctype_digit(strval(abs((int) $value)));
+                return $value === null
+                    || $value === ''
+                    || (is_int($value) && $value >= 0)
+                    || (is_string($value) && ctype_digit($value));
             case 'real':
             case 'float':
             case 'double':
                 return ! is_string($value) && (is_float($value) || is_numeric(strval($value)));
             case 'string':
-                return (is_string($value) && method_exists($value, '__toString')) || is_null($value) || is_string($value);
+                return $value === null || is_string($value) || $value instanceof Stringable;
             case 'bool':
             case 'boolean':
                 return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
@@ -225,7 +241,7 @@ trait CompanySettingsSaver
 
     private function backupCheckSettingType(mixed $settings): stdClass
     {
-        $settings = (object) $settings;
+        $settings = (object) get_object_vars((object) $settings);
         $casts = CompanySettings::$casts;
 
         foreach ($casts as $key => $value) {
@@ -366,10 +382,10 @@ trait CompanySettingsSaver
             return false;
         }
 
-        $postalCodeChanged = $company->isDirty('settings')
-            && ($originalSettings['postal_code'] ?? '') !== $settings->postal_code;
-        $taxCalculationEnabled = $company->isDirty('calculate_taxes')
-            && ! (bool) $company->getOriginal('calculate_taxes');
+        $postalCodeChanged = $company->exists
+            && ($originalSettings['postal_code'] ?? $settings->postal_code) !== $settings->postal_code;
+        $taxCalculationEnabled = $company->exists
+            && ! (bool) $company->getRawOriginal('calculate_taxes');
 
         return $postalCodeChanged || $taxCalculationEnabled;
     }

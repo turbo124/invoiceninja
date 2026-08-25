@@ -13,21 +13,13 @@
 namespace App\Utils\Traits;
 
 use App\DataMapper\CompanySettings;
+use Stringable;
 
 /**
  * Class SettingsSaver.
  */
 trait SettingsSaver
 {
-    private array $string_ids = [
-        'payment_refund_design_id',
-        'payment_receipt_design_id',
-        'delivery_note_design_id',
-        'statement_design_id',
-        'besr_id',
-        'gmail_sending_user_id',
-    ];
-
     /**
      * Used for custom validation of inbound
      * settings request.
@@ -60,18 +52,21 @@ trait SettingsSaver
 
                 continue;
             }
-            /*Separate loop if it is a _id field which is an integer cast as a string*/ elseif (substr($key, -3) == '_id' || substr($key, -14) == 'number_counter' || ($key == 'payment_terms' && property_exists($settings, $key) && strlen($settings->{$key} ?? '') >= 1) || ($key == 'valid_until' && property_exists($settings, $key) && strlen($settings->{$key} ?? '') >= 1)) {
+            /* Separate loop for integers stored as strings and number counters. */ elseif (in_array($key, CompanySettings::NUMERIC_STRING_CASTS, true) || str_ends_with($key, 'number_counter') || ($key == 'payment_terms' && property_exists($settings, $key) && strlen($settings->{$key} ?? '') >= 1) || ($key == 'valid_until' && property_exists($settings, $key) && strlen($settings->{$key} ?? '') >= 1)) {
                 $value = 'integer';
-
-                if (in_array($key, $this->string_ids)) {
-                    // if ($key == 'gmail_sending_user_id' || $key == 'besr_id') {
-                    $value = 'string';
-                }
 
                 if (! property_exists($settings, $key)) {
                     continue;
                 } elseif (! $this->checkAttribute($value, $settings->{$key})) {
                     return [$key, $value, $settings->{$key}];
+                }
+
+                continue;
+            } elseif (str_ends_with($key, '_id')) {
+                if (! property_exists($settings, $key)) {
+                    continue;
+                } elseif (! $this->checkAttribute('string', $settings->{$key})) {
+                    return [$key, 'string', $settings->{$key}];
                 }
 
                 continue;
@@ -104,13 +99,16 @@ trait SettingsSaver
         switch ($key) {
             case 'int':
             case 'integer':
-                return is_numeric($value) && ctype_digit(strval(abs($value)));
+                return $value === null
+                    || $value === ''
+                    || (is_int($value) && $value >= 0)
+                    || (is_string($value) && ctype_digit($value));
             case 'real':
             case 'float':
             case 'double':
                 return !is_string($value) && (is_float($value) || is_numeric(strval($value)));
             case 'string':
-                return !is_int($value) || (is_string($value) && method_exists($value, '__toString')) || is_null($value) || is_string($value);
+                return $value === null || is_string($value) || $value instanceof Stringable;
             case 'bool':
             case 'boolean':
                 return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;

@@ -875,6 +875,24 @@ class CompanySettings extends BaseSettings
         'delivery_note_design_id',
     ];
 
+    /**
+     * Settings stored as strings which only accept integer values.
+     *
+     * @var list<string>
+     */
+    public const NUMERIC_STRING_CASTS = [
+        'default_expense_payment_type_id',
+        'portal_design_id',
+        'endless_reminder_frequency_id',
+        'country_id',
+        'currency_id',
+        'payment_type_id',
+        'reset_counter_frequency_id',
+        'timezone_id',
+        'date_format_id',
+        'language_id',
+    ];
+
     // /**
     //  * Cast object values and return entire class
     //  * prevents missing properties from not being returned
@@ -901,7 +919,6 @@ class CompanySettings extends BaseSettings
         unset($data->protected_fields);
         unset($data->free_plan_casts);
         unset($data->string_casts);
-
         $data->timezone_id = (string) config('ninja.i18n.timezone_id');
         $data->currency_id = (string) config('ninja.i18n.currency_id');
         $data->language_id = (string) config('ninja.i18n.language_id');

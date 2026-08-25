@@ -168,6 +168,8 @@ class CompanySettingsCastTest extends TestCase
             'unknown_setting' => 'discard me',
         ];
 
+        $this->assertInstanceOf(CompanySettings::class, $company->settings);
+
         $stored = json_decode($company->getAttributes()['settings'], true, 512, JSON_THROW_ON_ERROR);
         $rehydrated = $this->companyWithSettings($stored)->settings;
 
@@ -180,6 +182,56 @@ class CompanySettingsCastTest extends TestCase
         $this->assertSame('2', $rehydrated->currency_id);
         $this->assertFalse($rehydrated->send_reminders);
         $this->assertSame(12.5, $rehydrated->default_task_rate);
+    }
+
+    public function testAlreadyTypedSettingsUseTheSameObjectInstance(): void
+    {
+        $settings = $this->companyWithSettings([
+            'currency_id' => 2,
+        ])->settings;
+        $cast = new CompanySettingsCast();
+
+        $this->assertSame($settings, $cast->normalize($settings));
+
+        $company = $this->companyWithSettings([]);
+        $company->settings = $settings;
+
+        $this->assertSame($settings, $company->settings);
+    }
+
+    public function testNumericStringIdsAreCanonicalizedWithoutChangingOpaqueIds(): void
+    {
+        $input = array_fill_keys(CompanySettings::NUMERIC_STRING_CASTS, '0002');
+        $opaqueIds = array_filter(
+            array_keys(CompanySettings::$casts),
+            static fn (string $property): bool => str_ends_with($property, '_id')
+                && ! in_array($property, CompanySettings::NUMERIC_STRING_CASTS, true),
+        );
+
+        foreach ($opaqueIds as $property) {
+            $input[$property] = 'VolejRejNm';
+        }
+
+        $input['timezone_id'] = 3.0;
+        $input['payment_type_id'] = '';
+        $settings = $this->companyWithSettings($input)->settings;
+
+        foreach (CompanySettings::NUMERIC_STRING_CASTS as $property) {
+            $expected = match ($property) {
+                'timezone_id' => '3',
+                'payment_type_id' => '',
+                default => '2',
+            };
+
+            $this->assertSame($expected, $settings->{$property}, $property);
+        }
+
+        foreach ($opaqueIds as $property) {
+            $this->assertSame('VolejRejNm', $settings->{$property}, $property);
+        }
+
+        $this->assertSame('3', $settings->timezone_id);
+        $this->assertSame('', $settings->payment_type_id);
     }
 
     public function testBooleanStringsUseSemanticBooleanCoercion(): void

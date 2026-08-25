@@ -41,10 +41,6 @@ class CompanyRepository extends BaseRepository
 
         $company->fill($data);
 
-        if ($hasSettings) {
-            $company->saveSettings($settings, $company);
-        }
-
         if (isset($data['smtp_username'])) {
             $company->smtp_username = $data['smtp_username'];
         }
@@ -61,7 +57,11 @@ class CompanyRepository extends BaseRepository
             $company->quickbooks = $company->quickbooks->with($data['quickbooks']['settings']);
         }
 
-        $company->save();
+        if ($hasSettings) {
+            $company->saveSettings($settings, $company);
+        } else {
+            $company->save();
+        }
 
         return $company;
     }
