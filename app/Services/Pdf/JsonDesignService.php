@@ -627,11 +627,17 @@ class JsonDesignService
                     .json-block {
                         margin-bottom: 12px;
                     }
-                    .invoice-widget--twig {
+                    .invoice-widget--twig,
+                    .invoice-twig-content {
                         width: 100%;
                         max-width: 100%;
                         min-width: 0;
                         box-sizing: border-box;
+                        position: relative;
+                    }
+                    .invoice-twig-content table {
+                        width: 100%;
+                        max-width: 100%;
                     }
                     table {
                         width: 100%;

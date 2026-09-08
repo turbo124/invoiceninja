@@ -29,8 +29,9 @@ class JsonDesignTwigBlockTest extends TestCase
         ]);
 
         $this->assertArrayHasKey('twig-1', $sections);
-        $this->assertSame('ninja', $sections['twig-1']['elements'][0]['element']);
-        $this->assertSame($source, $sections['twig-1']['elements'][0]['content']);
+        $this->assertSame('div', $sections['twig-1']['elements'][0]['element']);
+        $this->assertSame('ninja', $sections['twig-1']['elements'][0]['elements'][0]['element']);
+        $this->assertSame($source, $sections['twig-1']['elements'][0]['elements'][0]['content']);
     }
 
     public function testTwigBlockUnwrapsOuterNinjaTags(): void
@@ -40,8 +41,8 @@ class JsonDesignTwigBlockTest extends TestCase
             $this->twigBlock('twig-wrap', "<ninja>\n{$inner}\n</ninja>"),
         ]);
 
-        $this->assertSame("\n{$inner}\n", $sections['twig-wrap']['elements'][0]['content']);
-        $this->assertSame('ninja', $sections['twig-wrap']['elements'][0]['element']);
+        $this->assertSame("\n{$inner}\n", $sections['twig-wrap']['elements'][0]['elements'][0]['content']);
+        $this->assertSame('ninja', $sections['twig-wrap']['elements'][0]['elements'][0]['element']);
     }
 
     public function testEmptyTwigBlockStillEmitsNinjaElement(): void
@@ -50,8 +51,8 @@ class JsonDesignTwigBlockTest extends TestCase
             $this->twigBlock('twig-empty', ''),
         ]);
 
-        $this->assertSame('ninja', $sections['twig-empty']['elements'][0]['element']);
-        $this->assertSame('', $sections['twig-empty']['elements'][0]['content']);
+        $this->assertSame('ninja', $sections['twig-empty']['elements'][0]['elements'][0]['element']);
+        $this->assertSame('', $sections['twig-empty']['elements'][0]['elements'][0]['content']);
     }
 
     public function testTwigBlockIsNotSplitLikeATextBlock(): void
@@ -61,7 +62,7 @@ class JsonDesignTwigBlockTest extends TestCase
         ]);
 
         $this->assertCount(1, $sections['twig-lines']['elements']);
-        $this->assertSame("line one\nline two", $sections['twig-lines']['elements'][0]['content']);
+        $this->assertSame("line one\nline two", $sections['twig-lines']['elements'][0]['elements'][0]['content']);
     }
 
     public function testTemplatePlaceholderUsesTwigWidgetClass(): void

@@ -1282,8 +1282,17 @@ class JsonToSectionsAdapter
             'id' => $block['id'],
             'elements' => [
                 [
-                    'element' => 'ninja',
-                    'content' => $this->twigSource($block),
+                    'element' => 'div',
+                    'properties' => [
+                        'class' => 'invoice-twig-content',
+                        'style' => 'width:100%;max-width:100%;min-width:0;box-sizing:border-box;position:relative;',
+                    ],
+                    'elements' => [
+                        [
+                            'element' => 'ninja',
+                            'content' => $this->twigSource($block),
+                        ],
+                    ],
                 ],
             ],
         ];
