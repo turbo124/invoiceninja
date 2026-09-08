@@ -112,6 +112,73 @@ class PurchaseOrderTest extends TestCase
         $this->assertSame(47.25, $purchase_order->line_items[0]->cost);
     }
 
+    public function testCloneQuoteToPurchaseOrder()
+    {
+        $purchase_order_design_id = $this->encodePrimaryKey(7);
+        $client_settings = ClientSettings::defaults();
+        $client_settings->purchase_order_design_id = $purchase_order_design_id;
+        $this->client->settings = $client_settings;
+        $this->client->save();
+
+        $line_items = $this->quote->line_items;
+        $line_items[0]->cost = 125.50;
+        $line_items[0]->product_cost = 47.25;
+        $this->quote->line_items = $line_items;
+        $this->quote->design_id = 5;
+        $this->quote->save();
+        $this->quote->unsetRelation('client');
+
+        $purchase_order_count = PurchaseOrder::count();
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'clone_to_purchase_order',
+            'ids' => [$this->quote->hashed_id],
+        ])->assertStatus(200)
+            ->assertJsonPath('data.quote_id', $this->quote->hashed_id)
+            ->assertJsonPath('data.client_id', $this->client->hashed_id)
+            ->assertJsonPath('data.status_id', (string) PurchaseOrder::STATUS_DRAFT)
+            ->assertJsonPath('data.vendor_id', '')
+            ->assertJsonPath('data.entity_type', 'purchaseOrder')
+            ->assertJsonPath('data.design_id', $purchase_order_design_id)
+            ->assertJsonPath('data.line_items.0.cost', 47.25)
+            ->assertJsonCount(count((array) $this->quote->line_items), 'data.line_items');
+
+        $this->assertNotSame($this->encodePrimaryKey($this->quote->design_id), $response->json('data.design_id'));
+        $this->assertNotSame(125.50, $response->json('data.line_items.0.cost'));
+        $this->assertSame($purchase_order_count, PurchaseOrder::count());
+
+        $purchase_order = $response->json('data');
+        $purchase_order['vendor_id'] = $this->vendor->hashed_id;
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/purchase_orders', $purchase_order)
+            ->assertStatus(200)
+            ->assertJsonPath('data.quote_id', $this->quote->hashed_id);
+
+        $purchase_order = PurchaseOrder::find($this->decodePrimaryKey($response->json('data.id')));
+
+        $this->assertSame($this->quote->id, $purchase_order->quote_id);
+        $this->assertSame(7, $purchase_order->design_id);
+        $this->assertSame(47.25, $purchase_order->line_items[0]->cost);
+    }
+
+    public function testCloneQuoteToPurchaseOrderRequiresOneQuote()
+    {
+        $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'clone_to_purchase_order',
+            'ids' => [$this->quote->hashed_id, $this->quote->hashed_id],
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['ids']);
+    }
+
     public function testCloneInvoiceToPurchaseOrderRequiresOneInvoice()
     {
         try {

@@ -430,6 +430,31 @@ class XssSanitizationTest extends TestCase
         $this->assertStringNotContainsString('javascript:', $result);
     }
 
+    public function test_purify_strips_javascript_uris_that_contain_template_patterns(): void
+    {
+        $payloads = [
+            '<a href="javascript:alert(1)//$.a">x</a>',
+            '<a href="javascript:alert(1)//${foo}">x</a>',
+            '<a href="JaVaScRiPt:alert(1)//$.a">x</a>',
+            '<a href="vbscript:alert(1)//$.a">x</a>',
+            '<img src="javascript:alert(1)//$.a">',
+        ];
+
+        foreach ($payloads as $payload) {
+            $result = Purify::clean($payload, true);
+
+            $this->assertStringNotContainsString('javascript:', $result, $payload);
+            $this->assertStringNotContainsString('vbscript:', $result, $payload);
+        }
+    }
+
+    public function test_purify_preserves_dotted_template_href(): void
+    {
+        $result = Purify::clean('<a href="$client.name">x</a>', true);
+
+        $this->assertStringContainsString('href="$client.name"', $result);
+    }
+
     public function test_purify_preserves_safe_img_with_https()
     {
         $result = Purify::clean('<img src="https://example.com/image.jpg" alt="Photo" style="width:100px">');

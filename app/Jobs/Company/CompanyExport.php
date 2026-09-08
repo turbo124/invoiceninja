@@ -589,7 +589,7 @@ class CompanyExport implements ShouldQueue
 
         $this->export_data['purchase_orders'] = $this->company->purchase_orders()->orderBy('number', 'DESC')->cursor()->map(function ($purchase_order) {
             $purchase_order = $this->transformBasicEntities($purchase_order);
-            $purchase_order = $this->transformArrayOfKeys($purchase_order, ['expense_id','client_id', 'vendor_id', 'project_id', 'design_id', 'subscription_id','project_id', 'location_id']);
+            $purchase_order = $this->transformArrayOfKeys($purchase_order, ['expense_id','client_id', 'vendor_id', 'project_id', 'design_id', 'subscription_id','project_id', 'location_id', 'invoice_id', 'quote_id']);
 
             return $this->withoutRelations($purchase_order->makeVisible(['id',
                 'private_notes',

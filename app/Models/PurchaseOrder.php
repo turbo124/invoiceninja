@@ -40,6 +40,7 @@ use App\Models\Traits\IndexableItems;
  * @property int|null $recurring_id
  * @property int|null $design_id
  * @property int|null $invoice_id
+ * @property int|null $quote_id
  * @property string|null $number
  * @property float $discount
  * @property bool $is_amount_discount
@@ -96,6 +97,7 @@ use App\Models\Traits\IndexableItems;
  * @property int|null $currency_id
  * @property int|null $location_id
  * @property int|null $invoice_id
+ * @property int|null $quote_id
  * @property object|null $tax_data
  * @property-read int|null $activities_count
  * @property \App\Models\User|null $assigned_user
@@ -105,6 +107,7 @@ use App\Models\Traits\IndexableItems;
  * @property \App\Models\Expense|null $expense
  * @property string $hashed_id
  * @property \App\Models\Invoice|null $invoice
+ * @property \App\Models\Quote|null $quote
  * @property \App\Models\Project|null $project
  * @property \App\Models\User $user
  * @property \App\Models\Vendor $vendor
@@ -202,6 +205,7 @@ class PurchaseOrder extends BaseModel
         'custom_surcharge4',
         'design_id',
         'invoice_id',
+        'quote_id',
         'assigned_user_id',
         'exchange_rate',
         'balance',
@@ -382,6 +386,11 @@ class PurchaseOrder extends BaseModel
     public function invoice(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function quote(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Quote::class);
     }
 
     /** @return PurchaseOrderService  */

@@ -107,7 +107,8 @@ class QuoteController extends Controller
 
         if ($request->action == 'approve') {
 
-            if (auth()->guard('contact')->user()->company->docuninjaActive()) {
+            if (auth()->guard('contact')->user()->company->docuninjaActive()
+            && auth()->guard('contact')->user()->client->getSetting('require_quote_signature')) {
                 $invitations = \App\Models\QuoteInvitation::with('quote')
                                         ->whereIn('quote_id', $transformed_ids)
                                         ->where('client_contact_id', auth()->guard('contact')->user()->id)

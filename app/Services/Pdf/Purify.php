@@ -556,7 +556,7 @@ class Purify
                                 // nlog("data:image/* regex");
                                 $regex = '^data\:image\/[a-zA-Z0-9\+]+;base64,.*$';
                             } else {
-                                $regex = preg_quote($pattern, '/');
+                                $regex = '^' . preg_quote($pattern, '/') . '$';
                                 $regex = str_replace('\*', '.*', $regex);
                             }
 
