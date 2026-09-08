@@ -174,9 +174,9 @@ class CreateRawPdf
             throw new FilePermissionsFailure('Unable to generate the raw PDF => ' . $e->getMessage());
         }
 
-        // Prefer the resolved settings on PdfService (which may have been
-        // overridden by a JSON design's documentSettings.embedDocuments) over
-        // the raw client/company merged settings.
+        // Prefer the resolved settings on PdfService over the raw
+        // client/company merged settings. embed_documents is company/client
+        // owned (Invoice Design menu) and is not overridden by JSON designs.
         $merge_docs = isset($ps->config->settings->embed_documents)
             ? (bool) $ps->config->settings->embed_documents
             : (isset($this->entity->client)

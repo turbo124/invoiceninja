@@ -283,16 +283,14 @@ class PdfBuilder
             $template = $twig->createTemplate(html_entity_decode($template));
             $template = $template->render($data);
 
-            $f = $this->document->createDocumentFragment();
-
-            // $template = str_ireplace(['<br>', '<br />'], "<br/>", $template);
-            // $f->appendXML($template);
-
             $decoded_template = str_ireplace("<br>", "<br/>", html_entity_decode($template));
-            $f->appendXML('<![CDATA[' . $decoded_template . ']]>');
+            $decoded_template = preg_replace('/^\s*<ninja\b[^>]*>/i', '', $decoded_template) ?? $decoded_template;
+            $decoded_template = preg_replace('/<\/ninja>\s*$/i', '', $decoded_template) ?? $decoded_template;
 
-
-            $replacements[] = $f;
+            // Import the inner HTML into the parent (the widget placeholder).
+            // Leaving a <ninja> wrapper in the final tree lets libxml/Purify
+            // hoist tables and other block elements out of the widget.
+            $replacements[] = $this->fragmentFromHtml($decoded_template);
 
         }
 
@@ -2324,6 +2322,44 @@ class PdfBuilder
         }
 
         return false;
+    }
+
+    private function fragmentFromHtml(string $html): \DOMDocumentFragment
+    {
+        $fragment = $this->document->createDocumentFragment();
+
+        if (trim($html) === '') {
+            $fragment->appendChild($this->document->createTextNode(''));
+
+            return $fragment;
+        }
+
+        $temp = new \DOMDocument();
+        $wrappedHtml = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
+
+        if (@$temp->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD)) {
+            $wrapper = $temp->getElementsByTagName('div')->item(0);
+
+            if ($wrapper) {
+                foreach (iterator_to_array($wrapper->childNodes) as $child) {
+                    $fragment->appendChild($this->document->importNode($child, true));
+                }
+            }
+        }
+
+        if ($fragment->hasChildNodes()) {
+            return $fragment;
+        }
+
+        $fallback = $this->document->createDocumentFragment();
+
+        if (@$fallback->appendXML('<![CDATA[' . $html . ']]>')) {
+            return $fallback;
+        }
+
+        $fragment->appendChild($this->document->createTextNode($html));
+
+        return $fragment;
     }
 
     private function replaceTextNodeWithHtml(\DOMNode $node, string $html): void

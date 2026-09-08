@@ -602,6 +602,7 @@ export async function preparePortalPaymentContext(
     page: Page,
     companyGateway: CompanyGatewayEntity,
     paymentFlow: PortalPaymentFlow = 'default',
+    clientChanges: Record<string, unknown> = {}
 ): Promise<PaymentGatewayContext> {
     let client = await createAndLogInClient(api, page, {
         settings: {
@@ -618,6 +619,7 @@ export async function preparePortalPaymentContext(
     client = await updateClient(api.context, client, {
         ...defaultClientAddress,
         phone: '5555555555',
+        ...clientChanges,
     });
     const invoice = await createSentInvoice(api, client, {
         label: `gateway-${companyGateway.gateway_key}-${paymentFlow}`,

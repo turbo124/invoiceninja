@@ -292,6 +292,7 @@ class PdfMock
 
         return ['values'
          => [
+             '$client.shipping_city_state_postal' => 'Ryde, Sydney, 2113',
              '$client.shipping_postal_code' => '46420',
              '$client.shipping_location_name' => 'Location Name',
              '$client.billing_postal_code' => '11243',
@@ -444,7 +445,7 @@ class PdfMock
              '$user.last_name' => 'Erna Wunsch',
              '$client.website' => 'http://www.parisian.org/',
              '$dir_text_align' => 'left',
-             '$entity_images' => '',
+             '$entity_images' => $this->stubEntityImages(),
              '$task.discount' => '',
              '$contact.email' => 'bob@gmail.com',
              '$primary_color' => $this->settings->primary_color ?? '#4e4e4e',
@@ -550,6 +551,7 @@ class PdfMock
              '$user.name' => 'Derrick Monahan DDS Erna Wunsch',
              '$font_name' => $this->settings?->primary_font ?? 'Roboto', //@phpstan-ignore-line
              '$auto_bill' => 'This invoice will automatically be billed to your credit card on file on the due date.',
+             '$bill_to' => 'Bill To:',
              '$payments' => '',
              '$task.tax' => '',
              '$discount' => '$0.00',
@@ -627,12 +629,32 @@ class PdfMock
         ];
     }
 
+    /**
+     * Preview has no real attachments. When embed_documents is on, emit the
+     * same grid shape HtmlEngine uses so JSON designs can inject $entity_images.
+     */
+    private function stubEntityImages(): string
+    {
+        if (!($this->settings->embed_documents ?? false)) {
+            return '';
+        }
+
+        $src = 'data:image/svg+xml;base64,' . base64_encode(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140"><rect width="200" height="140" fill="#e5e7eb"/><text x="100" y="75" text-anchor="middle" fill="#6b7280" font-family="sans-serif" font-size="16">Image</text></svg>'
+        );
+
+        return '<div style="display:grid; grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);justify-items: center;">'
+            . '<img src="' . $src . '" style="max-width: 50%; margin-top: 20px;">'
+            . '<img src="' . $src . '" style="max-width: 50%; margin-top: 20px;">'
+            . '</div>';
+    }
 
     private function mockTranslatedLabels()
     {
         return [
             '$show_shipping_address_visibility_label' => ctrans('texts.shipping_address'),
             '$client.shipping_location_name_label' => ctrans('texts.name'),
+            '$client.shipping_city_state_postal_label' => ctrans('texts.shipping_city_state_postal'),
             '$client.shipping_postal_code_label' => ctrans('texts.shipping_postal_code'),
             '$show_shipping_address_block_label' => ctrans('texts.shipping_address'),
             '$client.billing_postal_code_label' => ctrans('texts.billing_postal_code'),
@@ -895,6 +917,7 @@ class PdfMock
             '$firstName_label' => ctrans('texts.first_name'),
             '$font_name_label' => '',
             '$auto_bill_label' => ctrans('texts.auto_bill'),
+            '$bill_to_label' => ctrans('texts.bill_to'),
             '$payments_label' => ctrans('texts.payments'),
             '$shipping_label' => ctrans('texts.shipping_address'),
             '$task.tax_label' => ctrans('texts.tax'),
@@ -1077,7 +1100,7 @@ class PdfMock
             '$vendor.website' => 'http://abernathy.com/consequatur-at-beatae-nesciunt',
             '$dir_text_align' => 'left',
             '$entity_footer' => $this->company->settings->purchase_order_footer,
-            '$entity_images' => '',
+            '$entity_images' => $this->stubEntityImages(),
             '$contact.email' => '',
             '$primary_color' => '#298AAB',
             '$contact.phone' => '+1 (920) 735-1990',

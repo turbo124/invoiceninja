@@ -53,7 +53,7 @@
         "eway/eway-rapid-php": "^2.0",
         "fakerphp/faker": "^1.14",
         "getbrevo/brevo-php": "^1.0",
-        "gocardless/gocardless-pro": "^4.12",
+        "gocardless/gocardless-pro": "^8.1",
         "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.2",
         "halaxa/json-machine": "^0.7.0",

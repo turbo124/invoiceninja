@@ -155,8 +155,10 @@ class HtmlEngine
         $data['$app_url'] = ['value' => $this->generateAppUrl(), 'label' => ''];
         $data['$from'] = ['value' => '', 'label' => ctrans('texts.from')];
         $data['$to'] = ['value' => '', 'label' => ctrans('texts.to')];
+        $data['$bill_to'] = ['value' => '', 'label' => ctrans('texts.bill_to')];
         $data['$shipping'] = ['value' => '', 'label' => ctrans('texts.ship_to')];
         $data['$ship_to'] = &$data['$shipping'];
+
         $data['$total_tax_labels'] = ['value' => $this->totalTaxLabels(), 'label' => ctrans('texts.taxes')];
         $data['$total_tax_values'] = ['value' => $this->totalTaxValues(), 'label' => ctrans('texts.taxes')];
         $data['$line_tax_labels'] = ['value' => $this->lineTaxLabels(), 'label' => ctrans('texts.taxes')];

@@ -208,11 +208,11 @@ class Peppol extends AbstractService implements MutatorInterface
     }
 
     /**
-     * Normalize amount for credit notes
+     * Document-level sign for credit-note monetary fields.
      *
-     * Credit notes must have positive values - the document type
-     * itself indicates it's a credit. This method ensures all
-     * amounts are positive when building a credit note.
+     * Money only — never quantity. One multiplier from the document total,
+     * never abs(). Per-field abs() collapses an internal offset line into
+     * another credit and breaks BR-CO-10 / BR-CO-13 / PEPPOL-EN16931-R120.
      *
      * @param float|int|string $amount
      * @return float
@@ -228,8 +228,29 @@ class Peppol extends AbstractService implements MutatorInterface
         $sign = ((float) $this->invoice->amount) < 0 ? -1 : 1;
 
         return $value * $sign;
-        // $value = (float) $amount;
-        // return $this->isCreditNote ? abs($value) : $value;
+    }
+
+    /**
+     * Credit-note UBL line signs.
+     *
+     * Price is always >= 0 (BR-27). Quantity carries any leftover sign so
+     * price × qty == line amount (PEPPOL-EN16931-R120). The line total is
+     * normalized once — an offset line keeps the opposite sign of the
+     * credit lines.
+     *
+     * @return array{quantity: float, price: float, line_total: float}
+     */
+    public function normalizeCreditNoteLine(float $quantity, float $cost, float $lineTotal): array
+    {
+        $sign = ((float) $this->invoice->amount) < 0 ? -1.0 : 1.0;
+        $normalizedLine = $lineTotal * $sign;
+        $price = abs($cost);
+
+        return [
+            'quantity' => $price > 0.0 ? $normalizedLine / $price : $quantity * $sign,
+            'price' => $price,
+            'line_total' => $normalizedLine,
+        ];
     }
 
     /**

@@ -277,6 +277,8 @@ class NinjaMailerJob implements ShouldQueue
                     $message = "Unknown issue sending via Postmark, please try again later.";
                 }
 
+                nlog("PostmarkException: {$message}");
+
                 $this->entityEmailFailed($message);
                 $this->cleanUpMailers();
             
