@@ -106,6 +106,8 @@ class PromptPay implements LivewireMethodInterface
 
         $server_response = json_decode($request->gateway_response);
 
+        $payment_intent = PaymentIntent::retrieve($server_response->id, array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid("st", true)]));
+
         $state = [
             'server_response' => $server_response,
             'payment_hash' => $request->payment_hash,
@@ -113,12 +115,8 @@ class PromptPay implements LivewireMethodInterface
 
         $state = array_merge($state, $request->all());
 
-        $state['payment_intent'] = PaymentIntent::retrieve($server_response->id, array_merge($this->stripe->stripe_connect_auth, ['idempotency_key' => uniqid("st", true)]));
-
         $this->stripe->payment_hash->data = array_merge((array) $this->stripe->payment_hash->data, $state);
         $this->stripe->payment_hash->save();
-
-        $payment_intent = $this->stripe->payment_hash->data->payment_intent;//@phpstan-ignore-line
 
         $references = array_values(array_filter([$payment_intent->id, $payment_intent->latest_charge ?? null], fn ($v) => is_string($v) && $v !== ''));
 
