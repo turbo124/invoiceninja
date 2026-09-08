@@ -151,7 +151,10 @@ class PromptPay implements LivewireMethodInterface
             'payment_method' => $payment_intent->payment_method,
             'payment_type' => PaymentType::PROMPTPAY,
             'amount' => $this->stripe->convertFromStripeAmount($this->stripe->payment_hash->data->stripe_amount, $this->stripe->client->currency()->precision, $this->stripe->client->currency()),
-            'transaction_reference' => $payment_intent->latest_charge ?: $payment_intent->id,
+            /* Always key off the payment intent id: the webhook settles with
+             * $pi->id, so both paths share one reference and cannot create
+             * duplicate payments. */
+            'transaction_reference' => $payment_intent->id,
             'gateway_type_id' => GatewayType::PROMPTPAY,
         ];
 

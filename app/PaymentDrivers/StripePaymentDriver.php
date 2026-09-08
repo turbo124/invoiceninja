@@ -272,7 +272,9 @@ class StripePaymentDriver extends BaseDriver implements SupportsHeadlessInterfac
         }
         if ($this->client
            && $this->client->currency()
-           && ($this->client->currency()->code == 'THB')) {
+           && ($this->client->currency()->code == 'THB')
+           && isset($this->client->country)
+           && in_array($this->client->country->iso_3166_3, ['THA'])) {
             $types[] = GatewayType::PROMPTPAY;
         }
 
