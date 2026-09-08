@@ -86,7 +86,10 @@ Route::group(['middleware' => ['auth:contact', 'locale', 'domain_db','check_clie
 
     Route::resource('payment_methods', PaymentMethodController::class)->except(['edit', 'update']);
 
-    Route::match(['GET', 'POST'], 'quotes/approve', [App\Http\Controllers\ClientPortal\QuoteController::class, 'bulk'])->name('quotes.bulk');
+    Route::post('quotes/approve', [App\Http\Controllers\ClientPortal\QuoteController::class, 'bulk'])->name('quotes.bulk');
+    Route::get('quotes/approve/continue/{request_hash}', [App\Http\Controllers\ClientPortal\QuoteController::class, 'continueApproval'])
+        ->where('request_hash', '[A-Za-z0-9]{64}')
+        ->name('quotes.approval.continue');
     Route::get('quotes', [App\Http\Controllers\ClientPortal\QuoteController::class, 'index'])->name('quotes.index')->middleware('portal_enabled');
     Route::get('quotes/{quote}', [App\Http\Controllers\ClientPortal\QuoteController::class, 'show'])->name('quote.show');
     Route::get('quotes/{quote_invitation}', [App\Http\Controllers\ClientPortal\QuoteController::class, 'show'])->name('quote.show_invitation');

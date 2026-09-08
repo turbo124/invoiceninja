@@ -128,6 +128,50 @@ class HelpersTest extends TestCase
         $this->assertSame('Juli 2026 - August 2026', $calculatedRange);
     }
 
+    public function testReservedKeywordsAreNotExpandedWhenTheInputExceedsTheLengthCap(): void
+    {
+        $value = str_repeat('a', 16379).':MONTH';
+
+        $this->assertSame($value, Helpers::processReservedKeywords(
+            $value,
+            $this->entity(),
+            Carbon::create(2024, 1, 15, 0, 0, 0, 'UTC'),
+        ));
+    }
+
+    public function testReservedKeywordsStillExpandAtTheLengthCap(): void
+    {
+        $value = Helpers::processReservedKeywords(
+            str_repeat('a', 16378).':MONTH',
+            $this->entity(),
+            Carbon::create(2024, 1, 15, 0, 0, 0, 'UTC'),
+        );
+
+        $this->assertSame(str_repeat('a', 16378).'January', $value);
+    }
+
+    public function testReservedKeywordOccurrencesAreCapped(): void
+    {
+        $value = Helpers::processReservedKeywords(
+            str_repeat(':MONTH', 33),
+            $this->entity(),
+            Carbon::create(2024, 1, 15, 0, 0, 0, 'UTC'),
+        );
+
+        $this->assertSame(str_repeat('January', 32).':MONTH', $value);
+    }
+
+    public function testReservedKeywordRangeOccurrencesAreCapped(): void
+    {
+        $value = Helpers::processReservedKeywords(
+            str_repeat('[MONTHYEAR|MONTHYEAR+1]', 33),
+            $this->entity(),
+            Carbon::create(2026, 8, 15, 0, 0, 0, 'UTC'),
+        );
+
+        $this->assertSame(str_repeat('August 2026 - September 2026', 32).'[MONTHYEAR|MONTHYEAR+1]', $value);
+    }
+
     private function entity(string $locale = 'en'): object
     {
         return new class ($locale) {

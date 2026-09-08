@@ -24,6 +24,10 @@ class Helpers
 {
     use MakesDates;
 
+    private const RESERVED_KEYWORD_MAX_LENGTH = 16384;
+
+    private const RESERVED_KEYWORD_MAX_MATCHES = 32;
+
     public static function sharedEmailVariables(?Client $client, ?array $settings = null): array
     {
         if (! $client) {
@@ -169,6 +173,10 @@ class Helpers
             return $value;
         }
 
+        if (strlen($value) > self::RESERVED_KEYWORD_MAX_LENGTH) {
+            return $value;
+        }
+
         // 04-10-2022 Return Early if no reserved keywords are present, this is a very expensive process
         Carbon::setLocale($entity->locale());
 
@@ -250,7 +258,7 @@ class Helpers
         // First case, with ranges.
         preg_match_all('/\[(.*?)]/', $value, $ranges);
 
-        $matches = array_shift($ranges);
+        $matches = array_slice(array_shift($ranges), 0, self::RESERVED_KEYWORD_MAX_MATCHES);
 
         foreach ($matches as $match) {
             if (! Str::contains($match, '|')) {
@@ -294,7 +302,7 @@ class Helpers
         // Second case with more common calculations.
         preg_match_all('/:([^:\s]+)/', $value, $common);
 
-        $matches = array_shift($common);
+        $matches = array_slice(array_shift($common), 0, self::RESERVED_KEYWORD_MAX_MATCHES);
 
         foreach ($matches as $match) {
             $matches = collect($replacements['literal'])->filter(function ($value, $key) use ($match) {

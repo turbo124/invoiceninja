@@ -744,4 +744,27 @@ class XssSanitizationTest extends TestCase
 
         $this->assertStringNotContainsString('file://', $css);
     }
+
+    public function test_purify_strips_whitelabel_css_rules_from_style_block()
+    {
+        $html = '<html><head><style>body { color: #333; } #invoiceninja-whitelabel-logo { display: none; } .invoice { margin: 20px; } .invoiceninja_whitelabel { opacity: 0; }</style></head><body><p>Test</p></body></html>';
+        $css = $this->extractStyleContent(Purify::clean($html));
+
+        $this->assertStringContainsString('body', $css);
+        $this->assertStringContainsString('.invoice', $css);
+        $this->assertStringNotContainsString('invoiceninja-whitelabel', $css);
+        $this->assertStringNotContainsString('invoiceninja_whitelabel', $css);
+    }
+
+    public function test_purify_style_block_whitelabel_scan_is_linear()
+    {
+        $payload = '<style>' . str_repeat('invoiceninja_whitelabel ', 25000) . '</style>';
+
+        $start = hrtime(true);
+        $css = $this->extractStyleContent(Purify::clean($payload));
+        $elapsed_ms = (hrtime(true) - $start) / 1e6;
+
+        $this->assertStringNotContainsString('invoiceninja_whitelabel', $css);
+        $this->assertLessThan(1000, $elapsed_ms, "Whitelabel CSS scan took {$elapsed_ms}ms; expected linear time.");
+    }
 }

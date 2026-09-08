@@ -22,6 +22,7 @@ use App\Models\User;
 use App\Utils\Traits\AppSetup;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -240,6 +241,127 @@ class QuotesTest extends TestCase
             ->assertSet('selected', [])
             ->call('toggleStatus', (string) Quote::STATUS_REJECTED)
             ->assertSet('status', []);
+
+        $account->delete();
+    }
+
+    public function testQuoteApprovalRouteDoesNotAcceptGetRequests(): void
+    {
+        $route = app('router')->getRoutes()->getByName('client.quotes.bulk');
+
+        $this->assertSame(['POST'], $route->methods());
+    }
+
+    public function testQuoteApprovalContinuationUsesPostAndConsumesTheCachedRequest(): void
+    {
+        $account = Account::factory()->create();
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+            'email' => uniqid('testuser') . '@gmail.com',
+        ]);
+        $company = Company::factory()->create(['account_id' => $account->id]);
+        $client = Client::factory()->create([
+            'company_id' => $company->id,
+            'user_id' => $user->id,
+        ]);
+        $settings = $client->settings;
+        $settings->auto_convert_quote = false;
+        $client->settings = $settings;
+        $client->save();
+        $contact = ClientContact::factory()->create([
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+        ]);
+        $quote = Quote::factory()->create([
+            'user_id' => $user->id,
+            'company_id' => $company->id,
+            'client_id' => $client->id,
+            'due_date' => now()->addMonth(),
+            'status_id' => Quote::STATUS_SENT,
+        ]);
+        $request_hash = str_repeat('a', 64);
+
+        Cache::put($request_hash, [
+            'client_contact_id' => $contact->id,
+            'request' => [
+                'action' => 'approve',
+                'process' => 'true',
+                'quotes' => [$quote->hashed_id],
+            ],
+        ], 60);
+
+        $this->actingAs($contact, 'contact');
+
+        $this->get(route('client.quotes.bulk', [
+            'action' => 'approve',
+            'process' => 'true',
+            'quotes' => [$quote->hashed_id],
+        ]))->assertNotFound();
+
+        $this->assertSame(Quote::STATUS_SENT, $quote->fresh()->status_id);
+
+        $this->get(route('client.quotes.approval.continue', $request_hash))
+            ->assertOk()
+            ->assertSee('method="post"', false)
+            ->assertSee($request_hash);
+
+        $this->assertSame(Quote::STATUS_SENT, $quote->fresh()->status_id);
+        $this->assertTrue(Cache::has($request_hash));
+
+        $response = $this->post(route('client.quotes.bulk'), [
+            '_token' => csrf_token(),
+            'request_hash' => $request_hash,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $this->assertSame(Quote::STATUS_APPROVED, $quote->fresh()->status_id);
+        $this->assertFalse(Cache::has($request_hash));
+
+        $this->post(route('client.quotes.bulk'), [
+            '_token' => csrf_token(),
+            'request_hash' => $request_hash,
+        ])
+            ->assertNotFound();
+
+        $account->delete();
+    }
+
+    public function testQuoteApprovalContinuationIsBoundToTheContact(): void
+    {
+        $account = Account::factory()->create();
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+            'email' => uniqid('testuser') . '@gmail.com',
+        ]);
+        $company = Company::factory()->create(['account_id' => $account->id]);
+        $client = Client::factory()->create([
+            'company_id' => $company->id,
+            'user_id' => $user->id,
+        ]);
+        [$contact, $other_contact] = ClientContact::factory()->count(2)->create([
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+        ])->all();
+        $request_hash = str_repeat('b', 64);
+
+        Cache::put($request_hash, [
+            'client_contact_id' => $contact->id,
+            'request' => [
+                'action' => 'approve',
+                'process' => 'true',
+                'quotes' => [],
+            ],
+        ], 60);
+
+        $this->actingAs($other_contact, 'contact')
+            ->get(route('client.quotes.approval.continue', $request_hash))
+            ->assertNotFound();
+
+        $this->assertTrue(Cache::has($request_hash));
 
         $account->delete();
     }
