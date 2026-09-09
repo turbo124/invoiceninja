@@ -226,7 +226,7 @@ class PaymentIntentWebhook implements ShouldQueue
                 return;
             }
 
-            $this->updatePromptPayPayment($payment_hash, $client, $meta);
+            $this->updatePromptPayPayment($payment_hash, $client, $meta, $pi);
         }
     }
 
@@ -312,7 +312,7 @@ class PaymentIntentWebhook implements ShouldQueue
         }
     }
 
-    private function updatePromptPayPayment($payment_hash, $client, $meta)
+    private function updatePromptPayPayment($payment_hash, $client, $meta, $pi)
     {
         $company_gateway = CompanyGateway::query()->find($this->company_gateway_id);
         $payment_method_type = $meta['gateway_type_id'];
@@ -326,7 +326,7 @@ class PaymentIntentWebhook implements ShouldQueue
             'payment_method' => $payment_hash->data->object->payment_method ?? $meta['payment_method'], //@phpstan-ignore-line
             'payment_type' => PaymentType::PROMPTPAY,
             'amount' => $payment_hash->data->amount_with_fee, //@phpstan-ignore-line
-            'transaction_reference' => $meta['transaction_reference'],
+            'transaction_reference' => $pi->id,
             'gateway_type_id' => GatewayType::PROMPTPAY,
         ];
 
