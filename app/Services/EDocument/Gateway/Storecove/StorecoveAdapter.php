@@ -12,6 +12,7 @@
 
 namespace App\Services\EDocument\Gateway\Storecove;
 
+use App\Services\EDocument\UblDocumentKind;
 use App\Services\EDocument\Standards\Peppol;
 use App\Services\EDocument\Standards\Peppol\CountryFactory;
 use App\Services\EDocument\Gateway\Storecove\NexusResolver;
@@ -152,7 +153,7 @@ class StorecoveAdapter
 
             $decoded = $e->decode('Peppol', $xml, 'xml');
 
-            $parent = ($invoice instanceof \App\Models\Credit || $decoded instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote)
+            $parent = (UblDocumentKind::from($invoice)->isCreditNote() || $decoded instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote)
                 ? Credit::class
                 : Invoice::class;
 
@@ -211,8 +212,7 @@ class StorecoveAdapter
             return $this;
         }
 
-        $isCredit = $this->ninja_invoice instanceof \App\Models\Credit
-            || ($this->ninja_invoice instanceof \App\Models\Invoice && $this->ninja_invoice->amount < 0);
+        $isCredit = UblDocumentKind::from($this->ninja_invoice)->isCreditNote();
 
         $mapper = new UblToStorecoveCreditLineMapper();
 

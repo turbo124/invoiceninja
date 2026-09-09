@@ -22,6 +22,7 @@ use App\Models\Invoice;
 use App\Models\PurchaseOrder;
 use App\Models\RecurringInvoice;
 use Illuminate\Support\Facades\App;
+use App\Services\EDocument\UblDocumentKind;
 use App\Services\EDocument\Standards\Peppol;
 use App\Exceptions\PeppolValidationException;
 use App\Services\EDocument\Standards\Validation\EntityLevelInterface;
@@ -214,10 +215,7 @@ class EntityLevel implements EntityLevelInterface
             if ((float) ($item->cost ?? 0) < 0) {
                 // Credit notes (and negative invoices emitted as credit notes) project
                 // negative cost into CreditedQuantity sign — PriceAmount stays ≥ 0.
-                $isCreditNoteRoute = $invoice instanceof Credit
-                    || ($invoice instanceof Invoice && (float) $invoice->amount < 0);
-
-                if (!$isCreditNoteRoute) {
+                if (!UblDocumentKind::from($invoice)->isCreditNote()) {
                     return [ctrans('texts.peppol_negative_line_price')];
                 }
             }

@@ -22,6 +22,7 @@ use App\Helpers\Invoice\InvoiceSum;
 use InvoiceNinja\EInvoice\EInvoice;
 use App\Utils\Traits\NumberFormatter;
 use App\Helpers\Invoice\InvoiceSumInclusive;
+use App\Services\EDocument\UblDocumentKind;
 use App\Services\EDocument\Standards\Peppol\PeppolLineBuilder;
 use App\Services\EDocument\Standards\Peppol\PeppolTaxCalculator;
 use App\Services\EDocument\Standards\Peppol\PeppolPartyBuilder;
@@ -187,7 +188,7 @@ class Peppol extends AbstractService implements MutatorInterface
         $this->calc = $this->invoice->calc();
         $this->e = new EInvoice();
         $this->router = new StorecoveRouter();
-        $this->isCreditNote = $this->shouldBeCreditNote();
+        $this->isCreditNote = UblDocumentKind::from($this->invoice)->isCreditNote();
 
         $this->taxCalculator = new PeppolTaxCalculator($this);
         $this->lineBuilder = new PeppolLineBuilder($this);
@@ -1001,30 +1002,6 @@ class Peppol extends AbstractService implements MutatorInterface
     public function getTaxCalculator(): PeppolTaxCalculator
     {
         return $this->taxCalculator;
-    }
-
-    /**
-     * Determine if the document should be a Credit Note
-     *
-     * Credit Note is used when:
-     * - The entity is a Credit model
-     * - The entity is an Invoice with a negative amount
-     *
-     * @return bool
-     */
-    private function shouldBeCreditNote(): bool
-    {
-        // Credit model = always credit note
-        if ($this->invoice instanceof Credit) {
-            return true;
-        }
-
-        // Negative invoice = credit note
-        if ($this->invoice instanceof Invoice && $this->invoice->amount < 0) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
