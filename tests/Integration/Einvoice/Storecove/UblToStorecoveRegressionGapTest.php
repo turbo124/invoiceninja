@@ -166,6 +166,31 @@ class UblToStorecoveRegressionGapTest extends TestCase
         $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
     }
 
+    public function testNegativeTotalOpposingLinePercentageDiscountSatisfiesR041(): void
+    {
+        $client = $this->harnessClient();
+        $credit = $this->harnessCredit($client, [
+            $this->harnessLineItem('Primary', 100, -5),
+            $this->harnessLineItem('Opposing', 100, 2, 10),
+        ]);
+
+        $this->assertLessThan(0, (float) $credit->amount);
+
+        $ubl = $this->buildUbl($credit);
+        $opposingLine = $ubl['ubl_lines'][1];
+
+        $this->assertEqualsWithDelta(-2.0, $opposingLine['quantity'], 0.001, 'Opposing line on negative-total doc keeps real qty with economic sign');
+        $this->assertEqualsWithDelta(-180.0, $opposingLine['line_extension_amount'], 0.01);
+        $this->assertSame('true', $opposingLine['allowance_charge']['charge_indicator'] ?? '', 'Opposing percentage discount increases magnitude → line charge');
+        $this->assertUblLineSatisfiesR120($opposingLine, 'opposing line');
+        $this->assertUblLineSatisfiesR040($opposingLine, 'opposing line');
+        $this->assertUblPassesSchematron($ubl['xml'], 'negative-total opposing line percentage discount');
+
+        $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
+        $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
+    }
+
     public function testPositiveTotalFlatDiscountOnClawbackUsesAllowanceNotCharge(): void
     {
         $client = $this->harnessClient();

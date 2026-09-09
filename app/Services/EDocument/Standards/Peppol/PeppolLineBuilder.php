@@ -94,17 +94,12 @@ class PeppolLineBuilder
 
             if ($isCreditNote) {
                 $hasLineAllowance = (float) ($item->discount ?? 0) > 0;
-                $lineAllowanceAmount = $hasLineAllowance
-                    ? $this->calculateTotalItemDiscountAmount($item)
-                    : 0.0;
 
                 $signed = $this->peppol->normalizeCreditNoteLine(
                     (float) $item->quantity,
                     (float) $item->cost,
                     (float) $rawLineTotal,
                     $hasLineAllowance,
-                    $lineAllowanceAmount,
-                    (bool) ($item->is_amount_discount ?? false),
                 );
 
                 $qty = new \InvoiceNinja\EInvoice\Models\Peppol\QuantityType\CreditedQuantity();
