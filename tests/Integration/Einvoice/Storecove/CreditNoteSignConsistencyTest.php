@@ -196,7 +196,7 @@ class CreditNoteSignConsistencyTest extends TestCase
 
         $storecove = new Storecove();
         $storecove->adapter
-            ->transformFromPeppol($model, $peppol->getDocument(), $peppol->isCreditNote(), $peppol->toXml())
+            ->transformFromPeppol($model, $peppol->getDocument(), $peppol->getDocumentKind(), $peppol->toXml())
             ->decorate();
 
         $result = $storecove->adapter->getDocument();

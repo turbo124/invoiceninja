@@ -349,7 +349,7 @@ class UblToStorecoveRegressionTest extends TestCase
         $storecove->adapter->transformFromPeppol(
             $credit,
             $ubl['peppol']->getDocument(),
-            true,
+            $ubl['peppol']->getDocumentKind(),
             $ubl['xml'],
         );
 

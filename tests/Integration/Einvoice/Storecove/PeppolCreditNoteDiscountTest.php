@@ -427,7 +427,7 @@ class PeppolCreditNoteDiscountTest extends TestCase
 
         $storecove = new Storecove();
         $storecove->adapter
-            ->transformFromPeppol($scenario['credit'], $scenario['document'], $scenario['peppol']->isCreditNote(), $scenario['xml'])
+            ->transformFromPeppol($scenario['credit'], $scenario['document'], $scenario['peppol']->getDocumentKind(), $scenario['xml'])
             ->decorate();
 
         $result = $storecove->adapter->getDocument();

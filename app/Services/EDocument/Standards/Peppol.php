@@ -23,6 +23,7 @@ use InvoiceNinja\EInvoice\EInvoice;
 use App\Utils\Traits\NumberFormatter;
 use App\Helpers\Invoice\InvoiceSumInclusive;
 use App\Services\EDocument\UblDocumentKind;
+use App\Services\EDocument\UblXmlEncoder;
 use App\Services\EDocument\Standards\Peppol\PeppolLineBuilder;
 use App\Services\EDocument\Standards\Peppol\PeppolTaxCalculator;
 use App\Services\EDocument\Standards\Peppol\PeppolPartyBuilder;
@@ -84,12 +85,11 @@ class Peppol extends AbstractService implements MutatorInterface
     private EInvoice $e;
 
     /**
+     * PEPPOL UBL document kind (380 invoice / 381 credit note).
      *
-     * Flag to indicate if document is a Credit Note
-     *
-     *  @var bool $isCreditNote
-     **/
-    private bool $isCreditNote = false;
+     * @var UblDocumentKind
+     */
+    private UblDocumentKind $documentKind;
 
     /**
      *
@@ -188,7 +188,7 @@ class Peppol extends AbstractService implements MutatorInterface
         $this->calc = $this->invoice->calc();
         $this->e = new EInvoice();
         $this->router = new StorecoveRouter();
-        $this->isCreditNote = UblDocumentKind::from($this->invoice)->isCreditNote();
+        $this->documentKind = UblDocumentKind::fromEntity($this->invoice);
 
         $this->taxCalculator = new PeppolTaxCalculator($this);
         $this->lineBuilder = new PeppolLineBuilder($this);
@@ -215,7 +215,7 @@ class Peppol extends AbstractService implements MutatorInterface
     {
         $value = (float) $amount;
 
-        if (!$this->isCreditNote) {
+        if (!$this->documentKind->isCreditNote()) {
             return $value;
         }
 
@@ -291,7 +291,7 @@ class Peppol extends AbstractService implements MutatorInterface
 
             $this->p_invoice->IssueDate = new \DateTime($this->invoice->date);
 
-            if ($this->invoice->due_date && !$this->isCreditNote) {
+            if ($this->invoice->due_date && !$this->documentKind->isCreditNote()) {
                 $this->p_invoice->DueDate = new \DateTime($this->invoice->due_date);
             }
 
@@ -309,12 +309,12 @@ class Peppol extends AbstractService implements MutatorInterface
                 $this->p_invoice->ProjectReference = [$pr];
             }
 
-            /** Set type code and line items based on document type */
-            if ($this->isCreditNote) {
-                $this->p_invoice->CreditNoteTypeCode = 381;
+            /** Set type code and line items based on document kind */
+            if ($this->documentKind->isCreditNote()) {
+                $this->p_invoice->CreditNoteTypeCode = $this->documentKind->typeCode();
                 $this->p_invoice->CreditNoteLine = $this->lineBuilder->getCreditNoteLines();
             } else {
-                $this->p_invoice->InvoiceTypeCode = 380;
+                $this->p_invoice->InvoiceTypeCode = $this->documentKind->typeCode();
                 $this->p_invoice->InvoiceLine = $this->lineBuilder->getInvoiceLines();
             }
 
@@ -376,19 +376,19 @@ class Peppol extends AbstractService implements MutatorInterface
     private function initDocument(): self
     {
         /** Handle Existing CreditNote Document */
-        if ($this->isCreditNote && $this->invoice->e_invoice && isset($this->invoice->e_invoice->CreditNote) && isset($this->invoice->e_invoice->CreditNote->ID)) {
+        if ($this->documentKind->isCreditNote() && $this->invoice->e_invoice && isset($this->invoice->e_invoice->CreditNote) && isset($this->invoice->e_invoice->CreditNote->ID)) {
             $this->decode($this->invoice->e_invoice->CreditNote, 'CreditNote');
             return $this;
         }
 
         /** Handle Existing Invoice Document */
-        if (!$this->isCreditNote && $this->invoice->e_invoice && isset($this->invoice->e_invoice->Invoice) && isset($this->invoice->e_invoice->Invoice->ID)) {
+        if (!$this->documentKind->isCreditNote() && $this->invoice->e_invoice && isset($this->invoice->e_invoice->Invoice) && isset($this->invoice->e_invoice->Invoice->ID)) {
             $this->decode($this->invoice->e_invoice->Invoice, 'Invoice');
             return $this;
         }
 
         /** Scaffold new document based on type */
-        if ($this->isCreditNote) {
+        if ($this->documentKind->isCreditNote()) {
             $this->p_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\CreditNote();
         } else {
             $this->p_invoice = new \InvoiceNinja\EInvoice\Models\Peppol\Invoice();
@@ -437,14 +437,17 @@ class Peppol extends AbstractService implements MutatorInterface
         return $this->p_invoice;
     }
 
+    public function getDocumentKind(): UblDocumentKind
+    {
+        return $this->documentKind;
+    }
+
     /**
-     * Check if the document is a Credit Note
-     *
-     * @return bool
+     * Whether this document is emitted as PEPPOL UBL 381 (CreditNote).
      */
     public function isCreditNote(): bool
     {
-        return $this->isCreditNote;
+        return $this->documentKind->isCreditNote();
     }
 
     /**
@@ -457,26 +460,8 @@ class Peppol extends AbstractService implements MutatorInterface
     public function toXml(): string
     {
         $e = new EInvoice();
-        $xml = $e->encode($this->p_invoice, 'xml');
 
-        if ($this->isCreditNote) {
-            $prefix = '<?xml version="1.0" encoding="UTF-8"?>
-<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">';
-            $suffix = '</CreditNote>';
-        } else {
-            $prefix = '<?xml version="1.0" encoding="UTF-8"?>
-<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">';
-            $suffix = '</Invoice>';
-        }
-
-        $xml = str_ireplace(['\n','<?xml version="1.0"?>'], ['', $prefix], $xml);
-        $xml .= $suffix;
-
-        return $xml;
+        return UblXmlEncoder::wrap($e->encode($this->p_invoice, 'xml'), $this->documentKind);
     }
 
     /**
@@ -506,7 +491,7 @@ class Peppol extends AbstractService implements MutatorInterface
     {
         $document = new \stdClass();
 
-        if ($this->isCreditNote) {
+        if ($this->documentKind->isCreditNote()) {
             $document->CreditNote = json_decode($this->toJson());
         } else {
             $document->Invoice = json_decode($this->toJson());
@@ -524,7 +509,7 @@ class Peppol extends AbstractService implements MutatorInterface
      */
     public function toArray(): array
     {
-        $key = $this->isCreditNote ? 'CreditNote' : 'Invoice';
+        $key = $this->documentKind->isCreditNote() ? 'CreditNote' : 'Invoice';
         return [$key => json_decode($this->toJson(), true)];
     }
 
@@ -744,7 +729,7 @@ class Peppol extends AbstractService implements MutatorInterface
             return;
         }
 
-        $skipProps = $this->isCreditNote
+        $skipProps = $this->documentKind->isCreditNote()
             ? ['InvoiceTypeCode', 'InvoiceLine', 'InvoicePeriod']
             : ['CreditNoteTypeCode', 'CreditNoteLine'];
 
@@ -767,7 +752,7 @@ class Peppol extends AbstractService implements MutatorInterface
         $this->mergeSettingsInto($this->_company_settings);
         $this->mergeSettingsInto($this->_client_settings);
 
-        $existingData = $this->isCreditNote
+        $existingData = $this->documentKind->isCreditNote()
             ? ($this->invoice->e_invoice->CreditNote ?? null)
             : ($this->invoice->e_invoice->Invoice ?? null);
 
@@ -992,11 +977,6 @@ class Peppol extends AbstractService implements MutatorInterface
     public function addToAllowanceTotal(float $amount): void
     {
         $this->allowance_total += $amount;
-    }
-
-    public function isCreditNoteDocument(): bool
-    {
-        return $this->isCreditNote;
     }
 
     public function getTaxCalculator(): PeppolTaxCalculator

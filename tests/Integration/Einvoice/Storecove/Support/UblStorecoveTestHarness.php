@@ -266,7 +266,7 @@ trait UblStorecoveTestHarness
             ->transformFromPeppol(
                 $model,
                 $peppol->getDocument(),
-                $peppol->isCreditNote(),
+                $peppol->getDocumentKind(),
                 $validatedUblXml ?? $peppol->toXml(),
             )
             ->decorate();

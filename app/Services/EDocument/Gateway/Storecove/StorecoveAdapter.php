@@ -13,6 +13,8 @@
 namespace App\Services\EDocument\Gateway\Storecove;
 
 use App\Services\EDocument\UblDocumentKind;
+use App\Services\EDocument\UblDocumentKindMismatchException;
+use App\Services\EDocument\UblXmlEncoder;
 use App\Services\EDocument\Standards\Peppol;
 use App\Services\EDocument\Standards\Peppol\CountryFactory;
 use App\Services\EDocument\Gateway\Storecove\NexusResolver;
@@ -48,6 +50,8 @@ class StorecoveAdapter
     private string $nexus;
 
     private bool $has_error = false;
+
+    private UblDocumentKind $documentKind = UblDocumentKind::Invoice;
 
     /**
      * Returns the transformed Storecove invoice or credit model.
@@ -118,7 +122,7 @@ class StorecoveAdapter
     public function transform(\App\Models\Invoice|\App\Models\Credit $invoice): self
     {
         $peppol = (new Peppol($invoice))->run();
-        return $this->transformFromPeppol($invoice, $peppol->getDocument(), $peppol->isCreditNote(), $peppol->toXml());
+        return $this->transformFromPeppol($invoice, $peppol->getDocument(), $peppol->getDocumentKind(), $peppol->toXml());
     }
 
     /**
@@ -129,22 +133,25 @@ class StorecoveAdapter
      *
      * @param  \App\Models\Invoice|\App\Models\Credit $invoice
      * @param  \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument
-     * @param  bool $isCreditNote
+     * @param  UblDocumentKind $documentKind
      * @param  string|null $validatedUblXml Schematron-valid UBL bytes; when set, used instead of re-encoding $peppolDocument
      * @return self
      */
     public function transformFromPeppol(
         \App\Models\Invoice|\App\Models\Credit $invoice,
         \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument,
-        bool $isCreditNote = false,
+        UblDocumentKind $documentKind,
         ?string $validatedUblXml = null,
     ): self {
         try {
             $this->ninja_invoice = $invoice;
+            $this->documentKind = $documentKind;
             $serializer = $this->getSerializer();
 
+            $this->assertDocumentKindMatchesPeppolDocument($documentKind, $peppolDocument);
+
             $e = new \InvoiceNinja\EInvoice\EInvoice();
-            $xml = $validatedUblXml ?? $this->encodePeppolDocumentToXml($peppolDocument, $isCreditNote, $e);
+            $xml = $validatedUblXml ?? $this->encodePeppolDocumentToXml($peppolDocument, $documentKind, $e);
 
             $context = [
                 DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
@@ -153,7 +160,9 @@ class StorecoveAdapter
 
             $decoded = $e->decode('Peppol', $xml, 'xml');
 
-            $parent = (UblDocumentKind::from($invoice)->isCreditNote() || $decoded instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote)
+            $this->assertDocumentKindMatchesPeppolDocument($documentKind, $decoded);
+
+            $parent = $documentKind->isCreditNote()
                 ? Credit::class
                 : Invoice::class;
 
@@ -181,6 +190,8 @@ class StorecoveAdapter
             foreach ($nexusResolver->getErrors() as $error) {
                 $this->addError($error);
             }
+        } catch (UblDocumentKindMismatchException $e) {
+            throw $e;
         } catch (\Throwable $th) {
 
             $this->addError($th->getMessage());
@@ -212,7 +223,7 @@ class StorecoveAdapter
             return $this;
         }
 
-        $isCredit = UblDocumentKind::from($this->ninja_invoice)->isCreditNote();
+        $isCredit = $this->documentKind->isCreditNote();
 
         $mapper = new UblToStorecoveCreditLineMapper();
 
@@ -363,28 +374,30 @@ class StorecoveAdapter
      */
     private function encodePeppolDocumentToXml(
         \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument,
-        bool $isCreditNote,
+        UblDocumentKind $documentKind,
         \InvoiceNinja\EInvoice\EInvoice $e,
     ): string {
-        $xml = $e->encode($peppolDocument, 'xml');
+        $this->assertDocumentKindMatchesPeppolDocument($documentKind, $peppolDocument);
 
-        if ($isCreditNote || $peppolDocument instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote) {
-            $prefix = '<?xml version="1.0" encoding="UTF-8"?>
-<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">';
-            $suffix = '</CreditNote>';
-        } else {
-            $prefix = '<?xml version="1.0" encoding="UTF-8"?>
-<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">';
-            $suffix = '</Invoice>';
+        return UblXmlEncoder::wrap($e->encode($peppolDocument, 'xml'), $documentKind);
+    }
+
+    /**
+     * @param  \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument
+     */
+    private function assertDocumentKindMatchesPeppolDocument(
+        UblDocumentKind $documentKind,
+        \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument,
+    ): void {
+        $documentIsCreditNote = $peppolDocument instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote;
+
+        if ($documentKind->isCreditNote() !== $documentIsCreditNote) {
+            throw new UblDocumentKindMismatchException(sprintf(
+                'UblDocumentKind::%s does not match Peppol %s document.',
+                $documentKind->name,
+                $documentIsCreditNote ? 'CreditNote' : 'Invoice',
+            ));
         }
-
-        $xml = str_ireplace(['\n', '<?xml version="1.0"?>'], ['', $prefix], $xml);
-
-        return $xml . $suffix;
     }
 
     /**

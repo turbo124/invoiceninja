@@ -215,7 +215,7 @@ class EntityLevel implements EntityLevelInterface
             if ((float) ($item->cost ?? 0) < 0) {
                 // Credit notes (and negative invoices emitted as credit notes) project
                 // negative cost into CreditedQuantity sign — PriceAmount stays ≥ 0.
-                if (!UblDocumentKind::from($invoice)->isCreditNote()) {
+                if (!UblDocumentKind::fromEntity($invoice)->isCreditNote()) {
                     return [ctrans('texts.peppol_negative_line_price')];
                 }
             }
