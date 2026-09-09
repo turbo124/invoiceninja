@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '../fixtures';
 import {
-    ensureCompanyGatewayForKey,
     ensureCompanyGatewayTypeEnabled,
     type CompanyGatewayEntity,
 } from '../api-helpers';
@@ -15,7 +14,10 @@ import {
     preparePortalPaymentContext,
     completeRequiredClientInfoForm,
 } from '../gateways/payment-flow-helpers';
-import { GoCardlessPaymentGateway } from '../gateways/gocardless-payment-gateway';
+import {
+    GoCardlessPaymentGateway,
+} from '../gateways/gocardless-payment-gateway';
+import { type GatewayExclusiveSetupOptions } from '../gateways/base-payment-gateway';
 import {
     GatewayType,
     PaymentType,
@@ -124,13 +126,17 @@ const instantBankPaymentMethods = [
 
 test.describe.configure({ timeout: 180_000 });
 
+test.afterEach(async () => {
+    await goCardless.restoreExclusiveGateway();
+});
+
 for (const paymentFlow of ['default', 'smooth'] as const) {
     test(`completes a new-account sandbox payment (${paymentFlow} flow)`, async ({
         api,
         page,
         notificationGuard,
     }) => {
-        const availability = await sandboxAvailability(api);
+        const availability = await prepareGoCardless(api);
         await notificationGuard.suppressPaymentEmails();
         const context = await preparePortalPaymentContext(
             api,
@@ -173,10 +179,9 @@ for (const method of directDebitMethods) {
                 test.skip(true, method.sandboxUpgrade);
             }
 
-            const availability = await sandboxAvailability(
-                api,
-                method.gatewayTypeId
-            );
+            const availability = await prepareGoCardless(api, {
+                gatewayTypeId: method.gatewayTypeId,
+            });
             await notificationGuard.suppressPaymentEmails();
             const context = await preparePortalPaymentContext(
                 api,
@@ -224,10 +229,9 @@ for (const method of directDebitMethods) {
                 test.skip(true, method.sandboxUpgrade);
             }
 
-            const availability = await sandboxAvailability(
-                api,
-                method.gatewayTypeId
-            );
+            const availability = await prepareGoCardless(api, {
+                gatewayTypeId: method.gatewayTypeId,
+            });
             await notificationGuard.suppressPaymentEmails();
             const context = await preparePortalPaymentContext(
                 api,
@@ -283,10 +287,9 @@ for (const method of instantBankPaymentMethods) {
             api,
             page,
         }) => {
-            const availability = await sandboxAvailability(
-                api,
-                GatewayType.INSTANT_BANK_PAY
-            );
+            const availability = await prepareGoCardless(api, {
+                gatewayTypeId: GatewayType.INSTANT_BANK_PAY,
+            });
             const context = await preparePortalPaymentContext(
                 api,
                 page,
@@ -334,7 +337,7 @@ test('adds a mandate and offers both the stored and new account choices', async 
     api,
     page,
 }) => {
-    const availability = await sandboxAvailability(api);
+    const availability = await prepareGoCardless(api);
     const context = await preparePortalPaymentContext(
         api,
         page,
@@ -387,11 +390,10 @@ test('completes a payment with bank account verification enabled', async ({
     page,
     notificationGuard,
 }) => {
-    const availability = await sandboxAvailability(
-        api,
-        GatewayType.DIRECT_DEBIT,
-        { verifyBankAccount: true }
-    );
+    const availability = await prepareGoCardless(api, {
+        gatewayTypeId: GatewayType.DIRECT_DEBIT,
+        configChanges: { verifyBankAccount: true },
+    });
     await notificationGuard.suppressPaymentEmails();
     const context = await preparePortalPaymentContext(
         api,
@@ -437,7 +439,9 @@ test('completes a payment with bank account verification enabled', async ({
 });
 
 test('shows only SEPA for an Austrian EUR client', async ({ api, page }) => {
-    let availability = await sandboxAvailability(api, GatewayType.SEPA);
+    let availability = await prepareGoCardless(api, {
+        gatewayTypeId: GatewayType.SEPA,
+    });
     const companyGateway = await ensureCompanyGatewayTypeEnabled(
         api.context,
         availability.companyGateway!,
@@ -482,10 +486,9 @@ test('rejects a forced unsupported GoCardless method', async ({
     api,
     page,
 }) => {
-    const availability = await sandboxAvailability(
-        api,
-        GatewayType.INSTANT_BANK_PAY
-    );
+    const availability = await prepareGoCardless(api, {
+        gatewayTypeId: GatewayType.INSTANT_BANK_PAY,
+    });
     const context = await preparePortalPaymentContext(
         api,
         page,
@@ -554,72 +557,20 @@ async function navigateToInstantBankPay(
     await page.waitForURL(/pay-sandbox\.gocardless\.com/, { timeout: 30_000 });
 }
 
-async function sandboxAvailability(
+async function prepareGoCardless(
     api: import('../fixtures').ApiFixture,
-    gatewayTypeId: number = goCardless.gatewayTypeId,
-    configChanges: Record<string, unknown> = {}
+    options: GatewayExclusiveSetupOptions = {},
 ): Promise<GatewayAvailability> {
-    test.skip(
-        !goCardless.isSandboxConfigured(),
-        'GoCardless payment completion requires GOCARDLESS_KEYS JSON with testMode=true'
-    );
-    let companyGateway = await ensureCompanyGatewayForKey(
+    const setup = await goCardless.setupExclusiveTestEnvironment(
         api.context,
-        goCardless.gatewayKey,
-        goCardless.envVar
+        options,
     );
 
-    test.skip(
-        !companyGateway,
-        'Unable to configure the GoCardless company gateway'
-    );
-
-    companyGateway = await configureGoCardlessSandbox(
-        api,
-        companyGateway!,
-        configChanges
-    );
-
-    const enabledGateway = await ensureCompanyGatewayTypeEnabled(
-        api.context,
-        companyGateway!,
-        gatewayTypeId
-    );
-
-    return {
-        envConfigured: true,
-        companyGatewayConfigured: true,
-        companyGateway: enabledGateway,
-    };
-}
-
-async function configureGoCardlessSandbox(
-    api: import('../fixtures').ApiFixture,
-    companyGateway: import('../api-helpers').CompanyGatewayEntity,
-    configChanges: Record<string, unknown> = {}
-): Promise<import('../api-helpers').CompanyGatewayEntity> {
-    const config = {
-        ...(JSON.parse(goCardless.getEnvValue()) as Record<string, unknown>),
-        ...configChanges,
-    };
-    const response = await api.context.request.put(
-        `/api/v1/company_gateways/${companyGateway.id}`,
-        {
-            data: {
-                gateway_key: companyGateway.gateway_key,
-                config: JSON.stringify(config),
-                fees_and_limits: companyGateway.fees_and_limits ?? {},
-            },
-        }
-    );
-
-    if (!response.ok()) {
-        throw new Error(
-            `Unable to apply the GoCardless sandbox configuration (${response.status()}): ${(await response.text()).slice(0, 300)}`
-        );
+    if (setup.skipReason) {
+        test.skip(true, setup.skipReason);
     }
 
-    return (await response.json()).data;
+    return setup.availability;
 }
 
 function clientLocation(

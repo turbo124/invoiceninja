@@ -2,11 +2,15 @@
 
 namespace Tests\Feature\PaymentDrivers\GoCardless;
 
+use App\DataMapper\FeesAndLimits;
 use App\Exceptions\PaymentFailed;
+use App\Http\Middleware\VerifyCsrfToken;
+use App\Models\ClientContact;
 use App\Models\ClientGatewayToken;
 use App\Models\CompanyGateway;
 use App\Models\Client;
 use App\Models\Country;
+use App\Models\Currency;
 use App\Models\GatewayType;
 use App\Models\PaymentHash;
 use App\Models\PaymentType;
@@ -29,8 +33,11 @@ use GoCardlessPro\Services\MandatesService;
 use GoCardlessPro\Services\PaymentsService;
 use GoCardlessPro\Webhook;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -262,12 +269,9 @@ class HostedPaymentPageTest extends TestCase
         $company_gateway = $this->makeCompanyGateway();
         $token = $this->createGatewayToken($company_gateway, $this->client, GatewayType::DIRECT_DEBIT, 'MD_OWNED');
         $driver = Mockery::mock(GoCardlessPaymentDriver::class, [$company_gateway, $this->client])->makePartial();
-        $driver->shouldReceive('ensurePaymentMethodAvailable')
-            ->once()
-            ->with(GatewayType::DIRECT_DEBIT, 42.0)
-            ->andReturnSelf();
+        $driver->shouldReceive('ensurePaymentMethodAvailable')->never();
 
-        $resolved_token = $driver->resolveClientGatewayToken('MD_OWNED', GatewayType::DIRECT_DEBIT, 42.0);
+        $resolved_token = $driver->resolveClientGatewayToken('MD_OWNED', GatewayType::DIRECT_DEBIT);
 
         $this->assertTrue($resolved_token->is($token));
     }
@@ -329,12 +333,12 @@ class HostedPaymentPageTest extends TestCase
 
         $this->createGatewayToken($token_company_gateway, $token_client, $token_gateway_type_id, 'MD_FOREIGN');
         $driver = Mockery::mock(GoCardlessPaymentDriver::class, [$company_gateway, $this->client])->makePartial();
-        $driver->shouldReceive('ensurePaymentMethodAvailable')->once()->andReturnSelf();
+        $driver->shouldReceive('ensurePaymentMethodAvailable')->never();
 
         $this->expectException(PaymentFailed::class);
         $this->expectExceptionCode(403);
 
-        $driver->resolveClientGatewayToken('MD_FOREIGN', GatewayType::DIRECT_DEBIT, 42.0);
+        $driver->resolveClientGatewayToken('MD_FOREIGN', GatewayType::DIRECT_DEBIT);
     }
 
     public static function invalidStoredMandateProvider(): array
@@ -349,13 +353,12 @@ class HostedPaymentPageTest extends TestCase
     public function test_stored_payment_rejects_an_unowned_mandate_before_calling_gocardless(): void
     {
         $payment_hash = Mockery::mock(PaymentHash::class);
-        $payment_hash->shouldReceive('amount_with_fee')->once()->andReturn(42.0);
         $driver = Mockery::mock(GoCardlessPaymentDriver::class);
         $driver->payment_hash = $payment_hash;
         $driver->shouldReceive('init')->once()->andReturnSelf();
         $driver->shouldReceive('resolveClientGatewayToken')
             ->once()
-            ->with('MD_FOREIGN', GatewayType::DIRECT_DEBIT, 42.0)
+            ->with('MD_FOREIGN', GatewayType::DIRECT_DEBIT)
             ->andThrow(new PaymentFailed('Unavailable', 403));
         $driver->shouldReceive('ensureMandateIsReady')->never();
         $request = new \App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest([
@@ -835,6 +838,25 @@ class HostedPaymentPageTest extends TestCase
         $this->assertHostedReturnLifetime(data_get($payload, 'redirect_uri'));
     }
 
+    public function test_hosted_payment_method_setup_caches_only_the_contact_key(): void
+    {
+        $this->makeTestData();
+        $this->actingAs($this->contact, 'contact');
+
+        $company_gateway = $this->makeCompanyGateway();
+        $driver = Mockery::mock(GoCardlessPaymentDriver::class);
+        $driver->company_gateway = $company_gateway;
+        $driver->shouldReceive('init')->once();
+        $direct_debit = new DirectDebit($driver);
+
+        $method = new \ReflectionMethod($direct_debit, 'createHostedFlowContext');
+        $context_id = $method->invoke($direct_debit, GatewayType::DIRECT_DEBIT);
+        $state = cache()->get($context_id);
+
+        $this->assertSame($this->contact->contact_key, $state['contact_key']);
+        $this->assertArrayNotHasKey('contact', $state);
+    }
+
     public function test_direct_debit_checkout_starts_the_hosted_flow_for_a_new_account(): void
     {
         $view = file_get_contents(resource_path('views/portal/ninja2020/gateways/gocardless/direct_debit/pay_livewire.blade.php'));
@@ -866,6 +888,76 @@ class HostedPaymentPageTest extends TestCase
         $response = $this->get('/gocardless/hosted_payment_page/setup_return/company/gateway/context');
 
         $response->assertForbidden();
+    }
+
+    public function test_hosted_payment_method_setup_return_rejects_a_different_contact_key(): void
+    {
+        $this->makeTestData();
+        $this->actingAs($this->contact, 'contact');
+        $company_gateway = $this->makeCompanyGateway();
+        $context_id = 'test-context-' . str()->random(12);
+        cache()->put($context_id, [
+            'db' => $this->company->db,
+            'company_gateway_id' => $company_gateway->id,
+            'gateway_type_id' => GatewayType::DIRECT_DEBIT,
+            'contact_key' => str()->random(40),
+            'gocardless' => ['billing_request' => 'BRQ_OTHER_CONTACT'],
+        ], now()->addHour());
+        $url = URL::temporarySignedRoute('gocardless.hosted_payment_page.setup_return', now()->addHour(), [
+            'company_key' => $this->company->company_key,
+            'company_gateway_id' => $company_gateway->hashed_id,
+            'context' => $context_id,
+        ]);
+
+        $this->get($url)->assertForbidden();
+    }
+
+    public function test_legacy_payment_method_response_cannot_attach_an_arbitrary_billing_request(): void
+    {
+        $this->makeTestData();
+        $this->withoutMiddleware([ThrottleRequests::class, VerifyCsrfToken::class]);
+
+        $company_gateway = $this->makeCompanyGateway();
+        $fees_and_limits = new FeesAndLimits();
+        $company_gateway->fees_and_limits = [GatewayType::DIRECT_DEBIT => $fees_and_limits];
+        $company_gateway->save();
+
+        $country = Country::query()->where('iso_3166_2', 'GB')->firstOrFail();
+        $currency = Currency::query()->where('code', 'GBP')->firstOrFail();
+        $settings = $this->client->settings;
+        $settings->currency_id = (string) $currency->id;
+        $settings->company_gateway_ids = $company_gateway->hashed_id;
+        $this->client->settings = $settings;
+        $this->client->country_id = $country->id;
+        $this->client->save();
+
+        $token_count = ClientGatewayToken::query()->count();
+        $this->actingAs(ClientContact::query()->findOrFail($this->contact->id), 'contact');
+
+        $response = $this->post(route('client.payment_methods.store', [
+            'method' => GatewayType::DIRECT_DEBIT,
+        ]), [
+            'billing_request' => 'BRQ_ARBITRARY',
+        ]);
+
+        $response->assertSee(ctrans('texts.gateway_temporarily_unavailable'));
+        $this->assertSame($token_count, ClientGatewayToken::query()->count());
+    }
+
+    public function test_legacy_authorization_response_fails_before_gocardless_lookup(): void
+    {
+        $gateway = Mockery::mock(GoCardlessClient::class);
+        $gateway->shouldNotReceive('billingRequests');
+        $driver = Mockery::mock(GoCardlessPaymentDriver::class)->makePartial();
+        $driver->gateway = $gateway;
+        $driver->shouldReceive('init')->once()->andReturnSelf();
+
+        $this->expectException(PaymentFailed::class);
+        $this->expectExceptionCode(403);
+
+        (new DirectDebit($driver))->authorizeResponse(Request::create('/', 'POST', [
+            'billing_request' => 'BRQ_ARBITRARY',
+        ]));
     }
 
     public function test_legacy_instant_bank_payment_callback_route_is_removed(): void

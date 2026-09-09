@@ -81,10 +81,8 @@ class GoCardlessPaymentDriver extends BaseDriver
         return $this;
     }
 
-    public function resolveClientGatewayToken(string $mandate_id, int $gateway_type_id, float $amount): ClientGatewayToken
+    public function resolveClientGatewayToken(string $mandate_id, int $gateway_type_id): ClientGatewayToken
     {
-        $this->ensurePaymentMethodAvailable($gateway_type_id, $amount);
-
         $token = $this->resolveOwnedClientGatewayToken($mandate_id);
 
         if ((int) $token->gateway_type_id !== $gateway_type_id) {

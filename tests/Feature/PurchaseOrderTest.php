@@ -351,12 +351,81 @@ class PurchaseOrderTest extends TestCase
 
     public function testPurchaseOrderGetWithClientStatus()
     {
+        $purchase_orders = collect([
+            'draft' => PurchaseOrder::STATUS_DRAFT,
+            'sent' => PurchaseOrder::STATUS_SENT,
+            'accepted' => PurchaseOrder::STATUS_ACCEPTED,
+            'cancelled' => PurchaseOrder::STATUS_CANCELLED,
+        ])->map(fn ($status_id, $status) => PurchaseOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'vendor_id' => $this->vendor->id,
+            'status_id' => $status_id,
+            'number' => 'client-status-' . $status,
+            'due_date' => $status === 'sent' ? now()->addDay()->toDateString() : null,
+        ]));
+
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
-        ])->get('/api/v1/purchase_orders?client_status=sent'.$this->encodePrimaryKey($this->purchase_order->id));
+        ])->get('/api/v1/purchase_orders?' . http_build_query([
+            'include' => 'vendor,expense',
+            'without_deleted_vendors' => 'true',
+            'sort' => 'number|desc',
+            'tag_ids' => '',
+            'per_page' => 100,
+            'page' => 1,
+            'filter' => '',
+            'status' => 'active,archived,deleted',
+            'client_status' => 'draft,sent,accepted,cancelled',
+        ]));
 
         $response->assertStatus(200);
+
+        $ids = array_column($response->json('data'), 'id');
+
+        foreach ($purchase_orders as $purchase_order) {
+            $this->assertContains($purchase_order->hashed_id, $ids);
+        }
+    }
+
+    public function testPurchaseOrderSentClientStatusScopesStatusAndDueDate()
+    {
+        $sent = PurchaseOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'vendor_id' => $this->vendor->id,
+            'status_id' => PurchaseOrder::STATUS_SENT,
+            'due_date' => null,
+        ]);
+
+        $expired_sent = PurchaseOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'vendor_id' => $this->vendor->id,
+            'status_id' => PurchaseOrder::STATUS_SENT,
+            'due_date' => now()->subDay()->toDateString(),
+        ]);
+
+        $future_draft = PurchaseOrder::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'vendor_id' => $this->vendor->id,
+            'status_id' => PurchaseOrder::STATUS_DRAFT,
+            'due_date' => now()->addDay()->toDateString(),
+        ]);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->get('/api/v1/purchase_orders?client_status=sent&per_page=100')
+            ->assertStatus(200);
+
+        $ids = array_column($response->json('data'), 'id');
+
+        $this->assertContains($sent->hashed_id, $ids);
+        $this->assertNotContains($expired_sent->hashed_id, $ids);
+        $this->assertNotContains($future_draft->hashed_id, $ids);
     }
 
     public function testPostNewPurchaseOrderPdf()

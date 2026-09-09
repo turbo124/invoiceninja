@@ -177,7 +177,7 @@ class GoCardlessWebhook implements ShouldQueue
                     continue;
                 }
 
-                if (in_array($event['action'], ['cancelled', 'charged_back', 'failed', 'late_failure_settled'], true) && array_key_exists('payment', $event['links'] ?? [])) {
+                if (in_array($event['action'], ['cancelled', 'failed', 'late_failure_settled'], true) && array_key_exists('payment', $event['links'] ?? [])) {
                     $payment = Payment::query()
                         ->where('transaction_reference', $event['links']['payment'])
                         ->where('company_id', $company->id)

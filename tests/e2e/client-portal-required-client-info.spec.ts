@@ -1,10 +1,9 @@
-import { dismissCookieConsent } from './client-portal-helpers';
+import { waitForAlpine } from './client-portal-helpers';
 import { test, expect } from './fixtures';
 import {
     assertRequiredClientInfoBlocksCheckout,
     assertRequiredClientInfoUnblocksCheckout,
     completeRequiredClientInfoForm,
-    isRequiredClientInfoBlockingCheckout,
     navigateToGatewayCheckoutWithoutRequiredClientInfo,
     prepareIncompleteClientPaymentContext,
     requiredClientInfoForm,
@@ -68,17 +67,15 @@ test.describe('Required client info checkout gating', () => {
                 await assertRequiredClientInfoBlocksCheckout(page);
 
                 const form = requiredClientInfoForm(page);
+                await waitForAlpine(page);
                 await form.locator('[name="contact_email"]').fill('not-an-email');
                 await form.locator('button.button-primary').click();
 
-                await expect
-                    .poll(() => isRequiredClientInfoBlockingCheckout(page), {
-                        timeout: 15_000,
-                    })
-                    .toBe(true);
+                await expect(page).toHaveURL(/\/client\/payments\/process/);
                 await expect(form.locator('p.border-red-300').first()).toBeVisible({
                     timeout: 15_000,
                 });
+                await assertRequiredClientInfoBlocksCheckout(page);
             } finally {
                 await context.restoreGatewayRequirements();
             }

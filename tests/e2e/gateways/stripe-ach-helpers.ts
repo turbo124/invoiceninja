@@ -1,15 +1,42 @@
-import { type Frame, type Page } from '@playwright/test';
+import { test, type Frame, type Page } from '@playwright/test';
+import {
+    bulkAction,
+    companyGatewayHasCredentials,
+    ensureCompanyGatewayForKey,
+    ensureCompanyGatewayTypeEnabled,
+    getCompanyGateway,
+    isGatewayMethodEnabled,
+    listCompanyGateways,
+    parseCompanyGatewayConfig,
+    testCompanyGatewayWithRetry,
+    type ApiContext,
+    type CompanyGatewayEntity,
+} from '../api-helpers';
+import { decodePrimaryKey } from '../hash-helpers';
+import {
+    isolateCompanyGateway,
+    isCompanyGatewayArchived,
+    listAllCompanyGateways,
+} from './gateway-isolation-helpers';
+import { GatewayType, type GatewayAvailability } from './types';
 
 /**
  * Stripe test mode helpers for ACH.
- *
- * `stripe-ach-live.spec.ts` carries its own copies of the Financial Connections walk
- * through and the Stripe REST calls; these are the shared versions used by newer specs.
  */
 
 let validatedSecret: Promise<string | null> | undefined;
 
 export const stripeGatewayKey = 'd14dd26a37cecc30fdd65700bfb55b23';
+
+export interface StripeAchGatewaySetupResult {
+    availability: GatewayAvailability;
+    restore?: () => Promise<void>;
+}
+
+export interface StripeAchSetupOptions {
+    /** Archive every other active company gateway so checkout cannot fall back to PayPal. */
+    isolate?: boolean;
+}
 
 /**
  * Documented test payment method that reaches `processing` and then fails.
@@ -121,8 +148,336 @@ function encodeForm(
         .join('&');
 }
 
-export function stripeGet<T>(secret: string, path: string): Promise<T> {
-    return stripeRequest<T>(secret, path);
+export function stripeGet<T>(
+    secret: string,
+    path: string,
+    params: Record<string, string> = {},
+): Promise<T> {
+    const url = new URL(`https://api.stripe.com${path}`);
+
+    for (const [key, value] of Object.entries(params)) {
+        url.searchParams.set(key, value);
+    }
+
+    return stripeRequest<T>(secret, url.pathname + url.search);
+}
+
+export async function stripeList<T>(
+    secret: string,
+    path: string,
+    params: Record<string, string>,
+): Promise<T[]> {
+    const body = await stripeGet<{ data: T[] }>(secret, path, params);
+
+    return body.data;
+}
+
+export function parseStripeKeysConfig(): Record<string, unknown> | null {
+    const raw = process.env.STRIPE_KEYS?.trim() ?? '';
+
+    if (!raw) {
+        return null;
+    }
+
+    if (raw.startsWith('sk_')) {
+        return null;
+    }
+
+    try {
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+
+        return companyGatewayHasCredentials(parsed) ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
+export function stripeGatewayConfigurationReady(
+    gateway: CompanyGatewayEntity,
+): boolean {
+    return companyGatewayHasCredentials(parseCompanyGatewayConfig(gateway));
+}
+
+export function selectCanonicalStripeGateway(
+    gateways: CompanyGatewayEntity[],
+): CompanyGatewayEntity | undefined {
+    const matches = gateways.filter(
+        (gateway) => gateway.gateway_key === stripeGatewayKey,
+    );
+
+    if (matches.length === 0) {
+        return undefined;
+    }
+
+    const active = matches.filter(
+        (gateway) => !isCompanyGatewayArchived(gateway),
+    );
+    const pool = active.length > 0 ? active : matches;
+
+    return [...pool].sort((left, right) => left.id.localeCompare(right.id))[0];
+}
+
+function describeStripeGatewayState(
+    gateways: CompanyGatewayEntity[],
+): string {
+    const stripeGateways = gateways.filter(
+        (gateway) => gateway.gateway_key === stripeGatewayKey,
+    );
+
+    if (stripeGateways.length === 0) {
+        return 'no Stripe company gateways';
+    }
+
+    return stripeGateways
+        .map((gateway) => {
+            const achEnabled = isGatewayMethodEnabled(gateway, GatewayType.ACH);
+
+            return `${decodePrimaryKey(gateway.id)} archived=${isCompanyGatewayArchived(gateway)} ach=${achEnabled}`;
+        })
+        .join('; ');
+}
+
+async function applyStripeConfig(
+    api: ApiContext,
+    gateway: CompanyGatewayEntity,
+    envConfig: Record<string, unknown>,
+): Promise<CompanyGatewayEntity> {
+    const config = {
+        ...parseCompanyGatewayConfig(gateway),
+        ...envConfig,
+    };
+
+    const response = await api.request.put(
+        `/api/v1/company_gateways/${gateway.id}`,
+        {
+            data: {
+                gateway_key: gateway.gateway_key,
+                config: JSON.stringify(config),
+                fees_and_limits: gateway.fees_and_limits ?? {},
+            },
+        },
+    );
+
+    if (!response.ok()) {
+        throw new Error(
+            `Failed to apply Stripe credentials to gateway ${decodePrimaryKey(gateway.id)} (${response.status()}): ${(await response.text()).slice(0, 300)}`,
+        );
+    }
+
+    return getCompanyGateway(api, gateway.id);
+}
+
+async function ensureStripeGatewayConfigured(
+    api: ApiContext,
+    gateway: CompanyGatewayEntity,
+): Promise<CompanyGatewayEntity> {
+    if (stripeGatewayConfigurationReady(gateway)) {
+        return gateway;
+    }
+
+    const envConfig = parseStripeKeysConfig();
+
+    if (!envConfig) {
+        throw new Error(
+            'STRIPE_KEYS must be JSON with apiKey and publishableKey when the company gateway has no Stripe credentials',
+        );
+    }
+
+    return applyStripeConfig(api, gateway, envConfig);
+}
+
+/** Sync credentials, enable ACH, and verify auth on every active Stripe gateway. */
+export async function syncActiveStripeAchGateways(
+    api: ApiContext,
+): Promise<CompanyGatewayEntity[]> {
+    const activeGateways = (await listCompanyGateways(api)).filter(
+        (gateway) => gateway.gateway_key === stripeGatewayKey,
+    );
+
+    if (activeGateways.length === 0) {
+        return [];
+    }
+
+    const ready: CompanyGatewayEntity[] = [];
+
+    for (const candidate of activeGateways) {
+        let gateway = await ensureStripeGatewayConfigured(api, candidate);
+
+        gateway = await ensureCompanyGatewayTypeEnabled(
+            api,
+            gateway,
+            GatewayType.ACH,
+        );
+
+        if (!isGatewayMethodEnabled(gateway, GatewayType.ACH)) {
+            throw new Error(
+                `Stripe gateway ${decodePrimaryKey(gateway.id)} does not offer ACH in fees_and_limits`,
+            );
+        }
+
+        const authTest = await testCompanyGatewayWithRetry(api, gateway.id);
+
+        if (!authTest.ok) {
+            throw new Error(
+                `Stripe gateway ${decodePrimaryKey(gateway.id)} failed API auth test: ${authTest.message}`,
+            );
+        }
+
+        ready.push(await getCompanyGateway(api, gateway.id));
+    }
+
+    return ready;
+}
+
+/**
+ * Prepare a portal-ready Stripe ACH gateway: valid env, credentials, ACH fee slot,
+ * driver auth, and optionally isolate the gateway from PayPal and others.
+ */
+export async function setupStripeAchExclusiveEnvironment(
+    api: ApiContext,
+    options: StripeAchSetupOptions = {},
+): Promise<StripeAchGatewaySetupResult> {
+    const stripeSecret = await validatedStripeTestSecret();
+
+    if (!stripeSecret) {
+        return {
+            availability: {
+                envConfigured: false,
+                companyGatewayConfigured: false,
+                skipReason:
+                    'Set STRIPE_KEYS to a valid Stripe test-mode secret key to run live ACH tests.',
+            },
+        };
+    }
+
+    let gateway = selectCanonicalStripeGateway(await listAllCompanyGateways(api));
+
+    if (!gateway) {
+        gateway = await ensureCompanyGatewayForKey(
+            api,
+            stripeGatewayKey,
+            'STRIPE_KEYS',
+        );
+    }
+
+    if (!gateway) {
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+                skipReason: `Stripe ACH: no company gateway for key ${stripeGatewayKey}. Set STRIPE_KEYS JSON with apiKey and publishableKey.`,
+            },
+        };
+    }
+
+    if (isCompanyGatewayArchived(gateway)) {
+        await bulkAction(api, 'company_gateways', [gateway.id], 'restore');
+        gateway = await getCompanyGateway(api, gateway.id);
+    }
+
+    try {
+        await syncActiveStripeAchGateways(api);
+        gateway = await ensureStripeGatewayConfigured(api, gateway);
+        gateway = await ensureCompanyGatewayTypeEnabled(
+            api,
+            gateway,
+            GatewayType.ACH,
+        );
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        const state = describeStripeGatewayState(await listAllCompanyGateways(api));
+
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+                skipReason: `Stripe ACH: ${message}. Gateways: ${state}`,
+            },
+        };
+    }
+
+    if (!isGatewayMethodEnabled(gateway, GatewayType.ACH)) {
+        const state = describeStripeGatewayState(await listAllCompanyGateways(api));
+
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+                companyGateway: gateway,
+                skipReason: `Stripe ACH is not enabled in fees_and_limits[2]. Gateways: ${state}`,
+            },
+        };
+    }
+
+    const authTest = await testCompanyGatewayWithRetry(api, gateway.id);
+
+    if (!authTest.ok) {
+        const state = describeStripeGatewayState(await listAllCompanyGateways(api));
+
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+                companyGateway: gateway,
+                skipReason: `Stripe gateway ${decodePrimaryKey(gateway.id)} failed API auth test: ${authTest.message}. Gateways: ${state}`,
+            },
+        };
+    }
+
+    gateway = await getCompanyGateway(api, gateway.id);
+
+    if (options.isolate === false) {
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: true,
+                companyGateway: gateway,
+            },
+        };
+    }
+
+    const { gateway: isolatedGateway, restore } = await isolateCompanyGateway(
+        api,
+        gateway,
+        GatewayType.ACH,
+    );
+
+    return {
+        availability: {
+            envConfigured: true,
+            companyGatewayConfigured: true,
+            companyGateway: isolatedGateway,
+        },
+        restore,
+    };
+}
+
+/** Skip the current test when Stripe ACH is not portal-ready; return the gateway to use. */
+export async function prepareStripeAchGateway(
+    api: ApiContext,
+    options: StripeAchSetupOptions = {},
+): Promise<{
+    companyGateway: CompanyGatewayEntity;
+    restore: () => Promise<void>;
+}> {
+    const setup = await setupStripeAchExclusiveEnvironment(api, options);
+
+    if (
+        !setup.availability.envConfigured ||
+        !setup.availability.companyGatewayConfigured ||
+        !setup.availability.companyGateway
+    ) {
+        test.skip(
+            true,
+            setup.availability.skipReason ??
+                'Stripe ACH is unavailable for this account.',
+        );
+    }
+
+    return {
+        companyGateway: setup.availability.companyGateway!,
+        restore: setup.restore ?? (async () => {}),
+    };
 }
 
 export interface StripeWebhookEndpoint {

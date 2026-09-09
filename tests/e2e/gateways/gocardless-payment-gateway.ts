@@ -1,7 +1,15 @@
 import { expect, type Page } from '@playwright/test';
-import { BasePaymentGateway } from './base-payment-gateway';
-import { GatewayType } from './types';
+import {
+    getCompanyGateway,
+    type ApiContext,
+    type CompanyGatewayEntity,
+} from '../api-helpers';
 import { dismissCookieConsent } from '../client-portal-helpers';
+import {
+    BasePaymentGateway,
+    type GatewayExclusiveSetupOptions,
+} from './base-payment-gateway';
+import { GatewayType } from './types';
 
 export class GoCardlessPaymentGateway extends BasePaymentGateway {
     readonly slug = 'gocardless';
@@ -31,6 +39,43 @@ export class GoCardlessPaymentGateway extends BasePaymentGateway {
         } catch {
             return false;
         }
+    }
+
+    protected envReadyForExclusiveSetup(): boolean {
+        return this.isSandboxConfigured();
+    }
+
+    protected envSkipReason(): string {
+        return 'GoCardless payment completion requires GOCARDLESS_KEYS JSON with testMode=true';
+    }
+
+    protected async syncGatewayCredentials(
+        api: ApiContext,
+        gateway: CompanyGatewayEntity,
+        options: GatewayExclusiveSetupOptions = {},
+    ): Promise<CompanyGatewayEntity> {
+        const config = {
+            ...(JSON.parse(this.getEnvValue()) as Record<string, unknown>),
+            ...(options.configChanges ?? {}),
+        };
+        const response = await api.request.put(
+            `/api/v1/company_gateways/${gateway.id}`,
+            {
+                data: {
+                    gateway_key: gateway.gateway_key,
+                    config: JSON.stringify(config),
+                    fees_and_limits: gateway.fees_and_limits ?? {},
+                },
+            },
+        );
+
+        if (!response.ok()) {
+            throw new Error(
+                `Unable to apply the GoCardless sandbox configuration (${response.status()}): ${(await response.text()).slice(0, 300)}`,
+            );
+        }
+
+        return getCompanyGateway(api, gateway.id);
     }
 
     async completePayment(

@@ -33,7 +33,7 @@ class HostedPaymentPageSetupReturnRequest extends FormRequest
 
         $this->context_state = Cache::get($this->route('context'), []);
 
-        if (! isset($this->context_state['db'], $this->context_state['company_gateway_id'], $this->context_state['gateway_type_id'], $this->context_state['contact'])) {
+        if (! isset($this->context_state['db'], $this->context_state['company_gateway_id'], $this->context_state['gateway_type_id'], $this->context_state['contact_key'])) {
             return false;
         }
 
@@ -44,7 +44,7 @@ class HostedPaymentPageSetupReturnRequest extends FormRequest
 
         return $contact
             && $company_gateway
-            && $contact->id === $this->context_state['contact']->id
+            && hash_equals((string) $this->context_state['contact_key'], (string) $contact->contact_key)
             && $contact->client->company_id === $company_gateway->company_id
             && $company_gateway->id === (int) $this->context_state['company_gateway_id']
             && hash_equals($company_gateway->company->company_key, (string) $this->route('company_key'))

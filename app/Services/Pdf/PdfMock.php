@@ -654,7 +654,7 @@ class PdfMock
         return [
             '$show_shipping_address_visibility_label' => ctrans('texts.shipping_address'),
             '$client.shipping_location_name_label' => ctrans('texts.name'),
-            '$client.shipping_city_state_postal_label' => ctrans('texts.shipping_city_state_postal'),
+            '$client.shipping_city_state_postal_label' => ctrans('texts.city_state_postal'),
             '$client.shipping_postal_code_label' => ctrans('texts.shipping_postal_code'),
             '$show_shipping_address_block_label' => ctrans('texts.shipping_address'),
             '$client.billing_postal_code_label' => ctrans('texts.billing_postal_code'),

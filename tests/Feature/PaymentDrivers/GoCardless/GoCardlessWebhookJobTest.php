@@ -644,24 +644,6 @@ class GoCardlessWebhookJobTest extends TestCase
         $this->assertSame($payment_count, Payment::query()->count());
     }
 
-    public function test_charged_back_event_marks_payment_failed(): void
-    {
-        Bus::fake([PaymentFailedMailer::class]);
-
-        $payment = $this->makePayment('PM_CHARGEBACK_1', Payment::STATUS_COMPLETED);
-
-        $this->dispatchEvents([[
-            'id' => 'EV_CHARGEBACK',
-            'resource_type' => 'payments',
-            'action' => 'charged_back',
-            'links' => ['payment' => 'PM_CHARGEBACK_1'],
-            'details' => ['description' => 'Charged back by payer'],
-        ]]);
-
-        $this->assertSame(Payment::STATUS_FAILED, $payment->fresh()->status_id);
-        Bus::assertDispatched(PaymentFailedMailer::class, 1);
-    }
-
     public function test_irrelevant_event_does_not_abort_remaining_events(): void
     {
         $payment = $this->makePayment('PM_BATCH_1', Payment::STATUS_PENDING);

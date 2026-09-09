@@ -114,13 +114,6 @@ class Peppol extends AbstractService implements MutatorInterface
 
     /** 
      * 
-     * @var array $tax_map
-     * 
-     **/
-    private array $tax_map = [];
-
-    /** 
-     * 
      * @var float $allowance_total
      * 
      **/
@@ -233,18 +226,64 @@ class Peppol extends AbstractService implements MutatorInterface
     /**
      * Credit-note UBL line signs.
      *
-     * Price is always >= 0 (BR-27). Quantity carries any leftover sign so
-     * price × qty == line amount (PEPPOL-EN16931-R120). The line total is
-     * normalized once — an offset line keeps the opposite sign of the
-     * credit lines.
+     * Price is always >= 0 (BR-27). Quantity carries sign so price × qty
+     * (+/- line allowances) reconciles with LineExtensionAmount
+     * (PEPPOL-EN16931-R120). When the line has a line-level AllowanceCharge,
+     * quantity is preserved — re-deriving it from line_total ÷ cost would
+     * double-count the discount. When there is no allowance, quantity is
+     * derived so offset / clawback rows still reconcile.
      *
      * @return array{quantity: float, price: float, line_total: float}
      */
-    public function normalizeCreditNoteLine(float $quantity, float $cost, float $lineTotal): array
-    {
+    public function normalizeCreditNoteLine(
+        float $quantity,
+        float $cost,
+        float $lineTotal,
+        bool $hasLineAllowance = false,
+        float $lineAllowanceAmount = 0.0,
+        bool $isAmountDiscount = false,
+    ): array {
         $sign = ((float) $this->invoice->amount) < 0 ? -1.0 : 1.0;
         $normalizedLine = $lineTotal * $sign;
         $price = abs($cost);
+
+        if ($hasLineAllowance) {
+            if ($sign < 0) {
+                // Negative-total documents flip LineExtensionAmount and emit a line
+                // allowance (not charge). Percentage discounts can reverse
+                // line_ext = qty × price − allowance to recover qty. Flat amounts
+                // are independent of price — keep commercial qty and rebuild net
+                // from abs(qty) × price − allowance (calc() subtracts flat discounts
+                // from signed line totals and over-magnifies negative rows).
+                $allowance = abs($lineAllowanceAmount);
+
+                if ($isAmountDiscount) {
+                    return [
+                        'quantity' => abs($quantity),
+                        'price' => $price,
+                        'line_total' => $normalizedLine,
+                    ];
+                }
+
+                return [
+                    'quantity' => $price > 0.0
+                        ? ($normalizedLine + $allowance) / $price
+                        : abs($quantity),
+                    'price' => $price,
+                    'line_total' => $normalizedLine,
+                ];
+            }
+
+            // Positive-total clawback rows: project commercial sign from cost × qty
+            // (BR-27: price ≥ 0, qty carries sign) and pair with a line charge.
+            $economicSign = ((float) $cost * (float) $quantity) < 0 ? -1.0 : 1.0;
+
+            return [
+                'quantity' => $economicSign * abs($quantity),
+                'price' => $price,
+                'line_total' => $normalizedLine,
+            ];
+        }
 
         return [
             'quantity' => $price > 0.0 ? $normalizedLine / $price : $quantity * $sign,
@@ -653,8 +692,6 @@ class Peppol extends AbstractService implements MutatorInterface
                 $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
                 $allowanceCharge->Amount->amount = number_format($surchargeAmount, 2, '.', '');
 
-                $this->taxCalculator->calculateTaxMap($surchargeAmount);
-
                 $allowanceCharge->TaxCategory = $this->globalTaxCategories;
                 $allowanceCharge->AllowanceChargeReason = ctrans('texts.surcharge');
                 $allowances[] = $allowanceCharge;
@@ -980,16 +1017,6 @@ class Peppol extends AbstractService implements MutatorInterface
     public function getOverrideVatNumber(): string
     {
         return $this->override_vat_number;
-    }
-
-    public function getTaxMap(): array
-    {
-        return $this->tax_map;
-    }
-
-    public function addToTaxMap(array $entry): void
-    {
-        $this->tax_map[] = $entry;
     }
 
     public function addToAllowanceTotal(float $amount): void

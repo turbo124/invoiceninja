@@ -101,6 +101,15 @@ class ProjectRepository extends BaseRepository
 
         if (count($projects) == 1) {
             $invoice->project_id = $_project->id;
+
+            /** If invoicing a project with an attached PO Number - place the PO number */
+            if($_project->quotes->count() == 1){
+                $quote = $_project->quotes->first();
+                
+                if(strlen($quote->po_number ?? '') >= 1){
+                    $invoice->po_number = $quote->po_number;
+                }
+            }
         }
         // $invoice->project_id = $project->id;
 

@@ -3086,11 +3086,10 @@ class PeppolTest extends TestCase
     }
 
     /**
-     * A negative price on a negative invoice (emitted as a credit note) must
-     * surface a clear, actionable message rather than falling through to an
-     * opaque schematron failure.
+     * Negative internal cost on a negative invoice is projected into CreditedQuantity
+     * sign (PriceAmount stays ≥ 0) and must not trip the negative-price guard.
      */
-    public function testNegativeLinePriceOnNegativeInvoiceIsRejected(): void
+    public function testNegativeLinePriceOnNegativeInvoiceIsProjected(): void
     {
         $client = $this->setupValidatedClient();
 
@@ -3101,8 +3100,11 @@ class PeppolTest extends TestCase
 
         $result = (new EntityLevel())->checkInvoice($invoice);
 
-        $this->assertFalse($result['passes'], 'Negative line price must fail Peppol validation');
-        $this->assertContains(ctrans('texts.peppol_negative_line_price'), $result['invoice']);
+        $this->assertNotContains(
+            ctrans('texts.peppol_negative_line_price'),
+            $result['invoice'],
+            'Negative cost on credit-note route is projected — not rejected as a negative price'
+        );
     }
 
     /**

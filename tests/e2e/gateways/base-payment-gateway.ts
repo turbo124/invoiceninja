@@ -1,12 +1,18 @@
 import { test, type Page } from '@playwright/test';
 import {
+    ensureCompanyGatewayForKey,
     ensureCompanyGatewayTypeEnabled,
     findCompanyGatewayByKey,
     listCompanyGateways,
+    syncCompanyGatewayConfigFromEnv,
     type ApiContext,
     type CompanyGatewayEntity,
 } from '../api-helpers';
 import { type ApiFixture } from '../fixtures';
+import {
+    isolateCompanyGateway,
+    setupExclusiveEnvGatewayEnvironment,
+} from './gateway-isolation-helpers';
 import {
     navigateToGatewayCheckout,
     prepareDefaultPaymentContext,
@@ -18,6 +24,13 @@ import {
     type PaymentGatewayRunContext,
 } from './types';
 
+export interface GatewayExclusiveSetupOptions {
+    gatewayTypeId?: number;
+    skipIsolation?: boolean;
+    skipAuthTest?: boolean;
+    configChanges?: Record<string, unknown>;
+}
+
 export abstract class BasePaymentGateway {
     abstract readonly slug: string;
     abstract readonly displayName: string;
@@ -26,7 +39,8 @@ export abstract class BasePaymentGateway {
     abstract readonly gatewayTypeId: GatewayTypeId;
     abstract readonly supportsFullPayment: boolean;
 
-    readonly requiresGatewayIsolation: boolean = false;
+    /** End-to-end specs scaffold, isolate, and auth-test the target gateway first. */
+    readonly requiresGatewayIsolation: boolean = true;
 
     /**
      * Whether checkout renders the application's own payment summary, where the gateway
@@ -106,10 +120,30 @@ export abstract class BasePaymentGateway {
         }
     }
 
-    async prepareExclusiveGateway(
+    protected envReadyForExclusiveSetup(): boolean {
+        return this.isEnvConfigured();
+    }
+
+    protected envSkipReason(): string {
+        return `${this.displayName}: set ${this.envVar} to run this test`;
+    }
+
+    protected async scaffoldCompanyGateway(
         api: ApiContext,
-        availability: GatewayAvailability,
-    ): Promise<void> {
+    ): Promise<CompanyGatewayEntity | undefined> {
+        return ensureCompanyGatewayForKey(
+            api,
+            this.gatewayKey,
+            this.envVar,
+        );
+    }
+
+    protected async syncGatewayCredentials(
+        api: ApiContext,
+        gateway: CompanyGatewayEntity,
+        _options: GatewayExclusiveSetupOptions = {},
+    ): Promise<CompanyGatewayEntity> {
+        return syncCompanyGatewayConfigFromEnv(api, gateway, this.envVar);
     }
 
     /**
@@ -118,13 +152,69 @@ export abstract class BasePaymentGateway {
      */
     async setupExclusiveTestEnvironment(
         api: ApiContext,
+        options: GatewayExclusiveSetupOptions = {},
     ): Promise<{
         availability: GatewayAvailability;
         skipReason?: string;
     }> {
-        throw new Error(
-            `${this.displayName} requires setupExclusiveTestEnvironment() to be implemented`,
+        const gatewayTypeId = options.gatewayTypeId ?? this.gatewayTypeId;
+
+        if (this.envReadyForExclusiveSetup()) {
+            const setup = await setupExclusiveEnvGatewayEnvironment(api, {
+                displayName: this.displayName,
+                gatewayKey: this.gatewayKey,
+                gatewayTypeId,
+                envConfigured: true,
+                envSkipReason: this.envSkipReason(),
+                skipIsolation: options.skipIsolation,
+                skipAuthTest: options.skipAuthTest,
+                scaffoldGateway: (apiContext) =>
+                    this.scaffoldCompanyGateway(apiContext),
+                syncGateway: (apiContext, gateway) =>
+                    this.syncGatewayCredentials(apiContext, gateway, options),
+            });
+
+            if (setup.restore) {
+                this.setGatewayIsolationRestore(setup.restore);
+            }
+
+            return {
+                availability: setup.availability,
+                skipReason: setup.skipReason,
+            };
+        }
+
+        const availability = await this.checkAvailability(api);
+
+        if (
+            !availability.envConfigured ||
+            !availability.companyGatewayConfigured ||
+            !availability.companyGateway
+        ) {
+            return {
+                availability,
+                skipReason: availability.skipReason,
+            };
+        }
+
+        if (options.skipIsolation) {
+            return { availability };
+        }
+
+        const { gateway, restore } = await isolateCompanyGateway(
+            api,
+            availability.companyGateway,
+            gatewayTypeId,
         );
+
+        this.setGatewayIsolationRestore(restore);
+
+        return {
+            availability: {
+                ...availability,
+                companyGateway: gateway,
+            },
+        };
     }
 
     async restoreExclusiveGateway(): Promise<void> {
@@ -175,7 +265,9 @@ export abstract class BasePaymentGateway {
     }
 
     async assertPaymentSucceeded(page: Page): Promise<void> {
-        await page.waitForURL(/\/client\/payments\//, { timeout: 60_000 });
+        await page.waitForURL(/\/client\/payments\/(?!process)/, {
+            timeout: 60_000,
+        });
     }
 
     async runEndToEnd({

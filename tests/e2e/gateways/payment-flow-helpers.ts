@@ -604,11 +604,13 @@ export async function preparePortalPaymentContext(
     paymentFlow: PortalPaymentFlow = 'default',
     clientChanges: Record<string, unknown> = {}
 ): Promise<PaymentGatewayContext> {
+    // Do not set client `company_gateway_ids` here: PaymentMethod::transformKeys()
+    // hashid-decodes each entry, so a mis-resolved id yields zero portal methods
+    // and the Pay Now dropdown never renders. Pick the gateway in the dropdown instead.
     let client = await createAndLogInClient(api, page, {
         settings: {
             ...paymentTestSettings,
             payment_flow: paymentFlow,
-            company_gateway_ids: companyGateway.id,
         },
         contact: {
             first_name: 'Playwright',
@@ -687,7 +689,6 @@ export async function prepareIncompleteClientPaymentContext(
         settings: {
             ...paymentTestSettings,
             payment_flow: options.paymentFlow ?? 'default',
-            company_gateway_ids: companyGateway.id,
         },
         contact: {
             first_name: 'Playwright',
@@ -771,16 +772,20 @@ export async function openInvoicePaymentPage(
         const dropdown = page.locator('[dusk="pay-now-dropdown"]');
         const payNowButton = page.getByRole('button', { name: /pay now/i });
 
-        if (await dropdown.isVisible().catch(() => false)) {
+        try {
+            await expect(dropdown).toBeVisible({ timeout: 15_000 });
             await dropdown.click();
             await expect(
                 page.locator('[dusk="payment-methods-dropdown"]'),
             ).toBeVisible({ timeout: 15_000 });
 
             return;
+        } catch {
+            // Over/under payment uses a plain Pay Now button instead of the dropdown.
         }
 
-        if (await payNowButton.isVisible().catch(() => false)) {
+        try {
+            await expect(payNowButton).toBeVisible({ timeout: 5_000 });
             await payNowButton.click();
             await expect(page).toHaveURL(
                 /\/client\/(?:invoices\/payment|payments\/process)/,
@@ -789,11 +794,11 @@ export async function openInvoicePaymentPage(
             await dismissCookieConsent(page);
 
             return;
+        } catch {
+            throw new Error(
+                `Invoice ${invoice.id} did not expose a Pay Now entry point`,
+            );
         }
-
-        throw new Error(
-            `Invoice ${invoice.id} did not expose a Pay Now entry point`,
-        );
     }
 
     await page.goto('/client/invoices');

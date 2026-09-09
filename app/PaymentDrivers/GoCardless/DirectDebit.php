@@ -13,15 +13,12 @@
 namespace App\PaymentDrivers\GoCardless;
 
 use App\Exceptions\PaymentFailed;
-use App\Http\Controllers\ClientPortal\InvoiceController;
-use App\Http\Requests\ClientPortal\Invoices\ProcessInvoicesInBulkRequest;
 use App\Http\Requests\ClientPortal\Payments\PaymentResponseRequest;
 use App\Jobs\Util\SystemLogger;
 use App\Models\GatewayType;
 use App\Models\ClientGatewayToken;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\PaymentHash;
 use App\Models\SystemLog;
 use App\PaymentDrivers\Common\LivewireMethodInterface;
 use App\PaymentDrivers\Common\MethodInterface;
@@ -75,68 +72,9 @@ class DirectDebit implements MethodInterface, LivewireMethodInterface
         throw new PaymentFailed($exception->getMessage(), $exception->getCode());
     }
 
-    /**
-     * Handle authorization response for Direct Debit.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|void
-     */
-    public function authorizeResponse(Request $request)
+    public function authorizeResponse(Request $request): never
     {
-
-        try {
-
-            $billing_request = $this->go_cardless->gateway->billingRequests()->get($request->billing_request);
-
-            $payment_meta = new \stdClass();
-            $payment_meta->brand = $billing_request->resources->customer_bank_account->bank_name;
-            $payment_meta->type = $this->resolveScheme($billing_request->mandate_request->scheme);
-            $payment_meta->state = 'pending';
-            $payment_meta->last4 = $billing_request->resources->customer_bank_account->account_number_ending;
-
-            $data = [
-                'payment_meta' => $payment_meta,
-                'token' => $billing_request->mandate_request->links->mandate,
-                'payment_method_id' => $this->resolveScheme($billing_request->mandate_request->scheme),
-            ];
-
-            $payment_method = $this->go_cardless->storeGatewayToken($data, ['gateway_customer_reference' => $billing_request->resources->customer->id]);
-
-            $mandate = $this->go_cardless->gateway->mandates()->get($billing_request->mandate_request->links->mandate);
-
-            if ($request->has('authorize_then_redirect') && $request->payment_hash !== null) {
-                $this->go_cardless->payment_hash = PaymentHash::where('hash', $request->payment_hash)->firstOrFail();
-
-                $data = [
-                    'invoices' => collect($this->go_cardless->payment_hash->data->invoices)->map(fn($invoice) => $invoice->invoice_id)->toArray(),
-                    'action' => 'payment',
-                ];
-
-                $request = new ProcessInvoicesInBulkRequest();
-                $request->replace($data);
-
-                session()->flash('message', ctrans('texts.payment_method_added'));
-
-                return app(InvoiceController::class)->bulk($request);
-            }
-
-            return redirect()->route('client.payment_methods.show', $payment_method->hashed_id);
-
-        } catch (\Exception $exception) {
-            return $this->processUnsuccessfulAuthorization($exception);
-        }
-
-    }
-
-    private function resolveScheme(string $scheme): int
-    {
-        match ($scheme) {
-            'sepa_core' => $type = GatewayType::SEPA,
-            'ach' => $type = GatewayType::BANK_TRANSFER,
-            default => $type = GatewayType::DIRECT_DEBIT,
-        };
-
-        return $type;
+        throw new PaymentFailed(ctrans('texts.gateway_temporarily_unavailable'), 403);
     }
 
 
@@ -155,7 +93,6 @@ class DirectDebit implements MethodInterface, LivewireMethodInterface
     public function paymentResponse(PaymentResponseRequest $request)
     {
         $gateway_type_id = (int) $request->payment_method_id;
-        $amount_with_fee = $this->go_cardless->payment_hash->amount_with_fee();
 
         if (! $request->source) {
             $authorisation_url = (new HostedPaymentPage($this->go_cardless))
@@ -167,7 +104,6 @@ class DirectDebit implements MethodInterface, LivewireMethodInterface
         $token = $this->go_cardless->resolveClientGatewayToken(
             (string) $request->source,
             $gateway_type_id,
-            $amount_with_fee,
         );
 
         $this->go_cardless->ensureMandateIsReady($token->token);
@@ -310,13 +246,13 @@ class DirectDebit implements MethodInterface, LivewireMethodInterface
     private function createHostedFlowContext(int $gateway_type_id): string
     {
         $key = 'gocardless-' . Str::uuid();
-        $contact = auth()->guard('contact')->user()?->fresh();
+        $contact_key = auth()->guard('contact')->user()?->contact_key;
 
         Cache::put($key, array_filter([
             'db' => $this->go_cardless->company_gateway->company->db,
             'company_gateway_id' => $this->go_cardless->company_gateway->id,
             'gateway_type_id' => $gateway_type_id,
-            'contact' => $contact,
+            'contact_key' => $contact_key,
         ]), now()->addDays(HostedPaymentPage::FLOW_EXPIRY_DAYS));
 
         return $key;

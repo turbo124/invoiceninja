@@ -381,31 +381,6 @@ class PeppolTaxCalculator
         return $this->peppol;
     }
 
-    /**
-     * calculateTaxMap
-     *
-     * Generates a standard tax_map entry for a given $amount
-     *
-     * Iterates through all of the globalTaxCategories found in the document
-     *
-     * @param  float $amount
-     * @return self
-     */
-    public function calculateTaxMap($amount): self
-    {
-        foreach ($this->peppol->getGlobalTaxCategories() as $tc) {
-
-            $this->peppol->addToTaxMap([
-                'taxableAmount' => $amount,
-                'taxAmount' => $amount * ($tc->Percent / 100),
-                'percentage' => $tc->Percent,
-            ]);
-
-        }
-
-        return $this;
-    }
-
     public function getJurisdiction(): JurisdictionRegionAddress
     {
         return $this->jurisdiction;

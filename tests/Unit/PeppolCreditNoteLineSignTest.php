@@ -69,6 +69,17 @@ class PeppolCreditNoteLineSignTest extends TestCase
         $this->assertNotEquals(14580.0, $sum);
     }
 
+    public function testEconomicSignProjectsNegativeCostIntoQuantityWhenLineHasAllowance(): void
+    {
+        $peppol = $this->peppolWithAmount(6534.0);
+
+        $line = $peppol->normalizeCreditNoteLine(2.0, -100.0, -180.0, true);
+
+        $this->assertSame(-2.0, $line['quantity']);
+        $this->assertSame(100.0, $line['price']);
+        $this->assertSame(-180.0, $line['line_total']);
+    }
+
     public function testNegativeInvoiceDocumentDoesNotAbsOffsetLine(): void
     {
         $peppol = $this->peppolWithAmount(-6534.0, credit: false);
@@ -86,6 +97,56 @@ class PeppolCreditNoteLineSignTest extends TestCase
         $this->assertEqualsWithDelta(
             $offset['price'] * $offset['quantity'],
             $offset['line_total'],
+            0.001
+        );
+    }
+
+    public function testNegativeDocumentWithLineAllowanceDerivesQuantityForR120(): void
+    {
+        $peppol = $this->peppolWithAmount(-180.0, credit: false);
+
+        $line = $peppol->normalizeCreditNoteLine(-2.0, 100.0, -180.0, true, -20.0);
+
+        $this->assertSame(2.0, $line['quantity']);
+        $this->assertSame(100.0, $line['price']);
+        $this->assertSame(180.0, $line['line_total']);
+        $this->assertEqualsWithDelta(
+            $line['quantity'] * $line['price'] - 20.0,
+            $line['line_total'],
+            0.001
+        );
+    }
+
+    public function testNegativeCreditWithLineAllowanceDerivesQuantityForR120(): void
+    {
+        $peppol = $this->peppolWithAmount(-4131.0);
+
+        $line = $peppol->normalizeCreditNoteLine(-1.0, 4590.0, -4131.0, true, -459.0);
+
+        $this->assertSame(1.0, $line['quantity']);
+        $this->assertSame(4590.0, $line['price']);
+        $this->assertSame(4131.0, $line['line_total']);
+        $this->assertEqualsWithDelta(
+            $line['quantity'] * $line['price'] - 459.0,
+            $line['line_total'],
+            0.001
+        );
+    }
+
+    public function testNegativeDocumentWithFlatAmountDiscountPreservesQuantity(): void
+    {
+        $peppol = $this->peppolWithAmount(-180.0, credit: false);
+
+        // Flat amount discounts must keep commercial qty; deriving from line_ext
+        // and allowance only works for percentage discounts.
+        $line = $peppol->normalizeCreditNoteLine(-2.0, 100.0, -180.0, true, 20.0, true);
+
+        $this->assertSame(2.0, $line['quantity']);
+        $this->assertSame(100.0, $line['price']);
+        $this->assertSame(180.0, $line['line_total']);
+        $this->assertEqualsWithDelta(
+            $line['quantity'] * $line['price'] - 20.0,
+            $line['line_total'],
             0.001
         );
     }

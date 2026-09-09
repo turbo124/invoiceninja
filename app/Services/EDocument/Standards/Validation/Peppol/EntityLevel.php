@@ -212,7 +212,14 @@ class EntityLevel implements EntityLevelInterface
             }
 
             if ((float) ($item->cost ?? 0) < 0) {
-                return [ctrans('texts.peppol_negative_line_price')];
+                // Credit notes (and negative invoices emitted as credit notes) project
+                // negative cost into CreditedQuantity sign — PriceAmount stays ≥ 0.
+                $isCreditNoteRoute = $invoice instanceof Credit
+                    || ($invoice instanceof Invoice && (float) $invoice->amount < 0);
+
+                if (!$isCreditNoteRoute) {
+                    return [ctrans('texts.peppol_negative_line_price')];
+                }
             }
         }
 

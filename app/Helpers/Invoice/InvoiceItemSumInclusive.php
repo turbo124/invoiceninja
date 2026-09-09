@@ -185,7 +185,12 @@ class InvoiceItemSumInclusive
     private function setDiscount()
     {
         if ($this->invoice->is_amount_discount) {
-            $this->setLineTotal($this->getLineTotal() - $this->formatValue($this->item->discount, $this->currency->precision));
+            $discount = $this->formatValue($this->item->discount, $this->currency->precision);
+            $this->setLineTotal(
+                $this->getLineTotal() < 0
+                    ? $this->getLineTotal() + $discount
+                    : $this->getLineTotal() - $discount
+            );
             $this->total_discount += $this->item->discount;
         } else {
             $this->setLineTotal($this->getLineTotal() - $this->formatValue(($this->item->line_total * ($this->item->discount / 100)), $this->currency->precision));
@@ -298,8 +303,7 @@ class InvoiceItemSumInclusive
      */
     private function getPeppolSurchargeTaxes(): self
     {
-
-        if (!$this->client->getSetting('enable_e_invoice')) {
+        if (! $this->shouldAllocatePeppolSurchargeTaxes()) {
             return $this;
         }
 
@@ -350,6 +354,19 @@ class InvoiceItemSumInclusive
             });
 
         return $this;
+    }
+
+    /**
+     * Peppol EN16931 VAT breakdown (BT-116) must include document surcharge bases (BT-99).
+     */
+    private function shouldAllocatePeppolSurchargeTaxes(): bool
+    {
+        if ($this->client->getSetting('enable_e_invoice')) {
+            return true;
+        }
+
+        return $this->client->getSetting('e_invoice_type') === 'PEPPOL'
+            || $this->client->getSetting('e_invoice_type') === 'EN16931';
     }
 
     private function setCustomSurchargeNetMap(array $surcharge): self

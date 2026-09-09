@@ -69,12 +69,12 @@ class CreditNoteSignTest extends TestCase
     public function testCreditLineIsPositiveQuantityNegativeAmounts(): void
     {
         // Positive inputs, as decoded from the positive Peppol CreditNote.
-        $line = $this->creditLine(100.0, 2.0, 200.0, 50.0, 238.0);
+        $line = $this->creditLine(100.0, 2.0, 200.0, 200.0, 238.0);
 
         $this->assertSame(2.0, $line->quantity, 'CreditedQuantity must stay POSITIVE');
         $this->assertSame(-100.0, $line->item_price, 'Unit price must be NEGATIVE');
         $this->assertSame(-200.0, $line->amount_excluding_vat, 'LineExtensionAmount must be NEGATIVE');
-        $this->assertSame(-50.0, $line->amount_excluding_tax, 'Price value must be NEGATIVE');
+        $this->assertSame(-200.0, $line->amount_excluding_tax, 'Line amount alias must match extension');
         $this->assertSame(-238.0, $line->amount_including_tax, 'Line tax-inclusive amount must be NEGATIVE');
 
         // Arithmetic coherence: unit price × quantity == line extension amount.
@@ -98,7 +98,7 @@ class CreditNoteSignTest extends TestCase
         $this->assertSame(1.0, $line->quantity, 'CreditedQuantity must stay POSITIVE');
         $this->assertSame(4590.0, $line->item_price, 'Offset unit price must be POSITIVE on the negative invoice');
         $this->assertSame(4590.0, $line->amount_excluding_vat, 'Offset LineExtensionAmount must be POSITIVE (clawback, not another credit)');
-        $this->assertSame(4590.0, $line->amount_excluding_tax, 'Offset price value must follow the unit price sign');
+        $this->assertSame(4590.0, $line->amount_excluding_tax, 'Offset line amount alias must match extension');
         $this->assertSame(4590.0, $line->amount_including_tax, 'Offset tax-inclusive amount must flip once, not through abs()');
 
         $this->assertSame(

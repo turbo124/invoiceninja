@@ -545,7 +545,7 @@ export function preparePayableBillingInvoice(
                 '"due_date" => now()->addDays(30)->format("Y-m-d"),' +
                 ']);' +
                 '$invoice->setConnection("db-ninja-01");' +
-                '$invoice->service()->fillDefaults()->save();' +
+                '$invoice->service()->markSent()->fillDefaults()->save();' +
                 'echo json_encode([' +
                 "'invoice_id' => (int) \$invoice->id," +
                 "'invoice_hashed_id' => (string) \$invoice->hashed_id," +
@@ -890,7 +890,7 @@ export async function downloadAccountInvoice(
 ): Promise<{ status: number; contentType: string; byteLength: number }> {
     const response = await api.request.post(
         `${ACCOUNT_MANAGEMENT_PREFIX}/invoices/download`,
-        { data: { id: invoiceHashedId } },
+        { data: { ids: [invoiceHashedId] } },
     );
 
     const buffer = await response.body();
@@ -1136,8 +1136,8 @@ export function proRataRatio(
     planTerm: 'month' | 'year',
     now = new Date(),
 ): number {
-    const expires = startOfDay(new Date(`${planExpires}T00:00:00`));
-    const today = startOfDay(now);
+    const expires = startOfUtcDay(new Date(`${planExpires}T00:00:00Z`));
+    const today = startOfUtcDay(now);
 
     if (expires.getTime() <= today.getTime()) {
         return 0;
@@ -1147,7 +1147,7 @@ export function proRataRatio(
         (expires.getTime() - today.getTime()) / (24 * 60 * 60 * 1000);
 
     let periodDays = planTerm === 'year' ? 365 : 30;
-    const paid = startOfDay(new Date(`${planPaid}T00:00:00`));
+    const paid = startOfUtcDay(new Date(`${planPaid}T00:00:00Z`));
     const candidate = Math.round(
         (expires.getTime() - paid.getTime()) / (24 * 60 * 60 * 1000),
     );
@@ -1317,6 +1317,8 @@ export function expectedTermUpgradeCharge(
     return roundMoney(Math.max(0, newPeriodTotal - credit));
 }
 
-function startOfDay(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+function startOfUtcDay(date: Date): Date {
+    return new Date(
+        Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    );
 }

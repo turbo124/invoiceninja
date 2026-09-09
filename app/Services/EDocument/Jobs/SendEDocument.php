@@ -117,7 +117,7 @@ class SendEDocument implements ShouldQueue
 
         // ── Step 3: Serialize to Storecove + decorate ──
         $storecove->adapter
-            ->transformFromPeppol($model, $peppol->getDocument(), $peppol->isCreditNote())
+            ->transformFromPeppol($model, $peppol->getDocument(), $peppol->isCreditNote(), $peppol->toXml())
             ->decorate();
 
         $result = $storecove->adapter->getDocument();

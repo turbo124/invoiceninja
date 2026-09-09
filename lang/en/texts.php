@@ -6374,6 +6374,7 @@ $lang = array(
     'total_tasks_over_estimate' => 'Tasks Over Estimate',
     'total_overdue_tasks' => 'Overdue Tasks',
     'total_tasks_due' => 'Tasks Due',
+    'commas_not_allowed' => 'Commas are not allowed',
 );
 
 return $lang;

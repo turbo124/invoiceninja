@@ -15,6 +15,7 @@ namespace App\Services\EDocument\Gateway\Storecove;
 use App\Services\EDocument\Standards\Peppol;
 use App\Services\EDocument\Standards\Peppol\CountryFactory;
 use App\Services\EDocument\Gateway\Storecove\NexusResolver;
+use App\Services\EDocument\Gateway\Storecove\UblToStorecoveCreditLineMapper;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -48,11 +49,11 @@ class StorecoveAdapter
     private bool $has_error = false;
 
     /**
-     * Returns the transformed Storecove invoice model.
+     * Returns the transformed Storecove invoice or credit model.
      *
-     * @return Invoice
+     * @return Invoice|Credit
      */
-    public function getInvoice(): Invoice
+    public function getInvoice(): Invoice|Credit
     {
         return $this->storecove_invoice;
     }
@@ -116,7 +117,7 @@ class StorecoveAdapter
     public function transform(\App\Models\Invoice|\App\Models\Credit $invoice): self
     {
         $peppol = (new Peppol($invoice))->run();
-        return $this->transformFromPeppol($invoice, $peppol->getDocument(), $peppol->isCreditNote());
+        return $this->transformFromPeppol($invoice, $peppol->getDocument(), $peppol->isCreditNote(), $peppol->toXml());
     }
 
     /**
@@ -128,37 +129,21 @@ class StorecoveAdapter
      * @param  \App\Models\Invoice|\App\Models\Credit $invoice
      * @param  \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument
      * @param  bool $isCreditNote
+     * @param  string|null $validatedUblXml Schematron-valid UBL bytes; when set, used instead of re-encoding $peppolDocument
      * @return self
      */
     public function transformFromPeppol(
         \App\Models\Invoice|\App\Models\Credit $invoice,
         \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument,
         bool $isCreditNote = false,
+        ?string $validatedUblXml = null,
     ): self {
         try {
             $this->ninja_invoice = $invoice;
             $serializer = $this->getSerializer();
 
             $e = new \InvoiceNinja\EInvoice\EInvoice();
-            $xml = $e->encode($peppolDocument, 'xml');
-
-            // Wrap with proper XML namespace declarations
-            if ($isCreditNote || $peppolDocument instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote) {
-                $prefix = '<?xml version="1.0" encoding="UTF-8"?>
-<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">';
-                $suffix = '</CreditNote>';
-            } else {
-                $prefix = '<?xml version="1.0" encoding="UTF-8"?>
-<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">';
-                $suffix = '</Invoice>';
-            }
-
-            $xml = str_ireplace(['\n', '<?xml version="1.0"?>'], ['', $prefix], $xml);
-            $xml .= $suffix;
+            $xml = $validatedUblXml ?? $this->encodePeppolDocumentToXml($peppolDocument, $isCreditNote, $e);
 
             $context = [
                 DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
@@ -173,6 +158,8 @@ class StorecoveAdapter
 
             $encoded = $e->encode($decoded, 'json');
             $this->storecove_invoice = $serializer->deserialize($encoded, $parent, 'json', $context);
+
+            $this->hydrateAllowanceChargeIndicatorsFromUblXml($xml);
 
 
             $client_country_code = $invoice->client->country->iso_3166_2;
@@ -224,12 +211,10 @@ class StorecoveAdapter
             return $this;
         }
 
-        // A credit is emitted as a NEGATIVE INVOICE. Its line amounts are already
-        // negated (CreditLines), so a discount allowance must keep the OPPOSITE
-        // sign to a normal invoice for the line to reconcile with Storecove's
-        // check: itemPrice*quantity/baseQuantity + allowanceCharges - amount ≈ 0.
         $isCredit = $this->ninja_invoice instanceof \App\Models\Credit
             || ($this->ninja_invoice instanceof \App\Models\Invoice && $this->ninja_invoice->amount < 0);
+
+        $mapper = new UblToStorecoveCreditLineMapper();
 
         //set all taxmap countries - resolve the taxing country
         $lines = $this->storecove_invoice->getInvoiceLines();
@@ -249,12 +234,11 @@ class StorecoveAdapter
             if (isset($line->allowance_charges)) {
                 foreach ($line->allowance_charges as &$allowance) {
                     if ($allowance->reason == "Discount" && !is_null($allowance->amount_excluding_tax)) {
-                        // Invoice discount reduces the (positive) line -> negative.
-                        // Credit line amounts are negative -> discount must be positive
-                        // so itemPrice*qty + allowanceCharges reconciles with amount.
-                        $allowance->amount_excluding_tax = $isCredit
-                            ? abs($allowance->amount_excluding_tax)
-                            : -abs($allowance->amount_excluding_tax);
+                        $allowance->amount_excluding_tax = $mapper->mapLineAllowanceAmount(
+                            $allowance,
+                            $line->item_price ?? 0,
+                            $isCredit,
+                        );
                     }
 
 
@@ -315,9 +299,10 @@ class StorecoveAdapter
 
 
             if ($allowance->reason == "Discount" && !is_null($allowance->amount_excluding_tax)) {
-                $allowance->amount_excluding_tax = $isCredit
-                    ? abs($allowance->amount_excluding_tax)
-                    : -abs($allowance->amount_excluding_tax);
+                $allowance->amount_excluding_tax = $mapper->mapDocumentAllowanceAmount(
+                    $allowance->amount_excluding_tax,
+                    $isCredit,
+                );
             }
 
             $allowance->setTaxesDutiesFees($taxes);
@@ -371,6 +356,73 @@ class StorecoveAdapter
         );
 
         return $this;
+    }
+
+    /**
+     * Encode a Peppol model to wrapped UBL XML (fallback when validated bytes are unavailable).
+     */
+    private function encodePeppolDocumentToXml(
+        \InvoiceNinja\EInvoice\Models\Peppol\Invoice|\InvoiceNinja\EInvoice\Models\Peppol\CreditNote $peppolDocument,
+        bool $isCreditNote,
+        \InvoiceNinja\EInvoice\EInvoice $e,
+    ): string {
+        $xml = $e->encode($peppolDocument, 'xml');
+
+        if ($isCreditNote || $peppolDocument instanceof \InvoiceNinja\EInvoice\Models\Peppol\CreditNote) {
+            $prefix = '<?xml version="1.0" encoding="UTF-8"?>
+<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">';
+            $suffix = '</CreditNote>';
+        } else {
+            $prefix = '<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">';
+            $suffix = '</Invoice>';
+        }
+
+        $xml = str_ireplace(['\n', '<?xml version="1.0"?>'], ['', $prefix], $xml);
+
+        return $xml . $suffix;
+    }
+
+    /**
+     * The EInvoice JSON roundtrip can lose line-level AllowanceCharge/ChargeIndicator.
+     * Re-read per line from UBL bytes (document-level allowances are handled separately in decorate()).
+     */
+    private function hydrateAllowanceChargeIndicatorsFromUblXml(string $xml): void
+    {
+        $dom = new \DOMDocument();
+        if (!@$dom->loadXML($xml)) {
+            return;
+        }
+
+        $cacNs = 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2';
+        $cbcNs = 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2';
+        $lineNsNames = ['CreditNoteLine', 'InvoiceLine'];
+
+        $lineIndicators = [];
+        foreach ($lineNsNames as $lineName) {
+            foreach ($dom->getElementsByTagNameNS($cacNs, $lineName) as $lineNode) {
+                $indicators = [];
+                foreach ($lineNode->getElementsByTagNameNS($cacNs, 'AllowanceCharge') as $acNode) {
+                    foreach ($acNode->getElementsByTagNameNS($cbcNs, 'ChargeIndicator') as $ciNode) {
+                        $indicators[] = trim($ciNode->textContent) ?: 'false';
+                    }
+                }
+                $lineIndicators[] = $indicators;
+            }
+        }
+
+        $wireLines = $this->storecove_invoice->getInvoiceLines() ?? [];
+        foreach ($wireLines as $lineIndex => $line) {
+            foreach ($line->allowance_charges ?? [] as $allowanceIndex => $allowance) {
+                if (isset($lineIndicators[$lineIndex][$allowanceIndex])) {
+                    $allowance->setChargeIndicator($lineIndicators[$lineIndex][$allowanceIndex]);
+                }
+            }
+        }
     }
 
     /**
