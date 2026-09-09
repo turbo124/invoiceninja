@@ -31,6 +31,7 @@ class InvoiceItemSum
     use NumberFormatter;
     use Discounter;
     use Taxer;
+    use HarvestsSurchargeTaxCategories;
 
     //@phpstan-ignore-next-line
     private array $eu_tax_jurisdictions = [
@@ -177,7 +178,7 @@ class InvoiceItemSum
             return $this;
         }
 
-        $this->calcLineItems()->getPeppolSurchargeTaxes();
+        $this->calcLineItems()->applyTaxedSurchargeTaxes();
 
         return $this;
     }
@@ -249,13 +250,7 @@ class InvoiceItemSum
     {
         if ($this->invoice->is_amount_discount) {
             $discount = $this->formatValue($this->item->discount, $this->currency->precision);
-            // Flat discounts move the line toward zero — subtract on positive rows,
-            // add on negative rows (offsets/clawbacks).
-            $this->setLineTotal(
-                $this->getLineTotal() < 0
-                    ? $this->getLineTotal() + $discount
-                    : $this->getLineTotal() - $discount
-            );
+            $this->setLineTotal($this->getLineTotal() - $discount);
             $this->total_discount += $this->item->discount;
         } else {
             $discount = ($this->item->line_total * ($this->item->discount / 100));
@@ -367,70 +362,40 @@ class InvoiceItemSum
     }
 
 
-    private function getPeppolSurchargeTaxes(): self
+    /**
+     * Allocate VAT to taxed document surcharges when invoice-level taxes do not
+     * already cover them. Tax categories are taken from the document header first,
+     * then from line items as a fallback.
+     */
+    private function applyTaxedSurchargeTaxes(): self
     {
-        if (! $this->shouldAllocatePeppolSurchargeTaxes()) {
+        if (! $this->hasSurchargesRequiringTaxAllocation() || $this->hasInvoiceLevelTaxCategories()) {
             return $this;
         }
 
-        collect($this->invoice->line_items)
-            ->flatMap(function ($item) {
-                return collect([1, 2, 3])
-                    ->map(fn($i) => [
-                        'name' => $item->{"tax_name{$i}"} ?? '',
-                        'percentage' => $item->{"tax_rate{$i}"} ?? 0,
-                        'tax_id' => $item->tax_id ?? '1',
-                    ])
-                    ->filter(fn($tax) => strlen($tax['name']) > 1);
-            })
-            ->unique(fn($tax) => $tax['percentage'] . '_' . $tax['name'])
-            ->values()
-            ->each(function ($tax) {
+        $this->harvestSurchargeTaxCategories()->each(function ($tax) {
 
-                $tax_component = 0;
+            $tax_component = 0;
 
-                $amount = 0;
+            $amount = 0;
 
-                if ($this->invoice->custom_surcharge1) {
-                    $tax_component += round($this->invoice->custom_surcharge1 * ($tax['percentage'] / 100), 2);
-                    $amount += $this->invoice->custom_surcharge1;
+            foreach ([1, 2, 3, 4] as $i) {
+                if (! $this->shouldTaxSurcharge($i)) {
+                    continue;
                 }
 
-                if ($this->invoice->custom_surcharge2) {
-                    $tax_component += round($this->invoice->custom_surcharge2 * ($tax['percentage'] / 100), 2);
-                    $amount += $this->invoice->custom_surcharge2;
-                }
+                $surcharge = $this->invoice->{"custom_surcharge{$i}"};
+                $tax_component += round($surcharge * ($tax['percentage'] / 100), 2);
+                $amount += $surcharge;
+            }
 
-                if ($this->invoice->custom_surcharge3) {
-                    $tax_component += round($this->invoice->custom_surcharge3 * ($tax['percentage'] / 100), 2);
-                    $amount += $this->invoice->custom_surcharge3;
-                }
+            if ($tax_component > 0) {
+                $this->groupTax($tax['name'], $tax['percentage'], $tax_component, $amount, $tax['tax_id']);
+            }
 
-                if ($this->invoice->custom_surcharge4) {
-                    $tax_component += round($this->invoice->custom_surcharge4 * ($tax['percentage'] / 100), 2);
-                    $amount += $this->invoice->custom_surcharge4;
-                }
-
-                if ($tax_component > 0) {
-                    $this->groupTax($tax['name'], $tax['percentage'], $tax_component, $amount, $tax['tax_id']);
-                }
-
-            });
+        });
 
         return $this;
-    }
-
-    /**
-     * Peppol EN16931 VAT breakdown (BT-116) must include document surcharge bases (BT-99).
-     */
-    private function shouldAllocatePeppolSurchargeTaxes(): bool
-    {
-        if ($this->client->getSetting('enable_e_invoice')) {
-            return true;
-        }
-
-        return $this->peppol_enabled
-            || in_array($this->client->getSetting('e_invoice_type'), ['PEPPOL', 'EN16931'], true);
     }
 
     private function groupTax($tax_name, $tax_rate, $tax_total, $amount, $tax_id = '')
@@ -577,7 +542,7 @@ class InvoiceItemSum
 
         }
 
-        $this->getPeppolSurchargeTaxes();
+        $this->applyTaxedSurchargeTaxes();
 
         return $this;
     }

@@ -73,7 +73,7 @@ class UblToStorecoveRegressionTest extends TestCase
         $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
 
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
 
         $line = $wire['invoice_lines'][0];
         $this->assertGreaterThan(0, $line['quantity']);
@@ -141,7 +141,7 @@ class UblToStorecoveRegressionTest extends TestCase
 
         $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
 
         $wireOffset = $wire['invoice_lines'][2];
         $this->assertEqualsWithDelta(1.0, $wireOffset['quantity'], 0.001);
@@ -190,7 +190,7 @@ class UblToStorecoveRegressionTest extends TestCase
 
         $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
 
         $lineSum = array_sum(array_column($wire['invoice_lines'], 'amount_excluding_vat'));
         $this->assertEqualsWithDelta(-5400.0, $lineSum, 0.05, 'Wire lines must net to UBL tax-exclusive total');
@@ -307,7 +307,7 @@ class UblToStorecoveRegressionTest extends TestCase
 
         $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
     }
 
     public function testAllCreditScenariosPassSchematron(): void

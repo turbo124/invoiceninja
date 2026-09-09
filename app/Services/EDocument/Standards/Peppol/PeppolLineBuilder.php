@@ -244,16 +244,21 @@ class PeppolLineBuilder
             $basePriceAmount->amount = (string) $cost;
             $basePrice->PriceAmount = $basePriceAmount;
 
-            // Offset/clawback rows on positive credits (negative CreditedQuantity).
-            $docSign = ((float) $invoice->amount) < 0 ? -1.0 : 1.0;
             $creditedQty = $isCreditNote
                 ? (float) ($normalizedCreditQuantity ?? $item->quantity)
                 : (float) $item->quantity;
-            $useLineCharge = $isCreditNote && $docSign > 0 && $creditedQty < 0;
             $discountAmount = $this->calculateTotalItemDiscountAmount($item);
 
-            if ($useLineCharge || ($isCreditNote && $discountAmount < 0)) {
-                $discountAmount = abs($discountAmount);
+            // Credit notes: charge iff the discount increases LineExtensionAmount
+            // magnitude relative to qty × price (PEPPOL-EN16931-R120). Flat vs
+            // percentage discounts diverge on signed rows; one delta rule covers both.
+            if ($isCreditNote) {
+                $lea = (float) $line->LineExtensionAmount->amount;
+                $delta = $lea - ($creditedQty * $cost);
+                $useLineCharge = $delta > 0.005;
+                $discountAmount = abs($delta);
+            } else {
+                $useLineCharge = false;
             }
 
             $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();

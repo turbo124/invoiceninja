@@ -137,11 +137,46 @@ class UblToStorecoveCreditLineMapperTest extends TestCase
         $this->assertSame(-459.0, $this->mapper->mapLineAllowanceAmount($allowance, 4590.0, true));
     }
 
+    public function testMapsCreditLineAllowancePositiveOnClawbackLine(): void
+    {
+        $allowance = new AllowanceCharges(null, 20.0, null, null, null, null, 'Discount', null, 'false');
+
+        $this->assertSame(20.0, $this->mapper->mapLineAllowanceAmount($allowance, 4590.0, true));
+    }
+
+    public function testMapsCreditLineChargeNegativeOnNormalLine(): void
+    {
+        $allowance = new AllowanceCharges(null, 20.0, null, null, null, null, 'Discount', null, 'true');
+
+        $this->assertSame(-20.0, $this->mapper->mapLineAllowanceAmount($allowance, -100.0, true));
+    }
+
     public function testMapsInvoiceLineAllowanceNegative(): void
     {
         $allowance = new AllowanceCharges(null, 20.0, null, null, null, null, 'Discount', null, 'false');
 
         $this->assertSame(-20.0, $this->mapper->mapLineAllowanceAmount($allowance, 100.0, false));
+    }
+
+    public function testMapsCreditDocumentSurchargeChargeNegativeOnWire(): void
+    {
+        $charge = new AllowanceCharges(null, 25.0, null, null, null, null, 'Surcharge', null, 'true');
+
+        $this->assertSame(-25.0, $this->mapper->mapDocumentAllowanceOrChargeAmount($charge, true));
+    }
+
+    public function testMapsCreditDocumentDiscountAllowancePositiveOnWire(): void
+    {
+        $allowance = new AllowanceCharges(null, 100.0, null, null, null, null, 'Discount', null, 'false');
+
+        $this->assertSame(100.0, $this->mapper->mapDocumentAllowanceOrChargeAmount($allowance, true));
+    }
+
+    public function testMapsInvoiceDocumentSurchargeChargePositiveOnWire(): void
+    {
+        $charge = new AllowanceCharges(null, 25.0, null, null, null, null, 'Surcharge', null, 'true');
+
+        $this->assertSame(25.0, $this->mapper->mapDocumentAllowanceOrChargeAmount($charge, false));
     }
 
     public function testApplyToCreditLineMatchesCreditNoteSignTestFixtures(): void

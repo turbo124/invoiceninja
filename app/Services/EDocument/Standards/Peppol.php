@@ -228,10 +228,10 @@ class Peppol extends AbstractService implements MutatorInterface
      *
      * Price is always >= 0 (BR-27). Quantity carries sign so price × qty
      * (+/- line allowances) reconciles with LineExtensionAmount
-     * (PEPPOL-EN16931-R120). When the line has a line-level AllowanceCharge,
-     * quantity is preserved — re-deriving it from line_total ÷ cost would
-     * double-count the discount. When there is no allowance, quantity is
-     * derived so offset / clawback rows still reconcile.
+     * (PEPPOL-EN16931-R120). Line-level AllowanceCharge handling depends on
+     * document sign and discount type: flat amount on negative-total documents
+     * keeps commercial CreditedQuantity; percentage discounts may re-derive qty;
+     * positive-total clawback rows re-sign qty from cost × quantity.
      *
      * @return array{quantity: float, price: float, line_total: float}
      */
@@ -249,12 +249,10 @@ class Peppol extends AbstractService implements MutatorInterface
 
         if ($hasLineAllowance) {
             if ($sign < 0) {
-                // Negative-total documents flip LineExtensionAmount and emit a line
-                // allowance (not charge). Percentage discounts can reverse
-                // line_ext = qty × price − allowance to recover qty. Flat amounts
-                // are independent of price — keep commercial qty and rebuild net
-                // from abs(qty) × price − allowance (calc() subtracts flat discounts
-                // from signed line totals and over-magnifies negative rows).
+                // Negative-total documents flip LineExtensionAmount. Percentage
+                // discounts may re-derive qty; flat amounts keep commercial qty and
+                // pair with a line charge in PeppolLineBuilder (calc subtracts flat
+                // discounts, increasing magnitude on negative rows).
                 $allowance = abs($lineAllowanceAmount);
 
                 if ($isAmountDiscount) {
@@ -275,7 +273,8 @@ class Peppol extends AbstractService implements MutatorInterface
             }
 
             // Positive-total clawback rows: project commercial sign from cost × qty
-            // (BR-27: price ≥ 0, qty carries sign) and pair with a line charge.
+            // (BR-27: price ≥ 0, qty carries sign). Allowance vs charge is chosen in
+            // PeppolLineBuilder from LEA − (qty × price) (R120).
             $economicSign = ((float) $cost * (float) $quantity) < 0 ? -1.0 : 1.0;
 
             return [

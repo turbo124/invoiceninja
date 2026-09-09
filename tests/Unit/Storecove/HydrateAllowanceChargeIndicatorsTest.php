@@ -80,10 +80,17 @@ XML;
         $this->assertSame('true', $line->allowance_charges[0]->getChargeIndicator());
 
         $document = $adapter->getDocument();
+        $wireJson = json_encode($document['document']);
+
         $this->assertStringNotContainsString(
             'charge_indicator',
-            json_encode($document['document']),
+            $wireJson,
             'Internal hydration field must not appear in Storecove wire JSON'
+        );
+        $this->assertStringNotContainsString(
+            'storecove_credit_mapped',
+            $wireJson,
+            'Internal credit mapping state must not appear in Storecove wire JSON'
         );
     }
 }

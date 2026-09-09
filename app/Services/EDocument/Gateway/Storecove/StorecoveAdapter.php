@@ -298,9 +298,9 @@ class StorecoveAdapter
             unset($tax);
 
 
-            if ($allowance->reason == "Discount" && !is_null($allowance->amount_excluding_tax)) {
-                $allowance->amount_excluding_tax = $mapper->mapDocumentAllowanceAmount(
-                    $allowance->amount_excluding_tax,
+            if (! is_null($allowance->amount_excluding_tax)) {
+                $allowance->amount_excluding_tax = $mapper->mapDocumentAllowanceOrChargeAmount(
+                    $allowance,
                     $isCredit,
                 );
             }
@@ -389,7 +389,7 @@ class StorecoveAdapter
 
     /**
      * The EInvoice JSON roundtrip can lose line-level AllowanceCharge/ChargeIndicator.
-     * Re-read per line from UBL bytes (document-level allowances are handled separately in decorate()).
+     * Re-read line- and document-level AllowanceCharge/ChargeIndicator from UBL bytes.
      */
     private function hydrateAllowanceChargeIndicatorsFromUblXml(string $xml): void
     {
@@ -421,6 +421,28 @@ class StorecoveAdapter
                 if (isset($lineIndicators[$lineIndex][$allowanceIndex])) {
                     $allowance->setChargeIndicator($lineIndicators[$lineIndex][$allowanceIndex]);
                 }
+            }
+        }
+
+        $documentIndicators = [];
+        foreach ($dom->documentElement->childNodes as $child) {
+            if ($child->nodeType !== XML_ELEMENT_NODE
+                || $child->namespaceURI !== $cacNs
+                || $child->localName !== 'AllowanceCharge') {
+                continue;
+            }
+
+            $indicator = 'false';
+            foreach ($child->getElementsByTagNameNS($cbcNs, 'ChargeIndicator') as $ciNode) {
+                $indicator = trim($ciNode->textContent) ?: 'false';
+                break;
+            }
+            $documentIndicators[] = $indicator;
+        }
+
+        foreach ($this->storecove_invoice->getAllowanceCharges() ?? [] as $index => $allowance) {
+            if (isset($documentIndicators[$index])) {
+                $allowance->setChargeIndicator($documentIndicators[$index]);
             }
         }
     }

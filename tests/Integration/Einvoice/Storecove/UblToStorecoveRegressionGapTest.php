@@ -82,7 +82,7 @@ class UblToStorecoveRegressionGapTest extends TestCase
 
         // Full contract — expected to fail until inclusive-tax offset lines reconcile in UBL + wire.
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
         $this->assertUblPassesSchematron($ubl['xml'], 'inclusive tax mixed discount credit');
     }
 
@@ -99,7 +99,7 @@ class UblToStorecoveRegressionGapTest extends TestCase
 
         $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
         $this->assertNotEmpty($wire['invoice_lines'][0]['allowance_charges'] ?? [], 'Line discount must appear on wire');
     }
 
@@ -139,7 +139,83 @@ class UblToStorecoveRegressionGapTest extends TestCase
         );
 
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
+    }
+
+    public function testNegativeTotalPercentageLineDiscountDerivesQuantityAndMapsToWire(): void
+    {
+        $client = $this->harnessClient();
+        $credit = $this->harnessCredit($client, [
+            $this->harnessLineItem('Pct', 100, -2, 10),
+        ]);
+
+        $this->assertLessThan(0, (float) $credit->amount);
+        $this->assertEqualsWithDelta(-180.0, (float) $credit->line_items[0]->line_total, 0.01);
+
+        $ubl = $this->buildUbl($credit);
+        $line = $ubl['ubl_lines'][0];
+
+        $this->assertEqualsWithDelta(2.0, $line['quantity'], 0.001, 'Percentage discount re-derives positive CreditedQuantity');
+        $this->assertEqualsWithDelta(180.0, $line['line_extension_amount'], 0.01, 'LEA = |qty| × price − line allowance');
+        $this->assertSame('false', $line['allowance_charge']['charge_indicator'] ?? 'false', 'Percentage on negative-total doc is a line allowance');
+        $this->assertUblLineSatisfiesR120($line, 'percentage negative-total line');
+        $this->assertUblPassesSchematron($ubl['xml'], 'percentage negative-total line');
+
+        $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
+        $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
+    }
+
+    public function testPositiveTotalFlatDiscountOnClawbackUsesAllowanceNotCharge(): void
+    {
+        $client = $this->harnessClient();
+        $credit = Credit::factory()->create([
+            'client_id' => $client->id,
+            'company_id' => $this->company->id,
+            'user_id' => $this->user->id,
+            'date' => now()->addDay()->format('Y-m-d'),
+            'uses_inclusive_taxes' => false,
+            'discount' => 0,
+            'is_amount_discount' => true,
+            'line_items' => [
+                $this->harnessLineItem('A', 9490, 1, 0, 0, true),
+                $this->harnessLineItem('C', 4590, -1, 20, 0, true),
+            ],
+            'tax_rate1' => 0,
+            'tax_name1' => '',
+            'tax_rate2' => 0,
+            'tax_name2' => '',
+            'tax_rate3' => 0,
+            'tax_name3' => '',
+        ])->calc()->getCredit();
+
+        CreditInvitation::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'client_contact_id' => $client->contacts()->first()->id,
+            'credit_id' => $credit->id,
+        ]);
+
+        $credit = $credit->fresh(['invitations']);
+        $this->assertGreaterThan(0, (float) $credit->amount, 'Primary line keeps document total positive');
+        $this->assertEqualsWithDelta(-4610.0, (float) $credit->line_items[1]->line_total, 0.01);
+
+        $ubl = $this->buildUbl($credit);
+        $offsetLine = $ubl['ubl_lines'][1];
+
+        $this->assertEqualsWithDelta(-1.0, $offsetLine['quantity'], 0.001);
+        $this->assertEqualsWithDelta(-4610.0, $offsetLine['line_extension_amount'], 0.01);
+        $this->assertSame('false', $offsetLine['allowance_charge']['charge_indicator'] ?? 'false', 'Flat discount on clawback increases magnitude → allowance, not charge');
+        $this->assertEqualsWithDelta(20.0, $offsetLine['allowance_charge']['amount'], 0.01);
+        $this->assertUblLineSatisfiesR120($offsetLine, 'flat clawback');
+        $this->assertUblPassesSchematron($ubl['xml'], 'flat amount discount on positive-total clawback');
+
+        $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
+        $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
+
+        $wireOffset = $wire['invoice_lines'][1];
+        $this->assertEqualsWithDelta(20.0, $this->wireAllowanceSum($wireOffset), 0.01, 'UBL allowance → positive wire discount on clawback line');
     }
 
     public function testNegativeTotalFlatAmountLineDiscountPreservesCreditedQuantity(): void
@@ -184,6 +260,8 @@ class UblToStorecoveRegressionGapTest extends TestCase
             0.001,
             'Flat amount discount must preserve commercial CreditedQuantity on negative-total documents'
         );
+        $this->assertEqualsWithDelta(220.0, $line['line_extension_amount'], 0.01, 'LEA = |qty| × price + flat line charge');
+        $this->assertSame('true', $line['allowance_charge']['charge_indicator'] ?? '', 'Flat amount on negative-total doc is a line charge');
         $this->assertUblLineSatisfiesR120($line, 'flat amount negative-total line');
         $this->assertUblPassesSchematron($ubl['xml'], 'flat amount negative-total line');
     }
@@ -192,6 +270,22 @@ class UblToStorecoveRegressionGapTest extends TestCase
      * Peppol builder does not emit line-level non-discount charges from line items.
      * Document-level custom surcharges use ChargeIndicator=true and are the supported charge shape.
      */
+    public function testPeppolSurchargeTaxedWithoutExplicitFlagViaRepositorySave(): void
+    {
+        $client = $this->harnessClient();
+        $credit = $this->harnessCredit($client, [
+            $this->harnessLineItem('Base', 500, 1),
+        ]);
+        $credit->custom_surcharge1 = 25;
+        $credit->custom_surcharge_tax1 = false;
+        $credit = $this->harnessSaveCredit($credit);
+
+        $this->assertTrue((bool) $credit->custom_surcharge_tax1, 'PEPPOL repository save forces surcharge tax flags');
+
+        $ubl = $this->buildUbl($credit);
+        $this->assertUblPassesSchematron($ubl['xml'], 'PEPPOL auto-taxed document surcharge');
+    }
+
     public function testNonDiscountLineChargeMapsFromUbl(): void
     {
         $client = $this->harnessClient();
@@ -199,8 +293,7 @@ class UblToStorecoveRegressionGapTest extends TestCase
             $this->harnessLineItem('Base', 500, 1),
         ]);
         $credit->custom_surcharge1 = 25;
-        $credit = $credit->calc()->getCredit();
-        $credit->save();
+        $credit = $this->harnessSaveCredit($credit);
 
         $ubl = $this->buildUbl($credit);
         $this->assertUblPassesSchematron($ubl['xml'], 'document surcharge credit');
@@ -213,17 +306,7 @@ class UblToStorecoveRegressionGapTest extends TestCase
 
         $wire = $this->buildWire($credit, $ubl['peppol'], $ubl['xml'])['document'];
         $this->assertAllCreditWireLinesMatchUbl($ubl['ubl_lines'], $wire['invoice_lines']);
-        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire);
-
-        $wireDocCharges = $wire['allowance_charges'] ?? [];
-        $this->assertNotEmpty($wireDocCharges, 'Document surcharge must appear on wire header');
-
-        $wireSurcharge = collect($wireDocCharges)->first(
-            fn ($ac) => stripos($ac['reason'] ?? '', 'surcharge') !== false
-                || ($ac['amount_excluding_tax'] ?? 0) > 0
-        );
-        $this->assertNotNull($wireSurcharge, 'Wire must carry document-level surcharge/charge');
-        $this->assertGreaterThan(0, $wireSurcharge['amount_excluding_tax'] ?? 0, 'Credit document charge stays positive on wire');
+        $this->assertCreditWireHeaderMatchesUbl($ubl['ubl_totals'], $wire, $ubl['xml']);
     }
 
     /**
@@ -271,31 +354,4 @@ class UblToStorecoveRegressionGapTest extends TestCase
         return $client->fresh();
     }
 
-    /**
-     * @return array<int, array{amount: float, charge_indicator: string, reason: string}>
-     */
-    private function parseUblDocumentAllowances(string $xml): array
-    {
-        $dom = new \DOMDocument();
-        $dom->loadXML($xml);
-        $xpath = new \DOMXPath($dom);
-        $xpath->registerNamespace('cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
-        $xpath->registerNamespace('cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
-
-        $rootTag = $xpath->query('//*[local-name()="CreditNote" or local-name()="Invoice"]')->item(0);
-        if (!$rootTag) {
-            return [];
-        }
-
-        $allowances = [];
-        foreach ($xpath->query('cac:AllowanceCharge', $rootTag) as $acNode) {
-            $allowances[] = [
-                'amount' => (float) trim($xpath->evaluate('string(cbc:Amount)', $acNode)),
-                'charge_indicator' => trim($xpath->evaluate('string(cbc:ChargeIndicator)', $acNode)) ?: 'false',
-                'reason' => trim($xpath->evaluate('string(cbc:AllowanceChargeReason)', $acNode)),
-            ];
-        }
-
-        return $allowances;
-    }
 }

@@ -25,6 +25,7 @@ use App\Services\EDocument\Standards\Peppol;
 use App\Services\EDocument\Gateway\Storecove\Storecove;
 use App\Services\EDocument\Standards\Validation\XsltDocumentValidator;
 use App\Repositories\CreditRepository;
+use App\Repositories\InvoiceRepository;
 
 /**
  * Shared helpers for UBL-first Storecove regression tests.
@@ -60,6 +61,7 @@ trait UblStorecoveTestHarness
         $settings->country_id = Country::where('iso_3166_2', 'DE')->first()->id;
         $settings->email = uniqid('ubl-storecove') . '@gmail.com';
         $settings->currency_id = '3';
+        $settings->e_invoice_type = 'PEPPOL';
 
         $tax_data = new TaxModel();
         $tax_data->regions->EU->has_sales_above_threshold = false;
@@ -170,8 +172,6 @@ trait UblStorecoveTestHarness
             'tax_name3' => '',
         ]);
 
-        $credit = $credit->calc()->getCredit();
-
         CreditInvitation::factory()->create([
             'user_id' => $this->user->id,
             'company_id' => $this->company->id,
@@ -179,8 +179,9 @@ trait UblStorecoveTestHarness
             'credit_id' => $credit->id,
         ]);
 
+        $credit = $this->harnessSaveCredit($credit);
+
         if ($markSent) {
-            $credit = (new CreditRepository())->save([], $credit);
             $credit = $credit->service()->markSent()->save();
         }
 
@@ -188,11 +189,20 @@ trait UblStorecoveTestHarness
     }
 
     /**
+     * Persist credit changes through the repository so Peppol surcharge-tax
+     * defaults (e_invoice_type=PEPPOL → custom_surcharge_taxN=true) apply before calc.
+     */
+    protected function harnessSaveCredit(Credit $credit): Credit
+    {
+        return (new CreditRepository())->save([], $credit);
+    }
+
+    /**
      * @param  array<int, InvoiceItem>  $lineItems
      */
     protected function harnessInvoice(Client $client, array $lineItems): Invoice
     {
-        return Invoice::factory()->create([
+        $invoice = Invoice::factory()->create([
             'client_id' => $client->id,
             'company_id' => $this->company->id,
             'user_id' => $this->user->id,
@@ -208,7 +218,9 @@ trait UblStorecoveTestHarness
             'tax_name2' => '',
             'tax_rate3' => 0,
             'tax_name3' => '',
-        ])->calc()->getInvoice();
+        ]);
+
+        return (new InvoiceRepository())->save([], $invoice);
     }
 
     /**
@@ -424,10 +436,9 @@ trait UblStorecoveTestHarness
         }
 
         $amount = abs($ublLine['allowance_charge']['amount']);
-        $isClawback = $wire['item_price'] > 0;
+        $isCharge = ($ublLine['allowance_charge']['charge_indicator'] ?? 'false') === 'true';
 
-        // Current production decorate() contract for reason=Discount lines.
-        $wire['allowance_sum'] = $isClawback ? -$amount : $amount;
+        $wire['allowance_sum'] = $isCharge ? -$amount : $amount;
 
         return $wire;
     }
@@ -556,7 +567,7 @@ trait UblStorecoveTestHarness
      * @param  array<string, float>  $ublTotals
      * @param  array<string, mixed>  $wireDoc
      */
-    protected function assertCreditWireHeaderMatchesUbl(array $ublTotals, array $wireDoc): void
+    protected function assertCreditWireHeaderMatchesUbl(array $ublTotals, array $wireDoc, ?string $ublXml = null): void
     {
         $lineSum = array_sum(array_column($wireDoc['invoice_lines'], 'amount_excluding_vat'));
 
@@ -567,6 +578,82 @@ trait UblStorecoveTestHarness
             $this->assertLessThanOrEqual(0, $subtotal['tax_amount'], 'Credit tax subtotal must be non-positive');
             $this->assertLessThanOrEqual(0, $subtotal['taxable_amount'], 'Credit taxable amount must be non-positive');
         }
+
+        if ($ublXml !== null) {
+            $this->assertCreditWireDocumentAllowancesMatchUbl($ublXml, $wireDoc);
+        }
+    }
+
+    /**
+     * @return array<int, array{amount: float, charge_indicator: string, reason: string}>
+     */
+    protected function parseUblDocumentAllowances(string $xml): array
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML($xml);
+        $xpath = new \DOMXPath($dom);
+        $xpath->registerNamespace('cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
+        $xpath->registerNamespace('cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
+
+        $rootTag = $xpath->query('//*[local-name()="CreditNote" or local-name()="Invoice"]')->item(0);
+        if (!$rootTag) {
+            return [];
+        }
+
+        $allowances = [];
+        foreach ($xpath->query('cac:AllowanceCharge', $rootTag) as $acNode) {
+            $allowances[] = [
+                'amount' => (float) trim($xpath->evaluate('string(cbc:Amount)', $acNode)),
+                'charge_indicator' => trim($xpath->evaluate('string(cbc:ChargeIndicator)', $acNode)) ?: 'false',
+                'reason' => trim($xpath->evaluate('string(cbc:AllowanceChargeReason)', $acNode)),
+            ];
+        }
+
+        return $allowances;
+    }
+
+    /**
+     * Credit-as-negative-invoice document-level allowance/charge projection from UBL.
+     *
+     * @param  array<int, array{amount: float, charge_indicator: string, reason: string}>  $ublDocAllowances
+     * @return array<int, float>
+     */
+    protected function expectedCreditWireDocumentAllowanceAmounts(array $ublDocAllowances): array
+    {
+        $amounts = [];
+
+        foreach ($ublDocAllowances as $allowance) {
+            $amount = abs($allowance['amount']);
+            $isCharge = ($allowance['charge_indicator'] ?? 'false') === 'true';
+            $amounts[] = $isCharge ? -$amount : $amount;
+        }
+
+        sort($amounts);
+
+        return $amounts;
+    }
+
+    /**
+     * @param  array<string, mixed>  $wireDoc
+     */
+    protected function assertCreditWireDocumentAllowancesMatchUbl(string $ublXml, array $wireDoc): void
+    {
+        $expected = $this->expectedCreditWireDocumentAllowanceAmounts(
+            $this->parseUblDocumentAllowances($ublXml)
+        );
+
+        $actual = array_map(
+            fn ($ac) => (float) ($ac['amount_excluding_tax'] ?? 0),
+            $wireDoc['allowance_charges'] ?? []
+        );
+        sort($actual);
+
+        $this->assertEqualsWithDelta(
+            $expected,
+            $actual,
+            0.01,
+            'Wire document allowance_charges must match UBL document AllowanceCharge signs'
+        );
     }
 
     private function xpathText(\DOMXPath $xpath, string $query, \DOMNode $context): string

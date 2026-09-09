@@ -1697,6 +1697,7 @@ class PeppolTest extends TestCase
             'calculate_taxes' => true,
             'tax_data' => $tax_data,
             'legal_entity_id' => 290868,
+            'custom_surcharge_taxes1' => true,
         ]);
 
         $cu = CompanyUserFactory::create($this->user->id, $company->id, $this->account->id);

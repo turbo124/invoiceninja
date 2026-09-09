@@ -10,6 +10,7 @@
  */
 namespace App\Services\EDocument\Gateway\Storecove\Models;
 
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 
@@ -49,7 +50,7 @@ class CreditLines
     #[SerializedPath('[cbc:LineExtensionAmount][#]')]
     public ?float $amount_excluding_vat;
 
-    #[SerializedPath('[cac:Price][cbc:PriceAmount][value]')]
+    /** Set by UblToStorecoveCreditLineMapper — not a UBL deserialize path. */
     public ?float $amount_excluding_tax;
 
     #[SerializedPath('[cbc:TaxInclusiveAmount][#]')]
@@ -88,6 +89,7 @@ class CreditLines
     #[SerializedPath('[cbc:Note]')]
     public ?string $note;
 
+    #[Ignore]
     private bool $storecoveCreditMapped = false;
 
     /**
@@ -149,6 +151,7 @@ class CreditLines
         (new \App\Services\EDocument\Gateway\Storecove\UblToStorecoveCreditLineMapper())->applyMappingOnce($this);
     }
 
+    #[Ignore]
     public function isStorecoveCreditMapped(): bool
     {
         return $this->storecoveCreditMapped;

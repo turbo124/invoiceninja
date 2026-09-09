@@ -50,27 +50,55 @@ class UblToStorecoveCreditLineMapper
         float $wireItemPrice,
         bool $isCreditDocument,
     ): float {
-        if ($allowance->reason !== 'Discount' || is_null($allowance->amount_excluding_tax)) {
-            return $allowance->amount_excluding_tax ?? 0.0;
+        if (is_null($allowance->amount_excluding_tax)) {
+            return 0.0;
+        }
+
+        if ($allowance->reason !== 'Discount' && $allowance->getChargeIndicator() === null) {
+            return $allowance->amount_excluding_tax;
         }
 
         $amount = abs($allowance->amount_excluding_tax);
+        $isCharge = $allowance->getChargeIndicator() === 'true';
 
-        if (!$isCreditDocument) {
+        if (! $isCreditDocument) {
+            return $isCharge ? $amount : -$amount;
+        }
+
+        if ($isCharge) {
             return -$amount;
         }
 
-        $isClawbackLine = $wireItemPrice > 0;
-
-        return $isClawbackLine ? -$amount : $amount;
+        return $amount;
     }
 
     /**
-     * Document-level discount allowance sign for Storecove.
+     * Document-level allowance/charge sign for Storecove credit-as-negative-invoice.
+     */
+    public function mapDocumentAllowanceOrChargeAmount(AllowanceCharges $allowance, bool $isCreditDocument): float
+    {
+        if (is_null($allowance->amount_excluding_tax)) {
+            return 0.0;
+        }
+
+        $amount = abs($allowance->amount_excluding_tax);
+        $isCharge = $allowance->getChargeIndicator() === 'true';
+
+        if ($isCreditDocument) {
+            return $isCharge ? -$amount : $amount;
+        }
+
+        return $isCharge ? $amount : -$amount;
+    }
+
+    /**
+     * @deprecated Use mapDocumentAllowanceOrChargeAmount()
      */
     public function mapDocumentAllowanceAmount(float $amount, bool $isCreditDocument): float
     {
-        return $isCreditDocument ? abs($amount) : -abs($amount);
+        $stub = new AllowanceCharges(null, $amount, null, null, null, null, 'Discount', null, 'false');
+
+        return $this->mapDocumentAllowanceOrChargeAmount($stub, $isCreditDocument);
     }
 
     /**
