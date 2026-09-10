@@ -174,7 +174,7 @@ for (const flow of ['default', 'smooth'] as const) {
                     ).toBeChecked();
                     await expect(
                         page.getByText(
-                            'Opt in or out of having this invoice automatically charged.',
+                            'Automatically pay future invoices in this recurring series?',
                             { exact: false }
                         )
                     ).toBeVisible();
