@@ -79,7 +79,7 @@ class PurchaseOrderTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/invoices/bulk', [
-            'action' => 'clone_to_purchase_order',
+            'action' => 'convert_to_purchase_order',
             'ids' => [$this->invoice->hashed_id],
         ])->assertStatus(200)
             ->assertJsonPath('data.invoice_id', $this->invoice->hashed_id)
@@ -134,7 +134,7 @@ class PurchaseOrderTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/quotes/bulk', [
-            'action' => 'clone_to_purchase_order',
+            'action' => 'convert_to_purchase_order',
             'ids' => [$this->quote->hashed_id],
         ])->assertStatus(200)
             ->assertJsonPath('data.quote_id', $this->quote->hashed_id)
@@ -173,7 +173,7 @@ class PurchaseOrderTest extends TestCase
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->postJson('/api/v1/quotes/bulk', [
-            'action' => 'clone_to_purchase_order',
+            'action' => 'convert_to_purchase_order',
             'ids' => [$this->quote->hashed_id, $this->quote->hashed_id],
         ])->assertStatus(422)
             ->assertJsonValidationErrors(['ids']);
@@ -186,12 +186,12 @@ class PurchaseOrderTest extends TestCase
                 'X-API-SECRET' => config('ninja.api_secret'),
                 'X-API-TOKEN' => $this->token,
             ])->postJson('/api/v1/invoices/bulk', [
-                'action' => 'clone_to_purchase_order',
+                'action' => 'convert_to_purchase_order',
                 'ids' => [$this->invoice->hashed_id, $this->invoice->hashed_id],
             ])->assertStatus(422)
                 ->assertJsonValidationErrors(['ids']);
         } finally {
-            Atomic::del('127.0.0.1|clone_to_purchase_order|' . $this->company->company_key);
+            Atomic::del('127.0.0.1|convert_to_purchase_order|' . $this->company->company_key);
         }
     }
 
