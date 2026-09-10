@@ -144,4 +144,28 @@ class PeppolCreditNoteLineSignTest extends TestCase
         $this->assertSame(100.0, $line['price']);
         $this->assertSame(-180.0, $line['line_total']);
     }
+
+    public function testNegativeDocumentMixedLinesProjectOpposingAndSameSign(): void
+    {
+        $invoice = new Invoice();
+        $invoice->amount = -3923.91;
+        $invoice->line_items = [
+            (object) ['cost' => 500.0, 'quantity' => 1.0],
+            (object) ['cost' => 4590.0, 'quantity' => -1.0],
+        ];
+
+        $peppol = (new ReflectionClass(Peppol::class))->newInstanceWithoutConstructor();
+        $prop = new \ReflectionProperty(Peppol::class, 'invoice');
+        $prop->setAccessible(true);
+        $prop->setValue($peppol, $invoice);
+
+        $primary = $peppol->normalizeCreditNoteLine(1.0, 500.0, 500.0, false);
+        $offset = $peppol->normalizeCreditNoteLine(-1.0, 4590.0, -4131.0, true);
+
+        $this->assertSame(-1.0, $primary['quantity']);
+        $this->assertSame(-500.0, $primary['line_total']);
+        $this->assertSame(1.0, $offset['quantity']);
+        $this->assertSame(4131.0, $offset['line_total']);
+        $this->assertEqualsWithDelta(3631.0, $primary['line_total'] + $offset['line_total'], 0.001);
+    }
 }

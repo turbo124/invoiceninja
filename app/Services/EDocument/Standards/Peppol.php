@@ -242,11 +242,20 @@ class Peppol extends AbstractService implements MutatorInterface
         bool $hasLineAllowance = false,
     ): array {
         $sign = ((float) $this->invoice->amount) < 0 ? -1.0 : 1.0;
-        $normalizedLine = $lineTotal * $sign;
         $price = abs($cost);
+        $normalizedLine = $this->normalizedCreditLineExtension($lineTotal, $sign, $quantity, $cost);
+
+        if ($sign < 0) {
+            return $this->normalizeNegativeTotalCreditLineQuantity(
+                $quantity,
+                $cost,
+                $price,
+                $normalizedLine,
+            );
+        }
 
         if ($hasLineAllowance) {
-            $economicSign = ((float) $cost * (float) $quantity * $sign) < 0 ? -1.0 : 1.0;
+            $economicSign = ((float) $cost * (float) $quantity) < 0 ? -1.0 : 1.0;
 
             return [
                 'quantity' => $economicSign * abs($quantity),
@@ -257,6 +266,52 @@ class Peppol extends AbstractService implements MutatorInterface
 
         return [
             'quantity' => $price > 0.0 ? $normalizedLine / $price : $quantity * $sign,
+            'price' => $price,
+            'line_total' => $normalizedLine,
+        ];
+    }
+
+    /**
+     * LineExtensionAmount in the credit-note frame before quantity projection.
+     */
+    private function normalizedCreditLineExtension(
+        float $lineTotal,
+        float $documentSign,
+        float $quantity,
+        float $cost,
+    ): float {
+        if ($documentSign > 0) {
+            return $lineTotal;
+        }
+
+        if ((float) $cost * (float) $quantity > 0) {
+            return $lineTotal * $documentSign;
+        }
+
+        return abs($lineTotal);
+    }
+
+    /**
+     * CreditedQuantity on negative-total credit notes (incl. negative invoices as 381).
+     *
+     * @return array{quantity: float, price: float, line_total: float}
+     */
+    private function normalizeNegativeTotalCreditLineQuantity(
+        float $quantity,
+        float $cost,
+        float $price,
+        float $normalizedLine,
+    ): array {
+        if ((float) $cost * (float) $quantity > 0) {
+            return [
+                'quantity' => -abs($quantity),
+                'price' => $price,
+                'line_total' => $normalizedLine,
+            ];
+        }
+
+        return [
+            'quantity' => abs($quantity),
             'price' => $price,
             'line_total' => $normalizedLine,
         ];
@@ -603,55 +658,46 @@ class Peppol extends AbstractService implements MutatorInterface
     {
         $allowances = [];
 
-        //Invoice Level discount
+        // Invoice-level discount — split by line VAT rate for BR-S-08 / R041.
         if ($this->invoice->discount > 0) {
+            if (!$this->invoice->is_amount_discount) {
+                $totalBase = abs($this->normalizeAmount($this->calc->getSubtotal()));
+                $totalDiscount = round($totalBase * ($this->invoice->discount / 100), 2);
+                $splits = $this->allocateDocumentAmountByTaxRate($totalDiscount);
+                $bucketNets = $this->lineNetByTaxRate();
 
-            // Add Allowance Charge to Price
-            $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-            $allowanceCharge->ChargeIndicator = 'false'; // false = discount
-            $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
-            $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-            $allowanceCharge->Amount->amount = number_format($this->normalizeAmount($this->calc->getTotalDiscount()), 2, '.', '');
-
-            // Add percentage if available
-            if ($this->invoice->discount > 0 && !$this->invoice->is_amount_discount) {
-
-                $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
-                $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->BaseAmount->amount = number_format($this->normalizeAmount($this->calc->getSubtotalWithSurcharges()), 2, '.', '');
-
-                $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
-                $mfn->value = number_format(round(($this->invoice->discount), 2), 2, '.', '');  // Format to always show 2 decimals
-                $allowanceCharge->MultiplierFactorNumeric = $mfn; // Convert percentage to decimal
+                foreach ($splits as $rate => $splitAmount) {
+                    $bucketNet = abs((float) ($bucketNets[$rate] ?? 0));
+                    $allowanceCharge = $this->makeDocumentAllowanceCharge(false);
+                    $allowanceCharge->Amount->amount = number_format($splitAmount, 2, '.', '');
+                    $allowanceCharge->BaseAmount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\BaseAmount();
+                    $allowanceCharge->BaseAmount->currencyID = $this->invoice->client->currency()->code;
+                    $allowanceCharge->BaseAmount->amount = number_format($bucketNet, 2, '.', '');
+                    $mfn = new \InvoiceNinja\EInvoice\Models\Peppol\NumericType\MultiplierFactorNumeric();
+                    $mfn->value = number_format(round((float) $this->invoice->discount, 2), 2, '.', '');
+                    $allowanceCharge->MultiplierFactorNumeric = $mfn;
+                    $allowanceCharge->TaxCategory[] = $this->taxCategoryForRate((string) $rate);
+                    $allowances[] = $allowanceCharge;
+                }
+            } else {
+                $totalDiscount = abs($this->normalizeAmount($this->calc->getTotalDiscount()));
+                foreach ($this->allocateDocumentAmountByTaxRate($totalDiscount) as $rate => $splitAmount) {
+                    $allowanceCharge = $this->makeDocumentAllowanceCharge(false);
+                    $allowanceCharge->Amount->amount = number_format($splitAmount, 2, '.', '');
+                    $allowanceCharge->TaxCategory[] = $this->taxCategoryForRate((string) $rate);
+                    $allowances[] = $allowanceCharge;
+                }
             }
-
-            $tc = clone $this->globalTaxCategories[0];
-            // $tc->Percent = '0';
-            unset($tc->TaxExemptionReasonCode);
-            unset($tc->TaxExemptionReason);
-
-            $allowanceCharge->TaxCategory[] = $tc;
-            $allowanceCharge->AllowanceChargeReason = ctrans('texts.discount');
-            $allowances[] = $allowanceCharge;
         }
 
-        //Invoice level surcharges
-        foreach (['custom_surcharge1', 'custom_surcharge2', 'custom_surcharge3', 'custom_surcharge4'] as $surcharge) {
-
-            $surchargeAmount = $this->invoice->{$surcharge};
-
-            if ($surchargeAmount > 0) {
-                $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
-                $allowanceCharge->ChargeIndicator = 'true';
-                $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
-                $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
-                $allowanceCharge->Amount->amount = number_format($surchargeAmount, 2, '.', '');
-
-                $allowanceCharge->TaxCategory = $this->globalTaxCategories;
-                $allowanceCharge->AllowanceChargeReason = ctrans('texts.surcharge');
+        $totalSurcharges = (float) $this->calc->getTotalSurcharges();
+        if ($totalSurcharges > 0) {
+            foreach ($this->allocateDocumentAmountByTaxRate($totalSurcharges) as $rate => $splitAmount) {
+                $allowanceCharge = $this->makeDocumentAllowanceCharge(true);
+                $allowanceCharge->Amount->amount = number_format($splitAmount, 2, '.', '');
+                $allowanceCharge->TaxCategory[] = $this->taxCategoryForRate((string) $rate);
                 $allowances[] = $allowanceCharge;
             }
-
         }
 
         return $allowances;
@@ -687,8 +733,8 @@ class Peppol extends AbstractService implements MutatorInterface
          * Very important to understand the logic here and not change this without undertsanding
          * the implications.
          */
-        $totalDiscount = $this->normalizeAmount($this->calc->getTotalDiscount());
-        $totalSurcharges = $this->normalizeAmount($this->calc->getTotalSurcharges());
+        $totalDiscount = abs($this->normalizeAmount($this->calc->getTotalDiscount()));
+        $totalSurcharges = abs((float) $this->calc->getTotalSurcharges());
         $tea->amount = $this->invoice->uses_inclusive_taxes
             ? (string) round($amount - $totalTaxes, 2)
             : (string) round($subtotal - $totalDiscount + $totalSurcharges, 2);
@@ -706,12 +752,14 @@ class Peppol extends AbstractService implements MutatorInterface
 
         $am = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\AllowanceTotalAmount();
         $am->currencyID = $this->invoice->client->currency()->code;
-        $am->amount = number_format($this->normalizeAmount($this->calc->getTotalDiscount()), 2, '.', '');
+        // BT-107: document-level allowance totals are unsigned (BR-CO-11).
+        $am->amount = number_format(abs($this->normalizeAmount($this->calc->getTotalDiscount())), 2, '.', '');
         $lmt->AllowanceTotalAmount = $am;
 
         $cta = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\ChargeTotalAmount();
         $cta->currencyID = $this->invoice->client->currency()->code;
-        $cta->amount = number_format($this->normalizeAmount($this->calc->getTotalSurcharges()), 2, '.', '');
+        // BT-108: document-level charge totals are unsigned (BR-CO-12), including credit notes.
+        $cta->amount = number_format(abs($this->calc->getTotalSurcharges()), 2, '.', '');
         $lmt->ChargeTotalAmount = $cta;
 
         return $lmt;
@@ -1012,6 +1060,136 @@ class Peppol extends AbstractService implements MutatorInterface
         $this->taxCalculator->setTaxBreakdown();
 
         return $this;
+    }
+
+    /**
+     * PEPPOL-EN16931-R041 / BR-S-08: taxable base per VAT rate from emitted lines
+     * plus document-level charges minus document-level allowances for that rate.
+     *
+     * @return array<string, float> keyed by Percent string
+     */
+    public function brs08TaxableAmountsByRate(): array
+    {
+        $lineSum = [];
+        $lines = $this->documentKind->isCreditNote()
+            ? ($this->p_invoice->CreditNoteLine ?? [])
+            : ($this->p_invoice->InvoiceLine ?? []);
+
+        foreach ($lines as $line) {
+            $categories = $line->Item->ClassifiedTaxCategory ?? [];
+            $category = is_array($categories) ? ($categories[0] ?? null) : $categories;
+            $rate = (string) ($category->Percent ?? '0');
+            $lea = (float) ($line->LineExtensionAmount->amount ?? 0);
+            $lineSum[$rate] = ($lineSum[$rate] ?? 0) + $lea;
+        }
+
+        $allowances = [];
+        $charges = [];
+        foreach ($this->p_invoice->AllowanceCharge ?? [] as $ac) {
+            $categories = $ac->TaxCategory ?? [];
+            if (! is_array($categories)) {
+                $categories = [$categories];
+            }
+            $category = $categories[0] ?? null;
+            $rate = (string) ($category->Percent ?? '0');
+            $amount = (float) ($ac->Amount->amount ?? 0);
+            if (($ac->ChargeIndicator ?? 'false') === 'true') {
+                $charges[$rate] = ($charges[$rate] ?? 0) + $amount;
+            } else {
+                $allowances[$rate] = ($allowances[$rate] ?? 0) + $amount;
+            }
+        }
+
+        $rates = array_unique(array_merge(array_keys($lineSum), array_keys($allowances), array_keys($charges)));
+        $result = [];
+        foreach ($rates as $rate) {
+            $result[$rate] = round(
+                ($lineSum[$rate] ?? 0) + ($charges[$rate] ?? 0) - ($allowances[$rate] ?? 0),
+                2
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<string, float>
+     */
+    private function lineNetByTaxRate(): array
+    {
+        $buckets = [];
+        foreach ($this->invoice->line_items as $item) {
+            if (strlen($item->tax_name1 ?? '') <= 1) {
+                continue;
+            }
+            $rate = (string) round((float) $item->tax_rate1, 2);
+            $buckets[$rate] = ($buckets[$rate] ?? 0) + (float) $item->line_total;
+        }
+
+        return $buckets;
+    }
+
+    /**
+     * @return array<string, float>
+     */
+    private function allocateDocumentAmountByTaxRate(float $amount): array
+    {
+        $buckets = $this->lineNetByTaxRate();
+        $weights = [];
+        foreach ($buckets as $rate => $net) {
+            $weights[$rate] = abs((float) $net);
+        }
+        $weightTotal = array_sum($weights);
+        if ($weightTotal <= 0 || $amount <= 0) {
+            return [];
+        }
+
+        $rates = array_keys($weights);
+        $allocated = [];
+        $remaining = round($amount, 2);
+
+        foreach ($rates as $index => $rate) {
+            if ($index === count($rates) - 1) {
+                $allocated[$rate] = max(0.0, round($remaining, 2));
+                break;
+            }
+
+            $share = round($amount * ($weights[$rate] / $weightTotal), 2);
+            $allocated[$rate] = $share;
+            $remaining -= $share;
+        }
+
+        return array_filter($allocated, fn ($value) => $value > 0);
+    }
+
+    private function taxCategoryForRate(string $rate): \InvoiceNinja\EInvoice\Models\Peppol\TaxCategoryType\TaxCategory
+    {
+        foreach ($this->globalTaxCategories as $category) {
+            if ((string) ($category->Percent ?? '') === $rate) {
+                $tc = clone $category;
+                unset($tc->TaxExemptionReasonCode);
+                unset($tc->TaxExemptionReason);
+
+                return $tc;
+            }
+        }
+
+        $tc = clone $this->globalTaxCategories[0];
+        unset($tc->TaxExemptionReasonCode);
+        unset($tc->TaxExemptionReason);
+
+        return $tc;
+    }
+
+    private function makeDocumentAllowanceCharge(bool $isCharge): \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge
+    {
+        $allowanceCharge = new \InvoiceNinja\EInvoice\Models\Peppol\AllowanceChargeType\AllowanceCharge();
+        $allowanceCharge->ChargeIndicator = $isCharge ? 'true' : 'false';
+        $allowanceCharge->Amount = new \InvoiceNinja\EInvoice\Models\Peppol\AmountType\Amount();
+        $allowanceCharge->Amount->currencyID = $this->invoice->client->currency()->code;
+        $allowanceCharge->AllowanceChargeReason = ctrans($isCharge ? 'texts.surcharge' : 'texts.discount');
+
+        return $allowanceCharge;
     }
 
     public function getJurisdiction()
