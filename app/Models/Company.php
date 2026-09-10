@@ -1101,6 +1101,5 @@ class Company extends BaseModel
     public function docuninjaActive(): bool
     {
         return (app()->environment('local') || Ninja::isHosted()) && $this->enable_modules && $this->account->hasFeature(\App\Models\Account::FEATURE_INVOICE_SETTINGS);
-        // return $this->enable_modules && Ninja::isHosted();
     }
 }
