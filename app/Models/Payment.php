@@ -319,10 +319,12 @@ class Payment extends BaseModel
         if (! $this->date) {
             return '';
         }
-
+     
         $date_format = DateFormat::find($this->client->getSetting('date_format_id'));
 
-        return $this->createClientDate($this->date, $this->client->timezone()->name)->format($date_format->format);
+        return $this->translateDate($this->date, $date_format->format, $this->client->locale());
+
+        // return $this->createClientDate($this->date, $this->client->timezone()->name)->format($date_format->format);
     }
 
     public function badgeForStatus(): string

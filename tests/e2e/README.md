@@ -63,6 +63,26 @@ npm run test:e2e -- tests/e2e/client-portal-payments/gateways.spec.ts
 npm run test:e2e -- tests/e2e/client-portal-payments/gateways.spec.ts -g "PayPal REST"
 ```
 
+Recurring auto-billing preferences in both the default and smooth checkout:
+
+```sh
+npm run test:e2e -- tests/e2e/client-portal-payments/auto-billing.spec.ts
+```
+
+This suite uses `STRIPE_KEYS` and the existing account fixtures. It exercises
+the real checkout and Livewire persistence without submitting a payment. It
+checks all four recurring policies, saved selections on reopening checkout,
+outstanding invoice propagation, future invoice inheritance, forced card saving
+when auto-billing is Yes, optional saving when it is No, and ordinary invoices.
+The choice is available only on the first invoice in the series, including when
+an existing token is selected; only the save-card row hides for token payments.
+Later invoices never show the choice, even if the first invoice is unpaid.
+The Artisan helper must access the
+same database as the browser's application. Gateway token-billing settings and
+gateway isolation are restored after each test.
+The submission check stubs the Stripe SDK result and intercepts the outgoing POST
+to verify `store_card=true` without charging a card or recording a payment.
+
 **VS Code:** use the Playwright extension with the repo's `playwright.config.ts`
 (see `.vscode/settings.json`). `.env` is loaded from `fixtures.ts` and
 `playwright.config.ts`. Escape double quotes inside JSON values (e.g.

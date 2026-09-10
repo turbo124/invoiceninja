@@ -544,7 +544,7 @@ class QuoteController extends BaseController
             return response()->json(['message' => ctrans('texts.quote_not_found')]);
         }
 
-        if ($action == 'clone_to_purchase_order') {
+        if ($action == 'convert_to_purchase_order') {
             $quote = $quotes->first();
 
             if (! $quote || $user->cannot('edit', $quote)) {
@@ -677,7 +677,7 @@ class QuoteController extends BaseController
      *
      *  The current range of actions are as follows
      *  - clone_to_quote
-     *  - clone_to_purchase_order
+     *  - convert_to_purchase_order
      *  - history
      *  - delivery_note
      *  - mark_paid
@@ -774,7 +774,7 @@ class QuoteController extends BaseController
 
                 return $this->itemResponse($quote);
 
-            case 'clone_to_purchase_order':
+            case 'convert_to_purchase_order':
                 $purchase_order = CloneQuoteToPurchaseOrderFactory::create($quote, auth()->user()->id);
                 $purchase_order->design_id = $this->decodePrimaryKey($quote->client->getSetting('purchase_order_design_id'));
 

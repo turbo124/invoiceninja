@@ -193,6 +193,7 @@ class InstantPayment
             }
 
             $payable_invoice['additional_info'] = $additional_info;
+            $payable_invoice['recurring_invoice_id'] = $invoice->recurring_id;
 
             $payable_invoice_collection->push($payable_invoice);
         }
