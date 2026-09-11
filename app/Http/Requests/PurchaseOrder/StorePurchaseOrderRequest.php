@@ -86,6 +86,9 @@ class StorePurchaseOrderRequest extends Request
 
     public function prepareForValidation()
     {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         $input = $this->all();
 
         $input = $this->decodePrimaryKeys($input);
@@ -117,6 +120,10 @@ class StorePurchaseOrderRequest extends Request
             $input['exchange_rate'] = 1;
         }
 
+        if (!isset($input['date'])) {
+            $input['date'] = now()->addSeconds($user->company()->utc_offset())->format('Y-m-d');
+        }
+        
         if (isset($input['footer']) && $this->hasHeader('X-REACT')) {
             $input['footer'] = str_replace("\n", "", $input['footer']);
         }

@@ -80,6 +80,11 @@ class StoreExpenseRequest extends Request
             unset($input['invoice_id']);
         }
 
+        if (!isset($input['date'])) {
+            $input['date'] = now()->addSeconds($user->company()->utc_offset())->format('Y-m-d');
+        }
+        
+
         if ($this->file('documents') instanceof \Illuminate\Http\UploadedFile) {
             $this->files->set('documents', [$this->file('documents')]);
         }

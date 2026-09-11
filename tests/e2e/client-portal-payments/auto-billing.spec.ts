@@ -498,6 +498,274 @@ for (const flow of ['default', 'smooth'] as const) {
             ).toBe(false);
         });
 
+        for (const tokenBilling of [
+            'optin',
+            'optout',
+            'always',
+            'off',
+        ] as const) {
+            for (const autoBill of ['optin', 'optout'] as const) {
+                test(`${autoBill}, gateway ${tokenBilling}: save-method inputs update before Livewire starts`, async ({
+                    api,
+                    page,
+                    checkoutGateway,
+                }) => {
+                    const gateway = await updateCompanyGatewayRequirements(
+                        api.context,
+                        checkoutGateway,
+                        { token_billing: tokenBilling }
+                    );
+                    const { client, invoice } =
+                        await preparePortalPaymentContext(
+                            api,
+                            page,
+                            gateway,
+                            flow
+                        );
+                    const recurring = await createRecurringInvoice(
+                        api,
+                        client,
+                        {
+                            autoBill,
+                        }
+                    );
+                    attachInvoices(recurring, [invoice]);
+                    await navigateToPortalGatewayCheckout(
+                        page,
+                        gateway,
+                        1,
+                        flow,
+                        invoice
+                    );
+                    await dismissCookieConsent(page);
+
+                    // Observe the DOM in the same change event, before any network round trip.
+                    await page.evaluate(() => {
+                        document.addEventListener('change', (event) => {
+                            const target = event.target as HTMLInputElement;
+                            if (!target.name?.startsWith('auto_bill_enabled_'))
+                                return;
+                            (window as any).__saveMethodAtChange = (
+                                document.querySelector(
+                                    'input[name="token-billing-checkbox"]:checked'
+                                ) as HTMLInputElement
+                            )?.value;
+                        });
+                    });
+
+                    for (const enabled of [
+                        autoBill === 'optin',
+                        autoBill !== 'optin',
+                    ]) {
+                        const expectedSave =
+                            enabled ||
+                            ['always', 'optout'].includes(tokenBilling);
+                        const optionalVisible =
+                            !enabled &&
+                            ['optin', 'optout'].includes(tokenBilling);
+                        let releaseRequest!: () => void;
+                        let releaseResponse!: () => void;
+                        let signalRequested!: () => void;
+                        let signalSaved!: () => void;
+                        const requestGate = new Promise<void>((resolve) => {
+                            releaseRequest = resolve;
+                        });
+                        const responseGate = new Promise<void>((resolve) => {
+                            releaseResponse = resolve;
+                        });
+                        const requested = new Promise<void>((resolve) => {
+                            signalRequested = resolve;
+                        });
+                        const saved = new Promise<void>((resolve) => {
+                            signalSaved = resolve;
+                        });
+                        await page.route('**/livewire/**', async (route) => {
+                            const body = route.request().postDataJSON() as {
+                                components?: { calls?: { method: string }[] }[];
+                            };
+                            if (
+                                !body.components?.some((component) =>
+                                    component.calls?.some(
+                                        (call) =>
+                                            call.method === 'setAutoBilling'
+                                    )
+                                )
+                            ) {
+                                await route.continue();
+                                return;
+                            }
+                            signalRequested();
+                            await requestGate;
+                            const response = await route.fetch();
+                            expect(response.ok()).toBe(true);
+                            signalSaved();
+                            await responseGate;
+                            await route.fulfill({ response }).catch(() => {});
+                        });
+                        try {
+                            if (autoBill === 'optout') {
+                                await page
+                                    .locator(
+                                        'input[name^="auto_bill_enabled_"]:checked'
+                                    )
+                                    .focus();
+                                await page.keyboard.press(
+                                    enabled ? 'ArrowLeft' : 'ArrowRight'
+                                );
+                            } else {
+                                await radios(page)
+                                    .locator(
+                                        `xpath=self::input[@value="${enabled ? 1 : 0}"]`
+                                    )
+                                    .check();
+                            }
+                            expect(
+                                await page.evaluate(
+                                    () => (window as any).__saveMethodAtChange
+                                )
+                            ).toBe(String(expectedSave));
+                            await requested;
+                            await expect(radios(page).first()).toBeDisabled();
+                            await expect(
+                                page.locator(
+                                    'input[name="token-billing-checkbox"]:checked'
+                                )
+                            ).toHaveValue(String(expectedSave));
+                            await expect(
+                                page.locator('#save-payment-method--container')
+                            ).toBeVisible({ visible: optionalVisible });
+                            await expect(
+                                page.locator('#pay-now')
+                            ).toBeEnabled();
+                            releaseRequest();
+                            await saved;
+                            expect(
+                                (
+                                    await getEntity<PortalEntity>(
+                                        api.context,
+                                        'recurring_invoices',
+                                        recurring.id
+                                    )
+                                ).auto_bill_enabled
+                            ).toBe(enabled);
+                            await expect(
+                                page.locator(
+                                    'input[name="token-billing-checkbox"]:checked'
+                                )
+                            ).toHaveValue(String(expectedSave));
+                            await expect(
+                                page.locator('#pay-now')
+                            ).toBeEnabled();
+                            // A later Livewire response must not undo a save-method choice
+                            // made while the auto-billing preference was being persisted.
+                            if (optionalVisible) {
+                                await page
+                                    .locator(
+                                        `input[name="token-billing-checkbox"][value="${!expectedSave}"]`
+                                    )
+                                    .check();
+                            }
+                            releaseResponse();
+                            await expect(radios(page).first()).toBeEnabled();
+                            await expect(
+                                page.locator(
+                                    'input[name="token-billing-checkbox"]:checked'
+                                )
+                            ).toHaveValue(
+                                String(
+                                    optionalVisible
+                                        ? !expectedSave
+                                        : expectedSave
+                                )
+                            );
+                        } finally {
+                            releaseRequest();
+                            releaseResponse();
+                            await page.unrouteAll({ behavior: 'wait' });
+                        }
+                    }
+                });
+            }
+        }
+
+        test('failed preference request permits a successful retry', async ({
+            api,
+            page,
+            checkoutGateway,
+        }) => {
+            const gateway = await updateCompanyGatewayRequirements(
+                api.context,
+                checkoutGateway,
+                { token_billing: 'optin' }
+            );
+            const { client, invoice } = await preparePortalPaymentContext(
+                api,
+                page,
+                gateway,
+                flow
+            );
+            const recurring = await createRecurringInvoice(api, client, {
+                autoBill: 'optin',
+            });
+            attachInvoices(recurring, [invoice]);
+            await navigateToPortalGatewayCheckout(
+                page,
+                gateway,
+                1,
+                flow,
+                invoice
+            );
+            await dismissCookieConsent(page);
+            let failed = false;
+            await page.route('**/livewire/**', async (route) => {
+                const body = route.request().postDataJSON();
+                if (
+                    !failed &&
+                    body.components?.some(
+                        (component: { calls?: { method: string }[] }) =>
+                            component.calls?.some(
+                                (call) => call.method === 'setAutoBilling'
+                            )
+                    )
+                ) {
+                    failed = true;
+                    await route.abort('failed');
+                } else {
+                    await route.continue();
+                }
+            });
+            await radios(page).locator('xpath=self::input[@value="1"]').check();
+            await expect.poll(() => failed).toBe(true);
+            await expect(radios(page).first()).toBeEnabled();
+            await expect(
+                page.locator('input[name="token-billing-checkbox"]:checked')
+            ).toHaveValue('true');
+            expect(
+                (
+                    await getEntity<PortalEntity>(
+                        api.context,
+                        'recurring_invoices',
+                        recurring.id
+                    )
+                ).auto_bill_enabled
+            ).toBe(false);
+            // A local update is optimistic; persistence still requires a successful request.
+            await choosePreference(page, false);
+            await choosePreference(page, true);
+            expect(
+                (
+                    await getEntity<PortalEntity>(
+                        api.context,
+                        'recurring_invoices',
+                        recurring.id
+                    )
+                ).auto_bill_enabled
+            ).toBe(true);
+            await expect(
+                page.locator('input[name="token-billing-checkbox"]:checked')
+            ).toHaveValue('true');
+        });
+
         test('ordinary invoice has no recurring auto-billing choice', async ({
             api,
             page,

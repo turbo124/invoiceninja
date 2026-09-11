@@ -83,6 +83,29 @@ gateway isolation are restored after each test.
 The submission check stubs the Stripe SDK result and intercepts the outgoing POST
 to verify `store_card=true` without charging a card or recording a payment.
 
+The timing tests cover both opt-in/out defaults against all four gateway token
+policies, mouse and keyboard changes, immediate form values before Livewire,
+manual save choices surviving a delayed response, and retry after a failed request.
+The two failed-request recovery tests currently fail: the auto-billing fieldset
+remains disabled after a network failure in both flows. They remain active as
+regression tests for the required recovery behavior.
+A failed request does not persist the preference; the optimistic form update is
+not a substitute for successful server persistence.
+
+To run the real Stripe sandbox payment regression in both flows:
+
+```sh
+PLAYWRIGHT_AUTOBILL_RACE=1 npm run test:e2e -- tests/e2e/client-portal-payments/auto-billing-input-order.spec.ts
+```
+
+This explicitly enabled suite requires direct Stripe test-mode keys (no Connect).
+It makes four test payments, selecting Yes and No for auto-billing, and checks
+submitted `store_card`, paid invoice balance and stored payment methods while
+the Livewire response is withheld. It suppresses user email notifications during
+each test and restores them afterwards. Use a dedicated test account/database.
+Run these suites sequentially with one worker (the npm script defaults to this),
+because the fixtures temporarily change shared gateway settings.
+
 **VS Code:** use the Playwright extension with the repo's `playwright.config.ts`
 (see `.vscode/settings.json`). `.env` is loaded from `fixtures.ts` and
 `playwright.config.ts`. Escape double quotes inside JSON values (e.g.
