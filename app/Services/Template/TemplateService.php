@@ -1094,7 +1094,9 @@ class TemplateService
             'address' => $entity->client->present()->address(),
             'shipping_address' => $entity->client->present()->shipping_address(),
             'locale' => substr($entity->client->locale(), 0, 2),
-            'location' => $entity->location ? $entity->service()->location(false) : [],
+            'location' => method_exists($entity->service(), 'location')
+                                        ? $entity->service()->location(false)
+                                        : [],
         ] : [];
     }
 
