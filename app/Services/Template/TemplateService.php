@@ -682,6 +682,8 @@ class TemplateService
                         'project' => $invoice->project ? $this->transformProject($invoice->project, true) : [],
                         'actual_delivery_date' => $this->translateDate(data_get($invoice, 'e_invoice.Invoice.Delivery.0.ActualDeliveryDate', $invoice->date), $invoice->client->date_format(), $invoice->client->locale()),
                         'invoice_period' => $invoice_period,
+                        'user' => $this->userInfo($invoice->user),
+                        'assigned_user' => $invoice->assigned_user ? $this->userInfo($invoice->assigned_user) : [],
                         'tags' => $invoice->tags->pluck('name')->values()->all(),
                     ];
 
@@ -824,6 +826,8 @@ class TemplateService
             'client' => $this->getClient($payment),
             'paymentables' => $pivot,
             'refund_activity' => $this->getPaymentRefundActivity($payment),
+            'user' => $this->userInfo($payment->user),
+            'assigned_user' => $payment->assigned_user ? $this->userInfo($payment->assigned_user) : [],
             'tags' => $payment->tags->pluck('name')->values()->all(),
         ];
 
@@ -946,6 +950,8 @@ class TemplateService
                 'total_tax_map' => $quote->calc()->getTotalTaxMap(),
                 'line_tax_map' => $quote->calc()->getTaxMap()->toArray(),
                 'project' => $quote->project ? $this->transformProject($quote->project, true) : [],
+                'user' => $this->userInfo($quote->user),
+                'assigned_user' => $quote->assigned_user ? $this->userInfo($quote->assigned_user) : [],
                 'tags' => $quote->tags->pluck('name')->values()->all(),
             ];
         })->toArray();
@@ -1030,6 +1036,8 @@ class TemplateService
                         'payments' => $payments,
                         'total_tax_map' => $credit->calc()->getTotalTaxMap(),
                         'line_tax_map' => $credit->calc()->getTaxMap()->toArray(),
+                        'user' => $this->userInfo($credit->user),
+                        'assigned_user' => $credit->assigned_user ? $this->userInfo($credit->assigned_user) : [],
                         'tags' => $credit->tags->pluck('name')->values()->all(),
                     ];
 
@@ -1086,7 +1094,9 @@ class TemplateService
             'address' => $entity->client->present()->address(),
             'shipping_address' => $entity->client->present()->shipping_address(),
             'locale' => substr($entity->client->locale(), 0, 2),
-            'location' => $entity->location ? $entity->service()->location(false) : [],
+            'location' => method_exists($entity->service(), 'location')
+                                        ? $entity->service()->location(false)
+                                        : [],
         ] : [];
     }
 
@@ -1179,6 +1189,8 @@ class TemplateService
                 'vendor' => $this->getVendor($expense),
                 'project' => ($expense->project && !$nested) ? $this->transformProject($expense->project, true) : [],
                 'invoice' => $expense->invoice ? $this->processInvoices([$expense->invoice]) : [],
+                'user' => $this->userInfo($expense->user),
+                'assigned_user' => $expense->assigned_user ? $this->userInfo($expense->assigned_user) : [],
                 'tags' => $expense->tags->pluck('name')->values()->all(),
             ];
         })->toArray();
@@ -1356,6 +1368,8 @@ class TemplateService
                 'currency_id' => $purchase_order->currency_id ? (string) $purchase_order->currency_id : '',
                 'total_tax_map' => $purchase_order->calc()->getTotalTaxMap(),
                 'line_tax_map' => $purchase_order->calc()->getTaxMap()->toArray(),
+                'user' => $this->userInfo($purchase_order->user),
+                'assigned_user' => $purchase_order->assigned_user ? $this->userInfo($purchase_order->assigned_user) : [],
                 'tags' => $purchase_order->tags->pluck('name')->values()->all(),
             ];
 

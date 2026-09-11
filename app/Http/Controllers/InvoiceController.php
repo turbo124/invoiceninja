@@ -547,7 +547,7 @@ class InvoiceController extends BaseController
             return response()->json(['message' => 'No Invoices Found']);
         }
 
-        if ($action == 'clone_to_purchase_order') {
+        if ($action == 'convert_to_purchase_order') {
             Atomic::del($request->lock_key);
 
             if ($user->cannot('edit', $invoices->first())) {
@@ -700,7 +700,7 @@ class InvoiceController extends BaseController
      *        The current range of actions are as follows
      *        - clone_to_invoice
      *        - clone_to_quote
-     *        - clone_to_purchase_order
+     *        - convert_to_purchase_order
      *        - history
      *        - delivery_note
      *        - mark_paid
@@ -787,7 +787,7 @@ class InvoiceController extends BaseController
 
                 return $this->itemResponse($quote);
 
-            case 'clone_to_purchase_order':
+            case 'convert_to_purchase_order':
                 $purchase_order = CloneInvoiceToPurchaseOrderFactory::create($invoice, auth()->user()->id);
                 $purchase_order->design_id = $this->decodePrimaryKey($invoice->client->getSetting('purchase_order_design_id'));
 

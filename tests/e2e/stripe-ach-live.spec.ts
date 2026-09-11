@@ -1,16 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expect, type Frame, type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import {
-    ensureCompanyGatewayTypeEnabled,
-    findCompanyGatewayByKey,
     getEntity,
-    listCompanyGateways,
     updateClient,
-    type ApiContext,
     type ApiEntity,
-    type CompanyGatewayEntity,
 } from './api-helpers';
 import {
     createAndLogInClient,
@@ -20,15 +15,20 @@ import {
 import { test } from './fixtures';
 import { decodePrimaryKey } from './hash-helpers';
 import {
+    completeFinancialConnections,
+    prepareStripeAchGateway,
+    stripeGet,
+    stripeList,
+    validatedStripeTestSecret,
+} from './gateways/stripe-ach-helpers';
+import {
     completeRequiredClientInfoForm,
     navigateToGatewayCheckout,
 } from './gateways/payment-flow-helpers';
 import { GatewayType } from './gateways/types';
 import { createSentInvoice } from './portal-entity-helpers';
 
-const stripeGatewayKey = 'd14dd26a37cecc30fdd65700bfb55b23';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-let validatedStripeTestSecretPromise: Promise<string | null> | undefined;
 
 interface ClientGatewayToken extends ApiEntity {
     id: string;
@@ -89,6 +89,13 @@ interface StripeMandate {
 test.describe('Stripe ACH live sandbox', () => {
     test.describe.configure({ retries: 0 });
 
+    let restoreStripeAchGateway: (() => Promise<void>) | undefined;
+
+    test.afterEach(async () => {
+        await restoreStripeAchGateway?.();
+        restoreStripeAchGateway = undefined;
+    });
+
     test('collects a new bank account during payment and persists the Stripe mandate', async ({
         api,
         page,
@@ -108,7 +115,11 @@ test.describe('Stripe ACH live sandbox', () => {
 
         await notificationGuard.suppressPaymentEmails();
 
-        const companyGateway = await requireStripeAchGateway(api.context);
+        const { companyGateway, restore } = await prepareStripeAchGateway(
+            api.context
+        );
+        restoreStripeAchGateway = restore;
+
         let client = await createAndLogInClient(api, page, {
             settings: {
                 payment_flow: 'default',
@@ -224,7 +235,11 @@ test.describe('Stripe ACH live sandbox', () => {
 
         await notificationGuard.suppressPaymentEmails();
 
-        const companyGateway = await requireStripeAchGateway(api.context);
+        const { companyGateway, restore } = await prepareStripeAchGateway(
+            api.context
+        );
+        restoreStripeAchGateway = restore;
+
         let client = await createAndLogInClient(api, page, {
             settings: {
                 payment_flow: 'default',
@@ -663,31 +678,6 @@ async function submitPaymentFormWithSetupIntent(
     });
 }
 
-async function requireStripeAchGateway(
-    api: ApiContext
-): Promise<CompanyGatewayEntity> {
-    const gateways = await listCompanyGateways(api);
-    const gateway = findCompanyGatewayByKey(
-        gateways,
-        stripeGatewayKey,
-        GatewayType.ACH
-    );
-
-    expect(gateway, 'A Stripe company gateway must exist').toBeDefined();
-
-    await ensureCompanyGatewayTypeEnabled(api, gateway!, GatewayType.ACH);
-
-    const refreshedGateway = findCompanyGatewayByKey(
-        await listCompanyGateways(api),
-        stripeGatewayKey,
-        GatewayType.ACH
-    );
-
-    expect(refreshedGateway?.id).toBeTruthy();
-
-    return refreshedGateway!;
-}
-
 function readLocalTokenState(paymentMethodId: string): string {
     return runArtisan(
         '\\App\\Libraries\\MultiDB::setDb("db-ninja-01");' +
@@ -726,207 +716,4 @@ function runArtisan(phpCode: string): string {
         encoding: 'utf8',
         env: process.env,
     }).trim();
-}
-
-async function completeFinancialConnections(
-    page: Page,
-    completedUrlPattern = /\/client\/payment_methods\/(?!create(?:\?|$))[^/?]+/
-): Promise<void> {
-    const deadline = Date.now() + 60_000;
-    let lastSnapshot = '';
-
-    while (Date.now() < deadline) {
-        if (completedUrlPattern.test(page.url())) {
-            return;
-        }
-
-        for (const frame of page.frames().reverse()) {
-            if (
-                frame === page.mainFrame() ||
-                !frame.url().includes('stripe.com')
-            ) {
-                continue;
-            }
-
-            const text = await frame
-                .locator('body')
-                .innerText()
-                .catch(() => '');
-
-            if (!text.trim()) {
-                continue;
-            }
-
-            lastSnapshot = text.replace(/\s+/g, ' ').slice(0, 1_000);
-
-            if (await clickVisible(frame, /Test \(Non-OAuth\)/i)) {
-                break;
-            }
-
-            if (await clickVisible(frame, /Finish without saving/i)) {
-                break;
-            }
-
-            if (
-                await clickVisible(
-                    frame,
-                    /Agree and continue|Continue|Get started/i
-                )
-            ) {
-                break;
-            }
-
-            const account = frame
-                .getByText(/Checking|Savings/i, { exact: false })
-                .first();
-            if (await account.isVisible().catch(() => false)) {
-                const clicked = await account
-                    .click({ force: true, timeout: 2_000 })
-                    .then(() => true)
-                    .catch(() => false);
-
-                if (clicked) {
-                    break;
-                }
-            }
-
-            if (
-                await clickVisible(frame, /Connect account|Link account|Done/i)
-            ) {
-                break;
-            }
-        }
-
-        await page.waitForTimeout(500);
-    }
-
-    throw new Error(
-        `Stripe Financial Connections did not complete. Last visible content: ${lastSnapshot}`
-    );
-}
-
-async function clickVisible(frame: Frame, name: RegExp): Promise<boolean> {
-    const button = frame.getByRole('button', { name }).first();
-
-    if (
-        (await button.isVisible().catch(() => false)) &&
-        (await button.isEnabled().catch(() => false))
-    ) {
-        const clicked = await button
-            .click({ force: true, timeout: 2_000 })
-            .then(() => true)
-            .catch(() => false);
-
-        if (clicked) {
-            return true;
-        }
-    }
-
-    const link = frame.getByRole('link', { name }).first();
-
-    if (await link.isVisible().catch(() => false)) {
-        const clicked = await link
-            .click({ force: true, timeout: 2_000 })
-            .then(() => true)
-            .catch(() => false);
-
-        if (clicked) {
-            return true;
-        }
-    }
-
-    const text = frame.getByText(name, { exact: false }).first();
-
-    if (await text.isVisible().catch(() => false)) {
-        return text
-            .click({ force: true, timeout: 2_000 })
-            .then(() => true)
-            .catch(() => false);
-    }
-
-    return false;
-}
-
-function parseStripeTestSecret(): string | null {
-    const raw = process.env.STRIPE_KEYS?.trim() ?? '';
-    let secret = raw.startsWith('sk_') ? raw : '';
-
-    if (!secret) {
-        try {
-            const parsed = JSON.parse(raw) as Record<string, unknown>;
-            secret = String(
-                parsed.apiKey ??
-                    parsed.secretKey ??
-                    parsed.secret ??
-                    parsed.api_key ??
-                    ''
-            );
-        } catch {
-            secret = raw.match(/sk_(?:test|live)_[A-Za-z0-9]+/)?.[0] ?? '';
-        }
-    }
-
-    return /^sk_test_/.test(secret) ? secret : null;
-}
-
-function validatedStripeTestSecret(): Promise<string | null> {
-    validatedStripeTestSecretPromise ??= validateStripeTestSecret();
-
-    return validatedStripeTestSecretPromise;
-}
-
-async function validateStripeTestSecret(): Promise<string | null> {
-    const secret = parseStripeTestSecret();
-
-    if (!secret) {
-        return null;
-    }
-
-    try {
-        const response = await fetch('https://api.stripe.com/v1/account', {
-            headers: { Authorization: `Bearer ${secret}` },
-            signal: AbortSignal.timeout(10_000),
-        });
-
-        return response.ok ? secret : null;
-    } catch {
-        return null;
-    }
-}
-
-async function stripeGet<T>(
-    secret: string,
-    path: string,
-    params: Record<string, string> = {}
-): Promise<T> {
-    const url = new URL(`https://api.stripe.com${path}`);
-
-    for (const [key, value] of Object.entries(params)) {
-        url.searchParams.set(key, value);
-    }
-
-    const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${secret}` },
-    });
-    const body = (await response.json()) as T & {
-        error?: { message?: string };
-    };
-
-    if (!response.ok) {
-        throw new Error(
-            `Stripe request failed (${response.status}): ${body.error?.message ?? path}`
-        );
-    }
-
-    return body;
-}
-
-async function stripeList<T>(
-    secret: string,
-    path: string,
-    params: Record<string, string>
-): Promise<T[]> {
-    const body = await stripeGet<{ data: T[] }>(secret, path, params);
-
-    return body.data;
 }

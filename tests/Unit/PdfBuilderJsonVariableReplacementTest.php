@@ -64,6 +64,35 @@ class PdfBuilderJsonVariableReplacementTest extends TestCase
         $this->assertStringNotContainsString('$payments', $content);
     }
 
+    public function testTableHeaderTokensFollowRenderLocaleAndPreserveCustomText(): void
+    {
+        foreach (['en', 'fr'] as $locale) {
+            $service = $this->pdfService();
+            $quantity = trans('texts.quantity', [], $locale);
+            $billTo = trans('texts.bill_to', [], $locale);
+            $service->html_variables['labels'] = [
+                '$product.quantity_label' => $quantity,
+                '$bill_to_label' => $billTo,
+            ];
+
+            $builder = new PdfBuilder($service);
+            $document = new DOMDocument();
+            @$document->loadHTML(
+                '<html><body><div id="bill">$bill_to_label</div><table><thead><tr>'
+                . '<th id="quantity">$product.quantity_label</th>'
+                . '<th id="custom">My custom header</th>'
+                . '</tr></thead></table></body></html>'
+            );
+            $builder->setDocument($document);
+            $builder->updateVariables();
+
+            $this->assertNotSame('texts.quantity', $quantity);
+            $this->assertSame($quantity, $document->getElementById('quantity')->textContent);
+            $this->assertSame($billTo, $document->getElementById('bill')->textContent);
+            $this->assertSame('My custom header', $document->getElementById('custom')->textContent);
+        }
+    }
+
     private function pdfServiceWithNestedPublicNotes(): PdfService
     {
         $service = $this->pdfService();

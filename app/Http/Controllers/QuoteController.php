@@ -16,6 +16,7 @@ use App\Events\Quote\QuoteWasCreated;
 use App\Events\Quote\QuoteWasUpdated;
 use App\Factory\CloneQuoteFactory;
 use App\Factory\CloneQuoteToInvoiceFactory;
+use App\Factory\CloneQuoteToPurchaseOrderFactory;
 use App\Factory\QuoteFactory;
 use App\Filters\QuoteFilters;
 use App\Http\Requests\Quote\ActionQuoteRequest;
@@ -32,6 +33,7 @@ use App\Models\Account;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Repositories\QuoteRepository;
 use App\Services\PdfMaker\BatchPdfService;
@@ -39,6 +41,7 @@ use App\Services\PdfMaker\PdfMerge;
 use App\Services\Template\TemplateAction;
 use App\Transformers\InvoiceTransformer;
 use App\Transformers\ProjectTransformer;
+use App\Transformers\PurchaseOrderTransformer;
 use App\Transformers\QuoteTransformer;
 use App\Utils\Ninja;
 use App\Utils\Traits\GeneratesCounter;
@@ -541,6 +544,16 @@ class QuoteController extends BaseController
             return response()->json(['message' => ctrans('texts.quote_not_found')]);
         }
 
+        if ($action == 'convert_to_purchase_order') {
+            $quote = $quotes->first();
+
+            if (! $quote || $user->cannot('edit', $quote)) {
+                return response()->json(['message' => ctrans('texts.access_denied')], 403);
+            }
+
+            return $this->performAction($quote, $action);
+        }
+
         /*
          * Download Quote/s
          */
@@ -664,6 +677,7 @@ class QuoteController extends BaseController
      *
      *  The current range of actions are as follows
      *  - clone_to_quote
+     *  - convert_to_purchase_order
      *  - history
      *  - delivery_note
      *  - mark_paid
@@ -759,6 +773,15 @@ class QuoteController extends BaseController
                 $quote = CloneQuoteFactory::create($quote, auth()->user()->id);
 
                 return $this->itemResponse($quote);
+
+            case 'convert_to_purchase_order':
+                $purchase_order = CloneQuoteToPurchaseOrderFactory::create($quote, auth()->user()->id);
+                $purchase_order->design_id = $this->decodePrimaryKey($quote->client->getSetting('purchase_order_design_id'));
+
+                $this->entity_transformer = PurchaseOrderTransformer::class;
+                $this->entity_type = PurchaseOrder::class;
+
+                return $this->itemResponse($purchase_order);
 
             case 'approve':
                 if (! in_array($quote->status_id, [Quote::STATUS_SENT, Quote::STATUS_DRAFT])) {

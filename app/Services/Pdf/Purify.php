@@ -250,7 +250,7 @@ class Purify
 
         $css = preg_replace('/\/\*.*?\*\//s', '', $css);
 
-        $css = preg_replace('/[^{}]*invoiceninja[\-_]whitelabel[^{}]*\{[^}]*\}/i', '', $css);
+        $css = self::stripWhitelabelCssRules($css);
 
         // Normalize CSS unicode escapes before filtering
         $css = preg_replace_callback(
@@ -264,6 +264,40 @@ class Purify
         $css = preg_replace('/file\s*:\s*\/\//i', '', $css);
 
         return $css;
+    }
+
+    /**
+     * Drop CSS rules that mention the Invoice Ninja whitelabel logo.
+     *
+     * Tokenises on '}' so each rule is examined once (O(n)). The previous
+     * unanchored `[^{}]*invoiceninja[\-_]whitelabel` regex restarts at every
+     * offset and is quadratic on brace-free input that repeats the needle.
+     */
+    private static function stripWhitelabelCssRules(string $css): string
+    {
+        if (stripos($css, 'invoiceninja-whitelabel') === false
+            && stripos($css, 'invoiceninja_whitelabel') === false) {
+            return $css;
+        }
+
+        $parts = explode('}', $css);
+        $count = count($parts);
+        $kept = [];
+
+        foreach ($parts as $i => $part) {
+            $rule = ($i === $count - 1) ? $part : $part . '}';
+
+            if ($rule === '') {
+                continue;
+            }
+
+            if (stripos($rule, 'invoiceninja-whitelabel') === false
+                && stripos($rule, 'invoiceninja_whitelabel') === false) {
+                $kept[] = $rule;
+            }
+        }
+
+        return implode('', $kept);
     }
 
     private static array $dangerous_svg_elements = [
@@ -522,7 +556,7 @@ class Purify
                                 // nlog("data:image/* regex");
                                 $regex = '^data\:image\/[a-zA-Z0-9\+]+;base64,.*$';
                             } else {
-                                $regex = preg_quote($pattern, '/');
+                                $regex = '^' . preg_quote($pattern, '/') . '$';
                                 $regex = str_replace('\*', '.*', $regex);
                             }
 

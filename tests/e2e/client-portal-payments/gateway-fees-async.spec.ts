@@ -1,9 +1,6 @@
 import { test, expect, uniqueName, type ApiFixture } from '../fixtures';
 import {
-    ensureCompanyGatewayTypeEnabled,
-    findCompanyGatewayByKey,
     getEntity,
-    listCompanyGateways,
     setCompanyGatewayFeeForKey,
     updateClient,
     type CompanyGatewayEntity,
@@ -17,6 +14,7 @@ import {
     completeFinancialConnections,
     createMandatedAchPaymentMethod,
     hasWebhookEndpoint,
+    prepareStripeAchGateway,
     stripeGatewayKey,
     stripeGet,
     validatedStripeTestSecret,
@@ -84,6 +82,7 @@ test.describe('Stripe ACH gateway fees', () => {
     let achGateways: CompanyGatewayEntity[] = [];
     let fee = 0;
     let restoreFee: (() => Promise<void>) | undefined;
+    let restoreStripeAchGateway: (() => Promise<void>) | undefined;
 
     test.beforeEach(async ({ api, notificationGuard }) => {
         const stripeSecret = await validatedStripeTestSecret();
@@ -99,19 +98,11 @@ test.describe('Stripe ACH gateway fees', () => {
 
         secret = stripeSecret;
 
-        const gateway = findCompanyGatewayByKey(
-            await listCompanyGateways(api.context),
-            stripeGatewayKey,
-            GatewayType.ACH,
-        );
-
-        test.skip(!gateway, 'no Stripe company gateway to run ACH against');
-
-        await ensureCompanyGatewayTypeEnabled(
+        const { companyGateway: gateway, restore } = await prepareStripeAchGateway(
             api.context,
-            gateway!,
-            GatewayType.ACH,
+            { isolate: false },
         );
+        restoreStripeAchGateway = restore;
 
         const applied = await setCompanyGatewayFeeForKey(
             api.context,
@@ -153,6 +144,8 @@ test.describe('Stripe ACH gateway fees', () => {
     test.afterEach(async () => {
         await restoreFee?.();
         restoreFee = undefined;
+        await restoreStripeAchGateway?.();
+        restoreStripeAchGateway = undefined;
     });
 
     test('a debit that starts processing records the fee once and keeps it when it settles', async ({

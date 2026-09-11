@@ -21,8 +21,15 @@ for (const gateway of paymentGateways) {
                 ? 'completes payment after required client info'
                 : 'unblocks checkout after required client info',
             async ({ api, page, notificationGuard }) => {
-                const availability = await gateway.checkAvailability(api.context);
-                gateway.skipUnlessAvailable(availability);
+                const setup = await gateway.setupExclusiveTestEnvironment(
+                    api.context,
+                );
+
+                if (setup.skipReason) {
+                    test.skip(true, setup.skipReason);
+                }
+
+                const availability = setup.availability;
 
                 test.setTimeout(gateway.supportsFullPayment ? 300_000 : 120_000);
 
@@ -49,6 +56,7 @@ for (const gateway of paymentGateways) {
                     }
                 } finally {
                     await context.restoreGatewayRequirements();
+                    await gateway.restoreExclusiveGateway();
                 }
             },
         );

@@ -61,8 +61,7 @@ class LoginController extends BaseController
     protected $entity_transformer = AuthenticatedCompanyUserTransformer::class;
 
     /**
-     * Constant response-time floor (milliseconds) for the precheck endpoint,
-     * used to prevent account existence leaking through lookup timing.
+     * Prevents account existence leaking through lookup timing.
      */
     private const PRECHECK_TIME_FLOOR_MS = 250;
 
@@ -84,34 +83,6 @@ class LoginController extends BaseController
     }
 
     /**
-     * validateLogin
-     *
-     * @param  LoginRequest $request
-     * @return void
-     */
-    protected function validateLogin(LoginRequest $request)
-    {
-        $request->validate([
-            $this->username() => 'required|string',
-            'password' => 'required_without:passkey_challenge_token|string',
-        ]);
-    }
-
-    /**
-     * Once the user is authenticated, we need to set
-     * the default company into a session variable.
-     *
-     * @param Request $request
-     * @param User $user
-     * @return void
-     * @deprecated .1 API ONLY we don't need to set any session variables
-     */
-    public function authenticated(Request $request, User $user): void
-    {
-        //$this->setCurrentCompanyId($user->companies()->first()->account->default_company_id);
-    }
-
-    /**
      * Login via API.
      *
      * @param LoginRequest $request The request
@@ -121,18 +92,17 @@ class LoginController extends BaseController
     {
         $this->forced_includes = ['company_users'];
 
-        $this->validateLogin($request);
-
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
             return $this->loginErrorResponse('Too many login attempts, you are being throttled', 401);
         }
 
-        /** Granular control - if we use passkeys and 2fa is also enabled - need to bypass 2fa */
-        $passkeyResult = $this->attemptPasskeyLogin($request);
-        $viaPasskey    = $passkeyResult === true;
-        $authenticated = $passkeyResult ?? $this->attemptLogin($request);
+        $via_passkey = $request->isPasskeyLogin();
+
+        $authenticated = $via_passkey
+            ? $this->attemptPasskeyLogin($request)
+            : $this->attemptLogin($request);
 
         if (!$authenticated) {
             return $this->handleFailedLogin($request);
@@ -143,8 +113,8 @@ class LoginController extends BaseController
         /** @var \App\Models\User $user */
         $user = $this->guard()->user();
 
-        if (!$viaPasskey && $errorResponse = $this->verifyTwoFactor($user, $request)) {
-            return $errorResponse;
+        if (!$via_passkey && $error_response = $this->verifyTwoFactor($user, $request)) {
+            return $error_response;
         }
 
         return $this->finalizeLogin($user, $request);
@@ -156,15 +126,6 @@ class LoginController extends BaseController
      * This unauthenticated endpoint lets the client render the correct login UI
      * (e.g. reveal the one-time-password field) before the user submits a
      * password, so credentials only need to be transmitted once.
-     *
-     * It is deliberately enumeration-resistant: a non-existent account and an
-     * existing account without two-factor authentication return a byte-for-byte
-     * identical payload ({"methods":["password"]}). The presence of "totp" is the
-     * only distinguishable signal, and disclosing that an account is protected by
-     * 2FA does not meaningfully help an attacker, since a 2FA-protected account
-     * cannot be breached by a password alone. Accounts that lack 2FA are therefore
-     * indistinguishable from unknown emails and cannot be harvested as a
-     * credential-stuffing target list.
      *
      * Passkeys and OAuth/SSO are intentionally omitted from this payload; passkeys
      * are surfaced out-of-band through the WebAuthn conditional-UI ceremony so they
@@ -195,73 +156,47 @@ class LoginController extends BaseController
         ], 200);
     }
 
-    /**
-     * Pad the precheck response to a constant time floor.
-     *
-     * The multi-database lookup short-circuits as soon as the account is found,
-     * so a hit (early database) and a miss (every database scanned) would
-     * otherwise be distinguishable by response timing — re-leaking the account
-     * existence the uniform payload is designed to conceal. Sleeping out the
-     * remainder of the floor collapses that timing difference.
-     *
-     * @param  float  $started_at  The microtime(true) captured at handler entry.
-     * @return void
-     */
-    private function equalizePrecheckResponseTime(float $started_at): void
-    {
-        $elapsed_ms = (microtime(true) - $started_at) * 1000;
-        $remaining_ms = self::PRECHECK_TIME_FLOOR_MS - $elapsed_ms;
-
-        if ($remaining_ms > 0) {
-            usleep((int) ($remaining_ms * 1000));
-        }
-    }
 
     /**
      * Attempt to authenticate the user via WebAuthn passkey credentials.
      *
-     * Uses a tri-state return to signal the outcome:
-     *  - null  – the request is not a passkey attempt (password present or no challenge token),
-     *            so the caller should fall through to password-based authentication.
-     *  - true  – passkey authentication succeeded and the user has been logged in via Auth::login().
-     *  - false – passkey authentication was attempted but failed (bad credential, expired challenge, etc.).
-     *
-     * The method resolves the user through MultiDB::hasUser() to support multi-tenant lookups
-     * and delegates cryptographic verification to PasskeyService::authenticate().
+     * The request is already classified as a passkey login by LoginRequest.
+     * This method resolves the user through MultiDB::hasUser() and delegates
+     * cryptographic verification to PasskeyService::authenticate().
      *
      * @param  LoginRequest  $request
-     * @return bool|null
+     * @return bool
      */
-    private function attemptPasskeyLogin(LoginRequest $request): ?bool
+    private function attemptPasskeyLogin(LoginRequest $request): bool
     {
-        if ($request->filled('password') || !$request->filled('passkey_challenge_token')) {
-            return null;
-        }
-
-        $passkeyPayload = $request->input('passkey_authentication');
-
-        if (!is_array($passkeyPayload)) {
-            return null;
-        }
-
-        $user = MultiDB::hasUser(['email' => $request->input('email'), 'is_deleted' => 0, 'deleted_at' => null]);
+        $user = MultiDB::hasUser([
+            'email' => $request->input('email'),
+            'is_deleted' => 0,
+            'deleted_at' => null,
+        ]);
 
         if (!$user) {
             return false;
         }
 
         try {
-            $passkeyService = app(PasskeyService::class);
-            $passkeyUser = $passkeyService->authenticate($user, (string) $request->input('passkey_challenge_token'), $passkeyPayload);
-            Auth::login($passkeyUser, false);
+            /** @var array $passkey_authentication */
+            $passkey_authentication = $request->input('passkey_authentication');
+
+            $passkey_user = app(PasskeyService::class)->authenticate(
+                $user,
+                (string) $request->input('passkey_challenge_token'),
+                $passkey_authentication,
+            );
+
+            Auth::login($passkey_user, false);
 
             return true;
         } catch (\Throwable $e) {
+            nlog('Passkey login failed: '.$e->getMessage());
 
             return false;
         }
-
-
     }
 
     /**
@@ -290,7 +225,7 @@ class LoginController extends BaseController
 
         $google2fa = new Google2FA();
 
-        if (strlen($request->input('one_time_password')) == 0 || !$google2fa->verifyKey(decrypt($user->google_2fa_secret), $request->input('one_time_password'))) {
+        if (!$google2fa->verifyKey(decrypt($user->google_2fa_secret), $request->input('one_time_password'))) {
             return $this->loginErrorResponse(ctrans('texts.invalid_one_time_password'), 422);
         }
 
@@ -320,8 +255,6 @@ class LoginController extends BaseController
             $user = $user->fresh();
         }
 
-        nlog("LOGIN:: {$request->email} - {$user->account_id}");
-
         /** @var \Illuminate\Database\Eloquent\Builder $cu */
         $cu = $this->hydrateCompanyUser($user);
 
@@ -330,7 +263,7 @@ class LoginController extends BaseController
         }
 
         if (Ninja::isHosted() && !$cu->first()->is_owner && !$user->account->isEnterprisePaidClient()) { //@phpstan-ignore-line
-            return response()->json(['message' => 'Pro / Free accounts only the owner can log in. Please upgrade'], 401);
+            return response()->json(['message' => 'Pro / Free accounts only the owner can log in. Please upgrade.'], 401);
         }
 
         event(new UserLoggedIn($user, $user->account->default_company, Ninja::eventVars($user->id)));
@@ -340,10 +273,6 @@ class LoginController extends BaseController
 
     /**
      * Handle a failed login attempt by recording analytics, firing events, and throttling.
-     *
-     * Logs a LoginFailure metric, records a LoginMeta entry with the client IP,
-     * dispatches the UserLoginFailed event for listeners (e.g. lockout notifications),
-     * increments the throttle counter, and returns a 401 JSON error response.
      *
      * @param  LoginRequest  $request  The failed login request.
      * @return JsonResponse            A 401 error response with invalid credentials message.
@@ -427,14 +356,8 @@ class LoginController extends BaseController
 
     public function refreshReact(Request $request)
     {
-        
-        $truth = app()->make(TruthSource::class);
-
-        if ($truth->getCompanyToken()) {
-            $company_token = $truth->getCompanyToken();
-        } else {
-            $company_token = CompanyToken::where('token', $request->header('X-API-TOKEN'))->first();
-        }
+        $company_token = app(TruthSource::class)->getCompanyToken()
+            ?? CompanyToken::where('token', $request->header('X-API-TOKEN'))->first();
 
         $cu = CompanyUser::query()
             ->where('user_id', $company_token->user_id);
@@ -448,7 +371,7 @@ class LoginController extends BaseController
                 (new CreateCompanyToken($company_user->company, $company_user->user, $request->server('HTTP_USER_AGENT')))->handle();
             }
         });
-        
+
         if ($request->has('current_company') && $request->input('current_company') == 'true') {
             $cu->where('company_id', $company_token->company_id);
         }
@@ -468,13 +391,8 @@ class LoginController extends BaseController
      */
     public function refresh(Request $request)
     {
-        $truth = app()->make(TruthSource::class);
-
-        if ($truth->getCompanyToken()) {
-            $company_token = $truth->getCompanyToken();
-        } else {
-            $company_token = CompanyToken::where('token', $request->header('X-API-TOKEN'))->first();
-        }
+        $company_token = app(TruthSource::class)->getCompanyToken()
+            ?? CompanyToken::where('token', $request->header('X-API-TOKEN'))->first();
 
         $cu = CompanyUser::query()
             ->where('user_id', $company_token->user_id);
@@ -711,29 +629,29 @@ class LoginController extends BaseController
     private function handleMicrosoftOauth()
     {
         if (request()->has('accessToken')) {
-            $accessToken = request()->input('accessToken');
+            $access_token = request()->input('accessToken');
         } elseif (request()->has('access_token')) {
-            $accessToken = request()->input('access_token');
+            $access_token = request()->input('access_token');
         } else {
             return response()->json(['message' => 'Invalid response from oauth server, no access token in response.'], 400);
         }
 
-        $expectedClientId = config('services.microsoft.client_id');
+        $expected_client_id = config('services.microsoft.client_id');
 
-        if ($expectedClientId) {
-            $parts = explode('.', $accessToken);
+        if ($expected_client_id) {
+            $parts = explode('.', $access_token);
             if (count($parts) === 3) {
                 $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
-                $tokenClientId = $payload['appid'] ?? $payload['azp'] ?? null;
+                $token_client_id = $payload['appid'] ?? $payload['azp'] ?? null;
 
-                if ($tokenClientId !== $expectedClientId) {
+                if ($token_client_id !== $expected_client_id) {
                     return response()->json(['message' => 'Invalid Microsoft token: audience mismatch.'], 403);
                 }
             }
         }
 
         $graph = new \Microsoft\Graph\Graph();
-        $graph->setAccessToken($accessToken);
+        $graph->setAccessToken($access_token);
 
         $user = $graph->createRequest('GET', '/me')
             ->setReturnType(Model\User::class)
@@ -1232,4 +1150,22 @@ class LoginController extends BaseController
 
         // return redirect('/#/');
     }
+
+    /**
+     * Pad the precheck response to a constant time floor.
+     *
+     * @param  float  $started_at  The microtime(true) captured at handler entry.
+     * @return void
+     */
+    private function equalizePrecheckResponseTime(float $started_at): void
+    {
+        $elapsed_ms = (microtime(true) - $started_at) * 1000;
+        $remaining_ms = self::PRECHECK_TIME_FLOOR_MS - $elapsed_ms;
+
+        if ($remaining_ms > 0) {
+            usleep((int) ($remaining_ms * 1000));
+        }
+    }
+
+
 }

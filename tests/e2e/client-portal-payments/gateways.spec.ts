@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures';
+import { ensureCompanyGatewayForKey, syncCompanyGatewayConfigFromEnv } from '../api-helpers';
 import { paymentGateways } from './registry';
 import { openInvoicePaymentPage } from '../gateways/payment-flow-helpers';
 import { type GatewayAvailability } from '../gateways/types';
@@ -9,12 +10,8 @@ test.describe('Client portal payment gateways', () => {
         test.describe(gateway.displayName, () => {
             let availability: GatewayAvailability;
 
-            test.beforeEach(async ({ api }, testInfo) => {
-                const isolateForEndToEnd =
-                    gateway.requiresGatewayIsolation &&
-                    testInfo.title === 'end-to-end payment flow';
-
-                if (isolateForEndToEnd) {
+            test.beforeEach(async ({ api }) => {
+                if (gateway.requiresGatewayIsolation) {
                     const setup =
                         await gateway.setupExclusiveTestEnvironment(
                             api.context,
@@ -29,15 +26,28 @@ test.describe('Client portal payment gateways', () => {
                     return;
                 }
 
+                if (gateway.isEnvConfigured()) {
+                    const companyGateway = await ensureCompanyGatewayForKey(
+                        api.context,
+                        gateway.gatewayKey,
+                        gateway.envVar,
+                    );
+
+                    if (companyGateway) {
+                        await syncCompanyGatewayConfigFromEnv(
+                            api.context,
+                            companyGateway,
+                            gateway.envVar,
+                        );
+                    }
+                }
+
                 availability = await gateway.checkAvailability(api.context);
                 gateway.skipUnlessAvailable(availability);
             });
 
-            test.afterEach(async ({}, testInfo) => {
-                if (
-                    gateway.requiresGatewayIsolation &&
-                    testInfo.title === 'end-to-end payment flow'
-                ) {
+            test.afterEach(async () => {
+                if (gateway.requiresGatewayIsolation) {
                     await gateway.restoreExclusiveGateway();
                 }
             });

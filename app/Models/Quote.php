@@ -318,6 +318,11 @@ class Quote extends BaseModel
         return $this->belongsTo(Invoice::class)->withTrashed();
     }
 
+    public function purchase_orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
     public function assigned_user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_user_id', 'id')->withTrashed();

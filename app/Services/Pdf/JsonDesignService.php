@@ -36,6 +36,7 @@ class JsonDesignService
     /** Stable public selectors shared with the visual invoice designer. */
     private const WIDGET_CLASS_BY_TYPE = [
         'text' => 'invoice-widget--text',
+        'twig' => 'invoice-widget--twig',
         'image' => 'invoice-widget--image',
         'logo' => 'invoice-widget--logo',
         'table' => 'invoice-widget--table',
@@ -197,15 +198,12 @@ class JsonDesignService
      */
     private function generateBaseTemplate(): string
     {
-        $blocks = $this->jsonDesign['blocks'] ?? [];
+        $blocks = JsonToSectionsAdapter::filterValidBlocks($this->jsonDesign['blocks'] ?? []);
         $pageSettings = $this->jsonDesign['pageSettings'] ?? [];
 
         // Build page CSS from settings
         $pageCSS = $this->buildPageCSS($pageSettings, $this->pdfService->config->settings);
         $customStyleElement = $this->customCssStyleElement();
-
-        // Get blocks grouped by row for layout
-        $rows = $this->adapter->getRowGroupedBlocks();
 
         // The paid/cancelled stamp is injected directly (no $-variable in the
         // template) as an absolutely-positioned overlay inside its anchor block
@@ -215,45 +213,30 @@ class JsonDesignService
         $stampHtml = $this->paidStampOverlay();
         $stampTargetId = $stampHtml === '' ? null : $this->stampTargetBlockId($blocks);
 
-        // Build container divs with flex row wrapping for multi-block rows.
-        // Every block container — single-block placeholder OR a multi-block
-        // flex-row — carries `class="json-block"` so the single
-        // .json-block { margin-bottom } rule controls inter-block spacing.
-        // The `flex-col` children inside a multi-block row don't get the
-        // class because margin-bottom on flex children is a no-op (the row
-        // height is the tallest column).
-        $blockContainers = '';
-        foreach ($rows as $rowBlocks) {
-            if (count($rowBlocks) === 1) {
-                // Single block - render normally. rowAlign still applies to
-                // the placeholder div: `margin-left/right: auto` aligns any
-                // block-level element with a non-100% width within its parent.
-                $block = $rowBlocks[0];
-                $alignStyle = $this->rowAlignStyle($block);
-                $overlay = ($block['id'] === $stampTargetId) ? $stampHtml : '';
-                $relative = $overlay !== '' ? 'position: relative; ' : '';
-                $widgetClasses = $this->widgetClasses($block);
-                $widgetType = $this->widgetType($block);
-                $blockContainers .= "<div id=\"{$block['id']}\" class=\"json-block {$widgetClasses}\" data-widget-type=\"{$widgetType}\" style=\"{$relative}{$alignStyle}\">{$overlay}</div>\n";
-            } else {
-                // Multiple blocks on same row - wrap in flex container.
-                // rowAlign maps to margin-auto on the flex-col, which in a
-                // flex container absorbs the available space on the
-                // appropriate side(s).
-                $blockContainers .= "<div class=\"flex-row json-block\">\n";
-                foreach ($rowBlocks as $block) {
-                    $widthPercent = ($block['gridPosition']['w'] / 12) * 100;
-                    $alignStyle = $this->rowAlignStyle($block);
-                    $overlay = ($block['id'] === $stampTargetId) ? $stampHtml : '';
-                    $relative = $overlay !== '' ? 'position: relative;' : '';
-                    $widgetClasses = $this->widgetClasses($block);
-                    $widgetType = $this->widgetType($block);
-                    $blockContainers .= "  <div class=\"flex-col\" style=\"width: {$widthPercent}%; {$alignStyle}\">\n";
-                    $blockContainers .= "    <div id=\"{$block['id']}\" class=\"{$widgetClasses}\" data-widget-type=\"{$widgetType}\" style=\"{$relative}\">{$overlay}</div>\n";
-                    $blockContainers .= "  </div>\n";
-                }
-                $blockContainers .= "</div>\n";
-            }
+        $pagination = $this->paginationMode();
+
+        if ($pagination === 'none') {
+            $content = $this->renderBlockContainers($this->adapter->getRowGroupedBlocks(), $stampHtml, $stampTargetId);
+            $content .= $this->entityImagesBlock($blocks);
+        } else {
+            $stacks = $this->partitionBlocksByRegion($blocks, $pagination);
+            $headerHtml = $this->renderBlockContainers(
+                $this->adapter->getRowGroupedBlocksFor($stacks['header']),
+                $stampHtml,
+                $stampTargetId
+            );
+            $bodyHtml = $this->renderBlockContainers(
+                $this->adapter->getRowGroupedBlocksFor($stacks['body']),
+                $stampHtml,
+                $stampTargetId
+            );
+            $bodyHtml .= $this->entityImagesBlock($blocks);
+            $footerHtml = $this->renderBlockContainers(
+                $this->adapter->getRowGroupedBlocksFor($stacks['footer']),
+                $stampHtml,
+                $stampTargetId
+            );
+            $content = $this->paginationTable($pagination, $headerHtml, $bodyHtml, $footerHtml);
         }
 
         return <<<HTML
@@ -270,11 +253,141 @@ class JsonDesignService
             </head>
             <body>
                 <div class="invoice-container">
-                    {$blockContainers}
+                    {$content}
                 </div>
             </body>
             </html>
             HTML;
+    }
+
+    /**
+     * @param array<int, array<int, array<string, mixed>>> $rows
+     */
+    private function renderBlockContainers(array $rows, string $stampHtml, ?string $stampTargetId): string
+    {
+        // Every block container — single-block placeholder OR a multi-block
+        // flex-row — carries `class="json-block"` so the single
+        // .json-block { margin-bottom } rule controls inter-block spacing.
+        // The `flex-col` children inside a multi-block row don't get the
+        // class because margin-bottom on flex children is a no-op (the row
+        // height is the tallest column).
+        $blockContainers = '';
+
+        foreach ($rows as $rowBlocks) {
+            if (count($rowBlocks) === 1) {
+                $block = $rowBlocks[0];
+                $alignStyle = $this->rowAlignStyle($block);
+                $overlay = ($block['id'] === $stampTargetId) ? $stampHtml : '';
+                $relative = $overlay !== '' ? 'position: relative; ' : '';
+                $widgetClasses = $this->widgetClasses($block);
+                $widgetType = $this->widgetType($block);
+                $blockContainers .= "<div id=\"{$block['id']}\" class=\"json-block {$widgetClasses}\" data-widget-type=\"{$widgetType}\" style=\"{$relative}{$alignStyle}\">{$overlay}</div>\n";
+            } else {
+                $blockContainers .= "<div class=\"flex-row json-block\">\n";
+                foreach ($rowBlocks as $block) {
+                    $widthPercent = ($block['gridPosition']['w'] / 12) * 100;
+                    $alignStyle = $this->rowAlignStyle($block);
+                    $overlay = ($block['id'] === $stampTargetId) ? $stampHtml : '';
+                    $relative = $overlay !== '' ? 'position: relative;' : '';
+                    $widgetClasses = $this->widgetClasses($block);
+                    $widgetType = $this->widgetType($block);
+                    $blockContainers .= "  <div class=\"flex-col\" style=\"width: {$widthPercent}%; {$alignStyle}\">\n";
+                    $blockContainers .= "    <div id=\"{$block['id']}\" class=\"{$widgetClasses}\" data-widget-type=\"{$widgetType}\" style=\"{$relative}\">{$overlay}</div>\n";
+                    $blockContainers .= "  </div>\n";
+                }
+                $blockContainers .= "</div>\n";
+            }
+        }
+
+        return $blockContainers;
+    }
+
+    private function paginationMode(): string
+    {
+        $mode = strtolower(trim((string) ($this->documentSettings()['pagination'] ?? 'none')));
+
+        return in_array($mode, ['header', 'footer', 'both'], true) ? $mode : 'none';
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $blocks
+     * @return array{header: array<int, array<string, mixed>>, body: array<int, array<string, mixed>>, footer: array<int, array<string, mixed>>}
+     */
+    private function partitionBlocksByRegion(array $blocks, string $pagination): array
+    {
+        $header = [];
+        $body = [];
+        $footer = [];
+        $useHeader = in_array($pagination, ['header', 'both'], true);
+        $useFooter = in_array($pagination, ['footer', 'both'], true);
+
+        foreach ($blocks as $block) {
+            $region = $this->blockRegion($block);
+
+            if ($region === 'header' && $useHeader) {
+                $header[] = $block;
+            } elseif ($region === 'footer' && $useFooter) {
+                $footer[] = $block;
+            } else {
+                $body[] = $block;
+            }
+        }
+
+        return [
+            'header' => $header,
+            'body' => $body,
+            'footer' => $footer,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $block
+     */
+    private function blockRegion(array $block): string
+    {
+        $region = strtolower((string) ($block['region'] ?? 'body'));
+
+        return in_array($region, ['header', 'body', 'footer'], true) ? $region : 'body';
+    }
+
+    private function paginationTable(string $pagination, string $headerHtml, string $bodyHtml, string $footerHtml): string
+    {
+        $html = '<table class="invoice-pagination" style="width:100%; border-collapse:collapse;">' . "\n";
+
+        if (in_array($pagination, ['header', 'both'], true)) {
+            $height = $this->chromeHeight('headerHeight', 80);
+            $html .= "<thead>\n<tr>\n<td class=\"invoice-page-header\" style=\"min-height: {$height}px; vertical-align: top;\">\n{$headerHtml}</td>\n</tr>\n</thead>\n";
+        }
+
+        $html .= "<tbody>\n<tr>\n<td class=\"invoice-page-body\" style=\"vertical-align: top;\">\n{$bodyHtml}</td>\n</tr>\n</tbody>\n";
+
+        if (in_array($pagination, ['footer', 'both'], true)) {
+            $height = $this->chromeHeight('footerHeight', 48);
+            $html .= "<tfoot>\n<tr>\n<td class=\"invoice-page-footer-space\" style=\"height: {$height}px; min-height: {$height}px;\"></td>\n</tr>\n</tfoot>\n";
+            $html .= "</table>\n";
+            $html .= "<div class=\"invoice-page-footer\" style=\"min-height: {$height}px;\">\n{$footerHtml}</div>\n";
+
+            return $html;
+        }
+
+        $html .= "</table>\n";
+
+        return $html;
+    }
+
+    private function chromeHeight(string $key, int $default): int
+    {
+        $raw = $this->documentSettings()[$key] ?? null;
+
+        if (is_string($raw)) {
+            $raw = preg_replace('/px$/i', '', trim($raw));
+        }
+
+        if (!is_numeric($raw)) {
+            return $default;
+        }
+
+        return max(24, min(400, (int) round((float) $raw)));
     }
 
     /**
@@ -375,6 +488,37 @@ class JsonDesignService
     }
 
     /**
+     * Append entity images after the designer blocks when HtmlEngine produced
+     * markup and the design did not already include $entity_images.
+     */
+    private function entityImagesBlock(array $blocks): string
+    {
+        $values = $this->pdfService->html_variables['values'] ?? [];
+        $entityImages = (string) ($values['$entity_images'] ?? '');
+
+        if ($entityImages === '' || $this->designIncludesEntityImages($blocks)) {
+            return '';
+        }
+
+        return '<div id="entity-images" class="json-block">' . $entityImages . '</div>' . "\n";
+    }
+
+    private function designIncludesEntityImages(array $blocks): bool
+    {
+        foreach ($blocks as $block) {
+            $properties = is_array($block['properties'] ?? null) ? $block['properties'] : [];
+
+            foreach (['content', 'source'] as $key) {
+                if (is_string($properties[$key] ?? null) && str_contains($properties[$key], '$entity_images')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * The paid/cancelled stamp overlay, or '' when it should not show.
      *
      * Reuses HtmlEngine's already-resolved gating: $show_paid_stamp is 'flex'
@@ -448,7 +592,7 @@ class JsonDesignService
             ? $this->combinedPageInset()
             : $this->getPageMarginsCSS($pageSettings);
 
-        return <<<CSS
+        $css = <<<CSS
                     @page {
                         size: {$pageSize};
                         margin: {$pageMargins};
@@ -482,6 +626,18 @@ class JsonDesignService
                        bottom margin, no sibling cascade. */
                     .json-block {
                         margin-bottom: 12px;
+                    }
+                    .invoice-widget--twig,
+                    .invoice-twig-content {
+                        width: 100%;
+                        max-width: 100%;
+                        min-width: 0;
+                        box-sizing: border-box;
+                        position: relative;
+                    }
+                    .invoice-twig-content table {
+                        width: 100%;
+                        max-width: 100%;
                     }
                     table {
                         width: 100%;
@@ -549,6 +705,45 @@ class JsonDesignService
                     }
 
             CSS;
+
+        if ($this->paginationMode() !== 'none') {
+            $css .= <<<'CSS'
+                    .invoice-pagination {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .invoice-pagination > thead {
+                        display: table-header-group;
+                    }
+                    .invoice-pagination > tfoot {
+                        display: table-footer-group;
+                    }
+                    .invoice-pagination > tbody > tr {
+                        break-inside: auto;
+                        page-break-inside: auto;
+                    }
+                    .invoice-page-header,
+                    .invoice-page-body {
+                        vertical-align: top;
+                    }
+                    .invoice-page-footer {
+                        position: fixed;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        box-sizing: border-box;
+                        z-index: 50;
+                    }
+                    .invoice-widget--table,
+                    .invoice-widget--tasks-table {
+                        break-inside: auto;
+                        page-break-inside: auto;
+                    }
+
+            CSS;
+        }
+
+        return $css;
     }
 
     /**

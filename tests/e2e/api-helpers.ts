@@ -438,6 +438,98 @@ export function findCompanyGatewayByKey(
     return gateways.find((gateway) => gateway.gateway_key === gatewayKey);
 }
 
+/** Whether a company gateway carries credentials the driver can authenticate with. */
+export function companyGatewayHasCredentials(
+    config: Record<string, unknown>,
+): boolean {
+    if (
+        String(config.apiKey ?? '').trim() &&
+        String(config.publishableKey ?? '').trim()
+    ) {
+        return true;
+    }
+
+    if (
+        String(config.clientId ?? '').trim() &&
+        String(config.secret ?? '').trim()
+    ) {
+        return true;
+    }
+
+    if (
+        String(config.apiLoginId ?? '').trim() &&
+        String(config.transactionKey ?? '').trim()
+    ) {
+        return true;
+    }
+
+    if (String(config.accessToken ?? '').trim()) {
+        return true;
+    }
+
+    return false;
+}
+
+export function parseEnvGatewayConfig(
+    envVar: string,
+): Record<string, unknown> | undefined {
+    const raw = process.env[envVar]?.trim() ?? '';
+
+    if (!raw) {
+        return undefined;
+    }
+
+    try {
+        return JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+        return undefined;
+    }
+}
+
+function gatewayConfigMatchesEnv(
+    gateway: CompanyGatewayEntity,
+    envConfig: Record<string, unknown>,
+): boolean {
+    const current = parseCompanyGatewayConfig(gateway);
+
+    return JSON.stringify(current) === JSON.stringify(envConfig);
+}
+
+/**
+ * Re-applies gateway credentials from an env JSON blob when the stored config has
+ * drifted. Stale Authorize.Net sandbox keys leave Accept.js without a public client key.
+ */
+export async function syncCompanyGatewayConfigFromEnv(
+    api: ApiContext,
+    gateway: CompanyGatewayEntity,
+    envVar: string,
+): Promise<CompanyGatewayEntity> {
+    const envConfig = parseEnvGatewayConfig(envVar);
+
+    if (!envConfig || gatewayConfigMatchesEnv(gateway, envConfig)) {
+        return gateway;
+    }
+
+    const response = await api.request.put(
+        `/api/v1/company_gateways/${gateway.id}`,
+        {
+            data: {
+                gateway_key: gateway.gateway_key,
+                config: JSON.stringify(envConfig),
+                fees_and_limits: gateway.fees_and_limits ?? {},
+            },
+        },
+    );
+
+    if (!response.ok()) {
+        throw new Error(
+            `Failed to sync ${gateway.gateway_key} credentials from ${envVar} (${response.status()}): ${(await response.text()).slice(0, 300)}`,
+        );
+    }
+
+    return getCompanyGateway(api, gateway.id);
+}
+
 /**
  * Portal `getPaymentMethods()` only offers a gateway type when
  * `fees_and_limits.{type}` exists and `is_enabled` is true. Empty `{}` means
@@ -454,11 +546,9 @@ export async function ensureCompanyGatewayTypeEnabled(
     if (current?.is_enabled) {
         const config = parseCompanyGatewayConfig(gateway);
 
-        if (String(config.clientId ?? '').trim() && String(config.secret ?? '').trim()) {
+        if (companyGatewayHasCredentials(config)) {
             return gateway;
         }
-
-        return getCompanyGateway(api, gateway.id);
     }
 
     const feesAndLimits = {
@@ -556,6 +646,69 @@ export async function setCompanyGatewayFee(
     };
 }
 
+function isCompanyGatewayArchived(
+    gateway: CompanyGatewayEntity,
+): boolean {
+    return (
+        Boolean(gateway.is_deleted) ||
+        (typeof gateway.archived_at === 'number' && gateway.archived_at > 0)
+    );
+}
+
+/**
+ * Prefer a live gateway row for one key, verify it still resolves over the API,
+ * and restore an archived match before reusing it.
+ */
+async function resolveCompanyGatewayForKey(
+    api: ApiContext,
+    gatewayKey: string,
+): Promise<CompanyGatewayEntity | undefined> {
+    const [active, deleted] = await Promise.all([
+        listCompanyGateways(api),
+        listCompanyGateways(api, { isDeleted: true }),
+    ]);
+    const matches = new Map<string, CompanyGatewayEntity>();
+
+    for (const gateway of [...active, ...deleted]) {
+        if (gateway.gateway_key === gatewayKey) {
+            matches.set(gateway.id, gateway);
+        }
+    }
+
+    if (matches.size === 0) {
+        return undefined;
+    }
+
+    const sorted = [...matches.values()].sort((left, right) =>
+        left.id.localeCompare(right.id),
+    );
+    const activeMatches = sorted.filter(
+        (gateway) => !isCompanyGatewayArchived(gateway),
+    );
+    const candidates = activeMatches.length > 0 ? activeMatches : sorted;
+
+    for (const candidate of candidates) {
+        const response = await api.request.get(
+            `/api/v1/company_gateways/${candidate.id}`,
+        );
+
+        if (!response.ok()) {
+            continue;
+        }
+
+        let gateway = (await response.json()).data as CompanyGatewayEntity;
+
+        if (isCompanyGatewayArchived(gateway)) {
+            await bulkAction(api, 'company_gateways', [gateway.id], 'restore');
+            gateway = await getCompanyGateway(api, gateway.id);
+        }
+
+        return gateway;
+    }
+
+    return undefined;
+}
+
 /**
  * Creates a company gateway for one key from its environment credentials when the
  * account has none, so a gateway is not skipped merely because it was never seeded.
@@ -568,9 +721,7 @@ export async function ensureCompanyGatewayForKey(
     gatewayKey: string,
     envVar: string,
 ): Promise<CompanyGatewayEntity | undefined> {
-    const existing = (await listCompanyGateways(api)).find(
-        (gateway) => gateway.gateway_key === gatewayKey && !gateway.is_deleted,
-    );
+    const existing = await resolveCompanyGatewayForKey(api, gatewayKey);
 
     if (existing) {
         return existing;

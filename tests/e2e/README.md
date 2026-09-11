@@ -36,6 +36,23 @@ Run the suite with:
 npm run test:e2e
 ```
 
+Default payment method authorization regression tests:
+
+```sh
+npm run test:e2e -- tests/e2e/client-portal-default-payment-method.spec.ts
+```
+
+These tests create two isolated clients and synthetic stored payment methods,
+exercise the real portal and Livewire endpoint, and remove their tokens and
+gateway afterward. They need the local Artisan helper to access the same
+`db-ninja-01` database as the browser backend. No payment gateway credentials
+or external payment calls are required. Coverage includes UI switching and
+repeat actions, signed-snapshot property tampering, changed/expired login,
+company ownership, and archived/deleted/missing tokens. Rejected requests must
+leave all fixture token state unchanged. The suite checks Livewire's empty 419
+response for locked properties outside debug mode (or its explicit exception
+in debug mode), and Invoice Ninja's existing 400 JSON model-not-found response.
+
 PayPal REST tests live under `tests/e2e/client-portal-payments/paypal/`. They
 scaffold their own company gateway from `PAYPAL_REST_KEYS` (create or update
 gateway, verify auth, archive other active gateways for isolated specs, restore
@@ -62,6 +79,49 @@ Gateway checkout matrix (PayPal REST, Stripe, Authorize, etc.):
 npm run test:e2e -- tests/e2e/client-portal-payments/gateways.spec.ts
 npm run test:e2e -- tests/e2e/client-portal-payments/gateways.spec.ts -g "PayPal REST"
 ```
+
+Recurring auto-billing preferences in both the default and smooth checkout:
+
+```sh
+npm run test:e2e -- tests/e2e/client-portal-payments/auto-billing.spec.ts
+```
+
+This suite uses `STRIPE_KEYS` and the existing account fixtures. It exercises
+the real checkout and Livewire persistence without submitting a payment. It
+checks all four recurring policies, saved selections on reopening checkout,
+outstanding invoice propagation, future invoice inheritance, forced card saving
+when auto-billing is Yes, optional saving when it is No, and ordinary invoices.
+The choice is available only on the first invoice in the series, including when
+an existing token is selected; only the save-card row hides for token payments.
+Later invoices never show the choice, even if the first invoice is unpaid.
+The Artisan helper must access the
+same database as the browser's application. Gateway token-billing settings and
+gateway isolation are restored after each test.
+The submission check stubs the Stripe SDK result and intercepts the outgoing POST
+to verify `store_card=true` without charging a card or recording a payment.
+
+The timing tests cover both opt-in/out defaults against all four gateway token
+policies, mouse and keyboard changes, immediate form values before Livewire,
+manual save choices surviving a delayed response, and retry after a failed request.
+The two failed-request recovery tests currently fail: the auto-billing fieldset
+remains disabled after a network failure in both flows. They remain active as
+regression tests for the required recovery behavior.
+A failed request does not persist the preference; the optimistic form update is
+not a substitute for successful server persistence.
+
+To run the real Stripe sandbox payment regression in both flows:
+
+```sh
+PLAYWRIGHT_AUTOBILL_RACE=1 npm run test:e2e -- tests/e2e/client-portal-payments/auto-billing-input-order.spec.ts
+```
+
+This explicitly enabled suite requires direct Stripe test-mode keys (no Connect).
+It makes four test payments, selecting Yes and No for auto-billing, and checks
+submitted `store_card`, paid invoice balance and stored payment methods while
+the Livewire response is withheld. It suppresses user email notifications during
+each test and restores them afterwards. Use a dedicated test account/database.
+Run these suites sequentially with one worker (the npm script defaults to this),
+because the fixtures temporarily change shared gateway settings.
 
 **VS Code:** use the Playwright extension with the repo's `playwright.config.ts`
 (see `.vscode/settings.json`). `.env` is loaded from `fixtures.ts` and

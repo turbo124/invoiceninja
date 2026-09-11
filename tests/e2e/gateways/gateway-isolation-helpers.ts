@@ -1,11 +1,14 @@
 import {
     bulkAction,
     ensureCompanyGatewayTypeEnabled,
+    getCompanyGateway,
     listCompanyGateways,
+    testCompanyGatewayWithRetry,
     type ApiContext,
     type CompanyGatewayEntity,
 } from '../api-helpers';
 import { decodePrimaryKey } from '../hash-helpers';
+import { type GatewayAvailability } from './types';
 
 export function findCompanyGatewayByRawId(
     gateways: CompanyGatewayEntity[],
@@ -55,6 +58,147 @@ export async function listAllCompanyGateways(
 export interface GatewayIsolationResult {
     gateway: CompanyGatewayEntity;
     restore: () => Promise<void>;
+}
+
+export interface ExclusiveGatewaySetupResult {
+    availability: GatewayAvailability;
+    restore?: () => Promise<void>;
+    skipReason?: string;
+}
+
+export interface EnvGatewaySetupOptions {
+    displayName: string;
+    gatewayKey: string;
+    gatewayTypeId: number;
+    envConfigured: boolean;
+    envSkipReason?: string;
+    skipIsolation?: boolean;
+    skipAuthTest?: boolean;
+    scaffoldGateway: (
+        api: ApiContext,
+    ) => Promise<CompanyGatewayEntity | undefined>;
+    syncGateway: (
+        api: ApiContext,
+        gateway: CompanyGatewayEntity,
+    ) => Promise<CompanyGatewayEntity>;
+}
+
+/**
+ * Scaffold a company gateway from env credentials, sync stale config, leave it as
+ * the only active gateway, and verify API auth — the same preflight PayPal REST runs
+ * before its isolated end-to-end specs.
+ */
+export async function setupExclusiveEnvGatewayEnvironment(
+    api: ApiContext,
+    options: EnvGatewaySetupOptions,
+): Promise<ExclusiveGatewaySetupResult> {
+    if (!options.envConfigured) {
+        return {
+            availability: {
+                envConfigured: false,
+                companyGatewayConfigured: false,
+            },
+            skipReason:
+                options.envSkipReason ??
+                `${options.displayName}: environment credentials are not configured`,
+        };
+    }
+
+    let gateway: CompanyGatewayEntity | undefined;
+
+    try {
+        gateway = await options.scaffoldGateway(api);
+
+        if (gateway) {
+            gateway = await options.syncGateway(api, gateway);
+        }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+            },
+            skipReason: `${options.displayName}: failed to scaffold company gateway — ${message}`,
+        };
+    }
+
+    if (!gateway) {
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+            },
+            skipReason: `${options.displayName}: no company gateway for key ${options.gatewayKey}`,
+        };
+    }
+
+    let enabledGateway: CompanyGatewayEntity;
+
+    try {
+        enabledGateway = await ensureCompanyGatewayTypeEnabled(
+            api,
+            gateway,
+            options.gatewayTypeId,
+        );
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: false,
+                companyGateway: gateway,
+            },
+            skipReason: `${options.displayName}: failed to enable payment type ${options.gatewayTypeId} — ${message}`,
+        };
+    }
+
+    if (options.skipIsolation) {
+        return {
+            availability: {
+                envConfigured: true,
+                companyGatewayConfigured: true,
+                companyGateway: enabledGateway,
+            },
+        };
+    }
+
+    const { gateway: isolatedGateway, restore } = await isolateCompanyGateway(
+        api,
+        enabledGateway,
+        options.gatewayTypeId,
+    );
+
+    if (!options.skipAuthTest) {
+        const authTest = await testCompanyGatewayWithRetry(
+            api,
+            isolatedGateway.id,
+        );
+
+        if (!authTest.ok) {
+            await restore();
+
+            return {
+                availability: {
+                    envConfigured: true,
+                    companyGatewayConfigured: false,
+                    companyGateway: isolatedGateway,
+                },
+                skipReason: `${options.displayName} gateway ${decodePrimaryKey(isolatedGateway.id)} failed API auth test: ${authTest.message}`,
+            };
+        }
+    }
+
+    return {
+        availability: {
+            envConfigured: true,
+            companyGatewayConfigured: true,
+            companyGateway: await getCompanyGateway(api, isolatedGateway.id),
+        },
+        restore,
+    };
 }
 
 async function assertOnlyTargetGatewayIsActive(

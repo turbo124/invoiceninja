@@ -102,21 +102,37 @@ class ACH implements LivewireMethodInterface
     {
         $this->stripe->init();
 
-        $setup_intent = json_decode($request->input('gateway_response'));
+        $setup_intent_response = json_decode($request->input('gateway_response'));
 
-        if (!$setup_intent || !isset($setup_intent->payment_method)) {
+        if (!$setup_intent_response || !isset($setup_intent_response->id)) {
             throw new PaymentFailed('Invalid response from payment gateway.');
         }
 
-        $customer = $this->stripe->findOrCreateCustomer();
-
         try {
-            // Retrieve the payment method to get bank account details
+            $setup_intent = $this->stripe->getSetupIntentId(
+                $setup_intent_response->id
+            );
+
+            if (
+                !$setup_intent->payment_method
+                || !$setup_intent->customer
+            ) {
+                throw new PaymentFailed('Invalid Stripe SetupIntent.');
+            }
+
             $payment_method = $this->stripe->getStripePaymentMethod($setup_intent->payment_method);
 
             if (!$payment_method || !isset($payment_method->us_bank_account)) {
                 throw new PaymentFailed('Unable to retrieve bank account details.');
             }
+
+            if ($payment_method->customer !== $setup_intent->customer) {
+                throw new PaymentFailed('Stripe customer mismatch.');
+            }
+
+            $customer = $this->stripe->getCustomer(
+                $setup_intent->customer
+            );
 
             $bank_account = $payment_method->us_bank_account;
 

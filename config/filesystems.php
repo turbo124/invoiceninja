@@ -80,6 +80,7 @@ return [
                     'private' => 0700,
                 ],
             ],
+            'visibility' => 'public',
             'throw' => false,
         ],
 

@@ -241,7 +241,7 @@ class FranceAfnorBillingContextTest extends TestCase
         $storecove = new Storecove();
 
         $storecove->adapter
-            ->transformFromPeppol($sourceDocument, $peppol->getDocument(), $peppol->isCreditNote())
+            ->transformFromPeppol($sourceDocument, $peppol->getDocument(), $peppol->getDocumentKind(), $peppol->toXml())
             ->decorate();
 
         $result = $storecove->adapter->getDocument();

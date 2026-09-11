@@ -636,7 +636,7 @@ class ZugferdEDocument extends AbstractService
             ->addDocumentSellerTaxRegistration($company_tax_registration[0], $company_tax_registration[1])
             ->setDocumentBuyer($this->client->present()->name(), $this->client->number)
             ->setDocumentBuyerAddress($this->client->address1, "", "", $this->client->postal_code, $this->client->city, $this->client->country->iso_3166_2, $this->client->state)
-            ->setDocumentBuyerContact($this->client->present()->primary_contact_name(), "", $this->client->present()->phone(), "", $this->client->present()->email())
+            ->setDocumentBuyerContact($this->client->present()->primary_contact_name_or_null(), "", $this->client->present()->phone(), "", $this->client->present()->email())
             ->setDocumentBuyerCommunication("EM", $this->client->present()->email());
 
         if (!empty($this->document->public_notes)) {

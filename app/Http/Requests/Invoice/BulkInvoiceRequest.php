@@ -36,7 +36,7 @@ class BulkInvoiceRequest extends Request
         $user = auth()->user();
 
         $rules = [
-            'action' => ['required', 'bail', 'string', 'in:archive,restore,delete,email,send_email,mark_paid,mark_sent,download,bulk_download,bulk_print,template,cancel,auto_bill,clone_to_invoice,clone_to_purchase_order,set_payment_link,history,delivery_note'],
+            'action' => ['required', 'bail', 'string', 'in:archive,restore,delete,email,send_email,mark_paid,mark_sent,download,bulk_download,bulk_print,template,cancel,auto_bill,clone_to_invoice,convert_to_purchase_order,set_payment_link,history,delivery_note'],
             'ids' => ['required', 'bail', 'array'],
             'email_type' => 'sometimes|in:reminder1,reminder2,reminder3,reminder_endless,custom1,custom2,custom3,invoice,quote,credit,payment,payment_partial,statement,purchase_order',
             'template' => 'sometimes|string',
@@ -45,7 +45,7 @@ class BulkInvoiceRequest extends Request
             'subscription_id' => 'sometimes|string',
         ];
 
-        if ($this->input('action') === 'clone_to_purchase_order') {
+        if ($this->input('action') === 'convert_to_purchase_order') {
             $rules['ids'][] = 'size:1';
         }
 

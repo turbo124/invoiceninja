@@ -147,21 +147,18 @@ class InvoiceSumInclusive
             $amount = $this->formatValue(($this->sub_total - ($this->sub_total * ($this->invoice->discount / 100))), 2);
         }
 
-        //Handles cases where the surcharge is not taxed
-        if (is_numeric($this->invoice->custom_surcharge1) && $this->invoice->custom_surcharge1 > 0 && $this->invoice->custom_surcharge_tax1) {
-            $amount += $this->invoice->custom_surcharge1;
-        }
+        $is_peppol = $this->client->getSetting('e_invoice_type') === 'PEPPOL';
 
-        if (is_numeric($this->invoice->custom_surcharge2) && $this->invoice->custom_surcharge2 > 0 && $this->invoice->custom_surcharge_tax2) {
-            $amount += $this->invoice->custom_surcharge2;
-        }
+        foreach ([1, 2, 3, 4] as $i) {
+            $surcharge = $this->invoice->{"custom_surcharge{$i}"};
 
-        if (is_numeric($this->invoice->custom_surcharge3) && $this->invoice->custom_surcharge3 > 0 && $this->invoice->custom_surcharge_tax3) {
-            $amount += $this->invoice->custom_surcharge3;
-        }
+            if (! is_numeric($surcharge) || $surcharge <= 0) {
+                continue;
+            }
 
-        if (is_numeric($this->invoice->custom_surcharge4) && $this->invoice->custom_surcharge4 > 0 && $this->invoice->custom_surcharge_tax4) {
-            $amount += $this->invoice->custom_surcharge4;
+            if ($is_peppol || $this->invoice->{"custom_surcharge_tax{$i}"}) {
+                $amount += $surcharge;
+            }
         }
 
         // Tax-anchored additive inclusive back-out for invoice-level taxes

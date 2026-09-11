@@ -130,7 +130,7 @@ class CreditCard implements MethodInterface, LivewireMethodInterface
 
             $error_details = $e->error_details;
 
-            if (isset($e->error_details['error_codes']) ?? false) {
+            if (isset($e->error_details['error_codes']) && is_array($e->error_details['error_codes'])) {
                 $error_details = end($e->error_details['error_codes']);
             } else {
                 $error_details = $e->getMessage();

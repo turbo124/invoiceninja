@@ -364,7 +364,7 @@ class PeppolCountryTest extends TestCase
         // ── Storecove adapter (transform + decorate) ──
         $storecove = new Storecove();
         $storecove->adapter
-            ->transformFromPeppol($fresh, $peppol, $p->isCreditNote())
+            ->transformFromPeppol($fresh, $peppol, $p->getDocumentKind(), $xml)
             ->decorate();
         $storecoveInvoice = $storecove->adapter->getInvoice();
 
@@ -608,7 +608,7 @@ class PeppolCountryTest extends TestCase
 
         $storecove = new Storecove();
         $storecove->adapter
-            ->transformFromPeppol($invoice, $p->getDocument(), $p->isCreditNote())
+            ->transformFromPeppol($invoice, $p->getDocument(), $p->getDocumentKind(), $p->toXml())
             ->decorate();
 
         $document = $storecove->adapter->getDocument();
@@ -647,7 +647,7 @@ class PeppolCountryTest extends TestCase
 
         $storecove = new Storecove();
         $storecove->adapter
-            ->transformFromPeppol($invoice, $p->getDocument(), $p->isCreditNote())
+            ->transformFromPeppol($invoice, $p->getDocument(), $p->getDocumentKind(), $p->toXml())
             ->decorate();
 
         $document = $storecove->adapter->getDocument();
@@ -680,7 +680,7 @@ class PeppolCountryTest extends TestCase
 
         $storecove = new Storecove();
         $storecove->adapter
-            ->transformFromPeppol($invoice, $p->getDocument(), $p->isCreditNote())
+            ->transformFromPeppol($invoice, $p->getDocument(), $p->getDocumentKind(), $p->toXml())
             ->decorate();
 
         $document = $storecove->adapter->getDocument();

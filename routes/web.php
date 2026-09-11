@@ -53,7 +53,12 @@ Route::any('nordigen/confirm', [NordigenController::class, 'confirm'])->name('no
 
 Route::get('checkout/3ds_redirect/{company_key}/{company_gateway_id}/{hash}', [Checkout3dsController::class, 'index'])->middleware('domain_db')->name('checkout.3ds_redirect');
 Route::get('mollie/3ds_redirect/{company_key}/{company_gateway_id}/{hash}', [Mollie3dsController::class, 'index'])->middleware('domain_db')->name('mollie.3ds_redirect');
-Route::get('gocardless/ibp_redirect/{company_key}/{company_gateway_id}/{hash}', [GoCardlessController::class, 'ibpRedirect'])->middleware('domain_db')->name('gocardless.ibp_redirect');
+Route::get('gocardless/hosted_payment_page/return/{company_key}/{company_gateway_id}/{hash}', [GoCardlessController::class, 'hostedPaymentPageReturn'])
+    ->middleware(['domain_db', 'throttle:20,1'])
+    ->name('gocardless.hosted_payment_page.return');
+Route::get('gocardless/hosted_payment_page/setup_return/{company_key}/{company_gateway_id}/{context}', [GoCardlessController::class, 'hostedPaymentPageSetupReturn'])
+    ->middleware(['domain_db', 'throttle:20,1'])
+    ->name('gocardless.hosted_payment_page.setup_return');
 Route::get('.well-known/apple-developer-merchantid-domain-association', [ApplePayDomainController::class, 'showAppleMerchantId']);
 
 Route::get('gocardless/oauth/connect/confirm', [GoCardlessOAuthController::class, 'confirm'])->name('gocardless.oauth.confirm');
