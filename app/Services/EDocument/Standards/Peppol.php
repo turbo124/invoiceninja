@@ -1087,7 +1087,7 @@ class Peppol extends AbstractService implements MutatorInterface
         $charges = [];
         foreach ($this->p_invoice->AllowanceCharge ?? [] as $ac) {
             $categories = $ac->TaxCategory ?? [];
-            if (! is_array($categories)) {
+            if (! is_array($categories)) { //@phpstan-ignore-line
                 $categories = [$categories];
             }
             $category = $categories[0] ?? null;
