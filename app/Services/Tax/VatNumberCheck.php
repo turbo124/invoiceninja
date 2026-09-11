@@ -35,10 +35,17 @@ class VatNumberCheck
 
     private function checkvat_number(): self
     {
-        // VIES files Greece as EL, and takes the number without its country prefix
-        $country_code = $this->country_code == 'GR' ? 'EL' : $this->country_code;
+        // Prefer the VAT registration prefix, falling back to the supplied country.
+        $country_code = strtoupper($this->country_code);
         $vat_number = strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $this->vat_number));
-        $vat_number = preg_replace("/^({$this->country_code}|{$country_code})/", '', $vat_number);
+
+        if (preg_match('/^(AT|BE|BG|CY|CZ|DE|DK|EE|EL|ES|FI|FR|GR|HR|HU|IE|IT|LT|LU|LV|MT|NL|PL|PT|RO|SE|SI|SK|XI)/', $vat_number, $matches)) {
+            $country_code = $matches[1];
+            $vat_number = substr($vat_number, 2);
+        }
+
+        // VIES files Greece as EL.
+        $country_code = $country_code == 'GR' ? 'EL' : $country_code;
 
         $response = Http::timeout(20)->post('https://ec.europa.eu/taxation_customs/vies/rest-api/check-vat-number', [
             'countryCode' => $country_code,

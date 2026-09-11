@@ -14,6 +14,7 @@ namespace Tests\Unit\Tax;
 
 use App\Services\Tax\VatNumberCheck;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -55,6 +56,31 @@ class VatNumberTest extends TestCase
         (new VatNumberCheck("GR123456789", "GR"))->run();
 
         Http::assertSent(fn ($request) => $request['countryCode'] == 'EL' && $request['vatNumber'] == '123456789');
+    }
+
+    #[DataProvider('vatCountryProvider')]
+    public function testVatCountrySelection(string $vat_number, string $fallback_country, string $expected_country, string $expected_number)
+    {
+        Http::fake(['ec.europa.eu/*' => Http::response(['valid' => false])]);
+
+        (new VatNumberCheck($vat_number, $fallback_country))->run();
+
+        Http::assertSent(fn ($request) => $request['countryCode'] == $expected_country && $request['vatNumber'] == $expected_number);
+    }
+
+    public static function vatCountryProvider(): array
+    {
+        return [
+            'prefix overrides country' => ['de 123 456 789', 'FR', 'DE', '123456789'],
+            'unprefixed number uses fallback' => ['123456789', 'FR', 'FR', '123456789'],
+            'Greek GR prefix' => ['GR123456789', 'DE', 'EL', '123456789'],
+            'Greek EL prefix' => ['EL123456789', 'DE', 'EL', '123456789'],
+            'Greek fallback' => ['123456789', 'GR', 'EL', '123456789'],
+            'Austrian prefix preserves letter' => ['ATU12345678', 'FR', 'AT', 'U12345678'],
+            'unprefixed Austrian number' => ['U12345678', 'AT', 'AT', 'U12345678'],
+            'unprefixed French letters' => ['AB123456789', 'FR', 'FR', 'AB123456789'],
+            'Northern Ireland prefix' => ['XI123456789', 'GB', 'XI', '123456789'],
+        ];
     }
 
     public function testUnavailableMemberStateIsNotAnInvalidNumber()
