@@ -36,6 +36,23 @@ Run the suite with:
 npm run test:e2e
 ```
 
+Default payment method authorization regression tests:
+
+```sh
+npm run test:e2e -- tests/e2e/client-portal-default-payment-method.spec.ts
+```
+
+These tests create two isolated clients and synthetic stored payment methods,
+exercise the real portal and Livewire endpoint, and remove their tokens and
+gateway afterward. They need the local Artisan helper to access the same
+`db-ninja-01` database as the browser backend. No payment gateway credentials
+or external payment calls are required. Coverage includes UI switching and
+repeat actions, signed-snapshot property tampering, changed/expired login,
+company ownership, and archived/deleted/missing tokens. Rejected requests must
+leave all fixture token state unchanged. The suite checks Livewire's empty 419
+response for locked properties outside debug mode (or its explicit exception
+in debug mode), and Invoice Ninja's existing 400 JSON model-not-found response.
+
 PayPal REST tests live under `tests/e2e/client-portal-payments/paypal/`. They
 scaffold their own company gateway from `PAYPAL_REST_KEYS` (create or update
 gateway, verify auth, archive other active gateways for isolated specs, restore
