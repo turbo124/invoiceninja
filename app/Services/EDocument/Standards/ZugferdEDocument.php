@@ -101,28 +101,34 @@ class ZugferdEDocument extends AbstractService
 
     private function setCustomSurcharges(): self
     {
-        $item = $this->calc->getTaxMap()->first() ?: ['tax_rate' => 0, 'tax_id' => null];
+        $tax_groups = $this->buildDocumentTaxGroups();
 
-        $tax_code = $item['tax_id'] ? $this->getTaxType($item["tax_id"] ?? '2') : $this->tax_code;
+        foreach ([1, 2, 3, 4] as $index) {
+            $amount = (float) $this->document->{"custom_surcharge{$index}"};
 
-        if ($this->document->custom_surcharge1 > 0) {
-            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge1 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge1;
-            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $tax_code, "VAT", $item["tax_rate"], null, null, null, null, null, null, ctrans('texts.surcharge'));
-        }
+            if ($amount <= 0) {
+                continue;
+            }
 
-        if ($this->document->custom_surcharge2 > 0) {
-            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge2 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge2;
-            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $tax_code, "VAT", $item["tax_rate"], null, null, null, null, null, null, ctrans('texts.surcharge'));
-        }
+            [$tax_category, $tax_rate] = $this->documentSurchargeTaxClassification($index, $tax_groups);
+            $surcharge = $this->document->uses_inclusive_taxes && $tax_rate > 0
+                ? round($amount / (1 + ($tax_rate / 100)), 2)
+                : $amount;
 
-        if ($this->document->custom_surcharge3 > 0) {
-            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge3 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge3;
-            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $tax_code, "VAT", $item["tax_rate"], null, null, null, null, null, null, ctrans('texts.surcharge'));
-        }
-
-        if ($this->document->custom_surcharge4 > 0) {
-            $surcharge = $this->document->uses_inclusive_taxes ? ($this->document->custom_surcharge4 / (1 + ($item["tax_rate"] / 100))) : $this->document->custom_surcharge4;
-            $this->xdocument->addDocumentAllowanceCharge($surcharge, true, $tax_code, "VAT", $item["tax_rate"], null, null, null, null, null, null, ctrans('texts.surcharge'));
+            $this->xdocument->addDocumentAllowanceCharge(
+                $surcharge,
+                true,
+                $tax_category,
+                "VAT",
+                $tax_rate,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ctrans('texts.surcharge')
+            );
         }
 
         return $this;
@@ -182,141 +188,58 @@ class ZugferdEDocument extends AbstractService
     private function setDocumentTaxes(): self
     {
         $document_discount = $this->getDocumentAllowanceTotalForZugferd();
+        $tax_groups = $this->buildDocumentTaxGroups();
+        $group_bases = array_column($tax_groups, 'base_amount', 'key');
+        $document_allowances = $this->allocateDocumentAllowanceAmounts($document_discount, $group_bases);
 
-        if ((string) $this->document->total_taxes == '0') {
-
-            $tax_amount = 0;
-            $tax_rate = 0;
-
-            $category_bases = $this->sumDutyTaxCategoryBasesFromLineItems();
-            $total_base_for_discount = array_sum($category_bases);
-            $document_allowances = $this->allocateDocumentAllowanceAmounts($document_discount, $category_bases);
-
-            foreach ($document_allowances as $duty_category => $allowance_amount) {
-                $category_bases[$duty_category] = round(
-                    ($category_bases[$duty_category] ?? 0) - $allowance_amount,
-                    2
-                );
-            }
-
-            $target_net = round((float) $this->document->amount - (float) $this->document->total_taxes, 2);
-            $category_bases = $this->reconcileTaxCategoryBasesToTarget($category_bases, $target_net);
-
-            foreach ($category_bases as $duty_category => $base_amount) {
-                if (round($base_amount, 2) <= 0) {
-                    continue;
-                }
-
-                $this->xdocument->addDocumentTax(
-                    $duty_category,
-                    "VAT",
-                    round($base_amount, 2),
-                    $tax_amount,
-                    $tax_rate,
-                    $this->exemptionReasonTextForDutyCategory($duty_category),
-                    $this->exemptionReasonCodeForDutyCategory($duty_category)
-                );
-            }
-
-            if ($document_discount > 0 && $total_base_for_discount > 0) {
-
-                foreach ($category_bases as $duty_category => $base_amount) {
-                    if (round($base_amount, 2) <= 0) {
-                        continue;
-                    }
-
-                    $allowance_amount = $document_allowances[$duty_category] ?? 0.0;
-
-                    if ($allowance_amount <= 0) {
-                        continue;
-                    }
-
-                    $this->xdocument->addDocumentAllowanceCharge(
-                        $allowance_amount,
-                        false,
-                        $duty_category,
-                        "VAT",
-                        0,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        ctrans('texts.discount')
-                    );
-                }
-            }
-
-            return $this;
+        foreach ($tax_groups as &$group) {
+            $group['base_amount'] = round(
+                $group['base_amount'] - ($document_allowances[$group['key']] ?? 0.0),
+                2
+            );
         }
+        unset($group);
 
-        $tax_map = $this->calc->getTaxMap();
-        $net_subtotal = $tax_map->sum('base_amount');
+        $target_net = round((float) $this->document->amount - (float) $this->calc->getTotalTaxes(), 2);
+        $tax_groups = $this->reconcileDocumentTaxGroupsToTarget($tax_groups, $target_net);
 
-        $total_tax = $this->calc->getTotalTaxes();
-        $taxable_amount = $this->document->amount - $total_tax;
+        foreach ($tax_groups as $group) {
+            $base_amount = round($group['base_amount'], 2);
 
-        //taxable amount and net subtotal should be the same
-        $adjustment = round($taxable_amount - $net_subtotal, 2);
+            if ($base_amount <= 0) {
+                continue;
+            }
 
-        /** Iterate and ensure all taxes are grouped so that we do not have duplicates */
-        $tax_map = $this->calc->getTaxMap()
-                        ->groupBy('tax_rate')
-                        ->map(function ($group) {
-                            return [
-                                'tax_id'      => $group->first()['tax_id'],
-                                'tax_rate'    => $group->first()['tax_rate'],
-                                'base_amount' => $group->sum('base_amount'),
-                                'total'       => $group->sum('total'),
-                            ];
-                        })
-                        ->values();
-
-        $document_allowances = $this->allocateDocumentAllowanceAmounts(
-            $document_discount,
-            $tax_map->pluck('base_amount')->all()
-        );
-
-        // Process each tax rate group
-        foreach ($tax_map as $index => $item) {
-            $tax_type = $this->getTaxType($item["tax_id"]);
-            // Add tax information
-            $isIntraCommunity = $tax_type == ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES;
+            $tax_amount = round($base_amount * ($group['tax_rate'] / 100), 2);
 
             $this->xdocument->addDocumentTax(
-                $tax_type,
+                $group['tax_category'],
                 "VAT",
-                $item["base_amount"] + $adjustment, // Taxable amount after discount
-                $item["total"],
-                $item["tax_rate"],
-                $isIntraCommunity ? ctrans('texts.intracommunity_tax_info') : null,
-                $isIntraCommunity ? "VATEX-EU-IC" : null
+                $base_amount,
+                $tax_amount,
+                $group['tax_rate'],
+                $this->exemptionReasonTextForDutyCategory($group['tax_category']),
+                $this->exemptionReasonCodeForDutyCategory($group['tax_category'])
             );
 
-            if ($document_discount > 0) {
+            $allowance_amount = $document_allowances[$group['key']] ?? 0.0;
 
-                $allowance_amount = $document_allowances[$index] ?? 0.0;
-
-                if ($allowance_amount > 0) {
-                    $this->xdocument->addDocumentAllowanceCharge(
-                        $allowance_amount,
-                        false,
-                        $this->getTaxType($item["tax_id"] ?? '2'),
-                        "VAT",
-                        $item["tax_rate"],
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        ctrans('texts.discount')
-                    );
-                }
+            if ($allowance_amount > 0) {
+                $this->xdocument->addDocumentAllowanceCharge(
+                    $allowance_amount,
+                    false,
+                    $group['tax_category'],
+                    "VAT",
+                    $group['tax_rate'],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    ctrans('texts.discount')
+                );
             }
-
-            $adjustment = 0;
         }
 
         return $this;
@@ -800,7 +723,7 @@ class ZugferdEDocument extends AbstractService
         $total_weight = array_sum($normalized_weights);
 
         if ($total_cents === 0 || empty($allocations)) {
-            return array_map(static fn (): float => 0.0, $allocations);
+            return array_map(static fn(): float => 0.0, $allocations);
         }
 
         if ($total_weight <= 0) {
@@ -809,7 +732,7 @@ class ZugferdEDocument extends AbstractService
                 break;
             }
 
-            return array_map(static fn (int $cents): float => $cents / 100, $allocations);
+            return array_map(static fn(int $cents): float => $cents / 100, $allocations);
         }
 
         $remainders = [];
@@ -839,7 +762,7 @@ class ZugferdEDocument extends AbstractService
             $allocations[$allocation_order[$index]]++;
         }
 
-        return array_map(static fn (int $cents): float => $cents / 100, $allocations);
+        return array_map(static fn(int $cents): float => $cents / 100, $allocations);
     }
 
     /**
@@ -847,56 +770,159 @@ class ZugferdEDocument extends AbstractService
      */
     private function invoiceLineTradeTaxClassification(object $item): array
     {
-        if (strlen($item->tax_name1 ?? '') > 1) {
+        $tax_id = (string) ($item->tax_id ?? '');
+        $has_explicit_tax_category = in_array($tax_id, [
+            (string) Product::PRODUCT_TYPE_EXEMPT,
+            (string) Product::PRODUCT_TYPE_ZERO_RATED,
+            (string) Product::PRODUCT_TYPE_REVERSE_TAX,
+            (string) Product::PRODUCT_INTRA_COMMUNITY,
+        ], true);
+
+        if (strlen($item->tax_name1 ?? '') > 1 || $has_explicit_tax_category) {
             return [$this->getTaxType($item->tax_id ?? '2'), (float) $item->tax_rate1];
         }
 
         return [$this->tax_code ?? ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX, 0.0];
     }
 
-    private function getPositionDutyTaxCategory(object $item): string
-    {
-        return $this->invoiceLineTradeTaxClassification($item)[0];
-    }
-
     /**
-     * @return array<string, float>
+     * @return array<int, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float
+     * }>
      */
-    private function sumDutyTaxCategoryBasesFromLineItems(): array
+    private function buildDocumentTaxGroups(): array
     {
-        $category_bases = [];
+        $groups = [];
 
         foreach ($this->document->line_items as $item) {
-            $category = $this->getPositionDutyTaxCategory($item);
-            $net = $this->getLineNetTotalForZugferd($item);
-            $category_bases[$category] = ($category_bases[$category] ?? 0) + $net;
+            [$tax_category, $tax_rate] = $this->invoiceLineTradeTaxClassification($item);
+            $this->addDocumentTaxGroup(
+                $groups,
+                $tax_category,
+                $tax_rate,
+                $this->getLineNetTotalForZugferd($item)
+            );
         }
 
-        return $category_bases;
+        foreach ([1, 2, 3, 4] as $index) {
+            $amount = (float) $this->document->{"custom_surcharge{$index}"};
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            [$tax_category, $tax_rate] = $this->documentSurchargeTaxClassification($index, $groups);
+            $net_amount = $this->document->uses_inclusive_taxes && $tax_rate > 0
+                ? round($amount / (1 + ($tax_rate / 100)), 2)
+                : $amount;
+
+            $this->addDocumentTaxGroup($groups, $tax_category, $tax_rate, $net_amount);
+        }
+
+        return array_values($groups);
     }
 
     /**
-     * @param  array<string, float>  $category_bases
-     * @return array<string, float>
+     * @param array<string, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float
+     * }> $groups
      */
-    private function reconcileTaxCategoryBasesToTarget(array $category_bases, float $target_net): array
-    {
-        if (empty($category_bases)) {
-            $duty = $this->tax_code ?? ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX;
+    private function addDocumentTaxGroup(
+        array &$groups,
+        string $tax_category,
+        float $tax_rate,
+        float $base_amount
+    ): void {
+        $key = $tax_category . '|' . number_format($tax_rate, 6, '.', '');
 
-            return [$duty => $target_net];
+        if (! isset($groups[$key])) {
+            $groups[$key] = [
+                'key' => $key,
+                'tax_category' => $tax_category,
+                'tax_rate' => $tax_rate,
+                'base_amount' => 0.0,
+            ];
         }
 
-        $sum = round(array_sum($category_bases), 2);
+        $groups[$key]['base_amount'] += $base_amount;
+    }
+
+    /**
+     * @param array<int|string, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float
+     * }> $tax_groups
+     * @return array{0: string, 1: float}
+     */
+    private function documentSurchargeTaxClassification(int $index, array $tax_groups): array
+    {
+        if (! (bool) $this->document->{"custom_surcharge_tax{$index}"}) {
+            return [ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX, 0.0];
+        }
+
+        foreach ($tax_groups as $group) {
+            if ($group['tax_rate'] > 0) {
+                return [$group['tax_category'], $group['tax_rate']];
+            }
+        }
+
+        return [
+            $this->tax_code ?? ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX,
+            0.0,
+        ];
+    }
+
+    /**
+     * @param array<int, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float
+     * }> $tax_groups
+     * @return array<int, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float
+     * }>
+     */
+    private function reconcileDocumentTaxGroupsToTarget(array $tax_groups, float $target_net): array
+    {
+        if (empty($tax_groups)) {
+            $duty = $this->tax_code ?? ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX;
+
+            return [[
+                'key' => $duty . '|0.000000',
+                'tax_category' => $duty,
+                'tax_rate' => 0.0,
+                'base_amount' => $target_net,
+            ]];
+        }
+
+        $sum = round(array_sum(array_column($tax_groups, 'base_amount')), 2);
         $adjustment = round($target_net - $sum, 2);
 
         if (abs($adjustment) >= 0.009) {
-            arsort($category_bases);
-            $top_category = array_key_first($category_bases);
-            $category_bases[$top_category] = round($category_bases[$top_category] + $adjustment, 2);
+            $largest_group_index = array_keys(
+                array_column($tax_groups, 'base_amount'),
+                max(array_column($tax_groups, 'base_amount')),
+                true
+            )[0];
+            $tax_groups[$largest_group_index]['base_amount'] = round(
+                $tax_groups[$largest_group_index]['base_amount'] + $adjustment,
+                2
+            );
         }
 
-        return $category_bases;
+        return $tax_groups;
     }
 
     private function exemptionReasonCodeForDutyCategory(string $duty_category): ?string
@@ -906,7 +932,8 @@ class ZugferdEDocument extends AbstractService
             ZugferdDutyTaxFeeCategories::VAT_REVERSE_CHARGE => 'VATEX-EU-AE',
             ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES => 'VATEX-EU-IC',
             ZugferdDutyTaxFeeCategories::SERVICE_OUTSIDE_SCOPE_OF_TAX => 'VATEX-EU-O',
-            default => $this->exemption_reason_code,
+            ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX => $this->exemption_reason_code,
+            default => null,
         };
     }
 
@@ -914,6 +941,10 @@ class ZugferdEDocument extends AbstractService
     {
         if ($duty_category == ZugferdDutyTaxFeeCategories::VAT_EXEMPT_FOR_EEA_INTRACOMMUNITY_SUPPLY_OF_GOODS_AND_SERVICES) {
             return ctrans('texts.intracommunity_tax_info');
+        }
+
+        if ($duty_category == ZugferdDutyTaxFeeCategories::EXEMPT_FROM_TAX) {
+            return ctrans('texts.tax_exempt');
         }
 
         return null;
