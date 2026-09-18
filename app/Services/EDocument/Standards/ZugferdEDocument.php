@@ -189,8 +189,10 @@ class ZugferdEDocument extends AbstractService
     {
         $document_discount = $this->getDocumentAllowanceTotalForZugferd();
         $tax_groups = $this->buildDocumentTaxGroups();
-        $group_bases = array_column($tax_groups, 'base_amount', 'key');
-        $document_allowances = $this->allocateDocumentAllowanceAmounts($document_discount, $group_bases);
+        $document_allowances = $this->allocateDocumentAllowanceAmounts(
+            $document_discount,
+            $this->buildLineTaxGroupBases()
+        );
 
         foreach ($tax_groups as &$group) {
             $group['base_amount'] = round(
@@ -203,6 +205,8 @@ class ZugferdEDocument extends AbstractService
         $target_net = round((float) $this->document->amount - (float) $this->calc->getTotalTaxes(), 2);
         $tax_groups = $this->reconcileDocumentTaxGroupsToTarget($tax_groups, $target_net);
 
+        $emitted_groups = [];
+
         foreach ($tax_groups as $group) {
             $base_amount = round($group['base_amount'], 2);
 
@@ -210,13 +214,22 @@ class ZugferdEDocument extends AbstractService
                 continue;
             }
 
-            $tax_amount = round($base_amount * ($group['tax_rate'] / 100), 2);
+            $group['base_amount'] = $base_amount;
+            $group['tax_amount'] = round($base_amount * ($group['tax_rate'] / 100), 2);
+            $emitted_groups[] = $group;
+        }
 
+        $emitted_groups = $this->reconcileDocumentTaxAmountsToTarget(
+            $emitted_groups,
+            round((float) $this->calc->getTotalTaxes(), 2)
+        );
+
+        foreach ($emitted_groups as $group) {
             $this->xdocument->addDocumentTax(
                 $group['tax_category'],
                 "VAT",
-                $base_amount,
-                $tax_amount,
+                $group['base_amount'],
+                $group['tax_amount'],
                 $group['tax_rate'],
                 $this->exemptionReasonTextForDutyCategory($group['tax_category']),
                 $this->exemptionReasonCodeForDutyCategory($group['tax_category'])
@@ -340,7 +353,7 @@ class ZugferdEDocument extends AbstractService
             $this->document->amount,                    // Total amount with VAT
             $this->document->balance,                   // Amount due
             $subtotal,                                  // Sum before tax
-            $this->document->uses_inclusive_taxes ? $this->calc->getTotalNetSurcharges() : $this->calc->getTotalSurcharges(),         // Total charges
+            $this->getDocumentChargeTotalForZugferd(),  // Total charges
             $document_discount,                         // Total allowances
             $taxable_amount,                           // Tax basis total (net)
             round($total_tax, 2),                       // Total tax amount
@@ -698,10 +711,31 @@ class ZugferdEDocument extends AbstractService
         }
 
         $line_total = $this->getLineNetTotalSumForZugferd();
-        $charge_total = round((float) $this->calc->getTotalNetSurcharges(), 2);
+        $charge_total = $this->getDocumentChargeTotalForZugferd();
         $tax_basis_total = round((float) $this->document->amount - (float) $this->calc->getTotalTaxes(), 2);
 
         return max(0, round($line_total + $charge_total - $tax_basis_total, 2));
+    }
+
+    private function getDocumentChargeTotalForZugferd(): float
+    {
+        $total = 0.0;
+        $tax_groups = $this->buildDocumentTaxGroups();
+
+        foreach ([1, 2, 3, 4] as $index) {
+            $amount = (float) $this->document->{"custom_surcharge{$index}"};
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            [, $tax_rate] = $this->documentSurchargeTaxClassification($index, $tax_groups);
+            $total += $this->document->uses_inclusive_taxes && $tax_rate > 0
+                ? round($amount / (1 + ($tax_rate / 100)), 2)
+                : $amount;
+        }
+
+        return round($total, 2);
     }
 
     /**
@@ -786,13 +820,25 @@ class ZugferdEDocument extends AbstractService
     }
 
     /**
-     * @return array<int, array{
-     *     key: string,
-     *     tax_category: string,
-     *     tax_rate: float,
-     *     base_amount: float
-     * }>
+     * @return array<string, float>
      */
+    private function buildLineTaxGroupBases(): array
+    {
+        $groups = [];
+
+        foreach ($this->document->line_items as $item) {
+            [$tax_category, $tax_rate] = $this->invoiceLineTradeTaxClassification($item);
+            $this->addDocumentTaxGroup(
+                $groups,
+                $tax_category,
+                $tax_rate,
+                $this->getLineNetTotalForZugferd($item)
+            );
+        }
+
+        return array_column(array_values($groups), 'base_amount', 'key');
+    }
+
     private function buildDocumentTaxGroups(): array
     {
         $groups = [];
@@ -921,6 +967,62 @@ class ZugferdEDocument extends AbstractService
                 2
             );
         }
+
+        return $tax_groups;
+    }
+
+    /**
+     * @param array<int, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float,
+     *     tax_amount: float
+     * }> $tax_groups
+     * @return array<int, array{
+     *     key: string,
+     *     tax_category: string,
+     *     tax_rate: float,
+     *     base_amount: float,
+     *     tax_amount: float
+     * }>
+     */
+    private function reconcileDocumentTaxAmountsToTarget(array $tax_groups, float $target_tax): array
+    {
+        if (empty($tax_groups)) {
+            return $tax_groups;
+        }
+
+        $adjustment = round($target_tax - array_sum(array_column($tax_groups, 'tax_amount')), 2);
+
+        if (abs($adjustment) < 0.009 || abs($adjustment) > 1.0) {
+            return $tax_groups;
+        }
+
+        $taxed_indexes = [];
+
+        foreach ($tax_groups as $index => $group) {
+            if ($group['tax_rate'] > 0) {
+                $taxed_indexes[] = $index;
+            }
+        }
+
+        if (empty($taxed_indexes)) {
+            return $tax_groups;
+        }
+
+        $largest_group_index = $taxed_indexes[0];
+
+        foreach ($taxed_indexes as $index) {
+            if ($tax_groups[$index]['tax_amount'] > $tax_groups[$largest_group_index]['tax_amount']) {
+                $largest_group_index = $index;
+            }
+        }
+
+        $tax_groups[$largest_group_index]['tax_amount'] = round(
+            $tax_groups[$largest_group_index]['tax_amount'] + $adjustment,
+            2
+        );
 
         return $tax_groups;
     }
