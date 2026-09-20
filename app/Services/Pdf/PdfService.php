@@ -13,6 +13,7 @@
 namespace App\Services\Pdf;
 
 use App\Models\Company;
+use App\Models\Credit;
 use App\Models\CreditInvitation;
 use App\Utils\Gotenberg\GotenbergPdf;
 use App\Models\Invoice;
@@ -136,7 +137,7 @@ class PdfService
 
             if ($this->shouldMergeEInvoiceToPdf()) {
 
-                try{
+                try {
                     $pdf = $this->mergeEInvoiceToPdf($pdf);
                 } catch (\Throwable $e) {
                     nlog("ERROR MERGING E-INVOICE TO PDF: " . $e->getMessage());
@@ -370,7 +371,7 @@ class PdfService
 
     private function shouldCreatePdfA3VisualPdf(): bool
     {
-        return $this->config->entity instanceof Invoice
+        return ($this->config->entity instanceof Invoice || $this->config->entity instanceof Credit)
             && ZugferdPdfMerger::shouldMerge($this->config->entity, $this->config->settings);
 
     }

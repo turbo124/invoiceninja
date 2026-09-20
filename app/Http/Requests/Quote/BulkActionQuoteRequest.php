@@ -14,6 +14,8 @@ namespace App\Http\Requests\Quote;
 
 use App\Http\Requests\Request;
 use App\Http\ValidationRules\Quote\ConvertableQuoteRule;
+use App\Models\Quote;
+use Illuminate\Validation\Validator;
 
 class BulkActionQuoteRequest extends Request
 {
@@ -49,5 +51,27 @@ class BulkActionQuoteRequest extends Request
         }
 
         return $rules;
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+        
+            $quotes = Quote::withTrashed()
+                        ->with('client')
+                        ->whereIn('id', $this->transformKeys($this->input('ids')))
+                        ->company()
+                        ->get();
+                
+            if (in_array($this->input('action'), ['mark_sent', 'send_email', 'email'])) {
+                if ($quotes->contains(fn (Quote $quote) => $quote->hasLapsedValidUntil())) {
+                    $validator->errors()->add(
+                        'ids',
+                        ctrans('texts.expired_quote_validation_error'),
+                    );
+                }
+            }
+
+        });
     }
 }

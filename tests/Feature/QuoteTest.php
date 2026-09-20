@@ -51,6 +51,286 @@ class QuoteTest extends TestCase
 
     }
 
+    public function testHasLapsedValidUntilIsInclusiveOfDueDate()
+    {
+        $quote = $this->makeDraftQuote(now()->format('Y-m-d'));
+
+        $this->assertFalse($quote->hasLapsedValidUntil());
+        $this->assertFalse($quote->hasLapsedValidUntil(now()->format('Y-m-d')));
+        $this->assertTrue($quote->hasLapsedValidUntil(now()->subDays(7)->format('Y-m-d')));
+        $this->assertFalse($quote->hasLapsedValidUntil(''));
+    }
+
+    public function testSentQuoteWithDueDateTodayIsNotExpired()
+    {
+        $quote = $this->makeDraftQuote(now()->format('Y-m-d'), Quote::STATUS_SENT);
+
+        $this->assertEquals(Quote::STATUS_SENT, $quote->status_id);
+        $this->assertEquals(Quote::STATUS_SENT, $quote->getRawOriginal('status_id'));
+    }
+
+    public function testSentQuoteWithPastDueDateIsExpired()
+    {
+        $quote = $this->makeDraftQuote(now()->subDays(7)->format('Y-m-d'), Quote::STATUS_SENT);
+
+        $this->assertEquals(Quote::STATUS_EXPIRED, $quote->status_id);
+        $this->assertEquals(Quote::STATUS_SENT, $quote->getRawOriginal('status_id'));
+    }
+
+    public function testStoreRejectsExpiredDueDate()
+    {
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes', [
+            'client_id' => $this->client->hashed_id,
+            'date' => now()->subDays(10)->format('Y-m-d'),
+            'due_date' => now()->subDays(7)->format('Y-m-d'),
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['due_date']);
+    }
+
+    public function testStoreAcceptsDueDateOfToday()
+    {
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes', [
+            'client_id' => $this->client->hashed_id,
+            'date' => now()->format('Y-m-d'),
+            'due_date' => now()->format('Y-m-d'),
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(now()->format('Y-m-d'), $response->json('data.due_date'));
+    }
+
+    public function testUpdateRejectsExpiredDueDate()
+    {
+        $quote = $this->makeDraftQuote(now()->addDays(7)->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/quotes/'.$quote->hashed_id, [
+            'due_date' => now()->subDays(7)->format('Y-m-d'),
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['due_date']);
+    }
+
+    public function testUpdateWithoutDueDateDoesNotRequireClientId()
+    {
+        $quote = $this->makeDraftQuote(now()->addDays(7)->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/quotes/'.$quote->hashed_id, [
+            'public_notes' => 'partial update',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('partial update', $response->json('data.public_notes'));
+    }
+
+    public function testPutMarkSentRejectsExpiredQuote()
+    {
+        $due_date = now()->subDays(7)->format('Y-m-d');
+        $quote = $this->makeDraftQuote($due_date);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/quotes/'.$quote->hashed_id.'?mark_sent=true', [
+            'client_id' => $this->client->hashed_id,
+            'due_date' => $due_date,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['due_date']);
+
+        $this->assertEquals(Quote::STATUS_DRAFT, $quote->fresh()->getRawOriginal('status_id'));
+    }
+
+    public function testPutMarkSentRejectsStoredExpiredDueDateWhenOmitted()
+    {
+        $quote = $this->makeDraftQuote(now()->subDays(7)->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/quotes/'.$quote->hashed_id.'?mark_sent=true', [
+            'public_notes' => 'mark sent only',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['due_date']);
+
+        $this->assertEquals(Quote::STATUS_DRAFT, $quote->fresh()->getRawOriginal('status_id'));
+    }
+
+    public function testPutMarkSentTodayGeneratesNumberWhenSent()
+    {
+        $this->setCounterNumberApplied('when_sent');
+
+        $quote = $this->makeDraftQuote(now()->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->putJson('/api/v1/quotes/'.$quote->hashed_id.'?mark_sent=true', [
+            'due_date' => now()->format('Y-m-d'),
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(Quote::STATUS_SENT, $response->json('data.status_id'));
+        $this->assertNotEmpty($response->json('data.number'));
+    }
+
+    public function testBulkMarkSentRejectsExpiredQuote()
+    {
+        $quote = $this->makeDraftQuote(now()->subDays(7)->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'mark_sent',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['ids']);
+
+        $this->assertEquals(Quote::STATUS_DRAFT, $quote->fresh()->getRawOriginal('status_id'));
+    }
+
+    public function testBulkEmailRejectsExpiredQuote()
+    {
+        $quote = $this->makeDraftQuote(now()->subDays(7)->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'email',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['ids']);
+    }
+
+    public function testBulkMarkSentTodayGeneratesNumberWhenSent()
+    {
+        $this->setCounterNumberApplied('when_sent');
+
+        $quote = $this->makeDraftQuote(now()->format('Y-m-d'));
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'mark_sent',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(Quote::STATUS_SENT, $response->json('data.0.status_id'));
+        $this->assertNotEmpty($response->json('data.0.number'));
+    }
+
+    private function makeDraftQuote(string $due_date, int $status_id = Quote::STATUS_DRAFT): Quote
+    {
+        return Quote::factory()->create([
+            'user_id' => $this->user->id,
+            'company_id' => $this->company->id,
+            'client_id' => $this->client->id,
+            'status_id' => $status_id,
+            'number' => $status_id === Quote::STATUS_DRAFT ? null : 'QT-'.uniqid(),
+            'date' => now()->subDays(10)->format('Y-m-d'),
+            'due_date' => $due_date,
+        ]);
+    }
+
+    private function setCounterNumberApplied(string $value): void
+    {
+        $settings = $this->company->settings;
+        $settings->counter_number_applied = $value;
+        $this->company->settings = $settings;
+        $this->company->save();
+    }
+
+    public function testBulkConvertSucceedsForSentQuote()
+    {
+        $quote = $this->makeDraftQuote(now()->addDays(7)->format('Y-m-d'), Quote::STATUS_SENT);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'convert',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertNotEmpty($response->json('data.0.invoice_id'));
+    }
+
+    public function testBulkConvertToInvoiceSucceedsForSentQuote()
+    {
+        $quote = $this->makeDraftQuote(now()->format('Y-m-d'), Quote::STATUS_SENT);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'convert_to_invoice',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertNotEmpty($response->json('data.0.invoice_id'));
+    }
+
+    public function testBulkConvertRejectsExpiredQuote()
+    {
+        $quote = $this->makeDraftQuote(now()->subDays(7)->format('Y-m-d'), Quote::STATUS_SENT);
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'convert',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['action']);
+        $this->assertNull($quote->fresh()->invoice_id);
+    }
+
+    public function testBulkConvertRejectsAlreadyConvertedQuote()
+    {
+        $quote = $this->makeDraftQuote(now()->addDays(7)->format('Y-m-d'), Quote::STATUS_SENT);
+        $quote->service()->convert()->save();
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'),
+            'X-API-TOKEN' => $this->token,
+        ])->postJson('/api/v1/quotes/bulk', [
+            'action' => 'convert_to_invoice',
+            'ids' => [$quote->hashed_id],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['action']);
+    }
+
     public function testQuoteDueDateInjectionValidationLayer()
     {
 

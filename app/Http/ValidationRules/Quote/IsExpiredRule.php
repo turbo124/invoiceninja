@@ -12,31 +12,33 @@
 
 namespace App\Http\ValidationRules\Quote;
 
+use App\Models\Client;
 use App\Utils\Traits\MakesHash;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use App\Models\Quote;
 
-class ConvertableQuoteRule implements ValidationRule
+class IsExpiredRule implements ValidationRule
 {
     use MakesHash;
+
+    public function __construct(private int $client_id){}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 
-        $ids = request()->input('ids');
+        if(!$value) {
+            return;
+        }
 
-        $quotes = Quote::withTrashed()
-                        ->whereIn('id', $this->transformKeys($ids))
-                        ->company()
-                        ->get();
+        $client = Client::withTrashed()->find($this->client_id);
 
-        foreach ($quotes as $quote) {
-            if (! $quote->service()->isConvertable()) {
-                $fail(ctrans('texts.quote_has_expired'));
-            }
+        if(!$client) {
+            return;
+        }
+
+        if(\Carbon\Carbon::parse($value)->addDay()->lte(now()->setTimezone($client->timezone()->name)->startOfDay())) {
+            $fail(ctrans('texts.quote_due_date_expired'));
         }
 
     }
-
 }
