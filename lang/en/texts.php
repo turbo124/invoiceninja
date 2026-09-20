@@ -6373,6 +6373,8 @@ $lang = array(
     'estimated_hours' => 'Estimated Hours',
     'unestimated_tasks' => 'Unestimated Tasks',
     'tasks_over_estimate' => 'Tasks Over Estimate',
+    'expired_quote_validation_error' => 'An expired quote cannot be marked as sent.',
+    'quote_due_date_expired' => 'Quote valid until date is in the past.'
 );
 
 return $lang;

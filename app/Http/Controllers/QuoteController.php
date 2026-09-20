@@ -577,7 +577,6 @@ class QuoteController extends BaseController
 
             $quotes->each(function ($quote, $key) use ($user) {
                 if ($user->can('edit', $quote) && $quote->service()->isConvertable()) {
-                    // $quote->service()->convertToInvoice();
                     $quote->service()->convert()->save();
                 }
             });

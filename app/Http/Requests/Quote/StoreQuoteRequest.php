@@ -17,8 +17,8 @@ use App\Http\Requests\Request;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Validation\Rule;
 use App\Utils\Traits\CleanLineItems;
-use App\Http\ValidationRules\Quote\UniqueQuoteNumberRule;
 use App\Http\ValidationRules\Project\ValidProjectForClient;
+use App\Http\ValidationRules\Quote\IsExpiredRule;
 
 class StoreQuoteRequest extends Request
 {
@@ -63,7 +63,7 @@ class StoreQuoteRequest extends Request
         $rules['project_id'] = ['bail', 'sometimes', new ValidProjectForClient($this->all())];
         $rules['is_amount_discount'] = ['boolean'];
         $rules['date'] = 'bail|sometimes|date:Y-m-d';
-        $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', Rule::requiredIf(fn() => strlen($this->partial_due_date ?? '') > 1), 'date'];
+        $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', Rule::requiredIf(fn() => strlen($this->partial_due_date ?? '') > 1), 'date', new IsExpiredRule($this->client_id)];
         $rules['line_items'] = 'array';
 
         $rules['discount'] = 'sometimes|numeric|max:99999999999999';
@@ -151,7 +151,6 @@ class StoreQuoteRequest extends Request
         if (isset($input['terms']) && $this->hasHeader('X-REACT')) {
             $input['terms'] = str_replace("\n", "", $input['terms']);
         }
-
 
         $this->replace($input);
     }

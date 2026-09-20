@@ -13,11 +13,13 @@
 namespace App\Http\Requests\Quote;
 
 use App\Http\Requests\Request;
+use App\Http\ValidationRules\Quote\IsExpiredRule;
 use App\Models\Quote;
 use App\Utils\Traits\ChecksEntityStatus;
 use App\Utils\Traits\CleanLineItems;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateQuoteRequest extends Request
 {
@@ -65,7 +67,7 @@ class UpdateQuoteRequest extends Request
         $rules['date'] = 'bail|sometimes|date:Y-m-d';
 
         $rules['partial_due_date'] = ['bail', 'sometimes', 'nullable', 'exclude_if:partial,0', 'date', 'before:due_date', 'after_or_equal:date'];
-        $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', 'after_or_equal:date', Rule::requiredIf(fn() => strlen($this->partial_due_date ?? '') > 1), 'date'];
+        $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', 'after_or_equal:date', Rule::requiredIf(fn() => strlen($this->partial_due_date ?? '') > 1), 'date', new IsExpiredRule($this->quote->client_id)];
         $rules['amount'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
 
         $rules['custom_surcharge1'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
@@ -76,6 +78,23 @@ class UpdateQuoteRequest extends Request
         $rules['location_id'] = ['nullable', 'sometimes','bail', Rule::exists('locations', 'id')->where('company_id', $user->company()->id)->where('client_id', $this->quote->client_id)];
 
         return $this->globalRules($rules);
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        if ($validator->errors()->isNotEmpty()) {
+            return;
+        }
+
+        $validator->after(function (Validator $validator): void {
+        
+            if ($this->boolean('mark_sent') && $this->quote->hasLapsedValidUntil($this->input('due_date', $this->quote->due_date))) {
+                $validator->errors()->add(
+                    'due_date',
+                    ctrans('texts.expired_quote_validation_error'),
+                );
+            }
+        });
     }
 
     public function prepareForValidation()
@@ -119,7 +138,6 @@ class UpdateQuoteRequest extends Request
         if (isset($input['terms']) && $this->hasHeader('X-REACT')) {
             $input['terms'] = str_replace("\n", "", $input['terms']);
         }
-
 
         $this->replace($input);
     }

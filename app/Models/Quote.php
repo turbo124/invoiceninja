@@ -140,15 +140,6 @@ class Quote extends BaseModel
     use Searchable;
     use HasTags;
     Use IndexableItems;
-    /**
-     * Get the index name for the model.
-     *
-     * @return string
-     */
-    public function searchableAs(): string
-    {
-        return 'quotes';
-    }
 
     protected $presenter = QuotePresenter::class;
 
@@ -222,6 +213,16 @@ class Quote extends BaseModel
 
     public const STATUS_EXPIRED = -1;
 
+    /**
+     * Get the index name for the model.
+     *
+     * @return string
+     */
+    public function searchableAs(): string
+    {
+        return 'quotes';
+    }
+
     public function toSearchableArray(): array
     {
         
@@ -268,11 +269,25 @@ class Quote extends BaseModel
 
     public function getStatusIdAttribute($value)
     {
-        if ($this->due_date && ! $this->is_deleted && $value == self::STATUS_SENT && Carbon::parse($this->due_date)->lte(now()->startOfDay())) {
+        if (! $this->is_deleted && $value == self::STATUS_SENT && $this->hasLapsedValidUntil()) {
             return self::STATUS_EXPIRED;
         }
 
         return $value;
+    }
+
+    /**
+     * Valid-until is inclusive of the due date. The quote expires the following day.
+     */
+    public function hasLapsedValidUntil(mixed $due_date = null): bool
+    {
+        $due = $due_date ?? $this->due_date;
+
+        if (! $due) {
+            return false;
+        }
+
+        return Carbon::parse($due)->addDay()->lte(now()->setTimezone($this->client->timezone()->name)->startOfDay());
     }
 
     public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
