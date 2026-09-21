@@ -1066,7 +1066,10 @@ class QuoteTest extends TestCase
             $this->assertSame($status, $quote->fresh()->status_id);
         }
 
-        $expired = $this->makeDraftQuote(now()->subDay()->format('Y-m-d'), Quote::STATUS_SENT);
+        $expired = $this->makeDraftQuote(
+            now()->setTimezone($this->client->timezone()->name)->subDays(7)->format('Y-m-d'),
+            Quote::STATUS_SENT,
+        );
 
         $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
