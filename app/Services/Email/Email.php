@@ -340,7 +340,7 @@ class Email implements ShouldQueue
             if (Ninja::isHosted() && $this->mailer === 'smtp') {
                 match ((new SmtpFailure())->action($e, $this->attempts(), $this->tries)) {
                     SmtpFailure::RETRY => $this->release($this->backoff()[$this->attempts() - 1]),
-                    SmtpFailure::FALLBACK => $this->retryWithDefaultMailer(),
+                    SmtpFailure::FALLBACK => $this->fallbackSmtp($e->getMessage()),
                     SmtpFailure::FAIL => $this->failSmtp($e->getMessage()),
                 };
 
@@ -464,6 +464,12 @@ class Email implements ShouldQueue
         $this->email_object->settings->email_sending_method = 'default';
         $this->setMailDriver();
         $this->email();
+    }
+
+    private function fallbackSmtp(string $message): void
+    {
+        $this->logMailError($message, $this->company->clients()->first());
+        $this->retryWithDefaultMailer();
     }
 
     private function failSmtp(string $message): void

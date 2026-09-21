@@ -197,7 +197,7 @@ class NinjaMailerJob implements ShouldQueue
             if (Ninja::isHosted() && $this->mailer === 'smtp') {
                 match ((new SmtpFailure())->action($e, $this->attempts(), $this->tries)) {
                     SmtpFailure::RETRY => $this->release($this->backoff()[$this->attempts() - 1]),
-                    SmtpFailure::FALLBACK => $this->retryWithDefaultMailer(),
+                    SmtpFailure::FALLBACK => $this->fallbackSmtp($e->getMessage()),
                     SmtpFailure::FAIL => $this->logMailError($e->getMessage(), $this->company->clients()->first()),
                 };
                 $this->cleanUpMailers();
@@ -327,6 +327,12 @@ class NinjaMailerJob implements ShouldQueue
         $this->nmo->settings->email_sending_method = 'default';
         $this->setMailDriver();
         $this->deliver();
+    }
+
+    private function fallbackSmtp(string $message): void
+    {
+        $this->logMailError($message, $this->company->clients()->first());
+        $this->retryWithDefaultMailer();
     }
 
     private function incrementEmailCounter(): void
