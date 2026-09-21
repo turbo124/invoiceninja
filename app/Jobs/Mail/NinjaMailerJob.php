@@ -37,6 +37,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Events\Invoice\InvoiceWasEmailedAndFailed;
 use App\Events\Payment\PaymentWasEmailedAndFailed;
+use App\Services\Email\SmtpFailure;
 
 /*Multi Mailer implemented*/
 
@@ -66,6 +67,9 @@ class NinjaMailerJob implements ShouldQueue
     protected $client_brevo_secret = false;
 
     protected $client_ses_secret = false;
+
+    /** Prevents a second in-process fallback if the hosted mailer also throws */
+    private bool $used_hosted_fallback = false;
 
     public function __construct(public ?NinjaMailerObject $nmo, public bool $override = false) {}
 
@@ -118,7 +122,16 @@ class NinjaMailerJob implements ShouldQueue
                 });
         }
 
-        //send email
+        $this->deliver();
+
+        $this->nmo = null;
+        $this->company = null;
+
+        $this->cleanUpMailers();
+    }
+
+    private function deliver(): void
+    {
         try {
             nlog("Trying to send to {$this->nmo->to_user->email} " . now()->toDateTimeString());
             nlog("Using mailer => " . $this->mailer);
@@ -156,8 +169,6 @@ class NinjaMailerJob implements ShouldQueue
 
             $pendingMail->send($mailable);
 
-            /* Count the amount of emails sent across all the users accounts */
-
             $this->incrementEmailCounter();
 
             LightLogs::create(new EmailSuccess($this->nmo->company->company_key, $this->nmo->mailable->subject, $this->nmo->mailable->viewData['text_body'] ?? ''))
@@ -165,13 +176,6 @@ class NinjaMailerJob implements ShouldQueue
 
         } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
             nlog("Mailer failed with a Transport Exception {$e->getMessage()}");
-
-            if (Ninja::isHosted() && $this->mailer == 'smtp') {
-                $settings = $this->nmo->settings;
-                $settings->email_sending_method = 'default';
-                $this->company->settings = $settings;
-                $this->company->save();
-            }
 
             if (stripos($e->getMessage(), 'code 406') !== false) {
 
@@ -189,7 +193,17 @@ class NinjaMailerJob implements ShouldQueue
                 return;
             }
 
-            
+            /** Carefully retry transient failures */
+            if (Ninja::isHosted() && $this->mailer === 'smtp') {
+                match ((new SmtpFailure())->action($e, $this->attempts(), $this->tries)) {
+                    SmtpFailure::RETRY => $this->release($this->backoff()[$this->attempts() - 1]),
+                    SmtpFailure::FALLBACK => $this->retryWithDefaultMailer(),
+                    SmtpFailure::FAIL => $this->logMailError($e->getMessage(), $this->company->clients()->first()),
+                };
+                $this->cleanUpMailers();
+                return;
+            }
+
             $this->cleanUpMailers();
             $this->logMailError($e->getMessage(), $this->company->clients()->first());
             return;
@@ -198,13 +212,13 @@ class NinjaMailerJob implements ShouldQueue
             nlog("Mailer failed with a Logic Exception {$e->getMessage()}");
             $this->cleanUpMailers();
             $this->logMailError($e->getMessage(), $this->company->clients()->first());
-            
+
             return;
         } catch (\Symfony\Component\Mime\Exception\LogicException $e) {
             nlog("Mailer failed with a Logic Exception {$e->getMessage()}");
             $this->cleanUpMailers();
             $this->logMailError($e->getMessage(), $this->company->clients()->first());
-            
+
             return;
         } catch (\Google\Service\Exception $e) {
 
@@ -224,7 +238,7 @@ class NinjaMailerJob implements ShouldQueue
             $this->logMailError($message, $this->company->clients()->first());
             $this->entityEmailFailed($message);
             $this->cleanUpMailers();
-            
+
             return;
 
         } catch (\Exception $e) {
@@ -246,20 +260,19 @@ class NinjaMailerJob implements ShouldQueue
                 }
 
                 $this->cleanUpMailers();
-            
+
                 return;
             }
 
             if (stripos($e->getMessage(), 'Dsn') !== false) {
 
                 nlog("Incorrectly configured mail server - setting to default mail driver.");
-                $this->nmo->settings->email_sending_method = 'default';
-                return $this->setMailDriver();
-
+                $this->retryWithDefaultMailer();
+                return;
             }
 
             /**
-             * Post mark buries the proper message in a guzzle response
+             * Post mark buries the proper message in a a guzzle response
              * this merges a text string with a json object
              * need to harvest the ->Message property using the following
              */
@@ -281,7 +294,7 @@ class NinjaMailerJob implements ShouldQueue
 
                 $this->entityEmailFailed($message);
                 $this->cleanUpMailers();
-            
+
                 return;
             }
 
@@ -301,12 +314,19 @@ class NinjaMailerJob implements ShouldQueue
             sleep(rand(2, 3));
             $this->release($this->backoff()[$this->attempts() - 1]);
         }
+    }
 
-        $this->nmo = null;
-        $this->company = null;
+    private function retryWithDefaultMailer(): void
+    {
+        if ($this->used_hosted_fallback) {
+            return;
+        }
 
-        /*Clean up mailers*/
+        $this->used_hosted_fallback = true;
         $this->cleanUpMailers();
+        $this->nmo->settings->email_sending_method = 'default';
+        $this->setMailDriver();
+        $this->deliver();
     }
 
     private function incrementEmailCounter(): void
