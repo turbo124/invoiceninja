@@ -222,14 +222,14 @@ class QuoteTest extends TestCase
 
     public function testUpdateRejectsChangingExpiredDueDateToAnotherExpiredDate()
     {
-        $due_date = now()->subDays(7)->format('Y-m-d');
+        $due_date = now()->setTimezone($this->client->timezone()->name)->subDays(7)->format('Y-m-d');
         $quote = $this->makeDraftQuote($due_date, Quote::STATUS_SENT);
 
         $response = $this->withHeaders([
             'X-API-SECRET' => config('ninja.api_secret'),
             'X-API-TOKEN' => $this->token,
         ])->putJson('/api/v1/quotes/'.$quote->hashed_id, [
-            'due_date' => now()->subDays(1)->format('Y-m-d'),
+            'due_date' => now()->setTimezone($this->client->timezone()->name)->subDays(1)->format('Y-m-d'),
             'terms' => 'should not persist',
         ]);
 
