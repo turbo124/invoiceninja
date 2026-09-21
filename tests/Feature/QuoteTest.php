@@ -981,6 +981,11 @@ class QuoteTest extends TestCase
 
     public function testQuoteTermsPreserveViewUrlTemplateHref(): void
     {
+        config([
+            'app.url' => 'https://ninja.test',
+            'ninja.app_url' => 'https://ninja.test',
+        ]);
+
         $terms = '<p><a href="$view_url">View quote online</a></p>';
 
         $response = $this->withHeaders([
