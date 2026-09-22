@@ -5653,6 +5653,7 @@ $lang = array(
     'activity_157' => 'Invoice cancellation for :invoice failed to send to AEAT :notes',
     'activity_158' => 'Quote :quote was rejected by :client :notes',
     'quotes_with_status_sent_can_be_rejected' => 'Only quotes with "Sent" status can be rejected.',
+    'quotes_with_status_sent_can_be_cancelled' => 'Only quotes with "Sent" status can be cancelled.',
     'reject' => 'Reject',
     'rejected' => 'Rejected',
     'reject_quote' => 'Reject Quote',
@@ -6374,7 +6375,9 @@ $lang = array(
     'unestimated_tasks' => 'Unestimated Tasks',
     'tasks_over_estimate' => 'Tasks Over Estimate',
     'expired_quote_validation_error' => 'An expired quote cannot be marked as sent.',
-    'quote_due_date_expired' => 'Quote valid until date is in the past.'
+    'quote_due_date_expired' => 'Quote valid until date is in the past.',
+    'activity_170' => ':user cancelled quote :quote for :client',
+    'default_tab' => 'Default Tab',
 );
 
 return $lang;

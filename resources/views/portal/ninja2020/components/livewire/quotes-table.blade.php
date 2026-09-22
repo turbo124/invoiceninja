@@ -37,6 +37,10 @@
                 <input wire:key="quote-status-rejected-{{ in_array(App\Models\Quote::STATUS_REJECTED, $status) ? 'selected' : 'unselected' }}" wire:change="toggleStatus('{{ App\Models\Quote::STATUS_REJECTED }}')" @checked(in_array(App\Models\Quote::STATUS_REJECTED, $status)) value="{{ App\Models\Quote::STATUS_REJECTED }}" type="checkbox" class="cursor-pointer form-checkbox" id="rejected-checkbox">
                 <label for="rejected-checkbox" class="text-sm cursor-pointer">{{ ctrans('texts.rejected') }}</label>
             </div>
+            <div class="mr-3">
+                <input wire:key="quote-status-cancelled-{{ in_array(App\Models\Quote::STATUS_CANCELLED, $status) ? 'selected' : 'unselected' }}" wire:change="toggleStatus('{{ App\Models\Quote::STATUS_CANCELLED }}')" @checked(in_array(App\Models\Quote::STATUS_CANCELLED, $status)) value="{{ App\Models\Quote::STATUS_CANCELLED }}" type="checkbox" class="cursor-pointer form-checkbox" id="cancelled-checkbox">
+                <label for="cancelled-checkbox" class="text-sm cursor-pointer">{{ ctrans('texts.cancelled') }}</label>
+            </div>
         </div>
     </div>
     <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">

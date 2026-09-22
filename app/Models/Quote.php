@@ -211,6 +211,8 @@ class Quote extends BaseModel
 
     public const STATUS_REJECTED = 5;
 
+    public const STATUS_CANCELLED = 6;
+
     public const STATUS_EXPIRED = -1;
 
     /**
@@ -416,6 +418,8 @@ class Quote extends BaseModel
                 return '<h5><span class="badge badge-light">' . ctrans('texts.converted') . '</span></h5>';
             case self::STATUS_REJECTED:
                 return '<h5><span class="badge badge-danger">' . ctrans('texts.rejected') . '</span></h5>';
+            case self::STATUS_CANCELLED:
+                return '<h5><span class="badge badge-secondary">' . ctrans('texts.cancelled') . '</span></h5>';
             default:
                 return '<h5><span class="badge badge-light">' . ctrans('texts.draft') . '</span></h5>';
         }
@@ -436,6 +440,8 @@ class Quote extends BaseModel
                 return ctrans('texts.converted');
             case self::STATUS_REJECTED:
                 return ctrans('texts.rejected');
+            case self::STATUS_CANCELLED:
+                return ctrans('texts.cancelled');
             default:
                 return ctrans('texts.draft');
 
@@ -532,7 +538,7 @@ class Quote extends BaseModel
      */
     public function canRemind(): bool
     {
-        if (in_array($this->status_id, [self::STATUS_DRAFT, self::STATUS_APPROVED, self::STATUS_CONVERTED]) || $this->is_deleted) {
+        if (in_array($this->status_id, [self::STATUS_DRAFT, self::STATUS_APPROVED, self::STATUS_CONVERTED, self::STATUS_CANCELLED]) || $this->is_deleted) {
             return false;
         }
 

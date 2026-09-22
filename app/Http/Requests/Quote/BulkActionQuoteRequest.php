@@ -34,7 +34,7 @@ class BulkActionQuoteRequest extends Request
         $input = $this->all();
 
         $rules = [
-            'action' => 'required|in:template,convert,convert_to_invoice,convert_to_project,email,bulk_download,bulk_print,clone_to_quote,convert_to_purchase_order,approve,download,restore,archive,delete,send_email,mark_sent',
+            'action' => 'required|in:template,convert,convert_to_invoice,convert_to_project,email,bulk_download,bulk_print,clone_to_quote,convert_to_purchase_order,approve,download,restore,archive,delete,send_email,mark_sent,cancel',
             'ids' => 'required|array',
             'template' => 'sometimes|string',
             'template_id' => 'sometimes|string',
@@ -70,6 +70,10 @@ class BulkActionQuoteRequest extends Request
                         ctrans('texts.expired_quote_validation_error'),
                     );
                 }
+            }
+
+            if ($this->input('action') === 'cancel' && $quotes->contains(fn(Quote $quote) => $quote->status_id !== Quote::STATUS_SENT)) {
+                $validator->errors()->add('ids', ctrans('texts.quotes_with_status_sent_can_be_cancelled'));
             }
 
         });

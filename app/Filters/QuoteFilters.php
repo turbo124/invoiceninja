@@ -105,6 +105,10 @@ class QuoteFilters extends QueryFilters
                 $quote_filters[] = Quote::STATUS_APPROVED;
             }
 
+            if (in_array('cancelled', $status_parameters)) {
+                $quote_filters[] = Quote::STATUS_CANCELLED;
+            }
+
             if (count($quote_filters) > 0) {
                 $query->orWhereIn('status_id', $quote_filters);
             }

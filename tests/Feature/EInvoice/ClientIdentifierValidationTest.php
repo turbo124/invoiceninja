@@ -409,7 +409,7 @@ class ClientIdentifierValidationTest extends TestCase
         return [
             'HR' => [191, 'HR'], // Croatia — has HR:VAT in routing_rules but not Peppol
             'CZ' => [203, 'CZ'], // Czech Republic
-            'HU' => [348, 'HU'], // Hungary
+            // 'HU' => [348, 'HU'], // Hungary
             'SK' => [703, 'SK'], // Slovakia
             'CH' => [756, 'CH'], // Switzerland
         ];

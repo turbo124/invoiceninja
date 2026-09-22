@@ -13,7 +13,6 @@
 namespace App\Http\Requests\Quote;
 
 use App\Http\Requests\Request;
-use App\Http\ValidationRules\Quote\IsExpiredRule;
 use App\Models\Quote;
 use App\Utils\Traits\ChecksEntityStatus;
 use App\Utils\Traits\CleanLineItems;
@@ -67,7 +66,7 @@ class UpdateQuoteRequest extends Request
         $rules['date'] = 'bail|sometimes|date:Y-m-d';
 
         $rules['partial_due_date'] = ['bail', 'sometimes', 'nullable', 'exclude_if:partial,0', 'date', 'before:due_date', 'after_or_equal:date'];
-        $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', 'after_or_equal:date', Rule::requiredIf(fn() => strlen($this->partial_due_date ?? '') > 1), 'date', new IsExpiredRule($this->quote->client_id)];
+        $rules['due_date'] = ['bail', 'sometimes', 'nullable', 'after:partial_due_date', 'after_or_equal:date', Rule::requiredIf(fn() => strlen($this->partial_due_date ?? '') > 1), 'date'];
         $rules['amount'] = ['sometimes', 'bail', 'numeric', 'max:99999999999999'];
 
         $rules['custom_surcharge1'] = ['sometimes', 'nullable', 'bail', 'numeric', 'max:99999999999999'];
@@ -88,11 +87,15 @@ class UpdateQuoteRequest extends Request
 
         $validator->after(function (Validator $validator): void {
         
-            if ($this->boolean('mark_sent') && $this->quote->hasLapsedValidUntil($this->input('due_date', $this->quote->due_date))) {
+            if (($this->boolean('mark_sent') || $this->boolean('send_email') || $this->boolean('email')) && $this->quote->hasLapsedValidUntil($this->input('due_date', $this->quote->due_date))) {
                 $validator->errors()->add(
                     'due_date',
                     ctrans('texts.expired_quote_validation_error'),
                 );
+            }
+
+            if ($this->filled('due_date') && $this->input('due_date') != $this->quote->due_date?->format('Y-m-d') && $this->quote->hasLapsedValidUntil($this->input('due_date'))) {
+                $validator->errors()->add('due_date', ctrans('texts.quote_due_date_expired'));
             }
         });
     }

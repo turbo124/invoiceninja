@@ -685,7 +685,8 @@ class QuoteController extends BaseController
      *  - delete
      *  - convert
      *  - convert_to_invoice
-     *  - email",
+     *  - email
+     *  - cancel",
      *      @OA\Parameter(ref="#/components/parameters/X-API-TOKEN"),
      *      @OA\Parameter(ref="#/components/parameters/X-Requested-With"),
      *      @OA\Parameter(ref="#/components/parameters/include"),
@@ -788,6 +789,14 @@ class QuoteController extends BaseController
                 }
 
                 return $this->itemResponse($quote->service()->approveWithNoCoversion()->save());
+
+            case 'cancel':
+                $quote->service()->cancel();
+
+                if (! $bulk) {
+                    return $this->itemResponse($quote);
+                }
+                break;
 
             case 'history':
                 // code...

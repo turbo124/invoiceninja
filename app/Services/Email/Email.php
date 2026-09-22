@@ -103,6 +103,9 @@ class Email implements ShouldQueue
     /** The mailable */
     public Mailable $mailable;
 
+    /** Prevents a second in-process fallback if the hosted mailer also throws */
+    private bool $used_hosted_fallback = false;
+
     public function __construct(public EmailObject $email_object, public Company $company) {}
 
     /**
@@ -318,13 +321,6 @@ class Email implements ShouldQueue
         } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
             nlog("Mailer failed with a Transport Exception {$e->getMessage()}");
 
-            if (Ninja::isHosted() && $this->mailer == 'smtp') {
-                $settings = $this->email_object->settings;
-                $settings->email_sending_method = 'default';
-                $this->company->settings = $settings;
-                $this->company->save();
-            }
-
             if (stripos($e->getMessage(), 'code 406') !== false) {
 
                 $address_object = reset($this->email_object->to);
@@ -338,6 +334,17 @@ class Email implements ShouldQueue
 
                 $this->entityEmailFailed($message);
                 
+                return;
+            }
+
+            if (Ninja::isHosted() && $this->mailer === 'smtp') {
+                match ((new SmtpFailure())->action($e, $this->attempts(), $this->tries)) {
+                    SmtpFailure::RETRY => $this->release($this->backoff()[$this->attempts() - 1]),
+                    SmtpFailure::FALLBACK => $this->fallbackSmtp($e->getMessage()),
+                    SmtpFailure::FAIL => $this->failSmtp($e->getMessage()),
+                };
+
+                $this->cleanUpMailers();
                 return;
             }
 
@@ -395,8 +402,8 @@ class Email implements ShouldQueue
             if (stripos($e->getMessage(), 'Dsn') !== false) {
 
                 nlog("Incorrectly configured mail server - setting to default mail driver.");
-                $this->email_object->settings->email_sending_method = 'default';
-                return $this->setMailDriver();
+                $this->retryWithDefaultMailer();
+                return;
 
             }
 
@@ -444,6 +451,31 @@ class Email implements ShouldQueue
         }
 
         $this->cleanUpMailers();
+    }
+
+    private function retryWithDefaultMailer(): void
+    {
+        if ($this->used_hosted_fallback) {
+            return;
+        }
+
+        $this->used_hosted_fallback = true;
+        $this->cleanUpMailers();
+        $this->email_object->settings->email_sending_method = 'default';
+        $this->setMailDriver();
+        $this->email();
+    }
+
+    private function fallbackSmtp(string $message): void
+    {
+        $this->logMailError($message, $this->company->clients()->first());
+        $this->retryWithDefaultMailer();
+    }
+
+    private function failSmtp(string $message): void
+    {
+        $this->logMailError($message, $this->company->clients()->first());
+        $this->entityEmailFailed($message);
     }
 
     /**

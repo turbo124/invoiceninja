@@ -21,7 +21,7 @@ class IsExpiredRule implements ValidationRule
 {
     use MakesHash;
 
-    public function __construct(private int $client_id){}
+    public function __construct(private ?int $client_id){}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

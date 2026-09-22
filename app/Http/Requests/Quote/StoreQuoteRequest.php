@@ -19,6 +19,7 @@ use Illuminate\Validation\Rule;
 use App\Utils\Traits\CleanLineItems;
 use App\Http\ValidationRules\Project\ValidProjectForClient;
 use App\Http\ValidationRules\Quote\IsExpiredRule;
+use Illuminate\Validation\Validator;
 
 class StoreQuoteRequest extends Request
 {
@@ -154,4 +155,5 @@ class StoreQuoteRequest extends Request
 
         $this->replace($input);
     }
+
 }
