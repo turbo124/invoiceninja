@@ -1181,6 +1181,10 @@ class BaseExport
                 $quote_filters[] = Quote::STATUS_CANCELLED;
             }
 
+            if (in_array('rejected', $status_parameters)) {
+                $quote_filters[] = Quote::STATUS_REJECTED;
+            }
+
             if (count($quote_filters) > 0) {
                 $query->whereIn('status_id', $quote_filters);
             }

@@ -49,7 +49,7 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
     use MockAccountData;
 
     /** @var list<string> */
-    private const QUOTE_STATUS_FILTERS = ['draft', 'sent', 'approved', 'cancelled', 'expired', 'upcoming', 'converted'];
+    private const QUOTE_STATUS_FILTERS = ['draft', 'sent', 'approved', 'cancelled', 'rejected', 'expired', 'upcoming', 'converted'];
 
     /** @var list<string> */
     private const PO_STATUS_FILTERS = ['draft', 'sent', 'accepted', 'cancelled'];
@@ -85,6 +85,7 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
             'draft_converted' => $this->createQuote(Quote::STATUS_DRAFT, $tomorrow, $this->invoice->id),
             'approved' => $this->createQuote(Quote::STATUS_APPROVED, $tomorrow),
             'cancelled' => $this->createQuote(Quote::STATUS_CANCELLED, $yesterday),
+            'rejected' => $this->createQuote(Quote::STATUS_REJECTED, $tomorrow),
             'sent_null_due' => $this->createQuote(Quote::STATUS_SENT, null),
             'sent_future_due' => $this->createQuote(Quote::STATUS_SENT, $tomorrow),
             'sent_today_due' => $this->createQuote(Quote::STATUS_SENT, $today),
@@ -194,6 +195,10 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
         }
 
         if (in_array('cancelled', $filters, true) && $record['status_id'] === Quote::STATUS_CANCELLED) {
+            return true;
+        }
+
+        if (in_array('rejected', $filters, true) && $record['status_id'] === Quote::STATUS_REJECTED) {
             return true;
         }
 
@@ -314,7 +319,7 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
 
     public function testQuoteExportInitIncludesDraftsWhenAllNamedStatusesAreSet(): void
     {
-        $status = 'draft,sent,approved,cancelled,expired,upcoming,converted';
+        $status = 'draft,sent,approved,cancelled,rejected,expired,upcoming,converted';
 
         $ids = (new QuoteExport($this->company, $this->exportInput($status)))
             ->init()
@@ -325,6 +330,7 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
         $this->assertContains($this->quotes['draft_future_due']['id'], $ids);
         $this->assertContains($this->quotes['approved']['id'], $ids);
         $this->assertContains($this->quotes['cancelled']['id'], $ids);
+        $this->assertContains($this->quotes['rejected']['id'], $ids);
         $this->assertContains($this->quotes['sent_null_due']['id'], $ids);
         $this->assertContains($this->quotes['sent_past_due']['id'], $ids);
     }
@@ -360,6 +366,21 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
         $this->assertNotContains($this->quotes['sent_null_due']['id'], $ids);
         $this->assertNotContains($this->quotes['sent_past_due']['id'], $ids);
         $this->assertNotContains($this->quotes['draft_converted']['id'], $ids);
+        $this->assertNotContains($this->quotes['rejected']['id'], $ids);
+    }
+
+    public function testQuoteExportRejectedReturnsOnlyRejectedQuotes(): void
+    {
+        $ids = (new QuoteExport($this->company, $this->exportInput('rejected')))
+            ->init()
+            ->pluck('id')
+            ->all();
+
+        $this->assertContains($this->quotes['rejected']['id'], $ids);
+        $this->assertNotContains($this->quotes['cancelled']['id'], $ids);
+        $this->assertNotContains($this->quotes['draft']['id'], $ids);
+        $this->assertNotContains($this->quotes['approved']['id'], $ids);
+        $this->assertNotContains($this->quotes['sent_null_due']['id'], $ids);
     }
 
     public function testQuoteExportSentDoesNotMatchDraftsWithFutureDueDates(): void

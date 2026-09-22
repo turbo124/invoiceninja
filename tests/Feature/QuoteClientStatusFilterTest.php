@@ -33,7 +33,7 @@ class QuoteClientStatusFilterTest extends TestCase
     use MockAccountData;
 
     /** @var list<string> */
-    private const STATUS_FILTERS = ['draft', 'sent', 'approved', 'cancelled', 'expired', 'upcoming', 'converted'];
+    private const STATUS_FILTERS = ['draft', 'sent', 'approved', 'cancelled', 'rejected', 'expired', 'upcoming', 'converted'];
 
     /** @var array<string, array{id: int, hashed_id: string, status_id: int, due_date: ?string, invoice_id: ?int}> */
     private array $fixtures = [];
@@ -167,6 +167,10 @@ class QuoteClientStatusFilterTest extends TestCase
             return true;
         }
 
+        if (in_array('rejected', $filters, true) && $record['status_id'] === Quote::STATUS_REJECTED) {
+            return true;
+        }
+
         if (
             in_array('sent', $filters, true)
             && $record['status_id'] === Quote::STATUS_SENT
@@ -240,8 +244,8 @@ class QuoteClientStatusFilterTest extends TestCase
 
     public function testAllNamedStatusesIncludeDraftsRegardlessOfParamOrder(): void
     {
-        $all = 'draft,sent,approved,cancelled,expired,upcoming,converted';
-        $reversed = 'converted,upcoming,expired,cancelled,approved,sent,draft';
+        $all = 'draft,sent,approved,cancelled,rejected,expired,upcoming,converted';
+        $reversed = 'converted,upcoming,expired,rejected,cancelled,approved,sent,draft';
 
         foreach ([$all, $reversed] as $client_status) {
             $response = $this->withHeaders($this->headers())
@@ -257,12 +261,12 @@ class QuoteClientStatusFilterTest extends TestCase
             $this->assertContains($this->fixtures['draft_converted']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['approved']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['cancelled']['hashed_id'], $ids);
+            $this->assertContains($this->fixtures['rejected']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['sent_null_due']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['sent_future_due']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['sent_today_due']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['sent_past_due']['hashed_id'], $ids);
             $this->assertContains($this->fixtures['sent_converted_future']['hashed_id'], $ids);
-            $this->assertNotContains($this->fixtures['rejected']['hashed_id'], $ids);
             $this->assertNotContains($this->fixtures['converted_status']['hashed_id'], $ids);
         }
     }
