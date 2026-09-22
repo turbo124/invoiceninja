@@ -1165,13 +1165,7 @@ class BaseExport
         }
 
         $query->where(function ($query) use ($status_parameters) {
-            if (in_array('sent', $status_parameters)) {
-                $query->orWhere(function ($q) {
-                    $q->where('status_id', Quote::STATUS_SENT)
-                    ->whereNull('due_date')
-                    ->orWhere('due_date', '>=', now()->toDateString());
-                });
-            }
+            
 
             $quote_filters = [];
 
@@ -1184,7 +1178,17 @@ class BaseExport
             }
 
             if (count($quote_filters) > 0) {
-                $query->orWhereIn('status_id', $quote_filters);
+                $query->whereIn('status_id', $quote_filters);
+            }
+
+            if (in_array('sent', $status_parameters)) {
+                $query->orWhere(function ($q) {
+                    $q->where('status_id', Quote::STATUS_SENT)
+                        ->where(function ($q) {
+                            $q->whereNull('due_date')
+                                ->orWhere('due_date', '>=', now()->toDateString());
+                        });
+                });
             }
 
             if (in_array('expired', $status_parameters)) {
@@ -1238,11 +1242,7 @@ class BaseExport
             }
 
             if (in_array('sent', $status_parameters)) {
-                $query->orWhere(function ($q) {
-                    $q->where('status_id', PurchaseOrder::STATUS_SENT)
-                    ->whereNull('due_date')
-                    ->orWhere('due_date', '>=', now()->toDateString());
-                });
+                $po_status[] = PurchaseOrder::STATUS_SENT;
             }
 
             if (in_array('accepted', $status_parameters)) {
