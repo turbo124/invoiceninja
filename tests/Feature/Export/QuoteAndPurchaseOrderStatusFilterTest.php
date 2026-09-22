@@ -49,7 +49,7 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
     use MockAccountData;
 
     /** @var list<string> */
-    private const QUOTE_STATUS_FILTERS = ['draft', 'sent', 'approved', 'expired', 'upcoming', 'converted'];
+    private const QUOTE_STATUS_FILTERS = ['draft', 'sent', 'approved', 'cancelled', 'expired', 'upcoming', 'converted'];
 
     /** @var list<string> */
     private const PO_STATUS_FILTERS = ['draft', 'sent', 'accepted', 'cancelled'];
@@ -193,6 +193,10 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
             return true;
         }
 
+        if (in_array('cancelled', $filters, true) && $record['status_id'] === Quote::STATUS_CANCELLED) {
+            return true;
+        }
+
         if (
             in_array('sent', $filters, true)
             && $record['status_id'] === Quote::STATUS_SENT
@@ -310,7 +314,7 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
 
     public function testQuoteExportInitIncludesDraftsWhenAllNamedStatusesAreSet(): void
     {
-        $status = 'draft,sent,approved,expired,upcoming,converted';
+        $status = 'draft,sent,approved,cancelled,expired,upcoming,converted';
 
         $ids = (new QuoteExport($this->company, $this->exportInput($status)))
             ->init()
@@ -320,9 +324,9 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
         $this->assertContains($this->quotes['draft']['id'], $ids);
         $this->assertContains($this->quotes['draft_future_due']['id'], $ids);
         $this->assertContains($this->quotes['approved']['id'], $ids);
+        $this->assertContains($this->quotes['cancelled']['id'], $ids);
         $this->assertContains($this->quotes['sent_null_due']['id'], $ids);
         $this->assertContains($this->quotes['sent_past_due']['id'], $ids);
-        $this->assertNotContains($this->quotes['cancelled']['id'], $ids);
     }
 
     public function testPurchaseOrderExportInitIncludesDraftsWhenAllNamedStatusesAreSet(): void
@@ -341,6 +345,21 @@ class QuoteAndPurchaseOrderStatusFilterTest extends TestCase
         $this->assertContains($this->purchaseOrders['cancelled']['id'], $ids);
         $this->assertContains($this->purchaseOrders['sent_past_due']['id'], $ids);
         $this->assertNotContains($this->purchaseOrders['received']['id'], $ids);
+    }
+
+    public function testQuoteExportCancelledReturnsOnlyCancelledQuotes(): void
+    {
+        $ids = (new QuoteExport($this->company, $this->exportInput('cancelled')))
+            ->init()
+            ->pluck('id')
+            ->all();
+
+        $this->assertContains($this->quotes['cancelled']['id'], $ids);
+        $this->assertNotContains($this->quotes['draft']['id'], $ids);
+        $this->assertNotContains($this->quotes['approved']['id'], $ids);
+        $this->assertNotContains($this->quotes['sent_null_due']['id'], $ids);
+        $this->assertNotContains($this->quotes['sent_past_due']['id'], $ids);
+        $this->assertNotContains($this->quotes['draft_converted']['id'], $ids);
     }
 
     public function testQuoteExportSentDoesNotMatchDraftsWithFutureDueDates(): void
