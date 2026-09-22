@@ -6377,6 +6377,7 @@ $lang = array(
     'expired_quote_validation_error' => 'An expired quote cannot be marked as sent.',
     'quote_due_date_expired' => 'Quote valid until date is in the past.',
     'activity_170' => ':user cancelled quote :quote for :client',
+    'default_tab' => 'Default Tab',
 );
 
 return $lang;
