@@ -52,6 +52,76 @@ async function sign(page: Page) {
     await page.touchscreen.tap(box.x + 80, box.y + 60);
 }
 
+async function readPdfDialogState(page: Page) {
+    return page.evaluate(() => {
+        const dialog = document.querySelector('#dialogPdf') as HTMLDialogElement | null;
+        const viewPdf = [...document.querySelectorAll('button')].find(
+            button => button.textContent?.trim() === 'View PDF',
+        );
+        const rect = viewPdf?.getBoundingClientRect();
+        const hit = rect
+            ? document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+            : null;
+        return {
+            dialogTeleportedToBody: !!document.body.querySelector(':scope > #dialogPdf'),
+            dialogOpen: dialog?.open ?? false,
+            dialogConnected: dialog?.isConnected ?? false,
+            htmlPortalDialogOpen: document.documentElement.classList.contains('portal-dialog-open'),
+            viewPdfReachable: !!viewPdf && !!hit && (hit === viewPdf || viewPdf.contains(hit)),
+            pdfIframePresent: !!dialog?.querySelector('#pdf-iframe'),
+        };
+    });
+}
+
+test.describe('desktop viewport', () => {
+    test.use({ viewport: { width: 1280, height: 720 }, hasTouch: false });
+
+    test('opens the View PDF modal on a payable smooth-flow invoice after click', async ({ api, page }, testInfo) => {
+        const client = await createAndLogInClient(api, page, {
+            settings: { ...paymentTestSettings, payment_flow: 'smooth' },
+        });
+        await updateClient(api.context, client, defaultClientAddress);
+        const invoice = await createSentInvoice(api, client, {
+            label: uniqueName('desktop-view-pdf'),
+            cost: 29,
+        });
+
+        await page.goto(`/client/invoices/${invoice.id}`);
+        await waitForAlpine(page);
+
+        const viewPdf = page.getByRole('button', { name: 'View PDF', exact: true });
+        await expect(viewPdf).toBeVisible();
+        await expect(page.locator('main').getByText('Payment Methods', { exact: true })).toBeVisible();
+        await expect(page.locator('main')).toContainText(/Balance Due/i);
+
+        await testInfo.attach('pdf-dialog-before-click', {
+            body: JSON.stringify(await readPdfDialogState(page)),
+            contentType: 'application/json',
+        });
+
+        await viewPdf.click();
+
+        await expect.poll(async () => (await readPdfDialogState(page)).dialogOpen, {
+            message: 'Alpine portalDialog.open() should call showModal() on #dialogPdf',
+            timeout: 10_000,
+        }).toBe(true);
+
+        const afterClick = await readPdfDialogState(page);
+        await testInfo.attach('pdf-dialog-after-click', {
+            body: JSON.stringify(afterClick),
+            contentType: 'application/json',
+        });
+
+        await expect(page.locator('body > #dialogPdf')).toBeVisible();
+        await expect(page.locator('html')).toHaveClass(/portal-dialog-open/);
+        await expect(page.locator('#dialogPdf')).toHaveJSProperty('open', true);
+        await expect.poll(async () => (await readPdfDialogState(page)).pdfIframePresent, {
+            message: 'Livewire pdf-slot should render the invoice PDF iframe inside the modal',
+            timeout: 30_000,
+        }).toBe(true);
+    });
+});
+
 for (const decision of ['approve', 'reject']) {
     test(`submits quote ${decision} and verifies the persisted result`, async ({ api, page }, testInfo) => {
         const client = await createAndLogInClient(api, page, { settings: {

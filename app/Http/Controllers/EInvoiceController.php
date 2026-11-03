@@ -153,9 +153,12 @@ class EInvoiceController extends BaseController
         $stub = new \stdClass();
         $stub->Invoice = $einvoice;
 
-        $company = auth()->user()->company();
-        $company->e_invoice = $stub;
-        $company->save();
+        $entity = $request->getEntity();
+        $entity->e_invoice = $entity->filterNullsRecursive(
+            json_decode(json_encode($stub), true)
+        );
+        $entity->saveQuietly();
+        
     }
 
     /**

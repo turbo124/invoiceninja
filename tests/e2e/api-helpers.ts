@@ -26,6 +26,12 @@ export interface ClientEntity extends ApiEntity {
     contacts?: Array<Record<string, unknown>>;
 }
 
+/** Client records sent to PUT /api/v1/clients/:id (portal fixtures included). */
+export type UpdatableClient = ApiEntity & {
+    id: string;
+    settings?: Record<string, unknown>;
+};
+
 export interface ApiUser extends ApiEntity {
     id: string;
     company_user?: {
@@ -183,11 +189,11 @@ export async function getCompany(
     return company as CompanyEntity;
 }
 
-export async function updateClient(
+export async function updateClient<T extends UpdatableClient>(
     api: ApiContext,
-    client: ClientEntity,
+    client: T,
     changes: Record<string, unknown> = {},
-): Promise<ClientEntity> {
+): Promise<T> {
     const { settings: settingsChanges, ...rest } = changes;
 
     const response = await api.request.put(`/api/v1/clients/${client.id}`, {
@@ -209,7 +215,7 @@ export async function updateClient(
 
     const body = await response.json();
 
-    return body.data as ClientEntity;
+    return body.data as T;
 }
 
 export async function updateCompany(

@@ -5,7 +5,7 @@ import {
     type BrowserContext,
     type Page,
 } from '@playwright/test';
-import { type ApiEntity, updateClient, type ClientEntity } from './api-helpers';
+import { type ApiEntity, updateClient } from './api-helpers';
 import { resolvePlaywrightUrls } from './environment';
 import { type ApiFixture, uniqueName } from './fixtures';
 
@@ -384,7 +384,7 @@ export async function patchPortalClient(
     client: PortalClient,
     changes: Record<string, unknown>,
 ): Promise<PortalClient> {
-    return updateClient(api.context, client as ClientEntity, changes) as Promise<PortalClient>;
+    return updateClient(api.context, client, changes);
 }
 
 export async function expectPortalPage(

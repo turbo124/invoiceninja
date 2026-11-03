@@ -595,9 +595,6 @@ class LoginController extends BaseController
     private function hydrateCompanyUser(User $user): Builder
     {
 
-        // /** @var \App\Models\User $user */
-        // $user = auth()->user();
-
         /** @var Builder $cu */
         $cu = CompanyUser::query()->where('user_id', $user->id);
 

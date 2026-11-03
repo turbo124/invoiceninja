@@ -121,9 +121,12 @@ class CompanyController extends BaseController
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        $companies = Company::where('account_id', $user->company()->account->id);
+        $companies = Company::where('account_id', $user->company()->account_id)
+                                ->whereHas('company_users', function ($q) use ($user){
+                                    $q->where('user_id', $user->id)->whereNull('company_user.deleted_at');
+                                });
 
-        return $this->listResponse($companies);
+        return $this->listResponse($companies, include_relations: false);
     }
 
     public function current()

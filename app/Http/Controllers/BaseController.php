@@ -21,6 +21,13 @@ use App\Models\Tag;
 use App\Utils\Statics;
 use App\Models\Account;
 use App\Models\Activity;
+use App\Models\Backup;
+use App\Models\CompanyToken;
+use App\Models\CompanyUser;
+use App\Models\Payment;
+use App\Models\Product;
+use App\Models\Project;
+use App\Models\Task;
 use App\Models\TaxRate;
 use App\Models\Webhook;
 use App\Models\Scheduler;
@@ -43,6 +50,8 @@ use Illuminate\Support\Facades\Schema as DbSchema;
 use App\Transformers\EntityTransformer;
 use League\Fractal\Resource\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use InvoiceNinja\EInvoice\Decoder\Schema;
 use League\Fractal\Serializer\JsonApiSerializer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -119,6 +128,29 @@ class BaseController extends Controller
         'tasks' => true,
         'vendor' => true,
         'vendors' => true,
+    ];
+
+    private const COMPANY_INCLUDE_PERMISSIONS = [
+        'clients' => 'view_client',
+        'credits' => 'view_credit',
+        'expenses' => 'view_expense',
+        'invoices' => 'view_invoice',
+        'payments' => 'view_payment',
+        'products' => 'view_product',
+        'projects' => 'view_project',
+        'purchase_orders' => 'view_purchase_order',
+        'quotes' => 'view_quote',
+        'recurring_expenses' => 'view_recurring_expense',
+        'recurring_invoices' => 'view_recurring_invoice',
+        'tasks' => 'view_task',
+        'vendors' => 'view_vendor',
+        'bank_integrations' => 'view_bank_transaction',
+        'bank_transactions' => 'view_bank_transaction',
+        'company_gateways' => null,
+        'webhooks' => null,
+        'contacts' => null,
+        'system_logs' => null,
+        'ledger' => null,
     ];
 
     protected array $client_exclusion_fields = ['balance', 'paid_to_date', 'credit_balance', 'client_hash'];
@@ -1001,23 +1033,23 @@ class BaseController extends Controller
      *
      * @param Builder $query
      */
-    protected function listResponse(Builder $query)
+    protected function listResponse(Builder $query, bool $include_relations = true)
     {
         $this->buildManager();
 
         $transformer = new $this->entity_transformer(request()->input('serializer'));
 
-        $includes = $transformer->getDefaultIncludes();
+        if (! $include_relations) {
+            $this->manager->parseIncludes([]);
+            $transformer->setDefaultIncludes([])->setAvailableIncludes([]);
+        }
 
-        // Pass transformer instance to avoid duplicate instantiation
-        $includes = $this->getRequestIncludes($includes, $transformer);
-
-        $query->with($this->tagAwareIncludes($includes));
+        $this->eagerLoadResponseIncludes($query, $transformer);
         $this->eagerLoadTagsIfSupported($query);
 
         $user = Auth::user();
 
-        if ($user && ! $user->hasPermission('view_' . Str::snake(class_basename($this->entity_type)))) {
+        if ($user && $this->entity_type !== Company::class && ! $user->hasPermission('view_' . Str::snake(class_basename($this->entity_type)))) {
             if (in_array($this->entity_type, [User::class])) {
                 $query->where('id', $user->id);
             } elseif (in_array($this->entity_type, [Activity::class, BankTransactionRule::class,CompanyGateway::class, TaxRate::class, BankIntegration::class, Scheduler::class, BankTransaction::class, Webhook::class, ExpenseCategory::class])) { //table without assigned_user_id
@@ -1079,26 +1111,116 @@ class BaseController extends Controller
         $query->with('tags');
     }
 
-    /**
-     * @param array<int, string> $includes
-     * @return array<int, string>
-     */
-    private function tagAwareIncludes(array $includes): array
+    private function eagerLoadResponseIncludes(Builder $query, EntityTransformer $transformer, bool $company_only = false): void
     {
-        $eager_loads = [];
+        $paths = $this->responseIncludePaths($query->getModel(), $transformer, $this->manager->getRequestedIncludes(), company_only: $company_only);
 
-        foreach ($includes as $include) {
-            $include = trim((string) $include);
-
-            if ($include === '') {
+        foreach ($query->getEagerLoads() as $path => $previous) {
+            if (! isset($paths[$path])) {
                 continue;
             }
 
-            $eager_loads[] = $this->eagerLoadIncludePath($include);
-            array_push($eager_loads, ...$this->tagIncludePaths($include));
+            $constraint = $paths[$path];
+            $paths[$path] = static function ($query) use ($previous, $constraint) {
+                $previous($query);
+                $constraint($query);
+            };
         }
 
-        return array_values(array_unique($eager_loads));
+        $query->with($paths);
+    }
+
+    /** Resolve declared transformer includes to the relations actually read by them. */
+    private function responseIncludePaths(Model $model, EntityTransformer $transformer, array $includes, string $prefix = '', int $depth = 0, bool $company_only = false): array
+    {
+        if ($depth >= 10) {
+            return [];
+        }
+
+        $paths = [];
+        $children = [];
+        $allowed = array_merge($transformer->getDefaultIncludes(), $transformer->getAvailableIncludes());
+
+        foreach (array_merge($transformer->getDefaultIncludes(), $includes) as $include) {
+            [$segment, $nested] = array_pad(explode('.', $include, 2), 2, null);
+            if (in_array($segment, $allowed, true)) {
+                $children[$segment] ??= [];
+                if ($nested !== null) {
+                    $children[$segment][] = $nested;
+                }
+            }
+        }
+
+        foreach ($children as $include => $nested) {
+            $protected_include = $model instanceof Company && array_key_exists($include, self::COMPANY_INCLUDE_PERMISSIONS);
+            // Only translate API names that differ from the relationship being read.
+            // Computed includes retain their existing transformer queries.
+            $relation_name = match (true) {
+                $model instanceof Company && in_array($include, ['designs', 'payment_terms'], true),
+                $model instanceof CompanyUser && $include === 'token',
+                $model instanceof CompanyGateway && $include === 'system_logs',
+                $model instanceof Payment && $include === 'type' => null,
+                ($model instanceof Company || $model instanceof User) && $include === 'company_user' => 'company_users',
+                $model instanceof Company && $include === 'tokens' => 'tokens_hashed',
+                $model instanceof Company && $include === 'task_schedulers' => 'schedulers',
+                $model instanceof BankIntegration && $include === 'bank_transactions' => 'transactions',
+                $model instanceof Activity && $include === 'history' => 'backup',
+                default => $include,
+            };
+
+            if ($relation_name === null && ! $protected_include) {
+                continue;
+            }
+
+            if ($relation_name === null || ! method_exists($model, $relation_name)) {
+                throw new \LogicException('Declare an eager-loadable relation for '.get_class($transformer).'::'.$include);
+            }
+
+            $relation = $model->newQueryWithoutRelationships()->getRelation($relation_name);
+            if (! $relation instanceof Relation) { // @phpstan-ignore-line
+                throw new \LogicException('Expected an eager-loadable relation for '.get_class($transformer).'::'.$include);
+            }
+
+            $path = $prefix.$relation_name;
+            $constraint = function ($query) use ($model, $include, $protected_include) {
+                $user = auth()->user();
+                if ($model instanceof Company && $user) {
+                    if ($include === 'company_user') {
+                        $query->where('company_user.user_id', $user->id);
+                    }
+                    if ($protected_include) {
+                        $this->applyCompanyIncludeConstraints($query, $user, $include);
+                    }
+                }
+            };
+
+            $related_model = $relation->getRelated();
+            $nested_paths = [];
+            // Profile and token includes are terminal; their include methods own serialization.
+            $profile = $related_model instanceof User && ($model instanceof Task || $model instanceof Project
+                || $model instanceof Product || $model instanceof Activity);
+            if (! $profile && ! $related_model instanceof CompanyToken) {
+                $transformer_class = $related_model instanceof Backup
+                    ? \App\Transformers\InvoiceHistoryTransformer::class
+                    : 'App\\Transformers\\'.class_basename($related_model).'Transformer';
+                $nested_paths = $this->responseIncludePaths(
+                    $related_model, new $transformer_class($this->serializer), $nested, $path.'.', $depth + 1,
+                    $company_only && ! $protected_include
+                );
+            }
+
+            if ($company_only && ! $protected_include && $nested_paths === []) {
+                continue;
+            }
+
+            $paths[$path] = $constraint;
+            $paths = array_merge($paths, $nested_paths);
+            if (isset(self::TAGGABLE_INCLUDE_SEGMENTS[$include]) && method_exists($related_model, 'tags')) {
+                $paths[$path.'.tags'] = static fn ($query) => $query;
+            }
+        }
+
+        return $paths;
     }
 
     private function normalizeFractalInclude(string $include): ?string
@@ -1128,49 +1250,6 @@ class BaseController extends Controller
         }
 
         return null;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function tagIncludePaths(string $include): array
-    {
-        $include = trim($include);
-
-        if ($include === '') {
-            return [];
-        }
-
-        $paths = [];
-        $prefix = [];
-
-        foreach (explode('.', $include) as $segment) {
-            $prefix[] = $segment;
-
-            if (isset(self::TAGGABLE_INCLUDE_SEGMENTS[$segment])) {
-                $paths[] = implode('.', $this->eagerLoadIncludeSegments($prefix)).'.tags';
-            }
-        }
-
-        return $paths;
-    }
-
-    private function eagerLoadIncludePath(string $include): string
-    {
-        return implode('.', $this->eagerLoadIncludeSegments(explode('.', $include)));
-    }
-
-    /**
-     * @param array<int, string> $segments
-     * @return array<int, string>
-     */
-    private function eagerLoadIncludeSegments(array $segments): array
-    {
-        if ($this->entity_type === BankIntegration::class && ($segments[0] ?? null) === 'bank_transactions') {
-            $segments[0] = 'transactions';
-        }
-
-        return $segments;
     }
 
     /**
@@ -1239,8 +1318,10 @@ class BaseController extends Controller
 
         $transformer = new $this->entity_transformer(request()->input('serializer'));
 
-        if ($item instanceof Company && $item->exists) {
-            $this->loadCompanyIncludes($item, $transformer);
+        if ($item instanceof Model && $item->exists) {
+            $query = $item->newQueryWithoutRelationships();
+            $this->eagerLoadResponseIncludes($query, $transformer, company_only: true);
+            $query->eagerLoadRelations([$item]);
         }
 
         if ($this->serializer && $this->serializer != EntityTransformer::API_SERIALIZER_JSON) {
@@ -1259,80 +1340,31 @@ class BaseController extends Controller
         return $this->response($this->manager->createData($resource)->toArray());
     }
 
-    private function loadCompanyIncludes(Company $company, EntityTransformer $transformer): void
+    private function applyCompanyIncludeConstraints($query, User $user, string $include): void
     {
-        /** @var User|null $user */
-        $user = auth()->user();
-
-        if (! $user || $user->isSuperUser()) {
+        if ($user->isAdmin()) {
             return;
         }
 
-        $permissions = [
-            'clients' => 'view_client',
-            'credits' => 'view_credit',
-            'expenses' => 'view_expense',
-            'invoices' => 'view_invoice',
-            'payments' => 'view_payment',
-            'products' => 'view_product',
-            'projects' => 'view_project',
-            'purchase_orders' => 'view_purchase_order',
-            'quotes' => 'view_quote',
-            'recurring_expenses' => 'view_recurring_expense',
-            'recurring_invoices' => 'view_recurring_invoice',
-            'tasks' => 'view_task',
-            'vendors' => 'view_vendor',
-            'bank_integrations' => 'view_bank_transaction',
-            'bank_transactions' => 'view_bank_transaction',
-        ];
-
-        $includes = array_unique(array_map(
-            static fn (string $include): string => Str::before($include, '.'),
-            array_merge(
-                $transformer->getDefaultIncludes(),
-                $this->manager->getRequestedIncludes()
-            )
-        ));
-
-        $with = [];
-
-        foreach (array_intersect($includes, array_keys($permissions)) as $include) {
-            $with[$include] = function ($query) use ($include, $permissions, $user) {
-                if (! $user->hasPermission($permissions[$include])) {
-                    $query->where(function ($query) use ($include, $user) {
-                        $query->where($include.'.user_id', $user->id);
-
-                        if (! in_array($include, ['bank_integrations', 'bank_transactions'], true)) {
-                            $query->orWhere($include.'.assigned_user_id', $user->id);
-                        }
-                    });
+        $permission = self::COMPANY_INCLUDE_PERMISSIONS[$include];
+        if ($permission === null) {
+            $query->where($query->getModel()->qualifyColumn('user_id'), $user->id);
+        } elseif (! $user->hasPermission($permission)) {
+            $query->where(function ($query) use ($include, $user) {
+                $query->where($query->getModel()->qualifyColumn('user_id'), $user->id);
+                if (! in_array($include, ['bank_integrations', 'bank_transactions'], true)) {
+                    $query->orWhere($query->getModel()->qualifyColumn('assigned_user_id'), $user->id);
                 }
-
-                if (
-                    $include === 'clients'
-                    && $user->hasExcludedPermissions(
-                        $this->client_excludable_permissions,
-                        $this->client_excludable_overrides
-                    )
-                ) {
-                    $query->exclude($this->client_exclusion_fields);
-                }
-
-                if (
-                    $include === 'bank_integrations'
-                    && $user->hasIntersectPermissions([
-                        'create_bank_transaction',
-                        'edit_bank_transaction',
-                        'view_bank_transaction',
-                    ])
-                ) {
-                    $query->exclude(['balance']);
-                }
-            };
+            });
         }
 
-        if ($with !== []) {
-            $company->load($with);
+        if ($include === 'clients' && $user->hasExcludedPermissions($this->client_excludable_permissions, $this->client_excludable_overrides)) {
+            $query->exclude($this->client_exclusion_fields);
+        }
+
+        if ($include === 'bank_integrations' && ! $user->isSuperUser()
+            && $user->hasIntersectPermissions(['create_bank_transaction', 'edit_bank_transaction', 'view_bank_transaction'])) {
+            $query->exclude(['balance']);
         }
     }
 

@@ -176,7 +176,7 @@ class ActivityTransformer extends EntityTransformer
             return null;
         }
 
-        $transformer = new RecurringInvoiceTransformer($this->serializer);
+        $transformer = new QuoteTransformer($this->serializer);
 
         return $this->includeItem($activity->quote, $transformer, Quote::class);
     }
