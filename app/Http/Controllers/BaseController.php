@@ -790,13 +790,16 @@ class BaseController extends Controller
             //2026-01-23: Improve Login Performance for react.
             return $this->refreshReactResponse($query);
             // return $this->miniLoadResponse($query);
-        } elseif ($user->getCompany()->is_large) {
+        } 
+        // elseif ($user->getCompany()->is_large) {
+        else {
             $this->manager->parseIncludes($this->mini_load);
 
             return $this->miniLoadResponse($query);
-        } else {
-            $this->manager->parseIncludes($this->first_load);
         }
+        //  else {
+        //     $this->manager->parseIncludes($this->first_load);
+        // }
 
         $this->serializer = request()->input('serializer') ?: EntityTransformer::API_SERIALIZER_ARRAY;
 

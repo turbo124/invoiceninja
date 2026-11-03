@@ -420,7 +420,9 @@ class LoginController extends BaseController
             return response()->json(['message' => 'Pro / Free accounts only the owner can log in. Please upgrade'], 403);
         }
 
-        return $this->refreshResponse($cu);
+        return $request->boolean('current_company')
+    ? $this->refreshResponse($cu)
+    : $this->timeConstrainedResponse($cu);
     }
 
     /**

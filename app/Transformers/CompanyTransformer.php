@@ -247,15 +247,16 @@ class CompanyTransformer extends EntityTransformer
 
     private function isLarge(Company $company): bool
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
+        // /** @var \App\Models\User $user */
+        // $user = auth()->user();
 
+        return true;
         //if the user is attached to more than one company AND they are not an admin across all companies
-        if ($company->is_large || ($user->company_users()->count() > 1 && ($user->company_users()->where('is_admin', 1)->count() != $user->company_users()->count()))) {
-            return true;
-        }
+        // if ($company->is_large || ($user->company_users()->count() > 1 && ($user->company_users()->where('is_admin', 1)->count() != $user->company_users()->count()))) {
+        //     return true;
+        // }
 
-        return false;
+        // return false;
     }
 
     public function includeExpenseCategories(Company $company)
