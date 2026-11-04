@@ -45,7 +45,7 @@ class Rule extends BaseRule implements RuleInterface
 
     public string $tax_name1 = 'MwSt.';
 
-    private string $tax_name;
+    public string $tax_name;
     /**
      * Initializes the rules and builds any required data.
      *

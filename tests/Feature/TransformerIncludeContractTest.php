@@ -125,7 +125,9 @@ class TransformerIncludeContractTest extends TestCase
         $user->setRawAttributes(['id' => 1]);
         auth()->setUser($user);
 
-        $transformer = new $transformer_class('array');
+        $response_user = new User();
+        $response_user->setRawAttributes(['id' => 3]);
+        $transformer = new $transformer_class('array', $response_user);
         $model = new $model_class();
         $method = 'include'.Str::studly($include);
         $this->assertTrue(method_exists($transformer, $method));
@@ -170,11 +172,48 @@ class TransformerIncludeContractTest extends TestCase
 
         $resource = $transformer->{$method}($model);
         $this->assertNotNull($resource);
+        $this->assertSame($response_user, (new ReflectionProperty(EntityTransformer::class, 'user'))->getValue($resource->getTransformer()));
         $data = $resource->getData();
         $related_model = $data instanceof Collection ? $data->first() : $data;
         $this->assertContains($related_model, $related_models);
         $child_type = (new ReflectionMethod($resource->getTransformer(), 'transform'))->getParameters()[0]->getType();
         $this->assertInstanceOf($child_type->getName(), $related_model);
+    }
+
+    public function testNestedIncludesPreserveExplicitUserAndDoNotInferAuthentication(): void
+    {
+        auth()->setUser(new User());
+        $task = new \App\Models\Task();
+        $client = new Client();
+        $client->setRelation('group_settings', new \App\Models\GroupSetting());
+        $task->setRelation('client', $client);
+        $user_property = new ReflectionProperty(EntityTransformer::class, 'user');
+        $serializer_property = new ReflectionProperty(EntityTransformer::class, 'serializer');
+
+        foreach ([null, new User()] as $user) {
+            foreach ([null, 'array', 'json'] as $serializer) {
+                $transformer = new \App\Transformers\TaskTransformer($serializer, $user);
+                $client_transformer = $transformer->includeClient($task)->getTransformer();
+                $group_transformer = $client_transformer->includeGroupSettings($client)->getTransformer();
+
+                foreach ([$transformer, $client_transformer, $group_transformer] as $nested_transformer) {
+                    $this->assertSame($user, $user_property->getValue($nested_transformer));
+                    $this->assertSame($serializer, $serializer_property->getValue($nested_transformer));
+                }
+            }
+        }
+
+        $this->assertNull($user_property->getValue(new \App\Transformers\TaskTransformer()));
+        $this->assertNull($user_property->getValue(new \App\Transformers\TaskTransformer('array')));
+    }
+
+    public function testComputedPaymentTypeReceivesExplicitUser(): void
+    {
+        $user = new User();
+        $transformer = new \App\Transformers\PaymentTransformer('array', $user);
+        $resource = $transformer->includeType(new \App\Models\Payment());
+
+        $this->assertSame($user, (new ReflectionProperty(EntityTransformer::class, 'user'))->getValue($resource->getTransformer()));
     }
 
     public static function profileIncludes(): array

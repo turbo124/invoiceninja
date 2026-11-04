@@ -26,7 +26,7 @@ class AuthenticatedCompanyUserTransformer extends CompanyUserTransformer
                               ->where('is_system', 1)
                               ->first();
 
-        $transformer = $company_user->user_id === auth()->user()->id ? new CompanyTokenTransformer($this->serializer) : new CompanyTokenHashedTransformer($this->serializer);
+        $transformer = $company_user->user_id === auth()->user()->id ? new CompanyTokenTransformer($this->serializer, $this->user) : new CompanyTokenHashedTransformer($this->serializer, $this->user);
 
         return $this->includeItem($token, $transformer, CompanyToken::class);
     }

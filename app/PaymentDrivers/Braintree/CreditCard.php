@@ -311,6 +311,7 @@ class CreditCard implements LivewireMethodInterface
             foreach ($data['tokens'] ?? [] as $token) {
                 $this->braintree->resolveStoredToken($token->token, GatewayType::CREDIT_CARD);
                 try {
+                    /** @var \Braintree\Result\Successful|\Braintree\Result\Error $result */
                     $result = $this->braintree->gateway->paymentMethodNonce()->create($token->token);
 
                     if (! $result->success) {
