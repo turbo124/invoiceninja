@@ -110,7 +110,7 @@ class TaskTransformer extends EntityTransformer
 
     public function includeProject(Task $task): ?Item
     {
-        $transformer = new ProjectTransformer($this->serializer);
+        $transformer = new ProjectProfileTransformer($this->serializer);
 
         if ($task->project) {
             return $this->includeItem($task->project, $transformer, Project::class);

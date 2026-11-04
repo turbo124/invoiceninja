@@ -124,6 +124,13 @@ class BaseRule implements RuleInterface
 
     private bool $should_calc_tax = true;
 
+    /** Standard rate for this client/jurisdiction (from calculateRates). */
+    public float $tax_rate = 0;
+    /** Reduced rate for this jurisdiction (from calculateRates). */
+    public float $reduced_tax_rate = 0;
+    /** Label for standard/reduced lines (from calculateRates). */
+    public string $tax_name = '';
+
     public function __construct() {}
 
     public function init(): self

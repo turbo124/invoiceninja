@@ -1134,6 +1134,7 @@ $lang = array(
     'plan_term_changes_to' => ':plan (:term) on :date',
     'cancel_plan_change' => 'Cancel Change',
     'plan' => 'Plan',
+    'billing_history' => 'Billing History',
     'expires' => 'Expires',
     'renews' => 'Renews',
     'plan_expired' => ':plan Plan Expired',

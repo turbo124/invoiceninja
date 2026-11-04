@@ -274,6 +274,7 @@ class Rule extends BaseRule implements RuleInterface
 
             $this->tax_name = $this->client->company->tax_data->regions->UK->subregions->GB->tax_name;
             $this->tax_rate = $this->client->company->tax_data->regions->UK->subregions->GB->tax_rate ?? 0;
+            $this->reduced_tax_rate = $this->client->company->tax_data->regions->UK->subregions->GB->reduced_tax_rate ?? 0;
 
             return $this;
         }

@@ -106,6 +106,44 @@ class SettingsSearchTest extends TestCase
         }
     }
 
+    public function testPrimarySettingsSidebarRoutesAreCatalogued(): void
+    {
+        $paths = array_column(SettingsSearchMap::all(), 'path');
+
+        $sidebar_routes = [
+            '/settings/company_details',
+            '/settings/user_details',
+            '/settings/localization',
+            '/settings/online_payments',
+            '/settings/tax_settings',
+            '/settings/product_settings',
+            '/settings/task_settings',
+            '/settings/tags',
+            '/settings/expense_settings',
+            '/settings/workflow_settings',
+            '/settings/account_management',
+            '/settings/backup_restore',
+            '/settings/import_export',
+            '/settings/invoice_design',
+            '/settings/custom_fields',
+            '/settings/generated_numbers',
+            '/settings/client_portal',
+            '/settings/e_invoice',
+            '/settings/email_settings',
+            '/settings/templates_and_reminders',
+            '/settings/bank_accounts',
+            '/settings/group_settings',
+            '/settings/subscriptions',
+            '/settings/schedules',
+            '/settings/users',
+            '/settings/system_logs',
+        ];
+
+        foreach ($sidebar_routes as $route) {
+            $this->assertContains($route, $paths, "Missing settings search entry for sidebar route {$route}");
+        }
+    }
+
     public function testCatalogueEntriesAreUnique(): void
     {
         // Paths may be intentionally aliased (e.g. "Tax Settings" and "Tax Rates"
@@ -136,10 +174,25 @@ class SettingsSearchTest extends TestCase
     public function testQuickbooksIsDiscoverableViaIntegrations(): void
     {
         $entry = collect(SettingsSearchMap::all())
-            ->first(fn (array $e): bool => str_contains($e['keywords'], 'quickbooks'));
+            ->first(
+                fn (array $e): bool => $e['label'] === 'quickbooks'
+                    && $e['path'] === '/settings/account_management/integrations'
+            );
 
         $this->assertNotNull($entry);
-        $this->assertSame('/settings/account_management/integrations', $entry['path']);
+    }
+
+    public function testQuickbooksSurfacesAsPrimarySearchLabel(): void
+    {
+        $settings = $this->settingsFor($this->user);
+
+        $quickbooks = collect($settings)->first(
+            fn (array $e): bool => $e['path'] === '/settings/account_management/integrations'
+                && strcasecmp($e['name'], ctrans('texts.quickbooks')) === 0
+        );
+
+        $this->assertNotNull($quickbooks);
+        $this->assertStringContainsStringIgnoringCase('qbo', $quickbooks['keywords']);
     }
 
     public function testAdminReceivesAdminOnlyDestinations(): void

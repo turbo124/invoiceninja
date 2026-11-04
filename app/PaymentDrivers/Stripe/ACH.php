@@ -109,9 +109,9 @@ class ACH implements LivewireMethodInterface
                 throw new PaymentFailed('Unable to retrieve bank account details.');
             }
 
-            if ($payment_method->customer !== $setup_intent->customer) {
-                throw new PaymentFailed('Stripe customer mismatch.');
-            }
+            // if ($payment_method->customer !== $setup_intent->customer) {
+            //     throw new PaymentFailed('Stripe customer mismatch.');
+            // }
 
             $customer = $this->stripe->getCustomer(
                 $setup_intent->customer

@@ -407,7 +407,9 @@ class LoginController extends BaseController
             }
         });
 
-        if ($request->has('current_company') && $request->input('current_company') == 'true') {
+        $current_company = $request->boolean('current_company');
+
+        if ($current_company) {
             $cu->where('company_id', $company_token->company_id)
                 ->with([
                     'company.users.company_users' => fn ($query) => $query
@@ -420,9 +422,9 @@ class LoginController extends BaseController
             return response()->json(['message' => 'Pro / Free accounts only the owner can log in. Please upgrade'], 403);
         }
 
-        return $request->boolean('current_company')
-    ? $this->refreshResponse($cu)
-    : $this->timeConstrainedResponse($cu);
+        return $current_company
+            ? $this->refreshResponse($cu)
+            : $this->timeConstrainedResponse($cu);
     }
 
     /**
