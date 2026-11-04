@@ -82,7 +82,7 @@ class BankIntegrationTransformer extends EntityTransformer
 
     public function includeCompany(BankIntegration $bank_integration)
     {
-        $transformer = new CompanyTransformer($this->serializer, $this->user);
+        $transformer = $this->companyTransformer($bank_integration->company);
 
         return $this->includeItem($bank_integration->company, $transformer, Company::class);
     }

@@ -110,7 +110,7 @@ class AccountTransformer extends EntityTransformer
 
     public function includeDefaultCompany(Account $account)
     {
-        $transformer = new CompanyTransformer($this->serializer, $this->user);
+        $transformer = $this->companyTransformer($account->default_company);
 
         return $this->includeItem($account->default_company, $transformer, Company::class);
     }

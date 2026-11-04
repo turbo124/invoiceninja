@@ -53,7 +53,7 @@ class ProductTransformer extends EntityTransformer
      */
     public function includeCompany(Product $product)
     {
-        $transformer = new CompanyTransformer($this->serializer, $this->user);
+        $transformer = $this->companyTransformer($product->company);
 
         return $this->includeItem($product->company, $transformer, Company::class);
     }

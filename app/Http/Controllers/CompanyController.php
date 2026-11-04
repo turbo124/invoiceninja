@@ -13,6 +13,7 @@
 namespace App\Http\Controllers;
 
 use App\Utils\Ninja;
+use App\Utils\TruthSource;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\Invoice;
@@ -270,6 +271,11 @@ class CompanyController extends BaseController
         $this->entity_type = CompanyUser::class;
 
         $ct = CompanyUser::whereUserId(auth()->user()->id)->whereCompanyId($company->id);
+
+        app(TruthSource::class)
+            ->setCompany($company)
+            ->setCompanyUser((clone $ct)->firstOrFail())
+            ->setCompanyToken($company_token);
 
         return $this->listResponse($ct);
     }

@@ -187,6 +187,313 @@ class IncludePermissionsTest extends TestCase
         return $company_token->token;
     }
 
+    private function createForeignTaskProject(): array
+    {
+        $this->second_company = Company::factory()->create(['account_id' => $this->account->id]);
+        $membership = CompanyUserFactory::create($this->admin_user->id, $this->second_company->id, $this->account->id);
+        $membership->is_admin = false;
+        $membership->is_owner = false;
+        $membership->is_locked = false;
+        $membership->permissions = '';
+        $membership->save();
+
+        $attributes = ['company_id' => $this->second_company->id, 'user_id' => $this->admin_user->id];
+        $client = Client::factory()->create($attributes);
+        $project = Project::factory()->create($attributes + ['client_id' => $client->id, 'name' => 'foreign-project-'.Str::uuid()]);
+        $task = Task::factory()->create($attributes + ['client_id' => $client->id, 'project_id' => $project->id, 'invoice_id' => null]);
+
+        $this->beforeApplicationDestroyed(function () use ($client, $project, $task) {
+            foreach ([$client, $project, $task] as $record) {
+                $this->assertFalse(DB::connection($this->fixture_connection)->table($record->getTable())->where('id', $record->id)->exists());
+            }
+        });
+
+        return [$project, $task];
+    }
+
+    public function testTaskProjectCompanyBoundaryOnRead(): void
+    {
+        $this->createFixture('');
+        [$foreign_project, $foreign_task] = $this->createForeignTaskProject();
+        $this->withHeaders(['X-API-SECRET' => config('ninja.api_secret'), 'X-API-TOKEN' => $this->admin_token]);
+
+        foreach ([
+            '/tasks?include=project',
+            '/tasks/'.$this->task->hashed_id.'?include=project',
+            '/projects?include=tasks.project',
+            '/projects/'.$this->project->hashed_id.'?include=tasks.project',
+            '/companies/'.$this->company->hashed_id.'?include=tasks.project,projects.tasks.project',
+            '/companies?include=tasks.project,projects.tasks.project',
+        ] as $endpoint) {
+            $response = $this->getJson('/api/v1'.$endpoint)->assertOk();
+            $this->assertStringNotContainsString($foreign_project->name, $response->getContent(), $endpoint);
+        }
+
+        $this->getJson('/api/v1/tasks?include=project&project_tasks='.$foreign_project->hashed_id)
+            ->assertOk()->assertJsonCount(0, 'data');
+        foreach (['/tasks/'.$foreign_task->hashed_id.'?include=project', '/projects/'.$foreign_project->hashed_id.'?include=tasks.project'] as $endpoint) {
+            $response = $this->getJson('/api/v1'.$endpoint);
+            $this->assertContains($response->status(), [401, 403, 404], $endpoint);
+            $this->assertStringNotContainsString($foreign_project->name, $response->getContent());
+        }
+
+        // Positive control: the valid company-B task/project are readable with a company-B token.
+        $this->withHeaders(['X-API-TOKEN' => $this->createToken($this->admin_user, $this->second_company)])
+            ->getJson('/api/v1/tasks/'.$foreign_task->hashed_id.'?include=project')
+            ->assertOk()->assertJsonPath('data.project.id', $foreign_project->hashed_id);
+    }
+
+    public function testTaskProjectCompanyBoundaryOnWrite(): void
+    {
+        $this->createFixture('');
+        [$foreign_project] = $this->createForeignTaskProject();
+        $this->task->update(['invoice_id' => null]);
+        $this->withHeaders(['X-API-SECRET' => config('ninja.api_secret'), 'X-API-TOKEN' => $this->admin_token]);
+
+        $response = $this->postJson('/api/v1/tasks?include=project', [
+            'client_id' => $this->client->hashed_id,
+            'project_id' => $foreign_project->hashed_id,
+            'description' => 'Cross-company project assignment attempt',
+        ])->assertSuccessful();
+        $this->assertStringNotContainsString($foreign_project->name, $response->getContent());
+        $this->assertFalse(Task::where('company_id', $this->company->id)->where('project_id', $foreign_project->id)->exists());
+
+        $this->putJson('/api/v1/tasks/'.$this->task->hashed_id.'?include=project', ['project_id' => $foreign_project->hashed_id])
+            ->assertSuccessful()->assertJsonPath('data.project.id', $this->project->hashed_id);
+        $this->assertSame($this->project->id, $this->task->fresh()->project_id);
+
+        $this->postJson('/api/v1/tasks/bulk?include=project', [
+            'ids' => [$this->task->hashed_id], 'action' => 'bulk_update',
+            'column' => 'project_id', 'new_value' => $foreign_project->hashed_id,
+        ])->assertSuccessful()->assertJsonPath('data.0.project.id', $this->project->hashed_id);
+        $this->assertSame($this->project->id, $this->task->fresh()->project_id);
+    }
+
+    #[DataProvider('companyResponseProvider')]
+    public function testUserMembershipTraversalDoesNotLoadOrReturnForeignProjects(bool $is_item, string $data_path): void
+    {
+        $this->createFixture('');
+        [$foreign_project] = $this->createForeignTaskProject();
+        $this->admin_user->password = Hash::make('task-project-boundary');
+        $this->admin_user->save();
+        $loaded_projects = [];
+        Project::retrieved(function (Project $project) use (&$loaded_projects) {
+            $loaded_projects[] = $project->id;
+        });
+
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'), 'X-API-TOKEN' => $this->admin_token,
+            'X-API-PASSWORD' => 'task-project-boundary',
+        ])->getJson('/api/v1/users'.($is_item ? '/'.$this->admin_user->hashed_id : '').'?include=company_user.company.tasks.project')->assertOk();
+
+        $response->assertJsonPath($data_path.'.company_user.company.id', $this->company->hashed_id);
+        $this->assertNotContains($foreign_project->id, $loaded_projects);
+        $this->assertContains($this->project->id, $loaded_projects);
+        $this->assertStringNotContainsString($foreign_project->name, $response->getContent());
+        $this->assertStringContainsString($this->project->hashed_id, $response->getContent());
+
+        if (! $is_item) {
+            $users = collect($response->json('data'))->keyBy('id');
+            $this->assertFalse($users[$this->restricted_user->hashed_id]['company_user']['is_admin']);
+            $this->assertSame($this->company->hashed_id, $users[$this->restricted_user->hashed_id]['company_user']['company']['id']);
+        }
+    }
+
+    public static function taskProjectBootstrapRequests(): array
+    {
+        return [
+            'flutter login' => ['login', false],
+            'react login' => ['login', true],
+            'membership discovery' => ['refresh', false],
+            'current company refresh' => ['refresh?current_company=true', false],
+            'react refresh' => ['refresh_react', true],
+        ];
+    }
+
+    #[DataProvider('taskProjectBootstrapRequests')]
+    public function testBootstrapOnlyLoadsAndIncludesActiveCompanyChildren(string $endpoint, bool $is_react): void
+    {
+        $this->createFixture('');
+        [$foreign_project] = $this->createForeignTaskProject();
+        $this->createToken($this->admin_user, $this->second_company);
+        $foreign_tax_rate = \App\Models\TaxRate::factory()->create([
+            'company_id' => $this->second_company->id,
+            'user_id' => $this->admin_user->id,
+        ]);
+        $this->beforeApplicationDestroyed(function () use ($foreign_tax_rate) {
+            $this->assertFalse(DB::connection($this->fixture_connection)->table('tax_rates')->where('id', $foreign_tax_rate->id)->exists());
+        });
+        $gateway_owner = CompanyUserFactory::create($this->restricted_user->id, $this->second_company->id, $this->account->id);
+        $gateway_owner->is_admin = true;
+        $gateway_owner->save();
+        $foreign_gateway = CompanyGatewayFactory::create($this->second_company->id, $this->restricted_user->id);
+        $foreign_gateway->gateway_key = '3b6621f970ab18887c4f6dca78d3f8bb';
+        $foreign_gateway->config = encrypt(json_encode(['apiKey' => 'synthetic-company-b-secret']));
+        $foreign_gateway->save();
+        $this->beforeApplicationDestroyed(function () use ($foreign_gateway) {
+            $this->assertFalse(DB::connection($this->fixture_connection)->table('company_gateways')->where('id', $foreign_gateway->id)->exists());
+        });
+        $active_tax_rate = \App\Models\TaxRate::factory()->create([
+            'company_id' => $this->company->id,
+            'user_id' => $this->admin_user->id,
+        ]);
+        $foreign_document = $this->second_company->documents()->save(Document::factory()->make([
+            'company_id' => $this->second_company->id, 'user_id' => $this->restricted_user->id,
+        ]));
+        $this->beforeApplicationDestroyed(function () use ($active_tax_rate, $foreign_document) {
+            foreach ([$active_tax_rate, $foreign_document] as $record) {
+                $this->assertFalse(DB::connection($this->fixture_connection)->table($record->getTable())->where('id', $record->id)->exists());
+            }
+        });
+        $loaded_records = [];
+        foreach ([\App\Models\TaxRate::class, CompanyGateway::class, Document::class, Project::class] as $model_class) {
+            $model_class::retrieved(function (Model $model) use (&$loaded_records) {
+                $loaded_records[] = $model->getTable().'.'.$model->id;
+            });
+        }
+        $this->withoutMiddleware(ThrottleRequests::class);
+        $headers = ['X-API-SECRET' => config('ninja.api_secret')];
+        if ($is_react) {
+            $headers['X-React'] = 'true';
+        }
+        $payload = ['include' => 'company.tasks.project,company.projects,user.company_user.company.tasks.project'];
+        if ($endpoint === 'login') {
+            Session::start();
+            $this->admin_user->password = Hash::make('task-project-boundary');
+            $this->admin_user->save();
+            $payload += ['email' => $this->admin_user->email, 'password' => 'task-project-boundary'];
+        } else {
+            $headers['X-API-TOKEN'] = $this->admin_token;
+        }
+
+        $response = $this->withHeaders($headers)->postJson('/api/v1/'.$endpoint, $payload)->assertOk();
+        $this->assertStringNotContainsString($foreign_project->name, $response->getContent());
+        $this->assertStringNotContainsString('synthetic-company-b-secret', $response->getContent());
+        foreach ([$foreign_project, $foreign_tax_rate, $foreign_gateway, $foreign_document] as $record) {
+            $this->assertNotContains($record->getTable().'.'.$record->id, $loaded_records);
+        }
+        $memberships = collect($response->json('data'))->keyBy('company.id');
+        $active_company = $memberships[$this->company->hashed_id]['company'];
+        $this->assertContains($active_tax_rate->hashed_id, array_column($active_company['tax_rates'], 'id'));
+        if ($endpoint === 'refresh?current_company=true') {
+            $response->assertJsonCount(1, 'data');
+        } else {
+            $this->assertTrue($memberships->has($this->second_company->hashed_id));
+            $company_transformer = new CompanyTransformer();
+            $relation_names = array_unique(array_merge($company_transformer->getDefaultIncludes(), $company_transformer->getAvailableIncludes()));
+            $this->assertSame([], array_values(array_intersect(array_keys($memberships[$this->second_company->hashed_id]['company']), $relation_names)));
+            $expected_relations = $is_react ? ['documents', 'tax_rates'] : [
+                'activities', 'tax_rates', 'documents', 'company_gateways', 'users', 'task_statuses',
+                'payment_terms', 'groups', 'designs', 'expense_categories', 'subscriptions',
+                'bank_integrations', 'bank_transaction_rules', 'task_schedulers', 'locations',
+            ];
+            $this->assertEqualsCanonicalizing($expected_relations, array_values(array_intersect(array_keys($active_company), $relation_names)));
+        }
+    }
+
+    public static function bootstrapFrontends(): array
+    {
+        return ['flutter' => [false], 'react' => [true]];
+    }
+
+    #[DataProvider('bootstrapFrontends')]
+    public function testLoginUsesSelectedCompanyInsteadOfFirstMembership(bool $is_react): void
+    {
+        $this->createFixture('');
+        $this->createForeignTaskProject();
+        $this->createToken($this->admin_user, $this->second_company);
+        $this->account->default_company_id = $this->second_company->id;
+        $this->account->save();
+        $tax_rate = \App\Models\TaxRate::factory()->create([
+            'company_id' => $this->second_company->id, 'user_id' => $this->admin_user->id,
+        ]);
+
+        $response = $this->loginFixtureUser($this->admin_user, $is_react)->assertOk();
+        $this->assertSame($this->second_company->id, auth()->user()->companyId());
+        $memberships = collect($response->json('data'))->keyBy('company.id');
+        $this->assertContains($tax_rate->hashed_id, array_column($memberships[$this->second_company->hashed_id]['company']['tax_rates'], 'id'));
+        $this->assertArrayNotHasKey('documents', $memberships[$this->company->hashed_id]['company']);
+        $this->assertArrayNotHasKey('tax_rates', $memberships[$this->company->hashed_id]['company']);
+        $truth = app(\App\Utils\TruthSource::class);
+        $this->assertSame($this->second_company->id, $truth->getCompany()->id);
+        $this->assertSame($this->second_company->id, $truth->getCompanyUser()->company_id);
+        $this->assertSame($this->second_company->id, $truth->getCompanyToken()->company_id);
+        $this->assertFalse((bool) $truth->getCompanyUser()->is_admin);
+    }
+
+    #[DataProvider('bootstrapFrontends')]
+    public function testLoginFallsBackToAnAccessibleCompany(bool $is_react): void
+    {
+        $this->createFixture('');
+        $this->createForeignTaskProject();
+        $this->account->default_company_id = $this->second_company->id;
+        $this->account->save();
+        $this->second_company->company_users()->where('user_id', $this->admin_user->id)->delete();
+
+        $response = $this->loginFixtureUser($this->admin_user, $is_react)->assertOk();
+        $response->assertJsonCount(1, 'data')->assertJsonPath('data.0.company.id', $this->company->hashed_id);
+        $this->assertArrayHasKey('tax_rates', $response->json('data.0.company'));
+        $truth = app(\App\Utils\TruthSource::class);
+        $this->assertSame($this->company->id, $truth->getCompany()->id);
+        $this->assertSame($this->company->id, $truth->getCompanyUser()->company_id);
+        $this->assertSame($this->company->id, $truth->getCompanyToken()->company_id);
+    }
+
+    #[DataProvider('bootstrapFrontends')]
+    public function testCompanySwitchLoadsChildrenUsingTheNewToken(bool $is_react): void
+    {
+        $this->createFixture('');
+        $this->createForeignTaskProject();
+        $second_token = $this->createToken($this->admin_user, $this->second_company);
+        $tax_rate = \App\Models\TaxRate::factory()->create([
+            'company_id' => $this->second_company->id, 'user_id' => $this->admin_user->id,
+        ]);
+        $this->withoutMiddleware(ThrottleRequests::class);
+        $endpoint = $is_react ? '/api/v1/refresh_react' : '/api/v1/refresh';
+
+        $first_response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'), 'X-API-TOKEN' => $this->admin_token,
+        ])->postJson($endpoint)->assertOk();
+        $memberships = collect($first_response->json('data'))->keyBy('company.id');
+        $this->assertSame($second_token, $memberships[$this->second_company->hashed_id]['token']['token']);
+        $this->assertArrayNotHasKey('tax_rates', $memberships[$this->second_company->hashed_id]['company']);
+
+        $second_response = $this->withHeaders(['X-API-TOKEN' => $second_token])->postJson($endpoint)->assertOk();
+        $memberships = collect($second_response->json('data'))->keyBy('company.id');
+        $this->assertContains($tax_rate->hashed_id, array_column($memberships[$this->second_company->hashed_id]['company']['tax_rates'], 'id'));
+        $this->assertArrayNotHasKey('tax_rates', $memberships[$this->company->hashed_id]['company']);
+        $this->assertArrayNotHasKey('documents', $memberships[$this->company->hashed_id]['company']);
+    }
+
+    public function testNewCompanyResponsePreservesDiscoveryTokenAndSelectedContext(): void
+    {
+        $this->createFixture('');
+        $this->company->company_users()->where('user_id', $this->admin_user->id)->update(['is_owner' => true]);
+        $this->withoutMiddleware(ThrottleRequests::class);
+        $response = $this->withHeaders([
+            'X-API-SECRET' => config('ninja.api_secret'), 'X-API-TOKEN' => $this->admin_token,
+        ])->postJson('/api/v1/companies?include=company.tax_rates,user.company_user,token,account', [
+            'settings' => ['name' => 'New company boundary test'],
+        ])->assertSuccessful()->assertJsonCount(1, 'data');
+
+        $membership = CompanyUser::where('user_id', $this->admin_user->id)->where('company_id', '!=', $this->company->id)->firstOrFail();
+        $this->second_company = $membership->company;
+        $response->assertJsonPath('data.0.company.id', $this->second_company->hashed_id)
+            ->assertJsonPath('data.0.company.is_large', true)
+            ->assertJsonPath('data.0.user.company_user.is_owner', true);
+        $this->assertArrayHasKey('tax_rates', $response->json('data.0.company'));
+        $new_token = $response->json('data.0.token.token');
+        $this->assertNotEmpty($new_token);
+        $truth = app(\App\Utils\TruthSource::class);
+        $this->assertSame($this->second_company->id, $truth->getCompany()->id);
+        $this->assertSame($this->second_company->id, $truth->getCompanyUser()->company_id);
+        $this->assertSame($this->second_company->id, $truth->getCompanyToken()->company_id);
+
+        $this->withHeaders(['X-API-TOKEN' => $this->admin_token])->getJson('/api/v1/companies')->assertOk()->assertJsonCount(2, 'data');
+        $this->withHeaders(['X-API-TOKEN' => $new_token])->postJson('/api/v1/refresh?current_company=true')
+            ->assertOk()->assertJsonPath('data.0.company.id', $this->second_company->hashed_id);
+    }
+
     private function createAdminData(): void
     {
         $admin_attributes = [
@@ -1649,7 +1956,7 @@ class IncludePermissionsTest extends TestCase
         try {
             $loaded_product = $query->firstOrFail();
             $queries_before = $connection->getQueryLog();
-            $data = $this->transformIncludedRecord($loaded_product, $include, new ProductTransformer('array'));
+            $data = $this->transformIncludedRecord($loaded_product, $include, new ProductTransformer('array', auth()->user()));
             $queries_after = $connection->getQueryLog();
         } finally {
             $connection->disableQueryLog();
@@ -1739,7 +2046,7 @@ class IncludePermissionsTest extends TestCase
         $this->applyDottedCompanyIncludes($query, [$include]);
         $company = $query->firstOrFail();
         $this->assertCount(1, $company->company_users);
-        $data = $this->transformIncludedRecord($company, $include, new CompanyTransformer('array'));
+        $data = $this->transformIncludedRecord($company, $include, new CompanyTransformer('array', auth()->user()));
         $this->assertSame([$this->client->hashed_id], array_column($data['company_user']['company']['clients'], 'id'));
     }
 
@@ -1756,7 +2063,7 @@ class IncludePermissionsTest extends TestCase
         $this->applyDottedCompanyIncludes($query, ['clients', 'contacts']);
         $company = $query->firstOrFail();
         $this->assertTrue($company->clients->first()->relationLoaded('contacts'));
-        $data = $this->transformIncludedRecord($company, 'clients,contacts', new CompanyTransformer('array'));
+        $data = $this->transformIncludedRecord($company, 'clients,contacts', new CompanyTransformer('array', auth()->user()));
 
         $this->assertSame([], $data['contacts']);
         // Client.contacts is loaded by the model and included by default, without an explicit dotted path.
@@ -1804,7 +2111,7 @@ class IncludePermissionsTest extends TestCase
         $this->applyDottedCompanyIncludes($query, ['clients.invoices']);
         $company = $query->firstOrFail();
         $this->assertFalse($company->clients->first()->relationLoaded('invoices'));
-        $data = $this->transformIncludedRecord($company, 'clients.invoices', new CompanyTransformer('array'));
+        $data = $this->transformIncludedRecord($company, 'clients.invoices', new CompanyTransformer('array', auth()->user()));
         $this->assertArrayNotHasKey('invoices', $data['clients'][0]);
     }
 
@@ -1830,11 +2137,11 @@ class IncludePermissionsTest extends TestCase
         $company = Company::query()->whereKey($this->company->id)->with(['tokens' => $constraint])->firstOrFail();
         $this->assertFalse($company->tokens->contains('id', $admin_token->id));
         $this->assertFalse($company->relationLoaded('tokens_hashed'));
-        $data = $this->transformIncludedRecord($company, 'tokens', new CompanyTransformer('array'));
+        $data = $this->transformIncludedRecord($company, 'tokens', new CompanyTransformer('array', auth()->user()));
         $this->assertCount(2, $data['tokens']);
 
         $company = Company::query()->whereKey($this->company->id)->with(['tokens_hashed' => $constraint])->firstOrFail();
-        $data = $this->transformIncludedRecord($company, 'tokens', new CompanyTransformer('array'));
+        $data = $this->transformIncludedRecord($company, 'tokens', new CompanyTransformer('array', auth()->user()));
         $this->assertSame([$owned_token->hashed_id], array_column($data['tokens'], 'id'));
     }
 

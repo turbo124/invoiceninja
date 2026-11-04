@@ -67,7 +67,7 @@ class BankTransactionRuleTransformer extends EntityTransformer
 
     public function includeCompany(BankTransactionRule $bank_transaction_rule)
     {
-        $transformer = new CompanyTransformer($this->serializer, $this->user);
+        $transformer = $this->companyTransformer($bank_transaction_rule->company);
 
         return $this->includeItem($bank_transaction_rule->company, $transformer, Company::class);
     }

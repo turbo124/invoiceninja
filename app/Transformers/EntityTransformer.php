@@ -12,6 +12,7 @@
 
 namespace App\Transformers;
 
+use App\Models\Company;
 use App\Models\User;
 use App\Utils\Traits\MakesHash;
 use League\Fractal\TransformerAbstract;
@@ -26,6 +27,17 @@ class EntityTransformer extends TransformerAbstract
 
     public function __construct(protected $serializer = null, protected ?User $user = null)
     {
+    }
+
+    protected function companyTransformer(Company $company): CompanyTransformer
+    {
+        $transformer = new CompanyTransformer($this->serializer, $this->user);
+
+        if (! $this->user || $company->id != $this->user->companyId()) {
+            $transformer->setDefaultIncludes([])->setAvailableIncludes([]);
+        }
+
+        return $transformer;
     }
 
     protected function includeCollection($data, $transformer, $entityType)

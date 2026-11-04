@@ -617,7 +617,7 @@ class LoginController extends BaseController
         $this->setLoginCache($user);
 
         $truth = app()->make(TruthSource::class);
-        $truth->setCompanyUser($cu->first());
+        $truth->setCompanyUser((clone $cu)->where('company_id', $set_company->id)->firstOrFail());
         $truth->setUser($user);
         $truth->setCompany($set_company);
 

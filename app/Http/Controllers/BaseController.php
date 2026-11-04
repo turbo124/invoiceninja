@@ -374,6 +374,9 @@ class BaseController extends Controller
      */
     protected function refreshReactResponse($query)
     {
+        /** @var User $user */
+        $user = auth()->user();
+
         $this->manager->parseIncludes([
             'account',
             'user.company_user',
@@ -389,14 +392,16 @@ class BaseController extends Controller
             $this->manager->setSerializer(new ArraySerializer());
         }
 
-        $transformer = new $this->entity_transformer($this->serializer);
+        $transformer = new $this->entity_transformer($this->serializer, $user);
 
         $limit = $this->resolveQueryLimit();
 
-        $paginator = $query->paginate($limit);
+        $paginator = $query->with('company')->paginate($limit);
 
         /** @phpstan-ignore-next-line */
         $query = $paginator->getCollection(); // @phpstan-ignore-line
+        $active_membership = $query->firstWhere('company_id', $user->companyId());
+        $active_membership?->company->load(['tax_rates', 'documents']);
 
         $resource = new Collection($query, $transformer, $this->entity_type);
 
@@ -425,7 +430,7 @@ class BaseController extends Controller
             $this->manager->setSerializer(new ArraySerializer());
         }
 
-        $transformer = new $this->entity_transformer($this->serializer);
+        $transformer = new $this->entity_transformer($this->serializer, $user);
 
         $updated_at = request()->has('updated_at') ? request()->input('updated_at') : 0;
 
@@ -626,70 +631,69 @@ class BaseController extends Controller
             $this->manager->setSerializer(new ArraySerializer());
         }
 
-        $transformer = new $this->entity_transformer($this->serializer);
+        $transformer = new $this->entity_transformer($this->serializer, $user);
         $created_at = request()->has('created_at') ? request()->input('created_at') : 0;
 
         $created_at = date('Y-m-d H:i:s', $created_at);
 
-        $query->with(
-            [
-                'company' => function ($query) {
-                    $query->whereNotNull('created_at')->with('documents', 'users');
-                },
-                'company.designs' => function ($query) use ($created_at) {
-                    $query->where('created_at', '>=', $created_at)->with('company');
-                },
-                'company.documents' => function ($query) use ($created_at) {
-                    $query->where('created_at', '>=', $created_at);
-                },
-                'company.groups' => function ($query) use ($created_at) {
-                    $query->where('created_at', '>=', $created_at)->with('documents');
-                },
-                'company.payment_terms' => function ($query) use ($created_at) {
-                    $query->where('created_at', '>=', $created_at);
-                },
-                'company.tax_rates' => function ($query) {
-                    $query->whereNotNull('created_at');
-                },
-                'company.activities' => function ($query) use ($user, $created_at) {
-                    $floor = max($created_at, now()->subDays(90)->toDateTimeString());
-                    $query->where('activities.created_at', '>=', $floor);
+        $company_includes = [
+            'users.company_users' => fn ($query) => $query
+                ->where('company_id', $user->companyId())->without(['user', 'account']),
+            'designs' => function ($query) use ($created_at) {
+                $query->where('created_at', '>=', $created_at)->with('company');
+            },
+            'documents' => function ($query) use ($created_at) {
+                $query->where('created_at', '>=', $created_at);
+            },
+            'groups' => function ($query) use ($created_at) {
+                $query->where('created_at', '>=', $created_at)->with('documents');
+            },
+            'payment_terms' => function ($query) use ($created_at) {
+                $query->where('created_at', '>=', $created_at);
+            },
+            'tax_rates' => function ($query) {
+                $query->whereNotNull('created_at');
+            },
+            'activities' => function ($query) use ($user, $created_at) {
+                $floor = max($created_at, now()->subDays(90)->toDateTimeString());
+                $query->where('activities.created_at', '>=', $floor);
 
-                    if (! $user->isAdmin()) {
-                        $query->where('activities.user_id', $user->id);
-                    }
-                },
-                'company.bank_integrations' => function ($query) use ($user) {
-                    if (! $user->hasPermission('view_bank_transaction')) {
-                        $query->where('bank_integrations.user_id', $user->id);
-                    }
+                if (! $user->isAdmin()) {
+                    $query->where('activities.user_id', $user->id);
+                }
+            },
+            'bank_integrations' => function ($query) use ($user) {
+                if (! $user->hasPermission('view_bank_transaction')) {
+                    $query->where('bank_integrations.user_id', $user->id);
+                }
 
-                    if (!$user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
-                        $query->exclude(["balance"]);
-                    }
-                },
-                'company.bank_transaction_rules' => function ($query) use ($user) {
-                    if (! $user->isAdmin() && !$user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
-                        $query->where('bank_transaction_rules.user_id', $user->id);
-                    }
-                },
-                'company.task_schedulers' => function ($query) use ($user) {
-                    if (! $user->isAdmin()) {
-                        $query->where('schedulers.user_id', $user->id);
-                    }
-                },
-                'company.locations' => function ($query) use ($created_at) {
-                    $query->where('created_at', '>=', $created_at);
-                },
-            ]
-        );
+                if (!$user->isSuperUser() && $user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
+                    $query->exclude(["balance"]);
+                }
+            },
+            'bank_transaction_rules' => function ($query) use ($user) {
+                if (! $user->isAdmin() && !$user->hasIntersectPermissions(['create_bank_transaction','edit_bank_transaction','view_bank_transaction'])) {
+                    $query->where('bank_transaction_rules.user_id', $user->id);
+                }
+            },
+            'schedulers' => function ($query) use ($user) {
+                if (! $user->isAdmin()) {
+                    $query->where('schedulers.user_id', $user->id);
+                }
+            },
+            'locations' => function ($query) use ($created_at) {
+                $query->where('created_at', '>=', $created_at);
+            },
+        ];
 
         $limit = $this->resolveQueryLimit();
 
-        $paginator = $query->paginate($limit);
+        $paginator = $query->with('company')->paginate($limit);
 
         /** @phpstan-ignore-next-line **/
         $query = $paginator->getCollection();// @phpstan-ignore-line
+        $active_membership = $query->firstWhere('company_id', $user->companyId());
+        $active_membership?->company->load($company_includes);
 
         $resource = new Collection($query, $transformer, $this->entity_type);
         $resource->setPaginator(new IlluminatePaginatorAdapter($paginator->appends(request()->query())));
@@ -731,9 +735,11 @@ class BaseController extends Controller
      */
     protected function listResponse(Builder $query, bool $include_relations = true)
     {
+
+        $user = Auth::user();
         $this->buildManager();
 
-        $transformer = new $this->entity_transformer(request()->input('serializer'));
+        $transformer = new $this->entity_transformer(request()->input('serializer'), $user);
 
         if (! $include_relations) {
             $this->manager->parseIncludes([]);
@@ -743,7 +749,6 @@ class BaseController extends Controller
         $this->eagerLoadResponseIncludes($query, $transformer);
         $this->eagerLoadTagsIfSupported($query);
 
-        $user = Auth::user();
 
         if ($user && $this->entity_type !== Company::class && ! $user->hasPermission('view_' . Str::snake(class_basename($this->entity_type)))) {
             if (in_array($this->entity_type, [User::class])) {
@@ -878,8 +883,11 @@ class BaseController extends Controller
             }
 
             $path = $prefix.$relation_name;
-            $constraint = function ($query) use ($model, $include, $protected_include) {
+            $constraint = function ($query) use ($model, $include, $protected_include, $prefix) {
                 $user = auth()->user();
+                if ($user && $prefix === '' && $model instanceof User && $include === 'company_user') {
+                    $query->where('company_user.company_id', $user->companyId());
+                }
                 if ($model instanceof Company && $user) {
                     if ($include === 'company_user') {
                         $query->where('company_user.user_id', $user->id);
@@ -1010,9 +1018,12 @@ class BaseController extends Controller
     protected function itemResponse($item)
     {
 
+        /** @var ?\App\Models\User $user */
+        $user = auth()->user();
+
         $this->buildManager();
 
-        $transformer = new $this->entity_transformer(request()->input('serializer'));
+        $transformer = new $this->entity_transformer(request()->input('serializer'), $user);
 
         if ($item instanceof Model && $item->exists) {
             $query = $item->newQueryWithoutRelationships();
@@ -1025,9 +1036,6 @@ class BaseController extends Controller
         }
 
         $resource = new Item($item, $transformer, $this->entity_type);
-
-        /** @var ?\App\Models\User $user */
-        $user = auth()->user();
 
         if ($user && request()->include_static) {
             $data['static'] = Statics::company($user->getCompany()->getLocale());

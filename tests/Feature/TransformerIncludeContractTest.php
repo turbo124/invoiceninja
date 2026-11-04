@@ -125,8 +125,10 @@ class TransformerIncludeContractTest extends TestCase
         $user->setRawAttributes(['id' => 1]);
         auth()->setUser($user);
 
-        $response_user = new User();
+        $response_user = \Mockery::mock(User::class)->makePartial();
         $response_user->setRawAttributes(['id' => 3]);
+        $response_user->shouldReceive('companyId')->andReturn(1);
+        $response_user->shouldReceive('cannot')->with('view', \Mockery::type(Model::class))->andReturn(false);
         $transformer = new $transformer_class('array', $response_user);
         $model = new $model_class();
         $method = 'include'.Str::studly($include);
@@ -214,6 +216,37 @@ class TransformerIncludeContractTest extends TestCase
         $resource = $transformer->includeType(new \App\Models\Payment());
 
         $this->assertSame($user, (new ReflectionProperty(EntityTransformer::class, 'user'))->getValue($resource->getTransformer()));
+    }
+
+    public function testCompanyReferencesOnlyEnableChildrenForTheExplicitViewersCompany(): void
+    {
+        $viewer = \Mockery::mock(User::class)->makePartial();
+        $viewer->shouldReceive('companyId')->andReturn(1);
+        auth()->setUser($viewer);
+
+        foreach ([
+            [\App\Models\CompanyUser::class, \App\Transformers\CompanyUserTransformer::class],
+            [\App\Models\Product::class, \App\Transformers\ProductTransformer::class],
+            [\App\Models\BankTransactionRule::class, \App\Transformers\BankTransactionRuleTransformer::class],
+        ] as [$model_class, $transformer_class]) {
+            foreach ([$viewer, null] as $user) {
+                $parent_transformer = new $transformer_class('array', $user);
+                // Reusing the parent must not carry the inactive company's restrictions into the active one.
+                foreach ([2, 1] as $company_id) {
+                    $company = new Company();
+                    $company->setRawAttributes(['id' => $company_id]);
+                    $model = (new $model_class())->setRelation('company', $company);
+                    $child_transformer = $parent_transformer->includeCompany($model)->getTransformer();
+                    if ($user && $company_id === 1) {
+                        $this->assertContains('documents', $child_transformer->getDefaultIncludes());
+                        $this->assertContains('tasks', $child_transformer->getAvailableIncludes());
+                    } else {
+                        $this->assertSame([], $child_transformer->getDefaultIncludes());
+                        $this->assertSame([], $child_transformer->getAvailableIncludes());
+                    }
+                }
+            }
+        }
     }
 
     public static function profileIncludes(): array
