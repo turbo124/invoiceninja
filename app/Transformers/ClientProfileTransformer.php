@@ -16,7 +16,10 @@ use App\Models\Client;
 
 class ClientProfileTransformer extends ClientTransformer
 {
-    protected array $defaultIncludes = [];
+    protected array $defaultIncludes = [
+        'contacts',
+        'locations',
+    ];
 
     protected array $availableIncludes = [];
 
@@ -31,4 +34,17 @@ class ClientProfileTransformer extends ClientTransformer
             'client_hash' => '',
         ]);
     }
+
+        /**
+     * @param Client $client
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function includeContacts(Client $client)
+    {
+        $transformer = new ClientContactProfileTransformer($this->serializer, $this->user);
+
+        return $this->includeCollection($client->contacts, $transformer, ClientContact::class);
+    }
+
 }
