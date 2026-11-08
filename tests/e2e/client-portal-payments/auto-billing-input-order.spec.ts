@@ -1,3 +1,4 @@
+import { isLivewireUpdateUrl } from '../livewire-helpers';
 import { test as base, expect } from '../fixtures';
 import {
     getEntity,
@@ -160,7 +161,7 @@ for (const flow of ['default', 'smooth'] as const) {
                 const gate = new Promise<void>((resolve) => {
                     release = resolve;
                 });
-                await page.route('**/livewire/**', async (route) => {
+                await page.route(isLivewireUpdateUrl, async (route) => {
                     const body = route.request().postDataJSON();
                     if (
                         !body.components?.some(

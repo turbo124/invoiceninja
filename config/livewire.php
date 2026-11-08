@@ -28,6 +28,11 @@ return [
 
     'view_path' => resource_path('views/livewire'),
 
+    'make_command' => [
+        'type' => 'class',
+        'emoji' => false,
+    ],
+
     /*
     |---------------------------------------------------------------------------
     | Layout
@@ -38,7 +43,7 @@ return [
     |
     */
 
-    'layout' => 'components.layouts.app',
+    'component_layout' => 'layouts::app',
 
     /*
     |---------------------------------------------------------------------------
@@ -50,7 +55,7 @@ return [
     |
     */
 
-    'lazy_placeholder' => null,
+    'component_placeholder' => null,
 
     /*
     |---------------------------------------------------------------------------

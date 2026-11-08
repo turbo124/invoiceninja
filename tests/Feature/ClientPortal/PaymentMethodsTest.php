@@ -24,7 +24,6 @@ use App\Models\User;
 use App\Livewire\PaymentMethods\UpdateDefaultMethod;
 use Livewire\Livewire;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Utils\Traits\AppSetup;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -180,12 +179,8 @@ class PaymentMethodsTest extends TestCase
         $before = $this->cgt->fresh()->is_default;
         $this->actingAs($this->otherContact, 'contact');
 
-        $this->expectException(ModelNotFoundException::class);
-        try {
-            $component->call('makeDefault');
-        } finally {
-            $this->assertSame($before, $this->cgt->fresh()->is_default);
-        }
+        $component->call('makeDefault')->assertNotFound();
+        $this->assertSame($before, $this->cgt->fresh()->is_default);
     }
 
     public function testDefaultMethodRejectsExpiredAuthentication(): void
@@ -211,8 +206,7 @@ class PaymentMethodsTest extends TestCase
         $this->cgt->company_id = $otherCompany->id;
         $this->cgt->save();
 
-        $this->expectException(ModelNotFoundException::class);
-        $component->call('makeDefault');
+        $component->call('makeDefault')->assertNotFound();
     }
 
     public function testDefaultMethodRejectsArchivedToken(): void
@@ -224,8 +218,7 @@ class PaymentMethodsTest extends TestCase
         ]);
         $this->cgt->delete();
 
-        $this->expectException(ModelNotFoundException::class);
-        $component->call('makeDefault');
+        $component->call('makeDefault')->assertNotFound();
     }
 
     public function testDefaultMethodRejectsDeletedToken(): void
@@ -238,8 +231,7 @@ class PaymentMethodsTest extends TestCase
         $this->cgt->is_deleted = true;
         $this->cgt->save();
 
-        $this->expectException(ModelNotFoundException::class);
-        $component->call('makeDefault');
+        $component->call('makeDefault')->assertNotFound();
     }
 
     public function testShowPaymentMethodOwnerCanAccess(): void

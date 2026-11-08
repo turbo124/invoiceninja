@@ -1,3 +1,4 @@
+import { isLivewireUpdate } from './livewire-helpers';
 import { type Locator, type Page } from '@playwright/test';
 import { expect, test, uniqueName } from './fixtures';
 import { createAndLogInClient, waitForAlpine } from './client-portal-helpers';
@@ -81,7 +82,7 @@ test('Livewire terms mount a usable signature step, which advances after touch s
     await expect(page.locator('html')).not.toHaveClass(/portal-dialog-open/);
     await expect(page.locator('.portal-summary details')).not.toHaveAttribute('open');
     await expectNoOverflow(page);
-    const termsUpdate = page.waitForResponse(r => r.url().includes('/livewire/update') && r.request().method() === 'POST');
+    const termsUpdate = page.waitForResponse(isLivewireUpdate);
     await tap(page.locator('#accept-terms-button'));
     expect((await termsUpdate).ok()).toBe(true);
     await expect(page.locator('#signature-pad')).toBeVisible();
@@ -96,7 +97,7 @@ test('Livewire terms mount a usable signature step, which advances after touch s
     await expect(page.locator('#save-button')).toBeDisabled();
     await page.setViewportSize({ width: 390, height: 844 });
     await touchSignature(page);
-    const signatureUpdate = page.waitForResponse(r => r.url().includes('/livewire/update') && r.request().method() === 'POST');
+    const signatureUpdate = page.waitForResponse(isLivewireUpdate);
     await tap(page.locator('#save-button'));
     expect((await signatureUpdate).ok()).toBe(true);
     await expect(page.locator('#signature-pad')).toHaveCount(0);
@@ -157,7 +158,7 @@ test('Livewire required-field errors remain accessible and valid input reveals t
         await waitForAlpine(page);
         // Normal invoice checkout has already handled terms. Configure the
         // component's alternate terms state, then exercise its real UI and morphs.
-        const configuredTerms = page.waitForResponse(r => r.url().includes('/livewire/update') && (r.request().postData() || '').includes('show_terms'));
+        const configuredTerms = page.waitForResponse(r => isLivewireUpdate(r) && (r.request().postData() || '').includes('show_terms'));
         await page.evaluate(() => {
             const root = document.querySelector('#required-client-info-form')!.closest('[wire\\:id]')!;
             const wire = (window as any).Livewire.find(root.getAttribute('wire:id'));
@@ -248,7 +249,7 @@ for (const width of [390, 1280]) {
             await expect(toggle).toBeHidden();
         }
         await expect(details).toHaveAttribute('open');
-        const update = page.waitForResponse(r => r.url().includes('/livewire/update') && r.request().method() === 'POST');
+        const update = page.waitForResponse(isLivewireUpdate);
         await page.locator('#accept-terms-button').click();
         expect((await update).ok()).toBe(true);
         await expect(page.locator('#signature-pad')).toBeVisible();

@@ -49,13 +49,8 @@
 
 @script
     <script>
-        // Initial component load
-        Livewire.hook('component.init', ({ component, cleanup }) => {
-            initializePaymentHandlers();
-        })
-
         function initializePaymentHandlers() {
-            const root = document.getElementById('gocardless-direct-debit-payment');
+            const root = $wire.$el;
 
             if (!root) {
                 return;
@@ -99,5 +94,7 @@
                 first.click();
             }
         }
+
+        initializePaymentHandlers();
     </script>
 @endscript

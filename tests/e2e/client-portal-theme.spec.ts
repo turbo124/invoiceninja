@@ -1,3 +1,4 @@
+import { isLivewireUpdate } from './livewire-helpers';
 import { createAndLogInClient, expectPortalPage } from './client-portal-helpers';
 import { expect, test } from './fixtures';
 
@@ -14,7 +15,7 @@ test('saved portal CSS and named targets survive Livewire table updates', async 
     await expect(page.locator('[data-portal-target="navigation-link"][aria-current="page"]').last())
         .toHaveCSS('background-color', 'rgb(23, 107, 85)');
 
-    const response = page.waitForResponse((response) => response.url().includes('/livewire/update') && response.request().method() === 'POST');
+    const response = page.waitForResponse(isLivewireUpdate);
     await page.locator('select[wire\\:model\\.live="per_page"]').selectOption('5');
     expect((await response).ok()).toBe(true);
     await expect(table).toHaveAttribute('data-portal-target', 'table');

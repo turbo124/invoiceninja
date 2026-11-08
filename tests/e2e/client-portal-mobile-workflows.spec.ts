@@ -354,7 +354,7 @@ test('Livewire signature initializes, preserves strokes and cleans up when remov
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewportSize({ width: 375, height: 667 });
-    await mount(page, `<script>window.livewireScriptConfig = {csrf: 'test', uri: '/livewire/update', progressBar: true};</script>${views['livewire-signature']}`, 'resources/js/app.js');
+    await mount(page, `<script>window.livewireScriptConfig = {csrf: 'test', uri: '/livewire-test/update', moduleUrl: '/livewire-test', progressBar: true};</script>${views['livewire-signature']}`, 'resources/js/app.js');
     await expect(page.locator('#save-button')).toBeDisabled();
     const canvas = await page.locator('#signature-pad').boundingBox();
     await page.mouse.move(canvas!.x + 15, canvas!.y + 25);
@@ -374,7 +374,7 @@ test('Livewire signature initializes, preserves strokes and cleans up when remov
 test('teleported dialogs initialise after insertion and release scroll locking on removal', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
-    await mount(page, `<script>window.livewireScriptConfig = {csrf: 'test', uri: '/livewire/update', progressBar: true};</script>
+    await mount(page, `<script>window.livewireScriptConfig = {csrf: 'test', uri: '/livewire-test/update', moduleUrl: '/livewire-test', progressBar: true};</script>
         <div x-data="{ visible: false }" style="position:relative;z-index:0;overflow:hidden;height:80px">
             <button id="insert" @click="visible = true">Insert</button>
             <template x-if="visible"><div x-data="portalDialog">
@@ -409,7 +409,7 @@ test('blocked storage does not prevent rejecting analytics or using the page', a
 });
 
 async function mountInvoiceSummary(page: Page) {
-    await mount(page, `<script>window.livewireScriptConfig = {csrf: 'test', uri: '/livewire/update', progressBar: true};</script>
+    await mount(page, `<script>window.livewireScriptConfig = {csrf: 'test', uri: '/livewire-test/update', moduleUrl: '/livewire-test', progressBar: true};</script>
         <div class="grid grid-cols-1 md:grid-cols-2"><div class="min-w-0 p-2">${views.summary}</div><button id="payment-step">Payment method</button></div>`, 'resources/js/app.js');
     await expect(page.locator('.portal-summary')).toBeVisible();
 }

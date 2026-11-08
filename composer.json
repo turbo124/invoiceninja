@@ -80,7 +80,7 @@
         "league/csv": "^9.6",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/fractal": "^0.21",
-        "livewire/livewire": "^3",
+        "livewire/livewire": "^4.0",
         "mailgun/mailgun-php": "^4.0",
         "microsoft/microsoft-graph": "^1.69",
         "mindee/mindee": "^1.8",

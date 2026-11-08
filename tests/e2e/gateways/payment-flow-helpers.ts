@@ -342,7 +342,9 @@ export async function completeRequiredClientInfoForm(
         try {
             await continueButton.click({ timeout: 20_000 });
         } catch {
-            await continueButton.click({ force: true });
+            if (await isRequiredClientInfoBlockingCheckout(page)) {
+                await continueButton.click({ force: true });
+            }
         }
     };
 
@@ -821,7 +823,11 @@ export async function selectGatewayFromDropdown(
     gatewayTypeId: number
 ): Promise<void> {
     const dropdown = page.locator('[dusk="pay-now-dropdown"]');
-    const methodsDropdown = page.locator('[dusk="payment-methods-dropdown"]');
+    const methodsDropdown = page.locator('[dusk="payment-methods-dropdown"] > [x-show="open"]');
+
+    await expect.poll(() => dropdown.evaluate(element => Boolean(
+        (element.closest('[x-data]') as HTMLElement & { _x_dataStack?: unknown[] })?._x_dataStack?.length,
+    ))).toBe(true);
 
     if (!(await methodsDropdown.isVisible().catch(() => false))) {
         await dropdown.click();

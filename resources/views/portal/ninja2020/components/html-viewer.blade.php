@@ -215,26 +215,22 @@ span {
 
 @push('head')
 <script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.hook('morphed', () => {
+            Array.from(document.getElementsByClassName('entity-field')).forEach((item) => {
+                if (item.innerText.length === 0) {
+                    item.parentNode.remove();
+                }
+            });
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         
         Array.from(document.getElementsByClassName("entity-field")).forEach(function(item) {
             if(item.innerText.length == 0){
                 item.parentNode.remove();
             }
-        });
-
-        document.addEventListener('livewire:init', () => {
-
-            Livewire.hook('message.processed', (message, component) => {
-
-                Array.from(document.getElementsByClassName("entity-field")).forEach(function(item) {
-                    if(item.innerText.length == 0){
-                        item.parentNode.remove();
-                    }
-                });
-
-            });
-
         });
 
         var timeout = false; 

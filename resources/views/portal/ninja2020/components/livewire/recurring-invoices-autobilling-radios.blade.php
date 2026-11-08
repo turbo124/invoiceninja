@@ -9,14 +9,17 @@
                     container.innerHTML = enabled ? this.requiredSaveMethod : this.optionalSaveMethod;
                 }
                 // Prevent overlapping choices while preserving the gateway's payment controls.
-                this.$root.querySelector('fieldset').disabled = true;
-                this.$wire.setAutoBilling(enabled);
+                const fieldset = this.$root.querySelector('fieldset');
+                fieldset.disabled = true;
+                this.$wire.setAutoBilling(enabled)
+                    .finally(() => { fieldset.disabled = false; })
+                    .catch(() => {});
             }
         }"
     @endif
 >
     @if($this->canChooseAutoBilling)
-        <fieldset aria-labelledby="auto-billing-label-{{ $this->invoice_id }}" wire:loading.attr="disabled">
+        <fieldset aria-labelledby="auto-billing-label-{{ $this->invoice_id }}">
             <dl class="sm:grid px-4 py-5 sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt id="auto-billing-label-{{ $this->invoice_id }}" class="text-sm leading-5 font-medium text-gray-500">
                     {{ ctrans('texts.auto_bill_option') }}

@@ -1,3 +1,4 @@
+import { isLivewireUpdate } from './livewire-helpers';
 import {
     chromium,
     expect,
@@ -230,7 +231,7 @@ export async function waitForLivewire(
 ): Promise<void> {
     const responsePromise = page.waitForResponse(
         (response) =>
-            /\/livewire(\/|$)/.test(response.url()) &&
+            isLivewireUpdate(response) &&
             response.request().method() === 'POST',
         { timeout: 30_000 },
     );
@@ -284,7 +285,7 @@ export async function submitLivewireComponent(
 
     const responsePromise = page.waitForResponse(
         (response) =>
-            /\/livewire(\/|$)/.test(response.url()) &&
+            isLivewireUpdate(response) &&
             response.request().method() === 'POST',
         { timeout: 30_000 },
     );

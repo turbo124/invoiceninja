@@ -333,10 +333,12 @@ test.describe('Client portal gateway fees', () => {
                 await gateway.assertCheckoutReady(page);
                 await gateway.completePayment(page);
 
-                const after = await waitForFeeOnInvoice(
-                    api,
-                    context.invoice.id,
-                );
+                await waitForFeeOnInvoice(api, context.invoice.id);
+                await expect.poll(
+                    async () => Number((await readInvoice(api, context.invoice.id)).balance),
+                    { timeout: 90_000, message: 'the completed payment must settle the invoice balance' },
+                ).toBeCloseTo(0, 2);
+                const after = await readInvoice(api, context.invoice.id);
                 const fees = feeLines(after);
 
                 expect(
@@ -507,7 +509,12 @@ test.describe('Gateway fee lifecycle', () => {
         await gateway.assertCheckoutReady(page);
         await gateway.completePayment(page);
 
-        const partlyPaid = await waitForFeeOnInvoice(api, context.invoice.id);
+        await waitForFeeOnInvoice(api, context.invoice.id);
+        await expect.poll(
+            async () => Number((await readInvoice(api, context.invoice.id)).paid_to_date),
+            { timeout: 90_000, message: 'the partial payment must settle before marking the remainder paid' },
+        ).toBeCloseTo(partial + fee, 2);
+        const partlyPaid = await readInvoice(api, context.invoice.id);
 
         expect(Number(partlyPaid.amount)).toBeCloseTo(
             Number(before.amount) + fee,
@@ -564,14 +571,17 @@ test.describe('Gateway fee lifecycle', () => {
                         readInvoice(api, second.id),
                     ]);
 
-                    return feeLines(a).length + feeLines(b).length;
+                    return {
+                        fees: feeLines(a).length + feeLines(b).length,
+                        balances: [Number(a.balance), Number(b.balance)],
+                    };
                 },
                 {
                     timeout: 90_000,
                     message: 'the bulk payment never reached the server',
                 },
             )
-            .toBe(1);
+            .toEqual({ fees: 1, balances: [0, 0] });
 
         const [firstAfter, secondAfter] = await Promise.all([
             readInvoice(api, context.invoice.id),

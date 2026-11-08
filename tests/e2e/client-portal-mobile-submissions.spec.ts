@@ -91,16 +91,22 @@ async function authenticate(page: Page, succeed: boolean) {
     const name = succeed ? /^complete(?: authentication)?$/i : /^fail(?: authentication)?$/i;
     let control: Locator | undefined;
     await expect.poll(async () => {
-        for (const frame of page.frames()) {
+        // An unavailable frame must not delay discovery of the hosted challenge.
+        const candidates = await Promise.all(page.frames().map(async frame => {
             const candidate = frame.getByRole('button', { name });
-            if (await candidate.isVisible().catch(() => false)) {
-                control = candidate;
-                return true;
+            try {
+                await candidate.waitFor({ state: 'visible', timeout: 500 });
+                return candidate;
+            } catch {
+                return undefined;
             }
-        }
-        return false;
+        }));
+        control = candidates.find(candidate => candidate !== undefined);
+        return control !== undefined;
     }, { timeout: 30_000, message: 'Stripe must display its real test authentication challenge' }).toBe(true);
-    await tap(control!);
+    // Activate the real hosted challenge outcome without depending on Stripe's
+    // overlapping touch targets. Application controls are still exercised by tap.
+    await control!.press('Enter');
 }
 
 for (const flow of ['default', 'smooth'] as const) {
@@ -157,9 +163,10 @@ for (const flow of ['default', 'smooth'] as const) {
                 await expect(page.locator('meta[name="stripe-publishable-key"]')).toHaveAttribute('content', /^pk_test_/);
                 await page.locator('#cardholder-name').fill('Mobile Sandbox');
                 const card = page.frameLocator('#card-element iframe').first();
-                await card.locator('[name="cardnumber"]').fill(authentication ? '4000000000003220' : '4242424242424242');
-                await card.locator('[name="exp-date"]').fill('1230');
-                await card.locator('[name="cvc"]').fill('123');
+                await card.locator('[name="cardnumber"]').pressSequentially(authentication ? '4000000000003220' : '4242424242424242', { delay: 30 });
+                await card.locator('[name="exp-date"]').pressSequentially('1230', { delay: 50 });
+                await card.locator('[name="cvc"]').pressSequentially('123', { delay: 50 });
+                await expect(card.locator('[name="cvc"]')).toHaveValue('123');
                 const postal = card.locator('[name="postal"]');
                 if (await postal.isVisible()) await postal.fill('90210');
                 let submissions = 0;

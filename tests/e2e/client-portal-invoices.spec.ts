@@ -46,7 +46,9 @@ test.describe('Client portal invoices', () => {
         api,
         page,
     }) => {
-        const client = await createAndLogInClient(api, page);
+        const client = await createAndLogInClient(api, page, {
+            settings: { payment_flow: 'default' },
+        });
         const marker = uniqueName('invoice-list');
         const invoice = await createSentInvoice(api, client, {
             label: marker,
@@ -65,7 +67,7 @@ test.describe('Client portal invoices', () => {
             .click();
 
         await expect(page).toHaveURL(
-            new RegExp(`/client/invoices/${invoice.id}(?:\\?.*)?$`),
+            new RegExp(`/client/(?:invoices/${invoice.id}|invoice/${invitationKey(invoice)})(?:\\?.*)?$`),
         );
         await expect(page.locator('[data-ref="meta-title"]')).toHaveText(
             'View Invoice',
@@ -73,16 +75,17 @@ test.describe('Client portal invoices', () => {
         await expect(
             page.getByRole('heading', { name: new RegExp(invoice.number ?? '') }),
         ).toBeVisible();
-        await expect(
-            page.getByRole('button', { name: /\$42\.00/ }),
-        ).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Pay Now', exact: true })).toBeVisible();
+        await expect(page.locator('input[name="payable_invoices[0][amount]"]')).toHaveValue('42.00');
     });
 
     test('shows invoice details including number and balance', async ({
         api,
         page,
     }) => {
-        const client = await createAndLogInClient(api, page);
+        const client = await createAndLogInClient(api, page, {
+            settings: { payment_flow: 'default' },
+        });
         const invoice = await createSentInvoice(api, client, {
             label: uniqueName('invoice-detail'),
             cost: 75,
@@ -98,9 +101,8 @@ test.describe('Client portal invoices', () => {
                 name: new RegExp(invoice.number ?? ''),
             }),
         ).toBeVisible();
-        await expect(
-            page.getByRole('button', { name: /\$75\.00/ }),
-        ).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Pay Now', exact: true })).toBeVisible();
+        await expect(page.locator('input[name="payable_invoices[0][amount]"]')).toHaveValue('75.00');
         await expect(page.locator('main')).toBeVisible();
     });
 
@@ -118,7 +120,7 @@ test.describe('Client portal invoices', () => {
 
         expect(response?.ok()).toBe(true);
         await expect(page).toHaveURL(
-            new RegExp(`/client/invoices/${invoice.id}(?:\\?.*)?$`),
+            new RegExp(`/client/(?:invoices/${invoice.id}|invoice/${invitationKey(invoice)})(?:\\?.*)?$`),
         );
         await expect(page.locator('[data-ref="meta-title"]')).toHaveText(
             'View Invoice',
@@ -363,7 +365,7 @@ test.describe('Client portal invoices', () => {
             page.getByRole('button', { name: 'View PDF', exact: true }),
         ).toBeVisible();
         await expect(
-            page.getByRole('button', { name: /Balance Due/i }),
+            page.locator('.portal-summary').getByText('Balance Due', { exact: true }).first(),
         ).toBeVisible();
 
         // Smooth flow either shows method buttons, required-fields, or checkout

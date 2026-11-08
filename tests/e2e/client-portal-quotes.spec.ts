@@ -403,7 +403,7 @@ test.describe('Client portal quotes', () => {
         page,
     }) => {
         const client = await createAndLogInClient(api, page, {
-            settings: { auto_convert_quote: true },
+            settings: { auto_convert_quote: true, payment_flow: 'default' },
         });
         const quote = await createSentQuote(api, client, {
             label: uniqueName('quote-convert'),
@@ -416,7 +416,8 @@ test.describe('Client portal quotes', () => {
         await expect(page.locator('[data-ref="meta-title"]')).toHaveText(
             'View Invoice',
         );
-        await expect(page.getByRole('button', { name: /\$120\.00/ })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Pay Now', exact: true })).toBeVisible();
+        await expect(page.locator('input[name="payable_invoices[0][amount]"]')).toHaveValue('120.00');
     });
 
     test('shows an expired quote status on the detail page', async ({

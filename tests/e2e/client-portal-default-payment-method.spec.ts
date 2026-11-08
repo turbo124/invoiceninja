@@ -1,3 +1,4 @@
+import { isLivewireUpdate } from './livewire-helpers';
 import { type Page } from '@playwright/test';
 import { runArtisan } from './artisan-helpers';
 import { createPortalClient, logInPortalClient, type PortalClient } from './client-portal-helpers';
@@ -111,7 +112,8 @@ async function makeDefault(page: Page, signedSnapshot: string, updates: Record<s
         const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content
             ?? document.querySelector('script[data-csrf]')?.getAttribute('data-csrf');
         if (!csrf) throw new Error('Missing current CSRF token');
-        const endpoint = document.querySelector('script[data-update-uri]')?.getAttribute('data-update-uri') ?? '/livewire/update';
+        const endpoint = document.querySelector('script[data-update-uri]')?.getAttribute('data-update-uri') ?? (window as Window & { livewireScriptConfig?: { uri: string } }).livewireScriptConfig?.uri;
+        if (!endpoint) throw new Error('Missing Livewire update URI');
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Livewire': '' },
@@ -133,7 +135,7 @@ function expectTokenUnavailable(response: { status: number; body: string }): voi
 test('switches the own-client default through the UI and safely repeats the action', async ({ page, scenario }) => {
     await openMethod(page, scenario);
     const otherBefore = tokenState(scenario).slice(2);
-    const updated = page.waitForResponse(response => response.url().includes('/livewire/update') && response.request().method() === 'POST');
+    const updated = page.waitForResponse(isLivewireUpdate);
     await page.locator(saveSelector).click();
     expect((await updated).status()).toBe(200);
     await expect(page.locator(saveSelector)).toBeDisabled();

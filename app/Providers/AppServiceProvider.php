@@ -79,10 +79,15 @@ class AppServiceProvider extends ServiceProvider
             ]);
         }
 
-        Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/livewire/update', $handle)
+        Livewire::setUpdateRoute(function ($handle, $path) {
+            return Route::post($path, $handle)
                 ->middleware(['client','throttle:1000,1']);
         });
+
+        Livewire::propertySynthesizer([
+            \App\Livewire\Synthesizers\ModelSynth::class,
+            \App\Livewire\Synthesizers\EloquentCollectionSynth::class,
+        ]);
 
         /* Ensure we don't have stale state in jobs */
         Queue::before(function (JobProcessing $event) {
@@ -200,5 +205,11 @@ class AppServiceProvider extends ServiceProvider
 
     }
 
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->singleton(
+            \Livewire\Mechanisms\PersistentMiddleware\PersistentMiddleware::class,
+            \App\Livewire\PersistentMiddleware::class,
+        );
+    }
 }

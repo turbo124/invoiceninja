@@ -1,3 +1,4 @@
+import { isLivewireUpdate } from './livewire-helpers';
 import { type Page, type Response } from '@playwright/test';
 import { type ApiContext, type ApiEntity } from './api-helpers';
 import {
@@ -962,7 +963,7 @@ async function captureLivewireResponse(
 ): Promise<Response> {
     const responsePromise = page.waitForResponse(
         (response) =>
-            /\/livewire(?:\/|$)/.test(response.url()) &&
+            isLivewireUpdate(response) &&
             response.request().method() === 'POST',
         { timeout: 30_000 }
     );
@@ -1098,7 +1099,7 @@ async function completeNoPaymentPurchase(
 
     const responsePromise = purchase.page.waitForResponse(
         (response) =>
-            /\/livewire(?:\/|$)/.test(response.url()) &&
+            isLivewireUpdate(response) &&
             response.request().method() === 'POST',
         { timeout: 30_000 }
     );

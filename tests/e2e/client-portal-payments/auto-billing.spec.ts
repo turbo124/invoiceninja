@@ -1,3 +1,4 @@
+import { isLivewireUpdate, isLivewireUpdateUrl } from '../livewire-helpers';
 import { type Page } from '@playwright/test';
 import { test as base, expect, type ApiFixture } from '../fixtures';
 import {
@@ -101,7 +102,7 @@ async function assertPreference(
 async function choosePreference(page: Page, enabled: boolean): Promise<void> {
     const response = page.waitForResponse(
         (response) =>
-            response.url().includes('/livewire/') &&
+            isLivewireUpdate(response) &&
             response.request().method() === 'POST' &&
             response.request().postData()?.includes('setAutoBilling') === true
     );
@@ -402,13 +403,16 @@ for (const flow of ['default', 'smooth'] as const) {
                 await choosePreference(page, false);
                 for (const width of [390, 1280]) {
                     await page.setViewportSize({ width, height: 900 });
-                    const auto = await radios(page).first().boundingBox();
-                    const save = await page
-                        .locator('#save-payment-method--container')
-                        .boundingBox();
-                    expect(auto).not.toBeNull();
-                    expect(save).not.toBeNull();
-                    expect(auto!.y).toBeLessThan(save!.y);
+                    const positions = await radios(page).first().evaluate(element => {
+                        const save_element = document.getElementById('save-payment-method--container');
+                        if (!save_element?.getClientRects().length) return null;
+                        return {
+                            auto_y: element.getBoundingClientRect().top,
+                            save_y: save_element.getBoundingClientRect().top,
+                        };
+                    });
+                    expect(positions).not.toBeNull();
+                    expect(positions!.auto_y).toBeLessThan(positions!.save_y);
                     expect(
                         await page.evaluate(
                             () =>
@@ -579,7 +583,7 @@ for (const flow of ['default', 'smooth'] as const) {
                         const saved = new Promise<void>((resolve) => {
                             signalSaved = resolve;
                         });
-                        await page.route('**/livewire/**', async (route) => {
+                        await page.route(isLivewireUpdateUrl, async (route) => {
                             const body = route.request().postDataJSON() as {
                                 components?: { calls?: { method: string }[] }[];
                             };
@@ -717,7 +721,7 @@ for (const flow of ['default', 'smooth'] as const) {
             );
             await dismissCookieConsent(page);
             let failed = false;
-            await page.route('**/livewire/**', async (route) => {
+            await page.route(isLivewireUpdateUrl, async (route) => {
                 const body = route.request().postDataJSON();
                 if (
                     !failed &&

@@ -90,7 +90,7 @@ test.describe('White label license purchase', () => {
         expect(String(invoice.status_id)).not.toBe('4'); // not paid yet
     });
 
-    test.fail(
+    test(
         'does not create duplicate invoices when payment method is double-clicked',
         async ({ api, page }) => {
         const { subscription } = await createWhiteLabelSubscription(api);

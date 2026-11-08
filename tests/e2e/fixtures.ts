@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { test as base } from '@playwright/test';
 import { loadPlaywrightEnvironment } from './environment';
 import {
@@ -57,6 +58,16 @@ export const test = base.extend<
     },
     { account: TestAccount; workerApi: ApiContext }
 >({
+    context: async ({ context }, use, test_info) => {
+        // Each browser scenario represents an independent client. Keep invitation
+        // rate limits from being shared by every test on the same local proxy.
+        const hash = createHash('sha256').update(test_info.testId).digest();
+        await context.setExtraHTTPHeaders({
+            'X-Forwarded-For': `198.18.${hash[0]}.${hash[1] || 1}`,
+        });
+        await use(context);
+    },
+
     account: [
         async ({}, use, workerInfo) => {
             await use(accountForParallelIndex(workerInfo.parallelIndex));

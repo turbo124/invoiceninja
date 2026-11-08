@@ -151,7 +151,7 @@ export async function isAccountManagementAvailable(
         `${ACCOUNT_MANAGEMENT_PREFIX}/plans`,
     );
 
-    if (!response.ok()) {
+    if (!response.ok() || !response.headers()['content-type']?.includes('application/json')) {
         return false;
     }
 

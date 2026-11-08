@@ -1,3 +1,4 @@
+import { isLivewireUpdate } from './livewire-helpers';
 import {
     createAndLogInClient,
     dismissCookieConsent,
@@ -22,7 +23,7 @@ async function toggleAutoBilling(
 
     const livewireResponse = page.waitForResponse(
         (response) =>
-            response.url().includes('/livewire/') &&
+            isLivewireUpdate(response) &&
             response.request().method() === 'POST' &&
             response.ok(),
         { timeout: 30_000 },
