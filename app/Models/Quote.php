@@ -581,5 +581,26 @@ class Quote extends BaseModel
     }
 
 
+    /**
+     * hasOptions
+     *
+     * checks the line items to determine whether there are any optional items in the quote.
+     * @return bool
+     */
+    public function hasOptions(): bool
+    {
+        foreach ($this->line_items ?? [] as $item) {
+            if (data_get($item, 'is_optional', false)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasOptionSelection(): bool
+    {
+        return ! empty($this->backup?->option_selection['confirmed_at']);
+    }
 
 }

@@ -25,6 +25,8 @@ use App\Jobs\Invoice\InjectSignature;
 use Illuminate\Contracts\View\Factory;
 use App\Events\Misc\InvitationWasViewed;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use App\Services\Quote\QuoteOptions;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use App\Http\Requests\ClientPortal\Quotes\ShowQuoteRequest;
 use App\Http\Requests\ClientPortal\Quotes\ShowQuotesRequest;
@@ -77,11 +79,41 @@ class QuoteController extends Controller
             event(new QuoteWasViewed($invitation, $invitation->company, Ninja::eventVars()));
         }
 
+        if ($quote->hasOptionSelection() && in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT]) && ! $quote->invoice_id && ! $quote->is_deleted) {
+            return $this->approve([$quote->id]);
+        }
+
+        if ($quote->hasOptions() && in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT]) && ! $quote->invoice_id && ! $quote->is_deleted) {
+            return redirect()->route('client.quote.options', $quote->hashed_id);
+        }
+
         if ($request->query('mode') === 'fullscreen') {
             return render('quotes.show-fullscreen', $data);
         }
 
         return $this->render('quotes.show', $data);
+    }
+
+    public function options(ShowQuoteRequest $request, Quote $quote)
+    {
+        if (! $quote->hasOptions() || ! in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT]) || $quote->invoice_id || $quote->is_deleted) {
+            return redirect()->route('client.quote.show', $quote->hashed_id);
+        }
+
+        return $this->render('quotes.options', ['quote' => $quote]);
+    }
+
+    public function reviewOptions(ShowQuoteRequest $request, Quote $quote, string $options_key)
+    {
+        return $this->approve([$quote->id], false, $options_key);
+    }
+
+    public function restartOptions(ShowQuoteRequest $request, Quote $quote)
+    {
+        $request->validate(['restart_confirmed' => ['required', 'accepted']]);
+        app(QuoteOptions::class)->restart($quote);
+
+        return redirect()->route('client.quote.options', $quote->hashed_id);
     }
 
     public function bulk(ProcessQuotesInBulkRequest $request)
@@ -108,6 +140,42 @@ class QuoteController extends Controller
 
         if ($request->action == 'approve') {
 
+            $quotes = Quote::query()
+                ->whereIn('id', $transformed_ids)
+                ->where('client_id', auth()->guard('contact')->user()->client_id)
+                ->where('company_id', auth()->guard('contact')->user()->company_id)
+                ->whereIn('status_id', [Quote::STATUS_DRAFT, Quote::STATUS_SENT])
+                ->get();
+            $quotes->each(fn ($quote) => app(QuoteOptions::class)->assertConfirmed($quote));
+            if ($request->filled('selection_key') || $quotes->contains(fn ($quote) => $quote->hasOptionSelection())) {
+                abort_unless(
+                    $quotes->count() === 1
+                    && ($quotes->first()->backup?->option_selection['key'] ?? null) === $request->input('selection_key'),
+                    409
+                );
+            }
+            $option_quotes = $quotes->filter(fn ($quote) => $quote->hasOptions());
+
+            if ($option_quotes->isNotEmpty()) {
+                if (! $request->filled('options_key')) {
+                    return redirect()->route('client.quote.options', $option_quotes->first()->hashed_id);
+                }
+
+                abort_unless(count($transformed_ids) === 1, 422);
+                if (! $request->has('process') && ! $request->has('request_hash')) {
+                    return $this->approve((array) $transformed_ids, false, $request->string('options_key')->toString());
+                }
+
+                app(QuoteOptions::class)->apply(
+                    $option_quotes->first(),
+                    $request->string('options_key')->toString(),
+                    $request->input('user_input'),
+                );
+                $request->merge(['selection_key' => $request->string('options_key')->toString()]);
+            } elseif ($request->filled('options_key') && ! $request->has('request_hash')) {
+                abort(409, ctrans('texts.quote_options_changed'));
+            }
+
             if (auth()->guard('contact')->user()->company->docuninjaActive()
             && auth()->guard('contact')->user()->client->getSetting('require_quote_signature')) {
                 $invitations = \App\Models\QuoteInvitation::with('quote')
@@ -119,6 +187,7 @@ class QuoteController extends Controller
                                         });
 
                 if ($invitations->count() > 0) {
+                    $invitation = $invitations->first();
                     $request_hash = \Illuminate\Support\Str::random(64);
                     $request->merge(['entity_type' => 'invoice', 'db' => auth()->guard('contact')->user()->company->db, 'request_hash' => $request_hash]);
 
@@ -126,7 +195,6 @@ class QuoteController extends Controller
                         'client_contact_id' => auth()->guard('contact')->id(),
                         'request' => $request->except(['_token', 'request_hash']),
                     ], 60 * 60 * 24);
-                    $invitation = $invitations->first();
 
                     return $this->render('components.docuninja', [
                         'invitation_id' => $invitation->id,
@@ -139,7 +207,11 @@ class QuoteController extends Controller
                 }
             }
 
-            return $this->approve((array) $transformed_ids, $request->has('process') || $request->has('request_hash'));
+            return $this->approve(
+                (array) $transformed_ids,
+                $request->has('process') || $request->has('request_hash'),
+                selection_key: $request->input('selection_key'),
+            );
         }
 
         if ($request->action == 'reject') {
@@ -281,7 +353,7 @@ class QuoteController extends Controller
 
     }
 
-    protected function approve(array $ids, $process = false)
+    protected function approve(array $ids, $process = false, ?string $options_key = null, ?string $selection_key = null)
     {
         $quotes = Quote::query()
             ->whereIn('id', $ids)
@@ -301,14 +373,46 @@ class QuoteController extends Controller
                 ->with('message', ctrans('texts.quotes_with_status_sent_can_be_approved'));
         }
 
-        if ($process) {
-            foreach ($quotes as $quote) {
-                if (request()->has('user_input') && strlen(request()->input('user_input')) > 2) {
-                    $quote->po_number = substr(request()->input('user_input'), 0, 180);
-                    $quote->saveQuietly();
-                }
+        $quotes->each(fn ($quote) => app(QuoteOptions::class)->assertConfirmed($quote));
+        $options_key ??= request()->input('options_key');
 
-                $quote->service()->approve(auth()->user())->save();
+        if (! $process && ($options_key || $quotes->contains(fn ($quote) => $quote->hasOptions()))) {
+            if (! $options_key) {
+                return redirect()->route('client.quote.options', $quotes->first(fn ($quote) => $quote->hasOptions())->hashed_id);
+            }
+
+            abort_unless($quotes->count() === 1, 422);
+            $quotes = $quotes->map(fn ($quote) => app(QuoteOptions::class)->restore($quote, $options_key));
+        }
+
+        if ($process) {
+            foreach ($quotes as $index => $quote) {
+                abort_if($quote->hasOptions(), 409, ctrans('texts.quote_options_changed'));
+
+                if ($quote->hasOptionSelection()) {
+                    $quote = DB::transaction(function () use ($quote, $selection_key) {
+                        $quote = Quote::query()->where('company_id', $quote->company_id)->lockForUpdate()->findOrFail($quote->id);
+                        abort_unless(
+                            $quote->hasOptionSelection()
+                            && $quote->backup->option_selection['key'] === $selection_key
+                            && in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT])
+                            && ! $quote->is_deleted && ! $quote->invoice_id && ! $quote->hasLapsedValidUntil(),
+                            409
+                        );
+                        app(QuoteOptions::class)->assertConfirmed($quote);
+                        $quote->service()->approve(auth()->guard('contact')->user())->save();
+
+                        return $quote;
+                    });
+                    $quotes[$index] = $quote;
+                } else {
+                    if (request()->has('user_input') && strlen(request()->input('user_input')) > 2) {
+                        $quote->po_number = substr(request()->input('user_input'), 0, 180);
+                        $quote->saveQuietly();
+                    }
+
+                    $quote->service()->approve(auth()->user())->save();
+                }
 
                 if (request()->has('signature') && ! is_null(request()->signature) && ! empty(request()->signature)) {
                     InjectSignature::dispatch($quote, auth()->guard('contact')->user()->id, request()->signature, request()->getClientIp());
@@ -346,6 +450,7 @@ class QuoteController extends Controller
             'quotes' => $quotes,
             'variables' => $variables,
             'requires_signature' => $requires_signature,
+            'options_key' => $options_key,
         ]);
     }
 }

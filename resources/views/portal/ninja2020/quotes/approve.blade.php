@@ -4,7 +4,7 @@
 @push('head')
     <meta name="show-quote-terms" content="{{ $settings->show_accept_quote_terms ? true : false }}">
     <meta name="require-quote-signature" content="{{ $requires_signature ? true : false }}">
-    <meta name="accept-user-input" content="{{ $client->getSetting('accept_client_input_quote_approval') }}">
+    <meta name="accept-user-input" content="{{ $quotes->contains(fn ($quote) => $quote->hasOptionSelection()) ? false : $client->getSetting('accept_client_input_quote_approval') }}">
     <meta name="docuninja-active" content="false">
 
 @endpush
@@ -15,6 +15,11 @@
         <input type="hidden" name="action" value="approve">
         <input type="hidden" name="process" value="true">
         <input type="hidden" name="user_input" value="">
+        @if($options_key ?? null)
+            <input type="hidden" name="options_key" value="{{ $options_key }}">
+        @elseif($quotes->count() === 1 && $quotes->first()->hasOptionSelection())
+            <input type="hidden" name="selection_key" value="{{ $quotes->first()->backup->option_selection['key'] }}">
+        @endif
 
         @foreach($quotes as $quote)
             <input type="hidden" name="quotes[]" value="{{ $quote->hashed_id }}">
@@ -52,6 +57,20 @@
                             </p>
                         </div>
                         <div>
+                            @if(($options_key ?? null) || $quote->hasOptionSelection())
+                                <div class="p-6">
+                                    <p class="mb-4 text-sm text-gray-600">{{ ctrans($quote->hasOptionSelection() ? 'texts.quote_options_confirmed' : 'texts.quote_options_confirm_help') }}</p>
+                                    @if($quote->hasOptionSelection() && ! $quote->sync?->dn_completed)
+                                        <form action="{{ route('client.quote.options.restart', $quote->hashed_id) }}" method="post"
+                                              onsubmit="return confirm(@js(ctrans('texts.quote_options_restart_confirmation')))">
+                                            @csrf
+                                            <input type="hidden" name="restart_confirmed" value="1">
+                                            <button type="submit" class="button button-secondary mb-4">{{ ctrans('texts.quote_options_restart') }}</button>
+                                        </form>
+                                    @endif
+                                    @include('portal.ninja2020.quotes.includes.financials', ['line_items' => $quote->line_items, 'interactive' => false])
+                                </div>
+                            @endif
                             <dl>
                                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                     <dt class="text-sm leading-5 font-medium text-gray-500">

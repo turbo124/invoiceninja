@@ -31,6 +31,8 @@ class ProcessQuotesInBulkRequest extends FormRequest
             'quotes' => ['required_without:request_hash', 'array'],
             'action' => ['required_without:request_hash', 'in:download,approve,reject'],
             'request_hash' => ['sometimes', 'string', 'regex:/^[A-Za-z0-9]{64}$/'],
+            'options_key' => ['sometimes', 'string', 'regex:/^[A-Za-z0-9]{64}$/'],
+            'selection_key' => ['sometimes', 'string', 'regex:/^[A-Za-z0-9]{64}$/'],
         ];
     }
 }
