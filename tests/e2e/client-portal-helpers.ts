@@ -23,6 +23,7 @@ export interface PortalClient extends ApiEntity {
 }
 
 export interface PortalClientOptions {
+    cleanup?: boolean;
     name?: string;
     settings?: Record<string, unknown>;
     contact?: {
@@ -87,7 +88,7 @@ export async function createPortalClient(
                 ...contactOverrides,
             },
         ],
-    });
+    }, { cleanup: options.cleanup });
 }
 
 export function portalContact(client: PortalClient): PortalContact {

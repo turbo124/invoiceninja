@@ -7,6 +7,8 @@ import {
 } from './api-helpers';
 import { type ApiFixture, uniqueName } from './fixtures';
 import { type PortalClient } from './client-portal-helpers';
+import { runArtisan } from './artisan-helpers';
+import { decodePrimaryKey } from './hash-helpers';
 
 export interface PortalEntity extends ApiEntity {
     id: string;
@@ -115,19 +117,33 @@ export async function createSentQuote(
     options: SentDocumentOptions = {},
 ): Promise<PortalEntity> {
     const label = options.label ?? 'portal-quote';
+    const due_in_days = options.dueInDays ?? 30;
+    const item = lineItem({ label, cost: options.cost ?? 13 });
     const quote = await api.createEntityFromBlank<PortalEntity>('quotes', {
         ...documentDefaults(client),
-        due_date: isoDate(options.dueInDays ?? 30),
+        due_date: isoDate(due_in_days < 0 ? 30 : due_in_days),
         terms: options.terms,
-        line_items: [
-            lineItem({
-                label,
-                cost: options.cost ?? 13,
-            }),
-        ],
+        line_items: [item],
     });
 
     await markEntitySent(api.context, 'quotes', quote.id);
+
+    if (due_in_days < 0) {
+        // The API rejects expired new quotes. Backdate this specific sent fixture
+        // to represent a quote that expired after it was issued.
+        const fixture = Buffer.from(JSON.stringify({
+            id: decodePrimaryKey(quote.id),
+            client_id: decodePrimaryKey(client.id),
+            product_key: item.product_key,
+            due_date: isoDate(due_in_days),
+        })).toString('base64');
+        runArtisan(
+            `$fixture = json_decode(base64_decode('${fixture}'), true);` +
+            '$quote = \\App\\Models\\Quote::whereKey($fixture["id"])->where("client_id", $fixture["client_id"])->firstOrFail();' +
+            'if (($quote->line_items[0]->product_key ?? null) !== $fixture["product_key"]) { throw new \\RuntimeException("Quote fixture does not match the local database."); }' +
+            '$quote->forceFill(["due_date" => $fixture["due_date"]])->saveQuietly();',
+        );
+    }
 
     return getEntity<PortalEntity>(api.context, 'quotes', quote.id);
 }

@@ -375,7 +375,7 @@ async function findPayPalHostedCardInput(
         for (const selector of target.selectors) {
             const input = frame.locator(selector).first();
 
-            if ((await input.count()) === 0) {
+            if ((await input.count().catch(() => 0)) === 0) {
                 continue;
             }
 
@@ -685,7 +685,7 @@ function isPayPalHostedUrl(url: string): boolean {
 
 function isMerchantPaymentResponseUrl(url: string): boolean {
     return (
-        url.includes('/client/payments/process/response') ||
+        url.includes('/payments/process/response') ||
         url.includes('/payment_response')
     );
 }

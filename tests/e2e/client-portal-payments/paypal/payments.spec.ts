@@ -21,7 +21,7 @@ test.use({
         process.env.PLAYWRIGHT_HEADLESS === '1' || process.env.CI === 'true',
 });
 
-test.describe.configure({ mode: 'serial', timeout: 300_000 });
+test.describe.configure({ timeout: 300_000 });
 
 function definePayPalPpcpPaymentFlowSuite(paymentFlow: PortalPaymentFlow): void {
     test.describe(`PayPal REST payment methods (PPCP) — ${paymentFlow} flow`, () => {

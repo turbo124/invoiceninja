@@ -144,6 +144,25 @@ class ClientRegistrationCustomFieldsTest extends TestCase
 
     // --- GET: registration form rendering ---
 
+    public function testFactoryDefaultsRenderAndValidateRegistrationFields(): void
+    {
+        $company = Company::factory()->create([
+            'account_id' => $this->account->id,
+            'client_can_register' => true,
+        ]);
+
+        $this->assertSame(ClientRegistrationFields::generate(), $company->fresh()->client_registration_fields);
+
+        $this->get(route('client.register', $company->company_key))
+            ->assertOk()
+            ->assertSee('name="first_name"', false)
+            ->assertSee('name="email"', false)
+            ->assertSee('name="password_confirmation"', false);
+
+        $this->post(route('client.register', $company->company_key), ['company_key' => $company->company_key])
+            ->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password']);
+    }
+
     public function testRegistrationFormRendersDateInputForDateCustomField(): void
     {
         $response = $this->get(route('client.register', $this->company->company_key));

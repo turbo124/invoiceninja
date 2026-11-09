@@ -5,6 +5,7 @@ import {
 } from '../../client-portal-helpers';
 import { test, expect, uniqueName } from '../../fixtures';
 import {
+    bulkAction,
     filterClientGatewayTokens,
     listClientGatewayTokens,
     updateClient,
@@ -37,6 +38,8 @@ export function definePayPalAdvancedCardVaultSuite(
     paypal: PayPalPaymentGateway,
     paymentFlow: PortalPaymentFlow,
 ): void {
+    test.describe.configure({ mode: 'serial' });
+
     let availability: GatewayAvailability;
     let setupSkipReason: string | undefined;
     let vaultClient: PortalClient | undefined;
@@ -61,8 +64,14 @@ export function definePayPalAdvancedCardVaultSuite(
         }
     }, 120_000);
 
-    test.afterAll(async () => {
-        await paypal.restoreExclusiveGateway();
+    test.afterAll(async ({ workerApi: worker_api }) => {
+        try {
+            if (vaultClient) {
+                await bulkAction(worker_api, 'clients', [vaultClient.id], 'delete');
+            }
+        } finally {
+            await paypal.restoreExclusiveGateway();
+        }
     });
 
     test.beforeEach(() => {
@@ -78,6 +87,7 @@ export function definePayPalAdvancedCardVaultSuite(
         test.setTimeout(120_000);
 
         vaultClient = await createAndLogInClient(api, page, {
+            cleanup: false,
             name: uniqueName('paypal-vault'),
             settings: {
                 ...paymentTestSettings,
@@ -138,7 +148,7 @@ export function definePayPalAdvancedCardVaultSuite(
         await paypal.assertPaymentSucceeded(page);
 
         const tokens = filterClientGatewayTokens(
-            await listClientGatewayTokens(api.context),
+            await listClientGatewayTokens(api.context, vaultClient!.id),
             {
                 clientId: vaultClient!.id,
                 companyGatewayId: availability.companyGateway!.id,
@@ -163,7 +173,7 @@ export function definePayPalAdvancedCardVaultSuite(
         }
 
         const existingTokens = filterClientGatewayTokens(
-            await listClientGatewayTokens(api.context),
+            await listClientGatewayTokens(api.context, vaultClient!.id),
             {
                 clientId: vaultClient!.id,
                 companyGatewayId: availability.companyGateway!.id,

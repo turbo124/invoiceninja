@@ -154,6 +154,25 @@ test.describe('Client portal authentication', () => {
         await expect(page.locator('main')).toBeVisible();
     });
 
+    test('shows validation errors for missing required registration fields', async ({
+        companyGuard: company_guard,
+        page,
+    }) => {
+        const company = await company_guard.update({ client_can_register: true });
+        await page.goto(`/client/register/${company.company_key}`);
+        await dismissCookieConsent(page);
+        await expect(page.locator('#register-form')).toBeVisible();
+
+        if (await page.locator('.cf-turnstile').count()) {
+            test.skip(true, 'Cloudflare Turnstile widget is present on registration');
+        }
+
+        await page.locator('#register-form button.button-primary').click();
+        await expect(page.locator('#register-form .validation-fail')).toHaveCount(4);
+        await expect(page.locator('#first_name')).toBeVisible();
+        await expect(page.locator('#email')).toBeVisible();
+    });
+
     test('registers a new client when self-registration is enabled', async ({
         api,
         companyGuard,
@@ -163,7 +182,7 @@ test.describe('Client portal authentication', () => {
 
         const company = await companyGuard.update({ client_can_register: true });
         const marker = uniqueName('self-register');
-        const email = `${marker}@example.test`;
+        const email = `${marker}@gmail.com`;
 
         await page.goto(`/client/register/${company.company_key}`);
         await dismissCookieConsent(page);
@@ -173,21 +192,14 @@ test.describe('Client portal authentication', () => {
             test.skip(true, 'Cloudflare Turnstile widget is present on registration');
         }
 
-        if (await page.locator('#first_name').isVisible().catch(() => false)) {
-            await page.locator('#first_name').fill('Self');
-        }
-        if (await page.locator('#last_name').isVisible().catch(() => false)) {
-            await page.locator('#last_name').fill('Register');
-        }
+        await page.locator('#first_name').fill('Self');
+        await page.locator('#last_name').fill('Register');
         if (await page.locator('#name').isVisible().catch(() => false)) {
             await page.locator('#name').fill(`${marker}-co`);
         }
-        if (await page.locator('#email').isVisible().catch(() => false)) {
-            await page.locator('#email').fill(email);
-        }
-        if (await page.locator('#password').isVisible().catch(() => false)) {
-            await page.locator('#password').fill('PortalRegister123!');
-        }
+        await page.locator('#email').fill(email);
+        await page.locator('#password').fill('PortalRegister123!');
+        await page.locator('#password_confirmation').fill('PortalRegister123!');
 
         await page.locator('#register-form button.button-primary').click();
 
@@ -195,10 +207,19 @@ test.describe('Client portal authentication', () => {
             test.skip(true, 'Cloudflare Turnstile captcha is enabled on registration');
         }
 
-        await expect(page).toHaveURL(/\/client\/(dashboard|invoices|login)/, {
+        await expect(page).toHaveURL(/\/client\/(dashboard|invoices)(?:\/|$)/, {
             timeout: 30_000,
         });
         await expect(page.getByRole('main')).toBeVisible();
+
+        const registered_response = await api.context.request.get(`/api/v1/clients?email=${encodeURIComponent(email)}`);
+        expect(registered_response.ok()).toBe(true);
+        const registered_clients = (await registered_response.json()).data as PortalClient[];
+        for (const registered_client of registered_clients) {
+            api.trackEntity('clients', registered_client.id);
+        }
+        expect(registered_clients).toHaveLength(1);
+        expect(registered_clients[0].contacts[0].email).toBe(email);
 
         // Ensure company API still works after registration.
         await expect(getCompany(api.context)).resolves.toBeTruthy();

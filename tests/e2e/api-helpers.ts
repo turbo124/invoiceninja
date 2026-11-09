@@ -858,9 +858,10 @@ export interface ClientGatewayTokenEntity extends ApiEntity {
 
 export async function listClientGatewayTokens(
     api: ApiContext,
+    client_id: string,
 ): Promise<ClientGatewayTokenEntity[]> {
     const response = await api.request.get(
-        '/api/v1/client_gateway_tokens?per_page=100',
+        `/api/v1/clients/${client_id}`,
     );
 
     if (!response.ok()) {
@@ -869,9 +870,13 @@ export async function listClientGatewayTokens(
         );
     }
 
-    const body = (await response.json()) as { data?: ClientGatewayTokenEntity[] };
+    // Token responses omit client_id. Read the client's own included tokens so
+    // ownership is established by the API response rather than a missing field.
+    const body = (await response.json()) as {
+        data: { gateway_tokens?: ClientGatewayTokenEntity[] };
+    };
 
-    return body.data ?? [];
+    return (body.data.gateway_tokens ?? []).map((token) => ({ ...token, client_id }));
 }
 
 export function filterClientGatewayTokens(

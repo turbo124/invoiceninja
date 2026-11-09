@@ -11,6 +11,7 @@
 
 namespace Database\Factories;
 
+use App\DataMapper\ClientRegistrationFields;
 use App\DataMapper\CompanySettings;
 use App\DataMapper\Tax\TaxModel;
 use App\Utils\Traits\MakesHash;
@@ -33,6 +34,7 @@ class CompanyFactory extends Factory
             'ip' => $this->faker->ipv4(),
             'db' => config('database.default'),
             'settings' => CompanySettings::defaults(),
+            'client_registration_fields' => ClientRegistrationFields::generate(),
             'is_large' => false,
             'default_password_timeout' => 30 * 60000,
             'enabled_modules' => config('ninja.enabled_modules'),
