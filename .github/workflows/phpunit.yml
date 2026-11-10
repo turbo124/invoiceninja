@@ -127,7 +127,7 @@ jobs:
         php artisan key:generate
         php artisan config:clear
         php artisan ninja:post-update
-        php artisan optimize
+        php artisan optimize:clear
         
     - name: Migrate Database
       run: |
