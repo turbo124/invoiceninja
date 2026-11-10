@@ -33,7 +33,6 @@ jobs:
       DB_USERNAME: root
       DB_PASSWORD: ninja
       DB_HOST: '127.0.0.1'
-      REDIS_PORT: 6379
       BROADCAST_DRIVER: log
       CACHE_DRIVER: redis
       QUEUE_CONNECTION: redis
@@ -97,6 +96,12 @@ jobs:
       run: |
         cp .env.ci .env
 
+    - name: Configure CI service ports
+      run: |
+        echo "REDIS_PORT=${{ job.services.redis.ports['6379'] }}" >> "$GITHUB_ENV"
+        echo "DB_PORT=${{ job.services.mariadb.ports[3306] }}" >> "$GITHUB_ENV"
+        echo "DB_PORT1=${{ job.services.mariadb.ports[3306] }}" >> "$GITHUB_ENV"
+
     - name: Get Composer Cache Directory
       id: composer-cache
       run: |
@@ -121,8 +126,6 @@ jobs:
         composer install --no-interaction --prefer-dist
 
     - name: Prepare Laravel Application
-      env:
-        REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
       run: |
         while ! php -r '
           $redis = new Redis();
@@ -150,7 +153,10 @@ jobs:
         tests/ci
       # Snappdf is for tests that opt into PDF_GENERATOR_REAL (see UsesRealPdfGeneration).
       env:
-        DB_PORT: ${{ job.services.mysql.ports[3306] }}
         PHP_CS_FIXER_IGNORE_ENV: true
         CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
         CI_NODE_INDEX: ${{ matrix.ci_node_index }}
+        # Job env wins over phpunit.xml; match .env.testing so tests do not require Redis.
+        QUEUE_CONNECTION: sync
+        CACHE_DRIVER: array
+        SESSION_DRIVER: array
