@@ -102,6 +102,7 @@ class QuoteBackupCastTest extends TestCase
             'backup' => '{"schema_version":1,"rules":{"deposit":{"amount":200}},"steps":["acceptance"],"guid":"source-guid"}',
         ]);
         $quote->backup->option_selection = [
+            'state' => QuoteBackup::STATE_PENDING_ACCEPTANCE,
             'line_items' => [['product_key' => 'Original optional work', 'is_optional' => true]],
             'partial' => 200,
             'selected_options' => [],
@@ -130,6 +131,7 @@ class QuoteBackupCastTest extends TestCase
     public function testConfirmedOptionSelectionSurvivesHydration(): void
     {
         $selection = [
+            'state' => QuoteBackup::STATE_PENDING_ACCEPTANCE,
             'line_items' => [['product_key' => 'Chimney repairs', 'is_optional' => true]],
             'partial' => 200,
             'selected_options' => [],
@@ -146,6 +148,23 @@ class QuoteBackupCastTest extends TestCase
         $this->assertTrue($restored_quote->hasOptionSelection());
         $this->assertSame($selection, $restored_quote->backup->option_selection);
         $this->assertSame('reserved-guid', $restored_quote->backup->guid);
+    }
+
+    public function testLegacySelectionRemainsReadableAndQuoteStatusControlsResumption(): void
+    {
+        $quote = new Quote();
+        $quote->backup = new QuoteBackup(option_selection: ['confirmed_at' => '2026-11-09T00:00:00+00:00']);
+        $quote->status_id = Quote::STATUS_SENT;
+
+        $this->assertTrue($quote->hasPendingOptionSelection());
+
+        $quote->status_id = Quote::STATUS_REJECTED;
+        $this->assertFalse($quote->hasPendingOptionSelection());
+        $this->assertTrue($quote->hasOptionSelection());
+
+        $quote->status_id = Quote::STATUS_SENT;
+        $quote->backup->option_selection['state'] = QuoteBackup::STATE_ACCEPTED;
+        $this->assertFalse($quote->hasPendingOptionSelection());
     }
 
     public function testRejectsMalformedJsonWithoutReplacingItWithDefaults(): void

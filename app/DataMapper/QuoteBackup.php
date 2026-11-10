@@ -22,6 +22,9 @@ use JsonSerializable;
  */
 class QuoteBackup implements Arrayable, Castable, JsonSerializable
 {
+    public const STATE_PENDING_ACCEPTANCE = 'pending_acceptance';
+    public const STATE_ACCEPTED = 'accepted';
+
     /**
      * @param array<string, array<string, mixed>> $rules Configuration for deposit, optional items, acceptance, payment, etc.
      * @param list<string> $steps Ordered workflow steps; storing these does not execute them.

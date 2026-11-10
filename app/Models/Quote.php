@@ -603,4 +603,12 @@ class Quote extends BaseModel
         return ! empty($this->backup?->option_selection['confirmed_at']);
     }
 
+    public function hasPendingOptionSelection(): bool
+    {
+        return $this->hasOptionSelection()
+            && in_array($this->status_id, [self::STATUS_DRAFT, self::STATUS_SENT])
+            && ($this->backup->option_selection['state'] ?? QuoteBackup::STATE_PENDING_ACCEPTANCE)
+                === QuoteBackup::STATE_PENDING_ACCEPTANCE;
+    }
+
 }

@@ -103,11 +103,6 @@ class QuoteController extends Controller
         return $this->render('quotes.options', ['quote' => $quote]);
     }
 
-    public function reviewOptions(ShowQuoteRequest $request, Quote $quote, string $options_key)
-    {
-        return $this->approve([$quote->id], false, $options_key);
-    }
-
     public function restartOptions(ShowQuoteRequest $request, Quote $quote)
     {
         $request->validate(['restart_confirmed' => ['required', 'accepted']]);
@@ -149,31 +144,25 @@ class QuoteController extends Controller
             $quotes->each(fn ($quote) => app(QuoteOptions::class)->assertConfirmed($quote));
             if ($request->filled('selection_key') || $quotes->contains(fn ($quote) => $quote->hasOptionSelection())) {
                 abort_unless(
-                    $quotes->count() === 1
-                    && ($quotes->first()->backup?->option_selection['key'] ?? null) === $request->input('selection_key'),
+                    $quotes->count() === 1 && count($transformed_ids) === 1
+                    && $quotes->first()->hasPendingOptionSelection()
+                    && $quotes->first()->backup->option_selection['key'] === $request->input('selection_key'),
                     409
                 );
             }
-            $option_quotes = $quotes->filter(fn ($quote) => $quote->hasOptions());
+            $option_quote = $quotes->first(fn ($quote) => $quote->hasOptions());
+            if ($option_quote) {
+                return redirect()->route('client.quote.options', $option_quote->hashed_id);
+            }
 
-            if ($option_quotes->isNotEmpty()) {
-                if (! $request->filled('options_key')) {
-                    return redirect()->route('client.quote.options', $option_quotes->first()->hashed_id);
-                }
-
-                abort_unless(count($transformed_ids) === 1, 422);
-                if (! $request->has('process') && ! $request->has('request_hash')) {
-                    return $this->approve((array) $transformed_ids, false, $request->string('options_key')->toString());
-                }
-
-                app(QuoteOptions::class)->apply(
-                    $option_quotes->first(),
-                    $request->string('options_key')->toString(),
+            if ($request->has('process') && ! $request->has('request_hash')
+                && $quotes->count() === 1 && $quotes->first()->hasPendingOptionSelection()) {
+                $request->validate(['user_input' => ['sometimes', 'nullable', 'string']]);
+                app(QuoteOptions::class)->captureApprovalInput(
+                    $quotes->first(),
                     $request->input('user_input'),
+                    $request->string('selection_key')->toString(),
                 );
-                $request->merge(['selection_key' => $request->string('options_key')->toString()]);
-            } elseif ($request->filled('options_key') && ! $request->has('request_hash')) {
-                abort(409, ctrans('texts.quote_options_changed'));
             }
 
             if (auth()->guard('contact')->user()->company->docuninjaActive()
@@ -188,6 +177,16 @@ class QuoteController extends Controller
 
                 if ($invitations->count() > 0) {
                     $invitation = $invitations->first();
+                    if ($invitation->quote->hasPendingOptionSelection()) {
+                        try {
+                            $invitation->quote->service()->refreshNinjaPdf($invitation);
+                        } catch (\Throwable $exception) {
+                            report($exception);
+
+                            return redirect()->route('client.quote.show', $invitation->quote->hashed_id)
+                                ->with('message', ctrans('texts.docuninja_unavailable'));
+                        }
+                    }
                     $request_hash = \Illuminate\Support\Str::random(64);
                     $request->merge(['entity_type' => 'invoice', 'db' => auth()->guard('contact')->user()->company->db, 'request_hash' => $request_hash]);
 
@@ -353,7 +352,7 @@ class QuoteController extends Controller
 
     }
 
-    protected function approve(array $ids, $process = false, ?string $options_key = null, ?string $selection_key = null)
+    protected function approve(array $ids, $process = false, ?string $selection_key = null)
     {
         $quotes = Quote::query()
             ->whereIn('id', $ids)
@@ -374,15 +373,8 @@ class QuoteController extends Controller
         }
 
         $quotes->each(fn ($quote) => app(QuoteOptions::class)->assertConfirmed($quote));
-        $options_key ??= request()->input('options_key');
-
-        if (! $process && ($options_key || $quotes->contains(fn ($quote) => $quote->hasOptions()))) {
-            if (! $options_key) {
-                return redirect()->route('client.quote.options', $quotes->first(fn ($quote) => $quote->hasOptions())->hashed_id);
-            }
-
-            abort_unless($quotes->count() === 1, 422);
-            $quotes = $quotes->map(fn ($quote) => app(QuoteOptions::class)->restore($quote, $options_key));
+        if (! $process && ($option_quote = $quotes->first(fn ($quote) => $quote->hasOptions()))) {
+            return redirect()->route('client.quote.options', $option_quote->hashed_id);
         }
 
         if ($process) {
@@ -393,7 +385,7 @@ class QuoteController extends Controller
                     $quote = DB::transaction(function () use ($quote, $selection_key) {
                         $quote = Quote::query()->where('company_id', $quote->company_id)->lockForUpdate()->findOrFail($quote->id);
                         abort_unless(
-                            $quote->hasOptionSelection()
+                            $quote->hasPendingOptionSelection()
                             && $quote->backup->option_selection['key'] === $selection_key
                             && in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT])
                             && ! $quote->is_deleted && ! $quote->invoice_id && ! $quote->hasLapsedValidUntil(),
@@ -450,7 +442,6 @@ class QuoteController extends Controller
             'quotes' => $quotes,
             'variables' => $variables,
             'requires_signature' => $requires_signature,
-            'options_key' => $options_key,
         ]);
     }
 }

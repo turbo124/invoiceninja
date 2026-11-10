@@ -73,12 +73,14 @@ class QuoteOptions extends Component
 
     public function continueApproval(): void
     {
-        $options_key = app(QuoteOptionsService::class)->store($this->quote, $this->selected_options, $this->quote_revision);
+        $quote = app(QuoteOptionsService::class)->apply(
+            $this->quote,
+            $this->selected_options,
+            $this->quote_revision,
+        );
 
-        $this->redirectRoute('client.quote.options.review', [
-            'quote' => $this->quote_id,
-            'options_key' => $options_key,
-        ]);
+        $this->redirectRoute('client.quote.show', ['quote' => $quote->hashed_id]);
+        $this->skipRender();
     }
 
     public function updatedSelectedOptions(): void

@@ -14,9 +14,9 @@ namespace App\Services\Quote;
 
 use App\DataMapper\QuoteBackup;
 use App\Models\Quote;
+use App\Http\ViewComposers\PortalComposer;
 use App\Services\Pdf\PdfService;
 use App\Services\Pdf\QuoteFinancials;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -134,70 +134,34 @@ class QuoteOptions
         }
     }
 
-    public function store(Quote $quote, array $selected_options, string $revision): string
+    public function apply(Quote $quote, array $selected_options, string $revision): Quote
     {
-        $this->assertRevision($quote, $revision);
-        $this->preview($quote, $selected_options);
-        $options_key = Str::random(64);
+        return DB::transaction(function () use ($quote, $selected_options, $revision) {
+            $contact = auth()->guard('contact')->user();
+            abort_unless($contact && ($contact->company->enabled_modules & PortalComposer::MODULE_QUOTES), 403);
 
-        Cache::put('quote_options:' . $options_key, [
-            'quote_id' => $quote->id,
-            'company_key' => $quote->company->company_key,
-            'client_contact_id' => auth()->guard('contact')->id(),
-            'revision' => $revision,
-            'selected_options' => $selected_options,
-        ], now()->addHour());
-
-        return $options_key;
-    }
-
-    public function restore(Quote $quote, string $options_key): Quote
-    {
-        return $this->preview($quote, $this->selection($quote, $options_key)['selected_options']);
-    }
-
-    private function selection(Quote $quote, string $options_key): array
-    {
-        $selection = Cache::get('quote_options:' . $options_key);
-
-        abort_unless(
-            is_array($selection)
-            && $selection['quote_id'] === $quote->id
-            && $selection['company_key'] === $quote->company->company_key
-            && $selection['client_contact_id'] === auth()->guard('contact')->id(),
-            404
-        );
-
-        $this->assertRevision($quote, $selection['revision']);
-
-        return $selection;
-    }
-
-    public function apply(Quote $quote, string $options_key, ?string $user_input = null): Quote
-    {
-        $quote = DB::transaction(function () use ($quote, $options_key, $user_input) {
-            $quote = Quote::query()->where('company_id', $quote->company_id)->lockForUpdate()->findOrFail($quote->id);
+            $quote = Quote::query()
+                ->where('company_id', $contact->company_id)
+                ->where('client_id', $contact->client_id)
+                ->lockForUpdate()
+                ->findOrFail($quote->id);
 
             abort_unless(
-                $quote->client_id === auth()->guard('contact')->user()->client_id
-                && in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT])
-                && ! $quote->is_deleted && ! $quote->invoice_id && ! $quote->hasLapsedValidUntil(),
+                in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT])
+                && ! $quote->is_deleted && ! $quote->invoice_id && ! $quote->hasLapsedValidUntil()
+                && $quote->hasOptions() && ! $quote->hasOptionSelection() && ! $quote->sync?->dn_completed,
                 409
             );
-            abort_if($quote->hasOptionSelection() || $quote->sync?->dn_completed, 409);
 
-            $selection = $this->selection($quote, $options_key);
-            $preview = $this->preview($quote, $selection['selected_options']);
+            $this->assertRevision($quote, $revision);
+            $selected_options = $this->validateSelection($quote, $selected_options);
+            $preview = $this->preview($quote, $selected_options);
             $backup = $quote->backup ?? new QuoteBackup();
             $original_line_items = json_decode($quote->getRawOriginal('line_items'), true, 512, JSON_THROW_ON_ERROR);
             $original_partial = (float) $quote->partial;
             $original_po_number = $quote->po_number;
             $quote->line_items = $preview->line_items;
             $quote->partial = $preview->partial;
-
-            if ($user_input !== null && strlen($user_input) > 2) {
-                $quote->po_number = substr($user_input, 0, 180);
-            }
 
             if (! $quote->design_id) {
                 $quote->design_id = (int) $quote->decodePrimaryKey($quote->client->getSetting('quote_design_id'));
@@ -206,13 +170,14 @@ class QuoteOptions
             $quote = (new ApplyNumber($quote->client))->run($quote, for_approval: true);
             $quote = $quote->calc()->getInvoice()->refresh();
             $backup->option_selection = [
+                'state' => QuoteBackup::STATE_PENDING_ACCEPTANCE,
                 'line_items' => $original_line_items,
                 'partial' => $original_partial,
                 'po_number' => $original_po_number,
-                'selected_options' => array_map('intval', $selection['selected_options']),
-                'contact_id' => auth()->guard('contact')->id(),
+                'selected_options' => $selected_options,
+                'contact_id' => $contact->id,
                 'confirmed_at' => now()->toIso8601String(),
-                'key' => $options_key,
+                'key' => Str::random(64),
                 'revision' => $this->revision($quote),
             ];
             $quote->backup = $backup;
@@ -220,10 +185,50 @@ class QuoteOptions
 
             return $quote->refresh();
         });
+    }
 
-        Cache::forget('quote_options:' . $options_key);
+    public function captureApprovalInput(Quote $quote, ?string $user_input, string $selection_key): Quote
+    {
+        if ($user_input === null || strlen($user_input) <= 2) {
+            return $quote;
+        }
 
-        return $quote;
+        return DB::transaction(function () use ($quote, $user_input, $selection_key) {
+            $contact = auth()->guard('contact')->user();
+            abort_unless($contact && ($contact->company->enabled_modules & PortalComposer::MODULE_QUOTES), 403);
+
+            $quote = Quote::query()
+                ->where('company_id', $contact->company_id)
+                ->where('client_id', $contact->client_id)
+                ->lockForUpdate()
+                ->findOrFail($quote->id);
+
+            abort_unless(
+                $quote->hasPendingOptionSelection()
+                && $quote->backup->option_selection['key'] === $selection_key
+                && ! $quote->is_deleted && ! $quote->invoice_id && ! $quote->hasLapsedValidUntil(),
+                409
+            );
+            $this->assertConfirmed($quote);
+
+            if (! $quote->client->getSetting('accept_client_input_quote_approval')) {
+                return $quote;
+            }
+
+            $po_number = substr($user_input, 0, 180);
+            if ($quote->po_number === $po_number) {
+                return $quote;
+            }
+
+            abort_if($quote->sync?->dn_completed, 409);
+            $quote->po_number = $po_number;
+            $backup = $quote->backup;
+            $backup->option_selection['revision'] = $this->revision($quote);
+            $quote->backup = $backup;
+            $quote->saveQuietly();
+
+            return $quote->refresh();
+        });
     }
 
     public function restart(Quote $quote): Quote
@@ -236,7 +241,7 @@ class QuoteOptions
                 $quote->company_id === $contact->company_id && $quote->client_id === $contact->client_id
                 && in_array($quote->status_id, [Quote::STATUS_DRAFT, Quote::STATUS_SENT])
                 && ! $quote->is_deleted && ! $quote->invoice_id && ! $quote->hasLapsedValidUntil()
-                && $quote->hasOptionSelection() && ! $quote->sync?->dn_completed,
+                && $quote->hasPendingOptionSelection() && ! $quote->sync?->dn_completed,
                 409
             );
 
