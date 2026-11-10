@@ -124,6 +124,16 @@ jobs:
       env:
         REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
       run: |
+        while ! php -r '
+          $redis = new Redis();
+          $port = (int) getenv("REDIS_PORT");
+          if (@$redis->connect("127.0.0.1", $port, 1.0) && $redis->ping()) {
+            exit(0);
+          }
+          exit(1);
+        '; do
+          sleep 1
+        done
         php artisan key:generate
         php artisan config:clear
         php artisan ninja:post-update
