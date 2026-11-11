@@ -479,7 +479,10 @@ class Client extends BaseModel implements HasLocalePreference
 
     public function timezone(): Timezone
     {
-        return Timezone::find($this->getSetting('timezone_id'));
+        /** @var \Illuminate\Support\Collection<Timezone> $timezones */
+        $timezones = app('timezones');
+
+        return $timezones->firstWhere('id', $this->getSetting('timezone_id'));
     }
 
     public function language()
