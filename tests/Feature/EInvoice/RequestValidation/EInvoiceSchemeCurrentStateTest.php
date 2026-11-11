@@ -57,7 +57,7 @@ class EInvoiceSchemeCurrentStateTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function test_invoice_hydration_error_is_reported_at_a_numeric_error_path(): void
+    public function testInvoiceHydrationErrorIsReportedAtTheFieldPath(): void
     {
         $validator = $this->validatorFor(new ValidInvoiceScheme(), [
             'Invoice' => [
@@ -66,7 +66,7 @@ class EInvoiceSchemeCurrentStateTest extends TestCase
         ]);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('e_invoice.0', $validator->errors()->toArray());
+        $this->assertArrayHasKey('e_invoice.InvoicePeriod', $validator->errors()->toArray());
     }
 
     public function test_credit_rule_rejects_a_missing_invoice_reference_id(): void

@@ -41,11 +41,13 @@ class ValidInvoiceScheme implements ValidationRule, ValidatorAwareRule
 
             $errors = $r->validatePayload($value['Invoice'], InvoiceLevel::class);
 
-            foreach ($errors as $key => $msg) {
+            foreach ($errors as $violation) {
+                $field_path = str_replace(['[', ']'], ['.', ''], $violation->getPropertyPath());
+                $error_key = (str_starts_with($field_path, 'InvoicePeriod') ? 'e_invoice.' : 'e_invoice.Invoice.') . $field_path;
 
                 $this->validator->errors()->add(
-                    "e_invoice.{$key}",
-                    "{$key} - {$msg}"
+                    $error_key,
+                    $violation->getMessage()
                 );
 
             }
