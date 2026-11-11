@@ -43,7 +43,7 @@ class EInvoiceSchemeCurrentStateTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function test_invoice_rule_only_manually_checks_the_first_invoice_period(): void
+    public function testInvoiceRuleValidatesEveryRelativeInvoicePeriod(): void
     {
         $validator = $this->validatorFor(new ValidInvoiceScheme(), [
             'Invoice' => [
@@ -54,7 +54,8 @@ class EInvoiceSchemeCurrentStateTest extends TestCase
             ],
         ]);
 
-        $this->assertTrue($validator->passes());
+        $this->assertTrue($validator->fails());
+        $this->assertArrayHasKey('e_invoice.InvoicePeriod.Description.1.StartDate', $validator->errors()->toArray());
     }
 
     public function testInvoiceHydrationErrorIsReportedAtTheFieldPath(): void
