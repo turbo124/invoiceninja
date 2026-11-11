@@ -241,6 +241,8 @@ class BatchPushToQuickbooksTest extends TestCase
 
     public function test_it_ignores_entities_of_an_unconfigured_type(): void
     {
+        Bus::fake();
+
         $company = $this->connectQuickbooks($this->company, 'push');
 
         $client = Client::factory()->create([
