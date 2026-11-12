@@ -1018,11 +1018,11 @@ class PeppolCountryTest extends TestCase
         $publicIdentifiers = $result['storecove']->getAccountingCustomerParty()?->getPublicIdentifiers() ?? [];
         $schemes = array_map(fn ($pi) => $pi->getScheme(), $publicIdentifiers);
 
-        $this->assertContains('FI:OVT', $schemes, 'FI receiver must have FI:OVT (routing) in publicIdentifiers');
+        $this->assertContains('FI:OVT2', $schemes, 'FI receiver must have FI:OVT2 (routing) in publicIdentifiers');
         $this->assertContains('FI:VAT', $schemes, 'FI receiver must have FI:VAT in publicIdentifiers when invoice has VAT');
 
         $customerEndpoint = $result['peppol']->AccountingCustomerParty->Party->EndpointID ?? null;
-        $this->assertNotNull($customerEndpoint, 'FI buyer must have EndpointID (OVT) when routing_id is OPID');
+        $this->assertNotNull($customerEndpoint, 'FI buyer must have EndpointID (OVT2) when routing_id is OPID');
         $this->assertSame('0037', $customerEndpoint->schemeID);
         $this->assertSame('003712345678', $customerEndpoint->value);
     }

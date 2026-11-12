@@ -87,7 +87,10 @@ class StorecoveTest extends TestCase
         $settings->country_id = Country::where('iso_3166_2', $params['company_country'] ?? 'DE')->first()->id;
         $settings->email = uniqid('testuser') . '@gmail.com';
         $settings->currency_id = '3';
-
+        $settings->city = 'Berlin';
+        $settings->postal_code = '10115';
+        $settings->phone = '+493012345678';
+        
         $tax_data = new TaxModel();
         $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
         $tax_data->regions->EU->tax_all_subregions = true;
