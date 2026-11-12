@@ -90,7 +90,7 @@ class StorecoveTest extends TestCase
         $settings->city = 'Berlin';
         $settings->postal_code = '10115';
         $settings->phone = '+493012345678';
-        
+
         $tax_data = new TaxModel();
         $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
         $tax_data->regions->EU->tax_all_subregions = true;
