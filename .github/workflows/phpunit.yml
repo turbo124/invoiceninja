@@ -56,12 +56,15 @@ jobs:
         ports:
           - 32768:3306
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: ninja
           MYSQL_PASSWORD: ninja
           MYSQL_DATABASE: ninja
           MYSQL_ROOT_PASSWORD: ninja
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
       redis:
         image: redis
         ports:
@@ -73,18 +76,6 @@ jobs:
       run: |
         sudo echo "127.0.0.1 ninja.test" | sudo tee -a /etc/hosts
 
-    - name: Start MariaDB service
-      run: |
-        sudo systemctl start mysql.service
-    - name: Verify MariaDB connection
-      env:
-        DB_PORT: ${{ job.services.mariadb.ports[3306] }}
-        DB_PORT1: ${{ job.services.mariadb.ports[3306] }}
-
-      run: |
-        while ! mysqladmin ping -h"127.0.0.1" -P"$DB_PORT" --silent; do
-          sleep 1
-        done
     - name: Setup PHP shivammathur/setup-php@v2
       uses: shivammathur/setup-php@v2
       with:
