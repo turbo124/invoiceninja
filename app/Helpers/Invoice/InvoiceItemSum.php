@@ -163,7 +163,8 @@ class InvoiceItemSum
         if ($this->client) {
             $this->currency = $this->client->currency();
             $this->shouldCalculateTax();
-            $this->peppol_enabled = $this->client->getSetting('e_invoice_type') == 'PEPPOL';
+            $this->peppol_enabled = $this->client->getSetting('e_invoice_type') == 'PEPPOL'
+                || ($this->invoice instanceof Invoice && $this->invoice->isSelfBilled());
         } else {
             $this->currency = $this->invoice->vendor->currency();
         }

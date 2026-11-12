@@ -148,6 +148,12 @@ jobs:
         restore-keys: |
           ci-timings-
 
+    - name: Cache Snappdf Chromium
+      uses: actions/cache@v6
+      with:
+        path: vendor/beganovich/snappdf/versions
+        key: snappdf-chromium-v1-${{ runner.os }}
+
     - name: Run Testsuite
       run: |
         cat .env
