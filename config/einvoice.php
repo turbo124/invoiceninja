@@ -67,7 +67,7 @@ return [
         "DK" => ["B+G", "DK:DIGST", "DK:ERST", "DK:DIGST"],
         "EE" => ["B+G", "EE:CC", "EE:VAT", "EE:CC"],
         "ES" => ["B", "", "ES:VAT", "ES:VAT"],
-        "FI" => ["B+G", "FI:OVT", "FI:VAT", "FI:OVT"],
+        "FI" => ["B+G", "FI:OVT2", "FI:VAT", "FI:OVT2"],
         "FR" => [
             ["G", "FR:SIRET", false, "0009:11000201100044"],
             ["B", "FR:SIRENE or FR:SIRET", "FR:VAT", "FR:SIRENE or FR:SIRET"],
