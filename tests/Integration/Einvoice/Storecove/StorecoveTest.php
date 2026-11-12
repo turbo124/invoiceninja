@@ -90,7 +90,7 @@ class StorecoveTest extends TestCase
         $settings->city = 'Berlin';
         $settings->postal_code = '10115';
         $settings->phone = '+493012345678';
-        
+
         $tax_data = new TaxModel();
         $tax_data->regions->EU->has_sales_above_threshold = $params['over_threshold'] ?? false;
         $tax_data->regions->EU->tax_all_subregions = true;
@@ -2573,7 +2573,7 @@ class StorecoveTest extends TestCase
             'DK with id'        => ['DK', 'business', 'DK12345678', 'DK12345678', '', 'DK:DIGST', '12345678'],
             'EE with id'        => ['EE', 'business', 'EE123456789', '12345678', '', 'EE:CC', '12345678'],
             'NO with id'        => ['NO', 'business', 'NO123456789', '123456789', '', 'NO:ORG', '123456789'],
-            'FI with id'        => ['FI', 'business', 'FI12345678', '123456789012', '', 'FI:OVT', '123456789012'],
+            'FI with id'        => ['FI', 'business', 'FI12345678', '123456789012', '', 'FI:OVT2', '123456789012'],
             'LT with id'        => ['LT', 'business', 'LT123456789', '1234567', '', 'LT:LEC', '1234567'],
             'IS with id'        => ['IS', 'business', 'IS123456', '1234567890', '', 'IS:KTNR', '1234567890'],
             'CH with id'        => ['CH', 'business', 'CHE123456789MWST', 'CHE123456789', '', 'CH:UIDB', 'CHE123456789'],
