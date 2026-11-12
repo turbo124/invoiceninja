@@ -17,8 +17,10 @@ use App\Helpers\Mail\Office365MailTransport;
 use App\Http\Middleware\SetDomainNameDb;
 use App\Models\Invoice;
 use App\Models\Proposal;
+use App\Utils\Elastic\RecoveringClientBuilder;
 use App\Utils\Ninja;
 use App\Utils\TruthSource;
+use Elastic\Client\ClientBuilderInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Mail\Mailer;
 use Illuminate\Queue\Events\JobFailed;
@@ -204,5 +206,8 @@ class AppServiceProvider extends ServiceProvider
 
     }
 
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->singleton(ClientBuilderInterface::class, RecoveringClientBuilder::class);
+    }
 }

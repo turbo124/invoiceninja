@@ -27,17 +27,62 @@ $tests = \Illuminate\Support\Str::of($process->getOutput())
             ->get(0)
     ))
     ->filter(fn (string $test) => !empty($test)) // Make sure there are no empty lines
-    ->unique() // We only need unique classes
-    // ->split(10)
-    // ->get(1);
-    ->split((int) getenv('CI_NODE_TOTAL')) // Split it into equally sized chunks
-    ->get((int) getenv('CI_NODE_INDEX')); // Get the index we need for this instance
+    ->unique(); // We only need unique classes
+
+$node_total = (int) getenv('CI_NODE_TOTAL');
+$node_index = (int) getenv('CI_NODE_INDEX');
+
+/**
+ * Class => seconds, written by tests/ci-merge-timings from previous runs.
+ * When it is missing, fall back to splitting by class count.
+ */
+$timings_file = 'tests/_output/ci-timings/timings.json';
+$timings = is_file($timings_file) ? json_decode(file_get_contents($timings_file), true) : null;
+
+if (is_array($timings) && count($timings) > 0) {
+    // Classes without a recorded time get the median
+    $sorted_times = array_values($timings);
+    sort($sorted_times);
+    $median = $sorted_times[intdiv(count($sorted_times), 2)];
+
+    // Greedy bin packing: slowest class first, into the node with the least total time.
+    // Sorting by name first keeps ties in the same order on every node.
+    $weights = $tests
+        ->mapWithKeys(fn (string $test) => [$test => (float) ($timings[stripslashes($test)] ?? $median)])
+        ->sortKeys()
+        ->sortDesc();
+
+    $loads = array_fill(0, $node_total, 0.0);
+    $buckets = array_fill(0, $node_total, []);
+
+    foreach ($weights as $test => $weight) {
+        $node = array_keys($loads, min($loads))[0];
+        $loads[$node] += $weight;
+        $buckets[$node][] = $test;
+    }
+
+    $tests = collect($buckets[$node_index]);
+
+    echo sprintf("Split by time: node %d of %d, %d classes, ~%.1f min\n", $node_index, $node_total, $tests->count(), $loads[$node_index] / 60);
+} else {
+    $tests = $tests
+        ->split($node_total) // Split it into equally sized chunks
+        ->get($node_index); // Get the index we need for this instance
+
+    echo "No timings found, split by class count\n";
+}
+
+/**
+ * Record per-test timings for tests/ci-merge-timings
+ */
+$junit_file = 'tests/_output/junit.xml';
+@mkdir(dirname($junit_file), 0777, true);
 
 /**
  * Run phpunit with a filter:
  * phpunit --filter 'TestClass|AnotherTestClass|...'
  */
-$process = new \Symfony\Component\Process\Process(['php', 'artisan', 'test', '--testdox', '--filter', $tests->join('|')], timeout: null);
+$process = new \Symfony\Component\Process\Process(['php', 'artisan', 'test', '--testdox', '--log-junit', $junit_file, '--filter', $tests->join('|')], timeout: null);
 $process->start();
 
 // Make sure we have live data output
