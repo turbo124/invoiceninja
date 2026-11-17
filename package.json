@@ -28,7 +28,7 @@
   "dependencies": {
     "@checkout.com/checkout-web-components": "^1.11.0",
     "@docuninja/builder2.0": "^0.0.113",
-    "axios": "^0.32",
+    "axios": "^1.21",
     "card-js": "^1.0.13",
     "card-validator": "^8.1.1",
     "clipboard": "^2.0.11",
