@@ -6595,6 +6595,7 @@ $lang = array(
     'order_reference_help' => 'The buyer\'s reference for this order.',
     'payment_types' => 'Payment Types',
     'payment_types_help' => 'Choose which payment types are selectable in the UI',
+    'renamed_from' => 'Renamed from :name',
 );
 
 return $lang;
