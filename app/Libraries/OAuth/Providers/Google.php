@@ -27,7 +27,7 @@ class Google implements ProviderInterface
             return false;
         }
 
-        $allowed = config('ninja.auth.google.allowed_client_ids', []);
+        $allowed = $this->allowedClientIds();
         $aud = $payload['aud'] ?? null;
         $azp = $payload['azp'] ?? $aud;
         if ($aud === null || !in_array($aud, $allowed, true) || !in_array($azp, $allowed, true)) {
@@ -82,7 +82,9 @@ class Google implements ProviderInterface
 
     public function verifyAccessTokenAudience($access_token): bool
     {
-        $expected = config('ninja.auth.google.client_id');
+        if (!is_string($access_token) || $access_token === '') {
+            return false;
+        }
 
         try {
             $info = (new \Google_Service_Oauth2(new Google_Client()))
@@ -90,8 +92,24 @@ class Google implements ProviderInterface
         } catch (\Exception $e) {
             return false;
         }
-        
-        return $info->getAudience() === $expected
-            && $info->getIssuedTo() === $expected;
+
+        $issuedTo = $info->getIssuedTo();
+
+        // The null check matters: a missing issued_to would otherwise equal a missing audience.
+        return $issuedTo !== null
+            && $issuedTo === $info->getAudience()
+            && in_array($issuedTo, $this->allowedClientIds(), true);
+    }
+
+    /**
+     * Client IDs whose tokens we accept: the web client plus any extra
+     * platform (Android / iOS) client IDs from GOOGLE_ALLOWED_CLIENT_IDS.
+     */
+    private function allowedClientIds(): array
+    {
+        return array_merge(
+            [config('ninja.auth.google.client_id')],
+            config('ninja.auth.google.allowed_client_ids')
+        );
     }
 }
